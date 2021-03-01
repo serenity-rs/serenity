@@ -4,7 +4,7 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 
-use bitflags::bitflags;
+use bitflags::__impl_bitflags;
 use futures::future::{BoxFuture, FutureExt};
 #[cfg(feature = "model")]
 use serde_json::json;
@@ -47,7 +47,7 @@ pub struct CurrentUser {
     #[serde(rename = "username")]
     pub name: String,
     pub verified: Option<bool>,
-    pub public_flags: UserPublicFlags,
+    pub public_flags: Option<UserPublicFlags>,
 }
 
 #[cfg(feature = "model")]
@@ -449,41 +449,43 @@ pub struct User {
     #[serde(rename = "username")]
     pub name: String,
     /// the public flags on a user's account
-    pub public_flags: UserPublicFlags,
+    pub public_flags: Option<UserPublicFlags>,
 }
 
-bitflags! {
-    /// User public flags
-    #[derive(Default, Deserialize, Serialize)]
-    pub struct UserPublicFlags: u32 {
-        /// User's flag as none
-        const NONE = 0b00000000_00000000_00000000_00000000;
+/// User's public flags
+#[derive(Clone, Deserialize, Serialize)]
+pub struct UserPublicFlags {
+    pub bits: u32,
+}
+
+__impl_bitflags! {
+    UserPublicFlags: u32 {
         /// User's flag as discord employee
-        const DISCORD_EMPLOYEE = 0b00000000_00000000_00000000_00000001;
+        DISCORD_EMPLOYEE = 0b00000000_00000000_00000000_00000001;
         /// User's flag as partnered server owner
-        const PARTNERED_SERVER_OWNER = 0b00000000_00000000_00000000_00000010;
+        PARTNERED_SERVER_OWNER = 0b00000000_00000000_00000000_00000010;
         /// User's flag as hypesquad events
-        const HYPESQUAD_EVENTS = 0b00000000_00000000_00000000_00000100;
+        HYPESQUAD_EVENTS = 0b00000000_00000000_00000000_00000100;
         /// User's flag as bug hunter level 1
-        const BUG_HUNTER_LEVEL_1 = 0b00000000_00000000_00000000_00001000;
+        BUG_HUNTER_LEVEL_1 = 0b00000000_00000000_00000000_00001000;
         /// User's flag as house bravery
-        const HOUSE_BRAVERY = 0b00000000_00000000_00000000_01000000;
+        HOUSE_BRAVERY = 0b00000000_00000000_00000000_01000000;
         /// User's flag as house brilliance
-        const HOUSE_BRILLIANCE = 0b00000000_00000000_00000000_10000000;
+        HOUSE_BRILLIANCE = 0b00000000_00000000_00000000_10000000;
         /// User's flag as house balance
-        const HOUSE_BALANCE = 0b00000000_00000000_00000001_00000000;
+        HOUSE_BALANCE = 0b00000000_00000000_00000001_00000000;
         /// User's flag as early supporter
-        const EARLY_SUPPORTER = 0b00000000_00000000_00000010_00000000;
+        EARLY_SUPPORTER = 0b00000000_00000000_00000010_00000000;
         /// User's flag as team user
-        const TEAM_USER = 0b00000000_00000000_00000100_00000000;
+        TEAM_USER = 0b00000000_00000000_00000100_00000000;
         /// User's flag as system
-        const SYSTEM = 0b00000000_00000000_00010000_00000000;
+        SYSTEM = 0b00000000_00000000_00010000_00000000;
         /// User's flag as bug hunter level 2
-        const BUG_HUNTER_LEVEL_2 = 0b00000000_00000000_01000000_00000000;
+        BUG_HUNTER_LEVEL_2 = 0b00000000_00000000_01000000_00000000;
         /// User's flag as verified bot
-        const VERIFIED_BOT = 0b00000000_00000001_00000000_00000000;
+        VERIFIED_BOT = 0b00000000_00000001_00000000_00000000;
         /// User's flag as early verified bot developer
-        const EARLY_VERIFIED_BOT_DEVELOPER = 0b00000000_00000010_00000000_00000000;
+        EARLY_VERIFIED_BOT_DEVELOPER = 0b00000000_00000010_00000000_00000000;
     }
 }
 
@@ -494,7 +496,7 @@ impl Default for User {
     /// - **bot** to `true`.
     /// - **discriminator** to `1432`.
     /// - **name** to `"test"`.
-    /// - **public_flags** to `UserPublicFlags::NONE`.
+    /// - **public_flags** to `None`.
     fn default() -> Self {
         User {
             id: UserId(210),
@@ -502,7 +504,7 @@ impl Default for User {
             bot: true,
             discriminator: 1432,
             name: "test".to_string(),
-            public_flags: UserPublicFlags::NONE,
+            public_flags: None,
         }
     }
 }
@@ -986,7 +988,7 @@ impl<'a> From<&'a CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name.clone(),
-            public_flags: user.public_flags,
+            public_flags: user.public_flags.clone(),
         }
     }
 }

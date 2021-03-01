@@ -450,7 +450,7 @@ mod test {
                     bot: false,
                     discriminator: 1,
                     name: "ab".to_string(),
-                    public_flags: UserPublicFlags::NONE,
+                    public_flags: None,
                 },
             }
         }

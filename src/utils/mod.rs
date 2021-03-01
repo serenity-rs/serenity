@@ -813,7 +813,7 @@ mod test {
             bot: false,
             discriminator: 0000,
             name: "Crab".to_string(),
-            public_flags: UserPublicFlags::NONE,
+            public_flags: None,
         };
 
         let mut guild = Guild {
