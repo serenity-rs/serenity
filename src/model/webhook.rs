@@ -182,9 +182,9 @@ impl Webhook {
     ///
     /// Returns an [`Error::Model`] if the [`token`] is `None`.
     ///
-    /// May also return an [`Error::Http`] if the content is illformed, or if the token is invalid.
+    /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
-    /// Or may return an [`Error::Json`] if there is an error in deserializing Discord's response.
+    /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
     ///
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`token`]: Self::token
@@ -287,9 +287,9 @@ impl Webhook {
     ///
     /// Returns an [`Error::Model`] if the [`token`] is `None`.
     ///
-    /// May also return an [`Error::Http`] if the content is illformed, or if the webhook's token is invalid.
+    /// May also return an [`Error::Http`] if the content is malformed, or if the webhook's token is invalid.
     ///
-    /// Or may return an [`Error::Json`] if there is an error deserializing Discord's response.
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     ///
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`token`]: Self::token
@@ -333,7 +333,7 @@ impl Webhook {
     /// May also return an [`Error::Http`] if the http client errors or if Discord returns an error.
     /// Such as if the `Webhook` was deleted.
     ///
-    /// Or may return an [`Error::Json`] if there is an error deserializing Discord's response.
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     ///
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`token`]: Self::token
@@ -381,7 +381,7 @@ impl WebhookId {
     /// Returns an [`Error::Http`] if the http client errors or if Discord returns an error.
     /// Such as if the `WebhookId` does not exist.
     ///
-    /// May also return an [`Error::Json`] if there is an error in deserializing the response.
+    /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///
     /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
     /// [`Error::Http`]: crate::error::Error::Http
