@@ -17,9 +17,46 @@ use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
+use crate::model::prelude::*;
+#[cfg(feature = "model")]
 use crate::model::ModelError;
 #[cfg(feature = "model")]
 use crate::utils;
+
+/// A representation of a type of webhook.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+pub enum WebhookType {
+    /// An indicator that the webhook can post messages to channels with
+    /// a token.
+    Incoming = 1,
+    /// An indicator that the webhook is managed by Discord for posting new
+    /// messages to channels without a token.
+    ChannelFollower = 2,
+}
+
+enum_number!(WebhookType {
+    Incoming,
+    ChannelFollower
+});
+
+impl WebhookType {
+    #[inline]
+    pub fn name(&self) -> &str {
+        match self {
+            WebhookType::Incoming => "incoming",
+            WebhookType::ChannelFollower => "channel follower",
+        }
+    }
+
+    #[inline]
+    pub fn num(self) -> u64 {
+        match self {
+            WebhookType::Incoming => 1,
+            WebhookType::ChannelFollower => 2,
+        }
+    }
+}
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
@@ -31,6 +68,9 @@ pub struct Webhook {
     ///
     /// Can be used to calculate the creation date of the webhook.
     pub id: WebhookId,
+    /// The type of the webhook.
+    #[serde(rename = "type")]
+    pub kind: WebhookType,
     /// The default avatar.
     ///
     /// This can be modified via [`ExecuteWebhook::avatar_url`].
@@ -55,6 +95,7 @@ impl fmt::Debug for Webhook {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Webhook")
             .field("id", &self.id)
+            .field("kind", &self.kind)
             .field("avatar", &self.avatar)
             .field("channel_id", &self.channel_id)
             .field("guild_id", &self.guild_id)
