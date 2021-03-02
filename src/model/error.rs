@@ -148,6 +148,8 @@ pub enum Error {
     /// Indicates that the bot is not author of the message.
     /// This error is returned in private/direct channels.
     NotAuthor,
+    /// Indicates that the webhook token is missing.
+    NoTokenSet,
 }
 
 impl Error {
@@ -186,6 +188,7 @@ impl Display for Error {
             Error::NameTooShort => f.write_str("Name is under the character limit."),
             Error::NameTooLong => f.write_str("Name is over the character limit."),
             Error::NotAuthor => f.write_str("The bot is not author of this message."),
+            Error::NoTokenSet => f.write_str("Token is not set."),
         }
     }
 }
