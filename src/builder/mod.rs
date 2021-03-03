@@ -14,17 +14,17 @@ mod create_interaction;
 
 mod create_allowed_mentions;
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod create_interaction_response;
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod create_interaction_response_followup;
 mod create_invite;
 mod create_message;
 mod edit_channel;
 mod edit_guild;
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod edit_interaction_response;
 mod edit_member;
 mod edit_message;
