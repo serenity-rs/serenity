@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.10.4] - 2021-03-03
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Fixed
+
+- [misc] Fix invalid usage of `#[doc(cfg)]` ([@acdenisSK]) [c:b192609]
+
 ## [0.10.3] - 2021-03-03
 
 Thanks to the following for their contributions:
@@ -4054,6 +4064,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.10.4]: https://github.com/serenity-rs/serenity/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/serenity-rs/serenity/compare/v0.10.2...v0.10.3
 [0.10.2]: https://github.com/serenity-rs/serenity/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/serenity-rs/serenity/compare/v0.10.0...v0.10.1
@@ -4284,6 +4295,8 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:b192609]: https://github.com/serenity-rs/serenity/commit/b1926090f0d4a08d9bd112bf6088bea021171f46
 
 [c:1cbc935]: https://github.com/serenity-rs/serenity/commit/1cbc935ac45e956f6aaad7b44e5cd36054df6c2c
 [c:8f38985]: https://github.com/serenity-rs/serenity/commit/8f38985620cbd6c9c6e6c1c8a17b31afe24b3458
