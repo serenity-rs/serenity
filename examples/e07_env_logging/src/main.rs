@@ -24,10 +24,9 @@ impl EventHandler for Handler {
     // For instrument to work, all parameters must implement Debug.
     //
     // Handler doesn't implement Debug here, so we specify to skip that argument.
-    // Context doesn't implement Debug either, but since it's ignored already, it
-    // doesn't need to be skipped.
-    #[instrument(skip(self))]
-    async fn resume(&self, _: Context, resume: ResumedEvent) {
+    // Context doesn't implement Debug either, so it is also skipped.
+    #[instrument(skip(self, _ctx))]
+    async fn resume(&self, _ctx: Context, resume: ResumedEvent) {
         // Log at the DEBUG level.
         //
         // In this example, this will not show up in the logs because DEBUG is
