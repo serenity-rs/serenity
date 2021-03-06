@@ -41,7 +41,7 @@ impl CreateInteractionResponse {
 impl<'a> Default for CreateInteractionResponse {
     fn default() -> CreateInteractionResponse {
         let mut map = HashMap::new();
-        map.insert("type", Value::Number(serde_json::Number::from(2)));
+        map.insert("type", Value::Number(serde_json::Number::from(4)));
 
         CreateInteractionResponse(map)
     }

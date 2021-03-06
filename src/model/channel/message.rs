@@ -26,6 +26,8 @@ use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::interactions::MessageInteraction;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::U64Visitor;
@@ -104,6 +106,12 @@ pub struct Message {
     pub stickers: Vec<Sticker>,
     /// The message that was replied to using this message.
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recusion
+    /// Sent if the message is a response to an [`Interaction`].
+    ///
+    /// [`Interaction`]: crate::model::interactions::Interaction
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub interaction: Option<MessageInteraction>,
 }
 
 #[cfg(feature = "model")]

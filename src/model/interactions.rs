@@ -212,10 +212,8 @@ pub struct ApplicationCommandOptionChoice {
 #[repr(u8)]
 pub enum InteractionResponseType {
     Pong = 1,
-    Acknowledge = 2,
-    ChannelMessage = 3,
     ChannelMessageWithSource = 4,
-    AcknowledgeWithSource = 5,
+    DeferredChannelMessageWithSource = 5,
 }
 
 #[derive(Clone, Serialize)]
@@ -229,6 +227,18 @@ __impl_bitflags! {
         /// Interaction message will only be visible to sender
         EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
     }
+}
+
+/// Sent when a [`Message`] is a response to an [`Interaction`].
+///
+/// [`Message`]: crate::model::channel::Message
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct MessageInteraction {
+    pub id: InteractionId,
+    #[serde(rename = "type")]
+    pub kind: InteractionType,
+    pub name: String,
+    pub user: User,
 }
 
 impl Interaction {
