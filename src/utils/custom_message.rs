@@ -270,5 +270,7 @@ fn dummy_message() -> Message {
         flags: None,
         stickers: Vec::new(),
         referenced_message: None,
+        #[cfg(feature = "unstable_discord_api")]
+        interaction: None,
     }
 }

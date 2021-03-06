@@ -1033,6 +1033,8 @@ mod test {
                 flags: None,
                 stickers: vec![],
                 referenced_message: None,
+                #[cfg(feature = "unstable_discord_api")]
+                interaction: None,
             },
         };
 
