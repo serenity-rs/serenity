@@ -116,7 +116,7 @@ impl ShardRunner {
             }
 
             let pre = self.shard.stage();
-            let (event, action, successful) = self.recv_event().await?;
+            let (event, action, mut successful) = self.recv_event().await?;
             let post = self.shard.stage();
 
             if post != pre {
@@ -136,8 +136,30 @@ impl ShardRunner {
                     return self.request_restart().await;
                 },
                 Some(other) => {
-                    #[allow(clippy::let_underscore_must_use)]
-                    let _ = self.action(&other).await;
+                    if let Err(e) = self.action(&other).await {
+                        debug!(
+                            "[ShardRunner {:?}] Reconnecting due to error performing {:?}: {:?}",
+                            self.shard.shard_info(),
+                            other,
+                            e
+                        );
+                        successful &= match self.shard.reconnection_type() {
+                            ReconnectType::Reidentify => false,
+                            ReconnectType::Resume => {
+                                if let Err(why) = self.shard.resume().await {
+                                    warn!(
+                                        "[ShardRunner {:?}] Resume failed, reidentifying: {:?}",
+                                        self.shard.shard_info(),
+                                        why
+                                    );
+
+                                    false
+                                } else {
+                                    true
+                                }
+                            },
+                        };
+                    }
                 },
                 None => {},
             }
