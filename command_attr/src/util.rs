@@ -263,3 +263,21 @@ pub fn rename_attributes(attributes: &mut Vec<Attribute>, name: &str, target: &s
         }
     }
 }
+
+pub fn append_line(desc: &mut AsOption<String>, mut line: String) {
+    if line.starts_with(' ') {
+        line.remove(0);
+    }
+
+    match &mut desc.0 {
+        Some(desc) => {
+            if line.trim().is_empty() {
+                desc.push('\n');
+            } else {
+                desc.push(' ');
+                desc.push_str(&line);
+            }
+        },
+        None => *desc = AsOption(Some(line)),
+    }
+}
