@@ -126,18 +126,8 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 options.examples.push(propagate_err!(attributes::parse(values)));
             },
             "description" => {
-                let mut arg: String = propagate_err!(attributes::parse(values));
-                if arg.starts_with(' ') {
-                    arg.remove(0);
-                }
-
-                if let Some(desc) = &mut options.description.0 {
-                    use std::fmt::Write;
-
-                    let _ = write!(desc, "\n{}", arg);
-                } else {
-                    options.description = AsOption(Some(arg));
-                }
+                let line: String = propagate_err!(attributes::parse(values));
+                util::append_line(&mut options.description, line);
             },
             _ => {
                 match_options!(name, values, options, span => [
@@ -628,18 +618,8 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
                 options.prefixes = vec![propagate_err!(attributes::parse(values))];
             },
             "description" => {
-                let mut arg: String = propagate_err!(attributes::parse(values));
-                if arg.starts_with(' ') {
-                    arg.remove(0);
-                }
-
-                if let Some(desc) = &mut options.description.0 {
-                    use std::fmt::Write;
-
-                    let _ = write!(desc, "\n{}", arg.trim_matches(' '));
-                } else {
-                    options.description = AsOption(Some(arg));
-                }
+                let line: String = propagate_err!(attributes::parse(values));
+                util::append_line(&mut options.description, line);
             },
             "summary" => {
                 let arg: String = propagate_err!(attributes::parse(values));
