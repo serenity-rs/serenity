@@ -1150,6 +1150,8 @@
 <span id="1147">1147</span>
 <span id="1148">1148</span>
 <span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -2186,6 +2188,8 @@
                 <span class="ident">flags</span>: <span class="prelude-val">None</span>,
                 <span class="ident">stickers</span>: <span class="macro">vec</span><span class="macro">!</span>[],
                 <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                <span class="ident">interaction</span>: <span class="prelude-val">None</span>,
             },
         };
 

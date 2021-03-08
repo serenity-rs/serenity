@@ -60,6 +60,11 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 
@@ -102,7 +107,12 @@
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embed&quot;</span>, <span class="ident">embed</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embeds</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;embeds&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="macro">vec</span><span class="macro">!</span>[]));
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>) <span class="op">=</span> <span class="ident">embeds</span>.<span class="ident">as_array_mut</span>() {
+            <span class="ident">embeds</span>.<span class="ident">push</span>(<span class="ident">embed</span>);
+        }
+
         <span class="self">self</span>
     }
 

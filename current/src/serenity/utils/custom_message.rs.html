@@ -275,6 +275,8 @@
 <span id="272">272</span>
 <span id="273">273</span>
 <span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
@@ -548,6 +550,8 @@
         <span class="ident">flags</span>: <span class="prelude-val">None</span>,
         <span class="ident">stickers</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
         <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="ident">interaction</span>: <span class="prelude-val">None</span>,
     }
 }
 </pre></div>
