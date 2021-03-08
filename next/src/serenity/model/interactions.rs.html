@@ -473,6 +473,16 @@
 <span id="470">470</span>
 <span id="471">471</span>
 <span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -688,10 +698,8 @@
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InteractionResponseType</span> {
     <span class="ident">Pong</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">Acknowledge</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">ChannelMessage</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="ident">ChannelMessageWithSource</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">AcknowledgeWithSource</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="ident">DeferredChannelMessageWithSource</span> <span class="op">=</span> <span class="number">5</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>)]</span>
@@ -705,6 +713,18 @@
         <span class="doccomment">/// Interaction message will only be visible to sender</span>
         <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0100_0000</span>;
     }
+}
+
+<span class="doccomment">/// Sent when a [`Message`] is a response to an [`Interaction`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`Message`]: crate::model::channel::Message</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageInteraction</span> {
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">InteractionId</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">InteractionType</span>,
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Interaction</span> {
