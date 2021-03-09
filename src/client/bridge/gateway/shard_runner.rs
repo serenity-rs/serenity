@@ -116,7 +116,7 @@ impl ShardRunner {
             }
 
             let pre = self.shard.stage();
-            let (event, action, mut successful) = self.recv_event().await?;
+            let (event, action, successful) = self.recv_event().await?;
             let post = self.shard.stage();
 
             if post != pre {
@@ -143,8 +143,8 @@ impl ShardRunner {
                             other,
                             e
                         );
-                        successful &= match self.shard.reconnection_type() {
-                            ReconnectType::Reidentify => false,
+                        match self.shard.reconnection_type() {
+                            ReconnectType::Reidentify => return self.request_restart().await,
                             ReconnectType::Resume => {
                                 if let Err(why) = self.shard.resume().await {
                                     warn!(
@@ -153,9 +153,7 @@ impl ShardRunner {
                                         why
                                     );
 
-                                    false
-                                } else {
-                                    true
+                                    return self.request_restart().await;
                                 }
                             },
                         };
