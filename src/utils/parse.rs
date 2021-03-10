@@ -1,14 +1,15 @@
-use crate::{model::prelude::*, prelude::*};
+use crate::model::prelude::*;
+use crate::prelude::*;
 
 /// Parse a value from a string in context of a received message.
 ///
-/// This trait is a superset of [`std::str::FromStr`] (the trait used in [`str::parse`]). The
+/// This trait is a superset of [`std::str::FromStr`]. The
 /// difference is that this trait aims to support serenity-specific Discord types like [`Member`]
 /// or [`Message`].
 ///
 /// Trait implementations may do network requests as part of their parsing procedure.
 ///
-/// Useful for implementing command argument parsing frameworks.
+/// Useful for implementing argument parsing in command frameworks.
 #[async_trait::async_trait]
 pub trait Parse: Sized {
     /// The associated error which can be returned from parsing.
@@ -63,8 +64,6 @@ impl std::fmt::Display for MemberParseError {
 impl Parse for Member {
     type Err = MemberParseError;
 
-    // To get impl documentation to show.
-    #[doc = ""]
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
         let guild = msg.guild(&ctx.cache).await.ok_or(MemberParseError::GuildNotInCache)?;
 
@@ -150,8 +149,6 @@ impl std::fmt::Display for MessageParseError {
 impl Parse for Message {
     type Err = MessageParseError;
 
-    // To get impl documentation to show.
-    #[doc = ""]
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
         let extract_from_id_pair = || {
             let mut parts = s.splitn(2, '-');
