@@ -30,7 +30,10 @@ impl<T: std::str::FromStr> Parse for T {
 /// Error that can be returned from [`Member::parse`].
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub enum MemberParseError {
+    /// The guild in which the parser was invoked is not in cache.
     GuildNotInCache,
+    /// The provided member string failed to parse, or the parsed result cannot be found in the
+    /// guild cache data.
     NotFoundOrMalformed,
 }
 
@@ -104,7 +107,9 @@ impl Parse for Member {
 /// Error that can be returned from [`Message::parse`].
 #[derive(Debug)]
 pub enum MessageParseError {
+    /// When the provided string does not adhere to any known guild message format
     Malformed,
+    /// When message data retrieval via HTTP failed
     Http(SerenityError),
     /// When the `gateway` feature is disabled and the required information was not in cache.
     HttpNotAvailable,
