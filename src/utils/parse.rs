@@ -29,6 +29,7 @@ impl<T: std::str::FromStr> Parse for T {
 }
 
 /// Error that can be returned from [`Member::parse`].
+#[non_exhaustive]
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub enum MemberParseError {
     /// The guild in which the parser was invoked is not in cache.
@@ -104,6 +105,7 @@ impl Parse for Member {
 }
 
 /// Error that can be returned from [`Message::parse`].
+#[non_exhaustive]
 #[derive(Debug)]
 pub enum MessageParseError {
     /// When the provided string does not adhere to any known guild message format
