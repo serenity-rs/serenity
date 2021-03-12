@@ -256,7 +256,7 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    ///
+    /// 
     /// Pushing a codeblock without a language:
     /// ```rust
     /// use serenity::utils::MessageBuilder;
