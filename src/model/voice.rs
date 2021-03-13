@@ -98,6 +98,7 @@ impl<'de> Deserialize<'de> for VoiceState {
             user: User,
             #[serde(default)]
             pending: bool,
+            premium_since: Option<DateTime<Utc>>,
             #[cfg(feature = "unstable_discord_api")]
             permissions: Option<String>,
         }
@@ -171,6 +172,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                                     roles: partial_member.roles,
                                     user: partial_member.user,
                                     pending: partial_member.pending,
+                                    premium_since: partial_member.premium_since,
                                     #[cfg(feature = "unstable_discord_api")]
                                     permissions: partial_member.permissions,
                                 });

@@ -460,8 +460,12 @@ impl CacheUpdate for GuildMemberRemoveEvent {
 pub struct GuildMemberUpdateEvent {
     pub guild_id: GuildId,
     pub nick: Option<String>,
+    pub joined_at: DateTime<Utc>,
     pub roles: Vec<RoleId>,
     pub user: User,
+    pub premium_since: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub pending: bool,
 }
 
 #[cfg(feature = "cache")]
@@ -473,23 +477,22 @@ impl CacheUpdate for GuildMemberUpdateEvent {
         cache.update_user_entry(&self.user).await;
 
         if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild_id) {
-            let mut found = false;
-
             let item = if let Some(member) = guild.members.get_mut(&self.user.id) {
                 let item = Some(member.clone());
 
+                member.joined_at.clone_from(&Some(self.joined_at));
                 member.nick.clone_from(&self.nick);
                 member.roles.clone_from(&self.roles);
                 member.user.clone_from(&self.user);
-
-                found = true;
+                member.pending.clone_from(&self.pending);
+                member.premium_since.clone_from(&self.premium_since);
 
                 item
             } else {
                 None
             };
 
-            if !found {
+            if item.is_none() {
                 guild.members.insert(self.user.id, Member {
                     deaf: false,
                     guild_id: self.guild_id,
@@ -499,6 +502,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     roles: self.roles.clone(),
                     user: self.user.clone(),
                     pending: false,
+                    premium_since: None,
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
                 });
@@ -999,6 +1003,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                             user: user.clone(),
                             roles: vec![],
                             pending: false,
+                            premium_since: None,
                             #[cfg(feature = "unstable_discord_api")]
                             permissions: None,
                         });

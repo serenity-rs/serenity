@@ -42,6 +42,8 @@ pub struct Member {
     /// Indicator that the member hasn't accepted the rules of the guild yet.
     #[serde(default)]
     pub pending: bool,
+    /// Timestamp representing the date since the member is boosting the guild.
+    pub premium_since: Option<DateTime<Utc>>,
     /// The total permissions of the member in a channel, including overrides.
     ///
     /// This is only `Some` when returned in an [`Interaction`] object.
@@ -544,4 +546,9 @@ pub struct PartialMember {
     pub nick: Option<String>,
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
+    /// Indicator that the member hasn't accepted the rules of the guild yet.
+    #[serde(default)]
+    pub pending: bool,
+    /// Timestamp representing the date since the member is boosting the guild.
+    pub premium_since: Option<DateTime<Utc>>,
 }
