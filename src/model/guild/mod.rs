@@ -2602,6 +2602,7 @@ mod test {
                 roles: vec1,
                 user: u,
                 pending: false,
+                premium_since: None,
                 #[cfg(feature = "unstable_discord_api")]
                 permissions: None,
             }
