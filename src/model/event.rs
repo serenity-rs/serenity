@@ -496,13 +496,13 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 guild.members.insert(self.user.id, Member {
                     deaf: false,
                     guild_id: self.guild_id,
-                    joined_at: None,
+                    joined_at: Some(self.joined_at),
                     mute: false,
                     nick: self.nick.clone(),
                     roles: self.roles.clone(),
                     user: self.user.clone(),
-                    pending: false,
-                    premium_since: None,
+                    pending: self.pending,
+                    premium_since: self.premium_since,
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
                 });
