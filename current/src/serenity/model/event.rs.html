@@ -2034,6 +2034,11 @@
 <span id="2031">2031</span>
 <span id="2032">2032</span>
 <span id="2033">2033</span>
+<span id="2034">2034</span>
+<span id="2035">2035</span>
+<span id="2036">2036</span>
+<span id="2037">2037</span>
+<span id="2038">2038</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -2497,8 +2502,12 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMemberUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">nick</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">joined_at</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
+    <span class="kw">pub</span> <span class="ident">premium_since</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">pending</span>: <span class="ident">bool</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2510,32 +2519,32 @@
         <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>).<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">false</span>;
-
             <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>) {
                 <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>.<span class="ident">clone</span>());
 
+                <span class="ident">member</span>.<span class="ident">joined_at</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">joined_at</span>));
                 <span class="ident">member</span>.<span class="ident">nick</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nick</span>);
                 <span class="ident">member</span>.<span class="ident">roles</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">roles</span>);
                 <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>);
-
-                <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                <span class="ident">member</span>.<span class="ident">pending</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pending</span>);
+                <span class="ident">member</span>.<span class="ident">premium_since</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">premium_since</span>);
 
                 <span class="ident">item</span>
             } <span class="kw">else</span> {
                 <span class="prelude-val">None</span>
             };
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">found</span> {
+            <span class="kw">if</span> <span class="ident">item</span>.<span class="ident">is_none</span>() {
                 <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">Member</span> {
                     <span class="ident">deaf</span>: <span class="bool-val">false</span>,
                     <span class="ident">guild_id</span>: <span class="self">self</span>.<span class="ident">guild_id</span>,
-                    <span class="ident">joined_at</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">joined_at</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">joined_at</span>),
                     <span class="ident">mute</span>: <span class="bool-val">false</span>,
                     <span class="ident">nick</span>: <span class="self">self</span>.<span class="ident">nick</span>.<span class="ident">clone</span>(),
                     <span class="ident">roles</span>: <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clone</span>(),
                     <span class="ident">user</span>: <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">clone</span>(),
-                    <span class="ident">pending</span>: <span class="bool-val">false</span>,
+                    <span class="ident">pending</span>: <span class="self">self</span>.<span class="ident">pending</span>,
+                    <span class="ident">premium_since</span>: <span class="self">self</span>.<span class="ident">premium_since</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
                 });
@@ -3036,6 +3045,7 @@
                             <span class="ident">user</span>: <span class="ident">user</span>.<span class="ident">clone</span>(),
                             <span class="ident">roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
                             <span class="ident">pending</span>: <span class="bool-val">false</span>,
+                            <span class="ident">premium_since</span>: <span class="prelude-val">None</span>,
                             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                             <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
                         });
