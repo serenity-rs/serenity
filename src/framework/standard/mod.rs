@@ -662,6 +662,10 @@ impl Framework for StandardFramework {
 
         match invoke {
             Invoke::Help(name) => {
+                if !self.config.allow_dm && msg.is_private() {
+                    return;
+                }
+
                 let args = Args::new(stream.rest(), &self.config.delimiters);
 
                 let owners = self.config.owners.clone();
