@@ -404,11 +404,13 @@ mod test {
             });
             let emoji = Emoji {
                 animated: false,
+                available: true,
                 id: EmojiId(5),
                 name: "a".to_string(),
                 managed: true,
                 require_colons: true,
                 roles: vec![],
+                user: None,
             };
             let role = Role {
                 id: RoleId(2),

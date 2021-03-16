@@ -1322,11 +1322,13 @@ mod test {
         let content_emoji = MessageBuilder::new()
             .emoji(&Emoji {
                 animated: false,
+                available: true,
                 id: EmojiId(32),
                 name: "Rohrkatze".to_string(),
                 managed: false,
                 require_colons: true,
                 roles: vec![],
+                user: None,
             })
             .build();
         let content_mentions =
