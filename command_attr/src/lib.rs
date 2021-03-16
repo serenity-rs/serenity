@@ -533,7 +533,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// This group macro purports all of the said purposes above, applied onto a `struct`:
 ///
-/// ```rust,no_run
+/// ```rust,ignore
 /// use command_attr::{command, group};
 ///
 /// # type CommandResult = ();
