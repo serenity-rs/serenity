@@ -99,7 +99,10 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn playing(name: &str) -> Activity {
+    pub fn playing<N>(name: N) -> Activity
+    where
+        N: ToString,
+    {
         Activity {
             application_id: None,
             assets: None,
@@ -149,7 +152,11 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming(name: &str, url: &str) -> Activity {
+    pub fn streaming<N, U>(name: N, url: U) -> Activity
+    where
+        N: ToString,
+        U: ToString,
+    {
         Activity {
             application_id: None,
             assets: None,
@@ -196,7 +203,10 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn listening(name: &str) -> Activity {
+    pub fn listening<N>(name: N) -> Activity
+    where
+        N: ToString,
+    {
         Activity {
             application_id: None,
             assets: None,
@@ -243,7 +253,10 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn competing(name: &str) -> Activity {
+    pub fn competing<N>(name: N) -> Activity
+    where
+        N: ToString,
+    {
         Activity {
             application_id: None,
             assets: None,
