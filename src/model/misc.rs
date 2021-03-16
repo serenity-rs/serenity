@@ -439,6 +439,7 @@ mod test {
                 roles: vec![],
                 user: user.clone(),
                 pending: false,
+                premium_since: None,
                 #[cfg(feature = "unstable_discord_api")]
                 permissions: None,
             };
