@@ -1567,6 +1567,8 @@
 <span id="1564">1564</span>
 <span id="1565">1565</span>
 <span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">default</span>::<span class="ident">Default</span>,
@@ -2892,11 +2894,13 @@
         <span class="kw">let</span> <span class="ident">content_emoji</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>()
             .<span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="ident">Emoji</span> {
                 <span class="ident">animated</span>: <span class="bool-val">false</span>,
+                <span class="ident">available</span>: <span class="bool-val">true</span>,
                 <span class="ident">id</span>: <span class="ident">EmojiId</span>(<span class="number">32</span>),
                 <span class="ident">name</span>: <span class="string">&quot;Rohrkatze&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">managed</span>: <span class="bool-val">false</span>,
                 <span class="ident">require_colons</span>: <span class="bool-val">true</span>,
                 <span class="ident">roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">user</span>: <span class="prelude-val">None</span>,
             })
             .<span class="ident">build</span>();
         <span class="kw">let</span> <span class="ident">content_mentions</span> <span class="op">=</span>

@@ -245,6 +245,15 @@
 <span id="242">242</span>
 <span id="243">243</span>
 <span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>, <span class="ident">Write</span> <span class="kw">as</span> <span class="ident">FmtWrite</span>};
 
@@ -253,16 +262,16 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::<span class="ident">Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">GuildId</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">EmojiId</span>, <span class="ident">RoleId</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">user</span>::<span class="ident">User</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">utils</span>::<span class="ident">default_true</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">ModelError</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">http</span>::<span class="ident">Http</span>,
-    <span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">EmojiId</span>, <span class="ident">RoleId</span>},
-};
 
 <span class="doccomment">/// Represents a custom guild emoji, which can either be created using the API,</span>
 <span class="doccomment">/// or via an integration. Emojis created using the API only work within the</span>
@@ -273,6 +282,10 @@
     <span class="doccomment">/// Whether the emoji is animated.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">animated</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether the emoji can be used. This may be false when the guild loses boosts,</span>
+    <span class="doccomment">/// reducing the emoji limit.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_true&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">available</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The Id of the emoji.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">EmojiId</span>,
     <span class="doccomment">/// The name of the emoji. It must be at least 2 characters long and can</span>
@@ -281,15 +294,20 @@
     <span class="doccomment">/// Whether the emoji is managed via an [`Integration`] service.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Integration`]: super::Integration</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">managed</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Whether the emoji name needs to be surrounded by colons in order to be</span>
     <span class="doccomment">/// used by the client.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">require_colons</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// A list of [`Role`]s that are allowed to use the emoji. If there are no</span>
     <span class="doccomment">/// roles specified, then usage is unrestricted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Role`]: super::Role</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The user who created the emoji.</span>
+    <span class="kw">pub</span> <span class="ident">user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
