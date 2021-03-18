@@ -136,8 +136,28 @@ impl ShardRunner {
                     return self.request_restart().await;
                 },
                 Some(other) => {
-                    #[allow(clippy::let_underscore_must_use)]
-                    let _ = self.action(&other).await;
+                    if let Err(e) = self.action(&other).await {
+                        debug!(
+                            "[ShardRunner {:?}] Reconnecting due to error performing {:?}: {:?}",
+                            self.shard.shard_info(),
+                            other,
+                            e
+                        );
+                        match self.shard.reconnection_type() {
+                            ReconnectType::Reidentify => return self.request_restart().await,
+                            ReconnectType::Resume => {
+                                if let Err(why) = self.shard.resume().await {
+                                    warn!(
+                                        "[ShardRunner {:?}] Resume failed, reidentifying: {:?}",
+                                        self.shard.shard_info(),
+                                        why
+                                    );
+
+                                    return self.request_restart().await;
+                                }
+                            },
+                        };
+                    }
                 },
                 None => {},
             }
