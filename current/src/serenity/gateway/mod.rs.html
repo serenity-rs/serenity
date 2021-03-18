@@ -179,6 +179,8 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -</span>
 <span class="doccomment">//! responsible for maintaing a WebSocket connection with Discord.</span>
@@ -343,6 +345,7 @@
     <span class="ident">Json</span>(<span class="ident">Value</span>),
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardAction</span> {
     <span class="ident">Heartbeat</span>,
@@ -351,6 +354,7 @@
 }
 
 <span class="doccomment">/// The type of reconnection that should be performed.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReconnectType</span> {
     <span class="doccomment">/// Indicator that a new connection should be made by sending an IDENTIFY.</span>
