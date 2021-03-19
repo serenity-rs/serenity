@@ -467,6 +467,9 @@
 <span id="464">464</span>
 <span id="465">465</span>
 <span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.</span>
 
@@ -874,11 +877,13 @@
             });
             <span class="kw">let</span> <span class="ident">emoji</span> <span class="op">=</span> <span class="ident">Emoji</span> {
                 <span class="ident">animated</span>: <span class="bool-val">false</span>,
+                <span class="ident">available</span>: <span class="bool-val">true</span>,
                 <span class="ident">id</span>: <span class="ident">EmojiId</span>(<span class="number">5</span>),
                 <span class="ident">name</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">managed</span>: <span class="bool-val">true</span>,
                 <span class="ident">require_colons</span>: <span class="bool-val">true</span>,
                 <span class="ident">roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">user</span>: <span class="prelude-val">None</span>,
             };
             <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">Role</span> {
                 <span class="ident">id</span>: <span class="ident">RoleId</span>(<span class="number">2</span>),
@@ -907,6 +912,7 @@
                 <span class="ident">roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
                 <span class="ident">user</span>: <span class="ident">user</span>.<span class="ident">clone</span>(),
                 <span class="ident">pending</span>: <span class="bool-val">false</span>,
+                <span class="ident">premium_since</span>: <span class="prelude-val">None</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                 <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
             };

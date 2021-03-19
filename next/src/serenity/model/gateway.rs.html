@@ -649,6 +649,19 @@
 <span id="646">646</span>
 <span id="647">647</span>
 <span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models pertaining to the gateway.</span>
 
@@ -751,7 +764,10 @@
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">playing</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">playing</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span>
+    <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">ToString</span>,
+    {
         <span class="ident">Activity</span> {
             <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">assets</span>: <span class="prelude-val">None</span>,
@@ -801,7 +817,11 @@
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">streaming</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">streaming</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>, <span class="ident">url</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span>
+    <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">ToString</span>,
+        <span class="ident">U</span>: <span class="ident">ToString</span>,
+    {
         <span class="ident">Activity</span> {
             <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">assets</span>: <span class="prelude-val">None</span>,
@@ -848,7 +868,10 @@
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listening</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">listening</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span>
+    <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">ToString</span>,
+    {
         <span class="ident">Activity</span> {
             <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">assets</span>: <span class="prelude-val">None</span>,
@@ -895,7 +918,10 @@
     <span class="doccomment">///     Ok(())</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">competing</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">competing</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span>
+    <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">ToString</span>,
+    {
         <span class="ident">Activity</span> {
             <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">assets</span>: <span class="prelude-val">None</span>,

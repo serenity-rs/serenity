@@ -2547,6 +2547,8 @@
 <span id="2544">2544</span>
 <span id="2545">2545</span>
 <span id="2546">2546</span>
+<span id="2547">2547</span>
+<span id="2548">2548</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">BTreeMap</span>, <span class="ident">fmt</span>, <span class="ident">sync</span>::<span class="ident">Arc</span>};
@@ -2979,7 +2981,8 @@
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo</span>::<span class="ident">CreateReaction</span> {
-                <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>(),
+                <span class="comment">// Escape emojis like &#39;#️⃣&#39; that contain a hash</span>
+                <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>().<span class="ident">replace</span>(<span class="string">&#39;#&#39;</span>, <span class="string">&quot;%23&quot;</span>),
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
             },
@@ -3296,7 +3299,8 @@
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo</span>::<span class="ident">DeleteReaction</span> {
-                <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>(),
+                <span class="comment">// Escape emojis like &#39;#️⃣&#39; that contain a hash</span>
+                <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>().<span class="ident">replace</span>(<span class="string">&#39;#&#39;</span>, <span class="string">&quot;%23&quot;</span>),
                 <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">user</span>,
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
