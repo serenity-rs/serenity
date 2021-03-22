@@ -161,7 +161,7 @@ impl Suggestions {
     }
 
     /// Concats names of suggestions with a given `separator`.
-    fn join(&self, separator: &str) -> String {
+    pub fn join(&self, separator: &str) -> String {
         let mut iter = self.as_vec().iter();
 
         let first_iter_element = match iter.next() {
