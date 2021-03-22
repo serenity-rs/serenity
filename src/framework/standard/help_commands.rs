@@ -156,7 +156,7 @@ pub struct Suggestions(pub Vec<SuggestedCommandName>);
 impl Suggestions {
     /// Immutably borrow inner `Vec`.
     #[inline]
-    fn as_vec(&self) -> &Vec<SuggestedCommandName> {
+    pub fn as_vec(&self) -> &Vec<SuggestedCommandName> {
         &self.0
     }
 
