@@ -17,8 +17,8 @@ use reqwest::{
     Url,
 };
 use reqwest::{multipart::Part, Client, ClientBuilder, Response as ReqwestResponse};
-use serde_json::json;
 use serde::de::DeserializeOwned;
+use serde_json::json;
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing::{debug, instrument, trace};
 
@@ -87,11 +87,8 @@ impl<'a> HttpBuilder<'a> {
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         let token = token.as_ref().trim();
 
-        let token = if token.starts_with("Bot ") {
-            token.to_string()
-        } else {
-            format!("Bot {}", token)
-        };
+        let token =
+            if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
 
         self.token = Some(token);
 
@@ -141,7 +138,7 @@ impl<'a> HttpBuilder<'a> {
     /// This is different than a native proxy's behavior where it will tunnel
     /// requests that use TLS via [`HTTP CONNECT`] method (e.g. using
     /// [`reqwest::Proxy`]).
-    /// 
+    ///
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
     pub fn proxy(mut self, proxy: impl Into<String>) -> Self {
@@ -2655,9 +2652,7 @@ impl Http {
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
-            let request = req
-                .build(&self.client, &self.token, self.proxy.as_deref())?
-                .build()?;
+            let request = req.build(&self.client, &self.token, self.proxy.as_deref())?.build()?;
             self.client.execute(request).await?
         } else {
             let ratelimiting_req = RatelimitedRequest::from(req);
@@ -2728,9 +2723,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_http_builder_defaults() {
-        let http = HttpBuilder::new("is this dubu?")
-            .await
-            .expect("Create Http");
+        let http = HttpBuilder::new("is this dubu?").await.expect("Create Http");
 
         assert!(!http.ratelimiter_disabled);
         assert!(http.proxy.is_none());

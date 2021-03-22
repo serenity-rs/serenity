@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use reqwest::{
     header::{
         HeaderMap as Headers,
@@ -10,7 +12,6 @@ use reqwest::{
     Url,
 };
 use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder};
-use std::borrow::Cow;
 use tracing::instrument;
 
 use super::{routing::RouteInfo, HttpError};
@@ -81,7 +82,7 @@ impl<'a> Request<'a> {
         &'a self,
         client: &Client,
         token: &str,
-        proxy: Option<&str>
+        proxy: Option<&str>,
     ) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,
