@@ -210,7 +210,10 @@ impl EditGuild {
     }
 
     /// Set the default message notification level.
-    pub fn default_message_notifications(&mut self, level: Option<DefaultMessageNotificationLevel>) -> &mut Self {
+    pub fn default_message_notifications(
+        &mut self,
+        level: Option<DefaultMessageNotificationLevel>,
+    ) -> &mut Self {
         let level = level.map_or(Value::Null, |x| Value::from(x as u8));
         self.0.insert("default_message_notifications", level);
         self
