@@ -98,7 +98,8 @@ impl<'a> HttpBuilder<'a> {
         self
     }
 
-    /// Sets the [`reqwest::Client`]
+    /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
+    /// be used.
     pub fn client(mut self, client: Arc<Client>) -> Self {
         self.client = Some(client);
 
@@ -113,14 +114,14 @@ impl<'a> HttpBuilder<'a> {
         self
     }
 
-    /// Sets whether or not the ratelimiter is disabled. By default, it is
-    /// enabled. In most cases, this should be used in conjunction with
-    /// [`Self::proxy`].
+    /// Sets whether or not the ratelimiter is disabled. By default if this this
+    /// not used, it is enabled. In most cases, this should be used in
+    /// conjunction with [`Self::proxy`].
     ///
     /// **Note**: You should **not** disable the ratelimiter unless you have
     /// another form of rate limiting. Disabling the ratelimiter has the main
-    /// purpose of delegating ratelimiting to an API proxy instead of the
-    /// current process.
+    /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
+    /// instead of the current process.
     pub fn ratelimiter_disabled(mut self, ratelimiter_disabled: bool) -> Self {
         self.ratelimiter_disabled = Some(ratelimiter_disabled);
 
@@ -128,17 +129,18 @@ impl<'a> HttpBuilder<'a> {
     }
 
     /// Sets the proxy that Discord HTTP API requests will be passed to. This is
-    /// mainly intended for something like [`twilight-http-proxy`] where multiple
-    /// processes can make API requests while sharing a single ratelimiter.
-    /// 
+    /// mainly intended for something like [`twilight-http-proxy`] where
+    /// multiple processes can make API requests while sharing a single
+    /// ratelimiter.
+    ///
     /// The proxy should be in the form of the protocol and hostname, e.g.
     /// `http://127.0.0.1:3000` or `http://myproxy.example`
     ///
-    /// This will act like a transparent proxy, simply sending HTTP API requests
-    /// to the proxy instead of Discord API to allow the proxy to intercept and
-    /// rate limit requests. This is different than a native proxy's behavior
-    /// where it will tunnel requests using TLS via [`HTTP CONNECT`] method
-    /// (e.g. using [`reqwest::Proxy`]).
+    /// This will simply send HTTP API requests to the proxy instead of Discord
+    /// API to allow the proxy to intercept, rate limit, and forward requests.
+    /// This is different than a native proxy's behavior where it will tunnel
+    /// requests that use TLS via [`HTTP CONNECT`] method (e.g. using
+    /// [`reqwest::Proxy`]).
     /// 
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
