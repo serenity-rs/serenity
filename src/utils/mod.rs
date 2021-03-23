@@ -4,6 +4,11 @@
 mod colour;
 mod custom_message;
 mod message_builder;
+#[cfg(feature = "client")]
+mod parse;
+
+#[cfg(feature = "client")]
+pub use parse::*;
 
 pub use self::{
     colour::Colour,
