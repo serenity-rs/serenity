@@ -156,12 +156,12 @@ pub struct Suggestions(pub Vec<SuggestedCommandName>);
 impl Suggestions {
     /// Immutably borrow inner `Vec`.
     #[inline]
-    fn as_vec(&self) -> &Vec<SuggestedCommandName> {
+    pub fn as_vec(&self) -> &Vec<SuggestedCommandName> {
         &self.0
     }
 
     /// Concats names of suggestions with a given `separator`.
-    fn join(&self, separator: &str) -> String {
+    pub fn join(&self, separator: &str) -> String {
         let mut iter = self.as_vec().iter();
 
         let first_iter_element = match iter.next() {
