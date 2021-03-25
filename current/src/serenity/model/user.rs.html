@@ -1118,6 +1118,25 @@
 <span id="1115">1115</span>
 <span id="1116">1116</span>
 <span id="1117">1117</span>
+<span id="1118">1118</span>
+<span id="1119">1119</span>
+<span id="1120">1120</span>
+<span id="1121">1121</span>
+<span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! User information-related models.</span>
 
@@ -1127,6 +1146,7 @@
 
 <span class="kw">use</span> <span class="ident">bitflags</span>::<span class="ident">__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">json</span>;
 
@@ -1574,7 +1594,7 @@
 }
 
 <span class="doccomment">/// User&#39;s public flags</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserPublicFlags</span> {
     <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u32</span>,
 }
@@ -1607,6 +1627,24 @@
         <span class="ident">VERIFIED_BOT</span> <span class="op">=</span> <span class="number">0b00000000_00000001_00000000_00000000</span>;
         <span class="doccomment">/// User&#39;s flag as early verified bot developer</span>
         <span class="ident">EARLY_VERIFIED_BOT_DEVELOPER</span> <span class="op">=</span> <span class="number">0b00000000_00000010_00000000_00000000</span>;
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserPublicFlags</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    {
+        <span class="prelude-val">Ok</span>(<span class="ident">UserPublicFlags</span>::<span class="ident">from_bits_truncate</span>(<span class="ident">deserializer</span>.<span class="ident">deserialize_u32</span>(<span class="ident">U32Visitor</span>)<span class="question-mark">?</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">UserPublicFlags</span> {
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
+        <span class="ident">serializer</span>.<span class="ident">serialize_u32</span>(<span class="self">self</span>.<span class="ident">bits</span>())
     }
 }
 
