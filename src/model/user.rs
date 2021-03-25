@@ -453,7 +453,7 @@ pub struct User {
 }
 
 /// User's public flags
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Copy, Deserialize, Serialize)]
 pub struct UserPublicFlags {
     pub bits: u32,
 }
