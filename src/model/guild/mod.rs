@@ -2576,13 +2576,7 @@ mod test {
         use crate::model::prelude::*;
 
         fn gen_user() -> User {
-            User {
-                id: UserId(210),
-                avatar: Some("abc".to_string()),
-                bot: true,
-                discriminator: 1432,
-                name: "test".to_string(),
-            }
+            User::default()
         }
 
         fn gen_member() -> Member {

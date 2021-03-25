@@ -429,6 +429,7 @@ mod test {
                 bot: false,
                 discriminator: 4132,
                 name: "fake".to_string(),
+                public_flags: None,
             };
             let member = Member {
                 deaf: false,

@@ -246,6 +246,7 @@ fn dummy_message() -> Message {
             bot: false,
             discriminator: 0x0000,
             name: String::new(),
+            public_flags: None,
         },
         channel_id: ChannelId::default(),
         content: String::new(),

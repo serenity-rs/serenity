@@ -4,6 +4,7 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 
+use bitflags::__impl_bitflags;
 use futures::future::{BoxFuture, FutureExt};
 #[cfg(feature = "model")]
 use serde_json::json;
@@ -46,6 +47,7 @@ pub struct CurrentUser {
     #[serde(rename = "username")]
     pub name: String,
     pub verified: Option<bool>,
+    pub public_flags: Option<UserPublicFlags>,
 }
 
 #[cfg(feature = "model")]
@@ -446,6 +448,45 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
+    /// the public flags on a user's account
+    pub public_flags: Option<UserPublicFlags>,
+}
+
+/// User's public flags
+#[derive(Clone, Copy, Deserialize, Serialize)]
+pub struct UserPublicFlags {
+    pub bits: u32,
+}
+
+__impl_bitflags! {
+    UserPublicFlags: u32 {
+        /// User's flag as discord employee
+        DISCORD_EMPLOYEE = 0b00000000_00000000_00000000_00000001;
+        /// User's flag as partnered server owner
+        PARTNERED_SERVER_OWNER = 0b00000000_00000000_00000000_00000010;
+        /// User's flag as hypesquad events
+        HYPESQUAD_EVENTS = 0b00000000_00000000_00000000_00000100;
+        /// User's flag as bug hunter level 1
+        BUG_HUNTER_LEVEL_1 = 0b00000000_00000000_00000000_00001000;
+        /// User's flag as house bravery
+        HOUSE_BRAVERY = 0b00000000_00000000_00000000_01000000;
+        /// User's flag as house brilliance
+        HOUSE_BRILLIANCE = 0b00000000_00000000_00000000_10000000;
+        /// User's flag as house balance
+        HOUSE_BALANCE = 0b00000000_00000000_00000001_00000000;
+        /// User's flag as early supporter
+        EARLY_SUPPORTER = 0b00000000_00000000_00000010_00000000;
+        /// User's flag as team user
+        TEAM_USER = 0b00000000_00000000_00000100_00000000;
+        /// User's flag as system
+        SYSTEM = 0b00000000_00000000_00010000_00000000;
+        /// User's flag as bug hunter level 2
+        BUG_HUNTER_LEVEL_2 = 0b00000000_00000000_01000000_00000000;
+        /// User's flag as verified bot
+        VERIFIED_BOT = 0b00000000_00000001_00000000_00000000;
+        /// User's flag as early verified bot developer
+        EARLY_VERIFIED_BOT_DEVELOPER = 0b00000000_00000010_00000000_00000000;
+    }
 }
 
 impl Default for User {
@@ -455,6 +496,7 @@ impl Default for User {
     /// - **bot** to `true`.
     /// - **discriminator** to `1432`.
     /// - **name** to `"test"`.
+    /// - **public_flags** to `None`.
     fn default() -> Self {
         User {
             id: UserId(210),
@@ -462,6 +504,7 @@ impl Default for User {
             bot: true,
             discriminator: 1432,
             name: "test".to_string(),
+            public_flags: None,
         }
     }
 }
@@ -932,6 +975,7 @@ impl From<CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name,
+            public_flags: user.public_flags,
         }
     }
 }
@@ -944,6 +988,7 @@ impl<'a> From<&'a CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name.clone(),
+            public_flags: user.public_flags.clone(),
         }
     }
 }
