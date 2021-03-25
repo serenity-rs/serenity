@@ -655,6 +655,13 @@ impl Route {
         format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait)
     }
 
+    pub fn webhook_message<D>(webhook_id: u64, token: D, message_id: u64) -> String
+    where
+        D: Display,
+    {
+        format!(api!("/webhooks/{}/{}/messages/{}"), webhook_id, token, message_id)
+    }
+
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub fn webhook_original_interaction_response<D: Display>(
@@ -876,6 +883,11 @@ pub enum RouteInfo<'a> {
         token: &'a str,
         webhook_id: u64,
     },
+    DeleteWebhookMessage {
+        token: &'a str,
+        webhook_id: u64,
+        message_id: u64,
+    },
     EditChannel {
         channel_id: u64,
     },
@@ -943,6 +955,11 @@ pub enum RouteInfo<'a> {
     EditWebhookWithToken {
         token: &'a str,
         webhook_id: u64,
+    },
+    EditWebhookMessage {
+        token: &'a str,
+        webhook_id: u64,
+        message_id: u64,
     },
     ExecuteWebhook {
         token: &'a str,
@@ -1412,6 +1429,16 @@ impl<'a> RouteInfo<'a> {
                 Route::WebhooksId(webhook_id),
                 Cow::from(Route::webhook_with_token(webhook_id, token)),
             ),
+            RouteInfo::DeleteWebhookMessage {
+                token,
+                webhook_id,
+                message_id,
+            } => (
+                LightMethod::Delete,
+                // FIXME: This should probably be another route.
+                Route::WebhooksId(webhook_id),
+                Cow::from(Route::webhook_message(webhook_id, token, message_id)),
+            ),
             RouteInfo::EditChannel {
                 channel_id,
             } => (
@@ -1544,6 +1571,16 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::WebhooksId(webhook_id),
                 Cow::from(Route::webhook_with_token(webhook_id, token)),
+            ),
+            RouteInfo::EditWebhookMessage {
+                token,
+                webhook_id,
+                message_id,
+            } => (
+                LightMethod::Patch,
+                // FIXME: This should probably be another route.
+                Route::WebhooksId(webhook_id),
+                Cow::from(Route::webhook_message(webhook_id, token, message_id)),
             ),
             RouteInfo::ExecuteWebhook {
                 token,
