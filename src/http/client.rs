@@ -1410,6 +1410,47 @@ impl Http {
         response.json::<Message>().await.map(Some).map_err(From::from)
     }
 
+    /// Edits a webhook's message by Id.
+    pub async fn edit_webhook_message(
+        &self,
+        webhook_id: u64,
+        token: &str,
+        message_id: u64,
+        map: &JsonMap,
+    ) -> Result<Message> {
+        let body = serde_json::to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::EditWebhookMessage {
+                token,
+                webhook_id,
+                message_id,
+            },
+        })
+        .await
+    }
+
+    /// Deletes a webhook's messsage by Id.
+    pub async fn delete_webhook_message(
+        &self,
+        webhook_id: u64,
+        token: &str,
+        message_id: u64,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::DeleteWebhookMessage {
+                token,
+                webhook_id,
+                message_id,
+            },
+        })
+        .await
+    }
+
     /// Gets the active maintenances from Discord's Status API.
     ///
     /// Does not require authentication.
