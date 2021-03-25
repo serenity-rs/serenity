@@ -6,6 +6,7 @@ use std::fmt::Write;
 
 use bitflags::__impl_bitflags;
 use futures::future::{BoxFuture, FutureExt};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 #[cfg(feature = "model")]
 use serde_json::json;
 
@@ -453,7 +454,7 @@ pub struct User {
 }
 
 /// User's public flags
-#[derive(Clone, Copy, Deserialize, Serialize)]
+#[derive(Clone, Copy)]
 pub struct UserPublicFlags {
     pub bits: u32,
 }
@@ -486,6 +487,24 @@ __impl_bitflags! {
         VERIFIED_BOT = 0b00000000_00000001_00000000_00000000;
         /// User's flag as early verified bot developer
         EARLY_VERIFIED_BOT_DEVELOPER = 0b00000000_00000010_00000000_00000000;
+    }
+}
+
+impl<'de> Deserialize<'de> for UserPublicFlags {
+    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(UserPublicFlags::from_bits_truncate(deserializer.deserialize_u32(U32Visitor)?))
+    }
+}
+
+impl Serialize for UserPublicFlags {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_u32(self.bits())
     }
 }
 
