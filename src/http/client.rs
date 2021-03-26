@@ -4,6 +4,7 @@ use std::{
     fmt,
     future::Future,
     pin::Pin,
+    str::FromStr,
     sync::Arc,
     task::{Context as FutContext, Poll},
 };
@@ -50,6 +51,7 @@ use crate::model::prelude::*;
 /// # async fn run() {
 /// let http = HttpBuilder::new("token")
 ///     .proxy("http://127.0.0.1:3000")
+///     .expect("Invalid proxy URL")
 ///     .ratelimiter_disabled(true)
 ///     .await
 ///     .expect("Error creating Http");
@@ -60,7 +62,7 @@ pub struct HttpBuilder<'a> {
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: Option<bool>,
     token: Option<String>,
-    proxy: Option<String>,
+    proxy: Option<Url>,
     fut: Option<BoxFuture<'a, Result<Http>>>,
 }
 
@@ -141,10 +143,11 @@ impl<'a> HttpBuilder<'a> {
     ///
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
-    pub fn proxy(mut self, proxy: impl Into<String>) -> Self {
-        self.proxy = Some(proxy.into());
+    pub fn proxy(mut self, proxy: impl Into<String>) -> Result<Self> {
+        let proxy = Url::from_str(&proxy.into()).map_err(|e| HttpError::Url(e))?;
+        self.proxy = Some(proxy);
 
-        self
+        Ok(self)
     }
 }
 
@@ -194,7 +197,7 @@ pub struct Http {
     pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
     pub ratelimiter_disabled: bool,
-    pub proxy: Option<String>,
+    pub proxy: Option<Url>,
     pub token: String,
 }
 
@@ -2337,7 +2340,9 @@ impl Http {
         };
 
         if let Some(proxy) = &self.proxy {
-            url.set_host(Some(proxy)).map_err(|e| Error::Http(Box::new(e.into())))?;
+            url.set_host(proxy.host_str()).map_err(|e| HttpError::Url(e))?;
+            url.set_scheme(proxy.scheme()).map_err(|_| HttpError::InvalidScheme)?;
+            url.set_port(proxy.port()).map_err(|_| HttpError::InvalidPort)?;
         }
 
         let mut multipart = reqwest::multipart::Form::new();
@@ -2656,7 +2661,7 @@ impl Http {
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
-            let request = req.build(&self.client, &self.token, self.proxy.as_deref())?.build()?;
+            let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
             self.client.execute(request).await?
         } else {
             let ratelimiting_req = RatelimitedRequest::from(req);
@@ -2738,10 +2743,16 @@ mod tests {
         let http = HttpBuilder::new("no it is token")
             .ratelimiter_disabled(true)
             .proxy("http://127.0.0.1:3000")
+            .expect("Set proxy")
             .await
             .expect("Create Http");
 
         assert!(http.ratelimiter_disabled);
-        assert_eq!(http.proxy.as_deref(), Some("http://127.0.0.1:3000"));
+
+        let proxy = http.proxy.expect("Http proxy missing");
+
+        assert_eq!(proxy.scheme(), "http");
+        assert_eq!(proxy.host_str(), Some("127.0.0.1"));
+        assert_eq!(proxy.port(), Some(3000));
     }
 }
