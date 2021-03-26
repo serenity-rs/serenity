@@ -2331,10 +2331,14 @@ impl Http {
         T: Into<AttachmentType<'a>>,
     {
         let uri = api!("/channels/{}/messages", channel_id);
-        let url = match Url::parse(&uri) {
+        let mut url = match Url::parse(&uri) {
             Ok(url) => url,
             Err(_) => return Err(Error::Url(uri)),
         };
+
+        if let Some(proxy) = &self.proxy {
+            url.set_host(Some(proxy)).map_err(|e| Error::Http(Box::new(e.into())))?;
+        }
 
         let mut multipart = reqwest::multipart::Form::new();
 
