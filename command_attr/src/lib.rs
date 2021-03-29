@@ -81,7 +81,8 @@ macro_rules! match_options {
 /// Documentation comments (`///`) applied onto the function are interpreted as sugar for the
 /// `#[description]` option. When more than one application of the option is performed,
 /// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
-/// which are sugar for the `#[doc = "..."]` attribute.
+/// which are sugar for the `#[doc = "..."]` attribute. If you wish to join lines together,
+/// end the previous lines with `\$`.
 ///
 /// # Notes
 /// The name of the command is parsed from the applied function,
@@ -585,6 +586,12 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[default_command(cmd)]`                            | A command to execute if none of the group's prefixes are given.                    | `cmd` is an identifier referencing a function marked by the `#[command]` macro                                                                                                       |
 /// | `#[description(desc)]` </br> `#[description = desc]` | The group's description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |
 /// | `#[summary(desc)]` </br> `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |
+///
+/// Documentation comments (`///`) applied onto the struct are interpreted as sugar for the
+/// `#[description]` option. When more than one application of the option is performed,
+/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
+/// which are sugar for the `#[doc = "..."]` attribute. If you wish to join lines together,
+/// end the previous lines with `\$`.
 ///
 /// Similarly to [`command`], this macro generates static instances of the group
 /// and its options. The identifiers of these instances are based off the name of the struct to differentiate
