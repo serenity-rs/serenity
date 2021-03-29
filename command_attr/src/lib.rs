@@ -297,9 +297,15 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     // Additionally, place the documentation attributes to the `cooked` list
     // to prevent the macro from rejecting them as invalid attributes.
-    for i in 0..fun.attributes.len() {
-        if fun.attributes[i].path.is_ident("doc") {
-            fun.cooked.push(fun.attributes.remove(i));
+    {
+        let mut i = 0;
+        while i < fun.attributes.len() {
+            if fun.attributes[i].path.is_ident("doc") {
+                fun.cooked.push(fun.attributes.remove(i));
+                continue;
+            }
+
+            i += 1;
         }
     }
 
