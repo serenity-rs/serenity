@@ -869,6 +869,7 @@ impl User {
 
     /// Returns a future that will await one message by this user.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reply<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -878,6 +879,7 @@ impl User {
 
     /// Returns a stream builder which can be awaited to obtain a stream of messages sent by this user.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_replies<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -887,6 +889,7 @@ impl User {
 
     /// Await a single reaction by this user.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reaction<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -896,6 +899,7 @@ impl User {
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this user.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reactions<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,

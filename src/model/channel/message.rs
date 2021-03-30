@@ -812,6 +812,7 @@ impl Message {
 
     /// Await a single reaction on this message.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reaction<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -821,6 +822,7 @@ impl Message {
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions on this message.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reactions<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
