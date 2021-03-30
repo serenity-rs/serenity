@@ -69,6 +69,8 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">Message</span>;
 
@@ -133,9 +135,11 @@
     <span class="ident">SetStatus</span>(<span class="ident">OnlineStatus</span>),
     <span class="doccomment">/// Sends a new filter for messages to the shard.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
     <span class="ident">SetMessageFilter</span>(<span class="ident">MessageFilter</span>),
     <span class="doccomment">/// Sends a new filter for reactions to the shard.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
     <span class="ident">SetReactionFilter</span>(<span class="ident">ReactionFilter</span>),
 }
 </pre></div>
