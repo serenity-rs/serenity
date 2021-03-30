@@ -32,7 +32,8 @@ the correct method for passing data, and what it should be.</p>
 <p>Documentation comments (<code>///</code>) applied onto the function are interpreted as sugar for the
 <code>#[description]</code> option. When more than one application of the option is performed,
 the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
-which are sugar for the <code>#[doc = &quot;...&quot;]</code> attribute.</p>
+which are sugar for the <code>#[doc = &quot;...&quot;]</code> attribute. If you wish to join lines together,
+however, you have to end the previous lines with <code>\$</code>.</p>
 <h1 id="notes" class="section-header"><a href="#notes">Notes</a></h1>
 <p>The name of the command is parsed from the applied function,
 or may be specified inside the <code>#[command]</code> attribute, a lá <code>#[command(&quot;foobar&quot;)]</code>.</p>

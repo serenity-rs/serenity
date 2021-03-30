@@ -948,6 +948,13 @@
 <span id="945">945</span>
 <span id="946">946</span>
 <span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
@@ -1032,7 +1039,8 @@
 <span class="doccomment">/// Documentation comments (`///`) applied onto the function are interpreted as sugar for the</span>
 <span class="doccomment">/// `#[description]` option. When more than one application of the option is performed,</span>
 <span class="doccomment">/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,</span>
-<span class="doccomment">/// which are sugar for the `#[doc = &quot;...&quot;]` attribute.</span>
+<span class="doccomment">/// which are sugar for the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together,</span>
+<span class="doccomment">/// however, you have to end the previous lines with `\$`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Notes</span>
 <span class="doccomment">/// The name of the command is parsed from the applied function,</span>
@@ -1542,6 +1550,12 @@
 <span class="doccomment">/// | `#[default_command(cmd)]`                            | A command to execute if none of the group&#39;s prefixes are given.                    | `cmd` is an identifier referencing a function marked by the `#[command]` macro                                                                                                       |</span>
 <span class="doccomment">/// | `#[description(desc)]` &lt;/br&gt; `#[description = desc]` | The group&#39;s description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |</span>
 <span class="doccomment">/// | `#[summary(desc)]` &lt;/br&gt; `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Documentation comments (`///`) applied onto the struct are interpreted as sugar for the</span>
+<span class="doccomment">/// `#[description]` option. When more than one application of the option is performed,</span>
+<span class="doccomment">/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,</span>
+<span class="doccomment">/// which are sugar for the `#[doc = &quot;...&quot;]` attribute. If you wish to join lines together,</span>
+<span class="doccomment">/// however, you have to end the previous lines with `\$`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Similarly to [`command`], this macro generates static instances of the group</span>
 <span class="doccomment">/// and its options. The identifiers of these instances are based off the name of the struct to differentiate</span>
