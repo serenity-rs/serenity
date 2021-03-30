@@ -840,6 +840,7 @@ impl ChannelId {
 
     /// Returns a future that will await one message sent in this channel.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reply<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -849,6 +850,7 @@ impl ChannelId {
 
     /// Returns a stream builder which can be awaited to obtain a stream of messages in this channel.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_replies<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -858,6 +860,7 @@ impl ChannelId {
 
     /// Await a single reaction in this guild.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reaction<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -867,6 +870,7 @@ impl ChannelId {
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions sent in this channel.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reactions<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,

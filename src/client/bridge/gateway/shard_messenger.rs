@@ -250,6 +250,7 @@ impl ShardMessenger {
     /// Sets a new filter for a message collector.
     #[inline]
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn set_message_filter(&self, collector: MessageFilter) {
         #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector));
@@ -257,6 +258,7 @@ impl ShardMessenger {
 
     /// Sets a new filter for a message collector.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn set_reaction_filter(&self, collector: ReactionFilter) {
         #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector));

@@ -61,8 +61,10 @@ pub enum ShardRunnerMessage {
     SetStatus(OnlineStatus),
     /// Sends a new filter for messages to the shard.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     SetMessageFilter(MessageFilter),
     /// Sends a new filter for reactions to the shard.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     SetReactionFilter(ReactionFilter),
 }
