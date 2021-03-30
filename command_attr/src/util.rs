@@ -269,15 +269,16 @@ pub fn append_line(desc: &mut AsOption<String>, mut line: String) {
         line.remove(0);
     }
 
-    match &mut desc.0 {
-        Some(desc) => {
-            if line.trim().is_empty() {
-                desc.push('\n');
-            } else {
-                desc.push(' ');
-                desc.push_str(&line);
-            }
+    let desc = desc.0.get_or_insert_with(String::default);
+
+    match line.rfind("\\$") {
+        Some(i) => {
+            desc.push_str(line[..i].trim_end());
+            desc.push(' ');
         },
-        None => *desc = AsOption(Some(line)),
+        None => {
+            desc.push_str(&line);
+            desc.push('\n');
+        },
     }
 }
