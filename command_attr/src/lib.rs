@@ -82,7 +82,7 @@ macro_rules! match_options {
 /// `#[description]` option. When more than one application of the option is performed,
 /// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
 /// which are sugar for the `#[doc = "..."]` attribute. If you wish to join lines together,
-/// end the previous lines with `\$`.
+/// however, you have to end the previous lines with `\$`.
 ///
 /// # Notes
 /// The name of the command is parsed from the applied function,
@@ -591,7 +591,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// `#[description]` option. When more than one application of the option is performed,
 /// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
 /// which are sugar for the `#[doc = "..."]` attribute. If you wish to join lines together,
-/// end the previous lines with `\$`.
+/// however, you have to end the previous lines with `\$`.
 ///
 /// Similarly to [`command`], this macro generates static instances of the group
 /// and its options. The identifiers of these instances are based off the name of the struct to differentiate
