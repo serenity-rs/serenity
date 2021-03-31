@@ -82,7 +82,7 @@ pub struct GuildChannel {
     pub position: i64,
     /// The topic of the channel.
     ///
-    /// **Note**: This is only available for text channels.
+    /// **Note**: This is only available for text and stage channels.
     pub topic: Option<String>,
     /// The maximum number of members allowed in the channel.
     ///
