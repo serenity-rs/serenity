@@ -315,6 +315,8 @@ __impl_bitflags! {
         ///
         /// [`Integration`]: super::guild::Integration
         MANAGE_EMOJIS = 0b0100_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows for requesting to speak in stage channels.
+        REQUEST_TO_SPEAK = 0b1_0000_0000_0000_0000_0000_0000_0000_0000;
     }
 }
 
@@ -342,6 +344,7 @@ generate_get_permission_names! {
     mute_members: "Mute Members",
     priority_speaker: "Priority Speaker",
     read_message_history: "Read Message History",
+    request_to_speak: "Request To Speak",
     read_messages: "Read Messages",
     send_messages: "Send Messages",
     send_tts_messages: "Send TTS Messages",
@@ -584,6 +587,14 @@ impl Permissions {
     /// [Speak]: Self::SPEAK
     pub fn speak(self) -> bool {
         self.contains(Self::SPEAK)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Request To Speak] permission.
+    ///
+    /// [Request To Speak]: Self::REQUEST_TO_SPEAK
+    pub fn request_to_speak(self) -> bool {
+        self.contains(Self::REQUEST_TO_SPEAK)
     }
 
     /// Shorthand for checking that the set of permissions contains the
