@@ -260,8 +260,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                     session_id.ok_or_else(|| de::Error::missing_field("session_id"))?;
                 let suppress = suppress.ok_or_else(|| de::Error::missing_field("suppress"))?;
                 let user_id = user_id.ok_or_else(|| de::Error::missing_field("user_id"))?;
-                let request_to_speak_timestamp = request_to_speak_timestamp
-                    .ok_or_else(|| de::Error::missing_field("request_to_speak"))?;
+                let request_to_speak_timestamp = request_to_speak_timestamp.unwrap_or(None);
 
                 if let (Some(guild_id), Some(member)) = (guild_id, member.as_mut()) {
                     member.guild_id = guild_id;
