@@ -1147,7 +1147,7 @@ impl Http {
         serde_json::from_value(value).map_err(From::from)
     }
 
-    /// Changes another user's voice state in a stage channel.
+    /// Changes a user's voice state in a stage channel.
     ///
     /// The Value is a map with values of:
     ///
@@ -1155,6 +1155,9 @@ impl Http {
     ///   (**required**)
     /// - **supress**: Bool which toggles user's suppressed state. Setting this
     ///   to `false` will invite the user to speak.
+    /// - **request_to_speak_timestamp**: Only when changing the current user's
+    ///   voice state, ISO8601 timestamp to set the user's request to speak.
+    ///   This can be any present or future time.
     ///
     /// # Examples
     ///
@@ -1173,38 +1176,26 @@ impl Http {
     ///     "suppress": false,
     /// });
     ///
-    /// http.edit_voice_state(guild_id, user_id, &map).await?;
+    /// // Edit state for another user
+    /// http.edit_voice_state(guild_id, Some(user_id), &map).await?;
+    ///
+    /// // Edit state for current user
+    /// http.edit_voice_state(guild_id, None, &map).await?;
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn edit_voice_state(&self, guild_id: u64, user_id: u64, map: &Value) -> Result<()> {
+    pub async fn edit_voice_state(
+        &self,
+        guild_id: u64,
+        user_id: Option<u64>,
+        map: &Value,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditVoiceState {
                 guild_id,
                 user_id,
-            },
-        })
-        .await
-    }
-
-    /// Edits the current bot user's voice state.
-    ///
-    /// The Value is a map with values of:
-    ///
-    /// - **channel_id**: ID of the channel the user is currently in
-    ///   (**required**)
-    /// - **supress**: Bool which toggles user's suppressed state. Setting this
-    ///   to `false` will invite the user to speak.
-    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's
-    ///   request to speak. This can be any present or future time.
-    pub async fn edit_voice_state_self(&self, guild_id: u64, map: &Value) -> Result<()> {
-        self.wind(204, Request {
-            body: Some(map.to_string().as_bytes()),
-            headers: None,
-            route: RouteInfo::EditVoiceStateSelf {
-                guild_id,
             },
         })
         .await
