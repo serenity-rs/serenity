@@ -48,7 +48,7 @@ pub struct GuildChannel {
     pub id: ChannelId,
     /// The bitrate of the channel.
     ///
-    /// **Note**: This is only available for voice channels.
+    /// **Note**: This is only available for voice and stage channels.
     pub bitrate: Option<u64>,
     /// Whether this guild channel belongs in a category.
     #[serde(rename = "parent_id")]

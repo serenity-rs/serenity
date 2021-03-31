@@ -306,7 +306,7 @@ pub enum ChannelType {
     ///
     /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
     Store = 6,
-    /// An indicator that the channel is a `StageChannel`
+    /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
 }
 
