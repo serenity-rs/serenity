@@ -1580,19 +1580,13 @@ impl<'a> RouteInfo<'a> {
                 guild_id,
                 user_id,
             } => {
-                if let Some(user_id) = user_id {
-                    (
-                        LightMethod::Patch,
-                        Route::GuildsIdVoiceStates(guild_id),
-                        Cow::from(Route::guild_voice_states(guild_id, user_id)),
-                    )
+                let route = if let Some(user_id) = user_id {
+                    Cow::from(Route::guild_voice_states(guild_id, user_id))
                 } else {
-                    (
-                        LightMethod::Patch,
-                        Route::GuildsIdVoiceStates(guild_id),
-                        Cow::from(Route::guild_voice_states(guild_id, "@me")),
-                    )
-                }
+                    Cow::from(Route::guild_voice_states(guild_id, "@me"))
+                };
+
+                (LightMethod::Patch, Route::GuildsIdVoiceStates(guild_id), route)
             },
             RouteInfo::EditWebhook {
                 webhook_id,
