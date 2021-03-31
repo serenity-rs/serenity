@@ -236,6 +236,18 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdVanityUrl(u64),
+    /// Route for the `/guilds/:guild_id/voice-states/:user_id` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdVoiceStates(u64),
+    /// Route for the `/guilds/:guild_id/voice-states/@me` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdVoiceStatesSelf(u64),
     /// Route for the `/guilds/:guild_id/webhooks` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -562,6 +574,14 @@ impl Route {
 
     pub fn guild_vanity_url(guild_id: u64) -> String {
         format!(api!("/guilds/{}/vanity-url"), guild_id)
+    }
+
+    pub fn guild_voice_states(guild_id: u64, user_id: u64) -> String {
+        format!(api!("/guilds/{}/voice-states/{}"), guild_id, user_id)
+    }
+
+    pub fn guild_voice_states_self(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/voice-states/@me"), guild_id)
     }
 
     pub fn guild_webhooks(guild_id: u64) -> String {
@@ -953,6 +973,13 @@ pub enum RouteInfo<'a> {
         role_id: u64,
     },
     EditRolePosition {
+        guild_id: u64,
+    },
+    EditVoiceState {
+        guild_id: u64,
+        user_id: u64,
+    },
+    EditVoiceStateSelf {
         guild_id: u64,
     },
     EditWebhook {
@@ -1561,6 +1588,21 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::GuildsIdRolesId(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
+            ),
+            RouteInfo::EditVoiceState {
+                guild_id,
+                user_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdVoiceStates(guild_id),
+                Cow::from(Route::guild_voice_states(guild_id, user_id)),
+            ),
+            RouteInfo::EditVoiceStateSelf {
+                guild_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdVoiceStatesSelf(guild_id),
+                Cow::from(Route::guild_voice_states_self(guild_id)),
             ),
             RouteInfo::EditWebhook {
                 webhook_id,

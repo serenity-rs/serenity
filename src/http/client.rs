@@ -1147,6 +1147,69 @@ impl Http {
         serde_json::from_value(value).map_err(From::from)
     }
 
+    /// Changes another user's voice state in a stage channel.
+    ///
+    /// The Value is a map with values of:
+    ///
+    /// - **channel_id**: ID of the channel the user is currently in
+    ///   (**required**)
+    /// - **supress**: Bool which toggles user's suppressed state. Setting this
+    ///   to `false` will invite the user to speak.
+    ///
+    /// # Examples
+    ///
+    /// Suppress a user
+    ///
+    /// ```rust,no_run
+    /// use serde_json::json;
+    /// use serenity::http::Http;
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// let guild_id = 187450744427773963;
+    /// let user_id = 150443906511667200;
+    /// let map = json!({
+    ///     "channel_id": "826929611849334784",
+    ///     "suppress": false,
+    /// });
+    ///
+    /// http.edit_voice_state(guild_id, user_id, &map).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub async fn edit_voice_state(&self, guild_id: u64, user_id: u64, map: &Value) -> Result<()> {
+        self.wind(204, Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditVoiceState {
+                guild_id,
+                user_id,
+            },
+        })
+        .await
+    }
+
+    /// Edits the current bot user's voice state.
+    ///
+    /// The Value is a map with values of:
+    ///
+    /// - **channel_id**: ID of the channel the user is currently in
+    ///   (**required**)
+    /// - **supress**: Bool which toggles user's suppressed state. Setting this
+    ///   to `false` will invite the user to speak.
+    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's
+    ///   request to speak. This can be any present or future time.
+    pub async fn edit_voice_state_self(&self, guild_id: u64, map: &Value) -> Result<()> {
+        self.wind(204, Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditVoiceStateSelf {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Edits a the webhook with the given data.
     ///
     /// The Value is a map with optional values of:
