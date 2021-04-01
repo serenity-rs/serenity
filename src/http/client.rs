@@ -1171,10 +1171,12 @@ impl Http {
     /// #     let http = Http::default();
     /// let guild_id = 187450744427773963;
     /// let user_id = 150443906511667200;
-    /// let map = json!({
+    /// let value = json!({
     ///     "channel_id": "826929611849334784",
     ///     "suppress": false,
     /// });
+    ///
+    /// let map = value.as_object().unwrap();
     ///
     /// // Edit state for another user
     /// http.edit_voice_state(guild_id, Some(user_id), &map).await?;
@@ -1188,10 +1190,12 @@ impl Http {
         &self,
         guild_id: u64,
         user_id: Option<u64>,
-        map: &Value,
+        map: &JsonMap,
     ) -> Result<()> {
+        let body = serde_json::to_vec(map)?;
+
         self.wind(204, Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(&body),
             headers: None,
             route: RouteInfo::EditVoiceState {
                 guild_id,

@@ -13,7 +13,7 @@ use tokio::{fs::File, io::AsyncReadExt};
 #[cfg(feature = "model")]
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
-use crate::builder::{CreateInvite, CreateMessage, EditMessage, GetMessages};
+use crate::builder::{CreateInvite, CreateMessage, EditMessage, EditVoiceState, GetMessages};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -452,6 +452,42 @@ impl GuildChannel {
         F: FnOnce(&mut EditMessage) -> &mut EditMessage,
     {
         self.id.edit_message(&http, message_id, f).await
+    }
+
+    /// Edits a voice state in a stage channel. Pass `None` for `user_id` to
+    /// edit the current user's voice state.
+    ///
+    /// Requires the [Mute Members] permission to suppress another user or
+    /// unsuppress the current user. This is not required if suppressing
+    /// the current user.
+    ///
+    /// Requires the [Request to Speak] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not
+    /// stage.
+    ///
+    /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
+    /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
+    pub async fn edit_voice_state<F>(
+        &self,
+        http: impl AsRef<Http>,
+        user_id: Option<impl Into<UserId>>,
+        f: F,
+    ) -> Result<()>
+    where
+        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
+    {
+        if self.kind != ChannelType::Stage {
+            return Err(Error::from(ModelError::InvalidChannelType));
+        }
+
+        let mut voice_state = EditVoiceState::default();
+        f(&mut voice_state);
+
+        let map = serenity_utils::hashmap_to_json_map(voice_state.0);
+        http.as_ref().edit_voice_state(self.id.0, user_id.map(|id| id.into().0), &map).await
     }
 
     /// Attempts to find this channel's guild in the Cache.
@@ -897,9 +933,11 @@ impl GuildChannel {
 
     /// Retrieves [`Member`]s from the current channel.
     ///
-    /// [`ChannelType::Voice`] returns [`Member`]s using the channel.
-    /// [`ChannelType::Text`] and [`ChannelType::News`] return [`Member`]s
-    /// that can read the channel.
+    /// [`ChannelType::Voice`] and [`ChannelType::Stage`] returns [`Member`]s
+    /// using the channel.
+    ///
+    /// [`ChannelType::Text`] and [`ChannelType::News`] return [`Member`]s that
+    /// can read the channel.
     ///
     /// # Errors
     ///
@@ -912,7 +950,7 @@ impl GuildChannel {
         let guild = cache.guild(self.guild_id).await.ok_or(ModelError::GuildNotFound)?;
 
         match self.kind {
-            ChannelType::Voice => Ok(guild
+            ChannelType::Voice | ChannelType::Stage => Ok(guild
                 .voice_states
                 .values()
                 .filter_map(|v| {
