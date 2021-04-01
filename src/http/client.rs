@@ -78,7 +78,7 @@ impl<'a> HttpBuilder<'a> {
         }
     }
 
-    /// Construct a new builder to call methods on for the Http construction.
+    /// Construct a new builder to call methods on for the HTTP construction.
     /// The `token` will automatically be prefixed "Bot " if not already.
     pub fn new(token: impl AsRef<str>) -> Self {
         Self::_new().token(token)
