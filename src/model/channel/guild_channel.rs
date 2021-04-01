@@ -102,6 +102,12 @@ pub struct GuildChannel {
     /// channels.
     #[serde(default, rename = "rate_limit_per_user")]
     pub slow_mode_rate: Option<u64>,
+    /// The region override.
+    ///
+    /// **Note**: This is only available for voice and stage channels.
+    pub rtc_region: Option<String>,
+    /// The video quality mode for a voice channel.
+    pub video_quality_mode: Option<VideoQualityMode>,
 }
 
 #[cfg(feature = "model")]

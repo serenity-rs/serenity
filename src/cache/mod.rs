@@ -1081,6 +1081,8 @@ mod test {
             user_limit: None,
             nsfw: false,
             slow_mode_rate: Some(0),
+            rtc_region: None,
+            video_quality_mode: None,
         };
 
         // Add a channel delete event to the cache, the cached messages for that

@@ -413,6 +413,22 @@ pub enum PermissionOverwriteType {
     Role(RoleId),
 }
 
+/// The video quality mode for a voice channel.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+pub enum VideoQualityMode {
+    /// An indicator that the video quality is chosen by Discord for optimal
+    /// performance.
+    Auto = 1,
+    /// An indicator that the video quality is 720p.
+    Full = 2,
+}
+
+enum_number!(VideoQualityMode {
+    Auto,
+    Full,
+});
+
 #[cfg(test)]
 mod test {
     #[cfg(all(feature = "model", feature = "utils"))]
@@ -435,6 +451,8 @@ mod test {
                 user_limit: None,
                 nsfw: false,
                 slow_mode_rate: Some(0),
+                rtc_region: None,
+                video_quality_mode: None,
             }
         }
 
