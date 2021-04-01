@@ -463,6 +463,33 @@ impl GuildChannel {
     ///
     /// Requires the [Request to Speak] permission.
     ///
+    /// # Example
+    ///
+    /// Invite a user to speak.
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "cache")]
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # use std::sync::Arc;
+    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
+    /// #
+    /// #     let http = Arc::new(Http::default());
+    /// #     let cache = Cache::default();
+    /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
+    /// #
+    /// use serenity::model::ModelError;
+    ///
+    /// // assuming the cache has been unlocked
+    /// let channel = cache
+    ///     .guild_channel(channel_id)
+    ///     .await
+    ///     .ok_or(ModelError::ItemMissing)?;
+    ///
+    /// channel.edit_voice_state(&http, user_id, |v| v.suppress(false)).await?;
+    /// #   Ok(())
+    /// # }
+    /// ```
+    ///
     /// # Errors
     ///
     /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not
@@ -471,6 +498,74 @@ impl GuildChannel {
     /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
     /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
     pub async fn edit_voice_state<F>(
+        &self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+        f: F,
+    ) -> Result<()>
+    where
+        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
+    {
+        self._edit_voice_state(http, Some(user_id), f).await
+    }
+
+    /// Edits the current user's voice state in a stage channel.
+    ///
+    /// The [Mute Members] permission is **not** required if suppressing the
+    /// current user.
+    ///
+    /// Requires the [Request to Speak] permission.
+    ///
+    /// # Example
+    ///
+    /// Send a request to speak, then clear the request.
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "cache")]
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # use std::sync::Arc;
+    /// # use serenity::{cache::Cache, http::Http, model::id::ChannelId};
+    /// #
+    /// #     let http = Arc::new(Http::default());
+    /// #     let cache = Cache::default();
+    /// #     let channel_id = ChannelId(0);
+    /// #
+    /// use serenity::model::ModelError;
+    ///
+    /// // assuming the cache has been unlocked
+    /// let channel = cache
+    ///     .guild_channel(channel_id)
+    ///     .await
+    ///     .ok_or(ModelError::ItemMissing)?;
+    ///
+    /// // Send a request to speak
+    /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(true)).await?;
+    ///
+    /// // Clear own request to speak
+    /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(false)).await?;
+    /// #   Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not
+    /// stage.
+    ///
+    /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
+    /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
+    pub async fn edit_own_voice_state<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<()>
+    where
+        F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
+    {
+        self._edit_voice_state(http, None::<u64>, f).await
+    }
+
+    async fn _edit_voice_state<F>(
         &self,
         http: impl AsRef<Http>,
         user_id: Option<impl Into<UserId>>,
