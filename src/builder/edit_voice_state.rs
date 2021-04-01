@@ -5,11 +5,11 @@ use chrono::{DateTime, Utc};
 use super::create_embed::Timestamp;
 use crate::internal::prelude::*;
 
-/// A builder which edits the properties of a [`Member`], to be used in
-/// conjunction with [`Member::edit`].
+/// A builder which edits a user's voice state, to be used in conjunction with
+/// [`GuildChannel::edit_voice_state`].
 ///
 /// [`Member`]: crate::model::guild::Member
-/// [`Member::edit`]: crate::model::guild::Member::edit
+/// [`GuildChannel::edit_voice_state`]: crate::model::channel::GuildChannel::edit_voice_state
 #[derive(Clone, Debug, Default)]
 pub struct EditVoiceState(pub HashMap<&'static str, Value>);
 
