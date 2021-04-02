@@ -1021,6 +1021,8 @@
 <span id="1018">1018</span>
 <span id="1019">1019</span>
 <span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
@@ -1924,6 +1926,8 @@
             <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
             <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
             <span class="ident">slow_mode_rate</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+            <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
+            <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Cache</span>::<span class="ident">default</span>());

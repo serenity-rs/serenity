@@ -1083,6 +1083,13 @@
 <span id="1080">1080</span>
 <span id="1081">1081</span>
 <span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
@@ -1188,6 +1195,13 @@
     <span class="doccomment">/// channels.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;rate_limit_per_user&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">slow_mode_rate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The region override.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This is only available for voice and stage channels. `None`</span>
+    <span class="doccomment">/// for voice and stage channels means automatic region selection.</span>
+    <span class="kw">pub</span> <span class="ident">rtc_region</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The video quality mode for a voice channel.</span>
+    <span class="kw">pub</span> <span class="ident">video_quality_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VideoQualityMode</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
