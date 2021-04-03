@@ -44,10 +44,11 @@ use crate::utils::parse_channel;
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Channel {
-    /// A [text] or [voice] channel within a [`Guild`].
+    /// A [text], [voice], or [stage] channel within a [`Guild`].
     ///
     /// [text]: ChannelType::Text
     /// [voice]: ChannelType::Voice
+    /// [Stage]: ChannelType::Stage
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.

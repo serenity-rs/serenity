@@ -480,10 +480,7 @@ impl GuildChannel {
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache
-    ///     .guild_channel(channel_id)
-    ///     .await
-    ///     .ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.edit_voice_state(&http, user_id, |v| v.suppress(false)).await?;
     /// #   Ok(())
@@ -533,10 +530,7 @@ impl GuildChannel {
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache
-    ///     .guild_channel(channel_id)
-    ///     .await
-    ///     .ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;
     ///
     /// // Send a request to speak
     /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(true)).await?;
@@ -554,11 +548,7 @@ impl GuildChannel {
     ///
     /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
     /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
-    pub async fn edit_own_voice_state<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<()>
+    pub async fn edit_own_voice_state<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
     where
         F: FnOnce(&mut EditVoiceState) -> &mut EditVoiceState,
     {
@@ -581,8 +571,10 @@ impl GuildChannel {
         let mut voice_state = EditVoiceState::default();
         f(&mut voice_state);
 
+        voice_state.0.insert("channel_id", Value::String(self.id.0.to_string()));
+
         let map = serenity_utils::hashmap_to_json_map(voice_state.0);
-        http.as_ref().edit_voice_state(self.id.0, user_id.map(|id| id.into().0), &map).await
+        http.as_ref().edit_voice_state(self.guild_id.0, user_id.map(|id| id.into().0), &map).await
     }
 
     /// Attempts to find this channel's guild in the Cache.
