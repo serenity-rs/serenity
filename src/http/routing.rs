@@ -258,6 +258,12 @@ pub enum Route {
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
     WebhooksId(u64),
+    /// Route for the `/webhooks/:webhook_id/:token/messages/:message_id` path.
+    ///
+    /// The data is the relevant [`WebhookId`].
+    ///
+    /// [`WebhookId`]: crate::model::id::WebhookId
+    WebhooksIdMessagesId(u64),
     /// Route for the `/webhooks/:application_id` path.
     ///
     /// The data is the relevant [`ApplicationId`].
@@ -1435,8 +1441,7 @@ impl<'a> RouteInfo<'a> {
                 message_id,
             } => (
                 LightMethod::Delete,
-                // FIXME: This should probably be another route.
-                Route::WebhooksId(webhook_id),
+                Route::WebhooksIdMessagesId(webhook_id),
                 Cow::from(Route::webhook_message(webhook_id, token, message_id)),
             ),
             RouteInfo::EditChannel {
@@ -1578,8 +1583,7 @@ impl<'a> RouteInfo<'a> {
                 message_id,
             } => (
                 LightMethod::Patch,
-                // FIXME: This should probably be another route.
-                Route::WebhooksId(webhook_id),
+                Route::WebhooksIdMessagesId(webhook_id),
                 Cow::from(Route::webhook_message(webhook_id, token, message_id)),
             ),
             RouteInfo::ExecuteWebhook {
