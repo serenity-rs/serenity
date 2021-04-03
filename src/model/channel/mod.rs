@@ -48,7 +48,7 @@ pub enum Channel {
     ///
     /// [text]: ChannelType::Text
     /// [voice]: ChannelType::Voice
-    /// [Stage]: ChannelType::Stage
+    /// [stage]: ChannelType::Stage
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
