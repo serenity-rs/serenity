@@ -1896,6 +1896,47 @@
 <span id="1893">1893</span>
 <span id="1894">1894</span>
 <span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
+<span id="1933">1933</span>
+<span id="1934">1934</span>
+<span id="1935">1935</span>
+<span id="1936">1936</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow</span>::<span class="ident">Cow</span>,
@@ -2157,6 +2198,12 @@
     <span class="ident">VoiceRegions</span>,
     <span class="doccomment">/// Route for the `/webhooks/:webhook_id` path.</span>
     <span class="ident">WebhooksId</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/webhooks/:webhook_id/:token/messages/:message_id` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`WebhookId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`WebhookId`]: crate::model::id::WebhookId</span>
+    <span class="ident">WebhooksIdMessagesId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/webhooks/:application_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ApplicationId`].</span>
@@ -2554,6 +2601,13 @@
         <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/webhooks/{}/{}?wait={}&quot;</span>), <span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_message</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>
+    <span class="kw">where</span>
+        <span class="ident">D</span>: <span class="ident">Display</span>,
+    {
+        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/webhooks/{}/{}/messages/{}&quot;</span>), <span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)
+    }
+
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_original_interaction_response</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(
@@ -2775,6 +2829,11 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">DeleteWebhookMessage</span> {
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">message_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">EditChannel</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
@@ -2842,6 +2901,11 @@
     <span class="ident">EditWebhookWithToken</span> {
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditWebhookMessage</span> {
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">message_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">ExecuteWebhook</span> {
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -3311,6 +3375,15 @@
                 <span class="ident">Route</span>::<span class="ident">WebhooksId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow</span>::<span class="ident">from</span>(<span class="ident">Route</span>::<span class="ident">webhook_with_token</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>)),
             ),
+            <span class="ident">RouteInfo</span>::<span class="ident">DeleteWebhookMessage</span> {
+                <span class="ident">token</span>,
+                <span class="ident">webhook_id</span>,
+                <span class="ident">message_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod</span>::<span class="ident">Delete</span>,
+                <span class="ident">Route</span>::<span class="ident">WebhooksIdMessagesId</span>(<span class="ident">webhook_id</span>),
+                <span class="ident">Cow</span>::<span class="ident">from</span>(<span class="ident">Route</span>::<span class="ident">webhook_message</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)),
+            ),
             <span class="ident">RouteInfo</span>::<span class="ident">EditChannel</span> {
                 <span class="ident">channel_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (
@@ -3443,6 +3516,15 @@
                 <span class="ident">LightMethod</span>::<span class="ident">Patch</span>,
                 <span class="ident">Route</span>::<span class="ident">WebhooksId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow</span>::<span class="ident">from</span>(<span class="ident">Route</span>::<span class="ident">webhook_with_token</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>)),
+            ),
+            <span class="ident">RouteInfo</span>::<span class="ident">EditWebhookMessage</span> {
+                <span class="ident">token</span>,
+                <span class="ident">webhook_id</span>,
+                <span class="ident">message_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod</span>::<span class="ident">Patch</span>,
+                <span class="ident">Route</span>::<span class="ident">WebhooksIdMessagesId</span>(<span class="ident">webhook_id</span>),
+                <span class="ident">Cow</span>::<span class="ident">from</span>(<span class="ident">Route</span>::<span class="ident">webhook_message</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)),
             ),
             <span class="ident">RouteInfo</span>::<span class="ident">ExecuteWebhook</span> {
                 <span class="ident">token</span>,
