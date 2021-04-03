@@ -1156,7 +1156,7 @@ impl Http {
     /// - **supress**: Bool which toggles user's suppressed state. Setting this
     ///   to `false` will invite the user to speak.
     ///
-    /// # Examples
+    /// # Example
     ///
     /// Suppress a user
     ///
@@ -1170,16 +1170,13 @@ impl Http {
     /// let user_id = 150443906511667200;
     /// let value = json!({
     ///     "channel_id": "826929611849334784",
-    ///     "suppress": false,
+    ///     "suppress": true,
     /// });
     ///
     /// let map = value.as_object().unwrap();
     ///
     /// // Edit state for another user
-    /// http.edit_voice_state(guild_id, Some(user_id), &map).await?;
-    ///
-    /// // Edit state for current user
-    /// http.edit_voice_state(guild_id, None, &map).await?;
+    /// http.edit_voice_state(guild_id, user_id, &map).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -1207,6 +1204,31 @@ impl Http {
     ///   to `false` will invite the user to speak.
     /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's
     ///   request to speak. This can be any present or future time.
+    ///
+    /// # Example
+    ///
+    /// Unsuppress the current bot user
+    ///
+    /// ```rust,no_run
+    /// use serde_json::json;
+    /// use serenity::http::Http;
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// let guild_id = 187450744427773963;
+    /// let value = json!({
+    ///     "channel_id": "826929611849334784",
+    ///     "suppress": false,
+    ///     "request_to_speak_timestamp": "2021-03-31T18:45:31.297561+00:00"
+    /// });
+    ///
+    /// let map = value.as_object().unwrap();
+    ///
+    /// // Edit state for current user
+    /// http.edit_voice_state_me(guild_id, &map).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
     pub async fn edit_voice_state_me(&self, guild_id: u64, map: &JsonMap) -> Result<()> {
         let body = serde_json::to_vec(map)?;
 
