@@ -131,6 +131,8 @@ impl EditGuild {
 
     /// Set the splash image of the guild on the invitation page.
     ///
+    /// The `splash` must be base64-encoded 1024x1024 png/jpeg/gif image-data.
+    ///
     /// Requires that the guild have the `INVITE_SPLASH` feature enabled.
     /// You can check this through a guild's [`features`] list.
     ///
@@ -138,6 +140,82 @@ impl EditGuild {
     pub fn splash(&mut self, splash: Option<&str>) -> &mut Self {
         let splash = splash.map_or(Value::Null, |x| Value::String(x.to_string()));
         self.0.insert("splash", splash);
+        self
+    }
+
+    /// Set the banner image of the guild, it appears on the left side-bar.
+    ///
+    /// The `banner` must be base64-encoded 16:9 png/jpeg image data.
+    ///
+    /// Requires that the guild have the `BANNER` feature enabled.
+    /// You can check this through a guild's [`features`] list.
+    ///
+    /// [`features`]: crate::model::guild::Guild::features
+    pub fn banner(&mut self, banner: Option<&str>) -> &mut Self {
+        let banner = banner.map_or(Value::Null, |x| Value::String(x.to_string()));
+        self.0.insert("banner", banner);
+        self
+    }
+
+    /// Set the channel ID where welcome messages and boost events will be
+    /// posted.
+    ///
+    /// **Note**:
+    /// This feature is for Community guilds only.
+    pub fn system_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
+        let channel_id = channel_id.map_or(Value::Null, |x| Value::from(x.0));
+        self.0.insert("system_channel_id", channel_id);
+        self
+    }
+
+    /// Set the channel ID of the rules and guidelines channel.
+    ///
+    /// **Note**:
+    /// This feature is for Community guilds only.
+    pub fn rules_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
+        let channel_id = channel_id.map_or(Value::Null, |x| Value::from(x.0));
+        self.0.insert("rules_channel_id", channel_id);
+        self
+    }
+
+    /// Set the channel ID where admins and moderators receive update messages
+    /// from Discord.
+    ///
+    /// **Note**:
+    /// This feature is for Community guilds only.
+    pub fn public_updates_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
+        let channel_id = channel_id.map_or(Value::Null, |x| Value::from(x.0));
+        self.0.insert("public_updates_channel_id", channel_id);
+        self
+    }
+
+    /// Set the preferred locale used in Server Discovery and update messages
+    /// from Discord.
+    ///
+    /// If this is not set, the locale will default to "en-US";
+    ///
+    /// **Note**:
+    /// This feature is for Community guilds only.
+    pub fn preferred_locale(&mut self, locale: Option<&str>) -> &mut Self {
+        let locale = locale.map_or(Value::Null, |x| Value::String(x.to_string()));
+        self.0.insert("preferred_locale", locale);
+        self
+    }
+
+    /// Set the content filter level.
+    pub fn explicit_content_filter(&mut self, level: Option<ExplicitContentFilter>) -> &mut Self {
+        let level = level.map_or(Value::Null, |x| Value::from(x as u8));
+        self.0.insert("explicit_content_filter", level);
+        self
+    }
+
+    /// Set the default message notification level.
+    pub fn default_message_notifications(
+        &mut self,
+        level: Option<DefaultMessageNotificationLevel>,
+    ) -> &mut Self {
+        let level = level.map_or(Value::Null, |x| Value::from(x as u8));
+        self.0.insert("default_message_notifications", level);
         self
     }
 
