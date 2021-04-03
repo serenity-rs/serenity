@@ -1147,7 +1147,7 @@ impl Http {
         serde_json::from_value(value).map_err(From::from)
     }
 
-    /// Changes a user's voice state in a stage channel.
+    /// Changes another user's voice state in a stage channel.
     ///
     /// The Value is a map with values of:
     ///
@@ -1155,9 +1155,6 @@ impl Http {
     ///   (**required**)
     /// - **supress**: Bool which toggles user's suppressed state. Setting this
     ///   to `false` will invite the user to speak.
-    /// - **request_to_speak_timestamp**: Only when changing the current user's
-    ///   voice state, ISO8601 timestamp to set the user's request to speak.
-    ///   This can be any present or future time.
     ///
     /// # Examples
     ///
@@ -1186,12 +1183,7 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn edit_voice_state(
-        &self,
-        guild_id: u64,
-        user_id: Option<u64>,
-        map: &JsonMap,
-    ) -> Result<()> {
+    pub async fn edit_voice_state(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
         let body = serde_json::to_vec(map)?;
 
         self.wind(204, Request {
@@ -1200,6 +1192,29 @@ impl Http {
             route: RouteInfo::EditVoiceState {
                 guild_id,
                 user_id,
+            },
+        })
+        .await
+    }
+
+    /// Changes the current user's voice state in a stage channel.
+    ///
+    /// The Value is a map with values of:
+    ///
+    /// - **channel_id**: ID of the channel the user is currently in
+    ///   (**required**)
+    /// - **supress**: Bool which toggles user's suppressed state. Setting this
+    ///   to `false` will invite the user to speak.
+    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's
+    ///   request to speak. This can be any present or future time.
+    pub async fn edit_voice_state_me(&self, guild_id: u64, map: &JsonMap) -> Result<()> {
+        let body = serde_json::to_vec(map)?;
+
+        self.wind(204, Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::EditVoiceStateMe {
+                guild_id,
             },
         })
         .await

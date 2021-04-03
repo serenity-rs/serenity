@@ -574,7 +574,12 @@ impl GuildChannel {
         voice_state.0.insert("channel_id", Value::String(self.id.0.to_string()));
 
         let map = serenity_utils::hashmap_to_json_map(voice_state.0);
-        http.as_ref().edit_voice_state(self.guild_id.0, user_id.map(|id| id.into().0), &map).await
+
+        if let Some(id) = user_id {
+            http.as_ref().edit_voice_state(self.guild_id.0, id.into().0, &map).await
+        } else {
+            http.as_ref().edit_voice_state_me(self.guild_id.0, &map).await
+        }
     }
 
     /// Attempts to find this channel's guild in the Cache.
