@@ -11,7 +11,7 @@ use super::{
     user::User,
 };
 #[cfg(feature = "model")]
-use crate::builder::ExecuteWebhook;
+use crate::builder::{EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(feature = "model")]
@@ -318,6 +318,60 @@ impl Webhook {
         } else {
             http.as_ref().execute_webhook(self.id.0, &token, wait, &map).await
         }
+    }
+
+    /// Edits a webhook message with the fields set via the given builder.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    ///
+    /// May also return an [`Error::Http`] if the content is malformed, the webhook's token is invalid, or
+    /// the given message Id does not belong to the current webhook.
+    ///
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`token`]: Self::token
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn edit_message<F>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: MessageId,
+        f: F,
+    ) -> Result<Message>
+    where
+        F: FnOnce(&mut EditWebhookMessage) -> &mut EditWebhookMessage,
+    {
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        let mut edit_webhook_message = EditWebhookMessage::default();
+        f(&mut edit_webhook_message);
+
+        let map = utils::hashmap_to_json_map(edit_webhook_message.0);
+
+        http.as_ref().edit_webhook_message(self.id.0, token, message_id.0, &map).await
+    }
+
+    /// Deletes a webhook message.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    ///
+    /// May also return an [`Error::Http`] if the webhook's token is invalid or
+    /// the given message Id does not belong to the current webhook.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`token`]: Self::token
+    /// [`Error::Http`]: crate::error::Error::Http
+    pub async fn delete_message(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: MessageId,
+    ) -> Result<()> {
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        http.as_ref().delete_webhook_message(self.id.0, token, message_id.0).await
     }
 
     /// Retrieves the latest information about the webhook, editing the
