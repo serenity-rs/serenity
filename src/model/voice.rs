@@ -46,6 +46,10 @@ pub struct VoiceState {
     pub suppress: bool,
     pub token: Option<String>,
     pub user_id: UserId,
+    /// When unsuppressed, non-bot users will have this set to the current time.
+    /// Bot users will be set to `None`. When suppressed, the user will have
+    /// their `request_to_speak_timestamp` removed.
+    pub request_to_speak_timestamp: Option<DateTime<Utc>>,
 }
 
 impl fmt::Debug for VoiceState {
@@ -63,6 +67,7 @@ impl fmt::Debug for VoiceState {
             .field("session_id", &self.session_id)
             .field("suppress", &self.suppress)
             .field("user_id", &self.user_id)
+            .field("request_to_speak_timestamp", &self.request_to_speak_timestamp)
             .finish()
     }
 }
@@ -85,6 +90,7 @@ impl<'de> Deserialize<'de> for VoiceState {
             Suppress,
             Token,
             UserId,
+            RequestToSpeakTimestamp,
         }
 
         #[derive(Deserialize)]
@@ -126,6 +132,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                 let mut suppress = None;
                 let mut token = None;
                 let mut user_id = None;
+                let mut request_to_speak_timestamp = None;
 
                 loop {
                     let key = match map.next_key() {
@@ -232,6 +239,14 @@ impl<'de> Deserialize<'de> for VoiceState {
                             }
                             user_id = Some(map.next_value()?);
                         },
+                        Field::RequestToSpeakTimestamp => {
+                            if request_to_speak_timestamp.is_some() {
+                                return Err(de::Error::duplicate_field(
+                                    "request_to_speak_timestamp",
+                                ));
+                            }
+                            request_to_speak_timestamp = Some(map.next_value()?);
+                        },
                     }
                 }
 
@@ -245,6 +260,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                     session_id.ok_or_else(|| de::Error::missing_field("session_id"))?;
                 let suppress = suppress.ok_or_else(|| de::Error::missing_field("suppress"))?;
                 let user_id = user_id.ok_or_else(|| de::Error::missing_field("user_id"))?;
+                let request_to_speak_timestamp = request_to_speak_timestamp.unwrap_or(None);
 
                 if let (Some(guild_id), Some(member)) = (guild_id, member.as_mut()) {
                     member.guild_id = guild_id;
@@ -264,6 +280,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                     suppress,
                     token,
                     user_id,
+                    request_to_speak_timestamp,
                 })
             }
         }
@@ -282,6 +299,7 @@ impl<'de> Deserialize<'de> for VoiceState {
             "suppress",
             "token",
             "user_id",
+            "request_to_speak_timestamp",
         ];
 
         deserializer.deserialize_struct("VoiceState", FIELDS, VoiceStateVisitor)

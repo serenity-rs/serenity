@@ -1147,6 +1147,101 @@ impl Http {
         serde_json::from_value(value).map_err(From::from)
     }
 
+    /// Changes another user's voice state in a stage channel.
+    ///
+    /// The Value is a map with values of:
+    ///
+    /// - **channel_id**: ID of the channel the user is currently in
+    ///   (**required**)
+    /// - **supress**: Bool which toggles user's suppressed state. Setting this
+    ///   to `false` will invite the user to speak.
+    ///
+    /// # Example
+    ///
+    /// Suppress a user
+    ///
+    /// ```rust,no_run
+    /// use serde_json::json;
+    /// use serenity::http::Http;
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// let guild_id = 187450744427773963;
+    /// let user_id = 150443906511667200;
+    /// let value = json!({
+    ///     "channel_id": "826929611849334784",
+    ///     "suppress": true,
+    /// });
+    ///
+    /// let map = value.as_object().unwrap();
+    ///
+    /// // Edit state for another user
+    /// http.edit_voice_state(guild_id, user_id, &map).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub async fn edit_voice_state(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
+        let body = serde_json::to_vec(map)?;
+
+        self.wind(204, Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::EditVoiceState {
+                guild_id,
+                user_id,
+            },
+        })
+        .await
+    }
+
+    /// Changes the current user's voice state in a stage channel.
+    ///
+    /// The Value is a map with values of:
+    ///
+    /// - **channel_id**: ID of the channel the user is currently in
+    ///   (**required**)
+    /// - **supress**: Bool which toggles user's suppressed state. Setting this
+    ///   to `false` will invite the user to speak.
+    /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's
+    ///   request to speak. This can be any present or future time.
+    ///
+    /// # Example
+    ///
+    /// Unsuppress the current bot user
+    ///
+    /// ```rust,no_run
+    /// use serde_json::json;
+    /// use serenity::http::Http;
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// let guild_id = 187450744427773963;
+    /// let value = json!({
+    ///     "channel_id": "826929611849334784",
+    ///     "suppress": false,
+    ///     "request_to_speak_timestamp": "2021-03-31T18:45:31.297561+00:00"
+    /// });
+    ///
+    /// let map = value.as_object().unwrap();
+    ///
+    /// // Edit state for current user
+    /// http.edit_voice_state_me(guild_id, &map).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub async fn edit_voice_state_me(&self, guild_id: u64, map: &JsonMap) -> Result<()> {
+        let body = serde_json::to_vec(map)?;
+
+        self.wind(204, Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::EditVoiceStateMe {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Edits a the webhook with the given data.
     ///
     /// The Value is a map with optional values of:

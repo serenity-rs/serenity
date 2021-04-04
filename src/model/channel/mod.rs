@@ -44,10 +44,11 @@ use crate::utils::parse_channel;
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Channel {
-    /// A [text] or [voice] channel within a [`Guild`].
+    /// A [text], [voice], or [stage] channel within a [`Guild`].
     ///
     /// [text]: ChannelType::Text
     /// [voice]: ChannelType::Voice
+    /// [stage]: ChannelType::Stage
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
@@ -242,7 +243,7 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 | 5 | 6 => serde_json::from_value::<GuildChannel>(Value::Object(v))
+            0 | 2 | 5 | 6 | 13 => serde_json::from_value::<GuildChannel>(Value::Object(v))
                 .map(Channel::Guild)
                 .map_err(DeError::custom),
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
@@ -306,6 +307,8 @@ pub enum ChannelType {
     ///
     /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
     Store = 6,
+    /// An indicator that the channel is a stage [`GuildChannel`].
+    Stage = 13,
 }
 
 enum_number!(ChannelType {
@@ -314,7 +317,8 @@ enum_number!(ChannelType {
     Voice,
     Category,
     News,
-    Store
+    Store,
+    Stage,
 });
 
 impl ChannelType {
@@ -327,6 +331,7 @@ impl ChannelType {
             ChannelType::Category => "category",
             ChannelType::News => "news",
             ChannelType::Store => "store",
+            ChannelType::Stage => "stage",
         }
     }
 
@@ -339,6 +344,7 @@ impl ChannelType {
             ChannelType::Category => 4,
             ChannelType::News => 5,
             ChannelType::Store => 6,
+            ChannelType::Stage => 13,
         }
     }
 }
