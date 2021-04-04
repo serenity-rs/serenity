@@ -1937,6 +1937,48 @@
 <span id="1934">1934</span>
 <span id="1935">1935</span>
 <span id="1936">1936</span>
+<span id="1937">1937</span>
+<span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
+<span id="1942">1942</span>
+<span id="1943">1943</span>
+<span id="1944">1944</span>
+<span id="1945">1945</span>
+<span id="1946">1946</span>
+<span id="1947">1947</span>
+<span id="1948">1948</span>
+<span id="1949">1949</span>
+<span id="1950">1950</span>
+<span id="1951">1951</span>
+<span id="1952">1952</span>
+<span id="1953">1953</span>
+<span id="1954">1954</span>
+<span id="1955">1955</span>
+<span id="1956">1956</span>
+<span id="1957">1957</span>
+<span id="1958">1958</span>
+<span id="1959">1959</span>
+<span id="1960">1960</span>
+<span id="1961">1961</span>
+<span id="1962">1962</span>
+<span id="1963">1963</span>
+<span id="1964">1964</span>
+<span id="1965">1965</span>
+<span id="1966">1966</span>
+<span id="1967">1967</span>
+<span id="1968">1968</span>
+<span id="1969">1969</span>
+<span id="1970">1970</span>
+<span id="1971">1971</span>
+<span id="1972">1972</span>
+<span id="1973">1973</span>
+<span id="1974">1974</span>
+<span id="1975">1975</span>
+<span id="1976">1976</span>
+<span id="1977">1977</span>
+<span id="1978">1978</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow</span>::<span class="ident">Cow</span>,
@@ -2176,6 +2218,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdVanityUrl</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/voice-states/:user_id` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdVoiceStates</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/voice-states/@me` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdVoiceStatesMe</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/webhooks` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
@@ -2502,6 +2556,14 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_vanity_url</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/guilds/{}/vanity-url&quot;</span>), <span class="ident">guild_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_voice_states</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/guilds/{}/voice-states/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">user_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_voice_states_me</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/guilds/{}/voice-states/@me&quot;</span>), <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
@@ -2893,6 +2955,13 @@
         <span class="ident">role_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditRolePosition</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditVoiceState</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">user_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditVoiceStateMe</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditWebhook</span> {
@@ -3501,6 +3570,21 @@
                 <span class="ident">LightMethod</span>::<span class="ident">Patch</span>,
                 <span class="ident">Route</span>::<span class="ident">GuildsIdRolesId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow</span>::<span class="ident">from</span>(<span class="ident">Route</span>::<span class="ident">guild_roles</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="ident">RouteInfo</span>::<span class="ident">EditVoiceState</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">user_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod</span>::<span class="ident">Patch</span>,
+                <span class="ident">Route</span>::<span class="ident">GuildsIdVoiceStates</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow</span>::<span class="ident">from</span>(<span class="ident">Route</span>::<span class="ident">guild_voice_states</span>(<span class="ident">guild_id</span>, <span class="ident">user_id</span>)),
+            ),
+            <span class="ident">RouteInfo</span>::<span class="ident">EditVoiceStateMe</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod</span>::<span class="ident">Patch</span>,
+                <span class="ident">Route</span>::<span class="ident">GuildsIdVoiceStatesMe</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow</span>::<span class="ident">from</span>(<span class="ident">Route</span>::<span class="ident">guild_voice_states_me</span>(<span class="ident">guild_id</span>)),
             ),
             <span class="ident">RouteInfo</span>::<span class="ident">EditWebhook</span> {
                 <span class="ident">webhook_id</span>,

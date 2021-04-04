@@ -648,6 +648,17 @@
 <span id="645">645</span>
 <span id="646">646</span>
 <span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
@@ -966,6 +977,8 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`Integration`]: super::guild::Integration</span>
         <span class="ident">MANAGE_EMOJIS</span> <span class="op">=</span> <span class="number">0b0100_0000_0000_0000_0000_0000_0000_0000</span>;
+        <span class="doccomment">/// Allows for requesting to speak in stage channels.</span>
+        <span class="ident">REQUEST_TO_SPEAK</span> <span class="op">=</span> <span class="number">0b1_0000_0000_0000_0000_0000_0000_0000_0000</span>;
     }
 }
 
@@ -993,6 +1006,7 @@
     <span class="ident">mute_members</span>: <span class="string">&quot;Mute Members&quot;</span>,
     <span class="ident">priority_speaker</span>: <span class="string">&quot;Priority Speaker&quot;</span>,
     <span class="ident">read_message_history</span>: <span class="string">&quot;Read Message History&quot;</span>,
+    <span class="ident">request_to_speak</span>: <span class="string">&quot;Request To Speak&quot;</span>,
     <span class="ident">read_messages</span>: <span class="string">&quot;Read Messages&quot;</span>,
     <span class="ident">send_messages</span>: <span class="string">&quot;Send Messages&quot;</span>,
     <span class="ident">send_tts_messages</span>: <span class="string">&quot;Send TTS Messages&quot;</span>,
@@ -1235,6 +1249,14 @@
     <span class="doccomment">/// [Speak]: Self::SPEAK</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">speak</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">SPEAK</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Request To Speak] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Request To Speak]: Self::REQUEST_TO_SPEAK</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request_to_speak</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">REQUEST_TO_SPEAK</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
