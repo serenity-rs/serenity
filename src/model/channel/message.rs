@@ -73,7 +73,6 @@ pub struct Message {
     pub mention_roles: Vec<RoleId>,
     /// Channels specifically mentioned in this message.
     ///
-    ```suggestion
     /// **Note**:
     /// Not all channel mentions in a message will appear in `mention_channels`. Only textual 
     /// channels that are visible to everyone in a lurkable guild will ever be included.
