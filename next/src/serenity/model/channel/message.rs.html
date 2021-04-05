@@ -1477,7 +1477,7 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
             <span class="ident">MessageType</span>::<span class="ident">PinsAdd</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span>
-                    <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} pinned a message to this channel. See all the pins.&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>);
+                    <span class="macro">format!</span>(<span class="string">&quot;{} pinned a message to this channel. See all the pins.&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>);
             },
             <span class="ident">MessageType</span>::<span class="ident">MemberJoin</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timestamp</span>.<span class="ident">timestamp</span>() <span class="kw">as</span> <span class="ident">usize</span>;
@@ -1507,7 +1507,7 @@
             <span class="ident">at_distinct</span>.<span class="ident">push</span>(<span class="string">&#39;#&#39;</span>);
 
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">at_distinct</span>, <span class="string">&quot;{:04}&quot;</span>, <span class="ident">u</span>.<span class="ident">discriminator</span>);
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">at_distinct</span>, <span class="string">&quot;{:04}&quot;</span>, <span class="ident">u</span>.<span class="ident">discriminator</span>);
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">u</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>();
             <span class="comment">// Check whether we&#39;re replacing a nickname mention or a normal mention.</span>
@@ -1524,7 +1524,7 @@
             <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>();
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span> {
-                <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">mention</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">role</span>.<span class="ident">name</span>));
+                <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">mention</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">role</span>.<span class="ident">name</span>));
             } <span class="kw">else</span> {
                 <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">mention</span>, <span class="string">&quot;@deleted-role&quot;</span>);
             }
@@ -1817,7 +1817,7 @@
         <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
         <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>(), <span class="ident">content</span>), <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>(), <span class="ident">content</span>), <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// `inlined` decides whether this reply is inlinded and whether it pings.</span>
@@ -1974,11 +1974,11 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">link</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
                 <span class="string">&quot;https://discord.com/channels/{}/{}/{}&quot;</span>,
                 <span class="ident">guild_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>
             ),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;https://discord.com/channels/@me/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/@me/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>),
         }
     }
 
@@ -2151,7 +2151,7 @@
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">20</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">MessageType</span> {
+<span class="macro">enum_number!</span>(<span class="ident">MessageType</span> {
     <span class="ident">Regular</span>,
     <span class="ident">GroupRecipientAddition</span>,
     <span class="ident">GroupRecipientRemoval</span>,
@@ -2207,7 +2207,7 @@
     <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">5</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">MessageActivityKind</span> {
+<span class="macro">enum_number!</span>(<span class="ident">MessageActivityKind</span> {
     <span class="ident">JOIN</span>,
     <span class="ident">SPECTATE</span>,
     <span class="ident">LISTEN</span>,
@@ -2308,7 +2308,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="macro">__impl_bitflags</span><span class="macro">!</span> {
+<span class="macro">__impl_bitflags!</span> {
     <span class="ident">MessageFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// This message has been published to subscribed channels (via Channel Following).</span>
         <span class="ident">CROSSPOSTED</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0001</span>;

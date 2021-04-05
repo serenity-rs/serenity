@@ -350,7 +350,7 @@
                     <span class="ident">PermissionOverwriteType</span>::<span class="ident">Role</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">id</span>.<span class="number">0</span>, <span class="string">&quot;role&quot;</span>),
                 };
 
-                <span class="macro">json</span><span class="macro">!</span>({
+                <span class="macro">json!</span>({
                     <span class="string">&quot;allow&quot;</span>: <span class="ident">perm</span>.<span class="ident">allow</span>.<span class="ident">bits</span>(),
                     <span class="string">&quot;deny&quot;</span>: <span class="ident">perm</span>.<span class="ident">deny</span>.<span class="ident">bits</span>(),
                     <span class="string">&quot;id&quot;</span>: <span class="ident">id</span>,

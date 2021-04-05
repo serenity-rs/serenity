@@ -208,9 +208,9 @@
 <span class="doccomment">/// The [UserAgent] sent along with every request.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [UserAgent]: ::reqwest::header::USER_AGENT</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_AGENT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">concat</span><span class="macro">!</span>(
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_AGENT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">concat!</span>(
     <span class="string">&quot;DiscordBot (https://github.com/serenity-rs/serenity, &quot;</span>,
-    <span class="macro">env</span><span class="macro">!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>),
+    <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>),
     <span class="string">&quot;)&quot;</span>
 );
 
@@ -288,7 +288,7 @@
     <span class="ident">HeartbeatAck</span> <span class="op">=</span> <span class="number">11</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">OpCode</span> {
+<span class="macro">enum_number!</span>(<span class="ident">OpCode</span> {
     <span class="ident">Event</span>,
     <span class="ident">Heartbeat</span>,
     <span class="ident">Identify</span>,

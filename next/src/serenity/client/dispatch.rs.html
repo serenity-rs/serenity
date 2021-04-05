@@ -1139,7 +1139,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="kw">let</span> <span class="ident">old_channel</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">channel</span>(<span class="ident">event</span>.<span class="ident">channel</span>.<span class="ident">id</span>()).<span class="kw">await</span>;
                     <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
@@ -1196,7 +1196,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="ident">event_handler</span>.<span class="ident">guild_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>, <span class="ident">_is_new</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">event_handler</span>.<span class="ident">guild_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="kw">await</span>;
@@ -1208,7 +1208,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="ident">event_handler</span>.<span class="ident">guild_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>, <span class="ident">_full</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">event_handler</span>.<span class="ident">guild_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="kw">await</span>;
@@ -1244,7 +1244,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="ident">event_handler</span>.<span class="ident">guild_member_removal</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>, <span class="ident">_member</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">event_handler</span>.<span class="ident">guild_member_removal</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>).<span class="kw">await</span>;
@@ -1253,7 +1253,7 @@
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMemberUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
-            <span class="kw">let</span> <span class="ident">_after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">feature_cache</span><span class="macro">!</span> {{
+            <span class="kw">let</span> <span class="ident">_after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">feature_cache!</span> {{
                 <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>.<span class="ident">id</span>).<span class="kw">await</span>
             } <span class="kw">else</span> {
                 <span class="prelude-val">None</span>
@@ -1262,7 +1262,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">_after</span> {
                         <span class="ident">event_handler</span>.<span class="ident">guild_member_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>, <span class="ident">after</span>).<span class="kw">await</span>;
                     }
@@ -1292,7 +1292,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="ident">event_handler</span>.<span class="ident">guild_role_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role_id</span>, <span class="ident">_role</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">event_handler</span>.<span class="ident">guild_role_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role_id</span>).<span class="kw">await</span>;
@@ -1304,7 +1304,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
@@ -1323,7 +1323,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>
                         .<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">guild</span>.<span class="ident">id</span>)
                         .<span class="kw">await</span>;
@@ -1377,7 +1377,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="kw">let</span> <span class="ident">_after</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">message</span>(<span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">id</span>).<span class="kw">await</span>;
                     <span class="ident">event_handler</span>.<span class="ident">message_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>, <span class="ident">_after</span>, <span class="ident">event</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
@@ -1459,7 +1459,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="ident">event_handler</span>.<span class="ident">user_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>.<span class="ident">expect</span>(<span class="string">&quot;missing old user&quot;</span>), <span class="ident">event</span>.<span class="ident">current_user</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">event_handler</span>.<span class="ident">user_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">current_user</span>).<span class="kw">await</span>;
@@ -1478,7 +1478,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">feature_cache</span><span class="macro">!</span> {{
+                <span class="macro">feature_cache!</span> {{
                     <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
                     <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;

@@ -234,7 +234,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: There can be no more than 10 choices set.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_int_choice</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>, <span class="ident">value</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
             <span class="string">&quot;value&quot;</span> : <span class="ident">value</span>
         });
@@ -242,7 +242,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_string_choice</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span>, <span class="ident">E</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>, <span class="ident">value</span>: <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">choice</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
             <span class="string">&quot;value&quot;</span>: <span class="ident">value</span>.<span class="ident">to_string</span>()
         });

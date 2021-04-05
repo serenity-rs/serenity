@@ -236,8 +236,8 @@
 <span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">MemberParseError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-			<span class="self">Self</span>::<span class="ident">GuildNotInCache</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Guild is not in cache&quot;</span>),
-			<span class="self">Self</span>::<span class="ident">NotFoundOrMalformed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Provided member was not found or provided string did not adhere to any known guild member format&quot;</span>),
+			<span class="self">Self</span>::<span class="ident">GuildNotInCache</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Guild is not in cache&quot;</span>),
+			<span class="self">Self</span>::<span class="ident">NotFoundOrMalformed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Provided member was not found or provided string did not adhere to any known guild member format&quot;</span>),
 		}
     }
 }
@@ -322,10 +322,10 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="self">Self</span>::<span class="ident">Malformed</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Provided string did not adhere to any known guild message format&quot;</span>)
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Provided string did not adhere to any known guild message format&quot;</span>)
             },
-            <span class="self">Self</span>::<span class="ident">Http</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to request message data via HTTP: {}&quot;</span>, <span class="ident">e</span>),
-            <span class="self">Self</span>::<span class="ident">HttpNotAvailable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(
+            <span class="self">Self</span>::<span class="ident">Http</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to request message data via HTTP: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="self">Self</span>::<span class="ident">HttpNotAvailable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(
                 <span class="ident">f</span>,
                 <span class="string">&quot;Gateway feature is disabled and the required information was not in cache&quot;</span>
             ),
@@ -371,7 +371,7 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">msg</span>);
         }
 
-        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>) {
+        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>) {
             <span class="ident">ctx</span>.<span class="ident">http</span>.<span class="ident">get_message</span>(<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="number">0</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">MessageParseError</span>::<span class="ident">Http</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">MessageParseError</span>::<span class="ident">HttpNotAvailable</span>)

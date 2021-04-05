@@ -1153,6 +1153,8 @@
 <span id="1150">1150</span>
 <span id="1151">1151</span>
 <span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -2158,7 +2160,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">MessageCreateEvent</span> {
             <span class="ident">message</span>: <span class="ident">Message</span> {
                 <span class="ident">id</span>: <span class="ident">MessageId</span>(<span class="number">3</span>),
-                <span class="ident">attachments</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">attachments</span>: <span class="macro">vec!</span>[],
                 <span class="ident">author</span>: <span class="ident">User</span> {
                     <span class="ident">id</span>: <span class="ident">UserId</span>(<span class="number">2</span>),
                     <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
@@ -2171,16 +2173,16 @@
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">GuildId</span>(<span class="number">1</span>)),
                 <span class="ident">content</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
                 <span class="ident">edited_timestamp</span>: <span class="prelude-val">None</span>,
-                <span class="ident">embeds</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">embeds</span>: <span class="macro">vec!</span>[],
                 <span class="ident">kind</span>: <span class="ident">MessageType</span>::<span class="ident">Regular</span>,
                 <span class="ident">member</span>: <span class="prelude-val">None</span>,
                 <span class="ident">mention_everyone</span>: <span class="bool-val">false</span>,
-                <span class="ident">mention_roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
-                <span class="ident">mention_channels</span>: <span class="macro">vec</span><span class="macro">!</span>[],
-                <span class="ident">mentions</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">mention_roles</span>: <span class="macro">vec!</span>[],
+                <span class="ident">mention_channels</span>: <span class="macro">vec!</span>[],
+                <span class="ident">mentions</span>: <span class="macro">vec!</span>[],
                 <span class="ident">nonce</span>: <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="number">1</span>)),
                 <span class="ident">pinned</span>: <span class="bool-val">false</span>,
-                <span class="ident">reactions</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">reactions</span>: <span class="macro">vec!</span>[],
                 <span class="ident">timestamp</span>: <span class="ident">datetime</span>,
                 <span class="ident">tts</span>: <span class="bool-val">false</span>,
                 <span class="ident">webhook_id</span>: <span class="prelude-val">None</span>,
@@ -2188,7 +2190,7 @@
                 <span class="ident">application</span>: <span class="prelude-val">None</span>,
                 <span class="ident">message_reference</span>: <span class="prelude-val">None</span>,
                 <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-                <span class="ident">stickers</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">stickers</span>: <span class="macro">vec!</span>[],
                 <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                 <span class="ident">interaction</span>: <span class="prelude-val">None</span>,
@@ -2196,30 +2198,30 @@
         };
 
         <span class="comment">// Check that the channel cache doesn&#39;t exist.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>));
         <span class="comment">// Add first message, none because message ID 2 doesn&#39;t already exist.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
         <span class="comment">// None, it only returns the oldest message if the cache was already full.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
         <span class="comment">// Assert there&#39;s only 1 message in the channel&#39;s message cache.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">1</span>);
 
         <span class="comment">// Add a second message, assert that channel message cache length is 2.</span>
         <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">MessageId</span>(<span class="number">4</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">2</span>);
 
         <span class="comment">// Add a third message, the first should now be removed.</span>
         <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">MessageId</span>(<span class="number">5</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_some</span>());
 
         {
             <span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>();
 
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">channel</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">channel</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             <span class="comment">// Check that the first message is now removed.</span>
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">MessageId</span>(<span class="number">3</span>)));
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">MessageId</span>(<span class="number">3</span>)));
         }
 
         <span class="kw">let</span> <span class="ident">guild_channel</span> <span class="op">=</span> <span class="ident">GuildChannel</span> {
@@ -2231,12 +2233,14 @@
             <span class="ident">last_message_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">last_pin_timestamp</span>: <span class="prelude-val">None</span>,
             <span class="ident">name</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
-            <span class="ident">permission_overwrites</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="ident">permission_overwrites</span>: <span class="macro">vec!</span>[],
             <span class="ident">position</span>: <span class="number">0</span>,
             <span class="ident">topic</span>: <span class="prelude-val">None</span>,
             <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
             <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
             <span class="ident">slow_mode_rate</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+            <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
+            <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
         };
 
         <span class="comment">// Add a channel delete event to the cache, the cached messages for that</span>
@@ -2244,8 +2248,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delete</span> <span class="op">=</span> <span class="ident">ChannelDeleteEvent</span> {
             <span class="ident">channel</span>: <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="ident">guild_channel</span>.<span class="ident">clone</span>()),
         };
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delete</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">delete</span>.<span class="ident">channel</span>.<span class="ident">id</span>()));
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delete</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">delete</span>.<span class="ident">channel</span>.<span class="ident">id</span>()));
 
         <span class="comment">// Test deletion of a guild channel&#39;s message cache when a GuildDeleteEvent</span>
         <span class="comment">// is received.</span>
@@ -2262,7 +2266,7 @@
                     <span class="ident">default_message_notifications</span>: <span class="ident">DefaultMessageNotificationLevel</span>::<span class="ident">All</span>,
                     <span class="ident">emojis</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
                     <span class="ident">explicit_content_filter</span>: <span class="ident">ExplicitContentFilter</span>::<span class="prelude-val">None</span>,
-                    <span class="ident">features</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                    <span class="ident">features</span>: <span class="macro">vec!</span>[],
                     <span class="ident">icon</span>: <span class="prelude-val">None</span>,
                     <span class="ident">joined_at</span>: <span class="ident">datetime</span>,
                     <span class="ident">large</span>: <span class="bool-val">false</span>,
@@ -2288,8 +2292,8 @@
                 },
             }
         };
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_create</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_create</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild_delete</span> <span class="op">=</span> <span class="ident">GuildDeleteEvent</span> {
             <span class="ident">guild</span>: <span class="ident">GuildUnavailable</span> {
@@ -2300,10 +2304,10 @@
 
         <span class="comment">// The guild existed in the cache, so the cache&#39;s guild is returned by the</span>
         <span class="comment">// update.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_delete</span>).<span class="kw">await</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_delete</span>).<span class="kw">await</span>.<span class="ident">is_some</span>());
 
         <span class="comment">// Assert that the channel&#39;s message cache no longer exists.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">ChannelId</span>(<span class="number">2</span>)));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">ChannelId</span>(<span class="number">2</span>)));
     }
 }
 </pre></div>

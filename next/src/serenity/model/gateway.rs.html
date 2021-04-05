@@ -1060,7 +1060,7 @@
     <span class="kw">pub</span> <span class="ident">small_text</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class="macro">bitflags</span><span class="macro">!</span> {
+<span class="macro">bitflags!</span> {
     <span class="doccomment">/// A set of flags defining what is in an activity&#39;s payload.</span>
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityFlags</span>: <span class="ident">u64</span> {
@@ -1128,7 +1128,7 @@
     <span class="ident">Competing</span> <span class="op">=</span> <span class="number">5</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">ActivityType</span> {
+<span class="macro">enum_number!</span>(<span class="ident">ActivityType</span> {
     <span class="ident">Playing</span>,
     <span class="ident">Streaming</span>,
     <span class="ident">Listening</span>,

@@ -743,10 +743,10 @@
 
     <span class="kw">fn</span> <span class="ident">_field</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="ident">String</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) {
         {
-            <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;fields&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="macro">vec</span><span class="macro">!</span>[]));
+            <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;fields&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="macro">vec!</span>[]));
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">entry</span> {
-                <span class="ident">inner</span>.<span class="ident">push</span>(<span class="macro">json</span><span class="macro">!</span>({
+                <span class="ident">inner</span>.<span class="ident">push</span>(<span class="macro">json!</span>({
                     <span class="string">&quot;inline&quot;</span>: <span class="ident">inline</span>,
                     <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>,
                     <span class="string">&quot;value&quot;</span>: <span class="ident">value</span>,
@@ -796,7 +796,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">url_object</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">url</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;url&quot;</span>: <span class="ident">url</span>,
         });
 
@@ -1141,7 +1141,7 @@
             <span class="ident">author</span>: <span class="prelude-val">None</span>,
             <span class="ident">colour</span>: <span class="ident">Colour</span>::<span class="ident">new</span>(<span class="number">0xFF0011</span>),
             <span class="ident">description</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;This is a test description&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">fields</span>: <span class="macro">vec</span><span class="macro">!</span>[
+            <span class="ident">fields</span>: <span class="macro">vec!</span>[
                 <span class="ident">EmbedField</span> {
                     <span class="ident">inline</span>: <span class="bool-val">false</span>,
                     <span class="ident">name</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
@@ -1186,7 +1186,7 @@
 
         <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>));
 
-        <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;color&quot;</span>: <span class="number">0xFF0011</span>,
             <span class="string">&quot;description&quot;</span>: <span class="string">&quot;This is a hakase description&quot;</span>,
             <span class="string">&quot;title&quot;</span>: <span class="string">&quot;still a hakase&quot;</span>,
@@ -1213,7 +1213,7 @@
             }
         });
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">built</span>, <span class="ident">obj</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">built</span>, <span class="ident">obj</span>);
     }
 }
 </pre></div>

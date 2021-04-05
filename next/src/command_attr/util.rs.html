@@ -323,7 +323,7 @@
             <span class="ident">Lit</span>::<span class="ident">ByteStr</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">String</span>::<span class="ident">from_utf8_unchecked</span>(<span class="ident">s</span>.<span class="ident">value</span>()) },
             <span class="ident">Lit</span>::<span class="ident">Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">value</span>().<span class="ident">to_string</span>(),
             <span class="ident">Lit</span>::<span class="ident">Byte</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">b</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">char</span>).<span class="ident">to_string</span>(),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;values must be a (byte)string or a char&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;values must be a (byte)string or a char&quot;</span>),
         }
     }
 
@@ -331,7 +331,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Lit</span>::<span class="ident">Bool</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="ident">b</span>.<span class="ident">value</span>
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">to_str</span>().<span class="ident">parse</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected bool from {:?}&quot;</span>, <span class="self">self</span>))
+            <span class="self">self</span>.<span class="ident">to_str</span>().<span class="ident">parse</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;expected bool from {:?}&quot;</span>, <span class="self">self</span>))
         }
     }
 
@@ -349,12 +349,12 @@
 <span class="kw">impl</span> <span class="ident">IdentExt2</span> <span class="kw">for</span> <span class="ident">Ident</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">to_uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">format_ident</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">to_string</span>().<span class="ident">to_uppercase</span>())
+        <span class="macro">format_ident!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">to_string</span>().<span class="ident">to_uppercase</span>())
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">with_suffix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">suffix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ident</span> {
-        <span class="macro">format_ident</span><span class="macro">!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="self">self</span>.<span class="ident">to_string</span>().<span class="ident">to_uppercase</span>(), <span class="ident">suffix</span>)
+        <span class="macro">format_ident!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="self">self</span>.<span class="ident">to_string</span>().<span class="ident">to_uppercase</span>(), <span class="ident">suffix</span>)
     }
 }
 
@@ -363,7 +363,7 @@
     <span class="ident">e</span>.<span class="ident">to_compile_error</span>().<span class="ident">into</span>()
 }
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">propagate_err</span> {
+<span class="macro">macro_rules!</span> <span class="ident">propagate_err</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
@@ -378,7 +378,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Parse</span><span class="op">&gt;</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Bracketed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SynResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">content</span>;
-        <span class="macro">bracketed</span><span class="macro">!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
+        <span class="macro">bracketed!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">Bracketed</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>))
     }
@@ -390,7 +390,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Parse</span><span class="op">&gt;</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Braced</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SynResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">content</span>;
-        <span class="macro">braced</span><span class="macro">!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
+        <span class="macro">braced!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">Braced</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>))
     }
@@ -402,7 +402,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Parse</span><span class="op">&gt;</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Parenthesised</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SynResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">content</span>;
-        <span class="macro">parenthesized</span><span class="macro">!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
+        <span class="macro">parenthesized!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">Parenthesised</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>))
     }
@@ -421,8 +421,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span> <span class="ident">ToTokens</span> <span class="kw">for</span> <span class="ident">AsOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TokenStream2</span>) {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote</span><span class="macro">!</span>(<span class="prelude-val">Some</span>(#<span class="ident">o</span>))),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote</span><span class="macro">!</span>(<span class="prelude-val">None</span>)),
+            <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(<span class="prelude-val">Some</span>(#<span class="ident">o</span>))),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(<span class="prelude-val">None</span>)),
         }
     }
 }
@@ -449,7 +449,7 @@
             <span class="ident">kind</span>,
         } <span class="op">=</span> <span class="self">self</span>;
 
-        <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote</span><span class="macro">!</span> {
+        <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
             #<span class="ident">mutable</span> #<span class="ident">name</span>: #<span class="ident">kind</span>
         });
     }
@@ -457,8 +457,8 @@
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_type_validation</span>(<span class="ident">have</span>: <span class="ident">Type</span>, <span class="ident">expect</span>: <span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="ident">Stmt</span> {
-    <span class="macro">parse_quote</span><span class="macro">!</span> {
-        <span class="ident">serenity</span>::<span class="ident">static_assertions</span>::<span class="macro">assert_type_eq_all</span><span class="macro">!</span>(#<span class="ident">have</span>, #<span class="ident">expect</span>);
+    <span class="macro">parse_quote!</span> {
+        <span class="ident">serenity</span>::<span class="ident">static_assertions</span>::<span class="macro">assert_type_eq_all!</span>(#<span class="ident">have</span>, #<span class="ident">expect</span>);
     }
 }
 
@@ -479,18 +479,18 @@
     <span class="kw">if</span> <span class="ident">fun</span>.<span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">len</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(
             <span class="ident">fun</span>.<span class="ident">args</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">span</span>(),
-            <span class="macro">format_args</span><span class="macro">!</span>(<span class="string">&quot;function&#39;s arity exceeds more than {} arguments&quot;</span>, <span class="ident">len</span>),
+            <span class="macro">format_args!</span>(<span class="string">&quot;function&#39;s arity exceeds more than {} arguments&quot;</span>, <span class="ident">len</span>),
         ));
     }
 
-    <span class="kw">let</span> <span class="ident">context</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">client</span>::<span class="ident">Context</span>);
-    <span class="kw">let</span> <span class="ident">message</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Message</span>);
-    <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Args</span>);
-    <span class="kw">let</span> <span class="ident">args2</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Args</span>);
-    <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandOptions</span>);
-    <span class="kw">let</span> <span class="ident">hoptions</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">HelpOptions</span>);
-    <span class="kw">let</span> <span class="ident">groups</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandGroup</span>]);
-    <span class="kw">let</span> <span class="ident">owners</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote</span><span class="macro">!</span>(<span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">UserId</span><span class="op">&gt;</span>);
+    <span class="kw">let</span> <span class="ident">context</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">client</span>::<span class="ident">Context</span>);
+    <span class="kw">let</span> <span class="ident">message</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Message</span>);
+    <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Args</span>);
+    <span class="kw">let</span> <span class="ident">args2</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Args</span>);
+    <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandOptions</span>);
+    <span class="kw">let</span> <span class="ident">hoptions</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">HelpOptions</span>);
+    <span class="kw">let</span> <span class="ident">groups</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandGroup</span>]);
+    <span class="kw">let</span> <span class="ident">owners</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">UserId</span><span class="op">&gt;</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>;
 

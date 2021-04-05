@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The Message Builder is an ergonomic utility to easily build a message, by adding text and mentioning mentionable structs."><meta name="keywords" content="rust, rustlang, rust-lang, MessageBuilder"><title>serenity::utils::MessageBuilder - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc struct"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><p class="location">Struct MessageBuilder</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#implementations">Methods</a><div class="sidebar-links"><a href="#method.build">build</a><a href="#method.channel">channel</a><a href="#method.emoji">emoji</a><a href="#method.mention">mention</a><a href="#method.new">new</a><a href="#method.push">push</a><a href="#method.push_bold">push_bold</a><a href="#method.push_bold_line">push_bold_line</a><a href="#method.push_bold_line_safe">push_bold_line_safe</a><a href="#method.push_bold_safe">push_bold_safe</a><a href="#method.push_codeblock">push_codeblock</a><a href="#method.push_codeblock_safe">push_codeblock_safe</a><a href="#method.push_italic">push_italic</a><a href="#method.push_italic_line">push_italic_line</a><a href="#method.push_italic_line_safe">push_italic_line_safe</a><a href="#method.push_italic_safe">push_italic_safe</a><a href="#method.push_line">push_line</a><a href="#method.push_line_safe">push_line_safe</a><a href="#method.push_mono">push_mono</a><a href="#method.push_mono_line">push_mono_line</a><a href="#method.push_mono_line_safe">push_mono_line_safe</a><a href="#method.push_mono_safe">push_mono_safe</a><a href="#method.push_quote">push_quote</a><a href="#method.push_quote_line">push_quote_line</a><a href="#method.push_quote_line_safe">push_quote_line_safe</a><a href="#method.push_quote_safe">push_quote_safe</a><a href="#method.push_safe">push_safe</a><a href="#method.push_spoiler">push_spoiler</a><a href="#method.push_spoiler_line">push_spoiler_line</a><a href="#method.push_spoiler_line_safe">push_spoiler_line_safe</a><a href="#method.push_spoiler_safe">push_spoiler_safe</a><a href="#method.push_strike">push_strike</a><a href="#method.push_strike_line">push_strike_line</a><a href="#method.push_strike_line_safe">push_strike_line_safe</a><a href="#method.push_strike_safe">push_strike_safe</a><a href="#method.push_underline">push_underline</a><a href="#method.push_underline_line">push_underline_line</a><a href="#method.push_underline_line_safe">push_underline_line_safe</a><a href="#method.push_underline_safe">push_underline_safe</a><a href="#method.quote_rest">quote_rest</a><a href="#method.role">role</a><a href="#method.user">user</a></div><a class="sidebar-title" href="#trait-implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-Clone">Clone</a><a href="#impl-Debug">Debug</a><a href="#impl-Default">Default</a><a href="#impl-Display">Display</a><a href="#impl-EmbedMessageBuilding">EmbedMessageBuilding</a></div><a class="sidebar-title" href="#synthetic-implementations">Auto Trait Implementations</a><div class="sidebar-links"><a href="#impl-RefUnwindSafe">RefUnwindSafe</a><a href="#impl-Send">Send</a><a href="#impl-Sync">Sync</a><a href="#impl-Unpin">Unpin</a><a href="#impl-UnwindSafe">UnwindSafe</a></div><a class="sidebar-title" href="#blanket-implementations">Blanket Implementations</a><div class="sidebar-links"><a href="#impl-Any">Any</a><a href="#impl-Borrow%3CT%3E">Borrow&lt;T&gt;</a><a href="#impl-BorrowMut%3CT%3E">BorrowMut&lt;T&gt;</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Instrument">Instrument</a><a href="#impl-Into%3CU%3E">Into&lt;U&gt;</a><a href="#impl-Same%3CT%3E">Same&lt;T&gt;</a><a href="#impl-ToOwned">ToOwned</a><a href="#impl-ToString">ToString</a><a href="#impl-TryFrom%3CU%3E">TryFrom&lt;U&gt;</a><a href="#impl-TryInto%3CU%3E">TryInto&lt;U&gt;</a><a href="#impl-VZip%3CV%3E">VZip&lt;V&gt;</a></div></div><p class="location"><a href="../index.html">serenity</a>::<wbr><a href="index.html">utils</a></p><div id="sidebar-vars" data-name="MessageBuilder" data-ty="struct" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Struct <a href="../index.html">serenity</a>::<wbr><a href="index.html">utils</a>::<wbr><a class="struct" href="">MessageBuilder</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#55" title="goto source code">[src]</a></span></h1><div class="docblock type-decl hidden-by-usual-hider"><pre class="rust struct">pub struct MessageBuilder(pub <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>);</pre></div><div class="docblock"><p>The Message Builder is an ergonomic utility to easily build a message,
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Struct <a href="../index.html">serenity</a>::<wbr><a href="index.html">utils</a>::<wbr><a class="struct" href="">MessageBuilder</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#55" title="goto source code">[src]</a></span></h1><div class="docblock type-decl hidden-by-usual-hider"><pre class="rust struct">pub struct MessageBuilder(pub <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>);</pre></div><div class="docblock"><p>The Message Builder is an ergonomic utility to easily build a message,
 by adding text and mentioning mentionable structs.</p>
 <p>The finalized value can be accessed via <a href="../../serenity/utils/struct.MessageBuilder.html#method.build"><code>build</code></a> or the inner value.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
@@ -43,7 +43,7 @@ and finally building it to retrieve the inner String:</p>
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">channel</span>(<span class="ident">channel_id</span>).<span class="ident">push</span>(<span class="string">&quot;!&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;&lt;#81384788765712384&gt;!&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;&lt;#81384788765712384&gt;!&quot;</span>);</pre></div>
 <p>This is equivalent to simply retrieving the tuple struct’s first value:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
@@ -52,7 +52,7 @@ and finally building it to retrieve the inner String:</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>();
 <span class="ident">content</span>.<span class="ident">push</span>(<span class="string">&quot;test&quot;</span>);
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>.<span class="ident">build</span>(), <span class="string">&quot;test&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>.<span class="ident">build</span>(), <span class="string">&quot;test&quot;</span>);</pre></div>
 </div><h4 id="method.channel" class="method"><code>pub fn <a href="#method.channel" class="fnname">channel</a>&lt;C:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../../serenity/model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>&gt;&gt;(&amp;mut self, channel: C) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#135-137" title="goto source code">[src]</a></h4><div class="docblock"><p>Mentions the <a href="../../serenity/model/channel/struct.GuildChannel.html"><code>GuildChannel</code></a> in the built message.</p>
 <p>This accepts anything that converts <em>into</em> a <a href="../../serenity/model/id/struct.ChannelId.html" title="ChannelId"><code>ChannelId</code></a>. Refer to
 <code>ChannelId</code>’s documentation for more information.</p>
@@ -69,7 +69,7 @@ how this is formatted.</p>
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push</span>(<span class="string">&quot;The channel is: &quot;</span>).<span class="ident">channel</span>(<span class="ident">channel_id</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;The channel is: &lt;#81384788765712384&gt;&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;The channel is: &lt;#81384788765712384&gt;&quot;</span>);</pre></div>
 </div><h4 id="method.emoji" class="method"><code>pub fn <a href="#method.emoji" class="fnname">emoji</a>(&amp;mut self, emoji: &amp;<a class="struct" href="../../serenity/model/guild/struct.Emoji.html" title="struct serenity::model::guild::Emoji">Emoji</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#182-188" title="goto source code">[src]</a></h4><div class="docblock"><p>Displays the given emoji in the built message.</p>
 <p>Refer to <code>Emoji</code>s <a href="../../serenity/model/guild/struct.Emoji.html#impl-Display">Display implementation</a> for more information on how
 this is formatted.</p>
@@ -84,7 +84,7 @@ this is formatted.</p>
 
 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push</span>(<span class="string">&quot;foo &quot;</span>).<span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="ident">emoji</span>).<span class="ident">push</span>(<span class="string">&quot;.&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">message</span>, <span class="string">&quot;foo &lt;:smugAnimeFace:302516740095606785&gt;.&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">message</span>, <span class="string">&quot;foo &lt;:smugAnimeFace:302516740095606785&gt;.&quot;</span>);</pre></div>
 </div><h4 id="method.mention" class="method"><code>pub fn <a href="#method.mention" class="fnname">mention</a>&lt;M:&nbsp;<a class="trait" href="../../serenity/model/misc/trait.Mentionable.html" title="trait serenity::model::misc::Mentionable">Mentionable</a>&gt;(&amp;mut self, item: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>M) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#191-197" title="goto source code">[src]</a></h4><div class="docblock"><p>Mentions something that implements the <a href="../../serenity/model/misc/trait.Mentionable.html" title="Mentionable"><code>Mentionable</code></a> trait.</p>
 </div><h4 id="method.push" class="method"><code>pub fn <a href="#method.push" class="fnname">push</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#222-224" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a string to the internal message content.</p>
 <p>Note that this does not mutate either the given data or the internal
@@ -97,7 +97,7 @@ internal message.</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>();
 <span class="ident">message</span>.<span class="ident">push</span>(<span class="string">&quot;test&quot;</span>);
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(
+<span class="macro">assert_eq!</span>(
     {
         <span class="ident">message</span>.<span class="ident">push</span>(<span class="string">&quot;ing&quot;</span>);
         <span class="ident">message</span>.<span class="ident">build</span>()
@@ -127,7 +127,7 @@ fn main() {
 }
 ```&quot;#</span>;
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="ident">expected</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="ident">expected</span>);</pre></div>
 <p>Pushing a codeblock without a language:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
@@ -137,7 +137,7 @@ fn main() {
     .<span class="ident">push_codeblock</span>(<span class="string">&quot;hello&quot;</span>, <span class="prelude-val">None</span>)
     .<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;```\nhello\n```&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;```\nhello\n```&quot;</span>);</pre></div>
 </div><h4 id="method.push_mono" class="method"><code>pub fn <a href="#method.push_mono" class="fnname">push_mono</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#308-314" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes inlined monospaced text to the content.</p>
 <h1 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h1>
 <p>Display a server configuration value to the user:</p>
@@ -156,9 +156,9 @@ fn main() {
     .<span class="ident">push</span>(<span class="string">&quot;.&quot;</span>)
     .<span class="ident">build</span>();
 
-<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;The setting `{}` for this server is `{}`.&quot;</span>, <span class="ident">key</span>, <span class="ident">value</span>);
+<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The setting `{}` for this server is `{}`.&quot;</span>, <span class="ident">key</span>, <span class="ident">value</span>);
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="ident">expected</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="ident">expected</span>);</pre></div>
 </div><h4 id="method.push_italic" class="method"><code>pub fn <a href="#method.push_italic" class="fnname">push_italic</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#337-343" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes inlined italicized text to the content.</p>
 <h1 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h1>
 <p>Emphasize information to the user:</p>
@@ -176,7 +176,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;You don&#39;t _always need_ to italicize _everything_.&quot;</span>;
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="ident">expected</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="ident">expected</span>);</pre></div>
 </div><h4 id="method.push_bold" class="method"><code>pub fn <a href="#method.push_bold" class="fnname">push_bold</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#346-352" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an inline bold text to the content.</p>
 </div><h4 id="method.push_underline" class="method"><code>pub fn <a href="#method.push_underline" class="fnname">push_underline</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#355-361" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an underlined inline text to the content.</p>
 </div><h4 id="method.push_strike" class="method"><code>pub fn <a href="#method.push_strike" class="fnname">push_strike</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#364-370" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a strikethrough inline text to the content.</p>
@@ -191,7 +191,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_line</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;hello\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;hello\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_mono_line" class="method"><code>pub fn <a href="#method.push_mono_line" class="fnname">push_mono_line</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#422-427" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes inlined monospace text with an added newline to the content.</p>
 <h1 id="examples-10" class="section-header"><a href="#examples-10">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -201,7 +201,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_mono_line</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;`hello`\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;`hello`\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_italic_line" class="method"><code>pub fn <a href="#method.push_italic_line" class="fnname">push_italic_line</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#442-447" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an inlined italicized text with an added newline to the content.</p>
 <h1 id="examples-11" class="section-header"><a href="#examples-11">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -211,7 +211,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_italic_line</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;_hello_\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;_hello_\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_bold_line" class="method"><code>pub fn <a href="#method.push_bold_line" class="fnname">push_bold_line</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#462-467" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an inline bold text with an added newline to the content.</p>
 <h1 id="examples-12" class="section-header"><a href="#examples-12">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -221,7 +221,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_bold_line</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;**hello**\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;**hello**\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_underline_line" class="method"><code>pub fn <a href="#method.push_underline_line" class="fnname">push_underline_line</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#482-487" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an underlined inline text with an added newline to the content.</p>
 <h1 id="examples-13" class="section-header"><a href="#examples-13">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -231,7 +231,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_underline_line</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;__hello__\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;__hello__\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_strike_line" class="method"><code>pub fn <a href="#method.push_strike_line" class="fnname">push_strike_line</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#502-507" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a strikethrough inline text with a newline added to the content.</p>
 <h1 id="examples-14" class="section-header"><a href="#examples-14">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -241,7 +241,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_strike_line</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;~~hello~~\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;~~hello~~\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_spoiler_line" class="method"><code>pub fn <a href="#method.push_spoiler_line" class="fnname">push_spoiler_line</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#522-527" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a spoiler’d inline text with a newline added to the content.</p>
 <h1 id="examples-15" class="section-header"><a href="#examples-15">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -251,7 +251,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_spoiler_line</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;||hello||\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;||hello||\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_quote_line" class="method"><code>pub fn <a href="#method.push_quote_line" class="fnname">push_quote_line</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#542-547" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a quoted inline text to the content</p>
 <h1 id="examples-16" class="section-header"><a href="#examples-16">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -261,7 +261,7 @@ fn main() {
 
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_quote_line</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;&gt; hello\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;&gt; hello\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_safe" class="method"><code>pub fn <a href="#method.push_safe" class="fnname">push_safe</a>&lt;C:&nbsp;I&gt;(&amp;mut self, content: C) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#551-561" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes text to your message, but normalizing content - that means
 ensuring that there’s no unwanted formatting, mention spam etc.</p>
 </div><h4 id="method.push_codeblock_safe" class="method"><code>pub fn <a href="#method.push_codeblock_safe" class="fnname">push_codeblock_safe</a>&lt;D:&nbsp;I&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;mut self, <br>&nbsp;&nbsp;&nbsp;&nbsp;content: D, <br>&nbsp;&nbsp;&nbsp;&nbsp;language: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;<br>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#564-580" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a code-block to your message normalizing content.</p>
@@ -282,7 +282,7 @@ ensuring that there’s no unwanted formatting, mention spam etc.</p>
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
     <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_line_safe</span>(<span class="string">&quot;Hello @everyone&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;How are you?&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;Hello @\u{200B}everyone\nHow are you?&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;Hello @\u{200B}everyone\nHow are you?&quot;</span>);</pre></div>
 </div><h4 id="method.push_mono_line_safe" class="method"><code>pub fn <a href="#method.push_mono_line_safe" class="fnname">push_mono_line_safe</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#707-712" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an inline monospaced text with added newline to the content normalizing content.</p>
 <h1 id="examples-18" class="section-header"><a href="#examples-18">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -293,7 +293,7 @@ ensuring that there’s no unwanted formatting, mention spam etc.</p>
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
     <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_mono_line_safe</span>(<span class="string">&quot;`hello @everyone`&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;world&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;`&#39;hello @\u{200B}everyone&#39;`\nworld&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;`&#39;hello @\u{200B}everyone&#39;`\nworld&quot;</span>);</pre></div>
 </div><h4 id="method.push_italic_line_safe" class="method"><code>pub fn <a href="#method.push_italic_line_safe" class="fnname">push_italic_line_safe</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#728-733" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an inline italicized text with added newline to the content normalizing content.</p>
 <h1 id="examples-19" class="section-header"><a href="#examples-19">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -304,7 +304,7 @@ ensuring that there’s no unwanted formatting, mention spam etc.</p>
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
     <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_italic_line_safe</span>(<span class="string">&quot;@everyone&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;Isn&#39;t a mention.&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;_@\u{200B}everyone_\nIsn&#39;t a mention.&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;_@\u{200B}everyone_\nIsn&#39;t a mention.&quot;</span>);</pre></div>
 </div><h4 id="method.push_bold_line_safe" class="method"><code>pub fn <a href="#method.push_bold_line_safe" class="fnname">push_bold_line_safe</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#749-754" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an inline bold text with added newline to the content normalizing content.</p>
 <h1 id="examples-20" class="section-header"><a href="#examples-20">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -315,7 +315,7 @@ ensuring that there’s no unwanted formatting, mention spam etc.</p>
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
     <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_bold_line_safe</span>(<span class="string">&quot;@everyone&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;Isn&#39;t a mention.&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;**@\u{200B}everyone**\nIsn&#39;t a mention.&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;**@\u{200B}everyone**\nIsn&#39;t a mention.&quot;</span>);</pre></div>
 </div><h4 id="method.push_underline_line_safe" class="method"><code>pub fn <a href="#method.push_underline_line_safe" class="fnname">push_underline_line_safe</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#772-777" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes an underlined inline text with added newline to the content normalizing content.</p>
 <h1 id="examples-21" class="section-header"><a href="#examples-21">Examples</a></h1>
 <p>Push content and then append a newline:</p>
@@ -328,7 +328,7 @@ ensuring that there’s no unwanted formatting, mention spam etc.</p>
     .<span class="ident">push</span>(<span class="string">&quot;Isn&#39;t a mention.&quot;</span>)
     .<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;__@\u{200B}everyone__\nIsn&#39;t a mention.&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;__@\u{200B}everyone__\nIsn&#39;t a mention.&quot;</span>);</pre></div>
 </div><h4 id="method.push_strike_line_safe" class="method"><code>pub fn <a href="#method.push_strike_line_safe" class="fnname">push_strike_line_safe</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#794-799" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a strikethrough inline text with added newline to the content normalizing
 content.</p>
 <h1 id="examples-22" class="section-header"><a href="#examples-22">Examples</a></h1>
@@ -340,7 +340,7 @@ content.</p>
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
     <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_strike_line_safe</span>(<span class="string">&quot;@everyone&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;Isn&#39;t a mention.&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;~~@\u{200B}everyone~~\nIsn&#39;t a mention.&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;~~@\u{200B}everyone~~\nIsn&#39;t a mention.&quot;</span>);</pre></div>
 </div><h4 id="method.push_spoiler_line_safe" class="method"><code>pub fn <a href="#method.push_spoiler_line_safe" class="fnname">push_spoiler_line_safe</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#816-821" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a spoiler’d inline text with added newline to the content normalizing
 content.</p>
 <h1 id="examples-23" class="section-header"><a href="#examples-23">Examples</a></h1>
@@ -352,7 +352,7 @@ content.</p>
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
     <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_spoiler_line_safe</span>(<span class="string">&quot;@everyone&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;Isn&#39;t a mention.&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;||@\u{200B}everyone||\nIsn&#39;t a mention.&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;||@\u{200B}everyone||\nIsn&#39;t a mention.&quot;</span>);</pre></div>
 </div><h4 id="method.push_quote_line_safe" class="method"><code>pub fn <a href="#method.push_quote_line_safe" class="fnname">push_quote_line_safe</a>&lt;D:&nbsp;I&gt;(&amp;mut self, content: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#838-843" title="goto source code">[src]</a></h4><div class="docblock"><p>Pushes a quoted inline text with added newline to the content normalizing
 content.</p>
 <h1 id="examples-24" class="section-header"><a href="#examples-24">Examples</a></h1>
@@ -364,7 +364,7 @@ content.</p>
 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
     <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_quote_line_safe</span>(<span class="string">&quot;@everyone&quot;</span>).<span class="ident">push</span>(<span class="string">&quot;Isn&#39;t a mention.&quot;</span>).<span class="ident">build</span>();
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;&gt; @\u{200B}everyone\nIsn&#39;t a mention.&quot;</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;&gt; @\u{200B}everyone\nIsn&#39;t a mention.&quot;</span>);</pre></div>
 </div><h4 id="method.quote_rest" class="method"><code>pub fn <a href="#method.quote_rest" class="fnname">quote_rest</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#846-850" title="goto source code">[src]</a></h4><div class="docblock"><p>Starts a multi-line quote, every push after this one will be quoted</p>
 </div><h4 id="method.role" class="method"><code>pub fn <a href="#method.role" class="fnname">role</a>&lt;R:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../../serenity/model/id/struct.RoleId.html" title="struct serenity::model::id::RoleId">RoleId</a>&gt;&gt;(&amp;mut self, role: R) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/utils/message_builder.rs.html#862-868" title="goto source code">[src]</a></h4><div class="docblock"><p>Mentions the <a href="../../serenity/model/guild/struct.Role.html"><code>Role</code></a> in the built message.</p>
 <p>This accepts anything that converts <em>into</em> a <a href="../../serenity/model/id/struct.RoleId.html" title="RoleId"><code>RoleId</code></a>. Refer to

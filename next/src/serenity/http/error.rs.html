@@ -198,7 +198,7 @@
 
 <span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">DiscordJsonError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="self">self</span>.<span class="ident">message</span>)
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="self">self</span>.<span class="ident">message</span>)
     }
 }
 
@@ -255,17 +255,17 @@
 
     <span class="doccomment">/// Returns true when the error is caused by an unsuccessful request</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsuccessful_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches</span><span class="macro">!</span>(<span class="self">self</span>, <span class="self">Self</span>::<span class="ident">UnsuccessfulRequest</span>(<span class="kw">_</span>))
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::<span class="ident">UnsuccessfulRequest</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns true when the error is caused by the url containing invalid input</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_url_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches</span><span class="macro">!</span>(<span class="self">self</span>, <span class="self">Self</span>::<span class="ident">Url</span>(<span class="kw">_</span>))
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::<span class="ident">Url</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns true when the error is caused by an invalid header</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_invalid_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches</span><span class="macro">!</span>(<span class="self">self</span>, <span class="self">Self</span>::<span class="ident">InvalidHeader</span>(<span class="kw">_</span>))
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::<span class="ident">InvalidHeader</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns the status code if the error is an unsuccessful request</span>
@@ -355,7 +355,7 @@
             <span class="ident">error</span>,
         };
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">error_response</span>, <span class="ident">known</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">error_response</span>, <span class="ident">known</span>);
     }
 }
 </pre></div>

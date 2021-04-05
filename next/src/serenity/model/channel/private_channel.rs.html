@@ -636,7 +636,7 @@
 
     <span class="doccomment">/// Returns &quot;DM with $username#discriminator&quot;.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;DM with {}&quot;</span>, <span class="self">self</span>.<span class="ident">recipient</span>.<span class="ident">tag</span>())
+        <span class="macro">format!</span>(<span class="string">&quot;DM with {}&quot;</span>, <span class="self">self</span>.<span class="ident">recipient</span>.<span class="ident">tag</span>())
     }
 
     <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a</span>
