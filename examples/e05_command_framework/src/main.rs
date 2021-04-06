@@ -249,8 +249,9 @@ async fn main() {
     // provides the context of the command, the message that was received,
     // and the full name of the command that will be called.
     //
-    // You can not use this to determine whether a command should be
-    // executed. Instead, the `#[check]` macro gives you this functionality.
+    // Avoid using this to determine whether a specific command should be
+    // executed. Instead, prefer using the `#[check]` macro which
+    // gives you this functionality.
     //
     // **Note**: Async closures are unstable, you may use them in your
     // application if you are fine using nightly Rust.
