@@ -632,8 +632,6 @@
 <span id="629">629</span>
 <span id="630">630</span>
 <span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
@@ -1017,9 +1015,7 @@
                 <span class="ident">id</span>,
                 <span class="kw-2">ref</span> <span class="ident">name</span>,
                 ..
-            } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="string">&quot;&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()), <span class="ident">id</span>)
-            },
+            } <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="string">&quot;&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()), <span class="ident">id</span>),
             <span class="ident">ReactionType</span>::<span class="ident">Unicode</span>(<span class="kw-2">ref</span> <span class="ident">unicode</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unicode</span>.<span class="ident">clone</span>(),
         }
     }
