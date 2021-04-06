@@ -605,7 +605,7 @@
     <span class="doccomment">/// [`initialize`]: Self::initialize</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restart</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>) {
-        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Restarting shard {}&quot;</span>, <span class="ident">shard_id</span>);
+        <span class="macro">info!</span>(<span class="string">&quot;Restarting shard {}&quot;</span>, <span class="ident">shard_id</span>);
         <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="number">4000</span>).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">shard_total</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_total</span>;
@@ -635,7 +635,7 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>, <span class="ident">code</span>: <span class="ident">u16</span>) {
-        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, <span class="ident">shard_id</span>);
+        <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, <span class="ident">shard_id</span>);
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage</span>::<span class="ident">ShutdownShard</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>));
 
@@ -643,7 +643,7 @@
         <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">shard_shutdown</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">shutdown_shard_id</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">shutdown_shard_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">shard_id</span> {
-                    <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="macro">warn!</span>(
                         <span class="string">&quot;Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID&quot;</span>,
                         <span class="ident">shard_id</span>,
                     );
@@ -651,7 +651,7 @@
             },
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> (),
             <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, <span class="ident">shard_id</span>, <span class="ident">why</span>,)
+                <span class="macro">warn!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, <span class="ident">shard_id</span>, <span class="ident">why</span>,)
             },
         }
 
@@ -678,7 +678,7 @@
             <span class="ident">runners</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
         };
 
-        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
+        <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);
 
         <span class="kw">for</span> <span class="ident">shard_id</span> <span class="kw">in</span> <span class="ident">keys</span> {
             <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="number">1000</span>).<span class="kw">await</span>;
@@ -690,7 +690,7 @@
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">fn</span> <span class="ident">boot</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_info</span>: [<span class="ident">ShardId</span>; <span class="number">2</span>]) {
-        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Telling shard queuer to start shard {}&quot;</span>, <span class="ident">shard_info</span>[<span class="number">0</span>]);
+        <span class="macro">info!</span>(<span class="string">&quot;Telling shard queuer to start shard {}&quot;</span>, <span class="ident">shard_info</span>[<span class="number">0</span>]);
 
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardQueuerMessage</span>::<span class="ident">Start</span>(<span class="ident">shard_info</span>[<span class="number">0</span>], <span class="ident">shard_info</span>[<span class="number">1</span>]);
 

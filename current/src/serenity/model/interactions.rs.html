@@ -601,7 +601,7 @@
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">2</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">InteractionType</span> {
+<span class="macro">enum_number!</span>(<span class="ident">InteractionType</span> {
     <span class="ident">Ping</span>,
     <span class="ident">ApplicationCommand</span>
 });
@@ -674,7 +674,7 @@
     <span class="ident">Role</span> <span class="op">=</span> <span class="number">8</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">ApplicationCommandOptionType</span> {
+<span class="macro">enum_number!</span>(<span class="ident">ApplicationCommandOptionType</span> {
     <span class="ident">SubCommand</span>,
     <span class="ident">SubCommandGroup</span>,
     <span class="ident">String</span>,
@@ -708,7 +708,7 @@
     <span class="ident">bits</span>: <span class="ident">u64</span>,
 }
 
-<span class="macro">__impl_bitflags</span><span class="macro">!</span> {
+<span class="macro">__impl_bitflags!</span> {
     <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Interaction message will only be visible to sender</span>
         <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0100_0000</span>;

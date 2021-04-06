@@ -48,7 +48,7 @@ limits are raised for whitelisted <a href="https://discord.com/developers/docs/t
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">json</span>;
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">http</span>::<span class="ident">Http</span>;
 
-<span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+<span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({
     <span class="string">&quot;name&quot;</span>: <span class="string">&quot;test&quot;</span>,
     <span class="string">&quot;region&quot;</span>: <span class="string">&quot;us-west&quot;</span>,
 });
@@ -88,7 +88,7 @@ long.</li>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">http</span>::<span class="ident">Http</span>;
 
 <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="number">81384788765712384</span>;
-<span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({<span class="string">&quot;name&quot;</span>: <span class="string">&quot;test&quot;</span>});
+<span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({<span class="string">&quot;name&quot;</span>: <span class="string">&quot;test&quot;</span>});
 
 <span class="kw">let</span> <span class="ident">webhook</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">create_webhook</span>(<span class="ident">channel_id</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.delete_channel" class="method"><code>pub async fn <a href="#method.delete_channel" class="fnname">delete_channel</a>(&amp;self, channel_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; <a class="type" href="../../../serenity/type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="enum" href="../../../serenity/model/channel/enum.Channel.html" title="enum serenity::model::channel::Channel">Channel</a>&gt;</code><a class="srclink" href="../../../src/serenity/http/client.rs.html#506-515" title="goto source code">[src]</a></h4><div class="docblock"><p>Deletes a private channel or a channel in a guild.</p>
@@ -182,7 +182,7 @@ to <code>false</code> will invite the user to speak.</li>
 
 <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="number">187450744427773963</span>;
 <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="number">150443906511667200</span>;
-<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json!</span>({
     <span class="string">&quot;channel_id&quot;</span>: <span class="string">&quot;826929611849334784&quot;</span>,
     <span class="string">&quot;suppress&quot;</span>: <span class="bool-val">true</span>,
 });
@@ -209,7 +209,7 @@ request to speak. This can be any present or future time.</li>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">http</span>::<span class="ident">Http</span>;
 
 <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="number">187450744427773963</span>;
-<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json!</span>({
     <span class="string">&quot;channel_id&quot;</span>: <span class="string">&quot;826929611849334784&quot;</span>,
     <span class="string">&quot;suppress&quot;</span>: <span class="bool-val">false</span>,
     <span class="string">&quot;request_to_speak_timestamp&quot;</span>: <span class="string">&quot;2021-03-31T18:45:31.297561+00:00&quot;</span>
@@ -239,7 +239,7 @@ does not.</p>
 
 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="number">245037420704169985</span>;
 <span class="kw">let</span> <span class="ident">image</span> <span class="op">=</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">read_image</span>(<span class="string">&quot;./webhook_img.png&quot;</span>)<span class="question-mark">?</span>;
-<span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+<span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({
     <span class="string">&quot;avatar&quot;</span>: <span class="ident">image</span>,
 });
 
@@ -256,7 +256,7 @@ does not.</p>
 
 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="number">245037420704169985</span>;
 <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="string">&quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>;
-<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({<span class="string">&quot;name&quot;</span>: <span class="string">&quot;new name&quot;</span>});
+<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json!</span>({<span class="string">&quot;name&quot;</span>: <span class="string">&quot;new name&quot;</span>});
 <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object</span>().<span class="ident">unwrap</span>();
 
 <span class="kw">let</span> <span class="ident">edited</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">edit_webhook_with_token</span>(<span class="ident">id</span>, <span class="ident">token</span>, <span class="ident">map</span>).<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
@@ -293,7 +293,7 @@ not saved does not return an error)</p>
 
 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="number">245037420704169985</span>;
 <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="string">&quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>;
-<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({<span class="string">&quot;content&quot;</span>: <span class="string">&quot;test&quot;</span>});
+<span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">json!</span>({<span class="string">&quot;content&quot;</span>: <span class="string">&quot;test&quot;</span>});
 <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object</span>().<span class="ident">unwrap</span>();
 
 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">execute_webhook</span>(<span class="ident">id</span>, <span class="ident">token</span>, <span class="bool-val">true</span>, <span class="ident">map</span>).<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
@@ -446,7 +446,7 @@ deserialize the response into a <a href="../../../serenity/model/channel/struct.
     <span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Message</span>,
 };
 
-<span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+<span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[
     <span class="comment">// payload bytes here</span>
 ];
 <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="number">381880193700069377</span>;
@@ -457,7 +457,7 @@ deserialize the response into a <a href="../../../serenity/model/channel/struct.
 
 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">fire</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>(<span class="ident">request</span>.<span class="ident">build</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Message content: {}&quot;</span>, <span class="ident">message</span>.<span class="ident">content</span>);</pre></div>
+<span class="macro">println!</span>(<span class="string">&quot;Message content: {}&quot;</span>, <span class="ident">message</span>.<span class="ident">content</span>);</pre></div>
 <h1 id="errors-2" class="section-header"><a href="#errors-2">Errors</a></h1>
 <p>If there is an error, it will be either <a href="../../../serenity/prelude/enum.SerenityError.html#variant.Http"><code>Error::Http</code></a> or <a href="../../../serenity/prelude/enum.SerenityError.html#variant.Json"><code>Error::Json</code></a>.</p>
 </div><h4 id="method.request" class="method"><code>pub async fn <a href="#method.request" class="fnname">request</a>(&amp;self, req: <a class="struct" href="../../../serenity/http/request/struct.Request.html" title="struct serenity::http::request::Request">Request</a>&lt;'_&gt;) -&gt; <a class="type" href="../../../serenity/type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://docs.rs/reqwest/0.11.2/reqwest/async_impl/response/struct.Response.html" title="struct reqwest::async_impl::response::Response">ReqwestResponse</a>&gt;</code><a class="srclink" href="../../../src/serenity/http/client.rs.html#2625" title="goto source code">[src]</a></h4><div class="docblock"><p>Performs a request, ratelimiting it if necessary.</p>
@@ -472,7 +472,7 @@ into some type.</p>
     <span class="ident">routing</span>::<span class="ident">RouteInfo</span>,
 };
 
-<span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+<span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[
     <span class="comment">// payload bytes here</span>
 ];
 <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="number">381880193700069377</span>;
@@ -483,7 +483,7 @@ into some type.</p>
 
 <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">request</span>(<span class="ident">request</span>.<span class="ident">build</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Response successful?: {}&quot;</span>, <span class="ident">response</span>.<span class="ident">status</span>().<span class="ident">is_success</span>());</pre></div>
+<span class="macro">println!</span>(<span class="string">&quot;Response successful?: {}&quot;</span>, <span class="ident">response</span>.<span class="ident">status</span>().<span class="ident">is_success</span>());</pre></div>
 </div></div><h2 id="trait-implementations" class="small-section-header">Trait Implementations<a href="#trait-implementations" class="anchor"></a></h2><div id="trait-implementations-list"><h3 id="impl-AsRef%3CHttp%3E" class="impl"><code class="in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="../../../serenity/http/client/struct.Http.html" title="struct serenity::http::client::Http">Http</a>&gt; for <a class="struct" href="../../../serenity/prelude/struct.Context.html" title="struct serenity::prelude::Context">Context</a></code><a href="#impl-AsRef%3CHttp%3E" class="anchor"></a><a class="srclink" href="../../../src/serenity/client/context.rs.html#407-411" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.as_ref" class="method hidden"><code>fn <a href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html#tymethod.as_ref" class="fnname">as_ref</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../serenity/http/client/struct.Http.html" title="struct serenity::http::client::Http">Http</a></code><a class="srclink" href="../../../src/serenity/client/context.rs.html#408-410" title="goto source code">[src]</a></h4><div class='docblock hidden'><p>Performs the conversion.</p>
 </div></div><h3 id="impl-AsRef%3CHttp%3E-1" class="impl"><code class="in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="../../../serenity/http/client/struct.Http.html" title="struct serenity::http::client::Http">Http</a>&gt; for <a class="struct" href="../../../serenity/http/client/struct.Http.html" title="struct serenity::http::client::Http">Http</a></code><a href="#impl-AsRef%3CHttp%3E-1" class="anchor"></a><a class="srclink" href="../../../src/serenity/http/client.rs.html#2666-2670" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.as_ref-1" class="method hidden"><code>fn <a href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html#tymethod.as_ref" class="fnname">as_ref</a>(&amp;self) -&gt; &amp;<a class="struct" href="../../../serenity/http/client/struct.Http.html" title="struct serenity::http::client::Http">Http</a></code><a class="srclink" href="../../../src/serenity/http/client.rs.html#2667-2669" title="goto source code">[src]</a></h4><div class='docblock hidden'><p>Performs the conversion.</p>
 </div></div><h3 id="impl-Debug" class="impl"><code class="in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../../serenity/http/client/struct.Http.html" title="struct serenity::http::client::Http">Http</a></code><a href="#impl-Debug" class="anchor"></a><a class="srclink" href="../../../src/serenity/http/client.rs.html#42-49" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.fmt" class="method hidden"><code>fn <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt" class="fnname">fmt</a>(&amp;self, f: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code><a class="srclink" href="../../../src/serenity/http/client.rs.html#43-48" title="goto source code">[src]</a></h4><div class='docblock hidden'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>

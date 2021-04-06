@@ -1710,7 +1710,7 @@
 
     <span class="kw">fn</span> <span class="ident">_channel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">channel</span>.<span class="ident">mention</span>());
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">channel</span>.<span class="ident">mention</span>());
         <span class="comment">// should not error, ignoring</span>
 
         <span class="self">self</span>
@@ -1753,7 +1753,7 @@
     <span class="doccomment">/// [Display implementation]: crate::model::guild::Emoji#impl-Display</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="kw-2">&amp;</span><span class="ident">Emoji</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">emoji</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">emoji</span>);
         <span class="comment">// should not error, ignoring</span>
 
         <span class="self">self</span>
@@ -1762,7 +1762,7 @@
     <span class="doccomment">/// Mentions something that implements the [`Mentionable`] trait.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mention</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mentionable</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">item</span>.<span class="ident">mention</span>());
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">item</span>.<span class="ident">mention</span>());
         <span class="comment">// should not error, ignoring</span>
 
         <span class="self">self</span>
@@ -2433,7 +2433,7 @@
     <span class="doccomment">/// [Display implementation]: RoleId#impl-Display</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">role</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">role</span>.<span class="ident">into</span>().<span class="ident">mention</span>());
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">role</span>.<span class="ident">into</span>().<span class="ident">mention</span>());
         <span class="comment">// should not error, ignoring</span>
 
         <span class="self">self</span>
@@ -2451,7 +2451,7 @@
     <span class="doccomment">/// [Display implementation]: UserId#impl-Display</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">user</span>.<span class="ident">into</span>().<span class="ident">mention</span>());
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">user</span>.<span class="ident">into</span>().<span class="ident">mention</span>());
         <span class="comment">// should not error, ignoring</span>
 
         <span class="self">self</span>
@@ -2566,7 +2566,7 @@
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">into</span>().<span class="ident">to_string</span>();
 
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;[{}]({})&quot;</span>, <span class="ident">name</span>, <span class="ident">url</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;[{}]({})&quot;</span>, <span class="ident">name</span>, <span class="ident">url</span>);
         <span class="comment">// error cannot be returned, ignoring instead</span>
 
         <span class="self">self</span>
@@ -2861,11 +2861,11 @@
     };
     <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
-    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">gen</span> {
+    <span class="macro">macro_rules!</span> <span class="ident">gen</span> {
         ($(<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span> <span class="op">=</span><span class="op">&gt;</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">text</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>:<span class="ident">expr</span>),<span class="op">+</span>]),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> ({
             $(
                 $(
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">text</span>).<span class="number">0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>);
+                    <span class="macro">assert_eq!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">text</span>).<span class="number">0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>);
                 )<span class="op">+</span>
             )<span class="op">+</span>
         });
@@ -2874,19 +2874,19 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">code_blocks</span>() {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock</span>(<span class="string">&quot;test&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;rb&quot;</span>)).<span class="ident">build</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;```rb\ntest\n```&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;```rb\ntest\n```&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">safe_content</span>() {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_safe</span>(<span class="string">&quot;@everyone discord.gg/discord-api&quot;</span>).<span class="ident">build</span>();
-        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;@everyone discord.gg/discord-api&quot;</span>);
+        <span class="macro">assert_ne!</span>(<span class="ident">content</span>, <span class="string">&quot;@everyone discord.gg/discord-api&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">no_free_formatting</span>() {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_bold_safe</span>(<span class="string">&quot;test**test&quot;</span>).<span class="ident">build</span>();
-        <span class="macro">assert_ne</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;**test**test**&quot;</span>);
+        <span class="macro">assert_ne!</span>(<span class="ident">content</span>, <span class="string">&quot;**test**test**&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -2899,80 +2899,80 @@
                 <span class="ident">name</span>: <span class="string">&quot;Rohrkatze&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">managed</span>: <span class="bool-val">false</span>,
                 <span class="ident">require_colons</span>: <span class="bool-val">true</span>,
-                <span class="ident">roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">roles</span>: <span class="macro">vec!</span>[],
                 <span class="ident">user</span>: <span class="prelude-val">None</span>,
             })
             .<span class="ident">build</span>();
         <span class="kw">let</span> <span class="ident">content_mentions</span> <span class="op">=</span>
             <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">channel</span>(<span class="number">1</span>).<span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="number">2</span>)).<span class="ident">role</span>(<span class="number">3</span>).<span class="ident">user</span>(<span class="number">4</span>).<span class="ident">build</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content_mentions</span>, <span class="string">&quot;&lt;#1&gt;&lt;@2&gt;&lt;@&amp;3&gt;&lt;@4&gt;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content_emoji</span>, <span class="string">&quot;&lt;:Rohrkatze:32&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">content_mentions</span>, <span class="string">&quot;&lt;#1&gt;&lt;@2&gt;&lt;@&amp;3&gt;&lt;@4&gt;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">content_emoji</span>, <span class="string">&quot;&lt;:Rohrkatze:32&gt;&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">content</span>() {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">Bold</span> <span class="op">+</span> <span class="ident">Italic</span> <span class="op">+</span> <span class="ident">Code</span> <span class="op">+</span> <span class="string">&quot;Fun!&quot;</span>;
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>.<span class="ident">to_string</span>(), <span class="string">&quot;***`Fun!`***&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">content</span>.<span class="ident">to_string</span>(), <span class="string">&quot;***`Fun!`***&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">Spoiler</span> <span class="op">+</span> <span class="ident">Bold</span> <span class="op">+</span> <span class="string">&quot;Divert your eyes elsewhere&quot;</span>;
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>.<span class="ident">to_string</span>(), <span class="string">&quot;||**Divert your eyes elsewhere**||&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">content</span>.<span class="ident">to_string</span>(), <span class="string">&quot;||**Divert your eyes elsewhere**||&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">init</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="number">0</span>, <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">default</span>().<span class="number">0</span>, <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="number">0</span>, <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">default</span>().<span class="number">0</span>, <span class="string">&quot;&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">message_content</span>() {
         <span class="kw">let</span> <span class="ident">message_content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push</span>(<span class="ident">Bold</span> <span class="op">+</span> <span class="ident">Italic</span> <span class="op">+</span> <span class="ident">Code</span> <span class="op">+</span> <span class="string">&quot;Fun!&quot;</span>).<span class="ident">build</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">message_content</span>, <span class="string">&quot;***`Fun!`***&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">message_content</span>, <span class="string">&quot;***`Fun!`***&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">message_content_safe</span>() {
         <span class="kw">let</span> <span class="ident">message_content</span> <span class="op">=</span> <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_safe</span>(<span class="ident">Bold</span> <span class="op">+</span> <span class="ident">Italic</span> <span class="op">+</span> <span class="string">&quot;test**test&quot;</span>).<span class="ident">build</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">message_content</span>, <span class="string">&quot;***test\\*\\*test***&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">message_content</span>, <span class="string">&quot;***test\\*\\*test***&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">push</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push</span>(<span class="string">&#39;a&#39;</span>).<span class="number">0</span>, <span class="string">&quot;a&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push</span>(<span class="string">&quot;&quot;</span>).<span class="number">0</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push</span>(<span class="string">&#39;a&#39;</span>).<span class="number">0</span>, <span class="string">&quot;a&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push</span>(<span class="string">&quot;&quot;</span>).<span class="number">0</span>.<span class="ident">is_empty</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">push_codeblock</span>() {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock</span>(<span class="string">&quot;foo&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>.<span class="ident">clone</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;```\nfoo\n```&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;```\nfoo\n```&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock</span>(<span class="string">&quot;fn main() { }&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;rs&quot;</span>)).<span class="number">0</span>.<span class="ident">clone</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">content</span>, <span class="string">&quot;```rs\nfn main() { }\n```&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="string">&quot;```rs\nfn main() { }\n```&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">push_codeblock_safe</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock_safe</span>(<span class="string">&quot;foo&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;rs&quot;</span>)).<span class="number">0</span>,
             <span class="string">&quot;```rs\nfoo\n```&quot;</span>,
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock_safe</span>(<span class="string">&quot;&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>, <span class="string">&quot;```\n\n```&quot;</span>,);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock_safe</span>(<span class="string">&quot;1 * 2&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>, <span class="string">&quot;```\n1 * 2\n```&quot;</span>,);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock_safe</span>(<span class="string">&quot;&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>, <span class="string">&quot;```\n\n```&quot;</span>,);
+        <span class="macro">assert_eq!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock_safe</span>(<span class="string">&quot;1 * 2&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>, <span class="string">&quot;```\n1 * 2\n```&quot;</span>,);
+        <span class="macro">assert_eq!</span>(
             <span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock_safe</span>(<span class="string">&quot;`1 * 3`&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>,
             <span class="string">&quot;```\n`1 * 3`\n```&quot;</span>,
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock_safe</span>(<span class="string">&quot;```.```&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>, <span class="string">&quot;```\n . \n```&quot;</span>,);
+        <span class="macro">assert_eq!</span>(<span class="ident">MessageBuilder</span>::<span class="ident">new</span>().<span class="ident">push_codeblock_safe</span>(<span class="string">&quot;```.```&quot;</span>, <span class="prelude-val">None</span>).<span class="number">0</span>, <span class="string">&quot;```\n . \n```&quot;</span>,);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">push_safe</span>() {
-        <span class="macro">gen</span><span class="macro">!</span> {
+        <span class="macro">gen!</span> {
             <span class="ident">push_safe</span> <span class="op">=</span><span class="op">&gt;</span> [
                 <span class="string">&quot;&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
                 <span class="string">&quot;foo&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;foo&quot;</span>,
@@ -3048,7 +3048,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">push_unsafe</span>() {
-        <span class="macro">gen</span><span class="macro">!</span> {
+        <span class="macro">gen!</span> {
             <span class="ident">push_bold</span> <span class="op">=</span><span class="op">&gt;</span> [
                 <span class="string">&quot;a&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;**a**&quot;</span>,
                 <span class="string">&quot;&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;****&quot;</span>,
@@ -3123,19 +3123,19 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">normalize</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;@everyone&quot;</span>), <span class="string">&quot;@\u{200B}everyone&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;@here&quot;</span>), <span class="string">&quot;@\u{200B}here&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discord.gg&quot;</span>), <span class="string">&quot;discord\u{2024}gg&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discord.me&quot;</span>), <span class="string">&quot;discord\u{2024}me&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discordlist.net&quot;</span>), <span class="string">&quot;discordlist\u{2024}net&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discordservers.com&quot;</span>), <span class="string">&quot;discordservers\u{2024}com&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discord.com/invite&quot;</span>), <span class="string">&quot;discord\u{2024}com/invite&quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{202E}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{200F}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{202B}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{200B}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{200D}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{200C}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;@everyone&quot;</span>), <span class="string">&quot;@\u{200B}everyone&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;@here&quot;</span>), <span class="string">&quot;@\u{200B}here&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discord.gg&quot;</span>), <span class="string">&quot;discord\u{2024}gg&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discord.me&quot;</span>), <span class="string">&quot;discord\u{2024}me&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discordlist.net&quot;</span>), <span class="string">&quot;discordlist\u{2024}net&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discordservers.com&quot;</span>), <span class="string">&quot;discordservers\u{2024}com&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;discord.com/invite&quot;</span>), <span class="string">&quot;discord\u{2024}com/invite&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{202E}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{200F}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{202B}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{200B}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{200D}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">super</span>::<span class="ident">normalize</span>(<span class="string">&quot;\u{200C}&quot;</span>), <span class="string">&quot; &quot;</span>);
     }
 }
 </pre></div>

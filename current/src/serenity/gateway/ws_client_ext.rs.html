@@ -236,9 +236,9 @@
         <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
         <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;[Shard {:?}] Requesting member chunks&quot;</span>, <span class="ident">shard_info</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Requesting member chunks&quot;</span>, <span class="ident">shard_info</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode</span>::<span class="ident">GetGuildMembers</span>.<span class="ident">num</span>(),
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;guild_id&quot;</span>: <span class="ident">guild_id</span>.<span class="ident">as_ref</span>().<span class="number">0</span>.<span class="ident">to_string</span>(),
@@ -248,11 +248,11 @@
         });
 
         <span class="kw">match</span> <span class="ident">filter</span> {
-            <span class="ident">ChunkGuildFilter</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>(<span class="string">&quot;&quot;</span>),
-            <span class="ident">ChunkGuildFilter</span>::<span class="ident">Query</span>(<span class="ident">query</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>(<span class="ident">query</span>),
+            <span class="ident">ChunkGuildFilter</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="string">&quot;&quot;</span>),
+            <span class="ident">ChunkGuildFilter</span>::<span class="ident">Query</span>(<span class="ident">query</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="ident">query</span>),
             <span class="ident">ChunkGuildFilter</span>::<span class="ident">UserIds</span>(<span class="ident">user_ids</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">user_ids</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="number">0</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-                <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;user_ids&quot;</span>] <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>(<span class="ident">ids</span>)
+                <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;user_ids&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="ident">ids</span>)
             },
         };
 
@@ -261,9 +261,9 @@
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>], <span class="ident">seq</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;[Shard {:?}] Sending heartbeat d: {:?}&quot;</span>, <span class="ident">shard_info</span>, <span class="ident">seq</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;[Shard {:?}] Sending heartbeat d: {:?}&quot;</span>, <span class="ident">shard_info</span>, <span class="ident">seq</span>);
 
-        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json</span><span class="macro">!</span>({
+        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
             <span class="string">&quot;d&quot;</span>: <span class="ident">seq</span>,
             <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode</span>::<span class="ident">Heartbeat</span>.<span class="ident">num</span>(),
         }))
@@ -278,9 +278,9 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;[Shard {:?}] Identifying&quot;</span>, <span class="ident">shard_info</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Identifying&quot;</span>, <span class="ident">shard_info</span>);
 
-        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json</span><span class="macro">!</span>({
+        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
             <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode</span>::<span class="ident">Identify</span>.<span class="ident">num</span>(),
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;compress&quot;</span>: <span class="bool-val">true</span>,
@@ -308,15 +308,15 @@
         <span class="kw">let</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">activity</span>, <span class="kw-2">ref</span> <span class="ident">status</span>) <span class="op">=</span> <span class="ident">current_presence</span>;
         <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">SystemTime</span>::<span class="ident">now</span>();
 
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;[Shard {:?}] Sending presence update&quot;</span>, <span class="ident">shard_info</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Sending presence update&quot;</span>, <span class="ident">shard_info</span>);
 
-        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json</span><span class="macro">!</span>({
+        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
             <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode</span>::<span class="ident">StatusUpdate</span>.<span class="ident">num</span>(),
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;afk&quot;</span>: <span class="bool-val">false</span>,
                 <span class="string">&quot;since&quot;</span>: <span class="ident">now</span>,
                 <span class="string">&quot;status&quot;</span>: <span class="ident">status</span>.<span class="ident">name</span>(),
-                <span class="string">&quot;game&quot;</span>: <span class="ident">activity</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">json</span><span class="macro">!</span>({
+                <span class="string">&quot;game&quot;</span>: <span class="ident">activity</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">json!</span>({
                     <span class="string">&quot;name&quot;</span>: <span class="ident">x</span>.<span class="ident">name</span>,
                     <span class="string">&quot;type&quot;</span>: <span class="ident">x</span>.<span class="ident">kind</span>,
                     <span class="string">&quot;url&quot;</span>: <span class="ident">x</span>.<span class="ident">url</span>,
@@ -334,9 +334,9 @@
         <span class="ident">seq</span>: <span class="ident">u64</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;[Shard {:?}] Sending resume; seq: {}&quot;</span>, <span class="ident">shard_info</span>, <span class="ident">seq</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Sending resume; seq: {}&quot;</span>, <span class="ident">shard_info</span>, <span class="ident">seq</span>);
 
-        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json</span><span class="macro">!</span>({
+        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
             <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode</span>::<span class="ident">Resume</span>.<span class="ident">num</span>(),
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;session_id&quot;</span>: <span class="ident">session_id</span>,

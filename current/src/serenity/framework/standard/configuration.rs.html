@@ -1094,7 +1094,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`dynamic_prefix`]: Self::dynamic_prefix</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_empty</span>() { <span class="macro">vec</span><span class="macro">!</span>[] } <span class="kw">else</span> { <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">prefix</span>.<span class="ident">to_string</span>()] };
+        <span class="self">self</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_empty</span>() { <span class="macro">vec!</span>[] } <span class="kw">else</span> { <span class="macro">vec!</span>[<span class="ident">prefix</span>.<span class="ident">to_string</span>()] };
 
         <span class="self">self</span>
     }
@@ -1240,7 +1240,7 @@
             <span class="ident">blocked_users</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
             <span class="ident">allowed_channels</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
             <span class="ident">case_insensitive</span>: <span class="bool-val">false</span>,
-            <span class="ident">delimiters</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Delimiter</span>::<span class="ident">Single</span>(<span class="string">&#39; &#39;</span>)],
+            <span class="ident">delimiters</span>: <span class="macro">vec!</span>[<span class="ident">Delimiter</span>::<span class="ident">Single</span>(<span class="string">&#39; &#39;</span>)],
             <span class="ident">disabled_commands</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
             <span class="ident">dynamic_prefixes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
             <span class="ident">ignore_bots</span>: <span class="bool-val">true</span>,
@@ -1248,7 +1248,7 @@
             <span class="ident">no_dm_prefix</span>: <span class="bool-val">false</span>,
             <span class="ident">on_mention</span>: <span class="prelude-val">None</span>,
             <span class="ident">owners</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
-            <span class="ident">prefixes</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;~&quot;</span>)],
+            <span class="ident">prefixes</span>: <span class="macro">vec!</span>[<span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;~&quot;</span>)],
         }
     }
 }

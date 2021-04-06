@@ -763,7 +763,7 @@
     <span class="doccomment">/// Returns the DiscordTag of a Member, taking possible nickname into account.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">distinct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}#{:04}&quot;</span>, <span class="self">self</span>.<span class="ident">display_name</span>(), <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">discriminator</span>)
+        <span class="macro">format!</span>(<span class="string">&quot;{}#{:04}&quot;</span>, <span class="self">self</span>.<span class="ident">display_name</span>(), <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">discriminator</span>)
     }
 
     <span class="doccomment">/// Edits the member with the given data. See [`Guild::edit_member`] for</span>

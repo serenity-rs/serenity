@@ -846,7 +846,7 @@
     <span class="ident">Stage</span> <span class="op">=</span> <span class="number">13</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">ChannelType</span> {
+<span class="macro">enum_number!</span>(<span class="ident">ChannelType</span> {
     <span class="ident">Text</span>,
     <span class="ident">Private</span>,
     <span class="ident">Voice</span>,
@@ -965,7 +965,7 @@
     <span class="ident">Full</span> <span class="op">=</span> <span class="number">2</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">VideoQualityMode</span> {
+<span class="macro">enum_number!</span>(<span class="ident">VideoQualityMode</span> {
     <span class="ident">Auto</span>,
     <span class="ident">Full</span>,
 });
@@ -986,7 +986,7 @@
                 <span class="ident">last_message_id</span>: <span class="prelude-val">None</span>,
                 <span class="ident">last_pin_timestamp</span>: <span class="prelude-val">None</span>,
                 <span class="ident">name</span>: <span class="string">&quot;nsfw-stuff&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">permission_overwrites</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+                <span class="ident">permission_overwrites</span>: <span class="macro">vec!</span>[],
                 <span class="ident">position</span>: <span class="number">0</span>,
                 <span class="ident">topic</span>: <span class="prelude-val">None</span>,
                 <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
@@ -1017,31 +1017,31 @@
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">nsfw_checks</span>() {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">guild_channel</span>();
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
             <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ChannelType</span>::<span class="ident">Voice</span>;
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
 
             <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ChannelType</span>::<span class="ident">Text</span>;
             <span class="ident">channel</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;nsfw-&quot;</span>.<span class="ident">to_string</span>();
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
 
             <span class="ident">channel</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;nsfw&quot;</span>.<span class="ident">to_string</span>();
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
             <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ChannelType</span>::<span class="ident">Voice</span>;
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
             <span class="ident">channel</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">ChannelType</span>::<span class="ident">Text</span>;
 
             <span class="ident">channel</span>.<span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;nsf&quot;</span>.<span class="ident">to_string</span>();
             <span class="ident">channel</span>.<span class="ident">nsfw</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
             <span class="ident">channel</span>.<span class="ident">nsfw</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
 
             <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="ident">channel</span>);
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>());
 
             <span class="kw">let</span> <span class="ident">private_channel</span> <span class="op">=</span> <span class="ident">private_channel</span>();
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">private_channel</span>.<span class="ident">is_nsfw</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">private_channel</span>.<span class="ident">is_nsfw</span>());
         }
     }
 }

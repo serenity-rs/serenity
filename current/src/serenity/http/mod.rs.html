@@ -522,11 +522,11 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_attachment_type</span>() {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="macro">matches</span><span class="macro">!</span>(
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(
             <span class="ident">AttachmentType</span>::<span class="ident">from</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;./dogs/corgis/kona.png&quot;</span>)),
             <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="kw">_</span>)
         ));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="macro">matches</span><span class="macro">!</span>(
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(
             <span class="ident">AttachmentType</span>::<span class="ident">from</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;./cats/copycat.png&quot;</span>)),
             <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="kw">_</span>)
         ));

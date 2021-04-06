@@ -17,18 +17,18 @@ actually invalid:</p>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">client</span>::<span class="ident">validate_token</span>;
 
 <span class="comment">// ensure a valid token is in fact valid:</span>
-<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg&quot;</span>).<span class="ident">is_ok</span>());
+<span class="macro">assert!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg&quot;</span>).<span class="ident">is_ok</span>());
 
 <span class="comment">// &quot;cat&quot; isn&#39;t a valid token:</span>
-<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;cat&quot;</span>).<span class="ident">is_err</span>());
+<span class="macro">assert!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;cat&quot;</span>).<span class="ident">is_err</span>());
 
 <span class="comment">// tokens must have three parts, separated by periods (this is still</span>
 <span class="comment">// actually an invalid token):</span>
-<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;aaa.abcdefgh.bbb&quot;</span>).<span class="ident">is_ok</span>());
+<span class="macro">assert!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;aaa.abcdefgh.bbb&quot;</span>).<span class="ident">is_ok</span>());
 
 <span class="comment">// the second part must be _at least_ 6 characters long:</span>
-<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;a.abcdef.b&quot;</span>).<span class="ident">is_ok</span>());
-<span class="macro">assert</span><span class="macro">!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;a.abcde.b&quot;</span>).<span class="ident">is_err</span>());</pre></div>
+<span class="macro">assert!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;a.abcdef.b&quot;</span>).<span class="ident">is_ok</span>());
+<span class="macro">assert!</span>(<span class="ident">validate_token</span>(<span class="string">&quot;a.abcde.b&quot;</span>).<span class="ident">is_err</span>());</pre></div>
 <h1 id="errors" class="section-header"><a href="#errors">Errors</a></h1>
 <p>Returns a <a href="../../serenity/prelude/enum.ClientError.html#variant.InvalidToken" title="ClientError::InvalidToken"><code>ClientError::InvalidToken</code></a> when one of the above checks fail.
 The type of failure is not specified.</p>

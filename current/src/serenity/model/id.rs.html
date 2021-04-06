@@ -180,7 +180,7 @@
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">U64Visitor</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">id_u64</span> {
+<span class="macro">macro_rules!</span> <span class="ident">id_u64</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         $(
             <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
@@ -321,7 +321,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
 
-<span class="macro">id_u64</span><span class="macro">!</span> {
+<span class="macro">id_u64!</span> {
     <span class="ident">AttachmentId</span>;
     <span class="ident">ApplicationId</span>;
     <span class="ident">ChannelId</span>;

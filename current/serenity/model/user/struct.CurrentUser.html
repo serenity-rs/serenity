@@ -23,8 +23,8 @@
 <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>;
 
 <span class="kw">match</span> <span class="ident">user</span>.<span class="ident">avatar_url</span>() {
-    <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&#39;s avatar can be found at {}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>, <span class="ident">url</span>),
-    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{} does not have an avatar set.&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>)
+    <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println!</span>(<span class="string">&quot;{}&#39;s avatar can be found at {}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>, <span class="ident">url</span>),
+    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println!</span>(<span class="string">&quot;{} does not have an avatar set.&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>)
 }</pre></div>
 </div><h4 id="method.default_avatar_url" class="method"><code>pub fn <a href="#method.default_avatar_url" class="fnname">default_avatar_url</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code><a class="srclink" href="../../../src/serenity/model/user.rs.html#90-92" title="goto source code">[src]</a></h4><div class="docblock"><p>Returns the formatted URL to the user’s default avatar URL.</p>
 <p>This will produce a PNG URL.</p>
@@ -55,7 +55,7 @@ then falls back to <a href="../../../serenity/model/user/struct.CurrentUser.html
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">guilds</span>) <span class="op">=</span> <span class="ident">user</span>.<span class="ident">guilds</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>).<span class="kw">await</span> {
     <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">guild</span>) <span class="kw">in</span> <span class="ident">guilds</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}: {}&quot;</span>, <span class="ident">index</span>, <span class="ident">guild</span>.<span class="ident">name</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{}: {}&quot;</span>, <span class="ident">index</span>, <span class="ident">guild</span>.<span class="ident">name</span>);
     }
 }</pre></div>
 <h1 id="errors-1" class="section-header"><a href="#errors-1">Errors</a></h1>
@@ -75,13 +75,13 @@ the data returned by the API.</p>
 <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">user</span>.<span class="ident">invite_url</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">Permissions</span>::<span class="ident">empty</span>()).<span class="kw">await</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
     <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Error getting invite url: {:?}&quot;</span>, <span class="ident">why</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;Error getting invite url: {:?}&quot;</span>, <span class="ident">why</span>);
 
         <span class="kw">return</span>;
     },
 };
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">url</span>, <span class="string">&quot;https://discordapp.com/api/oauth2/authorize? \
+<span class="macro">assert_eq!</span>(<span class="ident">url</span>, <span class="string">&quot;https://discordapp.com/api/oauth2/authorize? \
                  client_id=249608697955745802&amp;scope=bot&quot;</span>);</pre></div>
 <p>Get the invite url with some basic permissions set:</p>
 
@@ -93,13 +93,13 @@ the data returned by the API.</p>
 <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">user</span>.<span class="ident">invite_url</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">permissions</span>).<span class="kw">await</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
     <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Error getting invite url: {:?}&quot;</span>, <span class="ident">why</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;Error getting invite url: {:?}&quot;</span>, <span class="ident">why</span>);
 
         <span class="kw">return</span>;
     },
 };
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">url</span>,
+<span class="macro">assert_eq!</span>(<span class="ident">url</span>,
 <span class="string">&quot;https://discordapp.
 com/api/oauth2/authorize?client_id=249608697955745802&amp;scope=bot&amp;permissions=19456&quot;</span>);</pre></div>
 <h1 id="errors-2" class="section-header"><a href="#errors-2">Errors</a></h1>
@@ -116,8 +116,8 @@ If the user is not authorized for this end point.</p>
 <span class="comment">// assuming the user has been bound</span>
 
 <span class="kw">match</span> <span class="ident">user</span>.<span class="ident">static_avatar_url</span>() {
-    <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&#39;s static avatar can be found at {}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>, <span class="ident">url</span>),
-    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Could not get static avatar for {}.&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>)
+    <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println!</span>(<span class="string">&quot;{}&#39;s static avatar can be found at {}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>, <span class="ident">url</span>),
+    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println!</span>(<span class="string">&quot;Could not get static avatar for {}.&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>)
 }</pre></div>
 </div><h4 id="method.tag" class="method"><code>pub fn <a href="#method.tag" class="fnname">tag</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code><a class="srclink" href="../../../src/serenity/model/user.rs.html#343-345" title="goto source code">[src]</a></h4><div class="docblock"><p>Returns the tag of the current user.</p>
 <h1 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h1>
@@ -126,7 +126,7 @@ If the user is not authorized for this end point.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="comment">// assuming the user has been bound</span>
 
-<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;The current user&#39;s distinct identifier is {}&quot;</span>, <span class="ident">user</span>.<span class="ident">tag</span>());</pre></div>
+<span class="macro">println!</span>(<span class="string">&quot;The current user&#39;s distinct identifier is {}&quot;</span>, <span class="ident">user</span>.<span class="ident">tag</span>());</pre></div>
 </div></div><h2 id="trait-implementations" class="small-section-header">Trait Implementations<a href="#trait-implementations" class="anchor"></a></h2><div id="trait-implementations-list"><h3 id="impl-Clone" class="impl"><code class="in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../../../serenity/model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a></code><a href="#impl-Clone" class="anchor"></a><a class="srclink" href="../../../src/serenity/model/user.rs.html#37" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.clone" class="method hidden"><code>fn <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone" class="fnname">clone</a>(&amp;self) -&gt; <a class="struct" href="../../../serenity/model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a></code><a class="srclink" href="../../../src/serenity/model/user.rs.html#37" title="goto source code">[src]</a></h4><div class='docblock hidden'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
 </div><h4 id="method.clone_from" class="method hidden"><code>pub fn <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from" class="fnname">clone_from</a>(&amp;mut self, source: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>Self)</code><span class="since" title="Stable since Rust version 1.0.0">1.0.0</span><a class="srclink" href="https://doc.rust-lang.org/nightly/src/core/clone.rs.html#130" title="goto source code">[src]</a></h4><div class='docblock hidden'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
 </div></div><h3 id="impl-Debug" class="impl"><code class="in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../../serenity/model/user/struct.CurrentUser.html" title="struct serenity::model::user::CurrentUser">CurrentUser</a></code><a href="#impl-Debug" class="anchor"></a><a class="srclink" href="../../../src/serenity/model/user.rs.html#37" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.fmt" class="method hidden"><code>fn <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt" class="fnname">fmt</a>(&amp;self, f: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code><a class="srclink" href="../../../src/serenity/model/user.rs.html#37" title="goto source code">[src]</a></h4><div class='docblock hidden'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>

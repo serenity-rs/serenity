@@ -432,7 +432,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::<span class="ident">ShardMessenger</span>, <span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Reaction</span>, <span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">UserId</span>};
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">impl_reaction_collector</span> {
+<span class="macro">macro_rules!</span> <span class="ident">impl_reaction_collector</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         $(
             <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -673,7 +673,7 @@
 <span class="comment">// Implement the common setters for all reaction collector types.</span>
 <span class="comment">// This avoids using a trait that the user would need to import in</span>
 <span class="comment">// order to use any of these methods.</span>
-<span class="macro">impl_reaction_collector</span><span class="macro">!</span> {
+<span class="macro">impl_reaction_collector!</span> {
     <span class="ident">CollectReaction</span>;
     <span class="ident">ReactionCollectorBuilder</span>;
 }

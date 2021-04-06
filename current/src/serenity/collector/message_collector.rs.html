@@ -337,7 +337,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::<span class="ident">ShardMessenger</span>, <span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Message</span>};
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">impl_message_collector</span> {
+<span class="macro">macro_rules!</span> <span class="ident">impl_message_collector</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         $(
             <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -470,7 +470,7 @@
 }
 
 <span class="comment">// Implement the common setters for all message collector types.</span>
-<span class="macro">impl_message_collector</span><span class="macro">!</span> {
+<span class="macro">impl_message_collector!</span> {
     <span class="ident">CollectReply</span>;
     <span class="ident">MessageCollectorBuilder</span>;
 }

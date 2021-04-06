@@ -866,7 +866,7 @@
 
         <span class="kw">if</span> <span class="ident">limit</span> <span class="op">&gt;</span> <span class="number">100</span> {
             <span class="ident">limit</span> <span class="op">=</span> <span class="number">100</span>;
-            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Rection users limit clamped to 100! (API Restriction)&quot;</span>);
+            <span class="macro">warn!</span>(<span class="string">&quot;Rection users limit clamped to 100! (API Restriction)&quot;</span>);
         }
 
         <span class="ident">http</span>.<span class="ident">as_ref</span>()
@@ -1018,7 +1018,7 @@
                 <span class="kw-2">ref</span> <span class="ident">name</span>,
                 ..
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="string">&quot;&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()), <span class="ident">id</span>)
+                <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="string">&quot;&quot;</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()), <span class="ident">id</span>)
             },
             <span class="ident">ReactionType</span>::<span class="ident">Unicode</span>(<span class="kw-2">ref</span> <span class="ident">unicode</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">unicode</span>.<span class="ident">clone</span>(),
         }
@@ -1114,7 +1114,7 @@
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ReactionConversionError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to convert from a string to ReactionType&quot;</span>)
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to convert from a string to ReactionType&quot;</span>)
     }
 }
 
@@ -1221,7 +1221,7 @@
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">NeverFails</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
-        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;never fails&quot;</span>)
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;never fails&quot;</span>)
     }
 }
 

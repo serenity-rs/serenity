@@ -68,7 +68,7 @@ crate only.</p>
             <span class="ident">Entry</span>::<span class="ident">Vacant</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// We can convert a `serde_json::Value` to a User for test</span>
                 <span class="comment">// purposes.</span>
-                <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>(<span class="macro">json</span><span class="macro">!</span>({
+                <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>(<span class="macro">json!</span>({
                     <span class="string">&quot;id&quot;</span>: <span class="self">self</span>.<span class="ident">user_id</span>,
                     <span class="string">&quot;avatar&quot;</span>: <span class="self">self</span>.<span class="ident">user_avatar</span>.<span class="ident">clone</span>(),
                     <span class="string">&quot;bot&quot;</span>: <span class="self">self</span>.<span class="ident">user_is_bot</span>,

@@ -985,8 +985,8 @@
         <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Error</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Eos</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ArgError(\&quot;end of string\&quot;)&quot;</span>),
-            <span class="ident">Parse</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;ArgError(\&quot;{}\&quot;)&quot;</span>, <span class="ident">e</span>),
+            <span class="ident">Eos</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ArgError(\&quot;end of string\&quot;)&quot;</span>),
+            <span class="ident">Parse</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ArgError(\&quot;{}\&quot;)&quot;</span>, <span class="ident">e</span>),
         }
     }
 }
@@ -1265,7 +1265,7 @@
             };
 
             <span class="comment">// If there are no delimiters, then the only possible argument is the whole message.</span>
-            <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Token</span>::<span class="ident">new</span>(<span class="ident">kind</span>, <span class="number">0</span>, <span class="ident">message</span>.<span class="ident">len</span>())]
+            <span class="macro">vec!</span>[<span class="ident">Token</span>::<span class="ident">new</span>(<span class="ident">kind</span>, <span class="number">0</span>, <span class="ident">message</span>.<span class="ident">len</span>())]
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Stream</span>::<span class="ident">new</span>(<span class="ident">message</span>);

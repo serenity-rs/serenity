@@ -14,6 +14,6 @@ and how the raw-text will be displayed.</p>
 <span class="kw">let</span> <span class="ident">with_mention</span> <span class="op">=</span> <span class="string">&quot;@everyone&quot;</span>;
 <span class="kw">let</span> <span class="ident">without_mention</span> <span class="op">=</span> <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">with_mention</span>, <span class="kw-2">&amp;</span><span class="ident">ContentSafeOptions</span>::<span class="ident">default</span>()).<span class="kw">await</span>;
 
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;@\u{200B}everyone&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">without_mention</span>);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="string">&quot;@\u{200B}everyone&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">without_mention</span>);</pre></div>
 </div></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-js="../../search-index.js"></div>
     <script src="../../main.js"></script></body></html>

@@ -109,7 +109,7 @@ which will construct the timestamp string out of it.</p>
     }
 }
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span><span class="ident">Client</span>::<span class="ident">builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.title" class="method"><code>pub fn <a href="#method.title" class="fnname">title</a>&lt;D:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/alloc/string/trait.ToString.html" title="trait alloc::string::ToString">ToString</a>&gt;(&amp;mut self, title: D) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/builder/create_embed.rs.html#324-327" title="goto source code">[src]</a></h4><div class="docblock"><p>Set the title of the embed.</p>

@@ -139,7 +139,7 @@ client.</p>
     <span class="kw">loop</span> {
         <span class="kw">let</span> <span class="ident">sm</span> <span class="op">=</span> <span class="ident">shard_manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">sm</span>.<span class="ident">shards_instantiated</span>().<span class="kw">await</span>.<span class="ident">len</span>();
-        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Shard count instantiated: {}&quot;</span>, <span class="ident">count</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;Shard count instantiated: {}&quot;</span>, <span class="ident">count</span>);
 
         <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">5000</span>)).<span class="kw">await</span>;
     }
@@ -167,10 +167,10 @@ client.</p>
 
     <span class="ident">shard_manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
 
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Shutdown shard manager!&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Shutdown shard manager!&quot;</span>);
 });
 
-<span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Client shutdown: {:?}&quot;</span>, <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span>);</pre></div>
+<span class="macro">println!</span>(<span class="string">&quot;Client shutdown: {:?}&quot;</span>, <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span>);</pre></div>
 </div><span id="structfield.voice_manager" class="structfield small-section-header"><a href="#structfield.voice_manager" class="anchor field"></a><code>voice_manager: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;dyn <a class="trait" href="../../serenity/client/bridge/voice/trait.VoiceGatewayManager.html" title="trait serenity::client::bridge::voice::VoiceGatewayManager">VoiceGatewayManager</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + 'static&gt;&gt;</code></span><div class="docblock"><p>The voice manager for the client.</p>
 <p>This is an ergonomic structure for interfacing over shards’ voice
 connections.</p>
@@ -203,7 +203,7 @@ on effectively using sharding.</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span> {
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</pre></div>
 </div><h4 id="method.start_autosharded" class="method"><code>pub async fn <a href="#method.start_autosharded" class="fnname">start_autosharded</a>(&amp;mut self) -&gt; <a class="type" href="../../serenity/type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</code><a class="srclink" href="../../src/serenity/client/mod.rs.html#677" title="goto source code">[src]</a></h4><div class="docblock"><p>Establish the connection(s) and start listening for events.</p>
 <p>This will start receiving events in a loop and start dispatching the
@@ -227,7 +227,7 @@ on effectively using sharding.</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_autosharded</span>().<span class="kw">await</span> {
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</pre></div>
 <h1 id="errors" class="section-header"><a href="#errors">Errors</a></h1>
 <p>Returns a <a href="../../serenity/prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
@@ -254,7 +254,7 @@ on effectively using sharding.</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shard</span>(<span class="number">3</span>, <span class="number">5</span>).<span class="kw">await</span> {
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</pre></div>
 <p>Start shard 0 of 1 (you may also be interested in <a href="../../serenity/client/struct.Client.html#method.start"><code>start</code></a> or
 <a href="../../serenity/client/struct.Client.html#method.start_autosharded"><code>start_autosharded</code></a>):</p>
@@ -270,7 +270,7 @@ on effectively using sharding.</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shard</span>(<span class="number">0</span>, <span class="number">1</span>).<span class="kw">await</span> {
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</pre></div>
 <h1 id="errors-1" class="section-header"><a href="#errors-1">Errors</a></h1>
 <p>Returns a <a href="../../serenity/prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
@@ -297,7 +297,7 @@ on effectively using sharding.</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shards</span>(<span class="number">8</span>).<span class="kw">await</span> {
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</pre></div>
 <h1 id="errors-2" class="section-header"><a href="#errors-2">Errors</a></h1>
 <p>Returns a <a href="../../serenity/prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
@@ -325,7 +325,7 @@ information on effectively using sharding.</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shard_range</span>([<span class="number">4</span>, <span class="number">7</span>], <span class="number">10</span>).<span class="kw">await</span> {
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</pre></div>
 <h1 id="errors-3" class="section-header"><a href="#errors-3">Errors</a></h1>
 <p>Returns a <a href="../../serenity/prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to

@@ -77,7 +77,7 @@ can be read as “the second of three shards”.</p>
 <p>Retrieving the shard info for the second shard, out of two shards total:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">shard</span>.<span class="ident">shard_info</span>(), [<span class="number">1</span>, <span class="number">2</span>]);</pre></div>
+<span class="macro">assert_eq!</span>(<span class="ident">shard</span>.<span class="ident">shard_info</span>(), [<span class="number">1</span>, <span class="number">2</span>]);</pre></div>
 </div><h4 id="method.stage" class="method"><code>pub fn <a href="#method.stage" class="fnname">stage</a>(&amp;self) -&gt; <a class="enum" href="../../serenity/gateway/enum.ConnectionStage.html" title="enum serenity::gateway::ConnectionStage">ConnectionStage</a></code><a class="srclink" href="../../src/serenity/gateway/shard.rs.html#335-337" title="goto source code">[src]</a></h4><div class="docblock"><p>Returns the current connection stage of the shard.</p>
 </div><h4 id="method.check_heartbeat" class="method"><code>pub async fn <a href="#method.check_heartbeat" class="fnname">check_heartbeat</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><a class="srclink" href="../../src/serenity/gateway/shard.rs.html#585" title="goto source code">[src]</a></h4><div class="docblock"><p>Checks whether a heartbeat needs to be sent, as well as whether a
 heartbeat acknowledgement was received.</p>

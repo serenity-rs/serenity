@@ -18,14 +18,14 @@ the invocation would be <code>!foo bar</code>.</p>
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="kw">fn</span> <span class="ident">bar</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;baz&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;baz&quot;</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="kw">fn</span> <span class="ident">answer_to_life</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
-    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;42&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;42&quot;</span>);
 
     <span class="prelude-val">Ok</span>(())
 }

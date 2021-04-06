@@ -460,8 +460,8 @@
     <span class="kw">for</span> <span class="ident">private_channel</span> <span class="kw">in</span> <span class="ident">vec</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">private_channel</span> {
             <span class="ident">Channel</span>::<span class="ident">Private</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">channel</span>.<span class="ident">id</span>,
-            <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;Guild private channel decode&quot;</span>),
-            <span class="ident">Channel</span>::<span class="ident">Category</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;Channel category private channel decode&quot;</span>),
+            <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Guild private channel decode&quot;</span>),
+            <span class="ident">Channel</span>::<span class="ident">Category</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(<span class="string">&quot;Channel category private channel decode&quot;</span>),
         };
 
         <span class="ident">private_channels</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">private_channel</span>);
@@ -642,7 +642,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">permissions</span>.<span class="ident">is_empty</span>())
 }
 
-<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">num_visitors</span> {
+<span class="macro">macro_rules!</span> <span class="ident">num_visitors</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">visitor</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
         $(
             <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -659,7 +659,7 @@
                     <span class="ident">v</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span>().<span class="macro-nonterminal">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">with_capacity</span>(<span class="number">32</span>);
                         <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">&quot;Unknown &quot;</span>);
-                        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="macro">stringify</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="kw">type</span>));
+                        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="kw">type</span>));
                         <span class="macro-nonterminal">s</span>.<span class="ident">push_str</span>(<span class="string">&quot; value: &quot;</span>);
                         <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="ident">v</span>);
 
@@ -703,7 +703,7 @@
     }
 }
 
-<span class="macro">num_visitors</span><span class="macro">!</span>(<span class="ident">U16Visitor</span>: <span class="ident">u16</span>, <span class="ident">U32Visitor</span>: <span class="ident">u32</span>, <span class="ident">U64Visitor</span>: <span class="ident">u64</span>);
+<span class="macro">num_visitors!</span>(<span class="ident">U16Visitor</span>: <span class="ident">u16</span>, <span class="ident">U32Visitor</span>: <span class="ident">u32</span>, <span class="ident">U64Visitor</span>: <span class="ident">u64</span>);
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-js="../../../search-index.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

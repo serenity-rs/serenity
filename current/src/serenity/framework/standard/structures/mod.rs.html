@@ -521,12 +521,12 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">help_behaviour_eq</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
+        <span class="macro">assert_eq!</span>(
             <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
             <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>,
             <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>)
         );
@@ -534,26 +534,26 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">help_behaviour_hide</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">help_behaviour_strike</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
             <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">help_behaviour_nothing</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
             <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>)
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
     }
 }
 </pre></div>

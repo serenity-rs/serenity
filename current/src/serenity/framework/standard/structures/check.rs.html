@@ -160,14 +160,14 @@
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Reason</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown&quot;</span>),
-            <span class="self">Self</span>::<span class="ident">User</span>(<span class="ident">reason</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;User {}&quot;</span>, <span class="ident">reason</span>),
-            <span class="self">Self</span>::<span class="ident">Log</span>(<span class="ident">reason</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Log {}&quot;</span>, <span class="ident">reason</span>),
+            <span class="self">Self</span>::<span class="ident">Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown&quot;</span>),
+            <span class="self">Self</span>::<span class="ident">User</span>(<span class="ident">reason</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;User {}&quot;</span>, <span class="ident">reason</span>),
+            <span class="self">Self</span>::<span class="ident">Log</span>(<span class="ident">reason</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Log {}&quot;</span>, <span class="ident">reason</span>),
             <span class="self">Self</span>::<span class="ident">UserAndLog</span> {
                 <span class="ident">user</span>,
                 <span class="ident">log</span>,
             } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;UserAndLog {{user: {}, log: {}}}&quot;</span>, <span class="ident">user</span>, <span class="ident">log</span>)
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UserAndLog {{user: {}, log: {}}}&quot;</span>, <span class="ident">user</span>, <span class="ident">log</span>)
             },
         }
     }

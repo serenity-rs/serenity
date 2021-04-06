@@ -183,7 +183,7 @@
     <span class="doccomment">/// channel (probably indicating that the shard manager should stop anyway)</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Starting shard manager worker&quot;</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;Starting shard manager worker&quot;</span>);
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>().<span class="kw">await</span> {
             <span class="kw">match</span> <span class="ident">value</span> {
@@ -220,7 +220,7 @@
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShutdownInitiated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShutdownFinished</span>(<span class="ident">shard_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>) {
-                        <span class="macro">warn</span><span class="macro">!</span>(
+                        <span class="macro">warn!</span>(
                             <span class="string">&quot;[ShardMonitor] Could not forward Shutdown signal to ShardManager for shard {}: {:#?}&quot;</span>,
                             <span class="ident">shard_id</span>,
                             <span class="ident">why</span>

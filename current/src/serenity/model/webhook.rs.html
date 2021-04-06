@@ -486,7 +486,7 @@
     <span class="ident">ChannelFollower</span> <span class="op">=</span> <span class="number">2</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">WebhookType</span> {
+<span class="macro">enum_number!</span>(<span class="ident">WebhookType</span> {
     <span class="ident">Incoming</span>,
     <span class="ident">ChannelFollower</span>
 });
@@ -871,7 +871,7 @@
     <span class="doccomment">/// [`token`]: Self::token</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError</span>::<span class="ident">NoTokenSet</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;https://discord.com/api/webhooks/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">token</span>))
+        <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;https://discord.com/api/webhooks/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">token</span>))
     }
 }
 
