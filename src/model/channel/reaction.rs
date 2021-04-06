@@ -380,9 +380,7 @@ impl ReactionType {
                 id,
                 ref name,
                 ..
-            } => {
-                format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id)
-            },
+            } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
     }

@@ -72,6 +72,20 @@ pub struct Message {
     /// Array of [`Role`]s' Ids mentioned in the message.
     pub mention_roles: Vec<RoleId>,
     /// Channels specifically mentioned in this message.
+    ///
+    /// **Note**:
+    /// Not all channel mentions in a message will appear in `mention_channels`. Only textual
+    /// channels that are visible to everyone in a lurkable guild will ever be included.
+    ///
+    /// A lurkable guild is one that allows users to read public channels in a server without
+    /// actually joining the server. It also allows users to look at these channels without being
+    /// logged in to Discord.
+    ///
+    /// Only crossposted messages (via Channel Following) currently include `mention_channels` at
+    /// all. If no mentions in the message meet these requirements, this field will not be sent.
+    /// [Refer to Discord's documentation for more information][discord-docs].
+    ///
+    /// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object
     #[serde(default = "Vec::new")]
     pub mention_channels: Vec<ChannelMention>,
     /// Array of users mentioned in the message.
