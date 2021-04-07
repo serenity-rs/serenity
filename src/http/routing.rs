@@ -970,7 +970,7 @@ pub enum RouteInfo<'a> {
     },
     CrosspostMessage {
         channel_id: u64,
-        message_id: u64
+        message_id: u64,
     },
     EditNickname {
         guild_id: u64,

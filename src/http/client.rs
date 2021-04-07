@@ -1033,11 +1033,7 @@ impl Http {
         .await
     }
 
-    pub async fn crosspost_message(
-        &self,
-        channel_id: u64,
-        message_id: u64
-    ) -> Result<Message> {
+    pub async fn crosspost_message(&self, channel_id: u64, message_id: u64) -> Result<Message> {
         self.fire(Request {
             body: None,
             headers: None,
@@ -1046,7 +1042,7 @@ impl Http {
                 message_id,
             },
         })
-            .await
+        .await
     }
 
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
