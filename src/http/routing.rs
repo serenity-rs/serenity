@@ -97,7 +97,7 @@ pub enum Route {
     /// The data is the relevant [`ChannelId`]
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdCrosspostMessageId(u64),
+    ChannelsIdCrosspostsMessageId(u64),
     /// Route for the `/channels/:channel_id/typing` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -1325,7 +1325,7 @@ impl<'a> RouteInfo<'a> {
                 message_id,
             } => (
                 LightMethod::Post,
-                Route::ChannelsIdCrosspostMessageId(channel_id),
+                Route::ChannelsIdCrosspostsMessageId(channel_id),
                 Cow::from(Route::channel_message_crosspost(channel_id, message_id)),
             ),
             RouteInfo::CreateWebhook {
