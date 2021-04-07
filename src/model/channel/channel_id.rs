@@ -548,10 +548,15 @@ impl ChannelId {
         http.as_ref().pin_message(self.0, message_id.into().0).await
     }
 
-    /// Crossposts a message
+    /// Crossposts a [`Message`]
     ///
-    /// **Note**: Only available on announcements channels
     /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel
+    /// **Note**: Only available on announcements channels
+    ///
+    /// # Errors
+    //
+    // Returns [`Error::Http`] if the current user lacks permission,
+    // and if the user is not the author of the message
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
 

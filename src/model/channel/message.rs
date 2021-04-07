@@ -130,11 +130,10 @@ pub struct Message {
 
 #[cfg(feature = "model")]
 impl Message {
-    /// Crosspost a message
+    /// Crossposts this message
     ///
-    /// **Note**: Only available on announcements channels
     /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel
-    ///
+    /// **Note**: Only available on announcements channels
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a
@@ -147,7 +146,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.guild_id.is_some() {
+                if self.author.id != cache.current_user_id().await && self.guild_id.is_some() {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
