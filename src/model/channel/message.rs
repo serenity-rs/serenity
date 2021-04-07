@@ -133,6 +133,7 @@ impl Message {
     /// Crossposts this message
     ///
     /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel
+    ///
     /// **Note**: Only available on announcements channels
     /// # Errors
     ///
