@@ -1033,6 +1033,22 @@ impl Http {
         .await
     }
 
+    pub async fn crosspost_message(
+        &self,
+        channel_id: u64,
+        message_id: u64
+    ) -> Result<()> {
+        self.wind(204,Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::CrosspostMessage {
+                channel_id,
+                message_id,
+            },
+        })
+            .await
+    }
+
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
     ///
     /// Pass `None` to reset the nickname.

@@ -130,6 +130,39 @@ pub struct Message {
 
 #[cfg(feature = "model")]
 impl Message {
+
+    /// Crosspost a message
+    ///
+    /// **Note**: Only available on announcements channels
+    /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+
+    pub async fn crosspost(&self, cache_http: impl CacheHttp) -> Result<()> {
+        #[cfg(feature = "cache")]
+            {
+                if let Some(cache) = cache_http.cache() {
+                    if self.guild_id.is_some() {
+                        utils::user_has_perms_cache(
+                            cache,
+                            self.channel_id,
+                            self.guild_id,
+                            Permissions::MANAGE_MESSAGES,
+                        )
+                            .await?;
+                    }
+                }
+            }
+
+                self.channel_id.crosspost(cache_http.http(), self.id.0).await
+    }
+
     /// Retrieves the related channel located in the cache.
     ///
     /// Returns `None` if the channel is not in the cache.
