@@ -142,7 +142,6 @@ impl Message {
     /// the required permissions.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-
     pub async fn crosspost(&self, cache_http: impl CacheHttp) -> Result<Message> {
         #[cfg(feature = "cache")]
         {

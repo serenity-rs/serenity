@@ -558,7 +558,6 @@ impl ChannelId {
     // Returns [`Error::Http`] if the current user lacks permission,
     // and if the user is not the author of the message
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-
     pub async fn crosspost(
         &self,
         http: impl AsRef<Http>,
