@@ -556,7 +556,7 @@ impl ChannelId {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
 
-    pub async fn crosspost(&self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
+    pub async fn crosspost(&self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<Message> {
         http.as_ref().crosspost_message(self.0, message_id.into().0).await
     }
 

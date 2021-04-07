@@ -1037,8 +1037,8 @@ impl Http {
         &self,
         channel_id: u64,
         message_id: u64
-    ) -> Result<()> {
-        self.wind(204,Request {
+    ) -> Result<Message> {
+        self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::CrosspostMessage {

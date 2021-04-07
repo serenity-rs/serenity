@@ -130,7 +130,6 @@ pub struct Message {
 
 #[cfg(feature = "model")]
 impl Message {
-
     /// Crosspost a message
     ///
     /// **Note**: Only available on announcements channels
@@ -144,23 +143,23 @@ impl Message {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
 
-    pub async fn crosspost(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn crosspost(&self, cache_http: impl CacheHttp) -> Result<Message> {
         #[cfg(feature = "cache")]
-            {
-                if let Some(cache) = cache_http.cache() {
-                    if self.guild_id.is_some() {
-                        utils::user_has_perms_cache(
-                            cache,
-                            self.channel_id,
-                            self.guild_id,
-                            Permissions::MANAGE_MESSAGES,
-                        )
-                            .await?;
-                    }
+        {
+            if let Some(cache) = cache_http.cache() {
+                if self.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )
+                    .await?;
                 }
             }
+        }
 
-                self.channel_id.crosspost(cache_http.http(), self.id.0).await
+        self.channel_id.crosspost(cache_http.http(), self.id.0).await
     }
 
     /// Retrieves the related channel located in the cache.
