@@ -314,7 +314,6 @@ impl Http {
         .await
     }
 
-
     /// Creates an [`Integration`] for a [`Guild`].
     ///
     /// Refer to Discord's [docs] for field information.
@@ -960,7 +959,6 @@ impl Http {
         .await
     }
 
-
     /// Edits a guild command permissions.
     ///
     /// Updates for guild commands will be available immediately.
@@ -986,7 +984,7 @@ impl Http {
                 command_id,
             },
         })
-            .await
+        .await
     }
 
     /// Edits the positions of a guild's channels.
@@ -1843,7 +1841,7 @@ impl Http {
                 guild_id,
             },
         })
-            .await
+        .await
     }
 
     /// Gives the guild command permission for your application for a specific guild.
@@ -1862,7 +1860,7 @@ impl Http {
                 guild_id,
             },
         })
-            .await
+        .await
     }
 
     /// Gets a guild embed information.

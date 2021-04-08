@@ -1601,7 +1601,11 @@ impl<'a> RouteInfo<'a> {
             } => (
                 LightMethod::Put,
                 Route::ApplicationsIdGuildsIdCommandIdPermission(application_id),
-                Cow::from(Route::application_guild_command_permissions(application_id, guild_id, command_id)),
+                Cow::from(Route::application_guild_command_permissions(
+                    application_id,
+                    guild_id,
+                    command_id,
+                )),
             ),
             RouteInfo::EditGuildChannels {
                 guild_id,

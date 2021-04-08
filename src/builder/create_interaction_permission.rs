@@ -1,8 +1,10 @@
-use crate::model::interactions::ApplicationCommandPermissionType;
 use std::collections::HashMap;
+
 use serde_json::Value;
-use crate::model::Permissions;
+
 use crate::internal::prelude::Number;
+use crate::model::interactions::ApplicationCommandPermissionType;
+use crate::model::Permissions;
 use crate::utils;
 
 /// A builder for creating a new [`ApplicationCommandInteractionDataPermission`].
@@ -15,10 +17,9 @@ use crate::utils;
 pub struct CreateInteractionPermissions(pub HashMap<&'static str, Value>);
 
 impl CreateInteractionPermissions {
-
     pub fn create_permission<F>(&mut self, f: F) -> &mut Self
-        where
-            F: FnOnce(&mut CreateInteractionPermission) -> &mut CreateInteractionPermission
+    where
+        F: FnOnce(&mut CreateInteractionPermission) -> &mut CreateInteractionPermission,
     {
         let mut data = CreateInteractionPermission::default();
         f(&mut data);
@@ -31,7 +32,6 @@ impl CreateInteractionPermissions {
 
         self
     }
-
 }
 
 #[derive(Clone, Debug, Default)]

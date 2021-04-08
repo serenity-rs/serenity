@@ -154,7 +154,7 @@ pub struct ApplicationCommand {
     pub description: String,
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
-    pub default_permission: Option<bool>
+    pub default_permission: Option<bool>,
 }
 
 /// The parameters for a command.
@@ -182,7 +182,7 @@ pub struct ApplicationCommandPermission {
     pub id: InteractionId,
     pub application_id: ApplicationId,
     pub guild_id: GuildId,
-    pub permissions: Vec<ApplicationCommandPermissionData>
+    pub permissions: Vec<ApplicationCommandPermissionData>,
 }
 
 /// The permissions data.
@@ -192,7 +192,7 @@ pub struct ApplicationCommandPermissionData {
     #[serde(rename = "type")]
     pub kind: ApplicationCommandPermissionType,
     pub id: CommandPermissionId,
-    pub permission: bool
+    pub permission: bool,
 }
 
 /// The type of an application command option.
@@ -227,7 +227,7 @@ enum_number!(ApplicationCommandOptionType {
 #[repr(u8)]
 pub enum ApplicationCommandPermissionType {
     Role = 1,
-    User = 2
+    User = 2,
 }
 
 enum_number!(ApplicationCommandPermissionType {
@@ -384,7 +384,6 @@ impl Interaction {
             .await
     }
 
-
     /// Creates a guild specific [`ApplicationCommandPermission`]
     ///
     /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
@@ -401,14 +400,19 @@ impl Interaction {
         command_id: u64,
         f: F,
     ) -> Result<ApplicationCommandPermission>
-        where
-            F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
+    where
+        F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
     {
         let mut map = CreateInteractionPermissions::default();
         f(&mut map);
 
         http.as_ref()
-            .edit_guild_application_command_permissions(application_id, guild_id.0, command_id,&Value::Object(utils::hashmap_to_json_map(map.0)))
+            .edit_guild_application_command_permissions(
+                application_id,
+                guild_id.0,
+                command_id,
+                &Value::Object(utils::hashmap_to_json_map(map.0)),
+            )
             .await
     }
 
