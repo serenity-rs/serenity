@@ -154,7 +154,7 @@ pub struct ApplicationCommand {
     pub description: String,
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
-    pub default_permission: Option<Permissions>
+    pub default_permission: Option<bool>
 }
 
 /// The parameters for a command.
