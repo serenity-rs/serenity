@@ -1103,10 +1103,14 @@ pub enum RouteInfo<'a> {
         application_id: u64,
         guild_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     GetGuildApplicationCommandsPermissions {
         application_id: u64,
         guild_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     GetGuildApplicationCommandPermission {
         application_id: u64,
         guild_id: u64,
