@@ -322,6 +322,22 @@ pub enum Route {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationsIdGuildsIdCommands(u64),
+    /// Route for the `/applications/:application_id/guilds/:guild_id/commands/permissions` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationsIdGuildsIdCommandsPermissions(u64),
+    /// Route for the `/applications/:application_id/guilds/:guild_id/commands/:command_id/permissions` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationsIdGuildsIdCommandIdPermission(u64),
     /// Route for the `/applications/:application_id/guilds/:guild_id` path.
     ///
     /// The data is the relevant [`ApplicationId`].
@@ -760,8 +776,27 @@ impl Route {
 
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub fn application_guild_command_permissions(
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    ) -> String {
+        format!(
+            api!("/applications/{}/guilds/{}/commands/{}/permissions"),
+            application_id, guild_id, command_id
+        )
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub fn application_guild_commands(application_id: u64, guild_id: u64) -> String {
         format!(api!("/applications/{}/guilds/{}/commands"), application_id, guild_id)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub fn application_guild_commands_permissions(application_id: u64, guild_id: u64) -> String {
+        format!(api!("/applications/{}/guilds/{}/commands/permissions"), application_id, guild_id)
     }
 }
 
@@ -954,6 +989,13 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         command_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    EditGuildApplicationCommandPermission {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    },
     EditGuildChannels {
         guild_id: u64,
     },
@@ -1058,6 +1100,14 @@ pub enum RouteInfo<'a> {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     GetGuildApplicationCommands {
+        application_id: u64,
+        guild_id: u64,
+    },
+    GetGuildApplicationCommandsPermissions {
+        application_id: u64,
+        guild_id: u64,
+    },
+    GetGuildApplicationCommandPermission {
         application_id: u64,
         guild_id: u64,
     },
@@ -1544,6 +1594,15 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommandsId(application_id),
                 Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
             ),
+            RouteInfo::EditGuildApplicationCommandPermission {
+                application_id,
+                guild_id,
+                command_id,
+            } => (
+                LightMethod::Patch,
+                Route::ApplicationsIdGuildsIdCommandIdPermission(application_id),
+                Cow::from(Route::application_guild_command_permissions(application_id, guild_id, command_id)),
+            ),
             RouteInfo::EditGuildChannels {
                 guild_id,
             } => (
@@ -1754,6 +1813,22 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::ApplicationsIdGuildsIdCommands(application_id),
                 Cow::from(Route::application_guild_commands(application_id, guild_id)),
+            ),
+            RouteInfo::GetGuildApplicationCommandsPermissions {
+                application_id,
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::ApplicationsIdGuildsIdCommandsPermissions(application_id),
+                Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
+            ),
+            RouteInfo::GetGuildApplicationCommandPermission {
+                application_id,
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::ApplicationsIdGuildsIdCommandIdPermission(application_id),
+                Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
             ),
             RouteInfo::GetGuildEmbed {
                 guild_id,

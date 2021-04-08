@@ -7,6 +7,7 @@ use serde_json::{Map, Number, Value};
 use super::prelude::*;
 use crate::builder::{
     CreateInteraction,
+    CreateInteractionPermission,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
@@ -153,6 +154,7 @@ pub struct ApplicationCommand {
     pub description: String,
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
+    pub default_permission: Option<Permissions>
 }
 
 /// The parameters for a command.
@@ -171,6 +173,26 @@ pub struct ApplicationCommandOption {
     pub choices: Vec<ApplicationCommandOptionChoice>,
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
+}
+
+/// The permissions data.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandPermission {
+    pub id: InteractionId,
+    pub application_id: ApplicationId,
+    pub guild_id: GuildId,
+    pub permissions: Vec<Permissions>
+}
+
+/// The permissions data.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandPermissionData {
+    #[serde(rename = "type")]
+    pub kind: ApplicationCommandPermissionType,
+    pub id: u64,
+    pub permission: Permissions
 }
 
 /// The type of an application command option.
@@ -197,6 +219,20 @@ enum_number!(ApplicationCommandOptionType {
     User,
     Channel,
     Role,
+});
+
+/// The type of an application command option.
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ApplicationCommandPermissionType {
+    Role = 1,
+    User = 2
+}
+
+enum_number!(ApplicationCommandPermissionType {
+    Role,
+    User
 });
 
 /// The only valid values a user can pick in a command option.
@@ -345,6 +381,34 @@ impl Interaction {
         let map = Interaction::build_interaction(f);
         http.as_ref()
             .create_guild_application_command(application_id, guild_id.0, &Value::Object(map))
+            .await
+    }
+
+
+    /// Creates a guild specific [`ApplicationCommandPermission`]
+    ///
+    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    ///
+    /// # Errors
+    ///
+    /// Returns the same possible errors as `create_global_application_command`.
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    pub async fn create_guild_application_command_permission<F>(
+        http: impl AsRef<Http>,
+        guild_id: GuildId,
+        application_id: u64,
+        command_id: u64,
+        f: F,
+    ) -> Result<ApplicationCommandPermission>
+        where
+            F: FnOnce(&mut CreateInteractionPermission) -> &mut CreateInteractionPermission,
+    {
+        let mut map = CreateInteractionPermission::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_application_command_permissions(application_id, guild_id.0, command_id,&Value::Object(utils::hashmap_to_json_map(map.0)))
             .await
     }
 

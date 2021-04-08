@@ -11,6 +11,9 @@ mod create_embed;
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod create_interaction;
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+mod create_interaction_permission;
 
 mod create_allowed_mentions;
 #[cfg(feature = "unstable_discord_api")]
@@ -57,6 +60,7 @@ pub use self::{
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 pub use self::{
     create_interaction::{CreateInteraction, CreateInteractionOption},
+    create_interaction_permission::{CreateInteractionPermission},
     create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
     create_interaction_response_followup::CreateInteractionResponseFollowup,
     edit_interaction_response::EditInteractionResponse,

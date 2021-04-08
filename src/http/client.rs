@@ -314,6 +314,7 @@ impl Http {
         .await
     }
 
+
     /// Creates an [`Integration`] for a [`Guild`].
     ///
     /// Refer to Discord's [docs] for field information.
@@ -957,6 +958,35 @@ impl Http {
             },
         })
         .await
+    }
+
+
+    /// Edits a guild command permissions.
+    ///
+    /// Updates for guild commands will be available immediately.
+    ///
+    /// Refer to Discord's [docs] for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_guild_application_command_permissions(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+        map: &Value,
+    ) -> Result<ApplicationCommandPermission> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditGuildApplicationCommandPermission {
+                application_id,
+                guild_id,
+                command_id,
+            },
+        })
+            .await
     }
 
     /// Edits the positions of a guild's channels.
@@ -1795,6 +1825,44 @@ impl Http {
             },
         })
         .await
+    }
+
+    /// Fetches all of the guild commands permissions for your application for a specific guild.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_commands_permissions(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommandsPermissions {
+                application_id,
+                guild_id,
+            },
+        })
+            .await
+    }
+
+    /// Gives the guild command permission for your application for a specific guild.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_command_permissions(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+    ) -> Result<ApplicationCommandPermission> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommandPermission {
+                application_id,
+                guild_id,
+            },
+        })
+            .await
     }
 
     /// Gets a guild embed information.

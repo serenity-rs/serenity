@@ -5,6 +5,7 @@ use serde_json::{json, Value};
 use crate::{model::interactions::ApplicationCommandOptionType, utils};
 use crate::model::Permissions;
 use crate::internal::prelude::Number;
+use crate::model::interactions::ApplicationCommandPermissionType;
 
 /// A builder for creating a new [`ApplicationCommandInteractionDataOption`].
 ///
@@ -133,11 +134,10 @@ impl CreateInteraction {
     /// including administrators and guild owners.
     pub fn default_permission(&mut self, permissions: Option<Permissions>) -> &mut Self {
 
-        if let Some(permissions) = permissions {
-            self.0.insert("default_permission", Value::Number(Number::from(permissions.bits())));
-        } else {
-            self.0.insert("default_permission", Value::Null);
-        }
+        self.0.insert("default_permission", match permissions {
+                Some(permissions) => Value::Number(Number::from(permissions.bits())),
+                None => Value::Null
+            });
 
         self
     }
