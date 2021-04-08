@@ -1594,6 +1594,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommandsId(application_id),
                 Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
             RouteInfo::EditGuildApplicationCommandPermission {
                 application_id,
                 guild_id,
@@ -1818,6 +1819,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommands(application_id),
                 Cow::from(Route::application_guild_commands(application_id, guild_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
             RouteInfo::GetGuildApplicationCommandsPermissions {
                 application_id,
                 guild_id,
@@ -1826,6 +1828,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommandsPermissions(application_id),
                 Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
             RouteInfo::GetGuildApplicationCommandPermission {
                 application_id,
                 guild_id,
