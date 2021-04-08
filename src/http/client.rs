@@ -1033,6 +1033,9 @@ impl Http {
         .await
     }
 
+    /// Crossposts a message by Id.
+    ///
+    /// **Note**: Only available on announcements channels.
     pub async fn crosspost_message(&self, channel_id: u64, message_id: u64) -> Result<Message> {
         self.fire(Request {
             body: None,
