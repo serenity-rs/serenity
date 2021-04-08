@@ -92,9 +92,9 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPinsMessageId(u64),
-    /// Route for the `/channels/:channel_id/message/:message_id/crosspost` path
+    /// Route for the `/channels/:channel_id/message/:message_id/crosspost` path.
     ///
-    /// The data is the relevant [`ChannelId`]
+    /// The data is the relevant [`ChannelId`].
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdCrosspostsMessageId(u64),

@@ -130,11 +130,12 @@ pub struct Message {
 
 #[cfg(feature = "model")]
 impl Message {
-    /// Crossposts this message
+    /// Crossposts this message.
     ///
-    /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel
+    /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.
     ///
-    /// **Note**: Only available on announcements channels
+    /// **Note**: Only available on announcements channels.
+    /// 
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a
