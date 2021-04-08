@@ -191,7 +191,7 @@ pub struct ApplicationCommandPermission {
 pub struct ApplicationCommandPermissionData {
     #[serde(rename = "type")]
     pub kind: ApplicationCommandPermissionType,
-    pub id: u64,
+    pub id: CommandPermissionId,
     pub permission: bool
 }
 
