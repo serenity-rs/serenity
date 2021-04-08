@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use serde_json::{json, Value};
 
 use crate::{model::interactions::ApplicationCommandOptionType, utils};
+use crate::model::Permissions;
+use crate::internal::prelude::Number;
 
 /// A builder for creating a new [`ApplicationCommandInteractionDataOption`].
 ///
@@ -122,6 +124,21 @@ impl CreateInteraction {
     /// and cannot start with a space.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
+        self
+    }
+
+    /// Specify the default permissions of the Interaction
+    ///
+    /// **Note**: Setting it to None will disable it for anyone,
+    /// including administrators and guild owners.
+    pub fn default_permission(&mut self, permissions: Option<Permissions>) -> &mut Self {
+
+        if let Some(permissions) = permissions {
+            self.0.insert("default_permission", Value::Number(Number::from(permissions.bits())));
+        } else {
+            self.0.insert("default_permission", Value::Null);
+        }
+
         self
     }
 
