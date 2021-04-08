@@ -7,7 +7,7 @@ use serde_json::{Map, Number, Value};
 use super::prelude::*;
 use crate::builder::{
     CreateInteraction,
-    CreateInteractionPermission,
+    CreateInteractionPermissions,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
@@ -182,7 +182,7 @@ pub struct ApplicationCommandPermission {
     pub id: InteractionId,
     pub application_id: ApplicationId,
     pub guild_id: GuildId,
-    pub permissions: Vec<Permissions>
+    pub permissions: Vec<ApplicationCommandPermissionData>
 }
 
 /// The permissions data.
@@ -192,7 +192,7 @@ pub struct ApplicationCommandPermissionData {
     #[serde(rename = "type")]
     pub kind: ApplicationCommandPermissionType,
     pub id: u64,
-    pub permission: Permissions
+    pub permission: bool
 }
 
 /// The type of an application command option.
@@ -402,9 +402,9 @@ impl Interaction {
         f: F,
     ) -> Result<ApplicationCommandPermission>
         where
-            F: FnOnce(&mut CreateInteractionPermission) -> &mut CreateInteractionPermission,
+            F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
     {
-        let mut map = CreateInteractionPermission::default();
+        let mut map = CreateInteractionPermissions::default();
         f(&mut map);
 
         http.as_ref()
