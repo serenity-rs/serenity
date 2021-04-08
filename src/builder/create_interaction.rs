@@ -128,16 +128,12 @@ impl CreateInteraction {
         self
     }
 
-    /// Specify the default permissions of the Interaction
+    /// Specify if the command should not be usable by default
     ///
-    /// **Note**: Setting it to None will disable it for anyone,
+    /// **Note**: Setting it to false will disable it for anyone,
     /// including administrators and guild owners.
-    pub fn default_permission(&mut self, permissions: Option<Permissions>) -> &mut Self {
-
-        self.0.insert("default_permission", match permissions {
-                Some(permissions) => Value::Number(Number::from(permissions.bits())),
-                None => Value::Null
-            });
+    pub fn default_permission(&mut self, default_permission: bool) -> &mut Self {
+        self.0.insert("default_permission", Value::Bool(default_permission));
 
         self
     }
