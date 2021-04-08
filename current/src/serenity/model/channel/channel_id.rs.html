@@ -1042,6 +1042,24 @@
 <span id="1039">1039</span>
 <span id="1040">1040</span>
 <span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Write</span> <span class="kw">as</span> <span class="ident">FmtWrite</span>;
@@ -1591,6 +1609,24 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pin</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">pin_message</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Crossposts a [`Message`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Only available on announcements channels.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="comment">// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="comment">// and if the user is not the author of the message.</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">crosspost</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">crosspost_message</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets the list of [`Message`]s which are pinned to the channel.</span>

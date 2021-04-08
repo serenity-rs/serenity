@@ -2685,6 +2685,21 @@
 <span id="2682">2682</span>
 <span id="2683">2683</span>
 <span id="2684">2684</span>
+<span id="2685">2685</span>
+<span id="2686">2686</span>
+<span id="2687">2687</span>
+<span id="2688">2688</span>
+<span id="2689">2689</span>
+<span id="2690">2690</span>
+<span id="2691">2691</span>
+<span id="2692">2692</span>
+<span id="2693">2693</span>
+<span id="2694">2694</span>
+<span id="2695">2695</span>
+<span id="2696">2696</span>
+<span id="2697">2697</span>
+<span id="2698">2698</span>
+<span id="2699">2699</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">BTreeMap</span>, <span class="ident">fmt</span>, <span class="ident">sync</span>::<span class="ident">Arc</span>};
@@ -3714,6 +3729,21 @@
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo</span>::<span class="ident">EditMessage</span> {
+                <span class="ident">channel_id</span>,
+                <span class="ident">message_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Crossposts a message by Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Only available on announcements channels.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">crosspost_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo</span>::<span class="ident">CrosspostMessage</span> {
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
             },

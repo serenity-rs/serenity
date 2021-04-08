@@ -197,6 +197,20 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Error enum definition wrapping potential model implementation errors.</span>
 
@@ -300,6 +314,18 @@
     <span class="doccomment">/// [`ChannelId`]: super::id::ChannelId</span>
     <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
     <span class="ident">ChannelNotFound</span>,
+    <span class="doccomment">/// An indication that a [`Message`] has already been crossposted,</span>
+    <span class="doccomment">/// and cannot be crossposted twice.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Message`]: super::channel::Message</span>
+    <span class="ident">MessageAlreadyCrossposted</span>,
+    <span class="doccomment">/// An indication that you cannot crosspost a [`Message`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For instance, you cannot crosspost a system message or a</span>
+    <span class="doccomment">/// message coming from the crosspost feature.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Message`]: super::channel::Message</span>
+    <span class="ident">CannotCrosspostMessage</span>,
     <span class="doccomment">/// Indicates that there are hierarchy problems restricting an action.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// For example, when banning a user, if the other user has a role with an</span>
@@ -384,6 +410,8 @@
             <span class="ident">Error</span>::<span class="ident">ItemMissing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The required item is missing from the cache.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">WrongGuild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided member or channel is from the wrong guild.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">MessageTooLong</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message too large.&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">MessageAlreadyCrossposted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message already crossposted.&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">CannotCrosspostMessage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Cannot crosspost this message type.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">MessagingBot</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Attempted to message another bot user.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">NameTooShort</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is under the character limit.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">NameTooLong</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is over the character limit.&quot;</span>),
