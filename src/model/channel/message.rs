@@ -130,6 +130,52 @@ pub struct Message {
 
 #[cfg(feature = "model")]
 impl Message {
+    /// Crossposts this message.
+    ///
+    /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.
+    ///
+    /// **Note**: Only available on announcements channels.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// Returns a [`ModelError::MessageAlreadyCrossposted`] if the message has already been crossposted.
+    ///
+    /// Returns a [`ModelError`::CannotCrosspostMessage`] if the message cannot be crossposted.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    pub async fn crosspost(&self, cache_http: impl CacheHttp) -> Result<Message> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if self.author.id != cache.current_user_id().await && self.guild_id.is_some() {
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )
+                    .await?;
+                }
+            }
+        }
+
+        if let Some(flags) = self.flags {
+            if flags.contains(MessageFlags::CROSSPOSTED) {
+                return Err(Error::Model(ModelError::MessageAlreadyCrossposted));
+            } else if flags.contains(MessageFlags::IS_CROSSPOST)
+                || self.kind != MessageType::Regular
+            {
+                return Err(Error::Model(ModelError::CannotCrosspostMessage));
+            }
+        }
+
+        self.channel_id.crosspost(cache_http.http(), self.id.0).await
+    }
+
     /// Retrieves the related channel located in the cache.
     ///
     /// Returns `None` if the channel is not in the cache.
