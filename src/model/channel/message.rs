@@ -142,6 +142,10 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
+    /// Returns a [`ModelError::MessageAlreadyCrossposted`] if the message has already been crossposted.
+    ///
+    /// Returns a [`ModelError`::CannotCrosspostMessage`] if the message cannot be crossposted.
+    ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn crosspost(&self, cache_http: impl CacheHttp) -> Result<Message> {
         #[cfg(feature = "cache")]
@@ -156,6 +160,16 @@ impl Message {
                     )
                     .await?;
                 }
+            }
+        }
+
+        if let Some(flags) = self.flags {
+            if flags.contains(MessageFlags::CROSSPOSTED) {
+                return Err(Error::Model(ModelError::MessageAlreadyCrossposted));
+            } else if flags.contains(MessageFlags::IS_CROSSPOST)
+                || self.kind != MessageType::Regular
+            {
+                return Err(Error::Model(ModelError::CannotCrosspostMessage));
             }
         }
 
