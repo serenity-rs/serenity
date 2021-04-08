@@ -11,7 +11,7 @@ use crate::utils;
 ///
 /// All fields are required
 ///
-/// [`ApplicationCommandInteractionDataPermission`]: crate::model::interactions::ApplicationCommandInteractionDataPermission
+/// [`ApplicationCommandInteractionDataPermission`]: crate::model::interactions::ApplicationCommandPermissionData
 /// [`kind`]: Self::kind
 #[derive(Clone, Debug, Default)]
 pub struct CreateInteractionPermissions(pub HashMap<&'static str, Value>);
