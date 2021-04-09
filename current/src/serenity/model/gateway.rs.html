@@ -662,6 +662,60 @@
 <span id="659">659</span>
 <span id="660">660</span>
 <span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models pertaining to the gateway.</span>
 
@@ -879,6 +933,56 @@
             <span class="ident">flags</span>: <span class="prelude-val">None</span>,
             <span class="ident">instance</span>: <span class="prelude-val">None</span>,
             <span class="ident">kind</span>: <span class="ident">ActivityType::Listening</span>,
+            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
+            <span class="ident">party</span>: <span class="prelude-val">None</span>,
+            <span class="ident">secrets</span>: <span class="prelude-val">None</span>,
+            <span class="ident">state</span>: <span class="prelude-val">None</span>,
+            <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
+            <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="ident">sync_id</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">url</span>: <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Creates a `Activity` struct that appears as a `Watching &lt;name&gt;` status.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Create a command that sets the current cometing status:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
+    <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
+    <span class="doccomment">/// use serenity::framework::standard::{Args, CommandResult, macros::command};</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
+    <span class="doccomment">/// use serenity::client::Context;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
+    <span class="doccomment">/// #[command]</span>
+    <span class="doccomment">/// async fn watch(ctx: &amp;Context, _msg: &amp;Message, args: Args) -&gt; CommandResult {</span>
+    <span class="doccomment">///     let name = args.message();</span>
+    <span class="doccomment">///     ctx.set_activity(Activity::watching(&amp;name)).await;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     Ok(())</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">watching</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Activity</span>
+    <span class="kw">where</span>
+        <span class="ident">N</span>: <span class="ident">ToString</span>,
+    {
+        <span class="ident">Activity</span> {
+            <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">assets</span>: <span class="prelude-val">None</span>,
+            <span class="ident">details</span>: <span class="prelude-val">None</span>,
+            <span class="ident">flags</span>: <span class="prelude-val">None</span>,
+            <span class="ident">instance</span>: <span class="prelude-val">None</span>,
+            <span class="ident">kind</span>: <span class="ident">ActivityType::Watching</span>,
             <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
             <span class="ident">party</span>: <span class="prelude-val">None</span>,
             <span class="ident">secrets</span>: <span class="prelude-val">None</span>,
@@ -1122,6 +1226,8 @@
     <span class="ident">Streaming</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="doccomment">/// An indicator that the user is listening to something.</span>
     <span class="ident">Listening</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// An indicator that the user is watching something.</span>
+    <span class="ident">Watching</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="doccomment">/// An indicator that the user uses custum statuses</span>
     <span class="ident">Custom</span> <span class="op">=</span> <span class="number">4</span>,
     <span class="doccomment">/// An indicator that the user is competing somewhere.</span>
@@ -1132,6 +1238,7 @@
     <span class="ident">Playing</span>,
     <span class="ident">Streaming</span>,
     <span class="ident">Listening</span>,
+    <span class="ident">Watching</span>,
     <span class="ident">Custom</span>,
     <span class="ident">Competing</span>
 });
@@ -1144,6 +1251,7 @@
             <span class="ident">Playing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
             <span class="ident">Streaming</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
             <span class="ident">Listening</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="ident">Watching</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
             <span class="ident">Custom</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
             <span class="ident">Competing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
         }
