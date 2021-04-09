@@ -1111,6 +1111,13 @@ pub enum RouteInfo<'a> {
     },
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    GetGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     GetGuildApplicationCommandsPermissions {
         application_id: u64,
         guild_id: u64,
@@ -1837,6 +1844,15 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::ApplicationsIdGuildsIdCommands(application_id),
                 Cow::from(Route::application_guild_commands(application_id, guild_id)),
+            ),
+            RouteInfo::GetGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id,
+            } => (
+                LightMethod::Get,
+                Route::ApplicationsIdGuildsIdCommandsId(application_id),
+                Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
             RouteInfo::GetGuildApplicationCommandsPermissions {

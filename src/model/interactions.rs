@@ -365,6 +365,7 @@ impl Interaction {
         http.as_ref().create_global_application_command(application_id, &Value::Object(map)).await
     }
 
+    /// Edits a command by its Id
     pub async fn edit_global_application_command<F>(
         http: impl AsRef<Http>,
         application_id: u64,

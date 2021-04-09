@@ -1844,6 +1844,27 @@ impl Http {
         .await
     }
 
+    /// Fetches a guild command by its Id
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_command(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id,
+            },
+        })
+        .await
+    }
+
     /// Fetches all of the guild commands permissions for your application for a specific guild.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]

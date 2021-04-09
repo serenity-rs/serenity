@@ -1103,6 +1103,83 @@ impl GuildId {
             .await
     }
 
+    /// Get all guild application commands.
+    ///
+    /// # Errors
+    ///
+    /// Can return [`Error::Json`] if it cannot deserialize commands.
+    ///
+    /// [`Error::Json`]: crate::error::Error::Json
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_commands(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+    ) -> Result<Vec<ApplicationCommand>> {
+        http.as_ref().get_guild_application_commands(application_id.into(), self.0.into()).await
+    }
+
+    /// Get guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// Can return [`Error::Json`] if it cannot deserialize commands.
+    ///
+    /// [`Error::Json`]: crate::error::Error::Json
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_command(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        command_id: CommandId,
+    ) -> Result<ApplicationCommand> {
+        http.as_ref()
+            .get_guild_application_command(application_id.into(), self.0.into(), command_id.into())
+            .await
+    }
+
+    /// Edit guild application command by its Id
+    pub async fn edit_application_command<F>(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        command_id: CommandId,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+    {
+        let map = Interaction::build_interaction(f);
+        http.as_ref()
+            .edit_guild_application_command(
+                application_id.into(),
+                self.0.into(),
+                command_id.into(),
+                &Value::Object(map),
+            )
+            .await
+    }
+
+    /// Delete guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn delete_application_command(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        command_id: CommandId,
+    ) -> Result<()> {
+        http.as_ref()
+            .delete_guild_application_command(
+                application_id.into(),
+                self.0.into(),
+                command_id.into(),
+            )
+            .await
+    }
+
     /// Get all guild application commands permissions only.
     ///
     /// # Errors
