@@ -141,7 +141,7 @@ where
 
 pub mod prelude {
     #[cfg(feature = "simd-json")]
-    pub use simd_json::{Builder, Mutable, Value as ValueTrait};
+    pub use simd_json::{Builder, Mutable, Value as ValueTrait, ValueAccess};
 
-    pub use super::json;
+    pub use super::*;
 }

@@ -12,7 +12,7 @@ use crate::builder::{
 };
 use crate::http::Http;
 use crate::internal::prelude::*;
-use crate::json::{from_number, from_value, JsonMap, Value};
+use crate::json::{from_number, from_value, prelude::*, JsonMap, Value};
 use crate::utils;
 
 /// Information about an interaction.

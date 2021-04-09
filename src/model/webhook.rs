@@ -36,7 +36,10 @@ pub enum WebhookType {
     ChannelFollower = 2,
 }
 
-enum_number!(WebhookType { Incoming, ChannelFollower });
+enum_number!(WebhookType {
+    Incoming,
+    ChannelFollower
+});
 
 impl WebhookType {
     #[inline]
@@ -399,7 +402,7 @@ impl Webhook {
                 let _ = mem::replace(self, replacement);
 
                 Ok(())
-            }
+            },
             Err(why) => Err(why),
         }
     }

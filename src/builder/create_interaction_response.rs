@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
 use super::{CreateAllowedMentions, CreateEmbed};
-use crate::json::{from_number, Value};
+use crate::json::{from_number, prelude::*, Value};
 use crate::{
     model::interactions::{
-        InteractionApplicationCommandCallbackDataFlags, InteractionResponseType,
+        InteractionApplicationCommandCallbackDataFlags,
+        InteractionResponseType,
     },
     utils,
 };

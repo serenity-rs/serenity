@@ -38,7 +38,7 @@ use crate::http::CacheHttp;
 use crate::model::misc::ChannelParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
-use crate::{json::from_value, model::prelude::*};
+use crate::{json::prelude::*, model::prelude::*};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -178,13 +178,13 @@ impl Channel {
         match self {
             Channel::Guild(public_channel) => {
                 public_channel.delete(cache_http).await?;
-            }
+            },
             Channel::Private(private_channel) => {
                 private_channel.delete(cache_http.http()).await?;
-            }
+            },
             Channel::Category(category) => {
                 category.delete(cache_http).await?;
-            }
+            },
         }
 
         Ok(())
@@ -238,7 +238,7 @@ impl<'de> Deserialize<'de> for Channel {
                         Unexpected::Other("non-positive integer"),
                         &"a positive integer",
                     ));
-                }
+                },
             }
         };
 
@@ -311,7 +311,15 @@ pub enum ChannelType {
     Stage = 13,
 }
 
-enum_number!(ChannelType { Text, Private, Voice, Category, News, Store, Stage });
+enum_number!(ChannelType {
+    Text,
+    Private,
+    Voice,
+    Category,
+    News,
+    Store,
+    Stage
+});
 
 impl ChannelType {
     #[inline]
@@ -371,7 +379,11 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
             _ => return Err(DeError::custom("Unknown PermissionOverwriteType")),
         };
 
-        Ok(PermissionOverwrite { allow: data.allow, deny: data.deny, kind })
+        Ok(PermissionOverwrite {
+            allow: data.allow,
+            deny: data.deny,
+            kind,
+        })
     }
 }
 
@@ -418,7 +430,10 @@ pub enum VideoQualityMode {
     Full = 2,
 }
 
-enum_number!(VideoQualityMode { Auto, Full });
+enum_number!(VideoQualityMode {
+    Auto,
+    Full
+});
 
 #[cfg(test)]
 mod test {

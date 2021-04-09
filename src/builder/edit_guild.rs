@@ -34,13 +34,10 @@ impl EditGuild {
     }
 
     fn _afk_channel(&mut self, channel: Option<ChannelId>) {
-        self.0.insert(
-            "afk_channel_id",
-            match channel {
-                Some(channel) => from_number(channel.0),
-                None => NULL,
-            },
-        );
+        self.0.insert("afk_channel_id", match channel {
+            Some(channel) => from_number(channel.0),
+            None => NULL,
+        });
     }
 
     /// Set the amount of time a user is to be moved to the AFK channel -

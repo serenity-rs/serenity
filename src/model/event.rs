@@ -16,7 +16,7 @@ use super::utils::deserialize_emojis;
 use crate::cache::{Cache, CacheUpdate};
 use crate::internal::prelude::*;
 use crate::json::from_value;
-use crate::{constants::OpCode, json::from_number};
+use crate::{constants::OpCode, json::prelude::*};
 
 /// Event data for the channel creation event.
 ///

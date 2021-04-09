@@ -22,11 +22,11 @@ use crate::{
     builder::CreateInteraction,
     model::interactions::{ApplicationCommand, Interaction},
 };
+use crate::{json::from_value, model::prelude::*};
 use crate::{
-    json::from_number,
+    json::{from_number, prelude::*},
     model::utils::{deserialize_emojis, deserialize_roles},
 };
-use crate::{json::from_value, model::prelude::*};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.

@@ -18,7 +18,10 @@ use crate::cache::Cache;
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReaction, CollectReply, MessageCollectorBuilder, ReactionCollectorBuilder,
+    CollectReaction,
+    CollectReply,
+    MessageCollectorBuilder,
+    ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
 use crate::http::GuildPagination;
@@ -743,7 +746,7 @@ impl User {
             match guild {
                 GuildContainer::Guild(partial_guild) => {
                     self._has_role(cache_http, GuildContainer::Id(partial_guild.id), role).await
-                }
+                },
                 GuildContainer::Id(guild_id) => {
                     // Silences a warning when compiling without the `cache` feature.
                     #[allow(unused_mut)]
@@ -767,7 +770,7 @@ impl User {
                             .await
                             .map(|m| m.roles.contains(&role))
                     }
-                }
+                },
             }
         }
         .boxed()
@@ -1119,7 +1122,10 @@ mod test {
 
         #[test]
         fn default_avatars() {
-            let mut user = User { discriminator: 0, ..Default::default() };
+            let mut user = User {
+                discriminator: 0,
+                ..Default::default()
+            };
 
             assert!(user.default_avatar_url().ends_with("0.png"));
             user.discriminator = 1;
