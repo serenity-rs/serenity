@@ -1794,6 +1794,25 @@ impl Http {
         .await
     }
 
+    /// Fetches a global commands for your application by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_global_application_command(
+        &self,
+        application_id: u64,
+        command_id: u64,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGlobalApplicationCommand {
+                application_id,
+                command_id,
+            },
+        })
+        .await
+    }
+
     /// Gets guild information.
     pub async fn get_guild(&self, guild_id: u64) -> Result<PartialGuild> {
         self.fire(Request {

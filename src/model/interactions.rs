@@ -144,6 +144,10 @@ pub struct ApplicationCommandInteractionDataOption {
     pub options: Vec<ApplicationCommandInteractionDataOption>,
 }
 
+fn default_permission() -> bool {
+    true
+}
+
 /// The base command model that belongs to an application.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -154,7 +158,8 @@ pub struct ApplicationCommand {
     pub description: String,
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
-    pub default_permission: Option<bool>,
+    #[serde(default = "self::default_permission")]
+    pub default_permission: bool,
 }
 
 /// The parameters for a command.
@@ -358,6 +363,53 @@ impl Interaction {
     {
         let map = Interaction::build_interaction(f);
         http.as_ref().create_global_application_command(application_id, &Value::Object(map)).await
+    }
+
+    pub async fn edit_global_application_command<F>(
+        http: impl AsRef<Http>,
+        application_id: u64,
+        command_id: u64,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+    {
+        let map = Interaction::build_interaction(f);
+        http.as_ref()
+            .edit_global_application_command(application_id, command_id, &Value::Object(map))
+            .await
+    }
+
+    /// Get all global commands
+    ///
+    /// # Errors
+    pub async fn get_global_application_commands(
+        http: impl AsRef<Http>,
+        application_id: u64,
+    ) -> Result<Vec<ApplicationCommand>> {
+        http.as_ref().get_global_application_commands(application_id).await
+    }
+
+    /// Get a global command by its id
+    ///
+    /// # Errors
+    pub async fn get_global_application_command(
+        http: impl AsRef<Http>,
+        application_id: u64,
+        command_id: u64,
+    ) -> Result<ApplicationCommand> {
+        http.as_ref().get_global_application_command(application_id, command_id).await
+    }
+
+    /// Delete a global command by its id
+    ///
+    /// # Errors
+    pub async fn delete_global_application_command(
+        http: impl AsRef<Http>,
+        application_id: u64,
+        command_id: u64,
+    ) -> Result<()> {
+        http.as_ref().delete_global_application_command(application_id, command_id).await
     }
 
     /// Creates a guild specific [`ApplicationCommand`]
