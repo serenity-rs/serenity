@@ -416,6 +416,23 @@ impl Interaction {
             .await
     }
 
+    /// Get all guild application commands permissions only.
+    ///
+    /// # Errors
+    ///
+    /// Can return [`Error::Json`] if it cannot deserialize commands.
+    /// 
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn get_guild_application_commands_permissions(
+        http: impl AsRef<Http>,
+        guild_id: GuildId,
+        application_id: ApplicationId,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        http.as_ref()
+            .get_guild_application_commands_permissions(application_id.into(), guild_id.into())
+            .await
+    }
+
     #[inline]
     fn build_interaction<F>(f: F) -> Map<String, Value>
     where
