@@ -1,3 +1,7 @@
+//! This module exports different types for JSON interactions.
+//! It encapsulates the differences between serde_json and simd-json to allow
+//! ignoring those in the rest of the codebase.
+
 use serde::de::{Deserialize, DeserializeOwned};
 use serde::ser::Serialize;
 

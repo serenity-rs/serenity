@@ -2,9 +2,10 @@
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::json::from_number;
+use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils as serenity_utils;
-use crate::{json::from_number, model::prelude::*};
 
 /// A category of [`GuildChannel`]s.
 #[derive(Clone, Debug, Deserialize, Serialize)]

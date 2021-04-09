@@ -10,10 +10,7 @@ use crate::cache::Cache;
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReaction,
-    CollectReply,
-    MessageCollectorBuilder,
-    ReactionCollectorBuilder,
+    CollectReaction, CollectReply, MessageCollectorBuilder, ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
@@ -1144,13 +1141,7 @@ pub struct MembersIter<H: AsRef<Http>> {
 #[cfg(feature = "model")]
 impl<H: AsRef<Http>> MembersIter<H> {
     fn new(guild_id: GuildId, http: H) -> MembersIter<H> {
-        MembersIter {
-            guild_id,
-            http,
-            buffer: Vec::new(),
-            after: None,
-            tried_fetch: false,
-        }
+        MembersIter { guild_id, http, buffer: Vec::new(), after: None, tried_fetch: false }
     }
 
     /// Fills the `self.buffer` cache of Members.

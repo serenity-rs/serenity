@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
+use crate::internal::prelude::*;
+use crate::json::from_number;
 use crate::model::{guild::Role, Permissions};
-use crate::{internal::prelude::*, json::from_number};
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
