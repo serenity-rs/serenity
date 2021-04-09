@@ -1873,6 +1873,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommands(application_id),
                 Cow::from(Route::application_guild_commands(application_id, guild_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
             RouteInfo::GetGuildApplicationCommand {
                 application_id,
                 guild_id,
