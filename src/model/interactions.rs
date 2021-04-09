@@ -412,81 +412,8 @@ impl Interaction {
         http.as_ref().delete_global_application_command(application_id, command_id).await
     }
 
-    /// Creates a guild specific [`ApplicationCommand`]
-    ///
-    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
-    ///
-    /// # Errors
-    ///
-    /// Returns the same possible errors as `create_global_application_command`.
-    ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    pub async fn create_guild_application_command<F>(
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-        application_id: u64,
-        f: F,
-    ) -> Result<ApplicationCommand>
-    where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
-    {
-        let map = Interaction::build_interaction(f);
-        http.as_ref()
-            .create_guild_application_command(application_id, guild_id.0, &Value::Object(map))
-            .await
-    }
-
-    /// Creates a guild specific [`ApplicationCommandPermission`]
-    ///
-    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
-    ///
-    /// # Errors
-    ///
-    /// Returns the same possible errors as `create_global_application_command`.
-    ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    pub async fn create_guild_application_command_permission<F>(
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-        application_id: u64,
-        command_id: u64,
-        f: F,
-    ) -> Result<ApplicationCommandPermission>
-    where
-        F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
-    {
-        let mut map = CreateInteractionPermissions::default();
-        f(&mut map);
-
-        http.as_ref()
-            .edit_guild_application_command_permissions(
-                application_id,
-                guild_id.0,
-                command_id,
-                &Value::Object(utils::hashmap_to_json_map(map.0)),
-            )
-            .await
-    }
-
-    /// Get all guild application commands permissions only.
-    ///
-    /// # Errors
-    ///
-    /// Can return [`Error::Json`] if it cannot deserialize commands.
-    ///
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn get_guild_application_commands_permissions(
-        http: impl AsRef<Http>,
-        guild_id: GuildId,
-        application_id: ApplicationId,
-    ) -> Result<Vec<ApplicationCommandPermission>> {
-        http.as_ref()
-            .get_guild_application_commands_permissions(application_id.into(), guild_id.into())
-            .await
-    }
-
     #[inline]
-    fn build_interaction<F>(f: F) -> Map<String, Value>
+    pub(crate) fn build_interaction<F>(f: F) -> Map<String, Value>
     where
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {

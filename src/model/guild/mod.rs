@@ -551,13 +551,13 @@ impl Guild {
     pub async fn create_application_command<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: u64,
+        application_id: ApplicationId,
         f: F,
     ) -> Result<ApplicationCommand>
     where
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
-        Interaction::create_guild_application_command(http, self.id, application_id, f).await
+        self.id.create_application_command(http, application_id, f).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
