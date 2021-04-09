@@ -366,7 +366,9 @@ impl Interaction {
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
         let map = Interaction::build_interaction(f);
-        http.as_ref().create_global_application_command(application_id.into(), &Value::Object(map)).await
+        http.as_ref()
+            .create_global_application_command(application_id.into(), &Value::Object(map))
+            .await
     }
 
     /// Creates several application commands
@@ -399,7 +401,11 @@ impl Interaction {
     {
         let map = Interaction::build_interaction(f);
         http.as_ref()
-            .edit_global_application_command(application_id.into(), command_id.into(), &Value::Object(map))
+            .edit_global_application_command(
+                application_id.into(),
+                command_id.into(),
+                &Value::Object(map),
+            )
             .await
     }
 
@@ -428,7 +434,9 @@ impl Interaction {
         application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref().delete_global_application_command(application_id.into(), command_id.into()).await
+        http.as_ref()
+            .delete_global_application_command(application_id.into(), command_id.into())
+            .await
     }
 
     #[inline]

@@ -1165,6 +1165,8 @@ impl GuildId {
     }
 
     /// Edit guild application command by its Id
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_application_command<F>(
         &self,
         http: impl AsRef<Http>,
