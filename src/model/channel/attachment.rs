@@ -26,6 +26,8 @@ pub struct Attachment {
     pub url: String,
     /// If the attachment is an image, then the width of the image is provided.
     pub width: Option<u64>,
+    /// The attachment's [media type](https://en.wikipedia.org/wiki/Media_type)
+    pub content_type: Option<String>,
 }
 
 #[cfg(feature = "model")]
