@@ -10,6 +10,7 @@ use crate::builder::{
     CreateInteractionPermissions,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
+    CreateInteractions,
     EditInteractionResponse,
 };
 use crate::http::Http;
@@ -363,6 +364,24 @@ impl Interaction {
     {
         let map = Interaction::build_interaction(f);
         http.as_ref().create_global_application_command(application_id, &Value::Object(map)).await
+    }
+
+    /// Creates several application commands
+    pub async fn create_global_application_commands<F>(
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        f: F,
+    ) -> Result<Vec<ApplicationCommand>>
+    where
+        F: FnOnce(&mut CreateInteractions) -> &mut CreateInteractions,
+    {
+        let mut array = CreateInteractions::default();
+
+        f(&mut array);
+
+        http.as_ref()
+            .create_global_application_commands(application_id.into(), &Value::Array(array.0))
+            .await
     }
 
     /// Edits a command by its Id

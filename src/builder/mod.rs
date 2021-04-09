@@ -59,7 +59,7 @@ pub use self::{
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 pub use self::{
-    create_interaction::{CreateInteraction, CreateInteractionOption},
+    create_interaction::{CreateInteraction, CreateInteractionOption, CreateInteractions},
     create_interaction_permission::CreateInteractionPermissions,
     create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
     create_interaction_response_followup::CreateInteractionResponseFollowup,

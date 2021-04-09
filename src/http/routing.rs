@@ -835,10 +835,21 @@ pub enum RouteInfo<'a> {
     CreateGlobalApplicationCommand {
         application_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    CreateGlobalApplicationCommands {
+        application_id: u64,
+    },
     CreateGuild,
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     CreateGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    CreateGuildApplicationCommands {
         application_id: u64,
         guild_id: u64,
     },
@@ -1315,6 +1326,14 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdCommands(application_id),
                 Cow::from(Route::application_commands(application_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::CreateGlobalApplicationCommands {
+                application_id,
+            } => (
+                LightMethod::Put,
+                Route::ApplicationsIdCommands(application_id),
+                Cow::from(Route::application_commands(application_id)),
+            ),
             RouteInfo::CreateGuild => {
                 (LightMethod::Post, Route::Guilds, Cow::from(Route::guilds()))
             },
@@ -1324,6 +1343,15 @@ impl<'a> RouteInfo<'a> {
                 guild_id,
             } => (
                 LightMethod::Post,
+                Route::ApplicationsIdGuildsIdCommands(application_id),
+                Cow::from(Route::application_guild_commands(application_id, guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::CreateGuildApplicationCommands {
+                application_id,
+                guild_id,
+            } => (
+                LightMethod::Put,
                 Route::ApplicationsIdGuildsIdCommands(application_id),
                 Cow::from(Route::application_guild_commands(application_id, guild_id)),
             ),

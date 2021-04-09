@@ -26,7 +26,7 @@ use crate::model::prelude::*;
 use crate::utils;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
-    builder::{CreateInteraction, CreateInteractionPermissions},
+    builder::{CreateInteraction, CreateInteractionPermissions, CreateInteractions},
     model::interactions::{ApplicationCommand, Interaction},
 };
 
@@ -1066,6 +1066,30 @@ impl GuildId {
         let map = Interaction::build_interaction(f);
         http.as_ref()
             .create_guild_application_command(application_id.into(), self.0, &Value::Object(map))
+            .await
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_commands<F>(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        f: F,
+    ) -> Result<Vec<ApplicationCommand>>
+    where
+        F: FnOnce(&mut CreateInteractions) -> &mut CreateInteractions,
+    {
+        let mut array = CreateInteractions::default();
+
+        f(&mut array);
+
+        http.as_ref()
+            .create_guild_application_commands(
+                application_id.into(),
+                self.0,
+                &Value::Array(array.0),
+            )
             .await
     }
 

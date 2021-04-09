@@ -182,3 +182,44 @@ impl CreateInteraction {
         self
     }
 }
+
+#[derive(Clone, Debug, Default)]
+pub struct CreateInteractions(pub Vec<Value>);
+
+impl CreateInteractions {
+    /// Creates a new interaction
+    pub fn create_interaction<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+    {
+        let mut data = CreateInteraction::default();
+        f(&mut data);
+
+        self.add_interaction(data);
+
+        self
+    }
+
+    /// Adds a new interaction
+    pub fn add_interaction(&mut self, interaction: CreateInteraction) -> &mut Self {
+        let new_data = Value::Object(utils::hashmap_to_json_map(interaction.0));
+
+        self.0.push(new_data);
+
+        self
+    }
+
+    /// Sets all the interactions
+    pub fn set_interactions(&mut self, interactions: Vec<CreateInteraction>) -> &mut Self {
+        let new_interactions = interactions
+            .into_iter()
+            .map(|f| Value::Object(utils::hashmap_to_json_map(f.0)))
+            .collect::<Vec<Value>>();
+
+        for interaction in new_interactions {
+            self.0.push(interaction);
+        }
+
+        self
+    }
+}

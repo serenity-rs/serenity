@@ -244,6 +244,44 @@ impl Http {
         .await
     }
 
+    /// Creates new global application commands
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_global_application_commands(
+        &self,
+        application_id: u64,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateGlobalApplicationCommands {
+                application_id,
+            },
+        })
+        .await
+    }
+
+    /// Creates new guild application commands
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_guild_application_commands(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateGuildApplicationCommands {
+                application_id,
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Creates a guild with the data provided.
     ///
     /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`]
