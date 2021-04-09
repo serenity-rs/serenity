@@ -4,7 +4,6 @@ use serde_json::json;
 
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
-use crate::builder::CreateInteractionPermissions;
 #[cfg(feature = "model")]
 use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -27,7 +26,7 @@ use crate::model::prelude::*;
 use crate::utils;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
-    builder::CreateInteraction,
+    builder::{CreateInteraction, CreateInteractionPermissions},
     model::interactions::{ApplicationCommand, Interaction},
 };
 
