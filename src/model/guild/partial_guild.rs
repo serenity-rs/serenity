@@ -19,7 +19,7 @@ use crate::model::prelude::*;
 use crate::model::utils::{deserialize_emojis, deserialize_roles};
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
-    builder::CreateInteraction,
+    builder::{CreateInteraction, CreateInteractionPermissions, CreateInteractions},
     model::interactions::{ApplicationCommand, Interaction},
 };
 
@@ -242,6 +242,121 @@ impl PartialGuild {
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
         self.id.create_application_command(http, application_id, f).await
+    }
+
+    /// Bulk create guild application commands
+    pub async fn create_application_commands<F>(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        f: F,
+    ) -> Result<Vec<ApplicationCommand>>
+    where
+        F: FnOnce(&mut CreateInteractions) -> &mut CreateInteractions,
+    {
+        self.id.create_application_commands(http, application_id, f).await
+    }
+
+    /// Creates a guild specific [`ApplicationCommandPermission`]
+    ///
+    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    ///
+    /// # Errors
+    ///
+    /// Returns the same possible errors as `create_global_application_command`.
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_command_permission<F>(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        command_id: CommandId,
+        f: F,
+    ) -> Result<ApplicationCommandPermission>
+    where
+        F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
+    {
+        self.id.create_application_command_permission(http, application_id, command_id, f).await
+    }
+
+    /// Get all guild application commands.
+    ///
+    /// # Errors
+    ///
+    /// Can return [`Error::Json`] if it cannot deserialize commands.
+    ///
+    /// [`Error::Json`]: crate::error::Error::Json
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_commands(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.id.get_application_commands(http, application_id).await
+    }
+
+    /// Get guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// Can return [`Error::Json`] if it cannot deserialize commands.
+    ///
+    /// [`Error::Json`]: crate::error::Error::Json
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_command(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        command_id: CommandId,
+    ) -> Result<ApplicationCommand> {
+        self.id.get_application_command(http, application_id, command_id).await
+    }
+
+    /// Edit guild application command by its Id
+    pub async fn edit_application_command<F>(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        command_id: CommandId,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+    {
+        self.id.edit_application_command(http, application_id, command_id, f).await
+    }
+
+    /// Delete guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn delete_application_command(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        command_id: CommandId,
+    ) -> Result<()> {
+        self.id.delete_application_command(http, application_id, command_id).await
+    }
+
+    /// Get all guild application commands permissions only.
+    ///
+    /// # Errors
+    ///
+    /// Can return [`Error::Json`] if it cannot deserialize commands.
+    ///
+    /// [`Error::Json`]: crate::error::Error::Json
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_commands_permissions(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        self.id.get_application_commands_permissions(http, application_id).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
