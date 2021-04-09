@@ -1094,6 +1094,7 @@ pub enum RouteInfo<'a> {
     GetGlobalApplicationCommands {
         application_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     GetGlobalApplicationCommand {
         application_id: u64,
