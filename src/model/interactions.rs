@@ -421,7 +421,7 @@ impl Interaction {
     /// # Errors
     ///
     /// Can return [`Error::Json`] if it cannot deserialize commands.
-    /// 
+    ///
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_guild_application_commands_permissions(
         http: impl AsRef<Http>,
