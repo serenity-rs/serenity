@@ -1007,6 +1007,12 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         command_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    EditGuildApplicationCommandsPermissions {
+        application_id: u64,
+        guild_id: u64,
+    },
     EditGuildChannels {
         guild_id: u64,
     },
@@ -1652,6 +1658,15 @@ impl<'a> RouteInfo<'a> {
                     guild_id,
                     command_id,
                 )),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::EditGuildApplicationCommandsPermissions {
+                application_id,
+                guild_id,
+            } => (
+                LightMethod::Put,
+                Route::ApplicationsIdGuildsIdCommandsPermissions(application_id),
+                Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
             ),
             RouteInfo::EditGuildChannels {
                 guild_id,

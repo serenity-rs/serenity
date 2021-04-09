@@ -1025,6 +1025,32 @@ impl Http {
         .await
     }
 
+    /// Edits a guild commands permissions.
+    ///
+    /// Updates for guild commands will be available immediately.
+    ///
+    /// Refer to Discord's [docs] for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_guild_application_commands_permissions(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditGuildApplicationCommandsPermissions {
+                application_id,
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Edits the positions of a guild's channels.
     pub async fn edit_guild_channel_positions(&self, guild_id: u64, value: &Value) -> Result<()> {
         let body = serde_json::to_vec(value)?;

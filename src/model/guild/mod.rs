@@ -37,7 +37,12 @@ use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
-    builder::{CreateInteraction, CreateInteractionPermissions, CreateInteractions},
+    builder::{
+        CreateInteraction,
+        CreateInteractionPermissions,
+        CreateInteractions,
+        CreateInteractionsPermissions,
+    },
     model::interactions::{ApplicationCommand, Interaction},
 };
 
@@ -597,6 +602,29 @@ impl Guild {
         F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
     {
         self.id.create_application_command_permission(http, application_id, command_id, f).await
+    }
+
+    /// Creates guild specifics [`ApplicationCommandPermission`]
+    ///
+    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    ///
+    /// # Errors
+    ///
+    /// Returns the same possible errors as `create_global_application_command`.
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_commands_permissions<F>(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        f: F,
+    ) -> Result<Vec<ApplicationCommandPermission>>
+    where
+        F: FnOnce(&mut CreateInteractionsPermissions) -> &mut CreateInteractionsPermissions,
+    {
+        self.id.create_application_commands_permissions(http, application_id, f).await
     }
 
     /// Get all guild application commands.
