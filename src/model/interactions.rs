@@ -303,9 +303,9 @@ impl Interaction {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
-    /// use serenity::model::interactions::Interaction;
+    /// use serenity::model::{interactions::Interaction, id::ApplicationId};
     ///
-    /// let application_id = 42; // usually this will be the bot's UserId
+    /// let application_id = ApplicationId(42); // usually this will be the bot's UserId
     ///
     /// let _ = Interaction::create_global_application_command(&http, application_id, |a| {
     ///    a.name("ping")
@@ -323,9 +323,12 @@ impl Interaction {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
-    /// use serenity::model::interactions::{Interaction, ApplicationCommandOptionType};
+    /// use serenity::model::{
+    /// interactions::{Interaction, ApplicationCommandOptionType},
+    /// id::ApplicationId
+    /// };
     ///
-    /// let application_id = 42; // usually this will be the bot's UserId
+    /// let application_id = ApplicationId(42); // usually this will be the bot's UserId
     ///
     /// let _ = Interaction::create_global_application_command(&http, application_id, |a| {
     ///    a.name("echo")
@@ -356,14 +359,14 @@ impl Interaction {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_global_application_command<F>(
         http: impl AsRef<Http>,
-        application_id: u64,
+        application_id: ApplicationId,
         f: F,
     ) -> Result<ApplicationCommand>
     where
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
         let map = Interaction::build_interaction(f);
-        http.as_ref().create_global_application_command(application_id, &Value::Object(map)).await
+        http.as_ref().create_global_application_command(application_id.into(), &Value::Object(map)).await
     }
 
     /// Creates several application commands
@@ -387,8 +390,8 @@ impl Interaction {
     /// Edits a command by its Id
     pub async fn edit_global_application_command<F>(
         http: impl AsRef<Http>,
-        application_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        command_id: CommandId,
         f: F,
     ) -> Result<ApplicationCommand>
     where
@@ -396,7 +399,7 @@ impl Interaction {
     {
         let map = Interaction::build_interaction(f);
         http.as_ref()
-            .edit_global_application_command(application_id, command_id, &Value::Object(map))
+            .edit_global_application_command(application_id.into(), command_id.into(), &Value::Object(map))
             .await
     }
 
@@ -405,31 +408,27 @@ impl Interaction {
     /// # Errors
     pub async fn get_global_application_commands(
         http: impl AsRef<Http>,
-        application_id: u64,
+        application_id: ApplicationId,
     ) -> Result<Vec<ApplicationCommand>> {
-        http.as_ref().get_global_application_commands(application_id).await
+        http.as_ref().get_global_application_commands(application_id.into()).await
     }
 
     /// Get a global command by its id
-    ///
-    /// # Errors
     pub async fn get_global_application_command(
         http: impl AsRef<Http>,
-        application_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        command_id: CommandId,
     ) -> Result<ApplicationCommand> {
-        http.as_ref().get_global_application_command(application_id, command_id).await
+        http.as_ref().get_global_application_command(application_id.into(), command_id.into()).await
     }
 
     /// Delete a global command by its id
-    ///
-    /// # Errors
     pub async fn delete_global_application_command(
         http: impl AsRef<Http>,
-        application_id: u64,
-        command_id: u64,
+        application_id: ApplicationId,
+        command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref().delete_global_application_command(application_id, command_id).await
+        http.as_ref().delete_global_application_command(application_id.into(), command_id.into()).await
     }
 
     #[inline]
