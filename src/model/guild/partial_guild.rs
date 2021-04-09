@@ -245,6 +245,8 @@ impl PartialGuild {
     }
 
     /// Bulk create guild application commands
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
