@@ -466,6 +466,10 @@ pub struct GuildMemberUpdateEvent {
     pub premium_since: Option<DateTime<Utc>>,
     #[serde(default)]
     pub pending: bool,
+    #[serde(default)]
+    pub deaf: bool,
+    #[serde(default)]
+    pub mute: bool,
 }
 
 #[cfg(feature = "cache")]
