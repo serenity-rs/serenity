@@ -39,7 +39,7 @@ impl EditInteractionResponse {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
-        let mut embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(vec![]));
+        let embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(vec![]));
 
         if let Some(embeds) = embeds.as_array_mut() {
             embeds.push(embed);
