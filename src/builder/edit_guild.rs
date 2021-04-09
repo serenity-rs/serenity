@@ -264,4 +264,8 @@ impl EditGuild {
         let num = Value::Number(Number::from(verification_level.num()));
         self.0.insert("verification_level", num);
     }
+
+    pub fn system_channel_flags(&mut self, system_channel_flags: SystemChannelFlags) {
+        self.0.insert("system_channel_flags", system_channel_flags.bits().into());
+    }
 }
