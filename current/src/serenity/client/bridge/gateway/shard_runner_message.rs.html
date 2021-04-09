@@ -72,14 +72,14 @@
 <span id="69">69</span>
 <span id="70">70</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">Message</span>;
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
-    <span class="ident">gateway</span>::<span class="ident">Activity</span>,
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{
+    <span class="ident">gateway::Activity</span>,
     <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
-    <span class="ident">user</span>::<span class="ident">OnlineStatus</span>,
+    <span class="ident">user::OnlineStatus</span>,
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -94,7 +94,7 @@
 
 <span class="doccomment">/// A message to send from a shard over a WebSocket.</span>
 <span class="comment">// Once we can use `Box` as part of a pattern, we will reconsider boxing.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">large_enum_variant</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardRunnerMessage</span> {
     <span class="doccomment">/// Indicates that the client is to send a member chunk message.</span>

@@ -8,9 +8,9 @@
 <p>Ensure that a valid <a href="../../serenity/model/guild/struct.Emoji.html"><code>Emoji</code></a> usage is correctly parsed:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">EmojiId</span>, <span class="ident">GuildId</span>};
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">misc</span>::<span class="ident">EmojiIdentifier</span>;
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_emoji</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::id</span>::{<span class="ident">EmojiId</span>, <span class="ident">GuildId</span>};
+<span class="kw">use</span> <span class="ident">serenity::model::misc::EmojiIdentifier</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_emoji</span>;
 
 <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">EmojiIdentifier</span> {
     <span class="ident">animated</span>: <span class="bool-val">false</span>,
@@ -22,7 +22,7 @@
 <p>Asserting that an invalid emoji usage returns <code>None</code>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_emoji</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_emoji</span>;
 
 <span class="macro">assert!</span>(<span class="ident">parse_emoji</span>(<span class="string">&quot;&lt;:smugAnimeFace:302516740095606785&quot;</span>).<span class="ident">is_none</span>());</pre></div>
 </div></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-js="../../search-index.js"></div>

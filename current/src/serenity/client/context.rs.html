@@ -460,22 +460,22 @@
 <span id="457">457</span>
 <span id="458">458</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::<span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">RwLock</span>;
-<span class="kw">use</span> <span class="ident">typemap_rev</span>::<span class="ident">TypeMap</span>;
+<span class="kw">use</span> <span class="ident">futures::channel::mpsc::UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
+<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::<span class="ident">ShardMessenger</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">InterMessage</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::<span class="ident">Http</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::gateway::InterMessage</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::Http</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// The context is a general utility struct provided on event dispatches, which</span>
 <span class="doccomment">/// helps with dealing with the current &quot;context&quot; of the event dispatch.</span>
@@ -519,7 +519,7 @@
         <span class="ident">cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span> {
         <span class="ident">Context</span> {
-            <span class="ident">shard</span>: <span class="ident">ShardMessenger</span>::<span class="ident">new</span>(<span class="ident">runner_tx</span>),
+            <span class="ident">shard</span>: <span class="ident">ShardMessenger::new</span>(<span class="ident">runner_tx</span>),
             <span class="ident">shard_id</span>,
             <span class="ident">data</span>,
             <span class="ident">http</span>,
@@ -545,7 +545,7 @@
         <span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Context</span> {
         <span class="ident">Context</span> {
-            <span class="ident">shard</span>: <span class="ident">ShardMessenger</span>::<span class="ident">new</span>(<span class="ident">runner_tx</span>),
+            <span class="ident">shard</span>: <span class="ident">ShardMessenger::new</span>(<span class="ident">runner_tx</span>),
             <span class="ident">shard_id</span>,
             <span class="ident">data</span>,
             <span class="ident">http</span>,
@@ -586,7 +586,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">online</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus</span>::<span class="ident">Online</span>);
+        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Online</span>);
     }
 
     <span class="doccomment">/// Sets the current user as being [`Idle`]. This maintains the current</span>
@@ -623,7 +623,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus</span>::<span class="ident">Idle</span>);
+        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Idle</span>);
     }
 
     <span class="doccomment">/// Sets the current user as being [`DoNotDisturb`]. This maintains the</span>
@@ -660,7 +660,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus</span>::<span class="ident">DoNotDisturb</span>);
+        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::DoNotDisturb</span>);
     }
 
     <span class="doccomment">/// Sets the current user as being [`Invisible`]. This maintains the current</span>
@@ -697,7 +697,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invisible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus</span>::<span class="ident">Invisible</span>);
+        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Invisible</span>);
     }
 
     <span class="doccomment">/// &quot;Resets&quot; the current user&#39;s presence, by setting the activity to `None`</span>
@@ -736,7 +736,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">None</span>::<span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="ident">OnlineStatus</span>::<span class="ident">Online</span>);
+        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">None</span>::<span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="ident">OnlineStatus::Online</span>);
     }
 
     <span class="doccomment">/// Sets the current activity, defaulting to an online status of [`Online`].</span>
@@ -777,7 +777,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="ident">Activity</span>) {
-        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">Some</span>(<span class="ident">activity</span>), <span class="ident">OnlineStatus</span>::<span class="ident">Online</span>);
+        <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_presence</span>(<span class="prelude-val">Some</span>(<span class="ident">activity</span>), <span class="ident">OnlineStatus::Online</span>);
     }
 
     <span class="doccomment">/// Sets the current user&#39;s presence, providing all fields to be passed.</span>

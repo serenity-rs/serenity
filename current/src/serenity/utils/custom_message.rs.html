@@ -280,9 +280,9 @@
 <span id="277">277</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
+<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for constructing a personal [`Message`] instance.</span>
 <span class="doccomment">/// This can be useful for emitting a manual [`dispatch`] to the framework,</span>
@@ -300,7 +300,7 @@
     <span class="doccomment">/// of this message with valid data.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">default</span>()
+        <span class="self">Self</span><span class="ident">::default</span>()
     }
 
     <span class="doccomment">/// Assign the dummy message a proper ID for identification.</span>
@@ -519,38 +519,38 @@
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">fn</span> <span class="ident">dummy_message</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Message</span> {
     <span class="ident">Message</span> {
-        <span class="ident">id</span>: <span class="ident">MessageId</span>::<span class="ident">default</span>(),
-        <span class="ident">attachments</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+        <span class="ident">id</span>: <span class="ident">MessageId::default</span>(),
+        <span class="ident">attachments</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">author</span>: <span class="ident">User</span> {
-            <span class="ident">id</span>: <span class="ident">UserId</span>::<span class="ident">default</span>(),
+            <span class="ident">id</span>: <span class="ident">UserId::default</span>(),
             <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
             <span class="ident">bot</span>: <span class="bool-val">false</span>,
             <span class="ident">discriminator</span>: <span class="number">0x0000</span>,
-            <span class="ident">name</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
+            <span class="ident">name</span>: <span class="ident">String::new</span>(),
             <span class="ident">public_flags</span>: <span class="prelude-val">None</span>,
         },
-        <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>::<span class="ident">default</span>(),
-        <span class="ident">content</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
+        <span class="ident">channel_id</span>: <span class="ident">ChannelId::default</span>(),
+        <span class="ident">content</span>: <span class="ident">String::new</span>(),
         <span class="ident">edited_timestamp</span>: <span class="prelude-val">None</span>,
-        <span class="ident">embeds</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+        <span class="ident">embeds</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">guild_id</span>: <span class="prelude-val">None</span>,
-        <span class="ident">kind</span>: <span class="ident">MessageType</span>::<span class="ident">Regular</span>,
+        <span class="ident">kind</span>: <span class="ident">MessageType::Regular</span>,
         <span class="ident">member</span>: <span class="prelude-val">None</span>,
         <span class="ident">mention_everyone</span>: <span class="bool-val">false</span>,
-        <span class="ident">mention_roles</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-        <span class="ident">mention_channels</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-        <span class="ident">mentions</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-        <span class="ident">nonce</span>: <span class="ident">Value</span>::<span class="ident">Null</span>,
+        <span class="ident">mention_roles</span>: <span class="ident">Vec::new</span>(),
+        <span class="ident">mention_channels</span>: <span class="ident">Vec::new</span>(),
+        <span class="ident">mentions</span>: <span class="ident">Vec::new</span>(),
+        <span class="ident">nonce</span>: <span class="ident">Value::Null</span>,
         <span class="ident">pinned</span>: <span class="bool-val">false</span>,
-        <span class="ident">reactions</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+        <span class="ident">reactions</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">tts</span>: <span class="bool-val">false</span>,
         <span class="ident">webhook_id</span>: <span class="prelude-val">None</span>,
-        <span class="ident">timestamp</span>: <span class="ident">Utc</span>::<span class="ident">now</span>(),
+        <span class="ident">timestamp</span>: <span class="ident">Utc::now</span>(),
         <span class="ident">activity</span>: <span class="prelude-val">None</span>,
         <span class="ident">application</span>: <span class="prelude-val">None</span>,
         <span class="ident">message_reference</span>: <span class="prelude-val">None</span>,
         <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-        <span class="ident">stickers</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+        <span class="ident">stickers</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">interaction</span>: <span class="prelude-val">None</span>,

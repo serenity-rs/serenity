@@ -5,7 +5,7 @@
 <p>If the mention is invalid, <code>None</code> is returned.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_mention</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_mention</span>;
 
 <span class="macro">assert_eq!</span>(<span class="ident">parse_mention</span>(<span class="string">&quot;&lt;@136510335967297536&gt;&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">136510335967297536</span>));
 <span class="macro">assert_eq!</span>(<span class="ident">parse_mention</span>(<span class="string">&quot;&lt;@&amp;137235212097683456&gt;&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">137235212097683456</span>));

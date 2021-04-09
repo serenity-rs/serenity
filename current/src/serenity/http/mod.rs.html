@@ -300,26 +300,26 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">typing</span>;
 
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow</span>::<span class="ident">Cow</span>,
+    <span class="ident">borrow::Cow</span>,
     <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
-    <span class="ident">sync</span>::<span class="ident">Arc</span>,
+    <span class="ident">sync::Arc</span>,
 };
 
-<span class="kw">use</span> <span class="ident">reqwest</span>::<span class="ident">Method</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reqwest</span>::<span class="ident">StatusCode</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">fs</span>::<span class="ident">File</span>;
+<span class="kw">use</span> <span class="ident">reqwest::Method</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reqwest::StatusCode</span>;
+<span class="kw">use</span> <span class="ident">tokio::fs::File</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">client</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">HttpError</span>;
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">request</span>::<span class="ident">Request</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">typing</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::client</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::error::Error</span> <span class="kw">as</span> <span class="ident">HttpError</span>;
+<span class="kw">use</span> <span class="self">self</span><span class="ident">::request::Request</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::typing</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::Context</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">CacheAndHttp</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::CacheAndHttp</span>;
 
 <span class="doccomment">/// This trait will be required by functions that need [`Http`] and can</span>
 <span class="doccomment">/// optionally use a [`Cache`] to potentially avoid REST-requests.</span>
@@ -437,11 +437,11 @@
 <span class="kw">impl</span> <span class="ident">LightMethod</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reqwest_method</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Method</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">LightMethod</span>::<span class="ident">Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method</span>::<span class="ident">DELETE</span>,
-            <span class="ident">LightMethod</span>::<span class="ident">Get</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method</span>::<span class="ident">GET</span>,
-            <span class="ident">LightMethod</span>::<span class="ident">Patch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method</span>::<span class="ident">PATCH</span>,
-            <span class="ident">LightMethod</span>::<span class="ident">Post</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method</span>::<span class="ident">POST</span>,
-            <span class="ident">LightMethod</span>::<span class="ident">Put</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method</span>::<span class="ident">PUT</span>,
+            <span class="ident">LightMethod::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method::DELETE</span>,
+            <span class="ident">LightMethod::Get</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method::GET</span>,
+            <span class="ident">LightMethod::Patch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method::PATCH</span>,
+            <span class="ident">LightMethod::Post</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method::POST</span>,
+            <span class="ident">LightMethod::Put</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Method::PUT</span>,
         }
     }
 }
@@ -462,8 +462,8 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">params</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="ident">str</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">AttachmentType</span>::<span class="ident">Bytes</span> {
-            <span class="ident">data</span>: <span class="ident">Cow</span>::<span class="ident">Borrowed</span>(<span class="ident">params</span>.<span class="number">0</span>),
+        <span class="ident">AttachmentType::Bytes</span> {
+            <span class="ident">data</span>: <span class="ident">Cow::Borrowed</span>(<span class="ident">params</span>.<span class="number">0</span>),
             <span class="ident">filename</span>: <span class="ident">params</span>.<span class="number">1</span>.<span class="ident">to_string</span>(),
         }
     }
@@ -474,28 +474,28 @@
     <span class="doccomment">/// This string may refer to the path of a file on disk, or the http url to an image on the internet.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&quot;http://&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&quot;https://&quot;</span>) {
-            <span class="ident">AttachmentType</span>::<span class="ident">Image</span>(<span class="ident">s</span>)
+            <span class="ident">AttachmentType::Image</span>(<span class="ident">s</span>)
         } <span class="kw">else</span> {
-            <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="ident">s</span>))
+            <span class="ident">AttachmentType::Path</span>(<span class="ident">Path::new</span>(<span class="ident">s</span>))
         }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Path</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="ident">path</span>)
+        <span class="ident">AttachmentType::Path</span>(<span class="ident">path</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PathBuf</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pathbuf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="ident">pathbuf</span>.<span class="ident">as_path</span>())
+        <span class="ident">AttachmentType::Path</span>(<span class="ident">pathbuf</span>.<span class="ident">as_path</span>())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">File</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">File</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">AttachmentType</span>::<span class="ident">File</span> {
+        <span class="ident">AttachmentType::File</span> {
             <span class="ident">file</span>: <span class="ident">f</span>.<span class="number">0</span>,
             <span class="ident">filename</span>: <span class="ident">f</span>.<span class="number">1</span>.<span class="ident">to_string</span>(),
         }
@@ -516,19 +516,19 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">Path</span>;
+    <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">AttachmentType</span>;
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::AttachmentType</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_attachment_type</span>() {
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-            <span class="ident">AttachmentType</span>::<span class="ident">from</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;./dogs/corgis/kona.png&quot;</span>)),
-            <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="kw">_</span>)
+            <span class="ident">AttachmentType::from</span>(<span class="ident">Path::new</span>(<span class="string">&quot;./dogs/corgis/kona.png&quot;</span>)),
+            <span class="ident">AttachmentType::Path</span>(<span class="kw">_</span>)
         ));
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-            <span class="ident">AttachmentType</span>::<span class="ident">from</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;./cats/copycat.png&quot;</span>)),
-            <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="kw">_</span>)
+            <span class="ident">AttachmentType::from</span>(<span class="ident">Path::new</span>(<span class="string">&quot;./cats/copycat.png&quot;</span>)),
+            <span class="ident">AttachmentType::Path</span>(<span class="kw">_</span>)
         ));
     }
 }

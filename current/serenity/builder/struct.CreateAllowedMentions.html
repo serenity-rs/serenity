@@ -5,7 +5,7 @@
 used by the <a href="../../serenity/model/id/struct.ChannelId.html#method.send_message"><code>ChannelId::send_message</code></a> method.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">builder</span>::<span class="ident">ParseValue</span>;
+<span class="kw">use</span> <span class="ident">serenity::builder::ParseValue</span>;
 
 <span class="comment">// Mention only the user 110372470472613888</span>
 <span class="ident">m</span>.<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">am</span><span class="op">|</span> {
@@ -15,30 +15,30 @@ used by the <a href="../../serenity/model/id/struct.ChannelId.html#method.send_m
 
 <span class="comment">// Mention all users and the role 182894738100322304</span>
 <span class="ident">m</span>.<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">am</span><span class="op">|</span> {
-    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue</span>::<span class="ident">Users</span>);
+    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue::Users</span>);
     <span class="ident">am</span>.<span class="ident">roles</span>(<span class="macro">vec!</span>[<span class="number">182894738100322304</span>])
 });
 
 <span class="comment">// Mention all roles and nothing else</span>
 <span class="ident">m</span>.<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">am</span><span class="op">|</span> {
-    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue</span>::<span class="ident">Roles</span>)
+    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue::Roles</span>)
 });
 
 <span class="comment">// Mention all roles and users, but not everyone</span>
 <span class="ident">m</span>.<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">am</span><span class="op">|</span> {
-    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue</span>::<span class="ident">Users</span>);
-    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue</span>::<span class="ident">Roles</span>)
+    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue::Users</span>);
+    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue::Roles</span>)
 });
 
 <span class="comment">// Mention everyone and the users 182891574139682816, 110372470472613888</span>
 <span class="ident">m</span>.<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">am</span><span class="op">|</span> {
-    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue</span>::<span class="ident">Everyone</span>);
+    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue::Everyone</span>);
     <span class="ident">am</span>.<span class="ident">users</span>(<span class="macro">vec!</span>[<span class="number">182891574139682816</span>, <span class="number">110372470472613888</span>])
 });
 
 <span class="comment">// Mention everyone and the message author.</span>
 <span class="ident">m</span>.<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">am</span><span class="op">|</span> {
-    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue</span>::<span class="ident">Everyone</span>);
+    <span class="ident">am</span>.<span class="ident">parse</span>(<span class="ident">ParseValue::Everyone</span>);
     <span class="ident">am</span>.<span class="ident">users</span>(<span class="macro">vec!</span>[<span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>])
 });</pre></div>
 </div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><h3 id="impl" class="impl"><code class="in-band">impl <a class="struct" href="../../serenity/builder/struct.CreateAllowedMentions.html" title="struct serenity::builder::CreateAllowedMentions">CreateAllowedMentions</a></code><a href="#impl" class="anchor"></a><a class="srclink" href="../../src/serenity/builder/create_allowed_mentions.rs.html#66-154" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.parse" class="method"><code>pub fn <a href="#method.parse" class="fnname">parse</a>(&amp;mut self, value: <a class="enum" href="../../serenity/builder/enum.ParseValue.html" title="enum serenity::builder::ParseValue">ParseValue</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/builder/create_allowed_mentions.rs.html#75-82" title="goto source code">[src]</a></h4><div class="docblock"><p>Add a value that’s allowed to be mentioned.</p>

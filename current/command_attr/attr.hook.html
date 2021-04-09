@@ -13,11 +13,11 @@ return type is a boxed <a href="https://doc.rust-lang.org/nightly/core/future/fu
 <p>into this (some details omitted):</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">future</span>::<span class="ident">Future</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
+<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 
-<span class="kw">fn</span> <span class="ident">foo</span>(<span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std</span>::<span class="ident">future</span>::<span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+<span class="kw">fn</span> <span class="ident">foo</span>(<span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
         <span class="ident">n</span> <span class="op">+</span> <span class="number">4</span>
     })
 }</pre></div>
@@ -32,7 +32,7 @@ this closure:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="op">|</span><span class="ident">x</span>: <span class="ident">i32</span><span class="op">|</span> {
-    <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+    <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
         <span class="ident">x</span> <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">4</span>
     })
 }</pre></div>
@@ -42,11 +42,11 @@ this closure:</p>
 instead this:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">future</span>::<span class="ident">Future</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
+<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
 
-<span class="kw">fn</span> <span class="ident">foo</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std</span>::<span class="ident">future</span>::<span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;fut</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+<span class="kw">fn</span> <span class="ident">foo</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;fut</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw-2">*</span><span class="ident">n</span> <span class="op">+</span> <span class="number">4</span>
     })
 }</pre></div>

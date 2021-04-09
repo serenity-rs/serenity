@@ -271,21 +271,21 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
-    <span class="ident">sync</span>::<span class="ident">Arc</span>,
+    <span class="ident">sync::Arc</span>,
 };
 
 <span class="kw">use</span> <span class="ident">futures</span>::{
-    <span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>},
+    <span class="ident">channel::mpsc</span>::{<span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>},
     <span class="ident">StreamExt</span>,
 };
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>};
+<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
+<span class="kw">use</span> <span class="ident">tokio::time::delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::{<span class="ident">timeout</span>, <span class="ident">Duration</span>, <span class="ident">Instant</span>};
+<span class="kw">use</span> <span class="ident">tokio::time::sleep</span>;
+<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">timeout</span>, <span class="ident">Duration</span>, <span class="ident">Instant</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">warn</span>};
-<span class="kw">use</span> <span class="ident">typemap_rev</span>::<span class="ident">TypeMap</span>;
+<span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">GatewayIntents</span>,
@@ -299,14 +299,14 @@
     <span class="ident">ShardRunnerOptions</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">voice</span>::<span class="ident">VoiceGatewayManager</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::voice::VoiceGatewayManager</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">framework</span>::<span class="ident">Framework</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">ConnectionStage</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::{<span class="ident">InterMessage</span>, <span class="ident">Shard</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">CacheAndHttp</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::framework::Framework</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::gateway::ConnectionStage</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::gateway</span>::{<span class="ident">InterMessage</span>, <span class="ident">Shard</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::CacheAndHttp</span>;
 
 <span class="kw">const</span> <span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">5</span>;
 
@@ -386,21 +386,21 @@
         <span class="comment">// The duration to timeout from reads over the Rx channel. This can be</span>
         <span class="comment">// done in a loop, and if the read times out then a shard can be</span>
         <span class="comment">// started if one is presently waiting in the queue.</span>
-        <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>);
+        <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>);
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage</span>::<span class="ident">Shutdown</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown.&quot;</span>);
                     <span class="self">self</span>.<span class="ident">shutdown_runners</span>().<span class="kw">await</span>;
 
                     <span class="kw">break</span>;
                 },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage</span>::<span class="ident">ShutdownShard</span>(<span class="ident">shard</span>, <span class="ident">code</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard</span>, <span class="ident">code</span>))) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown shard {} with {}.&quot;</span>, <span class="ident">shard</span>.<span class="number">0</span>, <span class="ident">code</span>);
                     <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">shard</span>, <span class="ident">code</span>).<span class="kw">await</span>;
                 },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage</span>::<span class="ident">Start</span>(<span class="ident">id</span>, <span class="ident">total</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::Start</span>(<span class="ident">id</span>, <span class="ident">total</span>))) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to start shard {} of {}.&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>, <span class="ident">total</span>.<span class="number">0</span>);
                     <span class="self">self</span>.<span class="ident">checked_start</span>(<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">total</span>.<span class="number">0</span>).<span class="kw">await</span>;
                 },
@@ -423,7 +423,7 @@
 
         <span class="comment">// We must wait 5 seconds between IDENTIFYs to avoid session</span>
         <span class="comment">// invalidations.</span>
-        <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>);
+        <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>);
         <span class="kw">let</span> <span class="ident">elapsed</span> <span class="op">=</span> <span class="ident">instant</span>.<span class="ident">elapsed</span>();
 
         <span class="kw">if</span> <span class="ident">elapsed</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">duration</span> {
@@ -447,42 +447,42 @@
             <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">push_back</span>((<span class="ident">id</span>, <span class="ident">total</span>));
         }
 
-        <span class="self">self</span>.<span class="ident">last_start</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant</span>::<span class="ident">now</span>());
+        <span class="self">self</span>.<span class="ident">last_start</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u64</span>, <span class="ident">shard_total</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">shard_info</span> <span class="op">=</span> [<span class="ident">shard_id</span>, <span class="ident">shard_total</span>];
 
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="ident">Shard</span>::<span class="ident">new</span>(
-            <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>),
+        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="ident">Shard::new</span>(
+            <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">token</span>,
             <span class="ident">shard_info</span>,
             <span class="self">self</span>.<span class="ident">intents</span>,
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">ShardRunner</span>::<span class="ident">new</span>(<span class="ident">ShardRunnerOptions</span> {
-            <span class="ident">data</span>: <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>),
-            <span class="ident">event_handler</span>: <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">eh</span><span class="op">|</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">eh</span>)),
-            <span class="ident">raw_event_handler</span>: <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">rh</span><span class="op">|</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">rh</span>)),
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">ShardRunner::new</span>(<span class="ident">ShardRunnerOptions</span> {
+            <span class="ident">data</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>),
+            <span class="ident">event_handler</span>: <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">eh</span><span class="op">|</span> <span class="ident">Arc::clone</span>(<span class="ident">eh</span>)),
+            <span class="ident">raw_event_handler</span>: <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">rh</span><span class="op">|</span> <span class="ident">Arc::clone</span>(<span class="ident">rh</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="ident">framework</span>: <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">framework</span>),
+            <span class="ident">framework</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">framework</span>),
             <span class="ident">manager_tx</span>: <span class="self">self</span>.<span class="ident">manager_tx</span>.<span class="ident">clone</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
             <span class="ident">voice_manager</span>: <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">clone</span>(),
             <span class="ident">shard</span>,
-            <span class="ident">cache_and_http</span>: <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>),
+            <span class="ident">cache_and_http</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>),
         });
 
         <span class="kw">let</span> <span class="ident">runner_info</span> <span class="op">=</span> <span class="ident">ShardRunnerInfo</span> {
             <span class="ident">latency</span>: <span class="prelude-val">None</span>,
-            <span class="ident">runner_tx</span>: <span class="ident">ShardMessenger</span>::<span class="ident">new</span>(<span class="ident">runner</span>.<span class="ident">runner_tx</span>()),
-            <span class="ident">stage</span>: <span class="ident">ConnectionStage</span>::<span class="ident">Disconnected</span>,
+            <span class="ident">runner_tx</span>: <span class="ident">ShardMessenger::new</span>(<span class="ident">runner</span>.<span class="ident">runner_tx</span>()),
+            <span class="ident">stage</span>: <span class="ident">ConnectionStage::Disconnected</span>,
         };
 
-        <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
+        <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">run</span>().<span class="kw">await</span>;
             <span class="macro">debug!</span>(<span class="string">&quot;[ShardRunner {:?}] Stopping&quot;</span>, <span class="ident">runner</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>());
         });
@@ -522,9 +522,9 @@
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, <span class="ident">shard_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">runner</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">shard_id</span>) {
-            <span class="kw">let</span> <span class="ident">shutdown</span> <span class="op">=</span> <span class="ident">ShardManagerMessage</span>::<span class="ident">Shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>);
-            <span class="kw">let</span> <span class="ident">client_msg</span> <span class="op">=</span> <span class="ident">ShardClientMessage</span>::<span class="ident">Manager</span>(<span class="ident">shutdown</span>);
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">InterMessage</span>::<span class="ident">Client</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">client_msg</span>));
+            <span class="kw">let</span> <span class="ident">shutdown</span> <span class="op">=</span> <span class="ident">ShardManagerMessage::Shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>);
+            <span class="kw">let</span> <span class="ident">client_msg</span> <span class="op">=</span> <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">shutdown</span>);
+            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">InterMessage::Client</span>(<span class="ident">Box::new</span>(<span class="ident">client_msg</span>));
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">runner_tx</span>.<span class="ident">tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">msg</span>) {
                 <span class="macro">warn!</span>(

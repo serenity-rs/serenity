@@ -47,9 +47,9 @@ contain information about YouTube.</p>
 <p>Create an embed:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Embed</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::channel::Embed</span>;
 
-<span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Embed</span>::<span class="ident">fake</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+<span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Embed::fake</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
     <span class="ident">e</span>.<span class="ident">title</span>(<span class="string">&quot;Embed title&quot;</span>)
         .<span class="ident">description</span>(<span class="string">&quot;Making a basic embed&quot;</span>)
         .<span class="ident">field</span>(<span class="string">&quot;A field&quot;</span>, <span class="string">&quot;Has some content.&quot;</span>, <span class="bool-val">false</span>)

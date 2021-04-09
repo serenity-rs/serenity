@@ -7,7 +7,7 @@
 <p>Retrieving an Id from a valid <a href="../../serenity/model/user/struct.User.html"><code>User</code></a> mention:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_username</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_username</span>;
 
 <span class="comment">// regular username mention</span>
 <span class="macro">assert_eq!</span>(<span class="ident">parse_username</span>(<span class="string">&quot;&lt;@114941315417899012&gt;&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">114941315417899012</span>));
@@ -17,7 +17,7 @@
 <p>Asserting that an invalid username or nickname mention returns <code>None</code>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_username</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_username</span>;
 
 <span class="macro">assert!</span>(<span class="ident">parse_username</span>(<span class="string">&quot;&lt;@1149413154aa17899012&quot;</span>).<span class="ident">is_none</span>());
 <span class="macro">assert!</span>(<span class="ident">parse_username</span>(<span class="string">&quot;&lt;@!11494131541789a90b1c2&quot;</span>).<span class="ident">is_none</span>());</pre></div>

@@ -215,11 +215,11 @@
 <span class="doccomment">//! Error enum definition wrapping potential model implementation errors.</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
+    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>},
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Permissions</span>;
+<span class="kw">use</span> <span class="kw">super</span><span class="ident">::Permissions</span>;
 
 <span class="doccomment">/// An error returned from the [`model`] module.</span>
 <span class="doccomment">///</span>
@@ -383,11 +383,11 @@
     <span class="doccomment">/// cache.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cache_err</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">ItemMissing</span>
-            <span class="op">|</span> <span class="self">Self</span>::<span class="ident">ChannelNotFound</span>
-            <span class="op">|</span> <span class="self">Self</span>::<span class="ident">RoleNotFound</span>
-            <span class="op">|</span> <span class="self">Self</span>::<span class="ident">GuildNotFound</span>
-            <span class="op">|</span> <span class="self">Self</span>::<span class="ident">MemberNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="self">Self</span><span class="ident">::ItemMissing</span>
+            <span class="op">|</span> <span class="self">Self</span><span class="ident">::ChannelNotFound</span>
+            <span class="op">|</span> <span class="self">Self</span><span class="ident">::RoleNotFound</span>
+            <span class="op">|</span> <span class="self">Self</span><span class="ident">::GuildNotFound</span>
+            <span class="op">|</span> <span class="self">Self</span><span class="ident">::MemberNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         }
     }
@@ -396,27 +396,27 @@
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error</span>::<span class="ident">BulkDeleteAmount</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too few/many messages to bulk delete.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">DeleteMessageDaysAmount</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid delete message days.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">EmbedTooLarge</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Embed too large.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">GuildNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Guild not found in the cache.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">RoleNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role not found in the cache.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">MemberNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Member not found in the cache.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">ChannelNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Channel not found in the cache.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">Hierarchy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role hierarchy prevents this action.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">InvalidChannelType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The channel cannot perform the action.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">InvalidPermissions</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid permissions.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">InvalidUser</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The current user cannot perform the action.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">ItemMissing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The required item is missing from the cache.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">WrongGuild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided member or channel is from the wrong guild.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">MessageTooLong</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message too large.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">MessageAlreadyCrossposted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message already crossposted.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">CannotCrosspostMessage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Cannot crosspost this message type.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">MessagingBot</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Attempted to message another bot user.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">NameTooShort</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is under the character limit.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">NameTooLong</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is over the character limit.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">NotAuthor</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The bot is not author of this message.&quot;</span>),
-            <span class="ident">Error</span>::<span class="ident">NoTokenSet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Token is not set.&quot;</span>),
+            <span class="ident">Error::BulkDeleteAmount</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too few/many messages to bulk delete.&quot;</span>),
+            <span class="ident">Error::DeleteMessageDaysAmount</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid delete message days.&quot;</span>),
+            <span class="ident">Error::EmbedTooLarge</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Embed too large.&quot;</span>),
+            <span class="ident">Error::GuildNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Guild not found in the cache.&quot;</span>),
+            <span class="ident">Error::RoleNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role not found in the cache.&quot;</span>),
+            <span class="ident">Error::MemberNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Member not found in the cache.&quot;</span>),
+            <span class="ident">Error::ChannelNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Channel not found in the cache.&quot;</span>),
+            <span class="ident">Error::Hierarchy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role hierarchy prevents this action.&quot;</span>),
+            <span class="ident">Error::InvalidChannelType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The channel cannot perform the action.&quot;</span>),
+            <span class="ident">Error::InvalidPermissions</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid permissions.&quot;</span>),
+            <span class="ident">Error::InvalidUser</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The current user cannot perform the action.&quot;</span>),
+            <span class="ident">Error::ItemMissing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The required item is missing from the cache.&quot;</span>),
+            <span class="ident">Error::WrongGuild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided member or channel is from the wrong guild.&quot;</span>),
+            <span class="ident">Error::MessageTooLong</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message too large.&quot;</span>),
+            <span class="ident">Error::MessageAlreadyCrossposted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message already crossposted.&quot;</span>),
+            <span class="ident">Error::CannotCrosspostMessage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Cannot crosspost this message type.&quot;</span>),
+            <span class="ident">Error::MessagingBot</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Attempted to message another bot user.&quot;</span>),
+            <span class="ident">Error::NameTooShort</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is under the character limit.&quot;</span>),
+            <span class="ident">Error::NameTooLong</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is over the character limit.&quot;</span>),
+            <span class="ident">Error::NotAuthor</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The bot is not author of this message.&quot;</span>),
+            <span class="ident">Error::NoTokenSet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Token is not set.&quot;</span>),
         }
     }
 }

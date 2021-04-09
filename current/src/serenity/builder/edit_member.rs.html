@@ -92,10 +92,10 @@
 <span id="89">89</span>
 <span id="90">90</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>};
 
 <span class="doccomment">/// A builder which edits the properties of a [`Member`], to be used in</span>
 <span class="doccomment">/// conjunction with [`Member::edit`].</span>
@@ -112,7 +112,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Deafen Members]: crate::model::permissions::Permissions::DEAFEN_MEMBERS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deafen</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">deafen</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;deaf&quot;</span>, <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="ident">deafen</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;deaf&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">deafen</span>));
         <span class="self">self</span>
     }
 
@@ -122,7 +122,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mute</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;mute&quot;</span>, <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="ident">mute</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;mute&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">mute</span>));
         <span class="self">self</span>
     }
 
@@ -133,7 +133,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Nicknames]: crate::model::permissions::Permissions::MANAGE_NICKNAMES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nickname</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">nickname</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;nick&quot;</span>, <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">nickname</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;nick&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">nickname</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -144,14 +144,14 @@
     <span class="doccomment">/// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">roles</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">roles</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">role_ids</span> <span class="op">=</span>
-            <span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">x</span>.<span class="ident">as_ref</span>().<span class="number">0</span>))).<span class="ident">collect</span>();
+            <span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">x</span>.<span class="ident">as_ref</span>().<span class="number">0</span>))).<span class="ident">collect</span>();
 
         <span class="self">self</span>.<span class="ident">_roles</span>(<span class="ident">role_ids</span>);
         <span class="self">self</span>
     }
 
     <span class="kw">fn</span> <span class="ident">_roles</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;roles&quot;</span>, <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">roles</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;roles&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">roles</span>));
     }
 
     <span class="doccomment">/// The Id of the voice channel to move the member to.</span>
@@ -167,7 +167,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">_voice_channel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) {
-        <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">channel_id</span>.<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">channel_id</span>.<span class="number">0</span>));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;channel_id&quot;</span>, <span class="ident">num</span>);
     }
 
@@ -177,7 +177,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Move Members]: crate::model::permissions::Permissions::MOVE_MEMBERS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disconnect_member</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;channel_id&quot;</span>, <span class="ident">Value</span>::<span class="ident">Null</span>);
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;channel_id&quot;</span>, <span class="ident">Value::Null</span>);
 
         <span class="self">self</span>
     }

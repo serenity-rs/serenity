@@ -845,17 +845,17 @@
 <span id="842">842</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">sync</span>::<span class="ident">Arc</span>,
+    <span class="ident">sync::Arc</span>,
     <span class="ident">time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>},
 };
 
-<span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::{
-    <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>,
-    <span class="ident">protocol</span>::<span class="ident">frame</span>::<span class="ident">CloseFrame</span>,
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>::{
+    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>,
+    <span class="ident">protocol::frame::CloseFrame</span>,
 };
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
+<span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
-<span class="kw">use</span> <span class="ident">url</span>::<span class="ident">Url</span>;
+<span class="kw">use</span> <span class="ident">url::Url</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">ConnectionStage</span>,
@@ -866,18 +866,18 @@
     <span class="ident">WebSocketGatewayClientExt</span>,
     <span class="ident">WsStream</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">GatewayIntents</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">GatewayIntents</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">ws_impl</span>::<span class="ident">create_native_tls_client</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::ws_impl::create_native_tls_client</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">ws_impl</span>::<span class="ident">create_rustls_client</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::ws_impl::create_rustls_client</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{
     <span class="ident">event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>},
-    <span class="ident">gateway</span>::<span class="ident">Activity</span>,
-    <span class="ident">id</span>::<span class="ident">GuildId</span>,
-    <span class="ident">user</span>::<span class="ident">OnlineStatus</span>,
+    <span class="ident">gateway::Activity</span>,
+    <span class="ident">id::GuildId</span>,
+    <span class="ident">user::OnlineStatus</span>,
 };
 
 <span class="doccomment">/// A Shard is a higher-level handler for a websocket connection to Discord&#39;s</span>
@@ -994,12 +994,12 @@
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">current_presence</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="ident">OnlineStatus</span>::<span class="ident">Online</span>);
+        <span class="kw">let</span> <span class="ident">current_presence</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="ident">OnlineStatus::Online</span>);
         <span class="kw">let</span> <span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
         <span class="kw">let</span> <span class="ident">heartbeat_interval</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="ident">last_heartbeat_acknowledged</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="kw">let</span> <span class="ident">seq</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Handshake</span>;
+        <span class="kw">let</span> <span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Handshake</span>;
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">Shard</span> {
@@ -1011,7 +1011,7 @@
             <span class="ident">last_heartbeat_acknowledged</span>,
             <span class="ident">seq</span>,
             <span class="ident">stage</span>,
-            <span class="ident">started</span>: <span class="ident">Instant</span>::<span class="ident">now</span>(),
+            <span class="ident">started</span>: <span class="ident">Instant::now</span>(),
             <span class="ident">token</span>: <span class="ident">token</span>.<span class="ident">to_string</span>(),
             <span class="ident">session_id</span>,
             <span class="ident">shard_info</span>,
@@ -1072,14 +1072,14 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_heartbeat</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">seq</span>)).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">heartbeat_instants</span>.<span class="number">0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant</span>::<span class="ident">now</span>());
+                <span class="self">self</span>.<span class="ident">heartbeat_instants</span>.<span class="number">0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
                 <span class="self">self</span>.<span class="ident">last_heartbeat_acknowledged</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
                 <span class="prelude-val">Ok</span>(())
             },
             <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="ident">why</span> {
-                    <span class="ident">Error</span>::<span class="ident">Tungstenite</span>(<span class="ident">TungsteniteError</span>::<span class="ident">Io</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">Error::Tungstenite</span>(<span class="ident">TungsteniteError::Io</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">raw_os_error</span>() <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">32</span>) {
                             <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Err heartbeating: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>, <span class="ident">err</span>);
                         }
@@ -1089,7 +1089,7 @@
                     },
                 }
 
-                <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">HeartbeatFailed</span>))
+                <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::HeartbeatFailed</span>))
             },
         }
     }
@@ -1130,8 +1130,8 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
-        <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Offline</span> {
-            <span class="ident">status</span> <span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Invisible</span>;
+        <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus::Offline</span> {
+            <span class="ident">status</span> <span class="op">=</span> <span class="ident">OnlineStatus::Invisible</span>;
         }
 
         <span class="self">self</span>.<span class="ident">current_presence</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">status</span>;
@@ -1189,18 +1189,18 @@
         }
 
         <span class="kw">match</span> <span class="ident">event</span> {
-            <span class="ident">Event</span>::<span class="ident">Ready</span>(<span class="kw-2">ref</span> <span class="ident">ready</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::Ready</span>(<span class="kw-2">ref</span> <span class="ident">ready</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Received Ready&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
                 <span class="self">self</span>.<span class="ident">session_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ready</span>.<span class="ident">ready</span>.<span class="ident">session_id</span>.<span class="ident">clone</span>());
-                <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Connected</span>;
+                <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connected</span>;
             },
-            <span class="ident">Event</span>::<span class="ident">Resumed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::Resumed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Resumed&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
-                <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Connected</span>;
+                <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connected</span>;
                 <span class="self">self</span>.<span class="ident">last_heartbeat_acknowledged</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="self">self</span>.<span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">Some</span>(<span class="ident">Instant</span>::<span class="ident">now</span>()), <span class="prelude-val">None</span>);
+                <span class="self">self</span>.<span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>()), <span class="prelude-val">None</span>);
             },
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
         }
@@ -1221,21 +1221,21 @@
                 <span class="self">self</span>.<span class="ident">shard_info</span>, <span class="ident">s</span>, <span class="self">self</span>.<span class="ident">seq</span>
             );
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Handshake</span> {
-                <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Identifying</span>;
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage::Handshake</span> {
+                <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Identifying</span>;
 
-                <span class="kw">return</span> <span class="ident">ShardAction</span>::<span class="ident">Identify</span>;
+                <span class="kw">return</span> <span class="ident">ShardAction::Identify</span>;
             } <span class="kw">else</span> {
                 <span class="macro">warn!</span>(
                     <span class="string">&quot;[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting&quot;</span>,
                     <span class="self">self</span>.<span class="ident">shard_info</span>
                 );
 
-                <span class="kw">return</span> <span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="self">self</span>.<span class="ident">reconnection_type</span>());
+                <span class="kw">return</span> <span class="ident">ShardAction::Reconnect</span>(<span class="self">self</span>.<span class="ident">reconnection_type</span>());
             }
         }
 
-        <span class="ident">ShardAction</span>::<span class="ident">Heartbeat</span>
+        <span class="ident">ShardAction::Heartbeat</span>
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
@@ -1247,63 +1247,63 @@
         <span class="kw">let</span> <span class="ident">clean</span> <span class="op">=</span> <span class="ident">num</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">1000</span>);
 
         <span class="kw">match</span> <span class="ident">num</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">UNKNOWN_OPCODE</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::UNKNOWN_OPCODE</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Sent invalid opcode.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">DECODE_ERROR</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::DECODE_ERROR</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Sent invalid message.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">NOT_AUTHENTICATED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::NOT_AUTHENTICATED</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Sent no authentication.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">NoAuthentication</span>));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::NoAuthentication</span>));
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">AUTHENTICATION_FAILED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::AUTHENTICATION_FAILED</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">error!</span>(
                     <span class="string">&quot;[Shard {:?}] Sent invalid authentication, please check the token.&quot;</span>,
                     <span class="self">self</span>.<span class="ident">shard_info</span>
                 );
 
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">InvalidAuthentication</span>));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::InvalidAuthentication</span>));
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">ALREADY_AUTHENTICATED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::ALREADY_AUTHENTICATED</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Already authenticated.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">INVALID_SEQUENCE</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::INVALID_SEQUENCE</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Sent invalid seq: {}.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>, <span class="self">self</span>.<span class="ident">seq</span>);
 
                 <span class="self">self</span>.<span class="ident">seq</span> <span class="op">=</span> <span class="number">0</span>;
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">RATE_LIMITED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::RATE_LIMITED</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Gateway ratelimited.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">INVALID_SHARD</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::INVALID_SHARD</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Sent invalid shard data.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">InvalidShardData</span>));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::InvalidShardData</span>));
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">SHARDING_REQUIRED</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::SHARDING_REQUIRED</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">error!</span>(<span class="string">&quot;[Shard {:?}] Shard has too many guilds.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">OverloadedShard</span>));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::OverloadedShard</span>));
             },
-            <span class="prelude-val">Some</span>(<span class="number">4006</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">SESSION_TIMEOUT</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="number">4006</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">close_codes::SESSION_TIMEOUT</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Invalid session.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
                 <span class="self">self</span>.<span class="ident">session_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">INVALID_GATEWAY_INTENTS</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::INVALID_GATEWAY_INTENTS</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">error!</span>(<span class="string">&quot;[Shard {:?}] Invalid gateway intents have been provided.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">InvalidGatewayIntents</span>));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::InvalidGatewayIntents</span>));
             },
-            <span class="prelude-val">Some</span>(<span class="ident">close_codes</span>::<span class="ident">DISALLOWED_GATEWAY_INTENTS</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">close_codes::DISALLOWED_GATEWAY_INTENTS</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">error!</span>(
                     <span class="string">&quot;[Shard {:?}] Disallowed gateway intents have been provided.&quot;</span>,
                     <span class="self">self</span>.<span class="ident">shard_info</span>
                 );
 
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">DisallowedGatewayIntents</span>));
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::DisallowedGatewayIntents</span>));
             },
             <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">clean</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(
@@ -1317,13 +1317,13 @@
         }
 
         <span class="kw">let</span> <span class="ident">resume</span> <span class="op">=</span> <span class="ident">num</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="ident">close_codes</span>::<span class="ident">AUTHENTICATION_FAILED</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">session_id</span>.<span class="ident">is_some</span>())
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="ident">close_codes::AUTHENTICATION_FAILED</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">session_id</span>.<span class="ident">is_some</span>())
             .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>);
 
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="ident">resume</span> {
-            <span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="ident">ReconnectType</span>::<span class="ident">Resume</span>)
+            <span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Resume</span>)
         } <span class="kw">else</span> {
-            <span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="ident">ReconnectType</span>::<span class="ident">Reidentify</span>)
+            <span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Reidentify</span>)
         }))
     }
 
@@ -1357,22 +1357,22 @@
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GatewayEvent</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardAction</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">event</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent</span>::<span class="ident">Dispatch</span>(<span class="ident">seq</span>, <span class="kw-2">ref</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::Dispatch</span>(<span class="ident">seq</span>, <span class="kw-2">ref</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">handle_gateway_dispatch</span>(<span class="ident">seq</span>, <span class="ident">event</span>))
             },
-            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent</span>::<span class="ident">Heartbeat</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">handle_heartbeat_event</span>(<span class="ident">s</span>))),
-            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent</span>::<span class="ident">HeartbeatAck</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">heartbeat_instants</span>.<span class="number">1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant</span>::<span class="ident">now</span>());
+            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::Heartbeat</span>(<span class="ident">s</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">handle_heartbeat_event</span>(<span class="ident">s</span>))),
+            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::HeartbeatAck</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="self">self</span>.<span class="ident">heartbeat_instants</span>.<span class="number">1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
                 <span class="self">self</span>.<span class="ident">last_heartbeat_acknowledged</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
                 <span class="macro">trace!</span>(<span class="string">&quot;[Shard {:?}] Received heartbeat ack&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
             },
-            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent</span>::<span class="ident">Hello</span>(<span class="ident">interval</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::Hello</span>(<span class="ident">interval</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Received a Hello; interval: {}&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>, <span class="ident">interval</span>);
 
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Resuming</span> {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage::Resuming</span> {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
                 }
 
@@ -1380,32 +1380,32 @@
                     <span class="self">self</span>.<span class="ident">heartbeat_interval</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">interval</span>);
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Handshake</span> {
-                    <span class="ident">ShardAction</span>::<span class="ident">Identify</span>
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage::Handshake</span> {
+                    <span class="ident">ShardAction::Identify</span>
                 } <span class="kw">else</span> {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Received late Hello; autoreconnecting&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
-                    <span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="self">self</span>.<span class="ident">reconnection_type</span>())
+                    <span class="ident">ShardAction::Reconnect</span>(<span class="self">self</span>.<span class="ident">reconnection_type</span>())
                 }))
             },
-            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent</span>::<span class="ident">InvalidateSession</span>(<span class="ident">resumable</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::InvalidateSession</span>(<span class="ident">resumable</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Received session invalidation&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>,);
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="ident">resumable</span> {
-                    <span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="ident">ReconnectType</span>::<span class="ident">Resume</span>)
+                    <span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Resume</span>)
                 } <span class="kw">else</span> {
-                    <span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="ident">ReconnectType</span>::<span class="ident">Reidentify</span>)
+                    <span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Reidentify</span>)
                 }))
             },
-            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent</span>::<span class="ident">Reconnect</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="ident">ReconnectType</span>::<span class="ident">Resume</span>))),
-            <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">Closed</span>(<span class="kw-2">ref</span> <span class="ident">data</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::Reconnect</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Resume</span>))),
+            <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::Closed</span>(<span class="kw-2">ref</span> <span class="ident">data</span>))) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">handle_gateway_closed</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>)
             },
-            <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Tungstenite</span>(<span class="kw-2">ref</span> <span class="ident">why</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">Error::Tungstenite</span>(<span class="kw-2">ref</span> <span class="ident">why</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Websocket error: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>, <span class="ident">why</span>);
                 <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Will attempt to auto-reconnect&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="self">self</span>.<span class="ident">reconnection_type</span>())))
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardAction::Reconnect</span>(<span class="self">self</span>.<span class="ident">reconnection_type</span>())))
             },
             <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Unhandled error: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>, <span class="ident">why</span>);
@@ -1434,11 +1434,11 @@
             <span class="kw">let</span> <span class="ident">heartbeat_interval</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">heartbeat_interval</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">heartbeat_interval</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">heartbeat_interval</span>,
                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">return</span> <span class="self">self</span>.<span class="ident">started</span>.<span class="ident">elapsed</span>() <span class="op">&lt;</span> <span class="ident">StdDuration</span>::<span class="ident">from_secs</span>(<span class="number">15</span>);
+                    <span class="kw">return</span> <span class="self">self</span>.<span class="ident">started</span>.<span class="ident">elapsed</span>() <span class="op">&lt;</span> <span class="ident">StdDuration::from_secs</span>(<span class="number">15</span>);
                 },
             };
 
-            <span class="ident">StdDuration</span>::<span class="ident">from_secs</span>(<span class="ident">heartbeat_interval</span> <span class="op">/</span> <span class="number">1000</span>)
+            <span class="ident">StdDuration::from_secs</span>(<span class="ident">heartbeat_interval</span> <span class="op">/</span> <span class="number">1000</span>)
         };
 
         <span class="comment">// If a duration of time less than the heartbeat_interval has passed,</span>
@@ -1495,7 +1495,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`session_id`]: Self::session_id</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_reconnect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReconnectType</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Connecting</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage::Connecting</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
@@ -1504,9 +1504,9 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reconnection_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReconnectType</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">session_id</span>().<span class="ident">is_some</span>() {
-            <span class="ident">ReconnectType</span>::<span class="ident">Resume</span>
+            <span class="ident">ReconnectType::Resume</span>
         } <span class="kw">else</span> {
-            <span class="ident">ReconnectType</span>::<span class="ident">Reidentify</span>
+            <span class="ident">ReconnectType::Reidentify</span>
         }
     }
 
@@ -1593,8 +1593,8 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">identify</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_identify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="self">self</span>.<span class="ident">intents</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">heartbeat_instants</span>.<span class="number">0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant</span>::<span class="ident">now</span>());
-        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Identifying</span>;
+        <span class="self">self</span>.<span class="ident">heartbeat_instants</span>.<span class="number">0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
+        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Identifying</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1615,22 +1615,22 @@
         <span class="comment">//</span>
         <span class="comment">// This is used to accurately assess whether the state of the shard is</span>
         <span class="comment">// accurate when a Hello is received.</span>
-        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Connecting</span>;
-        <span class="self">self</span>.<span class="ident">started</span> <span class="op">=</span> <span class="ident">Instant</span>::<span class="ident">now</span>();
+        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connecting</span>;
+        <span class="self">self</span>.<span class="ident">started</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Handshake</span>;
+        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Handshake</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">client</span>)
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">Some</span>(<span class="ident">Instant</span>::<span class="ident">now</span>()), <span class="prelude-val">None</span>);
+        <span class="self">self</span>.<span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>()), <span class="prelude-val">None</span>);
         <span class="self">self</span>.<span class="ident">heartbeat_interval</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="self">self</span>.<span class="ident">last_heartbeat_acknowledged</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>.<span class="ident">session_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Disconnected</span>;
+        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Disconnected</span>;
         <span class="self">self</span>.<span class="ident">seq</span> <span class="op">=</span> <span class="number">0</span>;
     }
 
@@ -1639,13 +1639,13 @@
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Attempting to resume&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
         <span class="self">self</span>.<span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">initialize</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Resuming</span>;
+        <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Resuming</span>;
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">session_id</span>.<span class="ident">as_ref</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">session_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_resume</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="ident">session_id</span>, <span class="self">self</span>.<span class="ident">seq</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">NoSessionId</span>)),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::NoSessionId</span>)),
         }
     }
 
@@ -1680,10 +1680,10 @@
 }
 
 <span class="kw">fn</span> <span class="ident">build_gateway_url</span>(<span class="ident">base</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span> {
-    <span class="ident">Url</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}?v={}&quot;</span>, <span class="ident">base</span>, <span class="ident">constants</span>::<span class="ident">GATEWAY_VERSION</span>)).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
+    <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}?v={}&quot;</span>, <span class="ident">base</span>, <span class="ident">constants::GATEWAY_VERSION</span>)).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
         <span class="macro">warn!</span>(<span class="string">&quot;Error building gateway URL with base `{}`: {:?}&quot;</span>, <span class="ident">base</span>, <span class="ident">why</span>);
 
-        <span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">GatewayError</span>::<span class="ident">BuildingUrl</span>)
+        <span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::BuildingUrl</span>)
     })
 }
 </pre></div>

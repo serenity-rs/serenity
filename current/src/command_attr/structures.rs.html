@@ -648,16 +648,16 @@
 <span id="645">645</span>
 <span id="646">646</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>;
 <span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">ToTokens</span>};
 <span class="kw">use</span> <span class="ident">syn</span>::{
     <span class="ident">braced</span>,
     <span class="ident">parse</span>::{<span class="ident">Error</span>, <span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">punctuated</span>::<span class="ident">Punctuated</span>,
-    <span class="ident">spanned</span>::<span class="ident">Spanned</span>,
+    <span class="ident">punctuated::Punctuated</span>,
+    <span class="ident">spanned::Spanned</span>,
     <span class="ident">Attribute</span>,
     <span class="ident">Block</span>,
     <span class="ident">Expr</span>,
@@ -672,8 +672,8 @@
     <span class="ident">Visibility</span>,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">consts</span>::<span class="ident">CHECK</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="self">self</span>, <span class="ident">Argument</span>, <span class="ident">AsOption</span>, <span class="ident">IdentExt2</span>, <span class="ident">Parenthesised</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::consts::CHECK</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::util</span>::{<span class="self">self</span>, <span class="ident">Argument</span>, <span class="ident">AsOption</span>, <span class="ident">IdentExt2</span>, <span class="ident">Parenthesised</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OnlyIn</span> {
@@ -686,20 +686,20 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;guilds&quot;</span> <span class="op">|</span> <span class="string">&quot;guild&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OnlyIn</span>::<span class="ident">Guild</span>),
-            <span class="string">&quot;dms&quot;</span> <span class="op">|</span> <span class="string">&quot;dm&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OnlyIn</span>::<span class="ident">Dm</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">span</span>, <span class="string">&quot;invalid restriction type&quot;</span>)),
+            <span class="string">&quot;guilds&quot;</span> <span class="op">|</span> <span class="string">&quot;guild&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OnlyIn::Guild</span>),
+            <span class="string">&quot;dms&quot;</span> <span class="op">|</span> <span class="string">&quot;dm&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">OnlyIn::Dm</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">span</span>, <span class="string">&quot;invalid restriction type&quot;</span>)),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ToTokens</span> <span class="kw">for</span> <span class="ident">OnlyIn</span> {
     <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TokenStream2</span>) {
-        <span class="kw">let</span> <span class="ident">only_in_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">OnlyIn</span>);
+        <span class="kw">let</span> <span class="ident">only_in_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::OnlyIn</span>);
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OnlyIn</span>::<span class="ident">Dm</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path</span>::<span class="ident">Dm</span>)),
-            <span class="ident">OnlyIn</span>::<span class="ident">Guild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path</span>::<span class="ident">Guild</span>)),
-            <span class="ident">OnlyIn</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path</span>::<span class="prelude-val">None</span>)),
+            <span class="ident">OnlyIn::Dm</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::Dm</span>)),
+            <span class="ident">OnlyIn::Guild</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::Guild</span>)),
+            <span class="ident">OnlyIn::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">only_in_path::None</span>)),
         }
     }
 }
@@ -707,18 +707,18 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">OnlyIn</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">OnlyIn</span>::<span class="prelude-val">None</span>
+        <span class="ident">OnlyIn::None</span>
     }
 }
 
 <span class="kw">fn</span> <span class="ident">parse_argument</span>(<span class="ident">arg</span>: <span class="ident">FnArg</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">arg</span> {
-        <span class="ident">FnArg</span>::<span class="ident">Typed</span>(<span class="ident">typed</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">FnArg::Typed</span>(<span class="ident">typed</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">pat</span> <span class="op">=</span> <span class="ident">typed</span>.<span class="ident">pat</span>;
             <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">typed</span>.<span class="ident">ty</span>;
 
             <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">pat</span> {
-                <span class="ident">Pat</span>::<span class="ident">Ident</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Pat::Ident</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">ident</span>;
                     <span class="kw">let</span> <span class="ident">mutable</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">mutability</span>;
 
@@ -728,10 +728,10 @@
                         <span class="ident">kind</span>: <span class="kw-2">*</span><span class="ident">kind</span>,
                     })
                 },
-                <span class="ident">Pat</span>::<span class="ident">Wild</span>(<span class="ident">wild</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">Pat::Wild</span>(<span class="ident">wild</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">wild</span>.<span class="ident">underscore_token</span>;
 
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Ident</span>::<span class="ident">new</span>(<span class="string">&quot;_&quot;</span>, <span class="ident">token</span>.<span class="ident">spans</span>[<span class="number">0</span>]);
+                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="string">&quot;_&quot;</span>, <span class="ident">token</span>.<span class="ident">spans</span>[<span class="number">0</span>]);
 
                     <span class="prelude-val">Ok</span>(<span class="ident">Argument</span> {
                         <span class="ident">mutable</span>: <span class="prelude-val">None</span>,
@@ -739,11 +739,11 @@
                         <span class="ident">kind</span>: <span class="kw-2">*</span><span class="ident">kind</span>,
                     })
                 },
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">pat</span>.<span class="ident">span</span>(), <span class="macro">format_args!</span>(<span class="string">&quot;unsupported pattern: {:?}&quot;</span>, <span class="ident">pat</span>))),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">pat</span>.<span class="ident">span</span>(), <span class="macro">format_args!</span>(<span class="string">&quot;unsupported pattern: {:?}&quot;</span>, <span class="ident">pat</span>))),
             }
         },
-        <span class="ident">FnArg</span>::<span class="ident">Receiver</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">arg</span>.<span class="ident">span</span>(), <span class="macro">format_args!</span>(<span class="string">&quot;`self` arguments are prohibited: {:?}&quot;</span>, <span class="ident">arg</span>)))
+        <span class="ident">FnArg::Receiver</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">arg</span>.<span class="ident">span</span>(), <span class="macro">format_args!</span>(<span class="string">&quot;`self` arguments are prohibited: {:?}&quot;</span>, <span class="ident">arg</span>)))
         },
     }
 }
@@ -762,7 +762,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns a vector of cooked attributes that have been removed from the input vector.</span>
 <span class="kw">fn</span> <span class="ident">remove_cooked</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="comment">// FIXME: Replace with `Vec::drain_filter` once it is stable.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
@@ -794,10 +794,10 @@
 
 <span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">CommandFun</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">Attribute</span>::<span class="ident">parse_outer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">Attribute::parse_outer</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// Rename documentation comment attributes (`#[doc = &quot;...&quot;]`) to `#[description = &quot;...&quot;]`.</span>
-        <span class="ident">util</span>::<span class="ident">rename_attributes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>, <span class="string">&quot;doc&quot;</span>, <span class="string">&quot;description&quot;</span>);
+        <span class="ident">util::rename_attributes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>, <span class="string">&quot;doc&quot;</span>, <span class="string">&quot;description&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">remove_cooked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>);
 
@@ -812,8 +812,8 @@
         <span class="kw">let</span> <span class="ident">Parenthesised</span>(<span class="ident">args</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Parenthesised</span><span class="op">&lt;</span><span class="ident">FnArg</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ReturnType</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-            <span class="ident">ReturnType</span>::<span class="ident">Type</span>(<span class="kw">_</span>, <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">clone</span>(),
-            <span class="ident">ReturnType</span>::<span class="ident">Default</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">clone</span>(),
+            <span class="ident">ReturnType::Default</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">input</span>
                     .<span class="ident">error</span>(<span class="string">&quot;expected a result type of either `CommandResult` or `CheckResult`&quot;</span>))
             },
@@ -822,7 +822,7 @@
         <span class="comment">// { ... }</span>
         <span class="kw">let</span> <span class="ident">bcont</span>;
         <span class="macro">braced!</span>(<span class="ident">bcont</span> <span class="kw">in</span> <span class="ident">input</span>);
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">bcont</span>.<span class="ident">call</span>(<span class="ident">Block</span>::<span class="ident">parse_within</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">bcont</span>.<span class="ident">call</span>(<span class="ident">Block::parse_within</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">parse_argument</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
@@ -893,13 +893,13 @@
 
 <span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Hook</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">Attribute</span>::<span class="ident">parse_outer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">Attribute::parse_outer</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">remove_cooked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>);
 
         <span class="kw">if</span> <span class="ident">is_function</span>(<span class="ident">input</span>) {
-            <span class="ident">parse_function_hook</span>(<span class="ident">input</span>, <span class="ident">attributes</span>, <span class="ident">cooked</span>).<span class="ident">map</span>(<span class="self">Self</span>::<span class="ident">Function</span>)
+            <span class="ident">parse_function_hook</span>(<span class="ident">input</span>, <span class="ident">attributes</span>, <span class="ident">cooked</span>).<span class="ident">map</span>(<span class="self">Self</span><span class="ident">::Function</span>)
         } <span class="kw">else</span> {
-            <span class="ident">parse_closure_hook</span>(<span class="ident">input</span>, <span class="ident">attributes</span>, <span class="ident">cooked</span>).<span class="ident">map</span>(<span class="self">Self</span>::<span class="ident">Closure</span>)
+            <span class="ident">parse_closure_hook</span>(<span class="ident">input</span>, <span class="ident">attributes</span>, <span class="ident">cooked</span>).<span class="ident">map</span>(<span class="self">Self</span><span class="ident">::Closure</span>)
         }
     }
 }
@@ -924,16 +924,16 @@
     <span class="kw">let</span> <span class="ident">Parenthesised</span>(<span class="ident">args</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Parenthesised</span><span class="op">&lt;</span><span class="ident">FnArg</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ReturnType</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-        <span class="ident">ReturnType</span>::<span class="ident">Type</span>(<span class="kw">_</span>, <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">clone</span>(),
-        <span class="ident">ReturnType</span>::<span class="ident">Default</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Type</span>::<span class="ident">Verbatim</span>(<span class="ident">TokenStream2</span>::<span class="ident">from_str</span>(<span class="string">&quot;()&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid str to create `()`-type&quot;</span>))
+        <span class="ident">ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">clone</span>(),
+        <span class="ident">ReturnType::Default</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Type::Verbatim</span>(<span class="ident">TokenStream2::from_str</span>(<span class="string">&quot;()&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid str to create `()`-type&quot;</span>))
         },
     };
 
     <span class="comment">// { ... }</span>
     <span class="kw">let</span> <span class="ident">bcont</span>;
     <span class="macro">braced!</span>(<span class="ident">bcont</span> <span class="kw">in</span> <span class="ident">input</span>);
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">bcont</span>.<span class="ident">call</span>(<span class="ident">Block</span>::<span class="ident">parse_within</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">bcont</span>.<span class="ident">call</span>(<span class="ident">Block::parse_within</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">parse_argument</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
@@ -1012,7 +1012,7 @@
     <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TokenStream2</span>) {
         <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
 
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">permissions</span>::<span class="ident">Permissions</span>);
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::model::permissions::Permissions</span>);
 
         <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
             #<span class="ident">path</span> { <span class="ident">bits</span>: #<span class="ident">bits</span> }
@@ -1061,7 +1061,7 @@
                     <span class="kw">return</span> <span class="prelude-val">None</span>;
                 }
 
-                <span class="ident">u32</span>::<span class="ident">from_str_radix</span>(<span class="ident">s</span>, <span class="number">16</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>
+                <span class="ident">u32::from_str_radix</span>(<span class="ident">s</span>, <span class="number">16</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>
             },
         };
 
@@ -1072,7 +1072,7 @@
 <span class="kw">impl</span> <span class="ident">ToTokens</span> <span class="kw">for</span> <span class="ident">Colour</span> {
     <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TokenStream2</span>) {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">Colour</span>);
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::utils::Colour</span>);
 
         <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
             #<span class="ident">path</span>(#<span class="ident">value</span>)
@@ -1116,7 +1116,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">help_available</span>: <span class="bool-val">true</span>,
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         }
     }
 }
@@ -1131,9 +1131,9 @@
 <span class="kw">impl</span> <span class="ident">HelpBehaviour</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-            <span class="string">&quot;strike&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
-            <span class="string">&quot;hide&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>,
-            <span class="string">&quot;nothing&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>,
+            <span class="string">&quot;strike&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour::Strike</span>,
+            <span class="string">&quot;hide&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour::Hide</span>,
+            <span class="string">&quot;nothing&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour::Nothing</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
         })
     }
@@ -1141,11 +1141,11 @@
 
 <span class="kw">impl</span> <span class="ident">ToTokens</span> <span class="kw">for</span> <span class="ident">HelpBehaviour</span> {
     <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TokenStream2</span>) {
-        <span class="kw">let</span> <span class="ident">help_behaviour_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">HelpBehaviour</span>);
+        <span class="kw">let</span> <span class="ident">help_behaviour_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::HelpBehaviour</span>);
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path</span>::<span class="ident">Strike</span>)),
-            <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path</span>::<span class="ident">Hide</span>)),
-            <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path</span>::<span class="ident">Nothing</span>)),
+            <span class="ident">HelpBehaviour::Strike</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Strike</span>)),
+            <span class="ident">HelpBehaviour::Hide</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Hide</span>)),
+            <span class="ident">HelpBehaviour::Nothing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">help_behaviour_path::Nothing</span>)),
         }
     }
 }
@@ -1206,13 +1206,13 @@
             <span class="ident">group_prefix</span>: <span class="string">&quot;Prefix&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">strikethrough_commands_tip_in_dm</span>: <span class="prelude-val">None</span>,
             <span class="ident">strikethrough_commands_tip_in_guild</span>: <span class="prelude-val">None</span>,
-            <span class="ident">lacking_role</span>: <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
-            <span class="ident">lacking_permissions</span>: <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
-            <span class="ident">lacking_ownership</span>: <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>,
-            <span class="ident">lacking_conditions</span>: <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
-            <span class="ident">wrong_channel</span>: <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
-            <span class="ident">embed_error_colour</span>: <span class="ident">Colour</span>::<span class="ident">from_str</span>(<span class="string">&quot;DARK_RED&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">embed_success_colour</span>: <span class="ident">Colour</span>::<span class="ident">from_str</span>(<span class="string">&quot;ROSEWATER&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">lacking_role</span>: <span class="ident">HelpBehaviour::Strike</span>,
+            <span class="ident">lacking_permissions</span>: <span class="ident">HelpBehaviour::Strike</span>,
+            <span class="ident">lacking_ownership</span>: <span class="ident">HelpBehaviour::Hide</span>,
+            <span class="ident">lacking_conditions</span>: <span class="ident">HelpBehaviour::Strike</span>,
+            <span class="ident">wrong_channel</span>: <span class="ident">HelpBehaviour::Strike</span>,
+            <span class="ident">embed_error_colour</span>: <span class="ident">Colour::from_str</span>(<span class="string">&quot;DARK_RED&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">embed_success_colour</span>: <span class="ident">Colour::from_str</span>(<span class="string">&quot;ROSEWATER&quot;</span>).<span class="ident">unwrap</span>(),
             <span class="ident">max_levenshtein_distance</span>: <span class="number">0</span>,
             <span class="ident">indention_prefix</span>: <span class="string">&quot;-&quot;</span>.<span class="ident">to_string</span>(),
         }
@@ -1229,9 +1229,9 @@
 
 <span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">GroupStruct</span> {
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">Attribute</span>::<span class="ident">parse_outer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">Attribute::parse_outer</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">util</span>::<span class="ident">rename_attributes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>, <span class="string">&quot;doc&quot;</span>, <span class="string">&quot;description&quot;</span>);
+        <span class="ident">util::rename_attributes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>, <span class="string">&quot;doc&quot;</span>, <span class="string">&quot;description&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">remove_cooked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">attributes</span>);
 
@@ -1290,7 +1290,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">help_available</span>: <span class="bool-val">true</span>,
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         }
     }
 }

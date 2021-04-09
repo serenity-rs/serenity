@@ -60,9 +60,9 @@ the guild or if the guild is otherwise unavailable.</p>
 <p>Create a voice channel in a guild with the name <code>test</code>:</p>
 
 <div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">ChannelType</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::ChannelType</span>;
 
-<span class="ident">guild</span>.<span class="ident">create_channel</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">kind</span>(<span class="ident">ChannelType</span>::<span class="ident">Voice</span>));</pre></div>
+<span class="ident">guild</span>.<span class="ident">create_channel</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">kind</span>(<span class="ident">ChannelType::Voice</span>));</pre></div>
 <h1 id="errors-4" class="section-header"><a href="#errors-4">Errors</a></h1>
 <p>Returns <a href="../../../serenity/prelude/enum.SerenityError.html#variant.Http" title="Error::Http"><code>Error::Http</code></a> if the current user lacks permission,
 or if invalid data was given, such as the channel name being
@@ -135,7 +135,7 @@ permission restrictions.</p>
 <p>Mute a member and set their roles to just one role with a predefined Id:</p>
 
 <div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">GuildId</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::GuildId</span>;
 
 <span class="ident">GuildId</span>(<span class="number">7</span>).<span class="ident">edit_member</span>(<span class="ident">user_id</span>, <span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">mute</span>(<span class="bool-val">true</span>).<span class="ident">roles</span>(<span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="ident">role_id</span>])).<span class="kw">await</span>;</pre></div>
 <h1 id="errors-14" class="section-header"><a href="#errors-14">Errors</a></h1>
@@ -238,12 +238,12 @@ them.</p>
 <p>Obtain a reference to a <a href="../../../serenity/model/guild/struct.Role.html" title="Role"><code>Role</code></a> by its name.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">serenity::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
-<span class="attribute">#[<span class="ident">serenity</span>::<span class="ident">async_trait</span>]</span>
+<span class="attribute">#[<span class="ident">serenity::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
@@ -256,7 +256,7 @@ them.</p>
     }
 }
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span><span class="ident">Client</span>::<span class="ident">builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span><span class="ident">Client::builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.await_reply" class="method"><code>pub fn <a href="#method.await_reply" class="fnname">await_reply</a>&lt;'a&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;shard_messenger: &amp;'a impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="../../../serenity/client/bridge/gateway/struct.ShardMessenger.html" title="struct serenity::client::bridge::gateway::ShardMessenger">ShardMessenger</a>&gt;<br>) -&gt; <a class="struct" href="../../../serenity/collector/message_collector/struct.CollectReply.html" title="struct serenity::collector::message_collector::CollectReply">CollectReply</a>&lt;'a&gt;<span class="notable-traits"><span class="notable-traits-tooltip">ⓘ<div class="notable-traits-tooltiptext"><span class="docblock"><h3 class="notable">Notable traits for <a class="struct" href="../../../serenity/collector/message_collector/struct.CollectReply.html" title="struct serenity::collector::message_collector::CollectReply">CollectReply</a>&lt;'a&gt;</h3><code class="content"><span class="where fmt-newline">impl&lt;'a&gt; <a class="trait" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="trait core::future::future::Future">Future</a> for <a class="struct" href="../../../serenity/collector/message_collector/struct.CollectReply.html" title="struct serenity::collector::message_collector::CollectReply">CollectReply</a>&lt;'a&gt;</span><span class="where fmt-newline">    type <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html#associatedtype.Output" class="type">Output</a> = <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../../../serenity/model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;&gt;;</span></code></span></div></span></span></code><a class="srclink" href="../../../src/serenity/model/guild/partial_guild.rs.html#819-824" title="goto source code">[src]</a></h4><div class="item-info"><div class="stab portability">This is supported on <strong>crate feature <code>collector</code></strong> only.</div></div><div class="docblock"><p>Returns a future that will await one message sent in this guild.</p>
