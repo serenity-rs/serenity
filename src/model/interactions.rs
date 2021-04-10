@@ -395,7 +395,8 @@ impl Interaction {
             .await
     }
 
-    /// Creates several application commands
+    /// Same as create_global_application_command but allows
+    /// to create more than one global command per call.
     pub async fn create_global_application_commands<F>(
         http: impl AsRef<Http>,
         application_id: ApplicationId,
@@ -413,7 +414,7 @@ impl Interaction {
             .await
     }
 
-    /// Edits a command by its Id
+    /// Edits a global command by its Id.
     pub async fn edit_global_application_command<F>(
         http: impl AsRef<Http>,
         application_id: ApplicationId,
@@ -434,8 +435,6 @@ impl Interaction {
     }
 
     /// Get all global commands
-    ///
-    /// # Errors
     pub async fn get_global_application_commands(
         http: impl AsRef<Http>,
         application_id: ApplicationId,
