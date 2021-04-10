@@ -337,7 +337,7 @@ pub enum Route {
     /// [`ApplicationId`]: crate::model::id::ApplicationId
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    ApplicationsIdGuildsIdCommandIdPermission(u64),
+    ApplicationsIdGuildsIdCommandIdPermissions(u64),
     /// Route for the `/applications/:application_id/guilds/:guild_id` path.
     ///
     /// The data is the relevant [`ApplicationId`].
@@ -1141,9 +1141,10 @@ pub enum RouteInfo<'a> {
     },
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    GetGuildApplicationCommandPermission {
+    GetGuildApplicationCommandPermissions {
         application_id: u64,
         guild_id: u64,
+        command_id: u64,
     },
     GetGuildEmbed {
         guild_id: u64,
@@ -1652,7 +1653,7 @@ impl<'a> RouteInfo<'a> {
                 command_id,
             } => (
                 LightMethod::Put,
-                Route::ApplicationsIdGuildsIdCommandIdPermission(application_id),
+                Route::ApplicationsIdGuildsIdCommandIdPermissions(application_id),
                 Cow::from(Route::application_guild_command_permissions(
                     application_id,
                     guild_id,
@@ -1908,13 +1909,18 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            RouteInfo::GetGuildApplicationCommandPermission {
+            RouteInfo::GetGuildApplicationCommandPermissions {
                 application_id,
                 guild_id,
+                command_id,
             } => (
                 LightMethod::Get,
-                Route::ApplicationsIdGuildsIdCommandIdPermission(application_id),
-                Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
+                Route::ApplicationsIdGuildsIdCommandIdPermissions(application_id),
+                Cow::from(Route::application_guild_command_permissions(
+                    application_id,
+                    guild_id,
+                    command_id,
+                )),
             ),
             RouteInfo::GetGuildEmbed {
                 guild_id,

@@ -23,7 +23,7 @@ pub struct Integration {
     pub application: Option<IntegrationApplication>,
 }
 
-/// The type of an application command option.
+/// The behavior once the integration expires.
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]

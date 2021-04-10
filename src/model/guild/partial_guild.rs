@@ -226,11 +226,13 @@ impl PartialGuild {
         self.id.create_integration(&http, integration_id, kind).await
     }
 
-    /// Creates a new [`ApplicationCommand`] for the guild.
+    /// Creates a guild specific [`ApplicationCommand`]
     ///
-    /// See the documentation for [`Interaction::create_global_application_command`] on how to use this.
+    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
     ///
-    /// **Note**: `application_id` is usually the bot's id, unless it's a very old bot.
+    /// # Errors
+    ///
+    /// Returns the same possible errors as `create_global_application_command`.
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
     #[cfg(feature = "unstable_discord_api")]
@@ -249,7 +251,8 @@ impl PartialGuild {
         self.id.create_application_command(http, application_id, f).await
     }
 
-    /// Bulk create guild application commands
+    /// Same as create_application_command, but allows to create more
+    /// than one command per call.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_commands<F>(
@@ -264,15 +267,11 @@ impl PartialGuild {
         self.id.create_application_commands(http, application_id, f).await
     }
 
-    /// Creates a guild specific [`ApplicationCommandPermission`]
+    /// Creates a guild specific [`ApplicationCommandPermission`].
     ///
-    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    /// **Note**: It will update instantly.
     ///
-    /// # Errors
-    ///
-    /// Returns the same possible errors as `create_global_application_command`.
-    ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`ApplicationCommandPermission`]: crate::model::interactions::ApplicationCommandPermission
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_command_permission<F>(
@@ -288,15 +287,8 @@ impl PartialGuild {
         self.id.create_application_command_permission(http, application_id, command_id, f).await
     }
 
-    /// Creates guild specifics [`ApplicationCommandPermission`]
-    ///
-    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
-    ///
-    /// # Errors
-    ///
-    /// Returns the same possible errors as `create_global_application_command`.
-    ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// Same as create_application_command_permission but allows to create
+    /// more than one permission per call
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_commands_permissions<F>(
@@ -312,12 +304,6 @@ impl PartialGuild {
     }
 
     /// Get all guild application commands.
-    ///
-    /// # Errors
-    ///
-    /// Can return [`Error::Json`] if it cannot deserialize commands.
-    ///
-    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_application_commands(
@@ -328,13 +314,7 @@ impl PartialGuild {
         self.id.get_application_commands(http, application_id).await
     }
 
-    /// Get guild application command by its Id.
-    ///
-    /// # Errors
-    ///
-    /// Can return [`Error::Json`] if it cannot deserialize commands.
-    ///
-    /// [`Error::Json`]: crate::error::Error::Json
+    /// Get a specific guild application command by its Id.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_application_command(
@@ -375,12 +355,6 @@ impl PartialGuild {
     }
 
     /// Get all guild application commands permissions only.
-    ///
-    /// # Errors
-    ///
-    /// Can return [`Error::Json`] if it cannot deserialize commands.
-    ///
-    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_application_commands_permissions(
@@ -389,6 +363,18 @@ impl PartialGuild {
         application_id: ApplicationId,
     ) -> Result<Vec<ApplicationCommandPermission>> {
         self.id.get_application_commands_permissions(http, application_id).await
+    }
+
+    /// Get permissions for specific guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_command_permissions(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: ApplicationId,
+        command_id: CommandId,
+    ) -> Result<ApplicationCommandPermission> {
+        self.id.get_application_command_permissions(http, application_id, command_id).await
     }
 
     /// Creates a new role in the guild with the data set, if any.

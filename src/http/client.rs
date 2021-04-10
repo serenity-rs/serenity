@@ -1955,13 +1955,15 @@ impl Http {
         &self,
         application_id: u64,
         guild_id: u64,
+        command_id: u64,
     ) -> Result<ApplicationCommandPermission> {
         self.fire(Request {
             body: None,
             headers: None,
-            route: RouteInfo::GetGuildApplicationCommandPermission {
+            route: RouteInfo::GetGuildApplicationCommandPermissions {
                 application_id,
                 guild_id,
+                command_id,
             },
         })
         .await
