@@ -28,9 +28,10 @@ pub struct Interaction {
     #[serde(rename = "type")]
     pub kind: InteractionType,
     pub data: Option<ApplicationCommandInteractionData>,
-    pub guild_id: GuildId,
-    pub channel_id: ChannelId,
-    pub member: Member,
+    pub guild_id: Option<GuildId>,
+    pub channel_id: Option<ChannelId>,
+    pub member: Option<Member>,
+    pub user: Option<User>,
     pub token: String,
     pub version: u8,
 }
@@ -65,23 +66,45 @@ impl<'de> Deserialize<'de> for Interaction {
             None => None,
         };
 
-        let guild_id = map
-            .remove("guild_id")
-            .ok_or_else(|| DeError::custom("expected guild_id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
+        let guild_id = match map.contains_key("guild_id") {
+            true => Some(
+                map.remove("guild_id")
+                    .ok_or_else(|| DeError::custom("expected guild_id"))
+                    .and_then(GuildId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
 
-        let channel_id = map
-            .remove("channel_id")
-            .ok_or_else(|| DeError::custom("expected channel_id"))
-            .and_then(ChannelId::deserialize)
-            .map_err(DeError::custom)?;
+        let channel_id = match map.contains_key("channel_id") {
+            true => Some(
+                map.remove("channel_id")
+                    .ok_or_else(|| DeError::custom("expected channel_id"))
+                    .and_then(ChannelId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
 
-        let member = map
-            .remove("member")
-            .ok_or_else(|| DeError::custom("expected member"))
-            .and_then(Member::deserialize)
-            .map_err(DeError::custom)?;
+        let member = match map.contains_key("member") {
+            true => Some(
+                map.remove("member")
+                    .ok_or_else(|| DeError::custom("expected member"))
+                    .and_then(Member::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let user = match map.contains_key("user") {
+            true => Some(
+                map.remove("user")
+                    .ok_or_else(|| DeError::custom("expected user"))
+                    .and_then(User::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
 
         let token = map
             .remove("token")
@@ -102,6 +125,7 @@ impl<'de> Deserialize<'de> for Interaction {
             guild_id,
             channel_id,
             member,
+            user,
             token,
             version,
         })
