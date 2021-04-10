@@ -169,7 +169,7 @@ pub struct ApplicationCommandInteractionDataOption {
     pub options: Vec<ApplicationCommandInteractionDataOption>,
 }
 
-fn default_permission() -> bool {
+fn default_permission_value() -> bool {
     true
 }
 
@@ -183,7 +183,7 @@ pub struct ApplicationCommand {
     pub description: String,
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
-    #[serde(default = "self::default_permission")]
+    #[serde(default = "self::default_permission_value")]
     pub default_permission: bool,
 }
 
@@ -205,7 +205,7 @@ pub struct ApplicationCommandOption {
     pub options: Vec<ApplicationCommandOption>,
 }
 
-/// The permissions data.
+/// An application command permission.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandPermission {
