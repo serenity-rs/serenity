@@ -264,3 +264,6 @@ jobs:
       - name: 'Build example 13'
         working-directory: examples
         run: cargo build -p e13_parallel_loops
+      - name: 'Build example 14'
+        working-directory: examples
+        run: cargo build -p e14_slash_commands
