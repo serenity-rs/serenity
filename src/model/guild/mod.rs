@@ -15,7 +15,7 @@ use serde::de::Error as DeError;
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
 #[cfg(feature = "model")]
-use tracing::{error};
+use tracing::{error, warn};
 
 pub use self::audit_log::*;
 pub use self::emoji::*;

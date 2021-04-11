@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use serde_json::{json, Value};
 
-use crate::internal::prelude::Number;
 use crate::{model::interactions::ApplicationCommandOptionType, utils};
 
 /// A builder for creating a new [`ApplicationCommandInteractionDataOption`].
