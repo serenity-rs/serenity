@@ -37,6 +37,8 @@ pub struct Http {
     pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
     pub token: String,
+    #[cfg(feature = "unstable_discord_api")]
+    pub application_id: u64
 }
 
 impl fmt::Debug for Http {
@@ -56,7 +58,21 @@ impl Http {
             client,
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
             token: token.to_string(),
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: 0
         }
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn new_with_application_id(application_id: u64) -> Self {
+        let builder = configure_client_backend(Client::builder());
+        let built = builder.build().expect("Cannot build reqwest::Client");
+
+        let mut data = Self::new(Arc::new(built), "");
+
+        data.application_id = application_id;
+
+        data
     }
 
     pub fn new_with_token(token: &str) -> Self {
@@ -70,6 +86,15 @@ impl Http {
         };
 
         Self::new(Arc::new(built), &token)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn new_with_token_application_id(token: &str, application_id: u64) -> Self {
+        let mut base = Self::new_with_token(token);
+
+        base.application_id = application_id;
+
+        base
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -231,14 +256,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_global_application_command(
         &self,
-        application_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
             },
         })
         .await
@@ -249,14 +273,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_global_application_commands(
         &self,
-        application_id: u64,
         map: &Value,
     ) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommands {
-                application_id,
+                application_id: self.application_id,
             },
         })
         .await
@@ -267,7 +290,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_guild_application_commands(
         &self,
-        application_id: u64,
         guild_id: u64,
         map: &Value,
     ) -> Result<Vec<ApplicationCommand>> {
@@ -275,7 +297,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommands {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
             },
         })
@@ -337,7 +359,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
@@ -345,7 +366,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
             },
         })
@@ -591,14 +612,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_global_application_command(
         &self,
-        application_id: u64,
         command_id: u64,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
             route: RouteInfo::DeleteGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 command_id,
             },
         })
@@ -622,7 +642,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
     ) -> Result<()> {
@@ -630,7 +649,7 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::DeleteGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
             },
@@ -940,7 +959,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_global_application_command(
         &self,
-        application_id: u64,
         command_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
@@ -948,7 +966,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 command_id,
             },
         })
@@ -980,7 +998,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
         map: &Value,
@@ -989,7 +1006,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
             },
@@ -1008,7 +1025,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_command_permissions(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
         map: &Value,
@@ -1017,7 +1033,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandPermission {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
             },
@@ -1036,7 +1052,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_commands_permissions(
         &self,
-        application_id: u64,
         guild_id: u64,
         map: &Value,
     ) -> Result<Vec<ApplicationCommandPermission>> {
@@ -1044,7 +1059,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandsPermissions {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
             },
         })
@@ -1846,13 +1861,12 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_global_application_commands(
         &self,
-        application_id: u64,
     ) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommands {
-                application_id,
+                application_id: self.application_id,
             },
         })
         .await
@@ -1863,14 +1877,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_global_application_command(
         &self,
-        application_id: u64,
         command_id: u64,
     ) -> Result<ApplicationCommand> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 command_id,
             },
         })
@@ -1894,14 +1907,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_commands(
         &self,
-        application_id: u64,
         guild_id: u64,
     ) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommands {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
             },
         })
@@ -1913,7 +1925,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
     ) -> Result<ApplicationCommand> {
@@ -1921,7 +1932,7 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
             },
@@ -1934,14 +1945,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_commands_permissions(
         &self,
-        application_id: u64,
         guild_id: u64,
     ) -> Result<Vec<ApplicationCommandPermission>> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommandsPermissions {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
             },
         })
@@ -1953,7 +1963,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_command_permissions(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
     ) -> Result<ApplicationCommandPermission> {
@@ -1961,7 +1970,7 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommandPermissions {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
             },
@@ -2866,6 +2875,8 @@ impl Default for Http {
             client,
             ratelimiter: Ratelimiter::new(client2, ""),
             token: "".to_string(),
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: 0
         }
     }
 }

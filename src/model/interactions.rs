@@ -329,9 +329,7 @@ impl Interaction {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::{interactions::Interaction, id::ApplicationId};
     ///
-    /// let application_id = ApplicationId(42); // usually this will be the bot's UserId
-    ///
-    /// let _ = Interaction::create_global_application_command(&http, application_id, |a| {
+    /// let _ = Interaction::create_global_application_command(&http, |a| {
     ///    a.name("ping")
     ///     .description("A simple ping command")
     /// })
@@ -352,9 +350,7 @@ impl Interaction {
     /// id::ApplicationId
     /// };
     ///
-    /// let application_id = ApplicationId(42); // usually this will be the bot's UserId
-    ///
-    /// let _ = Interaction::create_global_application_command(&http, application_id, |a| {
+    /// let _ = Interaction::create_global_application_command(&http, |a| {
     ///    a.name("echo")
     ///     .description("What is said is echoed")
     ///     .create_interaction_option(|o| {
@@ -383,7 +379,6 @@ impl Interaction {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_global_application_command<F>(
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         f: F,
     ) -> Result<ApplicationCommand>
     where
@@ -391,7 +386,7 @@ impl Interaction {
     {
         let map = Interaction::build_interaction(f);
         http.as_ref()
-            .create_global_application_command(application_id.into(), &Value::Object(map))
+            .create_global_application_command(&Value::Object(map))
             .await
     }
 
@@ -399,7 +394,6 @@ impl Interaction {
     /// to create more than one global command per call.
     pub async fn create_global_application_commands<F>(
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         f: F,
     ) -> Result<Vec<ApplicationCommand>>
     where
@@ -410,14 +404,13 @@ impl Interaction {
         f(&mut array);
 
         http.as_ref()
-            .create_global_application_commands(application_id.into(), &Value::Array(array.0))
+            .create_global_application_commands(&Value::Array(array.0))
             .await
     }
 
     /// Edits a global command by its Id.
     pub async fn edit_global_application_command<F>(
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
         f: F,
     ) -> Result<ApplicationCommand>
@@ -427,7 +420,6 @@ impl Interaction {
         let map = Interaction::build_interaction(f);
         http.as_ref()
             .edit_global_application_command(
-                application_id.into(),
                 command_id.into(),
                 &Value::Object(map),
             )
@@ -437,28 +429,25 @@ impl Interaction {
     /// Get all global commands
     pub async fn get_global_application_commands(
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
     ) -> Result<Vec<ApplicationCommand>> {
-        http.as_ref().get_global_application_commands(application_id.into()).await
+        http.as_ref().get_global_application_commands().await
     }
 
     /// Get a global command by its id
     pub async fn get_global_application_command(
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<ApplicationCommand> {
-        http.as_ref().get_global_application_command(application_id.into(), command_id.into()).await
+        http.as_ref().get_global_application_command(command_id.into()).await
     }
 
     /// Delete a global command by its id
     pub async fn delete_global_application_command(
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<()> {
         http.as_ref()
-            .delete_global_application_command(application_id.into(), command_id.into())
+            .delete_global_application_command(command_id.into())
             .await
     }
 

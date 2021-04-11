@@ -2,11 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::Value;
 
-use crate::builder::CreateInteraction;
-use crate::internal::prelude::Number;
-use crate::model::id::InteractionId;
 use crate::model::interactions::ApplicationCommandPermissionType;
-use crate::model::Permissions;
 use crate::utils;
 
 #[derive(Clone, Debug, Default)]

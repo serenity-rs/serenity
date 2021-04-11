@@ -15,7 +15,7 @@ use serde::de::Error as DeError;
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
 #[cfg(feature = "model")]
-use tracing::{error, warn};
+use tracing::{error};
 
 pub use self::audit_log::*;
 pub use self::emoji::*;
@@ -558,13 +558,12 @@ impl Guild {
     pub async fn create_application_command<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         f: F,
     ) -> Result<ApplicationCommand>
     where
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
-        self.id.create_application_command(http, application_id, f).await
+        self.id.create_application_command(http, f).await
     }
 
     /// Same as create_application_command, but allows to create more
@@ -574,13 +573,12 @@ impl Guild {
     pub async fn create_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         f: F,
     ) -> Result<Vec<ApplicationCommand>>
     where
         F: FnOnce(&mut CreateInteractions) -> &mut CreateInteractions,
     {
-        self.id.create_application_commands(http, application_id, f).await
+        self.id.create_application_commands(http, f).await
     }
 
     /// Creates a guild specific [`ApplicationCommandPermission`].
@@ -593,14 +591,13 @@ impl Guild {
     pub async fn create_application_command_permission<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
         f: F,
     ) -> Result<ApplicationCommandPermission>
     where
         F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
     {
-        self.id.create_application_command_permission(http, application_id, command_id, f).await
+        self.id.create_application_command_permission(http, command_id, f).await
     }
 
     /// Same as create_application_command_permission but allows to create
@@ -610,13 +607,12 @@ impl Guild {
     pub async fn create_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         f: F,
     ) -> Result<Vec<ApplicationCommandPermission>>
     where
         F: FnOnce(&mut CreateInteractionsPermissions) -> &mut CreateInteractionsPermissions,
     {
-        self.id.create_application_commands_permissions(http, application_id, f).await
+        self.id.create_application_commands_permissions(http, f).await
     }
 
     /// Get all guild application commands.
@@ -625,9 +621,8 @@ impl Guild {
     pub async fn get_application_commands(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
     ) -> Result<Vec<ApplicationCommand>> {
-        self.id.get_application_commands(http, application_id).await
+        self.id.get_application_commands(http).await
     }
 
     /// Get a specific guild application command by its Id.
@@ -636,10 +631,9 @@ impl Guild {
     pub async fn get_application_command(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<ApplicationCommand> {
-        self.id.get_application_command(http, application_id, command_id).await
+        self.id.get_application_command(http, command_id).await
     }
 
     /// Edit guild application command by its Id
@@ -648,14 +642,13 @@ impl Guild {
     pub async fn edit_application_command<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
         f: F,
     ) -> Result<ApplicationCommand>
     where
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
-        self.id.edit_application_command(http, application_id, command_id, f).await
+        self.id.edit_application_command(http, command_id, f).await
     }
 
     /// Delete guild application command by its Id.
@@ -664,10 +657,9 @@ impl Guild {
     pub async fn delete_application_command(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<()> {
-        self.id.delete_application_command(http, application_id, command_id).await
+        self.id.delete_application_command(http, command_id).await
     }
 
     /// Get all guild application commands permissions only.
@@ -676,9 +668,8 @@ impl Guild {
     pub async fn get_application_commands_permissions(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
     ) -> Result<Vec<ApplicationCommandPermission>> {
-        self.id.get_application_commands_permissions(http, application_id).await
+        self.id.get_application_commands_permissions(http).await
     }
 
     /// Get permissions for specific guild application command by its Id.
@@ -687,10 +678,9 @@ impl Guild {
     pub async fn get_application_command_permissions(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<ApplicationCommandPermission> {
-        self.id.get_application_command_permissions(http, application_id, command_id).await
+        self.id.get_application_command_permissions(http, command_id).await
     }
 
     /// Creates a new role in the guild with the data set, if any.

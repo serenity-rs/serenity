@@ -1062,7 +1062,6 @@ impl GuildId {
     pub async fn create_application_command<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         f: F,
     ) -> Result<ApplicationCommand>
     where
@@ -1070,7 +1069,7 @@ impl GuildId {
     {
         let map = Interaction::build_interaction(f);
         http.as_ref()
-            .create_guild_application_command(application_id.into(), self.0, &Value::Object(map))
+            .create_guild_application_command(self.0, &Value::Object(map))
             .await
     }
 
@@ -1081,7 +1080,6 @@ impl GuildId {
     pub async fn create_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         f: F,
     ) -> Result<Vec<ApplicationCommand>>
     where
@@ -1093,7 +1091,6 @@ impl GuildId {
 
         http.as_ref()
             .create_guild_application_commands(
-                application_id.into(),
                 self.0,
                 &Value::Array(array.0),
             )
@@ -1110,7 +1107,6 @@ impl GuildId {
     pub async fn create_application_command_permission<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
         f: F,
     ) -> Result<ApplicationCommandPermission>
@@ -1122,7 +1118,6 @@ impl GuildId {
 
         http.as_ref()
             .edit_guild_application_command_permissions(
-                application_id.into(),
                 self.0,
                 command_id.into(),
                 &Value::Object(utils::hashmap_to_json_map(map.0)),
@@ -1137,7 +1132,6 @@ impl GuildId {
     pub async fn create_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         f: F,
     ) -> Result<Vec<ApplicationCommandPermission>>
     where
@@ -1148,7 +1142,6 @@ impl GuildId {
 
         http.as_ref()
             .edit_guild_application_commands_permissions(
-                application_id.into(),
                 self.0,
                 &Value::Array(map.0),
             )
@@ -1161,9 +1154,8 @@ impl GuildId {
     pub async fn get_application_commands(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
     ) -> Result<Vec<ApplicationCommand>> {
-        http.as_ref().get_guild_application_commands(application_id.into(), self.0.into()).await
+        http.as_ref().get_guild_application_commands(self.0.into()).await
     }
 
     /// Get a specific guild application command by its Id.
@@ -1172,11 +1164,10 @@ impl GuildId {
     pub async fn get_application_command(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<ApplicationCommand> {
         http.as_ref()
-            .get_guild_application_command(application_id.into(), self.0.into(), command_id.into())
+            .get_guild_application_command(self.0.into(), command_id.into())
             .await
     }
 
@@ -1186,7 +1177,6 @@ impl GuildId {
     pub async fn edit_application_command<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
         f: F,
     ) -> Result<ApplicationCommand>
@@ -1196,7 +1186,6 @@ impl GuildId {
         let map = Interaction::build_interaction(f);
         http.as_ref()
             .edit_guild_application_command(
-                application_id.into(),
                 self.0.into(),
                 command_id.into(),
                 &Value::Object(map),
@@ -1210,12 +1199,10 @@ impl GuildId {
     pub async fn delete_application_command(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<()> {
         http.as_ref()
             .delete_guild_application_command(
-                application_id.into(),
                 self.0.into(),
                 command_id.into(),
             )
@@ -1228,10 +1215,9 @@ impl GuildId {
     pub async fn get_application_commands_permissions(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
     ) -> Result<Vec<ApplicationCommandPermission>> {
         http.as_ref()
-            .get_guild_application_commands_permissions(application_id.into(), self.0.into())
+            .get_guild_application_commands_permissions(self.0.into())
             .await
     }
 
@@ -1241,12 +1227,10 @@ impl GuildId {
     pub async fn get_application_command_permissions(
         &self,
         http: impl AsRef<Http>,
-        application_id: ApplicationId,
         command_id: CommandId,
     ) -> Result<ApplicationCommandPermission> {
         http.as_ref()
             .get_guild_application_command_permissions(
-                application_id.into(),
                 self.0.into(),
                 command_id.into(),
             )
