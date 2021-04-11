@@ -15,7 +15,7 @@ impl EventHandler for Handler {
         interaction
             .create_interaction_response(&ctx.http, |response| {
                 response
-                    .kind(serenity::InteractionResponseType::ChannelMessageWithSource)
+                    .kind(InteractionResponseType::ChannelMessageWithSource)
                     .interaction_response_data(|message| message.content("Received event!"))
             })
             .await;
@@ -37,7 +37,7 @@ async fn main() {
 
     // The Application Id is usually the Bot User Id.
     let application_id: u64 =
-        env::var("APPLICATION_ID").expect("Expected an application id in the environment").parse();
+        env::var("APPLICATION_ID").expect("Expected an application id in the environment").parse().expect("application id is not a valid id");
 
     // Build our client.
     let mut client = Client::builder(token)
