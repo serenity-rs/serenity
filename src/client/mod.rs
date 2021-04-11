@@ -66,9 +66,9 @@ pub use crate::cache::Cache;
 use crate::framework::Framework;
 use crate::http::Http;
 use crate::internal::prelude::*;
-pub use crate::CacheAndHttp;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::id::ApplicationId;
+pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
@@ -163,7 +163,8 @@ impl<'a> ClientBuilder<'a> {
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(ApplicationId(application_id));
 
-        self.http = Some(Http::new_with_token_application_id(&self.token.clone().unwrap(), application_id));
+        self.http =
+            Some(Http::new_with_token_application_id(&self.token.clone().unwrap(), application_id));
 
         self
     }
@@ -328,7 +329,9 @@ impl<'a> Future for ClientBuilder<'a> {
             let http = Arc::new(self.http.take().unwrap());
 
             #[cfg(feature = "unstable_discord_api")]
-            self.application_id.expect("Please provide an Application Id in order to use slash commands features.");
+            self.application_id.expect(
+                "Please provide an Application Id in order to use slash commands features.",
+            );
 
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();

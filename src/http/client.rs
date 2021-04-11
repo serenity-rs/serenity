@@ -38,7 +38,7 @@ pub struct Http {
     pub ratelimiter: Ratelimiter,
     pub token: String,
     #[cfg(feature = "unstable_discord_api")]
-    pub application_id: u64
+    pub application_id: u64,
 }
 
 impl fmt::Debug for Http {
@@ -59,7 +59,7 @@ impl Http {
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
             token: token.to_string(),
             #[cfg(feature = "unstable_discord_api")]
-            application_id: 0
+            application_id: 0,
         }
     }
 
@@ -610,10 +610,7 @@ impl Http {
     /// Deletes a global command.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn delete_global_application_command(
-        &self,
-        command_id: u64,
-    ) -> Result<()> {
+    pub async fn delete_global_application_command(&self, command_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
@@ -1859,9 +1856,7 @@ impl Http {
     /// Fetches all of the global commands for your application.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn get_global_application_commands(
-        &self,
-    ) -> Result<Vec<ApplicationCommand>> {
+    pub async fn get_global_application_commands(&self) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: None,
             headers: None,
@@ -2876,7 +2871,7 @@ impl Default for Http {
             ratelimiter: Ratelimiter::new(client2, ""),
             token: "".to_string(),
             #[cfg(feature = "unstable_discord_api")]
-            application_id: 0
+            application_id: 0,
         }
     }
 }

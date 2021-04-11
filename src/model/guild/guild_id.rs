@@ -1068,9 +1068,7 @@ impl GuildId {
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
         let map = Interaction::build_interaction(f);
-        http.as_ref()
-            .create_guild_application_command(self.0, &Value::Object(map))
-            .await
+        http.as_ref().create_guild_application_command(self.0, &Value::Object(map)).await
     }
 
     /// Same as create_application_command, but allows to create more
@@ -1089,12 +1087,7 @@ impl GuildId {
 
         f(&mut array);
 
-        http.as_ref()
-            .create_guild_application_commands(
-                self.0,
-                &Value::Array(array.0),
-            )
-            .await
+        http.as_ref().create_guild_application_commands(self.0, &Value::Array(array.0)).await
     }
 
     /// Creates a guild specific [`ApplicationCommandPermission`].
@@ -1141,10 +1134,7 @@ impl GuildId {
         f(&mut map);
 
         http.as_ref()
-            .edit_guild_application_commands_permissions(
-                self.0,
-                &Value::Array(map.0),
-            )
+            .edit_guild_application_commands_permissions(self.0, &Value::Array(map.0))
             .await
     }
 
@@ -1166,9 +1156,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<ApplicationCommand> {
-        http.as_ref()
-            .get_guild_application_command(self.0.into(), command_id.into())
-            .await
+        http.as_ref().get_guild_application_command(self.0.into(), command_id.into()).await
     }
 
     /// Edit guild application command by its Id
@@ -1185,11 +1173,7 @@ impl GuildId {
     {
         let map = Interaction::build_interaction(f);
         http.as_ref()
-            .edit_guild_application_command(
-                self.0.into(),
-                command_id.into(),
-                &Value::Object(map),
-            )
+            .edit_guild_application_command(self.0.into(), command_id.into(), &Value::Object(map))
             .await
     }
 
@@ -1201,12 +1185,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref()
-            .delete_guild_application_command(
-                self.0.into(),
-                command_id.into(),
-            )
-            .await
+        http.as_ref().delete_guild_application_command(self.0.into(), command_id.into()).await
     }
 
     /// Get all guild application commands permissions only.
@@ -1216,9 +1195,7 @@ impl GuildId {
         &self,
         http: impl AsRef<Http>,
     ) -> Result<Vec<ApplicationCommandPermission>> {
-        http.as_ref()
-            .get_guild_application_commands_permissions(self.0.into())
-            .await
+        http.as_ref().get_guild_application_commands_permissions(self.0.into()).await
     }
 
     /// Get permissions for specific guild application command by its Id.
@@ -1230,10 +1207,7 @@ impl GuildId {
         command_id: CommandId,
     ) -> Result<ApplicationCommandPermission> {
         http.as_ref()
-            .get_guild_application_command_permissions(
-                self.0.into(),
-                command_id.into(),
-            )
+            .get_guild_application_command_permissions(self.0.into(), command_id.into())
             .await
     }
 }

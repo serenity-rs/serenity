@@ -385,9 +385,7 @@ impl Interaction {
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
         let map = Interaction::build_interaction(f);
-        http.as_ref()
-            .create_global_application_command(&Value::Object(map))
-            .await
+        http.as_ref().create_global_application_command(&Value::Object(map)).await
     }
 
     /// Same as create_global_application_command but allows
@@ -403,9 +401,7 @@ impl Interaction {
 
         f(&mut array);
 
-        http.as_ref()
-            .create_global_application_commands(&Value::Array(array.0))
-            .await
+        http.as_ref().create_global_application_commands(&Value::Array(array.0)).await
     }
 
     /// Edits a global command by its Id.
@@ -418,12 +414,7 @@ impl Interaction {
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
         let map = Interaction::build_interaction(f);
-        http.as_ref()
-            .edit_global_application_command(
-                command_id.into(),
-                &Value::Object(map),
-            )
-            .await
+        http.as_ref().edit_global_application_command(command_id.into(), &Value::Object(map)).await
     }
 
     /// Get all global commands
@@ -446,9 +437,7 @@ impl Interaction {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref()
-            .delete_global_application_command(command_id.into())
-            .await
+        http.as_ref().delete_global_application_command(command_id.into()).await
     }
 
     #[inline]
