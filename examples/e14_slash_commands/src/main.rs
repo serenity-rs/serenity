@@ -3,7 +3,7 @@ use std::env;
 use serenity::{
     async_trait,
     client::bridge::gateway::GatewayIntents,
-    model::{gateway::Ready, interactions::Interaction},
+    model::{gateway::Ready, interactions::{Interaction, InteractionResponseType}},
     prelude::*,
 };
 
@@ -18,13 +18,13 @@ impl EventHandler for Handler {
                     .kind(serenity::InteractionResponseType::ChannelMessageWithSource)
                     .interaction_response_data(|message| message.content("Received event!"))
             })
-            .await
+            .await;
     }
 
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
-        let interactions = Interactions::get_global_application_commands(&ctx.http).await;
+        let interactions = Interaction::get_global_application_commands(&ctx.http).await;
 
         println!("I have the following global slash command(s): {:?}", interactions);
     }
@@ -36,8 +36,8 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     // The Application Id is usually the Bot User Id.
-    let application_id =
-        env::var("APPLICATION_ID").expect("Expected an application id in the environment");
+    let application_id: u64 =
+        env::var("APPLICATION_ID").expect("Expected an application id in the environment").parse();
 
     // Build our client.
     let mut client = Client::builder(token)
