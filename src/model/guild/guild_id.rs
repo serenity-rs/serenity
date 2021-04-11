@@ -1057,7 +1057,7 @@ impl GuildId {
     /// Returns the same possible errors as [`create_global_application_command`].
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    /// [`create_global_application_command`]: Self::create_global_application_command
+    /// [`create_global_application_command`]: crate::model::interactions::Interaction::create_global_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_command<F>(

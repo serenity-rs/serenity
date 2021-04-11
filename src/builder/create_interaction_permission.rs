@@ -103,9 +103,7 @@ impl CreateInteractionsPermissionsData {
     }
 }
 
-/// A builder for creating a new [`ApplicationCommandInteractionDataPermission`].
-///
-/// All fields are required.
+/// A builder for creating several [`ApplicationCommandInteractionPermissionData`].
 ///
 /// [`ApplicationCommandInteractionDataPermission`]: crate::model::interactions::ApplicationCommandPermissionData
 /// [`kind`]: Self::kind
@@ -151,6 +149,12 @@ impl CreateInteractionPermissions {
     }
 }
 
+/// A builder for creating an [`ApplicationCommandInteractionPermissionData`].
+///
+/// All fields are required.
+///
+/// [`ApplicationCommandInteractionDataPermission`]: crate::model::interactions::ApplicationCommandPermissionData
+/// [`kind`]: Self::kind
 #[derive(Clone, Debug, Default)]
 pub struct CreateInteractionPermission(pub HashMap<&'static str, Value>);
 
