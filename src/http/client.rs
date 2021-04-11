@@ -268,7 +268,7 @@ impl Http {
         .await
     }
 
-    /// Creates new global application commands
+    /// Creates new global application commands.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_global_application_commands(
@@ -285,7 +285,7 @@ impl Http {
         .await
     }
 
-    /// Creates new guild application commands
+    /// Creates new guild application commands.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_guild_application_commands(
@@ -1015,9 +1015,9 @@ impl Http {
     ///
     /// Updates for guild commands will be available immediately.
     ///
-    /// Refer to Discord's [docs] for field information.
+    /// Refer to Discord's [documentation] for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_command_permissions(
@@ -1042,9 +1042,9 @@ impl Http {
     ///
     /// Updates for guild commands will be available immediately.
     ///
-    /// Refer to Discord's [docs] for field information.
+    /// Refer to Discord's [documentation] for field information.
     ///
-    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_commands_permissions(
@@ -1915,7 +1915,7 @@ impl Http {
         .await
     }
 
-    /// Fetches a guild command by its Id
+    /// Fetches a guild command by its Id.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_command(

@@ -427,7 +427,7 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a guild integration is created.
     ///
-    /// Provides the created integration and the GuildId this integration belongs to.
+    /// Provides the created integration and the id of the guild this integration belongs to.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn integration_create(
@@ -440,7 +440,7 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a guild integration is updated.
     ///
-    /// Provides the updated integration and the GuildId this integration belongs to.
+    /// Provides the updated integration and the id of the guild this integration belongs to.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn integration_update(
@@ -453,8 +453,7 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a guild integration is deleted.
     ///
-    /// Provides the IntegrationId, its GuildId and its associated ApplicationId
-    /// if it belongs to one.
+    /// Provides the integration's id, the id of the guild it belongs to, and its associated application id
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn integration_delete(

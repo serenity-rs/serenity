@@ -1054,9 +1054,10 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// Returns the same possible errors as `create_global_application_command`.
+    /// Returns the same possible errors as [`create_global_application_command`].
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`create_global_application_command`]: Self::create_global_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_command<F>(
@@ -1071,8 +1072,10 @@ impl GuildId {
         http.as_ref().create_guild_application_command(self.0, &Value::Object(map)).await
     }
 
-    /// Same as create_application_command, but allows to create more
+    /// Same as [`create_application_command`], but allows to create more
     /// than one command per call.
+    ///
+    /// [`create_application_command`]: Self::create_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_commands<F>(
@@ -1118,8 +1121,10 @@ impl GuildId {
             .await
     }
 
-    /// Same as create_application_command_permission but allows to create
-    /// more than one permission per call
+    /// Same as [`create_application_command_permission`] but allows to create
+    /// more than one permission per call.
+    ///
+    /// [`create_application_command_permission`]: Self::create_application_command_permission
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_commands_permissions<F>(
@@ -1159,7 +1164,7 @@ impl GuildId {
         http.as_ref().get_guild_application_command(self.0.into(), command_id.into()).await
     }
 
-    /// Edit guild application command by its Id
+    /// Edit guild application command by its Id.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_application_command<F>(

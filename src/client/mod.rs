@@ -158,7 +158,7 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// Sets the appliation id.
+    /// Sets the application id.
     #[cfg(feature = "unstable_discord_api")]
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(ApplicationId(application_id));

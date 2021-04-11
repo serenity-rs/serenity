@@ -388,8 +388,10 @@ impl Interaction {
         http.as_ref().create_global_application_command(&Value::Object(map)).await
     }
 
-    /// Same as create_global_application_command but allows
+    /// Same as [`create_global_application_command`] but allows
     /// to create more than one global command per call.
+    ///
+    /// [`create_global_application_command`]: Self::create_global_application_command
     pub async fn create_global_application_commands<F>(
         http: impl AsRef<Http>,
         f: F,
@@ -417,14 +419,14 @@ impl Interaction {
         http.as_ref().edit_global_application_command(command_id.into(), &Value::Object(map)).await
     }
 
-    /// Get all global commands
+    /// Gets all global commands.
     pub async fn get_global_application_commands(
         http: impl AsRef<Http>,
     ) -> Result<Vec<ApplicationCommand>> {
         http.as_ref().get_global_application_commands().await
     }
 
-    /// Get a global command by its id
+    /// Gets a global command by its Id.
     pub async fn get_global_application_command(
         http: impl AsRef<Http>,
         command_id: CommandId,
@@ -432,7 +434,7 @@ impl Interaction {
         http.as_ref().get_global_application_command(command_id.into()).await
     }
 
-    /// Delete a global command by its id
+    /// Deletes a global command by its Id.
     pub async fn delete_global_application_command(
         http: impl AsRef<Http>,
         command_id: CommandId,

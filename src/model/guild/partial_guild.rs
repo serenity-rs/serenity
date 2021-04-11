@@ -250,8 +250,10 @@ impl PartialGuild {
         self.id.create_application_command(http, f).await
     }
 
-    /// Same as create_application_command, but allows to create more
+    /// Same as [`create_application_command`], but allows to create more
     /// than one command per call.
+    ///
+    /// [`create_application_command`]: Self::create_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_commands<F>(
@@ -284,8 +286,10 @@ impl PartialGuild {
         self.id.create_application_command_permission(http, command_id, f).await
     }
 
-    /// Same as create_application_command_permission but allows to create
-    /// more than one permission per call
+    /// Same as [`create_application_command_permission`] but allows to create
+    /// more than one permission per call.
+    ///
+    /// [`create_application_command_permission`]: Self::create_application_command_permission
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_commands_permissions<F>(
@@ -320,7 +324,7 @@ impl PartialGuild {
         self.id.get_application_command(http, command_id).await
     }
 
-    /// Edit guild application command by its Id
+    /// Edit guild application command by its Id.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_application_command<F>(
