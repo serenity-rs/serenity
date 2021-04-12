@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
+#[cfg(feature = "simd-json")]
+use simd_json::Mutable;
 
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::json::Value;
 use crate::utils;
 
 #[derive(Clone, Debug, Default)]
@@ -20,7 +22,7 @@ impl EditInteractionResponse {
     }
 
     fn _content(&mut self, content: String) -> &mut Self {
-        self.0.insert("content", Value::String(content));
+        self.0.insert("content", Value::from(content));
         self
     }
 
@@ -37,9 +39,9 @@ impl EditInteractionResponse {
     /// Adds an embed for the message.
     pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
-        let embed = Value::Object(map);
+        let embed = Value::from(map);
 
-        let embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(vec![]));
+        let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
         if let Some(embeds) = embeds.as_array_mut() {
             embeds.push(embed);
@@ -71,7 +73,7 @@ impl EditInteractionResponse {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::Object(map);
+        let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
         self

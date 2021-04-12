@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
-
-use crate::internal::prelude::*;
+use crate::json::{from_number, json};
+use crate::json::{Value, NULL};
 use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType, VideoQualityMode};
 use crate::model::id::ChannelId;
 
@@ -40,7 +39,7 @@ impl EditChannel {
     ///
     /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn bitrate(&mut self, bitrate: u64) -> &mut Self {
-        self.0.insert("bitrate", Value::Number(Number::from(bitrate)));
+        self.0.insert("bitrate", from_number(bitrate));
         self
     }
 
@@ -50,7 +49,7 @@ impl EditChannel {
     ///
     /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn video_quality_mode(&mut self, quality: VideoQualityMode) -> &mut Self {
-        self.0.insert("video_quality_mode", Value::Number(Number::from(quality as u8)));
+        self.0.insert("video_quality_mode", from_number(quality as u8));
         self
     }
 
@@ -62,8 +61,8 @@ impl EditChannel {
     /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn voice_region(&mut self, id: Option<String>) -> &mut Self {
         self.0.insert("rtc_region", match id {
-            Some(region) => Value::String(region),
-            None => Value::Null,
+            Some(region) => Value::from(region),
+            None => NULL,
         });
         self
     }
@@ -72,13 +71,13 @@ impl EditChannel {
     ///
     /// Must be between 2 and 100 characters long.
     pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
-        self.0.insert("name", Value::String(name.to_string()));
+        self.0.insert("name", Value::from(name.to_string()));
         self
     }
 
     /// The position of the channel in the channel list.
     pub fn position(&mut self, position: u64) -> &mut Self {
-        self.0.insert("position", Value::Number(Number::from(position)));
+        self.0.insert("position", from_number(position));
         self
     }
 
@@ -90,7 +89,7 @@ impl EditChannel {
     ///
     /// [text]: crate::model::channel::ChannelType::Text
     pub fn topic<S: ToString>(&mut self, topic: S) -> &mut Self {
-        self.0.insert("topic", Value::String(topic.to_string()));
+        self.0.insert("topic", Value::from(topic.to_string()));
         self
     }
 
@@ -100,7 +99,7 @@ impl EditChannel {
     ///
     /// [text]: crate::model::channel::ChannelType::Text
     pub fn nsfw(&mut self, nsfw: bool) -> &mut Self {
-        self.0.insert("nsfw", Value::Bool(nsfw));
+        self.0.insert("nsfw", Value::from(nsfw));
 
         self
     }
@@ -111,7 +110,7 @@ impl EditChannel {
     ///
     /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn user_limit(&mut self, user_limit: u64) -> &mut Self {
-        self.0.insert("user_limit", Value::Number(Number::from(user_limit)));
+        self.0.insert("user_limit", from_number(user_limit));
         self
     }
 
@@ -129,8 +128,8 @@ impl EditChannel {
 
     fn _category(&mut self, category: Option<ChannelId>) {
         self.0.insert("parent_id", match category {
-            Some(c) => Value::Number(Number::from(c.0)),
-            None => Value::Null,
+            Some(c) => Value::from(c.0),
+            None => NULL,
         });
     }
 
@@ -139,7 +138,7 @@ impl EditChannel {
     /// **Info**: Only values from 0 to 120 are valid.
     #[inline]
     pub fn slow_mode_rate(&mut self, seconds: u64) -> &mut Self {
-        self.0.insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
+        self.0.insert("rate_limit_per_user", from_number(seconds));
 
         self
     }
@@ -196,9 +195,9 @@ impl EditChannel {
                     "type": kind,
                 })
             })
-            .collect();
+            .collect::<Vec<_>>();
 
-        self.0.insert("permission_overwrites", Value::Array(overwrites));
+        self.0.insert("permission_overwrites", Value::from(overwrites));
 
         self
     }
