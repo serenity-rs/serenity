@@ -52,8 +52,6 @@ mod ws_client_ext;
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use serde_json::Value;
-
 pub use self::{
     error::Error as GatewayError,
     shard::Shard,
@@ -61,6 +59,7 @@ pub use self::{
 };
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
+use crate::json::Value;
 use crate::model::{gateway::Activity, user::OnlineStatus};
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);

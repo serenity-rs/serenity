@@ -41,7 +41,6 @@ use tokio::sync::RwLock;
 use tracing::instrument;
 
 use crate::model::prelude::*;
-
 mod cache_update;
 mod settings;
 
@@ -1028,8 +1027,8 @@ mod test {
     use std::collections::HashMap;
 
     use chrono::{DateTime, Utc};
-    use serde_json::{Number, Value};
 
+    use crate::json::from_number;
     use crate::{
         cache::{Cache, CacheUpdate, Settings},
         model::prelude::*,
@@ -1072,7 +1071,7 @@ mod test {
                 mention_roles: vec![],
                 mention_channels: vec![],
                 mentions: vec![],
-                nonce: Value::Number(Number::from(1)),
+                nonce: from_number(1),
                 pinned: false,
                 reactions: vec![],
                 timestamp: datetime,

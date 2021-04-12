@@ -9,6 +9,7 @@ use crate::builder::CreateComponents;
 #[cfg(feature = "http")]
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
+use crate::json::{from_number, to_value};
 use crate::model::channel::{MessageFlags, MessageReference, ReactionType};
 use crate::utils;
 
@@ -74,15 +75,15 @@ impl<'a> CreateMessage<'a> {
     }
 
     fn _content(&mut self, content: String) -> &mut Self {
-        self.0.insert("content", Value::String(content));
+        self.0.insert("content", Value::from(content));
         self
     }
 
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
-        let embed = Value::Object(map);
+        let embed = Value::from(map);
 
-        let embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(Vec::new()));
+        let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");
 
         embeds_array.push(embed);
@@ -127,7 +128,7 @@ impl<'a> CreateMessage<'a> {
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.0.insert("embeds", Value::Array(Vec::new()));
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
         self._add_embed(embed)
     }
 
@@ -138,7 +139,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: This will replace all existing embeds.
     /// Use [`Self::add_embed()`] to add an additional embed.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        self.0.insert("embeds", Value::Array(Vec::new()));
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
         self._add_embed(embed)
     }
 
@@ -147,7 +148,7 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
     pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        self.0.insert("embeds", Value::Array(Vec::new()));
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
         for embed in embeds {
             self._add_embed(embed);
         }
@@ -161,7 +162,7 @@ impl<'a> CreateMessage<'a> {
     ///
     /// Defaults to `false`.
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::Bool(tts));
+        self.0.insert("tts", Value::from(tts));
         self
     }
 
@@ -217,7 +218,7 @@ impl<'a> CreateMessage<'a> {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::Object(map);
+        let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
         self
@@ -226,7 +227,7 @@ impl<'a> CreateMessage<'a> {
     /// Set the reference message this message is a reply to.
     #[allow(clippy::unwrap_used)] // allowing unwrap here because serializing MessageReference should never error
     pub fn reference_message(&mut self, reference: impl Into<MessageReference>) -> &mut Self {
-        self.0.insert("message_reference", serde_json::to_value(reference.into()).unwrap());
+        self.0.insert("message_reference", to_value(reference.into()).unwrap());
         self
     }
 
@@ -239,20 +240,20 @@ impl<'a> CreateMessage<'a> {
         let mut components = CreateComponents::default();
         f(&mut components);
 
-        self.0.insert("components", Value::Array(components.0));
+        self.0.insert("components", Value::from(components.0));
         self
     }
 
     /// Sets the components of this message.
     #[cfg(feature = "unstable_discord_api")]
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        self.0.insert("components", Value::Array(components.0));
+        self.0.insert("components", Value::from(components.0));
         self
     }
 
     /// Sets the flags for the message.
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits)));
+        self.0.insert("flags", from_number(flags.bits));
         self
     }
 }
@@ -264,7 +265,7 @@ impl<'a> Default for CreateMessage<'a> {
     /// [`Message`]: crate::model::channel::Message
     fn default() -> CreateMessage<'a> {
         let mut map = HashMap::new();
-        map.insert("tts", Value::Bool(false));
+        map.insert("tts", Value::from(false));
 
         CreateMessage(map, None, Default::default())
     }

@@ -15,17 +15,14 @@
 /// via [`Self::g`]:
 ///
 /// ```rust
-/// # extern crate serde_json;
-/// # extern crate serenity;
-/// #
-/// # use serde_json::json;
+/// # use serde_json::{json, from_value};
 /// # use serenity::model::guild::Role;
 /// # use serenity::model::id::RoleId;
 /// # use serenity::model::id::GuildId;
 /// # use serenity::model::permissions;
 /// #
 /// # fn main() {
-/// # let role = serde_json::from_value::<Role>(json!({
+/// # let role = from_value::<Role>(json!({
 /// #     "color": Colour::BLURPLE,
 /// #     "hoist": false,
 /// #     "id": RoleId(1),

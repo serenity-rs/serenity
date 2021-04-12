@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::internal::prelude::*;
+use crate::json::{from_number, Value};
 use crate::model::channel::ReactionType;
 use crate::model::interactions::message_component::{ButtonStyle, InputTextStyle};
 use crate::utils;
@@ -74,7 +75,8 @@ impl CreateActionRow {
 
     /// Adds a button.
     pub fn add_button(&mut self, button: CreateButton) -> &mut Self {
-        let components = self.0.entry("components").or_insert_with(|| Value::Array(Vec::new()));
+        let components =
+            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let components_array = components.as_array_mut().expect("Must be an array");
 
         components_array.push(button.build());
@@ -97,7 +99,8 @@ impl CreateActionRow {
 
     /// Adds a select menu.
     pub fn add_select_menu(&mut self, menu: CreateSelectMenu) -> &mut Self {
-        let components = self.0.entry("components").or_insert_with(|| Value::Array(Vec::new()));
+        let components =
+            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let components_array = components.as_array_mut().expect("Must be an array");
 
         components_array.push(menu.build());
@@ -120,7 +123,8 @@ impl CreateActionRow {
 
     /// Adds an input text.
     pub fn add_input_text(&mut self, input_text: CreateInputText) -> &mut Self {
-        let components = self.0.entry("components").or_insert_with(|| Value::Array(Vec::new()));
+        let components =
+            self.0.entry("components").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let components_array = components.as_array_mut().expect("Must be an array");
 
         components_array.push(input_text.build());
@@ -129,7 +133,7 @@ impl CreateActionRow {
     }
 
     pub fn build(&mut self) -> Value {
-        self.0.insert("type", Value::Number(serde_json::Number::from(1_u8)));
+        self.0.insert("type", from_number(1_u8));
 
         utils::hashmap_to_json_map(self.0.clone()).into()
     }
@@ -144,25 +148,25 @@ pub struct CreateButton(pub HashMap<&'static str, Value>);
 impl CreateButton {
     /// Sets the style of the button.
     pub fn style(&mut self, kind: ButtonStyle) -> &mut Self {
-        self.0.insert("style", Value::Number(serde_json::Number::from(kind as u8)));
+        self.0.insert("style", from_number(kind as u8));
         self
     }
 
     /// The label of the button.
     pub fn label<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("label", Value::String(label.to_string()));
+        self.0.insert("label", Value::from(label.to_string()));
         self
     }
 
     /// Sets the custom id of the button, a developer-defined identifier.
     pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
-        self.0.insert("custom_id", Value::String(id.to_string()));
+        self.0.insert("custom_id", Value::from(id.to_string()));
         self
     }
 
     /// The url for url style button.
     pub fn url<D: ToString>(&mut self, url: D) -> &mut Self {
-        self.0.insert("url", Value::String(url.to_string()));
+        self.0.insert("url", Value::from(url.to_string()));
         self
     }
 
@@ -172,34 +176,34 @@ impl CreateButton {
 
         match emoji {
             ReactionType::Unicode(u) => {
-                map.insert("name".to_string(), Value::String(u));
+                map.insert("name".to_string(), Value::from(u));
             },
             ReactionType::Custom {
                 animated,
                 id,
                 name,
             } => {
-                map.insert("animated".to_string(), Value::Bool(animated));
-                map.insert("id".to_string(), Value::String(id.to_string()));
+                map.insert("animated".to_string(), Value::from(animated));
+                map.insert("id".to_string(), Value::from(id.to_string()));
 
                 if let Some(name) = name {
-                    map.insert("name".to_string(), Value::String(name));
+                    map.insert("name".to_string(), Value::from(name));
                 }
             },
         };
 
-        self.0.insert("emoji", Value::Object(map));
+        self.0.insert("emoji", Value::from(map));
         self
     }
 
     /// Sets the disabled state for the button.
     pub fn disabled(&mut self, disabled: bool) -> &mut Self {
-        self.0.insert("disabled", Value::Bool(disabled));
+        self.0.insert("disabled", Value::from(disabled));
         self
     }
 
     pub fn build(mut self) -> Value {
-        self.0.insert("type", Value::Number(serde_json::Number::from(2_u8)));
+        self.0.insert("type", from_number(2_u8 as u8));
 
         utils::hashmap_to_json_map(self.0.clone()).into()
     }
@@ -214,31 +218,31 @@ pub struct CreateSelectMenu(pub HashMap<&'static str, Value>);
 impl CreateSelectMenu {
     /// The placeholder of the select menu.
     pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("placeholder", Value::String(label.to_string()));
+        self.0.insert("placeholder", Value::from(label.to_string()));
         self
     }
 
     /// Sets the custom id of the select menu, a developer-defined identifier.
     pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
-        self.0.insert("custom_id", Value::String(id.to_string()));
+        self.0.insert("custom_id", Value::from(id.to_string()));
         self
     }
 
     /// Sets the minimum values for the user to select.
     pub fn min_values(&mut self, min: u64) -> &mut Self {
-        self.0.insert("min_values", Value::Number(Number::from(min)));
+        self.0.insert("min_values", from_number(min));
         self
     }
 
     /// Sets the maximum values for the user to select.
     pub fn max_values(&mut self, max: u64) -> &mut Self {
-        self.0.insert("max_values", Value::Number(Number::from(max)));
+        self.0.insert("max_values", from_number(max));
         self
     }
 
     /// Sets the disabled state for the button.
     pub fn disabled(&mut self, disabled: bool) -> &mut Self {
-        self.0.insert("disabled", Value::Bool(disabled));
+        self.0.insert("disabled", Value::from(disabled));
         self
     }
 
@@ -249,13 +253,13 @@ impl CreateSelectMenu {
         let mut data = CreateSelectMenuOptions::default();
         f(&mut data);
 
-        self.0.insert("options", Value::Array(data.0));
+        self.0.insert("options", Value::from(data.0));
 
         self
     }
 
     pub fn build(mut self) -> Value {
-        self.0.insert("type", Value::Number(serde_json::Number::from(3_u8)));
+        self.0.insert("type", from_number(3_u8));
 
         utils::hashmap_to_json_map(self.0.clone()).into()
     }
@@ -314,19 +318,19 @@ pub struct CreateSelectMenuOption(pub HashMap<&'static str, Value>);
 impl CreateSelectMenuOption {
     /// Sets the label of this option.
     pub fn label<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("label", Value::String(label.to_string()));
+        self.0.insert("label", Value::from(label.to_string()));
         self
     }
 
     /// Sets the value of this option.
     pub fn value<D: ToString>(&mut self, value: D) -> &mut Self {
-        self.0.insert("value", Value::String(value.to_string()));
+        self.0.insert("value", Value::from(value.to_string()));
         self
     }
 
     /// Sets the description shown on this option.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::String(description.to_string()));
+        self.0.insert("description", Value::from(description.to_string()));
         self
     }
 
@@ -336,29 +340,29 @@ impl CreateSelectMenuOption {
 
         match emoji {
             ReactionType::Unicode(u) => {
-                map.insert("name".to_string(), Value::String(u));
+                map.insert("name".to_string(), Value::from(u));
             },
             ReactionType::Custom {
                 animated,
                 id,
                 name,
             } => {
-                map.insert("animated".to_string(), Value::Bool(animated));
-                map.insert("id".to_string(), Value::String(id.to_string()));
+                map.insert("animated".to_string(), Value::from(animated));
+                map.insert("id".to_string(), Value::from(id.to_string()));
 
                 if let Some(name) = name {
-                    map.insert("name".to_string(), Value::String(name));
+                    map.insert("name".to_string(), Value::from(name));
                 }
             },
         };
 
-        self.0.insert("emoji", Value::Object(map));
+        self.0.insert("emoji", Value::from(map));
         self
     }
 
     /// Sets this option as selected by default.
     pub fn default_selection(&mut self, disabled: bool) -> &mut Self {
-        self.0.insert("default", Value::Bool(disabled));
+        self.0.insert("default", Value::from(disabled));
         self
     }
 }
@@ -372,54 +376,54 @@ pub struct CreateInputText(pub HashMap<&'static str, Value>);
 impl CreateInputText {
     /// Sets the custom id of the input text, a developer-defined identifier.
     pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
-        self.0.insert("custom_id", Value::String(id.to_string()));
+        self.0.insert("custom_id", Value::from(id.to_string()));
         self
     }
 
     /// Sets the style of this input text
     pub fn style(&mut self, kind: InputTextStyle) -> &mut Self {
-        self.0.insert("style", Value::Number(serde_json::Number::from(kind as u8)));
+        self.0.insert("style", from_number(kind as u8));
         self
     }
 
     /// Sets the label of this input text.
     pub fn label<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("label", Value::String(label.to_string()));
+        self.0.insert("label", Value::from(label.to_string()));
         self
     }
 
     /// Sets the placeholder of this input text.
     pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
-        self.0.insert("placeholder", Value::String(label.to_string()));
+        self.0.insert("placeholder", Value::from(label.to_string()));
         self
     }
 
     /// Sets the minimum length required for the input text
     pub fn min_length(&mut self, min: u64) -> &mut Self {
-        self.0.insert("min_length", Value::Number(Number::from(min)));
+        self.0.insert("min_length", from_number(min));
         self
     }
 
     /// Sets the maximum length required for the input text
     pub fn max_length(&mut self, max: u64) -> &mut Self {
-        self.0.insert("max_length", Value::Number(Number::from(max)));
+        self.0.insert("max_length", from_number(max));
         self
     }
 
     /// Sets the value of this input text.
     pub fn value<D: ToString>(&mut self, value: D) -> &mut Self {
-        self.0.insert("value", Value::String(value.to_string()));
+        self.0.insert("value", Value::from(value.to_string()));
         self
     }
 
     /// Sets if the input text is required
     pub fn required(&mut self, required: bool) -> &mut Self {
-        self.0.insert("required", Value::Bool(required));
+        self.0.insert("required", Value::from(required));
         self
     }
 
     pub fn build(mut self) -> Value {
-        self.0.insert("type", Value::Number(serde_json::Number::from(4_u8)));
+        self.0.insert("type", from_number(4_u8));
 
         utils::hashmap_to_json_map(self.0.clone()).into()
     }

@@ -10,6 +10,7 @@ use tokio::{fs::File, io::AsyncReadExt};
 #[cfg(feature = "http")]
 use crate::http::{AttachmentType, Http};
 use crate::internal::prelude::*;
+use crate::json::from_number;
 use crate::model::{guild::Role, Permissions};
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
@@ -56,20 +57,20 @@ impl EditRole {
 
         #[cfg(feature = "utils")]
         {
-            map.insert("color", Value::Number(Number::from(role.colour.0)));
+            map.insert("color", from_number(role.colour.0));
         }
 
         #[cfg(not(feature = "utils"))]
         {
-            map.insert("color", Value::Number(Number::from(role.colour)));
+            map.insert("color", from_number(role.colour));
         }
 
-        map.insert("hoist", Value::Bool(role.hoist));
-        map.insert("managed", Value::Bool(role.managed));
-        map.insert("mentionable", Value::Bool(role.mentionable));
-        map.insert("name", Value::String(role.name.clone()));
-        map.insert("permissions", Value::Number(Number::from(role.permissions.bits())));
-        map.insert("position", Value::Number(Number::from(role.position)));
+        map.insert("hoist", Value::from(role.hoist));
+        map.insert("managed", Value::from(role.managed));
+        map.insert("mentionable", Value::from(role.mentionable));
+        map.insert("name", Value::from(role.name.clone()));
+        map.insert("permissions", from_number(role.permissions.bits()));
+        map.insert("position", from_number(role.position));
 
         if let Some(unicode_emoji) = &role.unicode_emoji {
             map.insert("unicode_emoji", Value::String(unicode_emoji.clone()));
@@ -84,39 +85,39 @@ impl EditRole {
 
     /// Sets the colour of the role.
     pub fn colour(&mut self, colour: u64) -> &mut Self {
-        self.0.insert("color", Value::Number(Number::from(colour)));
+        self.0.insert("color", from_number(colour));
         self
     }
 
     /// Whether or not to hoist the role above lower-positioned role in the user
     /// list.
     pub fn hoist(&mut self, hoist: bool) -> &mut Self {
-        self.0.insert("hoist", Value::Bool(hoist));
+        self.0.insert("hoist", Value::from(hoist));
         self
     }
 
     /// Whether or not to make the role mentionable, notifying its users.
     pub fn mentionable(&mut self, mentionable: bool) -> &mut Self {
-        self.0.insert("mentionable", Value::Bool(mentionable));
+        self.0.insert("mentionable", Value::from(mentionable));
         self
     }
 
     /// The name of the role to set.
     pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
-        self.0.insert("name", Value::String(name.to_string()));
+        self.0.insert("name", Value::from(name.to_string()));
         self
     }
 
     /// The set of permissions to assign the role.
     pub fn permissions(&mut self, permissions: Permissions) -> &mut Self {
-        self.0.insert("permissions", Value::Number(Number::from(permissions.bits())));
+        self.0.insert("permissions", from_number(permissions.bits()));
         self
     }
 
     /// The position to assign the role in the role list. This correlates to the
     /// role's position in the user list.
     pub fn position(&mut self, position: u8) -> &mut Self {
-        self.0.insert("position", Value::Number(Number::from(position)));
+        self.0.insert("position", from_number(position));
         self
     }
 
