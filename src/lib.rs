@@ -81,6 +81,7 @@ extern crate bytes_compat as bytes;
 mod internal;
 
 pub mod constants;
+pub mod json;
 pub mod model;
 pub mod prelude;
 

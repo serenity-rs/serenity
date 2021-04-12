@@ -1,14 +1,13 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use serde_json::json;
-
-#[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::model::id::GuildId;
 use crate::model::id::{EmojiId, RoleId};
@@ -67,14 +66,14 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serde_json::json;
+    /// # use serde_json::{json, from_value};
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::client::Context;
     /// # use serenity::model::prelude::{EmojiId, Emoji, Role};
     /// #
     /// # #[command]
     /// # async fn example(ctx: &Context) -> CommandResult {
-    /// #     let mut emoji = serde_json::from_value::<Emoji>(json!({
+    /// #     let mut emoji = from_value::<Emoji>(json!({
     /// #         "animated": false,
     /// #         "id": EmojiId(7),
     /// #         "name": "blobface",
@@ -152,7 +151,7 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # use serde_json::json;
+    /// # use serde_json::{json, from_value};
     /// # use serenity::{cache::Cache, model::{guild::{Emoji, Role}, id::EmojiId}};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
@@ -160,7 +159,7 @@ impl Emoji {
     /// # async fn run() {
     /// # let cache = Cache::default();
     /// #
-    /// # let mut emoji = serde_json::from_value::<Emoji>(json!({
+    /// # let mut emoji = from_value::<Emoji>(json!({
     /// #     "animated": false,
     /// #     "id": EmojiId(7),
     /// #     "name": "blobface",
@@ -193,14 +192,11 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # extern crate serde_json;
-    /// # extern crate serenity;
-    /// #
-    /// # use serde_json::json;
+    /// # use serde_json::{json, from_value};
     /// # use serenity::model::{guild::{Emoji, Role}, id::EmojiId};
     /// #
     /// # fn main() {
-    /// # let mut emoji = serde_json::from_value::<Emoji>(json!({
+    /// # let mut emoji = from_value::<Emoji>(json!({
     /// #     "animated": false,
     /// #     "id": EmojiId(7),
     /// #     "name": "blobface",
