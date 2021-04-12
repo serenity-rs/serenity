@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use super::CreateEmbed;
-use crate::internal::prelude::*;
 use crate::utils;
+use crate::{internal::prelude::*, json::from_number};
 
 /// A builder to specify the fields to edit in an existing message.
 ///
@@ -39,7 +39,7 @@ impl EditMessage {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
-        self.0.insert("content", Value::String(content.to_string()));
+        self.0.insert("content", Value::from(content.to_string()));
         self
     }
 
@@ -51,7 +51,7 @@ impl EditMessage {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
         let map = utils::hashmap_to_json_map(create_embed.0);
-        let embed = Value::Object(map);
+        let embed = Value::from(map);
 
         self.0.insert("embed", embed);
         self
@@ -62,7 +62,7 @@ impl EditMessage {
         // `1 << 2` is defined by the API to be the SUPPRESS_EMBEDS flag.
         // At the time of writing, the only accepted value in "flags" is `SUPPRESS_EMBEDS` for editing messages.
         if suppress {
-            self.0.insert("flags", serde_json::Value::Number(serde_json::Number::from(1 << 2)));
+            self.0.insert("flags", from_number(1 << 2));
         } else {
             self.0.remove("flags");
         }

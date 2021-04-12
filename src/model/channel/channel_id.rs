@@ -9,8 +9,6 @@ use futures::stream::Stream;
 #[cfg(feature = "model")]
 use reqwest::Url;
 #[cfg(feature = "model")]
-use serde_json::json;
-#[cfg(feature = "model")]
 use tokio::{fs::File, io::AsyncReadExt};
 
 #[cfg(feature = "model")]
@@ -30,6 +28,8 @@ use crate::collector::{
 use crate::http::AttachmentType;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
+#[cfg(feature = "model")]
+use crate::json::json;
 use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils;
@@ -370,7 +370,7 @@ impl ChannelId {
         let mut msg = EditMessage::default();
         f(&mut msg);
 
-        if let Some(Value::String(ref content)) = msg.0.get("content") {
+        if let Some(Value::String(content)) = msg.0.get("content") {
             if let Some(length_over) = Message::overflow_length(content) {
                 return Err(Error::Model(ModelError::MessageTooLong(length_over)));
             }
@@ -378,7 +378,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(msg.0);
 
-        http.as_ref().edit_message(self.0, message_id.into().0, &Value::Object(map)).await
+        http.as_ref().edit_message(self.0, message_id.into().0, &Value::from(map)).await
     }
 
     /// Attempts to find a [`Channel`] by its Id in the cache.
@@ -770,7 +770,7 @@ impl ChannelId {
         Message::check_embed_length(&map)?;
 
         let message = if msg.2.is_empty() {
-            http.as_ref().send_message(self.0, &Value::Object(map)).await?
+            http.as_ref().send_message(self.0, &Value::from(map)).await?
         } else {
             http.as_ref().send_files(self.0, msg.2.clone(), map).await?
         };
@@ -869,7 +869,7 @@ impl ChannelId {
         http: impl AsRef<Http>,
         name: impl std::fmt::Display,
     ) -> Result<Webhook> {
-        let map = serde_json::json!({
+        let map = json!({
             "name": name.to_string(),
         });
 
@@ -923,7 +923,7 @@ impl ChannelId {
             },
         };
 
-        let map = serde_json::json!({
+        let map = crate::json::json!({
             "name": name,
             "avatar": avatar
         });
