@@ -172,11 +172,13 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
+<span id="172">172</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
-
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::from_number</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::Value</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::interactions::ApplicationCommandOptionType</span>, <span class="ident">utils</span>};
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommandInteractionDataOption`].</span>
@@ -193,7 +195,7 @@
 <span class="kw">impl</span> <span class="ident">CreateInteractionOption</span> {
     <span class="doccomment">/// Set the ApplicationCommandOptionType for the InteractionOption.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ApplicationCommandOptionType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>
     }
 
@@ -217,7 +219,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Only one option can be `default`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_option</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">default</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;default&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">default</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;default&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">default</span>));
         <span class="self">self</span>
     }
 
@@ -225,7 +227,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This defaults to `false`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">required</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;required&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">required</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;required&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">required</span>));
         <span class="self">self</span>
     }
 
@@ -274,7 +276,7 @@
         <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">sub_option</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;options&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
         <span class="kw">let</span> <span class="ident">opt_arr</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
-        <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value::Object</span>(<span class="ident">new_option</span>));
+        <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value::from</span>(<span class="ident">new_option</span>));
 
         <span class="self">self</span>
     }
@@ -327,7 +329,7 @@
         <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;options&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
         <span class="kw">let</span> <span class="ident">opt_arr</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
-        <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value::Object</span>(<span class="ident">new_option</span>));
+        <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value::from</span>(<span class="ident">new_option</span>));
 
         <span class="self">self</span>
     }
@@ -338,7 +340,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_interaction_options</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateInteractionOption</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_options</span> <span class="op">=</span> <span class="ident">options</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::Object</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;options&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">new_options</span>));
         <span class="self">self</span>

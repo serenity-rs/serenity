@@ -448,6 +448,7 @@
 <span id="445">445</span>
 <span id="446">446</span>
 <span id="447">447</span>
+<span id="448">448</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Webhook model and implementations.</span>
 
@@ -467,6 +468,7 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::NULL</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -653,12 +655,12 @@
 
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Map::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>) <span class="op">=</span> <span class="ident">avatar</span> {
             <span class="ident">map</span>.<span class="ident">insert</span>(
                 <span class="string">&quot;avatar&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="kw">if</span> <span class="ident">avatar</span>.<span class="ident">is_empty</span>() { <span class="ident">Value::Null</span> } <span class="kw">else</span> { <span class="ident">Value::String</span>(<span class="ident">avatar</span>.<span class="ident">to_string</span>()) },
+                <span class="kw">if</span> <span class="ident">avatar</span>.<span class="ident">is_empty</span>() { <span class="ident">NULL</span> } <span class="kw">else</span> { <span class="ident">Value::String</span>(<span class="ident">avatar</span>.<span class="ident">to_string</span>()) },
             );
         }
 

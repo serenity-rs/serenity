@@ -1064,12 +1064,12 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">id::EmojiId</span>, <span class="ident">misc::EmojiIdentifier</span>};
 
 <span class="doccomment">/// Converts a HashMap into a final `serde_json::Map` representation.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hashmap_to_json_map</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Value</span>, <span class="ident">H</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hashmap_to_json_map</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Value</span>, <span class="ident">H</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">JsonMap</span>
 <span class="kw">where</span>
     <span class="ident">H</span>: <span class="ident">BuildHasher</span>,
     <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">ToString</span>,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">json_map</span> <span class="op">=</span> <span class="ident">Map::new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">json_map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
 
     <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">map</span> {
         <span class="ident">json_map</span>.<span class="ident">insert</span>(<span class="ident">key</span>.<span class="ident">to_string</span>(), <span class="ident">value</span>);

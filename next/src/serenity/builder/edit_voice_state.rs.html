@@ -64,6 +64,7 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
+<span id="64">64</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -71,6 +72,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::create_embed::Timestamp</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>;
 
 <span class="doccomment">/// A builder which edits a user&#39;s voice state, to be used in conjunction with</span>
 <span class="doccomment">/// [`GuildChannel::edit_voice_state`].</span>
@@ -89,7 +91,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suppress</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">deafen</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;suppress&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">deafen</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;suppress&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">deafen</span>));
         <span class="self">self</span>
     }
 
@@ -122,7 +124,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>) <span class="op">=</span> <span class="ident">timestamp</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;request_to_speak_timestamp&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>().<span class="ident">ts</span>));
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;request_to_speak_timestamp&quot;</span>, <span class="ident">Value::Null</span>);
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;request_to_speak_timestamp&quot;</span>, <span class="ident">json::NULL</span>);
         }
 
         <span class="self">self</span>

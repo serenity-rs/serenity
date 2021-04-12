@@ -179,7 +179,6 @@
 <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">serde_json::json</span>;
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
 
@@ -188,6 +187,7 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::gateway</span>::{<span class="ident">CurrentPresence</span>, <span class="ident">WsStream</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::ws_impl::SenderExt</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::json</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id::GuildId</span>;
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>

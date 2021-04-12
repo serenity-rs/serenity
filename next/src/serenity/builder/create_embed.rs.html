@@ -629,9 +629,9 @@
 <span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">TimeZone</span>};
-<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::Value</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::channel::Embed</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
@@ -669,7 +669,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_author</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">author</span>: <span class="ident">CreateEmbedAuthor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">author</span>.<span class="number">0</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;author&quot;</span>, <span class="ident">Value::Object</span>(<span class="ident">map</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;author&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">map</span>));
         <span class="self">self</span>
     }
 
@@ -695,7 +695,7 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">_colour</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">Colour</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">u64::from</span>(<span class="ident">colour</span>.<span class="number">0</span>))));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">u64::from</span>(<span class="ident">colour</span>.<span class="number">0</span>)));
     }
 
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.</span>
@@ -791,7 +791,7 @@
         <span class="kw">let</span> <span class="ident">footer</span> <span class="op">=</span> <span class="ident">create_embed_footer</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">footer</span>);
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;footer&quot;</span>, <span class="ident">Value::Object</span>(<span class="ident">map</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;footer&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">map</span>));
         <span class="self">self</span>
     }
 
@@ -1127,9 +1127,9 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
-
     <span class="kw">use</span> <span class="kw">super</span><span class="ident">::CreateEmbed</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::json</span>;
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::Value</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">model::channel</span>::{<span class="ident">Embed</span>, <span class="ident">EmbedField</span>, <span class="ident">EmbedFooter</span>, <span class="ident">EmbedImage</span>, <span class="ident">EmbedVideo</span>},
         <span class="ident">utils</span>::{<span class="self">self</span>, <span class="ident">Colour</span>},
@@ -1184,7 +1184,7 @@
         <span class="ident">builder</span>.<span class="ident">title</span>(<span class="string">&quot;still a hakase&quot;</span>);
         <span class="ident">builder</span>.<span class="ident">url</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">Value::Object</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>));
 
         <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;color&quot;</span>: <span class="number">0xFF0011</span>,

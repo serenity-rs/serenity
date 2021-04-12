@@ -334,7 +334,7 @@
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">create_embed</span>);
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">create_embed</span>.<span class="number">0</span>);
 
-        <span class="ident">Value::Object</span>(<span class="ident">map</span>)
+        <span class="ident">Value::from</span>(<span class="ident">map</span>)
     }
 }
 

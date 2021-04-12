@@ -2044,7 +2044,6 @@
 <span id="2041">2041</span>
 <span id="2042">2042</span>
 <span id="2043">2043</span>
-<span id="2044">2044</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -2062,8 +2061,9 @@
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::utils::deserialize_emojis</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::constants::OpCode</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::from_value</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants::OpCode</span>, <span class="ident">json::prelude</span>::<span class="kw-2">*</span>};
 
 <span class="doccomment">/// Event data for the channel creation event.</span>
 <span class="doccomment">///</span>
@@ -2476,7 +2476,7 @@
 
         <span class="prelude-val">Ok</span>(<span class="ident">GuildMemberAddEvent</span> {
             <span class="ident">guild_id</span>,
-            <span class="ident">member</span>: <span class="ident">Member::deserialize</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
+            <span class="ident">member</span>: <span class="ident">Member::deserialize</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
         })
     }
 }
@@ -2623,7 +2623,7 @@
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">members</span>) <span class="op">=</span> <span class="ident">members</span>.<span class="ident">as_array_mut</span>() {
-            <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">guild_id</span>.<span class="number">0</span>));
+            <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">from_number</span>(<span class="ident">guild_id</span>.<span class="number">0</span>);
 
             <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="ident">members</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">member</span>.<span class="ident">as_object_mut</span>() {
@@ -2632,7 +2632,7 @@
             }
         }
 
-        <span class="kw">let</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">members</span>)
+        <span class="kw">let</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">members</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">members</span><span class="op">|</span> {
                 <span class="ident">members</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(<span class="ident">HashMap::new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">member</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>;
@@ -2695,7 +2695,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;role&quot;</span>) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-                <span class="ident">role</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">id</span>)));
+                <span class="ident">role</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">id</span>));
             }
         }
 
@@ -2771,7 +2771,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;role&quot;</span>) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_object_mut</span>() {
-                <span class="ident">role</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">id</span>)));
+                <span class="ident">role</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">id</span>));
             }
         }
 
@@ -3079,10 +3079,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
-        <span class="kw">let</span> <span class="ident">presence</span> <span class="op">=</span> <span class="ident">Presence::deserialize</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">presence</span> <span class="op">=</span> <span class="ident">Presence::deserialize</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild_id</span>,
@@ -3385,7 +3385,7 @@
 
         <span class="prelude-val">Ok</span>(<span class="ident">VoiceStateUpdateEvent</span> {
             <span class="ident">guild_id</span>,
-            <span class="ident">voice_state</span>: <span class="ident">VoiceState::deserialize</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
+            <span class="ident">voice_state</span>: <span class="ident">VoiceState::deserialize</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
         })
     }
 }
@@ -3464,7 +3464,7 @@
                     .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">map</span>
                     .<span class="ident">remove</span>(<span class="string">&quot;d&quot;</span>)
-                    .<span class="ident">ok_or</span>(<span class="ident">Error::Decode</span>(<span class="string">&quot;expected gateway event d&quot;</span>, <span class="ident">Value::Object</span>(<span class="ident">map</span>)))
+                    .<span class="ident">ok_or</span>(<span class="ident">Error::Decode</span>(<span class="string">&quot;expected gateway event d&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">map</span>)))
                     .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">deserialize_event_with_type</span>(<span class="ident">kind</span>, <span class="ident">payload</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
@@ -3685,12 +3685,12 @@
 <span class="doccomment">/// Returns [`Error::Json`] if there is an error in deserializing the event data.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_event_with_type</span>(<span class="ident">kind</span>: <span class="ident">EventType</span>, <span class="ident">v</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">kind</span> {
-        <span class="ident">EventType::ChannelCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ChannelCreate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::ChannelDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ChannelDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::ChannelPinsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ChannelPinsUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::ChannelUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ChannelUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildBanAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildBanAdd</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildBanRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildBanRemove</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::ChannelCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ChannelCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::ChannelDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ChannelDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::ChannelPinsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ChannelPinsUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::ChannelUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ChannelUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildBanAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildBanAdd</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildBanRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildBanRemove</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::GuildCreate</span> <span class="op">|</span> <span class="ident">EventType::GuildUnavailable</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="comment">// GuildUnavailable isn&#39;t actually received from the gateway, so it</span>
             <span class="comment">// can be lumped in with GuildCreate&#39;s arm.</span>
@@ -3698,56 +3698,54 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-                <span class="kw">let</span> <span class="ident">guild_data</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">guild_data</span> <span class="op">=</span> <span class="ident">from_value</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>;
 
                 <span class="ident">Event::GuildUnavailable</span>(<span class="ident">guild_data</span>)
             } <span class="kw">else</span> {
-                <span class="ident">Event::GuildCreate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>))<span class="question-mark">?</span>)
+                <span class="ident">Event::GuildCreate</span>(<span class="ident">from_value</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>)
             }
         },
         <span class="ident">EventType::GuildDelete</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-                <span class="kw">let</span> <span class="ident">guild_data</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">guild_data</span> <span class="op">=</span> <span class="ident">from_value</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>;
 
                 <span class="ident">Event::GuildUnavailable</span>(<span class="ident">guild_data</span>)
             } <span class="kw">else</span> {
-                <span class="ident">Event::GuildDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>))<span class="question-mark">?</span>)
+                <span class="ident">Event::GuildDelete</span>(<span class="ident">from_value</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))<span class="question-mark">?</span>)
             }
         },
-        <span class="ident">EventType::GuildEmojisUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildEmojisUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildIntegrationsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event::GuildIntegrationsUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType::GuildMemberAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildMemberAdd</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildMemberRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildMemberRemove</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildMemberUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildMemberUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildMembersChunk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildMembersChunk</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildRoleCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildRoleCreate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildRoleDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildRoleDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildRoleUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildRoleUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::InviteCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::InviteCreate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::InviteDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::InviteDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::GuildUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::MessageCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::MessageCreate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::MessageDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::MessageDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::MessageDeleteBulk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::MessageDeleteBulk</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::ReactionAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ReactionAdd</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::ReactionRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ReactionRemove</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::ReactionRemoveAll</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ReactionRemoveAll</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::MessageUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::MessageUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::PresenceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::PresenceUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::PresencesReplace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::PresencesReplace</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::Ready</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::Ready</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::Resumed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::Resumed</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::TypingStart</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::TypingStart</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::UserUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::UserUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::VoiceServerUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::VoiceServerUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::VoiceStateUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::VoiceStateUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType::WebhookUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::WebhookUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildEmojisUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildEmojisUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildIntegrationsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildIntegrationsUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildMemberAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildMemberAdd</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildMemberRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildMemberRemove</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildMemberUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildMemberUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildMembersChunk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildMembersChunk</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildRoleCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildRoleCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildRoleDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildRoleDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildRoleUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildRoleUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::InviteCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::InviteCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::InviteDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::InviteDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::GuildUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::GuildUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::MessageCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::MessageCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::MessageDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::MessageDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::MessageDeleteBulk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::MessageDeleteBulk</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::ReactionAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ReactionAdd</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::ReactionRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ReactionRemove</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::ReactionRemoveAll</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ReactionRemoveAll</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::MessageUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::MessageUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::PresenceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::PresenceUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::PresencesReplace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::PresencesReplace</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::Ready</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::Ready</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::Resumed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::Resumed</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::TypingStart</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::TypingStart</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::UserUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::UserUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::VoiceServerUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::VoiceServerUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::VoiceStateUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::VoiceStateUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::WebhookUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::WebhookUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-        <span class="ident">EventType::InteractionCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::InteractionCreate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::InteractionCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::InteractionCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::Other</span>(<span class="ident">kind</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::Unknown</span>(<span class="ident">UnknownEvent</span> {
             <span class="ident">kind</span>,
             <span class="ident">value</span>: <span class="ident">v</span>,

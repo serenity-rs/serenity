@@ -571,9 +571,9 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::CacheHttp</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::misc::ChannelParseError</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils::parse_channel</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json::prelude</span>::<span class="kw-2">*</span>, <span class="ident">model::prelude</span>::<span class="kw-2">*</span>};
 
 <span class="doccomment">/// A container for any channel.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -778,13 +778,13 @@
         };
 
         <span class="kw">match</span> <span class="ident">kind</span> {
-            <span class="number">0</span> <span class="op">|</span> <span class="number">2</span> <span class="op">|</span> <span class="number">5</span> <span class="op">|</span> <span class="number">6</span> <span class="op">|</span> <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>(<span class="ident">Value::Object</span>(<span class="ident">v</span>))
+            <span class="number">0</span> <span class="op">|</span> <span class="number">2</span> <span class="op">|</span> <span class="number">5</span> <span class="op">|</span> <span class="number">6</span> <span class="op">|</span> <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">v</span>))
                 .<span class="ident">map</span>(<span class="ident">Channel::Guild</span>)
                 .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
-            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span>(<span class="ident">Value::Object</span>(<span class="ident">v</span>))
+            <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">v</span>))
                 .<span class="ident">map</span>(<span class="ident">Channel::Private</span>)
                 .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
-            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span>(<span class="ident">Value::Object</span>(<span class="ident">v</span>))
+            <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">v</span>))
                 .<span class="ident">map</span>(<span class="ident">Channel::Category</span>)
                 .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown channel type&quot;</span>)),

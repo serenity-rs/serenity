@@ -1228,10 +1228,6 @@
 <span id="1225">1225</span>
 <span id="1226">1226</span>
 <span id="1227">1227</span>
-<span id="1228">1228</span>
-<span id="1229">1229</span>
-<span id="1230">1230</span>
-<span id="1231">1231</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1249,7 +1245,6 @@
     <span class="ident">de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>},
     <span class="ident">ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>},
 };
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">EditMessage</span>};
@@ -1261,6 +1256,7 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">CollectReaction</span>, <span class="ident">ReactionCollectorBuilder</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::Value</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions::MessageInteraction</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
@@ -1588,10 +1584,8 @@
 
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::utils::hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>);
 
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>
-            .<span class="ident">http</span>()
-            .<span class="ident">edit_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="ident">map</span>))
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span>
+            <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -2015,10 +2009,8 @@
 
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::utils::hashmap_to_json_map</span>(<span class="ident">suppress</span>.<span class="number">0</span>);
 
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>
-            .<span class="ident">http</span>()
-            .<span class="ident">edit_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="ident">map</span>))
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span>
+            <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }

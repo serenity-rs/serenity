@@ -280,8 +280,8 @@
 <span id="277">277</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::NULL</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for constructing a personal [`Message`] instance.</span>
@@ -540,7 +540,7 @@
         <span class="ident">mention_roles</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">mention_channels</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">mentions</span>: <span class="ident">Vec::new</span>(),
-        <span class="ident">nonce</span>: <span class="ident">Value::Null</span>,
+        <span class="ident">nonce</span>: <span class="ident">NULL</span>,
         <span class="ident">pinned</span>: <span class="bool-val">false</span>,
         <span class="ident">reactions</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">tts</span>: <span class="bool-val">false</span>,

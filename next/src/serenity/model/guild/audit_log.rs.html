@@ -941,7 +941,7 @@
                                 <span class="comment">// using a proper Error num, the best we can do here is to check if the string contains</span>
                                 <span class="comment">// this error. This was added because Discord randomly started sending new fields.</span>
                                 <span class="comment">// But no JSON deserializer should ever error over this.</span>
-                                <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// Actually read the value to avoid syntax errors</span>
+                                <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="kw">crate</span><span class="ident">::json::Value</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// Actually read the value to avoid syntax errors</span>
                             } <span class="kw">else</span> {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
                             }

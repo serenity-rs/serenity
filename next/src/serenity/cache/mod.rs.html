@@ -1154,7 +1154,6 @@
 <span id="1151">1151</span>
 <span id="1152">1152</span>
 <span id="1153">1153</span>
-<span id="1154">1154</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -1197,7 +1196,6 @@
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
-
 <span class="kw">mod</span> <span class="ident">cache_update</span>;
 <span class="kw">mod</span> <span class="ident">settings</span>;
 
@@ -2138,8 +2136,8 @@
     <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
     <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-    <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">Number</span>, <span class="ident">Value</span>};
 
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::from_number</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>, <span class="ident">Settings</span>},
         <span class="ident">model::prelude</span>::<span class="kw-2">*</span>,
@@ -2180,7 +2178,7 @@
                 <span class="ident">mention_roles</span>: <span class="macro">vec!</span>[],
                 <span class="ident">mention_channels</span>: <span class="macro">vec!</span>[],
                 <span class="ident">mentions</span>: <span class="macro">vec!</span>[],
-                <span class="ident">nonce</span>: <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="number">1</span>)),
+                <span class="ident">nonce</span>: <span class="ident">from_number</span>(<span class="number">1</span>),
                 <span class="ident">pinned</span>: <span class="bool-val">false</span>,
                 <span class="ident">reactions</span>: <span class="macro">vec!</span>[],
                 <span class="ident">timestamp</span>: <span class="ident">datetime</span>,

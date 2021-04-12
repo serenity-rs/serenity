@@ -108,10 +108,12 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::from_number</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">guild::Role</span>, <span class="ident">Permissions</span>};
 
 <span class="doccomment">/// A builder to create or edit a [`Role`] for use via a number of model methods.</span>
@@ -160,40 +162,40 @@
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
         {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">role</span>.<span class="ident">colour</span>.<span class="number">0</span>)));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">colour</span>.<span class="number">0</span>));
         }
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
         {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">role</span>.<span class="ident">colour</span>)));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">colour</span>));
         }
 
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;hoist&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">role</span>.<span class="ident">hoist</span>));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;managed&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">role</span>.<span class="ident">managed</span>));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;mentionable&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>())));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">role</span>.<span class="ident">position</span>)));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;hoist&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">hoist</span>));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;managed&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">managed</span>));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;mentionable&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>()));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">position</span>));
 
         <span class="ident">EditRole</span>(<span class="ident">map</span>)
     }
 
     <span class="doccomment">/// Sets the colour of the role.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">colour</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">colour</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Whether or not to hoist the role above lower-positioned role in the user</span>
     <span class="doccomment">/// list.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hoist</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hoist</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;hoist&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">hoist</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;hoist&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">hoist</span>));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Whether or not to make the role mentionable, notifying its users.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mentionable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mentionable</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;mentionable&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">mentionable</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;mentionable&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">mentionable</span>));
         <span class="self">self</span>
     }
 
@@ -205,14 +207,14 @@
 
     <span class="doccomment">/// The set of permissions to assign the role.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permissions</span>: <span class="ident">Permissions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>())));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">from_number</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The position to assign the role in the role list. This correlates to the</span>
     <span class="doccomment">/// role&#39;s position in the user list.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">position</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">position</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="ident">position</span>));
         <span class="self">self</span>
     }
 }

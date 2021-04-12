@@ -108,7 +108,7 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">internal::prelude</span>::<span class="kw-2">*</span>, <span class="ident">json::NULL</span>};
 
 <span class="doccomment">/// A builder to edit the current user&#39;s settings, to be used in conjunction</span>
 <span class="doccomment">/// with [`CurrentUser::edit`].</span>
@@ -157,7 +157,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`utils::read_image`]: crate::utils::read_image</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">avatar</span> <span class="op">=</span> <span class="ident">avatar</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
+        <span class="kw">let</span> <span class="ident">avatar</span> <span class="op">=</span> <span class="ident">avatar</span>.<span class="ident">map_or</span>(<span class="ident">NULL</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;avatar&quot;</span>, <span class="ident">avatar</span>);
         <span class="self">self</span>
