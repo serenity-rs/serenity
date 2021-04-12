@@ -1,14 +1,15 @@
 use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
-#[cfg(feature = "model")]
-use serde_json::json;
+#[cfg(feature = "simd-json")]
+use simd_json::ValueAccess;
 
 use super::prelude::*;
 #[cfg(feature = "model")]
 use crate::builder::CreateAutocompleteResponse;
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::internal::prelude::{JsonMap, StdResult, Value};
+use crate::internal::prelude::StdResult;
+use crate::json::{from_number, json, JsonMap, Value};
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::interactions::{
     application_command::ApplicationCommandInteractionData,
@@ -88,7 +89,7 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
 
         if let Some(guild_id) = id {
             if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
-                member.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                member.insert("guild_id".to_string(), from_number(guild_id));
             }
 
             if let Some(data) = map.get_mut("data") {
@@ -98,7 +99,7 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
                             for value in values.values_mut() {
                                 value.as_object_mut().expect("couldn't deserialize").insert(
                                     "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
+                                    Value::from(guild_id.to_string()),
                                 );
                             }
                         }
@@ -112,7 +113,7 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
                                     .expect("couldn't deserialize application command")
                                     .insert(
                                         "guild_id".to_string(),
-                                        Value::String(guild_id.to_string()),
+                                        Value::from(guild_id.to_string()),
                                     );
                             }
                         }

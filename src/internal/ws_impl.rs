@@ -16,6 +16,7 @@ use url::Url;
 
 use crate::gateway::{GatewayError, WsStream};
 use crate::internal::prelude::*;
+use crate::json::{from_reader, from_str, to_string};
 
 #[async_trait]
 pub trait ReceiverExt {
@@ -50,22 +51,14 @@ impl ReceiverExt for WsStream {
 #[async_trait]
 impl SenderExt for SplitSink<WsStream, Message> {
     async fn send_json(&mut self, value: &Value) -> Result<()> {
-        Ok(serde_json::to_string(value)
-            .map(Message::Text)
-            .map_err(Error::from)
-            .map(|m| self.send(m))?
-            .await?)
+        Ok(to_string(value).map(Message::Text).map_err(Error::from).map(|m| self.send(m))?.await?)
     }
 }
 
 #[async_trait]
 impl SenderExt for WsStream {
     async fn send_json(&mut self, value: &Value) -> Result<()> {
-        Ok(serde_json::to_string(value)
-            .map(Message::Text)
-            .map_err(Error::from)
-            .map(|m| self.send(m))?
-            .await?)
+        Ok(to_string(value).map(Message::Text).map_err(Error::from).map(|m| self.send(m))?.await?)
     }
 }
 
@@ -73,19 +66,17 @@ impl SenderExt for WsStream {
 pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>> {
     Ok(match message {
         Some(Message::Binary(bytes)) => {
-            serde_json::from_reader(ZlibDecoder::new(&bytes[..])).map(Some).map_err(|why| {
+            from_reader(ZlibDecoder::new(&bytes[..])).map(Some).map_err(|why| {
                 warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
 
                 why
             })?
         },
-        Some(Message::Text(payload)) => {
-            serde_json::from_str(&payload).map(Some).map_err(|why| {
-                warn!("Err deserializing text: {:?}; text: {}", why, payload,);
+        Some(Message::Text(mut payload)) => from_str(&mut payload).map(Some).map_err(|why| {
+            warn!("Err deserializing text: {:?}; text: {}", why, payload,);
 
-                why
-            })?
-        },
+            why
+        })?,
         Some(Message::Close(Some(frame))) => {
             return Err(Error::Gateway(GatewayError::Closed(Some(frame))));
         },

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
-
-use crate::internal::prelude::*;
+use crate::json::from_number;
+use crate::json::json;
+use crate::json::Value;
 use crate::model::prelude::*;
 
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].
@@ -19,20 +19,20 @@ impl CreateChannel {
     ///
     /// **Note**: Must be between 2 and 100 characters long.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
-        self.0.insert("name", Value::String(name.to_string()));
+        self.0.insert("name", Value::from(name.to_string()));
 
         self
     }
     /// Specify what type the channel is, whether it's a text, voice, category or news channel.
     pub fn kind(&mut self, kind: ChannelType) -> &mut Self {
-        self.0.insert("type", Value::Number(Number::from(kind as u8)));
+        self.0.insert("type", from_number(kind as u8));
 
         self
     }
 
     /// Specify the category, the "parent" of this channel.
     pub fn category<I: Into<ChannelId>>(&mut self, id: I) -> &mut Self {
-        self.0.insert("parent_id", Value::Number(Number::from(id.into().0)));
+        self.0.insert("parent_id", from_number(id.into().0));
 
         self
     }
@@ -41,44 +41,30 @@ impl CreateChannel {
     ///
     /// **Note**: Must be between 0 and 1000 characters long.
     pub fn topic<D: ToString>(&mut self, topic: D) -> &mut Self {
-        self.0.insert("topic", Value::String(topic.to_string()));
+        self.0.insert("topic", Value::from(topic.to_string()));
 
         self
     }
 
     /// Specify if this channel will be inappropriate to browse while at work.
     pub fn nsfw(&mut self, b: bool) -> &mut Self {
-        self.0.insert("nsfw", Value::Bool(b));
+        self.0.insert("nsfw", Value::from(b));
 
         self
     }
 
     /// [Voice-only] Specify the bitrate at which sound plays in the voice channel.
     pub fn bitrate(&mut self, rate: u32) -> &mut Self {
-        self.0.insert("bitrate", Value::Number(Number::from(rate)));
+        self.0.insert("bitrate", from_number(rate));
 
         self
     }
 
     /// [Voice-only] Set how many users may occupy this voice channel.
     pub fn user_limit(&mut self, limit: u32) -> &mut Self {
-        self.0.insert("user_limit", Value::Number(Number::from(limit)));
+        self.0.insert("user_limit", from_number(limit));
 
         self
-    }
-
-    /// How many seconds must a user wait before sending another message.
-    ///
-    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt
-    /// from this restriction.
-    ///
-    /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
-    ///
-    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
-    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
-    #[deprecated(note = "replaced by `rate_limit_per_user`")]
-    pub fn rate_limit(&mut self, limit: u64) -> &mut Self {
-        self.rate_limit_per_user(limit)
     }
 
     /// How many seconds must a user wait before sending another message.
@@ -92,14 +78,14 @@ impl CreateChannel {
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(&mut self, seconds: u64) -> &mut Self {
-        self.0.insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
+        self.0.insert("rate_limit_per_user", from_number(seconds));
 
         self
     }
 
     /// Specify where the channel should be located.
     pub fn position(&mut self, pos: u32) -> &mut Self {
-        self.0.insert("position", Value::Number(Number::from(pos)));
+        self.0.insert("position", from_number(pos));
 
         self
     }
@@ -152,9 +138,9 @@ impl CreateChannel {
                     "type": kind,
                 })
             })
-            .collect();
+            .collect::<Vec<_>>();
 
-        self.0.insert("permission_overwrites", Value::Array(overwrites));
+        self.0.insert("permission_overwrites", Value::from(overwrites));
 
         self
     }

@@ -255,7 +255,7 @@ impl<'a> ClientBuilder<'a> {
     where
         F: Framework + Send + Sync + 'static,
     {
-        self.framework = Some(Arc::new(Box::new(framework)));
+        self.framework = Some(Arc::new(framework));
 
         self
     }
@@ -276,7 +276,7 @@ impl<'a> ClientBuilder<'a> {
 
     /// Gets the framework, if already initialized. See [`Self::framework`] for more info.
     #[cfg(feature = "framework")]
-    pub fn get_framework(&self) -> Option<Arc<Box<dyn Framework + Send + Sync>>> {
+    pub fn get_framework(&self) -> Option<Arc<dyn Framework + Send + Sync>> {
         self.framework.clone()
     }
 

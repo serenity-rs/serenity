@@ -4,6 +4,7 @@ use super::{CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
+use crate::json::from_number;
 use crate::model::channel::MessageFlags;
 use crate::utils;
 
@@ -39,15 +40,15 @@ impl EditMessage {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
-        self.0.insert("content", Value::String(content.to_string()));
+        self.0.insert("content", Value::from(content.to_string()));
         self
     }
 
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
-        let embed = Value::Object(map);
+        let embed = Value::from(map);
 
-        let embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(Vec::new()));
+        let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");
 
         embeds_array.push(embed);
@@ -92,7 +93,7 @@ impl EditMessage {
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.0.insert("embeds", Value::Array(Vec::new()));
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
         self._add_embed(embed)
     }
 
@@ -103,7 +104,7 @@ impl EditMessage {
     /// **Note**: This will replace all existing embeds.
     /// Use [`Self::add_embed()`] to add an additional embed.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        self.0.insert("embeds", Value::Array(Vec::new()));
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
         self._add_embed(embed)
     }
 
@@ -112,7 +113,7 @@ impl EditMessage {
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
     pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        self.0.insert("embeds", Value::Array(Vec::new()));
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
         for embed in embeds {
             self._add_embed(embed);
         }
@@ -126,7 +127,7 @@ impl EditMessage {
         // `1 << 2` is defined by the API to be the SUPPRESS_EMBEDS flag.
         // At the time of writing, the only accepted value in "flags" is `SUPPRESS_EMBEDS` for editing messages.
         let flags = if suppress { 1 << 2 } else { 0 };
-        self.0.insert("flags", serde_json::Value::Number(serde_json::Number::from(flags)));
+        self.0.insert("flags", from_number(flags));
 
         self
     }
@@ -139,7 +140,7 @@ impl EditMessage {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::Object(map);
+        let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
         self
@@ -154,20 +155,20 @@ impl EditMessage {
         let mut components = CreateComponents::default();
         f(&mut components);
 
-        self.0.insert("components", Value::Array(components.0));
+        self.0.insert("components", Value::from(components.0));
         self
     }
 
     /// Sets the components of this message.
     #[cfg(feature = "unstable_discord_api")]
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
-        self.0.insert("components", Value::Array(components.0));
+        self.0.insert("components", Value::from(components.0));
         self
     }
 
     /// Sets the flags for the message.
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits)));
+        self.0.insert("flags", from_number(flags.bits));
         self
     }
 }
