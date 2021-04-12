@@ -82,7 +82,7 @@ impl<'de> Deserialize<'de> for Reaction {
         if let Some(id) = guild_id {
             if let Some(member) = map.get_mut("member") {
                 if let Some(object) = member.as_object_mut() {
-                    object.insert("guild_id".to_owned(), Value::String(id.to_string()));
+                    object.insert("guild_id".to_owned(), Value::from(id.to_string()));
                 }
             }
         }

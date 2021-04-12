@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::internal::prelude::*;
+use crate::json::{from_number, Value};
 use crate::model::id::RoleId;
 
 /// A builder to add parameters when using [`GuildId::add_member`].
@@ -14,7 +14,7 @@ impl AddMember {
     ///
     /// Requires the access token to have the `guilds.join` scope granted.
     pub fn access_token(&mut self, access_token: impl ToString) -> &mut Self {
-        self.0.insert("access_token", Value::String(access_token.to_string()));
+        self.0.insert("access_token", Value::from(access_token.to_string()));
         self
     }
 
@@ -24,7 +24,7 @@ impl AddMember {
     ///
     /// [Manage Nicknames]: crate::model::permissions::Permissions::MANAGE_NICKNAMES
     pub fn nickname(&mut self, nickname: impl ToString) -> &mut Self {
-        self.0.insert("nick", Value::String(nickname.to_string()));
+        self.0.insert("nick", Value::from(nickname.to_string()));
         self
     }
 
@@ -34,9 +34,9 @@ impl AddMember {
     ///
     /// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES
     pub fn roles(&mut self, roles: impl IntoIterator<Item = impl AsRef<RoleId>>) -> &mut Self {
-        let roles = roles.into_iter().map(|x| Value::Number(Number::from(x.as_ref().0))).collect();
+        let roles = roles.into_iter().map(|x| from_number(x.as_ref().0)).collect::<Vec<Value>>();
 
-        self.0.insert("roles", Value::Array(roles));
+        self.0.insert("roles", Value::from(roles));
         self
     }
 
@@ -46,7 +46,7 @@ impl AddMember {
     ///
     /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
     pub fn mute(&mut self, mute: bool) -> &mut Self {
-        self.0.insert("mute", Value::Bool(mute));
+        self.0.insert("mute", Value::from(mute));
         self
     }
 
@@ -56,7 +56,7 @@ impl AddMember {
     ///
     /// [Deafen Members]: crate::model::permissions::Permissions::DEAFEN_MEMBERS
     pub fn deafen(&mut self, deafen: bool) -> &mut Self {
-        self.0.insert("deaf", Value::Bool(deafen));
+        self.0.insert("deaf", Value::from(deafen));
         self
     }
 }
