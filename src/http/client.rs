@@ -41,6 +41,8 @@ use crate::model::prelude::*;
 /// requests to Discord's HTTP API. If you do not need to use a proxy or do not
 /// need to disable the rate limiter, you can use [`Http::new`] or
 /// [`Http::new_with_token`] instead.
+/// If you want want to set request timeouts, you can either pass your own [`reqwest::Client`] 
+/// to [`HttpBuilder::client`], or just use [`Http::new`] instead.
 ///
 /// ## Example
 ///
@@ -236,6 +238,33 @@ impl Http {
         };
 
         Self::new(Arc::new(built), &token)
+    }
+
+    /// Create an instance of [`Http`] with support for request and connect timeouts.
+    /// The timeout is applied from when the request starts connecting until the response body has finished.
+    /// The connect_timeout is applied for only the connect phase.
+    pub fn new_with_timeouts(timeout: std::time::Duration, connect_timeout: std::time::Duration, token: &str) -> Self {
+        let builder = configure_client_backend(Client::builder())
+            .timeout(timeout)
+            .connect_timeout(connect_timeout);
+        
+        let built = builder.build().expect("Cannot build reqwest::Client");
+        let client = Arc::new(built);
+        let client2 = Arc::clone(&client);
+
+        let token = if token.trim().starts_with("Bot ") {
+            token.to_string()
+        } else {
+            format!("Bot {}", token)
+        };
+
+        Self {
+            client,
+            ratelimiter: Ratelimiter::new(client2, ""),
+            ratelimiter_disabled: false,
+            proxy: None,
+            token: token,
+        }
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -2863,11 +2892,7 @@ impl AsRef<Http> for Http {
 
 impl Default for Http {
     fn default() -> Self {
-        let built = Client::builder()
-            .timeout(std::time::Duration::from_millis(30000))
-            .connect_timeout(std::time::Duration::from_millis(3000))
-            .build()
-            .expect("Cannot build Reqwest::Client.");
+        let built = Client::builder().build().expect("Cannot build Reqwest::Client.");
         let client = Arc::new(built);
         let client2 = Arc::clone(&client);
 
