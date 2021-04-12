@@ -1,6 +1,4 @@
 use futures::stream::Stream;
-#[cfg(feature = "model")]
-use serde_json::json;
 
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
@@ -21,7 +19,8 @@ use crate::collector::{
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
+#[cfg(feature = "model")]
+use crate::json::json;
 #[cfg(feature = "model")]
 use crate::utils;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
@@ -34,6 +33,7 @@ use crate::{
     },
     model::interactions::ApplicationCommand,
 };
+use crate::{json::prelude::*, model::prelude::*};
 
 #[cfg(feature = "model")]
 impl GuildId {
@@ -572,7 +572,7 @@ impl GuildId {
         f(&mut map);
 
         http.as_ref()
-            .edit_guild_welcome_screen(self.0, &Value::Object(utils::hashmap_to_json_map(map.0)))
+            .edit_guild_welcome_screen(self.0, &Value::from(utils::hashmap_to_json_map(map.0)))
             .await
     }
 
@@ -593,7 +593,7 @@ impl GuildId {
         f(&mut map);
 
         http.as_ref()
-            .edit_guild_widget(self.0, &Value::Object(utils::hashmap_to_json_map(map.0)))
+            .edit_guild_widget(self.0, &Value::from(utils::hashmap_to_json_map(map.0)))
             .await
     }
 
@@ -869,8 +869,8 @@ impl GuildId {
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>,
     ) -> Result<Member> {
-        let mut map = Map::new();
-        map.insert("channel_id".to_string(), Value::Number(Number::from(channel_id.into().0)));
+        let mut map = JsonMap::new();
+        map.insert("channel_id".to_string(), from_number(channel_id.into().0));
 
         http.as_ref().edit_member(self.0, user_id.into().0, &map).await
     }
@@ -898,8 +898,8 @@ impl GuildId {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
     ) -> Result<Member> {
-        let mut map = Map::new();
-        map.insert("channel_id".to_string(), Value::Null);
+        let mut map = JsonMap::new();
+        map.insert("channel_id".to_string(), NULL);
         http.as_ref().edit_member(self.0, user_id.into().0, &map).await
     }
 
@@ -951,9 +951,9 @@ impl GuildId {
                     "position": pos,
                 })
             })
-            .collect();
+            .collect::<Vec<_>>();
 
-        http.as_ref().edit_guild_channel_positions(self.0, &Value::Array(items)).await
+        http.as_ref().edit_guild_channel_positions(self.0, &Value::from(items)).await
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -1148,7 +1148,7 @@ impl GuildId {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = ApplicationCommand::build_application_command(f);
-        http.as_ref().create_guild_application_command(self.0, &Value::Object(map)).await
+        http.as_ref().create_guild_application_command(self.0, &Value::from(map)).await
     }
 
     /// Same as [`create_application_command`], but allows to create more
@@ -1169,7 +1169,7 @@ impl GuildId {
 
         f(&mut array);
 
-        http.as_ref().create_guild_application_commands(self.0, &Value::Array(array.0)).await
+        http.as_ref().create_guild_application_commands(self.0, &Value::from(array.0)).await
     }
 
     /// Creates a guild specific [`ApplicationCommandPermission`].
@@ -1197,7 +1197,7 @@ impl GuildId {
             .edit_guild_application_command_permissions(
                 self.0,
                 command_id.into(),
-                &Value::Object(utils::hashmap_to_json_map(map.0)),
+                &Value::from(utils::hashmap_to_json_map(map.0)),
             )
             .await
     }
@@ -1221,9 +1221,7 @@ impl GuildId {
         let mut map = CreateApplicationCommandsPermissions::default();
         f(&mut map);
 
-        http.as_ref()
-            .edit_guild_application_commands_permissions(self.0, &Value::Array(map.0))
-            .await
+        http.as_ref().edit_guild_application_commands_permissions(self.0, &Value::from(map.0)).await
     }
 
     /// Get all guild application commands.
@@ -1261,7 +1259,7 @@ impl GuildId {
     {
         let map = ApplicationCommand::build_application_command(f);
         http.as_ref()
-            .edit_guild_application_command(self.0, command_id.into(), &Value::Object(map))
+            .edit_guild_application_command(self.0, command_id.into(), &Value::from(map))
             .await
     }
 

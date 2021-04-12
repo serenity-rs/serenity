@@ -1,8 +1,11 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+#[cfg(feature = "simd-json")]
+use simd_json::Mutable;
 
+use crate::json::json;
+use crate::json::Value;
 use crate::model::id::{RoleId, UserId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -70,7 +73,7 @@ impl CreateAllowedMentions {
     /// If you use either, do not specify it's same type here.
     #[inline]
     pub fn parse(&mut self, value: ParseValue) -> &mut Self {
-        let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
+        let val = self.0.entry("parse").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
         let arr = val.as_array_mut().expect("Must be an array");
         arr.push(json![value]);
@@ -84,7 +87,7 @@ impl CreateAllowedMentions {
     /// [`Self::users`] or [`Self::roles`].
     #[inline]
     pub fn empty_parse(&mut self) -> &mut Self {
-        let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
+        let val = self.0.entry("parse").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
         let arr = val.as_array_mut().expect("Must be an array");
         arr.clear();
@@ -97,7 +100,7 @@ impl CreateAllowedMentions {
     pub fn users<U: Into<UserId>>(&mut self, users: impl IntoIterator<Item = U>) -> &mut Self {
         self.0.insert(
             "users",
-            Value::Array({
+            Value::from({
                 users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
             }),
         );
@@ -107,7 +110,7 @@ impl CreateAllowedMentions {
     /// Makes users unable to be mentioned.
     #[inline]
     pub fn empty_users(&mut self) -> &mut Self {
-        let val = self.0.entry("users").or_insert_with(|| Value::Array(Vec::new()));
+        let val = self.0.entry("users").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
         let arr = val.as_array_mut().expect("Must be an array");
         arr.clear();
@@ -120,7 +123,7 @@ impl CreateAllowedMentions {
     pub fn roles<R: Into<RoleId>>(&mut self, users: impl IntoIterator<Item = R>) -> &mut Self {
         self.0.insert(
             "roles",
-            Value::Array({
+            Value::from({
                 users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
             }),
         );
@@ -130,7 +133,7 @@ impl CreateAllowedMentions {
     /// Makes roles unable to be mentioned.
     #[inline]
     pub fn empty_roles(&mut self) -> &mut Self {
-        let val = self.0.entry("roles").or_insert_with(|| Value::Array(Vec::new()));
+        let val = self.0.entry("roles").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
         let arr = val.as_array_mut().expect("Must be an array");
         arr.clear();
@@ -141,7 +144,7 @@ impl CreateAllowedMentions {
     /// Makes the reply mention/ping the user.
     #[inline]
     pub fn replied_user(&mut self, mention_user: bool) -> &mut Self {
-        self.0.insert("replied_user", Value::Bool(mention_user));
+        self.0.insert("replied_user", Value::from(mention_user));
 
         self
     }
