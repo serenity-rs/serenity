@@ -2679,6 +2679,8 @@
 <span id="2676">2676</span>
 <span id="2677">2677</span>
 <span id="2678">2678</span>
+<span id="2679">2679</span>
+<span id="2680">2680</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -2690,6 +2692,7 @@
 <span class="kw">mod</span> <span class="ident">partial_guild</span>;
 <span class="kw">mod</span> <span class="ident">premium_tier</span>;
 <span class="kw">mod</span> <span class="ident">role</span>;
+<span class="kw">mod</span> <span class="ident">system_channel</span>;
 
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="ident">futures::stream::StreamExt</span>;
@@ -2707,6 +2710,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::partial_guild</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::premium_tier</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::role</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::system_channel</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::utils</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateChannel</span>, <span class="ident">EditGuild</span>, <span class="ident">EditMember</span>, <span class="ident">EditRole</span>};

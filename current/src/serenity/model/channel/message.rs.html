@@ -1229,6 +1229,9 @@
 <span id="1226">1226</span>
 <span id="1227">1227</span>
 <span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -2267,8 +2270,10 @@
     <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span> <span class="number">15</span>,
     <span class="doccomment">/// A message reply.</span>
     <span class="ident">InlineReply</span> <span class="op">=</span> <span class="number">19</span>,
-    <span class="doccomment">/// A slash command</span>
+    <span class="doccomment">/// A slash command.</span>
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">20</span>,
+    <span class="doccomment">/// Server setup tips.</span>
+    <span class="ident">GuildInviteReminder</span> <span class="op">=</span> <span class="number">22</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">MessageType</span> {
@@ -2313,6 +2318,7 @@
             <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">15</span>,
             <span class="ident">InlineReply</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">19</span>,
             <span class="ident">ApplicationCommand</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
+            <span class="ident">GuildInviteReminder</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">22</span>,
         }
     }
 }
