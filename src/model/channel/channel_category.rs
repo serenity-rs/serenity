@@ -2,6 +2,7 @@
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::json::from_number;
 use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils as serenity_utils;
@@ -125,8 +126,8 @@ impl ChannelCategory {
         F: FnOnce(&mut EditChannel) -> &mut EditChannel,
     {
         let mut map = HashMap::new();
-        map.insert("name", Value::String(self.name.clone()));
-        map.insert("position", Value::Number(Number::from(self.position)));
+        map.insert("name", Value::from(self.name.clone()));
+        map.insert("position", from_number(self.position));
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);

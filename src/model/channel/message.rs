@@ -15,7 +15,8 @@ use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
 };
-use serde_json::Value;
+#[cfg(feature = "simdjson")]
+use simd_json::ValueAccess;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
@@ -29,6 +30,7 @@ use crate::collector::{CollectComponentInteraction, ComponentInteractionCollecto
 use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::json::Value;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::{message_component::ActionRow, MessageInteraction};
 use crate::model::prelude::*;
@@ -354,10 +356,8 @@ impl Message {
 
         let map = crate::utils::hashmap_to_json_map(builder.0);
 
-        *self = cache_http
-            .http()
-            .edit_message(self.channel_id.0, self.id.0, &Value::Object(map))
-            .await?;
+        *self =
+            cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::from(map)).await?;
 
         Ok(())
     }
@@ -781,10 +781,8 @@ impl Message {
 
         let map = crate::utils::hashmap_to_json_map(suppress.0);
 
-        *self = cache_http
-            .http()
-            .edit_message(self.channel_id.0, self.id.0, &Value::Object(map))
-            .await?;
+        *self =
+            cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::from(map)).await?;
 
         Ok(())
     }
@@ -917,7 +915,7 @@ impl Message {
     }
 
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
-        if let Some(Value::String(ref content)) = map.get("content") {
+        if let Some(Value::String(content)) = map.get("content") {
             if let Some(length_over) = Message::overflow_length(content) {
                 return Err(Error::Model(ModelError::MessageTooLong(length_over)));
             }
