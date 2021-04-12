@@ -1,6 +1,8 @@
 use serde::de::Error as DeError;
 #[cfg(feature = "simd-json")]
 use simd_json::StaticNode;
+#[cfg(feature = "simd-json")]
+use simd_json::StaticNode;
 #[cfg(feature = "cache")]
 use tracing::{error, warn};
 
