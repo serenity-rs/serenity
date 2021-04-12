@@ -187,10 +187,10 @@ pub struct ApplicationCommandInteractionData {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataResolved {
-    users: Option<HashMap<UserId, User>>,
-    members: Option<HashMap<UserId, PartialMember>>,
-    roles: Option<HashMap<RoleId, Role>>,
-    channels: Option<HashMap<ChannelId, PartialChannel>>,
+    pub users: Option<HashMap<UserId, User>>,
+    pub members: Option<HashMap<UserId, PartialMember>>,
+    pub roles: Option<HashMap<RoleId, Role>>,
+    pub channels: Option<HashMap<ChannelId, PartialChannel>>,
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
