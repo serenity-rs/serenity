@@ -252,14 +252,59 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
 ///
 /// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a
 /// top-level key and another vector of `options`.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataOption {
     pub name: String,
     pub value: Option<Value>,
-    // pub kind: ApplicationCommandOptionType,
+    #[serde(rename = "type")]
+    pub kind: ApplicationCommandOptionType,
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
+}
+
+impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let name = map
+            .remove("name")
+            .ok_or_else(|| DeError::custom("expected value"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
+        let value = match map.contains_key("value") {
+            true => Some(
+                map.remove("value")
+                    .ok_or_else(|| DeError::custom("expected value"))
+                    .and_then(Value::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let kind = map
+            .remove("type")
+            .ok_or_else(|| DeError::custom("expected type"))
+            .and_then(ApplicationCommandOptionType::deserialize)
+            .map_err(DeError::custom)?;
+
+        let options = match map.contains_key("options") {
+            true => map
+                .remove("options")
+                .ok_or_else(|| DeError::custom("expected type"))
+                .and_then(deserialize_options)
+                .map_err(DeError::custom)?,
+            false => vec![],
+        };
+
+        Ok(Self {
+            name,
+            value,
+            kind,
+            options,
+        })
+    }
 }
 
 fn default_permission_value() -> bool {

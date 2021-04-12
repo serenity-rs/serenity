@@ -102,6 +102,15 @@ pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
+pub fn deserialize_options<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
+    let options: Vec<ApplicationCommandInteractionDataOption> =
+        Deserialize::deserialize(deserializer)?;
+
+    Ok(options)
+}
+
 pub fn deserialize_presences<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, Presence>, D::Error> {
