@@ -1,6 +1,10 @@
 use serde::de::Error as DeError;
+
 #[cfg(feature = "cache")]
 use tracing::{error, warn};
+
+#[cfg(feature = "simd-json")]
+use simd_json::StaticNode;
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -24,8 +28,6 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::model::prelude::*;
-use crate::model::utils::{deserialize_emojis, deserialize_roles};
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
     builder::{
@@ -35,6 +37,11 @@ use crate::{
         CreateApplicationCommandsPermissions,
     },
     model::interactions::ApplicationCommand,
+};
+use crate::{json::from_value, model::prelude::*};
+use crate::{
+    json::{from_number, prelude::*},
+    model::utils::{deserialize_emojis, deserialize_roles},
 };
 
 /// Partial information about a [`Guild`]. This does not include information
@@ -1443,14 +1450,14 @@ impl<'de> Deserialize<'de> for PartialGuild {
             if let Some(array) = map.get_mut("roles").and_then(|x| x.as_array_mut()) {
                 for value in array {
                     if let Some(role) = value.as_object_mut() {
-                        role.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                        role.insert("guild_id".to_string(), from_number(guild_id));
                     }
                 }
             }
         }
 
         let afk_channel_id = match map.remove("afk_channel_id") {
-            Some(v) => serde_json::from_value::<Option<ChannelId>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<ChannelId>>(v).map_err(DeError::custom)?,
             None => None,
         };
         let afk_timeout = map
@@ -1470,8 +1477,8 @@ impl<'de> Deserialize<'de> for PartialGuild {
             .map_err(DeError::custom)?;
         let features = map
             .remove("features")
-            .ok_or_else(|| DeError::custom("expected guild features"))
-            .and_then(serde_json::from_value::<Vec<String>>)
+            .ok_or_else(|| Error::Other("expected guild features"))
+            .and_then(from_value::<Vec<String>>)
             .map_err(DeError::custom)?;
         let icon = match map.remove("icon") {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
@@ -1525,7 +1532,10 @@ impl<'de> Deserialize<'de> for PartialGuild {
             None => PremiumTier::default(),
         };
         let premium_subscription_count = match map.remove("premium_subscription_count") {
+            #[cfg(not(feature = "simd-json"))]
             Some(Value::Null) | None => 0,
+            #[cfg(feature = "simd-json")]
+            Some(Value::Static(StaticNode::Null)) | None => 0,
             Some(v) => u64::deserialize(v).map_err(DeError::custom)?,
         };
         let banner = match map.remove("banner") {

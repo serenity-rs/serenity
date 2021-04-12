@@ -2,7 +2,8 @@
 
 use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
-use serde_json::{Map, Number, Value};
+#[cfg(feature = "simd-json")]
+use simd_json::ValueAccess;
 
 use super::prelude::*;
 use crate::builder::{
@@ -14,6 +15,7 @@ use crate::builder::{
 };
 use crate::http::Http;
 use crate::internal::prelude::*;
+use crate::json::{from_number, from_value, JsonMap, Value};
 use crate::utils;
 
 /// Information about an interaction.
@@ -64,7 +66,7 @@ impl<'de> Deserialize<'de> for Interaction {
 
         if let Some(guild_id) = id {
             if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
-                member.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                member.insert("guild_id".to_string(), from_number(guild_id));
             }
 
             if let Some(data) = map.get_mut("data") {
@@ -74,7 +76,7 @@ impl<'de> Deserialize<'de> for Interaction {
                             for value in values.values_mut() {
                                 value.as_object_mut().unwrap().insert(
                                     "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
+                                    Value::from(guild_id.to_string()),
                                 );
                             }
                         }
@@ -85,7 +87,7 @@ impl<'de> Deserialize<'de> for Interaction {
                             for value in values.values_mut() {
                                 value.as_object_mut().unwrap().insert(
                                     "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
+                                    Value::from(guild_id.to_string()),
                                 );
                             }
                         }
@@ -113,12 +115,11 @@ impl<'de> Deserialize<'de> for Interaction {
             .map_err(DeError::custom)?;
 
         let data = match map.contains_key("data") {
-            true => Some(
-                map.remove("data")
-                    .ok_or_else(|| DeError::custom("expected data"))
-                    .and_then(ApplicationCommandInteractionData::deserialize)
+            true => Some(match map.remove("data") {
+                Some(data) => from_value::<ApplicationCommandInteractionData>(data)
                     .map_err(DeError::custom)?,
-            ),
+                None => return Err(DeError::custom("expected data")),
+            }),
             false => None,
         };
 
@@ -516,7 +517,7 @@ impl ApplicationCommand {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = ApplicationCommand::build_application_command(f);
-        http.as_ref().create_global_application_command(&Value::Object(map)).await
+        http.as_ref().create_global_application_command(&Value::from(map)).await
     }
 
     /// Same as [`create_global_application_command`] but allows
@@ -534,7 +535,7 @@ impl ApplicationCommand {
 
         f(&mut array);
 
-        http.as_ref().create_global_application_commands(&Value::Array(array.0)).await
+        http.as_ref().create_global_application_commands(&Value::from(array.0)).await
     }
 
     /// Edits a global command by its Id.
@@ -547,7 +548,7 @@ impl ApplicationCommand {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = ApplicationCommand::build_application_command(f);
-        http.as_ref().edit_global_application_command(command_id.into(), &Value::Object(map)).await
+        http.as_ref().edit_global_application_command(command_id.into(), &Value::from(map)).await
     }
 
     /// Gets all global commands.
@@ -574,7 +575,7 @@ impl ApplicationCommand {
     }
 
     #[inline]
-    pub(crate) fn build_application_command<F>(f: F) -> Map<String, Value>
+    pub(crate) fn build_application_command<F>(f: F) -> JsonMap
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
@@ -781,7 +782,7 @@ impl Interaction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
+        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
     }
 
     /// Edits the initial interaction response.
@@ -819,7 +820,7 @@ impl Interaction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::Object(map)).await
+        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
     }
 
     /// Deletes the initial interaction response.
@@ -863,7 +864,7 @@ impl Interaction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_followup_message(&self.token, &Value::Object(map)).await
+        http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
     }
 
     /// Edits a followup response to the response sent.
@@ -899,7 +900,7 @@ impl Interaction {
         Message::check_embed_length(&map)?;
 
         http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::Object(map))
+            .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
             .await
     }
 
