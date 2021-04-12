@@ -1035,8 +1035,10 @@ pub enum MessageType {
     GuildDiscoveryRequalified = 15,
     /// A message reply.
     InlineReply = 19,
-    /// A slash command
+    /// A slash command.
     ApplicationCommand = 20,
+    /// Server setup tips.
+    GuildInviteReminder = 22,
 }
 
 enum_number!(MessageType {
@@ -1081,6 +1083,7 @@ impl MessageType {
             GuildDiscoveryRequalified => 15,
             InlineReply => 19,
             ApplicationCommand => 20,
+            GuildInviteReminder => 22,
         }
     }
 }
