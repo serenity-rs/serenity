@@ -2863,7 +2863,10 @@ impl AsRef<Http> for Http {
 
 impl Default for Http {
     fn default() -> Self {
-        let built = Client::builder().build().expect("Cannot build Reqwest::Client.");
+        let built = Client::builder()
+            .timeout(std::time::Duration::from_millis(30000))
+            .connect_timeout(std::time::Duration::from_millis(3000))
+            .build().expect("Cannot build Reqwest::Client.");
         let client = Arc::new(built);
         let client2 = Arc::clone(&client);
 
