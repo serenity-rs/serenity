@@ -19,7 +19,6 @@ use reqwest::{
 };
 use reqwest::{multipart::Part, Client, ClientBuilder, Response as ReqwestResponse};
 use serde::de::DeserializeOwned;
-use serde_json::json;
 use tokio::{fs::File, io::AsyncReadExt};
 use tracing::{debug, instrument, trace};
 
@@ -35,6 +34,7 @@ use super::{
 use crate::constants;
 use crate::http::routing::Route;
 use crate::internal::prelude::*;
+use crate::json::{from_number, from_value, json, to_string, to_vec};
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::application_command::{
     ApplicationCommand,
@@ -363,7 +363,7 @@ impl Http {
     /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-channel
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(&self, guild_id: u64, map: &JsonMap) -> Result<GuildChannel> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -541,7 +541,7 @@ impl Http {
     /// Create a guild called `"test"` in the [US West region]:
     ///
     /// ```rust,no_run
-    /// use serde_json::json;
+    /// use serenity::json::json;
     /// use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -656,7 +656,7 @@ impl Http {
     /// [Create Invite]: Permissions::CREATE_INVITE
     /// [docs]: https://discord.com/developers/docs/resources/channel#create-channel-invite
     pub async fn create_invite(&self, channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -675,7 +675,7 @@ impl Http {
         target_id: u64,
         map: &Value,
     ) -> Result<()> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.wind(204, Request {
             body: Some(&body),
@@ -690,7 +690,7 @@ impl Http {
 
     /// Creates a private channel with a user.
     pub async fn create_private_channel(&self, map: &Value) -> Result<PrivateChannel> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -722,7 +722,7 @@ impl Http {
 
     /// Creates a role.
     pub async fn create_role(&self, guild_id: u64, map: &JsonMap) -> Result<Role> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
         let mut value = self
             .request(Request {
                 body: Some(&body),
@@ -736,10 +736,10 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+            map.insert("guild_id".to_string(), from_number(guild_id));
         }
 
-        serde_json::from_value(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
@@ -759,7 +759,7 @@ impl Http {
     /// Creating a webhook named `test`:
     ///
     /// ```rust,no_run
-    /// use serde_json::json;
+    /// use serenity::json::json;
     /// use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -772,7 +772,7 @@ impl Http {
     /// # }
     /// ```
     pub async fn create_webhook(&self, channel_id: u64, map: &Value) -> Result<Webhook> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1123,7 +1123,7 @@ impl Http {
 
     /// Changes channel information.
     pub async fn edit_channel(&self, channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1149,7 +1149,7 @@ impl Http {
 
     /// Changes emoji information.
     pub async fn edit_emoji(&self, guild_id: u64, emoji_id: u64, map: &Value) -> Result<Emoji> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1214,7 +1214,7 @@ impl Http {
 
     /// Changes guild information.
     pub async fn edit_guild(&self, guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1307,7 +1307,7 @@ impl Http {
 
     /// Edits the positions of a guild's channels.
     pub async fn edit_guild_channel_positions(&self, guild_id: u64, value: &Value) -> Result<()> {
-        let body = serde_json::to_vec(value)?;
+        let body = to_vec(value)?;
 
         self.wind(204, Request {
             body: Some(&body),
@@ -1321,7 +1321,7 @@ impl Http {
 
     /// Edits a [`Guild`]'s widget.
     pub async fn edit_guild_widget(&self, guild_id: u64, map: &Value) -> Result<GuildWidget> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1339,7 +1339,7 @@ impl Http {
         guild_id: u64,
         map: &Value,
     ) -> Result<GuildWelcomeScreen> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1353,7 +1353,7 @@ impl Http {
 
     /// Does specific actions to a member.
     pub async fn edit_member(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<Member> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         let mut value = self
             .request(Request {
@@ -1369,10 +1369,10 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+            map.insert("guild_id".to_string(), from_number(guild_id));
         }
 
-        serde_json::from_value::<Member>(value).map_err(From::from)
+        from_value::<Member>(value).map_err(From::from)
     }
 
     /// Edits a message by Id.
@@ -1384,7 +1384,7 @@ impl Http {
         message_id: u64,
         map: &Value,
     ) -> Result<Message> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1431,7 +1431,7 @@ impl Http {
     /// Pass [`None`] to reset the nickname.
     pub async fn edit_nickname(&self, guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
         let map = json!({ "nick": new_nickname });
-        let body = serde_json::to_vec(&map)?;
+        let body = to_vec(&map)?;
 
         self.wind(200, Request {
             body: Some(&body),
@@ -1486,7 +1486,7 @@ impl Http {
 
     /// Edits the current user's profile settings.
     pub async fn edit_profile(&self, map: &JsonMap) -> Result<CurrentUser> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         let request = self
             .request(Request {
@@ -1501,7 +1501,7 @@ impl Http {
 
     /// Changes a role in a guild.
     pub async fn edit_role(&self, guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
-        let body = serde_json::to_vec(&map)?;
+        let body = to_vec(&map)?;
         let mut value = self
             .request(Request {
                 body: Some(&body),
@@ -1516,10 +1516,10 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+            map.insert("guild_id".to_string(), from_number(guild_id));
         }
 
-        serde_json::from_value(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Changes the position of a role in a guild.
@@ -1529,7 +1529,7 @@ impl Http {
         role_id: u64,
         position: u64,
     ) -> Result<Vec<Role>> {
-        let body = serde_json::to_vec(&json!([{
+        let body = to_vec(&json!([{
             "id": role_id,
             "position": position,
         }]))?;
@@ -1549,12 +1549,12 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for role in array {
                 if let Some(map) = role.as_object_mut() {
-                    map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                    map.insert("guild_id".to_string(), from_number(guild_id));
                 }
             }
         }
 
-        serde_json::from_value(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Edits a thread channel in the [`GuildChannel`] given its Id.
@@ -1585,8 +1585,10 @@ impl Http {
     /// Suppress a user
     ///
     /// ```rust,no_run
-    /// use serde_json::json;
-    /// use serenity::http::Http;
+    /// use serenity::{
+    ///     http::Http,
+    ///     json::{json, prelude::*},
+    /// };
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
@@ -1605,7 +1607,7 @@ impl Http {
     /// # }
     /// ```
     pub async fn edit_voice_state(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.wind(204, Request {
             body: Some(&body),
@@ -1634,8 +1636,10 @@ impl Http {
     /// Unsuppress the current bot user
     ///
     /// ```rust,no_run
-    /// use serde_json::json;
-    /// use serenity::http::Http;
+    /// use serenity::{
+    ///     http::Http,
+    ///     json::{json, prelude::*},
+    /// };
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
@@ -1654,7 +1658,7 @@ impl Http {
     /// # }
     /// ```
     pub async fn edit_voice_state_me(&self, guild_id: u64, map: &JsonMap) -> Result<()> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.wind(204, Request {
             body: Some(&body),
@@ -1685,7 +1689,7 @@ impl Http {
     /// Edit the image of a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
-    /// use serde_json::json;
+    /// use serenity::json::json;
     /// use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -1722,8 +1726,9 @@ impl Http {
     /// Edit the name of a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
-    /// use serde_json::json;
+    /// use serenity::json::prelude::*;
     /// use serenity::http::Http;
+    ///
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
@@ -1742,7 +1747,7 @@ impl Http {
         token: &str,
         map: &JsonMap,
     ) -> Result<Webhook> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1787,7 +1792,7 @@ impl Http {
     /// Sending a webhook with message content of `test`:
     ///
     /// ```rust,no_run
-    /// use serde_json::json;
+    /// use serenity::json::prelude::*;
     /// use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
@@ -1810,7 +1815,7 @@ impl Http {
         wait: bool,
         map: &JsonMap,
     ) -> Result<Option<Message>> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         let mut headers = Headers::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
@@ -1907,7 +1912,7 @@ impl Http {
             }
         }
 
-        multipart = multipart.text("payload_json", serde_json::to_string(&map)?);
+        multipart = multipart.text("payload_json", to_string(&map)?);
 
         let response = self
             .client
@@ -1932,7 +1937,7 @@ impl Http {
         message_id: u64,
         map: &JsonMap,
     ) -> Result<Message> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1980,7 +1985,7 @@ impl Http {
         let mut map: BTreeMap<String, Value> = response.json::<BTreeMap<String, Value>>().await?;
 
         match map.remove("scheduled_maintenances") {
-            Some(v) => serde_json::from_value::<Vec<Maintenance>>(v).map_err(From::from),
+            Some(v) => from_value::<Vec<Maintenance>>(v).map_err(From::from),
             None => Ok(vec![]),
         }
     }
@@ -2565,7 +2570,7 @@ impl Http {
             .await?;
 
         if let Some(values) = value.as_array_mut() {
-            let num = Value::Number(Number::from(guild_id));
+            let num = from_number(guild_id);
 
             for value in values {
                 if let Some(element) = value.as_object_mut() {
@@ -2574,7 +2579,7 @@ impl Http {
             }
         }
 
-        serde_json::from_value::<Vec<Member>>(value).map_err(From::from)
+        from_value::<Vec<Member>>(value).map_err(From::from)
     }
 
     /// Gets the amount of users that can be pruned.
@@ -2585,7 +2590,7 @@ impl Http {
             days: u64,
         }
 
-        let req = serde_json::from_value::<GetGuildPruneCountRequest>(map.clone())?;
+        let req = from_value::<GetGuildPruneCountRequest>(map.clone())?;
 
         self.fire(Request {
             body: None,
@@ -2628,12 +2633,12 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for role in array {
                 if let Some(map) = role.as_object_mut() {
-                    map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                    map.insert("guild_id".to_string(), from_number(guild_id));
                 }
             }
         }
 
-        serde_json::from_value(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
@@ -2743,10 +2748,10 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+            map.insert("guild_id".to_string(), from_number(guild_id));
         }
 
-        serde_json::from_value::<Member>(value).map_err(From::from)
+        from_value::<Member>(value).map_err(From::from)
     }
 
     /// Gets a message by an Id, bots only.
@@ -2827,7 +2832,7 @@ impl Http {
         let mut map = response.json::<BTreeMap<String, Value>>().await?;
 
         match map.remove("incidents") {
-            Some(v) => serde_json::from_value::<Vec<Incident>>(v).map_err(From::from),
+            Some(v) => from_value::<Vec<Incident>>(v).map_err(From::from),
             None => Ok(vec![]),
         }
     }
@@ -2847,7 +2852,7 @@ impl Http {
         let mut map = response.json::<BTreeMap<String, Value>>().await?;
 
         match map.remove("scheduled_maintenances") {
-            Some(v) => serde_json::from_value::<Vec<Maintenance>>(v).map_err(From::from),
+            Some(v) => from_value::<Vec<Maintenance>>(v).map_err(From::from),
             None => Ok(vec![]),
         }
     }
@@ -3080,7 +3085,7 @@ impl Http {
             }
         }
 
-        multipart = multipart.text("payload_json", serde_json::to_string(&map)?);
+        multipart = multipart.text("payload_json", to_string(&map)?);
 
         let response = self
             .client
@@ -3100,7 +3105,7 @@ impl Http {
 
     /// Sends a message to a channel.
     pub async fn send_message(&self, channel_id: u64, map: &Value) -> Result<Message> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -3187,12 +3192,12 @@ impl Http {
         if let Some(members) = value.as_array_mut() {
             for member in members {
                 if let Some(map) = member.as_object_mut() {
-                    map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                    map.insert("guild_id".to_string(), from_number(guild_id));
                 }
             }
         }
 
-        serde_json::from_value(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Starts removing some members from a guild based on the last time they've been online.
@@ -3203,7 +3208,7 @@ impl Http {
             days: u64,
         }
 
-        let req = serde_json::from_value::<StartGuildPruneRequest>(map.clone())?;
+        let req = from_value::<StartGuildPruneRequest>(map.clone())?;
 
         self.fire(Request {
             body: None,

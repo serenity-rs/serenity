@@ -2,6 +2,8 @@ use std::convert::TryFrom;
 
 use serde::de::Error as DeError;
 use serde::{Serialize, Serializer};
+#[cfg(feature = "simd-json")]
+use simd_json::ValueAccess;
 
 use super::prelude::*;
 use crate::builder::{
@@ -10,6 +12,7 @@ use crate::builder::{
     EditInteractionResponse,
 };
 use crate::http::Http;
+use crate::json::{from_number, from_value, Value};
 use crate::model::interactions::InteractionType;
 use crate::utils;
 
@@ -87,7 +90,7 @@ impl MessageComponentInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
+        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
     }
 
     /// Edits the initial interaction response.
@@ -125,7 +128,7 @@ impl MessageComponentInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::Object(map)).await
+        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
     }
 
     /// Deletes the initial interaction response.
@@ -169,7 +172,7 @@ impl MessageComponentInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_followup_message(&self.token, &Value::Object(map)).await
+        http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
     }
 
     /// Edits a followup response to the response sent.
@@ -205,7 +208,7 @@ impl MessageComponentInteraction {
         Message::check_embed_length(&map)?;
 
         http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::Object(map))
+            .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
             .await
     }
 
@@ -232,7 +235,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
 
         if let Some(guild_id) = id {
             if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
-                member.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                member.insert("guild_id".to_string(), from_number(guild_id));
             }
 
             if let Some(data) = map.get_mut("data") {
@@ -242,7 +245,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
                             for value in values.values_mut() {
                                 value.as_object_mut().unwrap().insert(
                                     "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
+                                    Value::from(guild_id.to_string()),
                                 );
                             }
                         }
@@ -253,7 +256,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
                             for value in values.values_mut() {
                                 value.as_object_mut().unwrap().insert(
                                     "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
+                                    Value::from(guild_id.to_string()),
                                 );
                             }
                         }
@@ -388,13 +391,13 @@ impl<'de> Deserialize<'de> for Component {
             .map_err(DeError::custom)?;
 
         match kind {
-            ComponentType::ActionRow => serde_json::from_value::<ActionRow>(Value::Object(map))
+            ComponentType::ActionRow => from_value::<ActionRow>(Value::from(map))
                 .map(Component::ActionRow)
                 .map_err(DeError::custom),
-            ComponentType::Button => serde_json::from_value::<Button>(Value::Object(map))
+            ComponentType::Button => from_value::<Button>(Value::from(map))
                 .map(Component::Button)
                 .map_err(DeError::custom),
-            ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
+            ComponentType::SelectMenu => from_value::<SelectMenu>(Value::from(map))
                 .map(Component::SelectMenu)
                 .map_err(DeError::custom),
             ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
@@ -480,10 +483,10 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
             .map_err(DeError::custom)?;
 
         match kind {
-            ComponentType::Button => serde_json::from_value::<Button>(Value::Object(map))
+            ComponentType::Button => from_value::<Button>(Value::from(map))
                 .map(ActionRowComponent::Button)
                 .map_err(DeError::custom),
-            ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
+            ComponentType::SelectMenu => from_value::<SelectMenu>(Value::from(map))
                 .map(ActionRowComponent::SelectMenu)
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown component type")),

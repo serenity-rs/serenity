@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::internal::prelude::*;
+use crate::{internal::prelude::*, json::NULL};
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
@@ -49,7 +49,7 @@ impl EditProfile {
     ///
     /// [`utils::read_image`]: crate::utils::read_image
     pub fn avatar(&mut self, avatar: Option<&str>) -> &mut Self {
-        let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_string()));
+        let avatar = avatar.map_or(NULL, |x| Value::from(x.to_string()));
 
         self.0.insert("avatar", avatar);
         self
@@ -66,7 +66,7 @@ impl EditProfile {
     ///
     /// [provided]: Self::password
     pub fn email(&mut self, email: &str) -> &mut Self {
-        self.0.insert("email", Value::String(email.to_string()));
+        self.0.insert("email", Value::from(email.to_string()));
         self
     }
 
@@ -77,7 +77,7 @@ impl EditProfile {
     ///
     /// [provided]: Self::password
     pub fn new_password(&mut self, new_password: &str) -> &mut Self {
-        self.0.insert("new_password", Value::String(new_password.to_string()));
+        self.0.insert("new_password", Value::from(new_password.to_string()));
         self
     }
 
@@ -87,7 +87,7 @@ impl EditProfile {
     /// [modifying the password]: Self::new_password
     /// [modifying the associated email address]: Self::email
     pub fn password(&mut self, password: &str) -> &mut Self {
-        self.0.insert("password", Value::String(password.to_string()));
+        self.0.insert("password", Value::from(password.to_string()));
         self
     }
 
@@ -98,7 +98,7 @@ impl EditProfile {
     /// If there are no available discriminators with the requested username,
     /// an error will occur.
     pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
-        self.0.insert("username", Value::String(username.to_string()));
+        self.0.insert("username", Value::from(username.to_string()));
         self
     }
 }

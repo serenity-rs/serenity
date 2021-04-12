@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
+#[cfg(feature = "simd-json")]
+use simd_json::ValueAccess;
 
 use super::prelude::*;
 use crate::builder::{
@@ -12,7 +14,8 @@ use crate::builder::{
     EditInteractionResponse,
 };
 use crate::http::Http;
-use crate::internal::prelude::{JsonMap, StdResult, Value};
+use crate::internal::prelude::StdResult;
+use crate::json::{from_number, JsonMap, Value};
 use crate::model::channel::PartialChannel;
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
@@ -108,7 +111,7 @@ impl ApplicationCommandInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
+        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
     }
 
     /// Edits the initial interaction response.
@@ -146,7 +149,7 @@ impl ApplicationCommandInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::Object(map)).await
+        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
     }
 
     /// Deletes the initial interaction response.
@@ -190,7 +193,7 @@ impl ApplicationCommandInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_followup_message(&self.token, &Value::Object(map)).await
+        http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
     }
 
     /// Edits a followup response to the response sent.
@@ -226,7 +229,7 @@ impl ApplicationCommandInteraction {
         Message::check_embed_length(&map)?;
 
         http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::Object(map))
+            .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
             .await
     }
 
@@ -253,7 +256,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
 
         if let Some(guild_id) = id {
             if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
-                member.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                member.insert("guild_id".to_string(), from_number(guild_id));
             }
 
             if let Some(data) = map.get_mut("data") {
@@ -263,7 +266,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
                             for value in values.values_mut() {
                                 value.as_object_mut().unwrap().insert(
                                     "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
+                                    Value::from(guild_id.to_string()),
                                 );
                             }
                         }
@@ -274,7 +277,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
                             for value in values.values_mut() {
                                 value.as_object_mut().unwrap().insert(
                                     "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
+                                    Value::from(guild_id.to_string()),
                                 );
                             }
                         }
@@ -772,7 +775,7 @@ impl ApplicationCommand {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = ApplicationCommand::build_application_command(f);
-        http.as_ref().create_global_application_command(&Value::Object(map)).await
+        http.as_ref().create_global_application_command(&Value::from(map)).await
     }
 
     /// Overrides all global application commands.
@@ -789,7 +792,7 @@ impl ApplicationCommand {
 
         f(&mut array);
 
-        http.as_ref().create_global_application_commands(&Value::Array(array.0)).await
+        http.as_ref().create_global_application_commands(&Value::from(array.0)).await
     }
 
     /// Edits a global command by its Id.
@@ -802,7 +805,7 @@ impl ApplicationCommand {
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = ApplicationCommand::build_application_command(f);
-        http.as_ref().edit_global_application_command(command_id.into(), &Value::Object(map)).await
+        http.as_ref().edit_global_application_command(command_id.into(), &Value::from(map)).await
     }
 
     /// Gets all global commands.
@@ -829,7 +832,7 @@ impl ApplicationCommand {
     }
 
     #[inline]
-    pub(crate) fn build_application_command<F>(f: F) -> Map<String, Value>
+    pub(crate) fn build_application_command<F>(f: F) -> JsonMap
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {

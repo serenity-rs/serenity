@@ -21,12 +21,12 @@ use crate::model::{
 /// value:
 ///
 /// ```rust,no_run
-/// # use serde_json::json;
+/// # use serde_json::{json, from_value};
 /// # use serenity::model::prelude::*;
 /// #
 /// # async fn run() {
 /// # let user = UserId(1);
-/// # let emoji = serde_json::from_value::<Emoji>(json!({
+/// # let emoji = from_value::<Emoji>(json!({
 /// #     "animated": false,
 /// #     "id": EmojiId(2),
 /// #     "name": "test",
@@ -150,16 +150,16 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # use serde_json::json;
     /// # use serenity::model::guild::Role;
     /// #
     /// # {
     /// #
-    /// use serenity::model::guild::Emoji;
-    /// use serenity::model::id::EmojiId;
-    /// use serenity::utils::MessageBuilder;
+    /// # use serde_json::{json, from_value};
+    /// # use serenity::model::guild::Emoji;
+    /// # use serenity::model::id::EmojiId;
+    /// # use serenity::utils::MessageBuilder;
     ///
-    /// # let emoji = serde_json::from_value::<Emoji>(json!({
+    /// # let emoji = from_value::<Emoji>(json!({
     /// #     "animated": false,
     /// #     "id": EmojiId(302516740095606785),
     /// #     "managed": true,
