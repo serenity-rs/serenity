@@ -466,6 +466,10 @@ pub struct GuildMemberUpdateEvent {
     pub premium_since: Option<DateTime<Utc>>,
     #[serde(default)]
     pub pending: bool,
+    #[serde(default)]
+    pub deaf: bool,
+    #[serde(default)]
+    pub mute: bool,
 }
 
 #[cfg(feature = "cache")]
@@ -486,6 +490,8 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.user.clone_from(&self.user);
                 member.pending.clone_from(&self.pending);
                 member.premium_since.clone_from(&self.premium_since);
+                member.deaf.clone_from(&self.deaf);
+                member.mute.clone_from(&self.mute);
 
                 item
             } else {
