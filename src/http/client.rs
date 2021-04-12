@@ -64,6 +64,8 @@ pub struct HttpBuilder<'a> {
     token: Option<String>,
     proxy: Option<Url>,
     fut: Option<BoxFuture<'a, Result<Http>>>,
+    #[cfg(feature = "unstable_discord_api")]
+    application_id: Option<u64>
 }
 
 impl<'a> HttpBuilder<'a> {
@@ -75,6 +77,8 @@ impl<'a> HttpBuilder<'a> {
             token: None,
             proxy: None,
             fut: None,
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: None
         }
     }
 
@@ -82,6 +86,14 @@ impl<'a> HttpBuilder<'a> {
     /// The `token` will automatically be prefixed "Bot " if not already.
     pub fn new(token: impl AsRef<str>) -> Self {
         Self::_new().token(token)
+    }
+
+    /// Sets the application_id to use slash commands.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn application_id(mut self, application_id: u64) -> Self {
+        self.application_id = Some(application_id);
+
+        self
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
@@ -160,6 +172,9 @@ impl<'a> Future for HttpBuilder<'a> {
         if self.fut.is_none() {
             let token = self.token.take().unwrap();
 
+            #[cfg(feature = "unstable_discord_api")]
+            let application_id = self.application_id.expect("Expected application Id in order to use slash commands");
+
             let client = self.client.take().unwrap_or_else(|| {
                 let builder = configure_client_backend(Client::builder());
                 Arc::new(builder.build().expect("Cannot build reqwest::Client"))
@@ -180,6 +195,8 @@ impl<'a> Future for HttpBuilder<'a> {
                     ratelimiter_disabled,
                     proxy,
                     token,
+                    #[cfg(feature = "unstable_discord_api")]
+                    application_id
                 })
             }))
         }
@@ -3052,36 +3069,5 @@ impl Default for Http {
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::HttpBuilder;
-
-    #[tokio::test]
-    async fn test_http_builder_defaults() {
-        let http = HttpBuilder::new("is this dubu?").await.expect("Create Http");
-
-        assert!(!http.ratelimiter_disabled);
-        assert!(http.proxy.is_none());
-    }
-
-    #[tokio::test]
-    async fn test_http_builder_with_proxy() {
-        let http = HttpBuilder::new("no it is token")
-            .ratelimiter_disabled(true)
-            .proxy("http://127.0.0.1:3000")
-            .expect("Set proxy")
-            .await
-            .expect("Create Http");
-
-        assert!(http.ratelimiter_disabled);
-
-        let proxy = http.proxy.expect("Http proxy missing");
-
-        assert_eq!(proxy.scheme(), "http");
-        assert_eq!(proxy.host_str(), Some("127.0.0.1"));
-        assert_eq!(proxy.port(), Some(3000));
     }
 }
