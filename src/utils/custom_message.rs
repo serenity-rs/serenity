@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use serde_json::Value;
 
+use crate::json::NULL;
 use crate::model::prelude::*;
 
 /// A builder for constructing a personal [`Message`] instance.
@@ -259,7 +259,7 @@ fn dummy_message() -> Message {
         mention_roles: Vec::new(),
         mention_channels: Vec::new(),
         mentions: Vec::new(),
-        nonce: Value::Null,
+        nonce: NULL,
         pinned: false,
         reactions: Vec::new(),
         tts: false,

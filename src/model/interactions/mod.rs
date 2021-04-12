@@ -10,10 +10,10 @@ use message_component::MessageComponentInteraction;
 use ping::PingInteraction;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
-use serde_json::Value;
 
 use super::prelude::*;
 use crate::internal::prelude::*;
+use crate::json::{from_value, Value};
 
 #[derive(Clone, Debug)]
 pub enum Interaction {
@@ -108,21 +108,21 @@ impl<'de> Deserialize<'de> for Interaction {
             .map_err(DeError::custom)?;
 
         match kind {
-            InteractionType::Ping => serde_json::from_value::<PingInteraction>(Value::Object(map))
+            InteractionType::Ping => from_value::<PingInteraction>(Value::from(map))
                 .map(Interaction::Ping)
                 .map_err(DeError::custom),
             InteractionType::ApplicationCommand => {
-                serde_json::from_value::<ApplicationCommandInteraction>(Value::Object(map))
+                from_value::<ApplicationCommandInteraction>(Value::from(map))
                     .map(Interaction::ApplicationCommand)
                     .map_err(DeError::custom)
             },
             InteractionType::MessageComponent => {
-                serde_json::from_value::<MessageComponentInteraction>(Value::Object(map))
+                from_value::<MessageComponentInteraction>(Value::from(map))
                     .map(Interaction::MessageComponent)
                     .map_err(DeError::custom)
             },
             InteractionType::Autocomplete => {
-                serde_json::from_value::<AutocompleteInteraction>(Value::Object(map))
+                from_value::<AutocompleteInteraction>(Value::from(map))
                     .map(Interaction::Autocomplete)
                     .map_err(DeError::custom)
             },
