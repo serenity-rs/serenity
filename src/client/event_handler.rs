@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
 use async_trait::async_trait;
-use serde_json::Value;
 
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
+use crate::json::Value;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::{application_command::ApplicationCommand, Interaction};
 use crate::model::prelude::*;

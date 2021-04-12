@@ -39,9 +39,9 @@ use crate::cache::FromStrAndCache;
 use crate::http::CacheHttp;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::model::misc::ChannelParseError;
-use crate::model::prelude::*;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
+use crate::{json::prelude::*, model::prelude::*};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -246,15 +246,13 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 | 5 | 6 | 10 | 11 | 12 | 13 => {
-                serde_json::from_value::<GuildChannel>(Value::Object(v))
-                    .map(Channel::Guild)
-                    .map_err(DeError::custom)
-            },
-            1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
+            0 | 2 | 5 | 6 | 10 | 11 | 12 | 13 => from_value::<GuildChannel>(Value::from(v))
+                .map(Channel::Guild)
+                .map_err(DeError::custom),
+            1 => from_value::<PrivateChannel>(Value::from(v))
                 .map(Channel::Private)
                 .map_err(DeError::custom),
-            4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
+            4 => from_value::<ChannelCategory>(Value::from(v))
                 .map(Channel::Category)
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),

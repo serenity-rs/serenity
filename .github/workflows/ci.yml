@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 env:
-  minrust: 1.48.0
+    minrust: 1.49.0
 
 jobs:
   test:
@@ -24,6 +24,7 @@ jobs:
           - unstable Discord API features
           - rustls tokio 0.2
           - native-tls tokio 0.2
+          - simd-json
 
         include:
           - name: beta
@@ -36,6 +37,8 @@ jobs:
             os: windows-latest
           - name: no cache
             features: builder client framework gateway model http standard_framework utils rustls_backend
+          - name: simd-json
+            features: default_no_backend rustls_backend simd-json
           - name: no gateway
             features: model http rustls_backend
           - name: unstable Discord API features
@@ -78,22 +81,32 @@ jobs:
 
       - name: Build all features
         if: matrix.features == ''
+        env:
+            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo build --all-features
 
       - name: Test all features
         if: matrix.features == ''
+        env:
+            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo test --all-features
 
       - name: Build some features
         if: matrix.features
+        env:
+            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo build --no-default-features --features "${{ matrix.features }}"
 
       - name: Test some features
         if: ${{ !matrix.dont-test && matrix.features }}
+        env:
+            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo test --no-default-features --features "${{ matrix.features }}"
 
       - name: Check minimal versions
         if: matrix.toolchain == 'nightly'
+        env:
+            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo clean; cargo update -Z minimal-versions; cargo check
 
   MSRV:
@@ -125,7 +138,10 @@ jobs:
             target
           key: ${{ runner.os }}-msrv-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
 
-      - run: cargo check --all-features
+      - name: Check
+        env:
+            RUSTFLAGS: -C target-feature=+avx,+avx2,+sse4.2
+        run: cargo check --all-features
 
   doc:
     name: Build docs

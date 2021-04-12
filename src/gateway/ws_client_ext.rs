@@ -2,7 +2,6 @@ use std::env::consts;
 use std::time::SystemTime;
 
 use async_trait::async_trait;
-use serde_json::json;
 use tracing::instrument;
 use tracing::{debug, trace};
 
@@ -11,6 +10,7 @@ use crate::constants::{self, OpCode};
 use crate::gateway::{CurrentPresence, WsStream};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
+use crate::json::json;
 use crate::model::id::GuildId;
 
 #[async_trait]
