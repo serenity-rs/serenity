@@ -11,11 +11,11 @@ avatar.</p>
 image from a file and return its contents in base64-encoded form:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils</span>;
 
 <span class="comment">// assuming a `context` has been bound</span>
 
-<span class="kw">let</span> <span class="ident">base64</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">read_image</span>(<span class="string">&quot;./my_image.jpg&quot;</span>)
+<span class="kw">let</span> <span class="ident">base64</span> <span class="op">=</span> <span class="ident">utils::read_image</span>(<span class="string">&quot;./my_image.jpg&quot;</span>)
     .<span class="ident">expect</span>(<span class="string">&quot;Failed to read image&quot;</span>);
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>;

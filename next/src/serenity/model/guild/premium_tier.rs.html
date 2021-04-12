@@ -57,17 +57,17 @@
 <span class="kw">impl</span> <span class="ident">PremiumTier</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PremiumTier</span>::<span class="ident">Tier0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">PremiumTier</span>::<span class="ident">Tier1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">PremiumTier</span>::<span class="ident">Tier2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">PremiumTier</span>::<span class="ident">Tier3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
+            <span class="ident">PremiumTier::Tier0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+            <span class="ident">PremiumTier::Tier1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
+            <span class="ident">PremiumTier::Tier2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="ident">PremiumTier::Tier3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PremiumTier</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">PremiumTier</span>::<span class="ident">Tier0</span>
+        <span class="ident">PremiumTier::Tier0</span>
     }
 }
 </pre></div>

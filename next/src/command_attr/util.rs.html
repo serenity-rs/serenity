@@ -286,9 +286,9 @@
 <span id="283">283</span>
 <span id="284">284</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>;
+<span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>;
 <span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">format_ident</span>, <span class="ident">quote</span>, <span class="ident">ToTokens</span>};
 <span class="kw">use</span> <span class="ident">syn</span>::{
     <span class="ident">braced</span>,
@@ -296,8 +296,8 @@
     <span class="ident">parenthesized</span>,
     <span class="ident">parse</span>::{<span class="ident">Error</span>, <span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">SynResult</span>},
     <span class="ident">parse_quote</span>,
-    <span class="ident">punctuated</span>::<span class="ident">Punctuated</span>,
-    <span class="ident">spanned</span>::<span class="ident">Spanned</span>,
+    <span class="ident">punctuated::Punctuated</span>,
+    <span class="ident">spanned::Spanned</span>,
     <span class="ident">token</span>::{<span class="ident">Comma</span>, <span class="ident">Mut</span>},
     <span class="ident">Attribute</span>,
     <span class="ident">Ident</span>,
@@ -308,7 +308,7 @@
     <span class="ident">Type</span>,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">structures</span>::<span class="ident">CommandFun</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structures::CommandFun</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LitExt</span> {
     <span class="kw">fn</span> <span class="ident">to_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
@@ -319,16 +319,16 @@
 <span class="kw">impl</span> <span class="ident">LitExt</span> <span class="kw">for</span> <span class="ident">Lit</span> {
     <span class="kw">fn</span> <span class="ident">to_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Lit</span>::<span class="ident">Str</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">value</span>(),
-            <span class="ident">Lit</span>::<span class="ident">ByteStr</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">String</span>::<span class="ident">from_utf8_unchecked</span>(<span class="ident">s</span>.<span class="ident">value</span>()) },
-            <span class="ident">Lit</span>::<span class="ident">Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">value</span>().<span class="ident">to_string</span>(),
-            <span class="ident">Lit</span>::<span class="ident">Byte</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">b</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">char</span>).<span class="ident">to_string</span>(),
+            <span class="ident">Lit::Str</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">value</span>(),
+            <span class="ident">Lit::ByteStr</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">unsafe</span> { <span class="ident">String::from_utf8_unchecked</span>(<span class="ident">s</span>.<span class="ident">value</span>()) },
+            <span class="ident">Lit::Char</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">value</span>().<span class="ident">to_string</span>(),
+            <span class="ident">Lit::Byte</span>(<span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">b</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">char</span>).<span class="ident">to_string</span>(),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;values must be a (byte)string or a char&quot;</span>),
         }
     }
 
     <span class="kw">fn</span> <span class="ident">to_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Lit</span>::<span class="ident">Bool</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="self">self</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Lit::Bool</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="ident">b</span>.<span class="ident">value</span>
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">to_str</span>().<span class="ident">parse</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;expected bool from {:?}&quot;</span>, <span class="self">self</span>))
@@ -337,7 +337,7 @@
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">to_ident</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ident</span> {
-        <span class="ident">Ident</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_str</span>(), <span class="self">self</span>.<span class="ident">span</span>())
+        <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_str</span>(), <span class="self">self</span>.<span class="ident">span</span>())
     }
 }
 
@@ -367,7 +367,7 @@
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">util</span>::<span class="ident">into_stream</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::util::into_stream</span>(<span class="ident">e</span>),
         }
     }};
 }
@@ -380,7 +380,7 @@
         <span class="kw">let</span> <span class="ident">content</span>;
         <span class="macro">bracketed!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Bracketed</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">Bracketed</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T::parse</span>)<span class="question-mark">?</span>))
     }
 }
 
@@ -392,7 +392,7 @@
         <span class="kw">let</span> <span class="ident">content</span>;
         <span class="macro">braced!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Braced</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">Braced</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T::parse</span>)<span class="question-mark">?</span>))
     }
 }
 
@@ -404,7 +404,7 @@
         <span class="kw">let</span> <span class="ident">content</span>;
         <span class="macro">parenthesized!</span>(<span class="ident">content</span> <span class="kw">in</span> <span class="ident">input</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Parenthesised</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">Parenthesised</span>(<span class="ident">content</span>.<span class="ident">parse_terminated</span>(<span class="ident">T::parse</span>)<span class="question-mark">?</span>))
     }
 }
 
@@ -456,9 +456,9 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_type_validation</span>(<span class="ident">have</span>: <span class="ident">Type</span>, <span class="ident">expect</span>: <span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn</span>::<span class="ident">Stmt</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_type_validation</span>(<span class="ident">have</span>: <span class="ident">Type</span>, <span class="ident">expect</span>: <span class="ident">Type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">syn::Stmt</span> {
     <span class="macro">parse_quote!</span> {
-        <span class="ident">serenity</span>::<span class="ident">static_assertions</span>::<span class="macro">assert_type_eq_all!</span>(#<span class="ident">have</span>, #<span class="ident">expect</span>);
+        <span class="macro">serenity::static_assertions::assert_type_eq_all!</span>(#<span class="ident">have</span>, #<span class="ident">expect</span>);
     }
 }
 
@@ -471,26 +471,26 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_declaration_validations</span>(<span class="ident">fun</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CommandFun</span>, <span class="ident">dec_for</span>: <span class="ident">DeclarFor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SynResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dec_for</span> {
-        <span class="ident">DeclarFor</span>::<span class="ident">Command</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-        <span class="ident">DeclarFor</span>::<span class="ident">Help</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
-        <span class="ident">DeclarFor</span>::<span class="ident">Check</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
+        <span class="ident">DeclarFor::Command</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
+        <span class="ident">DeclarFor::Help</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
+        <span class="ident">DeclarFor::Check</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
     };
 
     <span class="kw">if</span> <span class="ident">fun</span>.<span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">len</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
             <span class="ident">fun</span>.<span class="ident">args</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">span</span>(),
             <span class="macro">format_args!</span>(<span class="string">&quot;function&#39;s arity exceeds more than {} arguments&quot;</span>, <span class="ident">len</span>),
         ));
     }
 
-    <span class="kw">let</span> <span class="ident">context</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">client</span>::<span class="ident">Context</span>);
-    <span class="kw">let</span> <span class="ident">message</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Message</span>);
-    <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Args</span>);
-    <span class="kw">let</span> <span class="ident">args2</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Args</span>);
-    <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandOptions</span>);
-    <span class="kw">let</span> <span class="ident">hoptions</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">HelpOptions</span>);
-    <span class="kw">let</span> <span class="ident">groups</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandGroup</span>]);
-    <span class="kw">let</span> <span class="ident">owners</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">UserId</span><span class="op">&gt;</span>);
+    <span class="kw">let</span> <span class="ident">context</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity::client::Context</span>);
+    <span class="kw">let</span> <span class="ident">message</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity::model::channel::Message</span>);
+    <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity::framework::standard::Args</span>);
+    <span class="kw">let</span> <span class="ident">args2</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serenity::framework::standard::Args</span>);
+    <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="ident">serenity::framework::standard::CommandOptions</span>);
+    <span class="kw">let</span> <span class="ident">hoptions</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">serenity::framework::standard::HelpOptions</span>);
+    <span class="kw">let</span> <span class="ident">groups</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">serenity::framework::standard::CommandGroup</span>]);
+    <span class="kw">let</span> <span class="ident">owners</span>: <span class="ident">Type</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">std::collections::HashSet</span><span class="op">&lt;</span><span class="ident">serenity::model::id::UserId</span><span class="op">&gt;</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -499,7 +499,7 @@
             <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fun</span>.<span class="ident">body</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">generate_type_validation</span>(<span class="ident">x</span>.<span class="ident">kind</span>.<span class="ident">clone</span>(), <span class="ident">kind</span>)),
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fun</span>.<span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">Argument</span> {
                 <span class="ident">mutable</span>: <span class="prelude-val">None</span>,
-                <span class="ident">name</span>: <span class="ident">Ident</span>::<span class="ident">new</span>(<span class="ident">name</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>()),
+                <span class="ident">name</span>: <span class="ident">Ident::new</span>(<span class="ident">name</span>, <span class="ident">Span::call_site</span>()),
                 <span class="ident">kind</span>,
             }),
         }
@@ -510,7 +510,7 @@
     <span class="ident">spoof_or_check</span>(<span class="ident">context</span>, <span class="string">&quot;_ctx&quot;</span>);
     <span class="ident">spoof_or_check</span>(<span class="ident">message</span>, <span class="string">&quot;_msg&quot;</span>);
 
-    <span class="kw">if</span> <span class="ident">dec_for</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DeclarFor</span>::<span class="ident">Check</span> {
+    <span class="kw">if</span> <span class="ident">dec_for</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DeclarFor::Check</span> {
         <span class="ident">spoof_or_check</span>(<span class="ident">args2</span>, <span class="string">&quot;_args&quot;</span>);
         <span class="ident">spoof_or_check</span>(<span class="ident">options</span>, <span class="string">&quot;_options&quot;</span>);
 
@@ -519,7 +519,7 @@
 
     <span class="ident">spoof_or_check</span>(<span class="ident">args</span>, <span class="string">&quot;_args&quot;</span>);
 
-    <span class="kw">if</span> <span class="ident">dec_for</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DeclarFor</span>::<span class="ident">Help</span> {
+    <span class="kw">if</span> <span class="ident">dec_for</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DeclarFor::Help</span> {
         <span class="ident">spoof_or_check</span>(<span class="ident">hoptions</span>, <span class="string">&quot;_hoptions&quot;</span>);
         <span class="ident">spoof_or_check</span>(<span class="ident">groups</span>, <span class="string">&quot;_groups&quot;</span>);
         <span class="ident">spoof_or_check</span>(<span class="ident">owners</span>, <span class="string">&quot;_owners&quot;</span>);
@@ -537,8 +537,8 @@
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">populate_fut_lifetimes_on_refs</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span>) {
     <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">args</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Type</span>::<span class="ident">Reference</span>(<span class="ident">reference</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">arg</span>.<span class="ident">kind</span> {
-            <span class="ident">reference</span>.<span class="ident">lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Lifetime</span>::<span class="ident">new</span>(<span class="string">&quot;&#39;fut&quot;</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>()));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Type::Reference</span>(<span class="ident">reference</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">arg</span>.<span class="ident">kind</span> {
+            <span class="ident">reference</span>.<span class="ident">lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Lifetime::new</span>(<span class="string">&quot;&#39;fut&quot;</span>, <span class="ident">Span::call_site</span>()));
         }
     }
 }
@@ -547,7 +547,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rename_attributes</span>(<span class="ident">attributes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">attributes</span> {
         <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="ident">name</span>) {
-            <span class="ident">attr</span>.<span class="ident">path</span> <span class="op">=</span> <span class="ident">Path</span>::<span class="ident">from</span>(<span class="ident">PathSegment</span>::<span class="ident">from</span>(<span class="ident">Ident</span>::<span class="ident">new</span>(<span class="ident">target</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>())));
+            <span class="ident">attr</span>.<span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::from</span>(<span class="ident">PathSegment::from</span>(<span class="ident">Ident::new</span>(<span class="ident">target</span>, <span class="ident">Span::call_site</span>())));
         }
     }
 }
@@ -557,7 +557,7 @@
         <span class="ident">line</span>.<span class="ident">remove</span>(<span class="number">0</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">desc</span> <span class="op">=</span> <span class="ident">desc</span>.<span class="number">0</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">String</span>::<span class="ident">default</span>);
+    <span class="kw">let</span> <span class="ident">desc</span> <span class="op">=</span> <span class="ident">desc</span>.<span class="number">0</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">String::default</span>);
 
     <span class="kw">match</span> <span class="ident">line</span>.<span class="ident">rfind</span>(<span class="string">&quot;\\$&quot;</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {

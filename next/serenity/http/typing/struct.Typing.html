@@ -14,7 +14,7 @@ long-running command is still being processed.</p>
 <h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="comment">// Initiate typing (assuming `http` is bound)</span>
-<span class="kw">let</span> <span class="ident">typing</span> <span class="op">=</span> <span class="ident">Typing</span>::<span class="ident">start</span>(<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">http</span>), <span class="number">7</span>)<span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="ident">typing</span> <span class="op">=</span> <span class="ident">Typing::start</span>(<span class="ident">Arc::new</span>(<span class="ident">http</span>), <span class="number">7</span>)<span class="question-mark">?</span>;
 
 <span class="comment">// Run some long-running process</span>
 <span class="ident">long_process</span>();

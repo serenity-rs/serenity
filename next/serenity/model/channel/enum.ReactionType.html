@@ -62,14 +62,14 @@ by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.Pa
 rest of the library:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryInto</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>;
+<span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">ReactionType</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::channel::ReactionType</span>;
 
 <span class="kw">fn</span> <span class="ident">foo</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">bar</span>: <span class="ident">R</span>)
 <span class="kw">where</span>
-    <span class="ident">R</span>::<span class="ident">Error</span>: <span class="ident">Debug</span>,
+    <span class="ident">R::Error</span>: <span class="ident">Debug</span>,
 {
     <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">bar</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>());
 }
@@ -78,14 +78,14 @@ rest of the library:</p>
 <p>Creating a <code>ReactionType</code> from a custom emoji argument in the following format:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
+<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">ReactionType</span>;
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">EmojiId</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::channel::ReactionType</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::id::EmojiId</span>;
 
 <span class="kw">let</span> <span class="ident">emoji_string</span> <span class="op">=</span> <span class="string">&quot;&lt;:customemoji:600404340292059257&gt;&quot;</span>;
-<span class="kw">let</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="ident">ReactionType</span>::<span class="ident">try_from</span>(<span class="ident">emoji_string</span>).<span class="ident">unwrap</span>();
-<span class="kw">let</span> <span class="ident">reaction2</span> <span class="op">=</span> <span class="ident">ReactionType</span>::<span class="ident">Custom</span> {
+<span class="kw">let</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="ident">ReactionType::try_from</span>(<span class="ident">emoji_string</span>).<span class="ident">unwrap</span>();
+<span class="kw">let</span> <span class="ident">reaction2</span> <span class="op">=</span> <span class="ident">ReactionType::Custom</span> {
     <span class="ident">animated</span>: <span class="bool-val">false</span>,
     <span class="ident">id</span>: <span class="ident">EmojiId</span>(<span class="number">600404340292059257</span>),
     <span class="ident">name</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;customemoji&quot;</span>.<span class="ident">to_string</span>()),

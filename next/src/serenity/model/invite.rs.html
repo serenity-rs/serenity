@@ -391,19 +391,19 @@
 
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">super</span><span class="ident">::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">utils</span> <span class="kw">as</span> <span class="ident">model_utils</span>, <span class="ident">Permissions</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">builder</span>::<span class="ident">CreateInvite</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder::CreateInvite</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
 
 <span class="doccomment">/// Information about an invite code.</span>
 <span class="doccomment">///</span>
@@ -467,17 +467,17 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="ident">model_utils</span>::<span class="ident">user_has_perms_cache</span>(
+                <span class="ident">model_utils::user_has_perms_cache</span>(
                     <span class="ident">cache</span>,
                     <span class="ident">channel_id</span>,
                     <span class="prelude-val">None</span>,
-                    <span class="ident">Permissions</span>::<span class="ident">CREATE_INVITE</span>,
+                    <span class="ident">Permissions::CREATE_INVITE</span>,
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
             }
         }
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">f</span>(<span class="ident">CreateInvite</span>::<span class="ident">default</span>()).<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>(<span class="ident">CreateInvite::default</span>()).<span class="number">0</span>);
 
         <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">create_invite</span>(<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
@@ -502,11 +502,11 @@
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">id</span>);
-                <span class="ident">model_utils</span>::<span class="ident">user_has_perms_cache</span>(
+                <span class="ident">model_utils::user_has_perms_cache</span>(
                     <span class="ident">cache</span>,
                     <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">id</span>,
                     <span class="ident">guild_id</span>,
-                    <span class="ident">Permissions</span>::<span class="ident">MANAGE_GUILD</span>,
+                    <span class="ident">Permissions::MANAGE_GUILD</span>,
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
             }
@@ -527,7 +527,7 @@
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
         {
-            <span class="ident">invite</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">utils</span>::<span class="ident">parse_invite</span>(<span class="ident">invite</span>);
+            <span class="ident">invite</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::utils::parse_invite</span>(<span class="ident">invite</span>);
         }
 
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_invite</span>(<span class="ident">invite</span>, <span class="ident">stats</span>).<span class="kw">await</span>
@@ -708,11 +708,11 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">id</span>);
 
-                <span class="ident">model_utils</span>::<span class="ident">user_has_perms_cache</span>(
+                <span class="ident">model_utils::user_has_perms_cache</span>(
                     <span class="ident">cache</span>,
                     <span class="self">self</span>.<span class="ident">channel</span>.<span class="ident">id</span>,
                     <span class="ident">guild_id</span>,
-                    <span class="ident">Permissions</span>::<span class="ident">MANAGE_GUILD</span>,
+                    <span class="ident">Permissions::MANAGE_GUILD</span>,
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
             }

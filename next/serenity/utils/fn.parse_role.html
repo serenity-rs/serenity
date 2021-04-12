@@ -7,13 +7,13 @@
 <p>Retrieving an Id from a valid <a href="../../serenity/model/guild/struct.Role.html"><code>Role</code></a> mention:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_role</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_role</span>;
 
 <span class="macro">assert_eq!</span>(<span class="ident">parse_role</span>(<span class="string">&quot;&lt;@&amp;136107769680887808&gt;&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">136107769680887808</span>));</pre></div>
 <p>Asserting that an invalid role mention returns <code>None</code>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_role</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_role</span>;
 
 <span class="macro">assert!</span>(<span class="ident">parse_role</span>(<span class="string">&quot;&lt;@&amp;136107769680887808&quot;</span>).<span class="ident">is_none</span>());</pre></div>
 </div></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-js="../../search-index.js"></div>

@@ -33,15 +33,15 @@ and cannot do.</p>
 <p>Inheriting permissions from an exisiting channel:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">channel</span>::{<span class="ident">PermissionOverwrite</span>, <span class="ident">PermissionOverwriteType</span>};
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">UserId</span>;
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">permissions</span>::<span class="ident">Permissions</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::channel</span>::{<span class="ident">PermissionOverwrite</span>, <span class="ident">PermissionOverwriteType</span>};
+<span class="kw">use</span> <span class="ident">serenity::model::id::UserId</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::permissions::Permissions</span>;
 
 <span class="comment">// Assuming a channel has already been bound.</span>
 <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">PermissionOverwrite</span> {
-    <span class="ident">allow</span>: <span class="ident">Permissions</span>::<span class="ident">READ_MESSAGES</span>,
-    <span class="ident">deny</span>: <span class="ident">Permissions</span>::<span class="ident">SEND_TTS_MESSAGES</span>,
-    <span class="ident">kind</span>: <span class="ident">PermissionOverwriteType</span>::<span class="ident">Member</span>(<span class="ident">UserId</span>(<span class="number">1234</span>)),
+    <span class="ident">allow</span>: <span class="ident">Permissions::READ_MESSAGES</span>,
+    <span class="ident">deny</span>: <span class="ident">Permissions::SEND_TTS_MESSAGES</span>,
+    <span class="ident">kind</span>: <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">UserId</span>(<span class="number">1234</span>)),
 }];
 
 <span class="ident">channel</span>.<span class="ident">edit</span>(<span class="ident">http</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> {

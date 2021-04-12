@@ -274,14 +274,14 @@
 <span id="271">271</span>
 <span id="272">272</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">Message</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">TrySendError</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
+<span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="ident">TrySendError</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">ShardClientMessage</span>, <span class="ident">ShardRunnerMessage</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">InterMessage</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::gateway::InterMessage</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A lightweight wrapper around an mpsc sender.</span>
 <span class="doccomment">///</span>
@@ -375,8 +375,8 @@
         <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
         <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">ChunkGuild</span> {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::ChunkGuild</span> {
             <span class="ident">guild_id</span>,
             <span class="ident">limit</span>,
             <span class="ident">filter</span>,
@@ -410,8 +410,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetActivity</span>(<span class="ident">activity</span>));
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetActivity</span>(<span class="ident">activity</span>));
     }
 
     <span class="doccomment">/// Sets the user&#39;s full presence information.</span>
@@ -443,12 +443,12 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
-        <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Offline</span> {
-            <span class="ident">status</span> <span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Invisible</span>;
+        <span class="kw">if</span> <span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus::Offline</span> {
+            <span class="ident">status</span> <span class="op">=</span> <span class="ident">OnlineStatus::Invisible</span>;
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetPresence</span>(<span class="ident">status</span>, <span class="ident">activity</span>));
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetPresence</span>(<span class="ident">status</span>, <span class="ident">activity</span>));
     }
 
     <span class="doccomment">/// Sets the user&#39;s current online status.</span>
@@ -485,19 +485,19 @@
     <span class="doccomment">/// [`Invisible`]: OnlineStatus::Invisible</span>
     <span class="doccomment">/// [`Offline`]: OnlineStatus::Offline</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">online_status</span>: <span class="ident">OnlineStatus</span>) {
-        <span class="kw">if</span> <span class="ident">online_status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Offline</span> {
-            <span class="ident">online_status</span> <span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Invisible</span>;
+        <span class="kw">if</span> <span class="ident">online_status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus::Offline</span> {
+            <span class="ident">online_status</span> <span class="op">=</span> <span class="ident">OnlineStatus::Invisible</span>;
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetStatus</span>(<span class="ident">online_status</span>));
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetStatus</span>(<span class="ident">online_status</span>));
     }
 
     <span class="doccomment">/// Shuts down the websocket by attempting to cleanly close the</span>
     <span class="doccomment">/// connection.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown_clean</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">Close</span>(<span class="number">1000</span>, <span class="prelude-val">None</span>));
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::Close</span>(<span class="number">1000</span>, <span class="prelude-val">None</span>));
     }
 
     <span class="doccomment">/// Sends a raw message over the WebSocket.</span>
@@ -510,8 +510,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`set_presence`]: Self::set_presence</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">websocket_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="ident">Message</span>) {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">Message</span>(<span class="ident">message</span>));
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::Message</span>(<span class="ident">message</span>));
     }
 
     <span class="doccomment">/// Sends a message to the shard.</span>
@@ -520,7 +520,7 @@
     <span class="doccomment">/// Returns a `TrySendError` if the shard&#39;s receiver was closed.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_to_shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">ShardRunnerMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">InterMessage</span>::<span class="ident">Client</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">msg</span>))))
+        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">InterMessage::Client</span>(<span class="ident">Box::new</span>(<span class="ident">ShardClientMessage::Runner</span>(<span class="ident">msg</span>))))
     }
 
     <span class="doccomment">/// Sets a new filter for a message collector.</span>
@@ -528,16 +528,16 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">collector</span>: <span class="ident">MessageFilter</span>) {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetMessageFilter</span>(<span class="ident">collector</span>));
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetMessageFilter</span>(<span class="ident">collector</span>));
     }
 
     <span class="doccomment">/// Sets a new filter for a message collector.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">collector</span>: <span class="ident">ReactionFilter</span>) {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetReactionFilter</span>(<span class="ident">collector</span>));
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage::SetReactionFilter</span>(<span class="ident">collector</span>));
     }
 }
 

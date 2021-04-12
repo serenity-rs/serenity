@@ -627,14 +627,14 @@
 <span id="624">624</span>
 <span id="625">625</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashSet</span>;
+<span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
+<span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Delimiter</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
-    <span class="ident">channel</span>::<span class="ident">Message</span>,
+<span class="kw">use</span> <span class="kw">super</span><span class="ident">::Delimiter</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::Context</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{
+    <span class="ident">channel::Message</span>,
     <span class="ident">id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">UserId</span>},
 };
 
@@ -667,7 +667,7 @@
         <span class="comment">// Assume that they want to do this for prefixes</span>
         <span class="ident">WithWhiteSpace</span> {
             <span class="ident">prefixes</span>: <span class="ident">b</span>,
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         }
     }
 }
@@ -678,7 +678,7 @@
         <span class="ident">WithWhiteSpace</span> {
             <span class="ident">prefixes</span>,
             <span class="ident">groups</span>,
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         }
     }
 }
@@ -1234,21 +1234,21 @@
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Configuration</span> {
         <span class="ident">Configuration</span> {
             <span class="ident">allow_dm</span>: <span class="bool-val">true</span>,
-            <span class="ident">with_whitespace</span>: <span class="ident">WithWhiteSpace</span>::<span class="ident">default</span>(),
+            <span class="ident">with_whitespace</span>: <span class="ident">WithWhiteSpace::default</span>(),
             <span class="ident">by_space</span>: <span class="bool-val">true</span>,
-            <span class="ident">blocked_guilds</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
-            <span class="ident">blocked_users</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
-            <span class="ident">allowed_channels</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
+            <span class="ident">blocked_guilds</span>: <span class="ident">HashSet::default</span>(),
+            <span class="ident">blocked_users</span>: <span class="ident">HashSet::default</span>(),
+            <span class="ident">allowed_channels</span>: <span class="ident">HashSet::default</span>(),
             <span class="ident">case_insensitive</span>: <span class="bool-val">false</span>,
-            <span class="ident">delimiters</span>: <span class="macro">vec!</span>[<span class="ident">Delimiter</span>::<span class="ident">Single</span>(<span class="string">&#39; &#39;</span>)],
-            <span class="ident">disabled_commands</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
-            <span class="ident">dynamic_prefixes</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">delimiters</span>: <span class="macro">vec!</span>[<span class="ident">Delimiter::Single</span>(<span class="string">&#39; &#39;</span>)],
+            <span class="ident">disabled_commands</span>: <span class="ident">HashSet::default</span>(),
+            <span class="ident">dynamic_prefixes</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">ignore_bots</span>: <span class="bool-val">true</span>,
             <span class="ident">ignore_webhooks</span>: <span class="bool-val">true</span>,
             <span class="ident">no_dm_prefix</span>: <span class="bool-val">false</span>,
             <span class="ident">on_mention</span>: <span class="prelude-val">None</span>,
-            <span class="ident">owners</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
-            <span class="ident">prefixes</span>: <span class="macro">vec!</span>[<span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;~&quot;</span>)],
+            <span class="ident">owners</span>: <span class="ident">HashSet::default</span>(),
+            <span class="ident">prefixes</span>: <span class="macro">vec!</span>[<span class="ident">String::from</span>(<span class="string">&quot;~&quot;</span>)],
         }
     }
 }

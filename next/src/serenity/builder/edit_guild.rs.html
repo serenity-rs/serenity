@@ -268,11 +268,39 @@
 <span id="265">265</span>
 <span id="266">266</span>
 <span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder to optionally edit certain fields of a [`Guild`]. This is meant</span>
 <span class="doccomment">/// for usage with [`Guild::edit`].</span>
@@ -297,14 +325,14 @@
     <span class="doccomment">/// [`afk_timeout`]: Self::afk_timeout</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">afk_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">_afk_channel</span>(<span class="ident">channel</span>.<span class="ident">map</span>(<span class="ident">Into</span>::<span class="ident">into</span>));
+        <span class="self">self</span>.<span class="ident">_afk_channel</span>(<span class="ident">channel</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>));
         <span class="self">self</span>
     }
 
     <span class="kw">fn</span> <span class="ident">_afk_channel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;afk_channel_id&quot;</span>, <span class="kw">match</span> <span class="ident">channel</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">channel</span>.<span class="number">0</span>)),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value</span>::<span class="ident">Null</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">channel</span>.<span class="number">0</span>)),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Value::Null</span>,
         });
     }
 
@@ -313,7 +341,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`afk_channel`]: Self::afk_channel</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">afk_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;afk_timeout&quot;</span>, <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">timeout</span>)));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;afk_timeout&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">timeout</span>)));
         <span class="self">self</span>
     }
 
@@ -346,7 +374,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`utils::read_image`]: crate::utils::read_image</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;icon&quot;</span>, <span class="ident">icon</span>.<span class="ident">map_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>())));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;icon&quot;</span>, <span class="ident">icon</span>.<span class="ident">map_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>())));
         <span class="self">self</span>
     }
 
@@ -354,7 +382,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between (and including) 2-100 chracters.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -368,7 +396,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">_owner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>) {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">user_id</span>.<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">user_id</span>.<span class="number">0</span>));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;owner_id&quot;</span>, <span class="ident">id</span>);
     }
 
@@ -396,7 +424,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">region</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">region</span>: <span class="ident">Region</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;region&quot;</span>, <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">region</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;region&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">region</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -409,7 +437,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splash</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">splash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">splash</span> <span class="op">=</span> <span class="ident">splash</span>.<span class="ident">map_or</span>(<span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
+        <span class="kw">let</span> <span class="ident">splash</span> <span class="op">=</span> <span class="ident">splash</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;splash&quot;</span>, <span class="ident">splash</span>);
         <span class="self">self</span>
     }
@@ -423,7 +451,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">banner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">banner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">banner</span> <span class="op">=</span> <span class="ident">banner</span>.<span class="ident">map_or</span>(<span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
+        <span class="kw">let</span> <span class="ident">banner</span> <span class="op">=</span> <span class="ident">banner</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;banner&quot;</span>, <span class="ident">banner</span>);
         <span class="self">self</span>
     }
@@ -434,7 +462,7 @@
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// This feature is for Community guilds only.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_channel_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">from</span>(<span class="ident">x</span>.<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">x</span>.<span class="number">0</span>));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;system_channel_id&quot;</span>, <span class="ident">channel_id</span>);
         <span class="self">self</span>
     }
@@ -444,7 +472,7 @@
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// This feature is for Community guilds only.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rules_channel_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">from</span>(<span class="ident">x</span>.<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">x</span>.<span class="number">0</span>));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rules_channel_id&quot;</span>, <span class="ident">channel_id</span>);
         <span class="self">self</span>
     }
@@ -455,7 +483,7 @@
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// This feature is for Community guilds only.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_updates_channel_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">from</span>(<span class="ident">x</span>.<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">x</span>.<span class="number">0</span>));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;public_updates_channel_id&quot;</span>, <span class="ident">channel_id</span>);
         <span class="self">self</span>
     }
@@ -468,14 +496,14 @@
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// This feature is for Community guilds only.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preferred_locale</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">locale</span> <span class="op">=</span> <span class="ident">locale</span>.<span class="ident">map_or</span>(<span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
+        <span class="kw">let</span> <span class="ident">locale</span> <span class="op">=</span> <span class="ident">locale</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;preferred_locale&quot;</span>, <span class="ident">locale</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the content filter level.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_content_filter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExplicitContentFilter</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">level</span>.<span class="ident">map_or</span>(<span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">from</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">level</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;explicit_content_filter&quot;</span>, <span class="ident">level</span>);
         <span class="self">self</span>
     }
@@ -485,7 +513,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultMessageNotificationLevel</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">level</span>.<span class="ident">map_or</span>(<span class="ident">Value</span>::<span class="ident">Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">from</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">level</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;default_message_notifications&quot;</span>, <span class="ident">level</span>);
         <span class="self">self</span>
     }
@@ -532,8 +560,36 @@
     }
 
     <span class="kw">fn</span> <span class="ident">_verification_level</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">verification_level</span>: <span class="ident">VerificationLevel</span>) {
-        <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">verification_level</span>.<span class="ident">num</span>()));
+        <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">verification_level</span>.<span class="ident">num</span>()));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;verification_level&quot;</span>, <span class="ident">num</span>);
+    }
+
+    <span class="doccomment">/// Modifies the notifications that are sent by discord to the configured system channel.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::{http::Http, model::id::GuildId};</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let mut guild = GuildId(0).to_partial_guild(&amp;http).await?;</span>
+    <span class="doccomment">/// use serenity::model::guild::SystemChannelFlags;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // assuming a `guild` has already been bound</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let edit = guild.edit(&amp;http, |g| {</span>
+    <span class="doccomment">///     g.system_channel_flags(SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS)</span>
+    <span class="doccomment">/// })</span>
+    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Err(why) = edit {</span>
+    <span class="doccomment">///     println!(&quot;Error setting verification level: {:?}&quot;, why);</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// #     Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_channel_flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">system_channel_flags</span>: <span class="ident">SystemChannelFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;system_channel_flags&quot;</span>, <span class="ident">system_channel_flags</span>.<span class="ident">bits</span>().<span class="ident">into</span>());
+        <span class="self">self</span>
     }
 }
 </pre></div>

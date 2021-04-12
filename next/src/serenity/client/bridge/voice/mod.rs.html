@@ -50,14 +50,14 @@
 <span id="47">47</span>
 <span id="48">48</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">async_trait</span>::<span class="ident">async_trait</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::<span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
+<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
+<span class="kw">use</span> <span class="ident">futures::channel::mpsc::UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">gateway</span>::<span class="ident">InterMessage</span>,
+    <span class="ident">gateway::InterMessage</span>,
     <span class="ident">model</span>::{
         <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
-        <span class="ident">voice</span>::<span class="ident">VoiceState</span>,
+        <span class="ident">voice::VoiceState</span>,
     },
 };
 

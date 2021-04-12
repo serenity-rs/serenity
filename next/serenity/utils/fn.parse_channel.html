@@ -7,13 +7,13 @@
 <p>Retrieving an Id from a valid <a href="../../serenity/model/channel/enum.Channel.html"><code>Channel</code></a> mention:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_channel</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_channel</span>;
 
 <span class="macro">assert_eq!</span>(<span class="ident">parse_channel</span>(<span class="string">&quot;&lt;#81384788765712384&gt;&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">81384788765712384</span>));</pre></div>
 <p>Asserting that an invalid channel mention returns <code>None</code>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">utils</span>::<span class="ident">parse_channel</span>;
+<span class="kw">use</span> <span class="ident">serenity::utils::parse_channel</span>;
 
 <span class="macro">assert!</span>(<span class="ident">parse_channel</span>(<span class="string">&quot;&lt;#!81384788765712384&gt;&quot;</span>).<span class="ident">is_none</span>());
 <span class="macro">assert!</span>(<span class="ident">parse_channel</span>(<span class="string">&quot;&lt;#81384788765712384&quot;</span>).<span class="ident">is_none</span>());</pre></div>

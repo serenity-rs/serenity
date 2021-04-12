@@ -9,12 +9,12 @@ where possible. Issuing too many requests will lead to ratelimits.</p>
 </div><h4 id="method.new_with_settings" class="method"><code>pub fn <a href="#method.new_with_settings" class="fnname">new_with_settings</a>(settings: <a class="struct" href="../../serenity/cache/struct.Settings.html" title="struct serenity::cache::Settings">Settings</a>) -&gt; Self</code><a class="srclink" href="../../src/serenity/cache/mod.rs.html#182" title="goto source code">[src]</a></h4><div class="docblock"><p>Creates a new cache instance with settings applied.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">cache</span>::{<span class="ident">Cache</span>, <span class="ident">Settings</span>};
+<span class="kw">use</span> <span class="ident">serenity::cache</span>::{<span class="ident">Cache</span>, <span class="ident">Settings</span>};
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">Settings</span>::<span class="ident">new</span>();
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">Settings::new</span>();
 <span class="ident">settings</span>.<span class="ident">max_messages</span>(<span class="number">10</span>);
 
-<span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Cache</span>::<span class="ident">new_with_settings</span>(<span class="ident">settings</span>);</pre></div>
+<span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Cache::new_with_settings</span>(<span class="ident">settings</span>);</pre></div>
 </div><h4 id="method.unknown_members" class="method"><code>pub async fn <a href="#method.unknown_members" class="fnname">unknown_members</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a></code><a class="srclink" href="../../src/serenity/cache/mod.rs.html#236-248" title="goto source code">[src]</a></h4><div class="docblock"><p>Fetches the number of <a href="../../serenity/model/guild/struct.Member.html" title="Member"><code>Member</code></a>s that have not had data received.</p>
 <p>The important detail to note here is that this is the number of
 _member_s that have not had data received. A single <a href="../../serenity/model/user/struct.User.html" title="User"><code>User</code></a> may have
@@ -23,12 +23,12 @@ multiple associated member objects that have not been received.</p>
 used to determine how many members have not yet been received.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">thread</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
+<span class="kw">use</span> <span class="ident">std::thread</span>;
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
-<span class="attribute">#[<span class="ident">serenity</span>::<span class="ident">async_trait</span>]</span>
+<span class="attribute">#[<span class="ident">serenity::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">Ready</span>) {
         <span class="comment">// Wait some time for guilds to be received.</span>
@@ -40,13 +40,13 @@ used to determine how many members have not yet been received.</p>
         <span class="comment">//</span>
         <span class="comment">// For demonstrative purposes we&#39;re just sleeping the thread for 5</span>
         <span class="comment">// seconds.</span>
-        <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">5</span>)).<span class="kw">await</span>;
+        <span class="ident">tokio::time::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">5</span>)).<span class="kw">await</span>;
 
         <span class="macro">println!</span>(<span class="string">&quot;{} unknown members&quot;</span>, <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">unknown_members</span>().<span class="kw">await</span>);
     }
 }
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.private_channels" class="method"><code>pub async fn <a href="#method.private_channels" class="fnname">private_channels</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html" title="struct std::collections::hash::map::HashMap">HashMap</a>&lt;<a class="struct" href="../../serenity/model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>, <a class="struct" href="../../serenity/model/channel/struct.PrivateChannel.html" title="struct serenity::model::channel::PrivateChannel">PrivateChannel</a>&gt;</code><a class="srclink" href="../../src/serenity/cache/mod.rs.html#272-274" title="goto source code">[src]</a></h4><div class="docblock"><p>Fetches a vector of all <a href="../../serenity/model/channel/struct.PrivateChannel.html" title="PrivateChannel"><code>PrivateChannel</code></a> Ids that are
@@ -70,7 +70,7 @@ current <a href="../../serenity/prelude/struct.Context.html"><code>Context</code
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
-<span class="attribute">#[<span class="ident">serenity</span>::<span class="ident">async_trait</span>]</span>
+<span class="attribute">#[<span class="ident">serenity::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">Ready</span>) {
         <span class="kw">let</span> <span class="ident">guilds</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">cache</span>.<span class="ident">guilds</span>().<span class="kw">await</span>.<span class="ident">len</span>();
@@ -117,7 +117,7 @@ is indirectly a <a href="../../serenity/model/id/struct.ChannelId.html" title="C
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
-<span class="attribute">#[<span class="ident">serenity</span>::<span class="ident">async_trait</span>]</span>
+<span class="attribute">#[<span class="ident">serenity::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>, <span class="ident">message</span>: <span class="ident">Message</span>) {
 
@@ -135,7 +135,7 @@ is indirectly a <a href="../../serenity/model/id/struct.ChannelId.html" title="C
     }
 }
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span><span class="ident">Client</span>::<span class="ident">builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span><span class="ident">Client::builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.guild_channel_field" class="method"><code>pub async fn <a href="#method.guild_channel_field" class="fnname">guild_channel_field</a>&lt;Ret, Fun&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;id: impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../../serenity/model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;field_selector: Fun<br>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;Ret&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Fun: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>(&amp;<a class="struct" href="../../serenity/model/channel/struct.GuildChannel.html" title="struct serenity::model::channel::GuildChannel">GuildChannel</a>) -&gt; Ret,&nbsp;</span></code><a class="srclink" href="../../src/serenity/cache/mod.rs.html#490-499" title="goto source code">[src]</a></h4><div class="docblock"><p>This method allows to only clone a field of the guild channel instead of
@@ -239,9 +239,9 @@ and retrieve from the guild’s <a href="../../serenity/model/guild/struct.Guild
 <p>Printing the maximum number of messages in a channel to be cached:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
+<span class="kw">use</span> <span class="ident">serenity::cache::Cache</span>;
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Cache</span>::<span class="ident">new</span>();
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Cache::new</span>();
 <span class="macro">println!</span>(<span class="string">&quot;Max settings: {}&quot;</span>, <span class="ident">cache</span>.<span class="ident">settings</span>().<span class="kw">await</span>.<span class="ident">max_messages</span>);</pre></div>
 </div><h4 id="method.set_max_messages" class="method"><code>pub async fn <a href="#method.set_max_messages" class="fnname">set_max_messages</a>(&amp;self, max: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code><a class="srclink" href="../../src/serenity/cache/mod.rs.html#817-819" title="goto source code">[src]</a></h4><div class="docblock"><p>Sets the maximum amount of messages per channel to cache.</p>
 <p>By default, no messages will be cached.</p>

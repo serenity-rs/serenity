@@ -959,15 +959,15 @@
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
 
-<span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
-<span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
+<span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
+<span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
+<span class="kw">use</span> <span class="ident">quote::quote</span>;
 <span class="kw">use</span> <span class="ident">syn</span>::{
     <span class="ident">parse</span>::{<span class="ident">Error</span>, <span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span>},
     <span class="ident">parse_macro_input</span>,
     <span class="ident">parse_quote</span>,
-    <span class="ident">punctuated</span>::<span class="ident">Punctuated</span>,
-    <span class="ident">spanned</span>::<span class="ident">Spanned</span>,
+    <span class="ident">punctuated::Punctuated</span>,
+    <span class="ident">spanned::Spanned</span>,
     <span class="ident">Ident</span>,
     <span class="ident">Lit</span>,
     <span class="ident">Token</span>,
@@ -989,10 +989,10 @@
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">values</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>);<span class="kw-2">*</span>]) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span> {
             $(
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">attributes</span>::<span class="ident">parse</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">values</span>)),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::attributes::parse</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">values</span>)),
             )<span class="op">*</span>
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">return</span> <span class="ident">Error</span>::<span class="ident">new</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>))
+                <span class="kw">return</span> <span class="ident">Error::new</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>))
                     .<span class="ident">to_compile_error</span>()
                     .<span class="ident">into</span>();
             },
@@ -1065,7 +1065,7 @@
         <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">to_string</span>()
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">Options</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">Options::new</span>();
 
     <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">fun</span>.<span class="ident">attributes</span> {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">span</span>();
@@ -1076,17 +1076,17 @@
 
         <span class="kw">match</span> <span class="ident">name</span> {
             <span class="string">&quot;num_args&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">u16</span>::<span class="ident">parse</span>(<span class="ident">values</span>));
+                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">u16::parse</span>(<span class="ident">values</span>));
 
                 <span class="ident">options</span>.<span class="ident">min_args</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">args</span>));
                 <span class="ident">options</span>.<span class="ident">max_args</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">args</span>));
             },
             <span class="string">&quot;example&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">options</span>.<span class="ident">examples</span>.<span class="ident">push</span>(<span class="macro">propagate_err!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>)));
+                <span class="ident">options</span>.<span class="ident">examples</span>.<span class="ident">push</span>(<span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>)));
             },
             <span class="string">&quot;description&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">line</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>));
-                <span class="ident">util</span>::<span class="ident">append_line</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>.<span class="ident">description</span>, <span class="ident">line</span>);
+                <span class="kw">let</span> <span class="ident">line</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>));
+                <span class="ident">util::append_line</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>.<span class="ident">description</span>, <span class="ident">line</span>);
             },
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">match_options!</span>(<span class="ident">name</span>, <span class="ident">values</span>, <span class="ident">options</span>, <span class="ident">span</span> <span class="op">=</span><span class="op">&gt;</span> [
@@ -1128,9 +1128,9 @@
         <span class="ident">sub_commands</span>,
     } <span class="op">=</span> <span class="ident">options</span>;
 
-    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor</span>::<span class="ident">Command</span>));
+    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor::Command</span>));
 
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandResult</span>);
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity::framework::standard::CommandResult</span>);
     <span class="ident">create_return_type_validation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">res</span>);
 
     <span class="kw">let</span> <span class="ident">visibility</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">visibility</span>;
@@ -1144,8 +1144,8 @@
 
     <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">cooked</span>.<span class="ident">clone</span>();
 
-    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandOptions</span>);
-    <span class="kw">let</span> <span class="ident">command_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Command</span>);
+    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::CommandOptions</span>);
+    <span class="kw">let</span> <span class="ident">command_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::Command</span>);
 
     <span class="ident">populate_fut_lifetimes_on_refs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>.<span class="ident">args</span>);
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">args</span>;
@@ -1181,8 +1181,8 @@
 
         #(#<span class="ident">cooked</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> (#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
-            <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
+        #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> (#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::serenity::futures::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
+            <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
             <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
         }
@@ -1239,7 +1239,7 @@
 
         <span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">Names</span> {
             <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">Lit</span>, <span class="macro">Token!</span>[,]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse_terminated</span>(<span class="ident">Lit</span>::<span class="ident">parse</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">n</span>: <span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">Lit</span>, <span class="macro">Token!</span>[,]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse_terminated</span>(<span class="ident">Lit::parse</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">Names</span>(<span class="ident">n</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">to_str</span>()).<span class="ident">collect</span>()))
             }
         }
@@ -1252,7 +1252,7 @@
 
     <span class="comment">// Revert the change for the names of documentation attributes done when</span>
     <span class="comment">// parsing the function input with `CommandFun`.</span>
-    <span class="ident">util</span>::<span class="ident">rename_attributes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>.<span class="ident">attributes</span>, <span class="string">&quot;description&quot;</span>, <span class="string">&quot;doc&quot;</span>);
+    <span class="ident">util::rename_attributes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>.<span class="ident">attributes</span>, <span class="string">&quot;description&quot;</span>, <span class="string">&quot;doc&quot;</span>);
 
     <span class="comment">// Additionally, place the documentation attributes to the `cooked` list</span>
     <span class="comment">// to prevent the macro from rejecting them as invalid attributes.</span>
@@ -1268,7 +1268,7 @@
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">HelpOptions</span>::<span class="ident">default</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">HelpOptions::default</span>();
 
     <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">fun</span>.<span class="ident">attributes</span> {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">span</span>();
@@ -1310,13 +1310,13 @@
     }
 
     <span class="kw">fn</span> <span class="ident">produce_strike_text</span>(<span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>, <span class="ident">dm_or_guild</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Write</span>;
+        <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strike_text</span> <span class="op">=</span>
-            <span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;~~`Strikethrough commands`~~ are unavailable because they&quot;</span>);
+            <span class="ident">String::from</span>(<span class="string">&quot;~~`Strikethrough commands`~~ are unavailable because they&quot;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">concat_with_comma</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_permissions</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">concat_with_comma</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_permissions</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour::Strike</span> {
             <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
             <span class="ident">strike_text</span>.<span class="ident">push_str</span>(<span class="string">&quot; require permissions&quot;</span>);
 
@@ -1325,7 +1325,7 @@
             <span class="bool-val">false</span>
         };
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_role</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span> {
+        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_role</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour::Strike</span> {
             <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
             <span class="kw">if</span> <span class="ident">concat_with_comma</span> {
@@ -1336,7 +1336,7 @@
             }
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_conditions</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span> {
+        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">lacking_conditions</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour::Strike</span> {
             <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
             <span class="kw">if</span> <span class="ident">concat_with_comma</span> {
@@ -1347,7 +1347,7 @@
             }
         }
 
-        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">wrong_channel</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span> {
+        <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">wrong_channel</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour::Strike</span> {
             <span class="ident">is_any_option_strike</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
             <span class="kw">if</span> <span class="ident">concat_with_comma</span> {
@@ -1409,9 +1409,9 @@
     <span class="kw">let</span> <span class="ident">strikethrough_commands_tip_in_dm</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="ident">strikethrough_commands_tip_in_dm</span>);
     <span class="kw">let</span> <span class="ident">strikethrough_commands_tip_in_guild</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="ident">strikethrough_commands_tip_in_guild</span>);
 
-    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor</span>::<span class="ident">Help</span>));
+    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor::Help</span>));
 
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandResult</span>);
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">serenity::framework::standard::CommandResult</span>);
     <span class="ident">create_return_type_validation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">res</span>);
 
     <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">HELP_OPTIONS</span>);
@@ -1421,8 +1421,8 @@
 
     <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">cooked</span>.<span class="ident">clone</span>();
 
-    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">HelpOptions</span>);
-    <span class="kw">let</span> <span class="ident">command_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">HelpCommand</span>);
+    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::HelpOptions</span>);
+    <span class="kw">let</span> <span class="ident">command_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::HelpCommand</span>);
 
     <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">body</span>;
     <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">ret</span>;
@@ -1473,8 +1473,8 @@
 
         #(#<span class="ident">cooked</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">nn</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
-            <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
+        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">nn</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::serenity::futures::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
+            <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
             <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
         }
@@ -1575,7 +1575,7 @@
         <span class="ident">group</span>.<span class="ident">name</span>.<span class="ident">to_string</span>()
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">GroupOptions</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">GroupOptions::new</span>();
 
     <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">attributes</span> {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">span</span>();
@@ -1586,17 +1586,17 @@
 
         <span class="kw">match</span> <span class="ident">name</span> {
             <span class="string">&quot;prefix&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">options</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">propagate_err!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>))];
+                <span class="ident">options</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>))];
             },
             <span class="string">&quot;description&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">line</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>));
-                <span class="ident">util</span>::<span class="ident">append_line</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>.<span class="ident">description</span>, <span class="ident">line</span>);
+                <span class="kw">let</span> <span class="ident">line</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>));
+                <span class="ident">util::append_line</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>.<span class="ident">description</span>, <span class="ident">line</span>);
             },
             <span class="string">&quot;summary&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">arg</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>));
+                <span class="kw">let</span> <span class="ident">arg</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>));
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">desc</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>.<span class="ident">summary</span>.<span class="number">0</span> {
-                    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Write</span>;
+                    <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">desc</span>, <span class="string">&quot;\n{}&quot;</span>, <span class="ident">arg</span>.<span class="ident">trim_matches</span>(<span class="string">&#39; &#39;</span>));
                 } <span class="kw">else</span> {
@@ -1650,8 +1650,8 @@
     <span class="kw">let</span> <span class="ident">sub_groups</span> <span class="op">=</span> <span class="ident">sub_groups</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">with_suffix</span>(<span class="ident">GROUP</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
     <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">GROUP_OPTIONS</span>);
-    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">GroupOptions</span>);
-    <span class="kw">let</span> <span class="ident">group_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">CommandGroup</span>);
+    <span class="kw">let</span> <span class="ident">options_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::GroupOptions</span>);
+    <span class="kw">let</span> <span class="ident">group_path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::CommandGroup</span>);
 
     (<span class="macro">quote!</span> {
         #(#<span class="ident">cooked</span>)<span class="op">*</span>
@@ -1709,29 +1709,29 @@
         <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">n</span>[..];
 
         <span class="kw">match</span> <span class="ident">n</span> {
-            <span class="string">&quot;name&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>)),
-            <span class="string">&quot;display_in_help&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">display_in_help</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>)),
-            <span class="string">&quot;check_in_help&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">check_in_help</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>)),
+            <span class="string">&quot;name&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>)),
+            <span class="string">&quot;display_in_help&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">display_in_help</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>)),
+            <span class="string">&quot;check_in_help&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">check_in_help</span> <span class="op">=</span> <span class="macro">propagate_err!</span>(<span class="ident">attributes::parse</span>(<span class="ident">values</span>)),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">return</span> <span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, <span class="ident">n</span>))
+                <span class="kw">return</span> <span class="ident">Error::new</span>(<span class="ident">span</span>, <span class="macro">format_args!</span>(<span class="string">&quot;invalid attribute: {:?}&quot;</span>, <span class="ident">n</span>))
                     .<span class="ident">to_compile_error</span>()
                     .<span class="ident">into</span>();
             },
         }
     }
 
-    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor</span>::<span class="ident">Check</span>));
+    <span class="macro">propagate_err!</span>(<span class="ident">create_declaration_validations</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">DeclarFor::Check</span>));
 
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Reason</span><span class="op">&gt;</span>);
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">serenity::framework::standard::Reason</span><span class="op">&gt;</span>);
     <span class="ident">create_return_type_validation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>, <span class="ident">res</span>);
 
     <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
     <span class="kw">let</span> <span class="ident">n2</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>();
     <span class="kw">let</span> <span class="ident">visibility</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">visibility</span>;
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;&lt;fn&gt;&quot;</span> { <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">clone</span>() } <span class="kw">else</span> { <span class="ident">Ident</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">Span</span>::<span class="ident">call_site</span>()) };
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;&lt;fn&gt;&quot;</span> { <span class="ident">fun</span>.<span class="ident">name</span>.<span class="ident">clone</span>() } <span class="kw">else</span> { <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">Span::call_site</span>()) };
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">with_suffix</span>(<span class="ident">CHECK</span>);
 
-    <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">Check</span>);
+    <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::framework::standard::Check</span>);
     <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">cooked</span>;
     <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">body</span>;
     <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">ret</span>;
@@ -1749,8 +1749,8 @@
 
         #(#<span class="ident">cooked</span>)<span class="op">*</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">n</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
-            <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
+        #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">n</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::serenity::futures::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
+            <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
             <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
         }
@@ -1871,7 +1871,7 @@
     <span class="kw">let</span> <span class="ident">hook</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">Hook</span>);
 
     <span class="kw">match</span> <span class="ident">hook</span> {
-        <span class="ident">Hook</span>::<span class="ident">Function</span>(<span class="kw-2">mut</span> <span class="ident">fun</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Hook::Function</span>(<span class="kw-2">mut</span> <span class="ident">fun</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">cooked</span>;
             <span class="kw">let</span> <span class="ident">visibility</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">visibility</span>;
             <span class="kw">let</span> <span class="ident">fun_name</span> <span class="op">=</span> <span class="ident">fun</span>.<span class="ident">name</span>;
@@ -1884,15 +1884,15 @@
             (<span class="macro">quote!</span> {
                 #(#<span class="ident">cooked</span>)<span class="op">*</span>
                 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-                #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">fun_name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
-                    <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
+                #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">fun_name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::serenity::futures::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
+                    <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
                     <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
                 }
             })
                 .<span class="ident">into</span>()
         },
-        <span class="ident">Hook</span>::<span class="ident">Closure</span>(<span class="ident">closure</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Hook::Closure</span>(<span class="ident">closure</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">cooked</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">cooked</span>;
             <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">args</span>;
             <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">ret</span>;
@@ -1901,7 +1901,7 @@
             (<span class="macro">quote!</span> {
                 #(#<span class="ident">cooked</span>)<span class="op">*</span>
                 <span class="op">|</span>#<span class="ident">args</span><span class="op">|</span> #<span class="ident">ret</span> {
-                    <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
+                    <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
                     <span class="kw">async</span> <span class="kw">move</span> { #<span class="ident">body</span> }.<span class="ident">boxed</span>()
                 }
