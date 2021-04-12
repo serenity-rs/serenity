@@ -17,6 +17,10 @@ bitflags = "1.1"
 serde_json = "1"
 async-trait = "0.1.9"
 
+[dependencies.simd-json]
+version = "0.4"
+optional = true
+
 [dependencies.tracing]
 version = "0.1.23"
 features = ["log"]
@@ -131,10 +135,23 @@ package = "http"
 default = ["default_no_backend", "rustls_backend"]
 default_native_tls = ["default_no_backend", "native_tls_backend"]
 default_tokio_0_2 = ["default_no_backend", "rustls_tokio_0_2_backend"]
-default_native_tls_tokio_0_2 = ["default_no_backend", "native_tls_tokio_0_2_backend"]
+default_native_tls_tokio_0_2 = [
+    "default_no_backend",
+    "native_tls_tokio_0_2_backend",
+]
 
 # Serenity requires a backend, this picks all default features without a backend.
-default_no_backend = ["builder", "cache", "client", "framework", "gateway", "model", "http", "standard_framework", "utils"]
+default_no_backend = [
+    "builder",
+    "cache",
+    "client",
+    "framework",
+    "gateway",
+    "model",
+    "http",
+    "standard_framework",
+    "utils",
+]
 
 builder = ["utils"]
 cache = []
@@ -152,16 +169,43 @@ unstable_discord_api = []
 utils = ["base64"]
 voice = ["client", "model"]
 
+# Enables simd accelerated parsing
+simdjson = ["simd-json"]
+
 # Backends to pick from:
 # - Rustls Backends
-rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/tokio-rustls", "tokio", "rustls_backend_marker", "bytes"]
-rustls_tokio_0_2_backend = ["reqwest_compat/rustls-tls", "async-tungstenite_compat/tokio-rustls", "tokio_compat", "bytes_compat", "rustls_backend_marker"]
+rustls_backend = [
+    "reqwest/rustls-tls",
+    "async-tungstenite/tokio-rustls",
+    "tokio",
+    "rustls_backend_marker",
+    "bytes",
+]
+rustls_tokio_0_2_backend = [
+    "reqwest_compat/rustls-tls",
+    "async-tungstenite_compat/tokio-rustls",
+    "tokio_compat",
+    "bytes_compat",
+    "rustls_backend_marker",
+]
 # Marks that a Rustls backend is active
 rustls_backend_marker = []
 
 # - Native TLS Backends
-native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls", "tokio", "bytes", "native_tls_backend_marker"]
-native_tls_tokio_0_2_backend = ["reqwest_compat/native-tls", "async-tungstenite_compat/tokio-native-tls", "tokio_compat", "bytes_compat", "native_tls_backend_marker"]
+native_tls_backend = [
+    "reqwest/native-tls",
+    "async-tungstenite/tokio-native-tls",
+    "tokio",
+    "bytes",
+    "native_tls_backend_marker",
+]
+native_tls_tokio_0_2_backend = [
+    "reqwest_compat/native-tls",
+    "async-tungstenite_compat/tokio-native-tls",
+    "tokio_compat",
+    "bytes_compat",
+    "native_tls_backend_marker",
+]
 # Marks that a Native TLS backend is active
 native_tls_backend_marker = []
 

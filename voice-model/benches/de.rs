@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use serde_json::from_str;
+use from_str;
 use serenity_voice_model::Event;
 
 pub fn json_deser(c: &mut Criterion) {

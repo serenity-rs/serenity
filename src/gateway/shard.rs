@@ -175,13 +175,13 @@ impl Shard {
     pub fn current_presence(&self) -> &CurrentPresence {
         &self.current_presence
     }
-
+    
     /// Whether the shard has permanently shutdown.
     #[inline]
     pub fn is_shutdown(&self) -> bool {
         self.shutdown
     }
-
+    
     /// Retrieves the heartbeat instants of the shard.
     ///
     /// This is the time of when a heartbeat was sent and when an
