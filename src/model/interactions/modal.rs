@@ -1,5 +1,7 @@
 use serde::de::Error as DeError;
 use serde::Serialize;
+#[cfg(feature = "simdjson")]
+use simd_json::ValueAccess;
 
 use super::message_component::ActionRow;
 use super::prelude::*;
@@ -9,6 +11,7 @@ use crate::builder::{
     EditInteractionResponse,
 };
 use crate::http::Http;
+use crate::json::from_number;
 use crate::model::interactions::InteractionType;
 use crate::utils;
 
@@ -92,7 +95,7 @@ impl ModalSubmitInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
+        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
     }
 
     /// Edits the initial interaction response.
@@ -130,7 +133,7 @@ impl ModalSubmitInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::Object(map)).await
+        http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
     }
 
     /// Deletes the initial interaction response.
@@ -174,7 +177,7 @@ impl ModalSubmitInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_followup_message(&self.token, &Value::Object(map)).await
+        http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
     }
 
     /// Edits a followup response to the response sent.
@@ -210,7 +213,7 @@ impl ModalSubmitInteraction {
         Message::check_embed_length(&map)?;
 
         http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::Object(map))
+            .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
             .await
     }
 
@@ -255,7 +258,7 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
 
         if let Some(guild_id) = id {
             if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
-                member.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                member.insert("guild_id".to_string(), from_number(guild_id));
             }
 
             if let Some(data) = map.get_mut("data") {
