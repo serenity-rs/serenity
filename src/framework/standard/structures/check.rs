@@ -74,7 +74,9 @@ impl Display for Reason {
             Self::UserAndLog {
                 user,
                 log,
-            } => write!(f, "UserAndLog {{user: {}, log: {}}}", user, log),
+            } => {
+                write!(f, "UserAndLog {{user: {}, log: {}}}", user, log)
+            },
         }
     }
 }

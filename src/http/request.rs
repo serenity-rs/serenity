@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use reqwest::{
     header::{
         HeaderMap as Headers,
@@ -80,6 +82,7 @@ impl<'a> Request<'a> {
         &'a self,
         client: &Client,
         token: &str,
+        proxy: Option<&Url>,
     ) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,
@@ -87,7 +90,11 @@ impl<'a> Request<'a> {
             route: ref route_info,
         } = *self;
 
-        let (method, _, path) = route_info.deconstruct();
+        let (method, _, mut path) = route_info.deconstruct();
+
+        if let Some(proxy) = proxy {
+            path = Cow::Owned(path.to_mut().replace("https://discord.com/", proxy.as_str()));
+        }
 
         let mut builder = client.request(method.reqwest_method(), Url::parse(&path)?);
 

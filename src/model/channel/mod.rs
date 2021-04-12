@@ -320,7 +320,7 @@ enum_number!(ChannelType {
     Category,
     News,
     Store,
-    Stage,
+    Stage
 });
 
 impl ChannelType {
@@ -434,7 +434,7 @@ pub enum VideoQualityMode {
 
 enum_number!(VideoQualityMode {
     Auto,
-    Full,
+    Full
 });
 
 #[cfg(test)]
