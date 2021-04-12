@@ -46,6 +46,32 @@ impl<'de> Deserialize<'de> for Interaction {
             if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
                 member.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
             }
+
+            if let Some(data) = map.get_mut("data") {
+                if let Some(resolved) = data.get_mut("resolved") {
+                    if let Some(roles) = resolved.get_mut("roles") {
+                        if let Some(values) = roles.as_object_mut() {
+                            for value in values.values_mut() {
+                                value.as_object_mut().unwrap().insert(
+                                    "guild_id".to_string(),
+                                    Value::String(guild_id.to_string()),
+                                );
+                            }
+                        }
+                    }
+
+                    if let Some(channels) = resolved.get_mut("channels") {
+                        if let Some(values) = channels.as_object_mut() {
+                            for value in values.values_mut() {
+                                value.as_object_mut().unwrap().insert(
+                                    "guild_id".to_string(),
+                                    Value::String(guild_id.to_string()),
+                                );
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         let id = map
@@ -154,6 +180,72 @@ pub struct ApplicationCommandInteractionData {
     pub name: String,
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
+    pub resolved: Option<ApplicationCommandInteractionDataResolved>,
+}
+
+/// The resolved data of a command data interaction payload.
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandInteractionDataResolved {
+    users: Option<HashMap<UserId, User>>,
+    members: Option<HashMap<UserId, PartialMember>>,
+    roles: Option<HashMap<RoleId, Role>>,
+    channels: Option<HashMap<ChannelId, PartialChannel>>,
+}
+
+impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        println!("{:?}", map);
+
+        let members = match map.contains_key("members") {
+            true => Some(
+                map.remove("members")
+                    .ok_or_else(|| DeError::custom("expected members"))
+                    .and_then(deserialize_partial_members_map)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let users = match map.contains_key("users") {
+            true => Some(
+                map.remove("users")
+                    .ok_or_else(|| DeError::custom("expected users"))
+                    .and_then(deserialize_users)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let roles = match map.contains_key("roles") {
+            true => Some(
+                map.remove("roles")
+                    .ok_or_else(|| DeError::custom("expected roles"))
+                    .and_then(deserialize_roles_map)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let channels = match map.contains_key("channels") {
+            true => Some(
+                map.remove("channels")
+                    .ok_or_else(|| DeError::custom("expected chanels"))
+                    .and_then(deserialize_channels_map)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        Ok(Self {
+            users,
+            members,
+            roles,
+            channels,
+        })
+    }
 }
 
 /// A set of a parameter and a value from the user.
@@ -165,6 +257,7 @@ pub struct ApplicationCommandInteractionData {
 pub struct ApplicationCommandInteractionDataOption {
     pub name: String,
     pub value: Option<Value>,
+    // pub kind: ApplicationCommandOptionType,
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
 }

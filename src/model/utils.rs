@@ -70,6 +70,38 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     Ok(members)
 }
 
+pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<UserId, PartialMember>, D::Error> {
+    let map: HashMap<UserId, PartialMember> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+pub fn deserialize_users<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<UserId, User>, D::Error> {
+    let map: HashMap<UserId, User> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<RoleId, Role>, D::Error> {
+    let map: HashMap<RoleId, Role> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<ChannelId, PartialChannel>, D::Error> {
+    let map: HashMap<ChannelId, PartialChannel> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
 pub fn deserialize_presences<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, Presence>, D::Error> {
