@@ -65,7 +65,7 @@ pub struct HttpBuilder<'a> {
     proxy: Option<Url>,
     fut: Option<BoxFuture<'a, Result<Http>>>,
     #[cfg(feature = "unstable_discord_api")]
-    application_id: Option<u64>
+    application_id: Option<u64>,
 }
 
 impl<'a> HttpBuilder<'a> {
@@ -78,7 +78,7 @@ impl<'a> HttpBuilder<'a> {
             proxy: None,
             fut: None,
             #[cfg(feature = "unstable_discord_api")]
-            application_id: None
+            application_id: None,
         }
     }
 
@@ -173,7 +173,9 @@ impl<'a> Future for HttpBuilder<'a> {
             let token = self.token.take().unwrap();
 
             #[cfg(feature = "unstable_discord_api")]
-            let application_id = self.application_id.expect("Expected application Id in order to use slash commands");
+            let application_id = self
+                .application_id
+                .expect("Expected application Id in order to use slash commands");
 
             let client = self.client.take().unwrap_or_else(|| {
                 let builder = configure_client_backend(Client::builder());
@@ -196,7 +198,7 @@ impl<'a> Future for HttpBuilder<'a> {
                     proxy,
                     token,
                     #[cfg(feature = "unstable_discord_api")]
-                    application_id
+                    application_id,
                 })
             }))
         }
