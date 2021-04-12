@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
-
-use crate::internal::prelude::*;
+use crate::json::{from_number, Value, NULL};
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -103,7 +101,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_age(&mut self, max_age: u64) -> &mut Self {
-        self.0.insert("max_age", Value::Number(Number::from(max_age)));
+        self.0.insert("max_age", from_number(max_age));
         self
     }
 
@@ -137,7 +135,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
-        self.0.insert("max_uses", Value::Number(Number::from(max_uses)));
+        self.0.insert("max_uses", from_number(max_uses));
         self
     }
 
@@ -171,7 +169,7 @@ impl CreateInvite {
     /// # fn main() {}
     /// ```
     pub fn temporary(&mut self, temporary: bool) -> &mut Self {
-        self.0.insert("temporary", Value::Bool(temporary));
+        self.0.insert("temporary", Value::from(temporary));
         self
     }
 
@@ -203,7 +201,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn unique(&mut self, unique: bool) -> &mut Self {
-        self.0.insert("unique", Value::Bool(unique));
+        self.0.insert("unique", Value::from(unique));
         self
     }
 }
@@ -222,7 +220,7 @@ impl Default for CreateInvite {
     /// ```
     fn default() -> CreateInvite {
         let mut map = HashMap::new();
-        map.insert("validate", Value::Null);
+        map.insert("validate", NULL);
 
         CreateInvite(map)
     }

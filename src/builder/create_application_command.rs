@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
+#[cfg(feature = "simd-json")]
+use simd_json::Mutable;
 
+use crate::json::{from_number, json, Value};
 use crate::{model::interactions::application_command::ApplicationCommandOptionType, utils};
 
 /// A builder for creating a new [`ApplicationCommandOption`].
@@ -18,7 +20,7 @@ pub struct CreateApplicationCommandOption(pub HashMap<&'static str, Value>);
 impl CreateApplicationCommandOption {
     /// Sets the ApplicationCommandOptionType.
     pub fn kind(&mut self, kind: ApplicationCommandOptionType) -> &mut Self {
-        self.0.insert("type", Value::Number(serde_json::Number::from(kind as u8)));
+        self.0.insert("type", from_number(kind as u8));
         self
     }
 
@@ -26,7 +28,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: The option name must be between 1 and 32 characters.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
-        self.0.insert("name", Value::String(name.to_string()));
+        self.0.insert("name", Value::from(name.to_string()));
         self
     }
 
@@ -34,7 +36,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: The description must be between 1 and 100 characters.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::String(description.to_string()));
+        self.0.insert("description", Value::from(description.to_string()));
         self
     }
 
@@ -42,7 +44,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: Only one option can be `default`.
     pub fn default_option(&mut self, default: bool) -> &mut Self {
-        self.0.insert("default", Value::Bool(default));
+        self.0.insert("default", Value::from(default));
         self
     }
 
@@ -50,7 +52,7 @@ impl CreateApplicationCommandOption {
     ///
     /// **Note**: This defaults to `false`.
     pub fn required(&mut self, required: bool) -> &mut Self {
-        self.0.insert("required", Value::Bool(required));
+        self.0.insert("required", Value::from(required));
         self
     }
 
@@ -75,7 +77,7 @@ impl CreateApplicationCommandOption {
     }
 
     fn add_choice(&mut self, value: Value) -> &mut Self {
-        let choices = self.0.entry("choices").or_insert_with(|| Value::Array(Vec::new()));
+        let choices = self.0.entry("choices").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let choices_arr = choices.as_array_mut().expect("Must be an array");
         choices_arr.push(value);
 
@@ -97,9 +99,9 @@ impl CreateApplicationCommandOption {
 
     pub fn add_sub_option(&mut self, sub_option: CreateApplicationCommandOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(sub_option.0);
-        let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
+        let options = self.0.entry("options").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let opt_arr = options.as_array_mut().expect("Must be an array");
-        opt_arr.push(Value::Object(new_option));
+        opt_arr.push(Value::from(new_option));
 
         self
     }
@@ -119,7 +121,7 @@ impl CreateApplicationCommand {
     /// **Note**: Must be between 1 and 32 characters long,
     /// and cannot start with a space.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
-        self.0.insert("name", Value::String(name.to_string()));
+        self.0.insert("name", Value::from(name.to_string()));
         self
     }
 
@@ -128,7 +130,7 @@ impl CreateApplicationCommand {
     /// **Note**: Setting it to false will disable it for anyone,
     /// including administrators and guild owners.
     pub fn default_permission(&mut self, default_permission: bool) -> &mut Self {
-        self.0.insert("default_permission", Value::Bool(default_permission));
+        self.0.insert("default_permission", Value::from(default_permission));
 
         self
     }
@@ -137,7 +139,7 @@ impl CreateApplicationCommand {
     ///
     /// **Note**: Must be between 1 and 100 characters long.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::String(description.to_string()));
+        self.0.insert("description", Value::from(description.to_string()));
         self
     }
 
@@ -158,9 +160,9 @@ impl CreateApplicationCommand {
     /// **Note**: Application commands can only have up to 10 options.
     pub fn add_option(&mut self, option: CreateApplicationCommandOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(option.0);
-        let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
+        let options = self.0.entry("options").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let opt_arr = options.as_array_mut().expect("Must be an array");
-        opt_arr.push(Value::Object(new_option));
+        opt_arr.push(Value::from(new_option));
 
         self
     }
@@ -171,9 +173,10 @@ impl CreateApplicationCommand {
     pub fn set_options(&mut self, options: Vec<CreateApplicationCommandOption>) -> &mut Self {
         let new_options = options
             .into_iter()
-            .map(|f| Value::Object(utils::hashmap_to_json_map(f.0)))
+            .map(|f| Value::from(utils::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();
-        self.0.insert("options", Value::Array(new_options));
+
+        self.0.insert("options", Value::from(new_options));
         self
     }
 }
@@ -197,7 +200,7 @@ impl CreateApplicationCommands {
 
     /// Adds a new application command.
     pub fn add_application_command(&mut self, command: CreateApplicationCommand) -> &mut Self {
-        let new_data = Value::Object(utils::hashmap_to_json_map(command.0));
+        let new_data = Value::from(utils::hashmap_to_json_map(command.0));
 
         self.0.push(new_data);
 
@@ -211,7 +214,7 @@ impl CreateApplicationCommands {
     ) -> &mut Self {
         let new_application_command = commands
             .into_iter()
-            .map(|f| Value::Object(utils::hashmap_to_json_map(f.0)))
+            .map(|f| Value::from(utils::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();
 
         for application_command in new_application_command {

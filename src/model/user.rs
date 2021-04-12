@@ -7,8 +7,6 @@ use std::fmt::Write;
 use bitflags::__impl_bitflags;
 use futures::future::{BoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-#[cfg(feature = "model")]
-use serde_json::json;
 
 use super::prelude::*;
 use super::utils::deserialize_u16;
@@ -29,6 +27,9 @@ use crate::collector::{
 use crate::http::GuildPagination;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+#[cfg(feature = "model")]
+use crate::json::json;
+use crate::json::to_string;
 #[cfg(feature = "model")]
 use crate::utils;
 use crate::{internal::prelude::*, model::misc::Mentionable};
@@ -130,10 +131,10 @@ impl CurrentUser {
         F: FnOnce(&mut EditProfile) -> &mut EditProfile,
     {
         let mut map = HashMap::new();
-        map.insert("username", Value::String(self.name.clone()));
+        map.insert("username", Value::from(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
-            map.insert("email", Value::String(email.clone()));
+            map.insert("email", Value::from(email.clone()));
         }
 
         let mut edit_profile = EditProfile(map);
@@ -425,7 +426,7 @@ impl DefaultAvatar {
     ///
     /// [`Error::Json`]: crate::error::Error::Json
     pub fn name(self) -> Result<String> {
-        serde_json::to_string(&self).map_err(From::from)
+        to_string(&self).map_err(From::from)
     }
 }
 

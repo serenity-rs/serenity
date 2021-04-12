@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::internal::prelude::*;
+use crate::json::{from_number, Value};
 use crate::model::channel::ChannelType;
 
 #[derive(Debug, Clone, Default)]
@@ -11,7 +11,7 @@ impl CreateThread {
     ///
     /// **Note**: Must be between 2 and 100 characters long.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
-        self.0.insert("name", Value::String(name.to_string()));
+        self.0.insert("name", Value::from(name.to_string()));
 
         self
     }
@@ -20,7 +20,7 @@ impl CreateThread {
     ///
     /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
     pub fn auto_archive_duration(&mut self, duration: u16) -> &mut Self {
-        self.0.insert("auto_archive_duration", Value::Number(Number::from(duration)));
+        self.0.insert("auto_archive_duration", from_number(duration));
 
         self
     }
@@ -34,7 +34,7 @@ impl CreateThread {
     /// [`ChannelType::PublicThread`]: crate::model::channel::ChannelType::PublicThread
     /// [`ChannelType::PrivateThread`]: crate::model::channel::ChannelType::PrivateThread
     pub fn kind(&mut self, kind: ChannelType) -> &mut Self {
-        self.0.insert("type", Value::Number(Number::from(kind as u8)));
+        self.0.insert("type", from_number(kind as u8));
 
         self
     }
