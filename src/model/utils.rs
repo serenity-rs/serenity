@@ -11,6 +11,8 @@ use super::prelude::*;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+use crate::model::interactions::ApplicationCommandInteractionDataOption;
 
 pub fn default_true() -> bool {
     true
@@ -102,6 +104,7 @@ pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
 pub fn deserialize_options<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
