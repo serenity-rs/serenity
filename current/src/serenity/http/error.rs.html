@@ -179,6 +179,12 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
@@ -244,6 +250,10 @@
     <span class="ident">InvalidHeader</span>(<span class="ident">InvalidHeaderValue</span>),
     <span class="doccomment">/// Reqwest&#39;s Error contain information on why sending a request failed.</span>
     <span class="ident">Request</span>(<span class="ident">ReqwestError</span>),
+    <span class="doccomment">/// When using a proxy with an invalid scheme.</span>
+    <span class="ident">InvalidScheme</span>,
+    <span class="doccomment">/// When using a proxy with an invalid port.</span>
+    <span class="ident">InvalidPort</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
@@ -310,6 +320,8 @@
             <span class="ident">Error::Url</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided URL is incorrect.&quot;</span>),
             <span class="ident">Error::InvalidHeader</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided value is an invalid header value.&quot;</span>),
             <span class="ident">Error::Request</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error while sending HTTP request.&quot;</span>),
+            <span class="ident">Error::InvalidScheme</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid Url scheme.&quot;</span>),
+            <span class="ident">Error::InvalidPort</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid port.&quot;</span>),
         }
     }
 }
