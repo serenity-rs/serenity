@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
-
 use crate::http::AttachmentType;
+use crate::json::Value;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -78,7 +77,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn avatar_url<S: ToString>(&mut self, avatar_url: S) -> &mut Self {
-        self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
+        self.0.insert("avatar_url", Value::from(avatar_url.to_string()));
         self
     }
 
@@ -107,7 +106,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
-        self.0.insert("content", Value::String(content.to_string()));
+        self.0.insert("content", Value::from(content.to_string()));
         self
     }
 
@@ -152,7 +151,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
     /// [struct-level documentation]: #examples
     pub fn embeds(&mut self, embeds: Vec<Value>) -> &mut Self {
-        self.0.insert("embeds", Value::Array(embeds));
+        self.0.insert("embeds", Value::from(embeds));
         self
     }
 
@@ -178,7 +177,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::Bool(tts));
+        self.0.insert("tts", Value::from(tts));
         self
     }
 
@@ -204,7 +203,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
-        self.0.insert("username", Value::String(username.to_string()));
+        self.0.insert("username", Value::from(username.to_string()));
         self
     }
 }
@@ -227,7 +226,7 @@ impl<'a> Default for ExecuteWebhook<'a> {
     /// [`Webhook`]: crate::model::webhook::Webhook
     fn default() -> ExecuteWebhook<'a> {
         let mut map = HashMap::new();
-        map.insert("tts", Value::Bool(false));
+        map.insert("tts", Value::from(false));
 
         ExecuteWebhook(map, vec![])
     }

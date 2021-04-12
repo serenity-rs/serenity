@@ -16,8 +16,8 @@ use super::Cache;
 /// Creating a custom struct implementation to update the cache with:
 ///
 /// ```rust,ignore
-/// use serde_json::json;
 /// use serenity::{
+///     json::json,    
 ///     cache::{Cache, CacheUpdate},
 ///     model::{
 ///         id::UserId,
@@ -70,7 +70,7 @@ use super::Cache;
 ///             Entry::Vacant(entry) => {
 ///                 // We can convert a [`serde_json::Value`] to a User for test
 ///                 // purposes.
-///                 let user = serde_json::from_value::<User>(json!({
+///                 let user = from_value::<User>(json!({
 ///                     "id": self.user_id,
 ///                     "avatar": self.user_avatar.clone(),
 ///                     "bot": self.user_is_bot,
