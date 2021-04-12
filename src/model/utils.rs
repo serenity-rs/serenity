@@ -3,6 +3,8 @@ use std::{collections::HashMap, hash::Hash};
 use serde::de::Error as DeError;
 use serde::de::MapAccess;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
+#[cfg(feature = "simd-json")]
+use simd_json::ValueAccess;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::permissions::Permissions;

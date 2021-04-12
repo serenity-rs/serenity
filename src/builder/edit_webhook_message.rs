@@ -16,7 +16,7 @@ impl EditWebhookMessage {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
-        self.0.insert("content", Value::String(content.to_string()));
+        self.0.insert("content", Value::from(content.to_string()));
         self
     }
 
@@ -34,7 +34,7 @@ impl EditWebhookMessage {
     /// [struct-level documentation of `ExecuteWebhook`]: crate::builder::ExecuteWebhook#examples
     #[inline]
     pub fn embeds(&mut self, embeds: Vec<Value>) -> &mut Self {
-        self.0.insert("embeds", Value::Array(embeds));
+        self.0.insert("embeds", Value::from(embeds));
         self
     }
 
@@ -46,7 +46,7 @@ impl EditWebhookMessage {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::Object(map);
+        let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
         self

@@ -15,10 +15,10 @@ use super::prelude::*;
 use super::utils::deserialize_emojis;
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
-use crate::constants::OpCode;
 use crate::internal::prelude::*;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::{application_command::ApplicationCommand, Interaction};
+use crate::{constants::OpCode, json::prelude::*};
 
 /// Event data for the channel creation event.
 ///
@@ -431,7 +431,7 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
 
         Ok(GuildMemberAddEvent {
             guild_id,
-            member: Member::deserialize(Value::Object(map)).map_err(DeError::custom)?,
+            member: Member::deserialize(Value::from(map)).map_err(DeError::custom)?,
         })
     }
 }
@@ -581,7 +581,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             .map_err(DeError::custom)?;
 
         if let Some(members) = members.as_array_mut() {
-            let num = Value::Number(Number::from(guild_id.0));
+            let num = from_number(guild_id.0);
 
             for member in members {
                 if let Some(map) = member.as_object_mut() {
@@ -590,7 +590,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             }
         }
 
-        let members = serde_json::from_value::<Vec<Member>>(members)
+        let members = from_value::<Vec<Member>>(members)
             .map(|members| {
                 members.into_iter().fold(HashMap::new(), |mut acc, member| {
                     let id = member.user.id;
@@ -653,7 +653,7 @@ impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
 
         if let Some(value) = map.get_mut("role") {
             if let Some(role) = value.as_object_mut() {
-                role.insert("guild_id".to_string(), Value::Number(Number::from(id)));
+                role.insert("guild_id".to_string(), from_number(id));
             }
         }
 
@@ -729,7 +729,7 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
 
         if let Some(value) = map.get_mut("role") {
             if let Some(role) = value.as_object_mut() {
-                role.insert("guild_id".to_string(), Value::Number(Number::from(id)));
+                role.insert("guild_id".to_string(), from_number(id));
             }
         }
 
@@ -1066,10 +1066,10 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let guild_id = match map.remove("guild_id") {
-            Some(v) => serde_json::from_value::<Option<GuildId>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<GuildId>>(v).map_err(DeError::custom)?,
             None => None,
         };
-        let presence = Presence::deserialize(Value::Object(map)).map_err(DeError::custom)?;
+        let presence = Presence::deserialize(Value::from(map)).map_err(DeError::custom)?;
 
         Ok(Self {
             guild_id,
@@ -1369,7 +1369,7 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
 
         Ok(VoiceStateUpdateEvent {
             guild_id,
-            voice_state: VoiceState::deserialize(Value::Object(map)).map_err(DeError::custom)?,
+            voice_state: VoiceState::deserialize(Value::from(map)).map_err(DeError::custom)?,
         })
     }
 }
@@ -1703,7 +1703,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                     .map_err(DeError::custom)?;
                 let payload = map
                     .remove("d")
-                    .ok_or(Error::Decode("expected gateway event d", Value::Object(map)))
+                    .ok_or(Error::Decode("expected gateway event d", Value::from(map)))
                     .map_err(DeError::custom)?;
 
                 let x = match deserialize_event_with_type(kind.clone(), payload) {
@@ -2471,12 +2471,12 @@ impl<T> TryFrom<RelatedId<T>> for Option<T> {
 /// Returns [`Error::Json`] if there is an error in deserializing the event data.
 pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
     Ok(match kind {
-        EventType::ChannelCreate => Event::ChannelCreate(serde_json::from_value(v)?),
-        EventType::ChannelDelete => Event::ChannelDelete(serde_json::from_value(v)?),
-        EventType::ChannelPinsUpdate => Event::ChannelPinsUpdate(serde_json::from_value(v)?),
-        EventType::ChannelUpdate => Event::ChannelUpdate(serde_json::from_value(v)?),
-        EventType::GuildBanAdd => Event::GuildBanAdd(serde_json::from_value(v)?),
-        EventType::GuildBanRemove => Event::GuildBanRemove(serde_json::from_value(v)?),
+        EventType::ChannelCreate => Event::ChannelCreate(from_value(v)?),
+        EventType::ChannelDelete => Event::ChannelDelete(from_value(v)?),
+        EventType::ChannelPinsUpdate => Event::ChannelPinsUpdate(from_value(v)?),
+        EventType::ChannelUpdate => Event::ChannelUpdate(from_value(v)?),
+        EventType::GuildBanAdd => Event::GuildBanAdd(from_value(v)?),
+        EventType::GuildBanRemove => Event::GuildBanRemove(from_value(v)?),
         EventType::GuildCreate | EventType::GuildUnavailable => {
             // GuildUnavailable isn't actually received from the gateway, so it
             // can be lumped in with GuildCreate's arm.
@@ -2484,83 +2484,75 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             let mut map = JsonMap::deserialize(v)?;
 
             if map.remove("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
-                let guild_data = serde_json::from_value(Value::Object(map))?;
+                let guild_data = from_value(Value::from(map))?;
 
                 Event::GuildUnavailable(guild_data)
             } else {
-                Event::GuildCreate(serde_json::from_value(Value::Object(map))?)
+                Event::GuildCreate(from_value(Value::from(map))?)
             }
         },
         EventType::GuildDelete => {
             let mut map = JsonMap::deserialize(v)?;
 
             if map.remove("unavailable").and_then(|v| v.as_bool()).unwrap_or(false) {
-                let guild_data = serde_json::from_value(Value::Object(map))?;
+                let guild_data = from_value(Value::from(map))?;
 
                 Event::GuildUnavailable(guild_data)
             } else {
-                Event::GuildDelete(serde_json::from_value(Value::Object(map))?)
+                Event::GuildDelete(from_value(Value::from(map))?)
             }
         },
-        EventType::GuildEmojisUpdate => Event::GuildEmojisUpdate(serde_json::from_value(v)?),
-        EventType::GuildIntegrationsUpdate => {
-            Event::GuildIntegrationsUpdate(serde_json::from_value(v)?)
-        },
-        EventType::GuildMemberAdd => Event::GuildMemberAdd(serde_json::from_value(v)?),
-        EventType::GuildMemberRemove => Event::GuildMemberRemove(serde_json::from_value(v)?),
-        EventType::GuildMemberUpdate => Event::GuildMemberUpdate(serde_json::from_value(v)?),
-        EventType::GuildMembersChunk => Event::GuildMembersChunk(serde_json::from_value(v)?),
-        EventType::GuildRoleCreate => Event::GuildRoleCreate(serde_json::from_value(v)?),
-        EventType::GuildRoleDelete => Event::GuildRoleDelete(serde_json::from_value(v)?),
-        EventType::GuildRoleUpdate => Event::GuildRoleUpdate(serde_json::from_value(v)?),
-        EventType::InviteCreate => Event::InviteCreate(serde_json::from_value(v)?),
-        EventType::InviteDelete => Event::InviteDelete(serde_json::from_value(v)?),
-        EventType::GuildUpdate => Event::GuildUpdate(serde_json::from_value(v)?),
-        EventType::MessageCreate => Event::MessageCreate(serde_json::from_value(v)?),
-        EventType::MessageDelete => Event::MessageDelete(serde_json::from_value(v)?),
-        EventType::MessageDeleteBulk => Event::MessageDeleteBulk(serde_json::from_value(v)?),
-        EventType::ReactionAdd => Event::ReactionAdd(serde_json::from_value(v)?),
-        EventType::ReactionRemove => Event::ReactionRemove(serde_json::from_value(v)?),
-        EventType::ReactionRemoveAll => Event::ReactionRemoveAll(serde_json::from_value(v)?),
-        EventType::MessageUpdate => Event::MessageUpdate(serde_json::from_value(v)?),
-        EventType::PresenceUpdate => Event::PresenceUpdate(serde_json::from_value(v)?),
-        EventType::PresencesReplace => Event::PresencesReplace(serde_json::from_value(v)?),
-        EventType::Ready => Event::Ready(serde_json::from_value(v)?),
-        EventType::Resumed => Event::Resumed(serde_json::from_value(v)?),
-        EventType::TypingStart => Event::TypingStart(serde_json::from_value(v)?),
-        EventType::UserUpdate => Event::UserUpdate(serde_json::from_value(v)?),
-        EventType::VoiceServerUpdate => Event::VoiceServerUpdate(serde_json::from_value(v)?),
-        EventType::VoiceStateUpdate => Event::VoiceStateUpdate(serde_json::from_value(v)?),
-        EventType::WebhookUpdate => Event::WebhookUpdate(serde_json::from_value(v)?),
+        EventType::GuildEmojisUpdate => Event::GuildEmojisUpdate(from_value(v)?),
+        EventType::GuildIntegrationsUpdate => Event::GuildIntegrationsUpdate(from_value(v)?),
+        EventType::GuildMemberAdd => Event::GuildMemberAdd(from_value(v)?),
+        EventType::GuildMemberRemove => Event::GuildMemberRemove(from_value(v)?),
+        EventType::GuildMemberUpdate => Event::GuildMemberUpdate(from_value(v)?),
+        EventType::GuildMembersChunk => Event::GuildMembersChunk(from_value(v)?),
+        EventType::GuildRoleCreate => Event::GuildRoleCreate(from_value(v)?),
+        EventType::GuildRoleDelete => Event::GuildRoleDelete(from_value(v)?),
+        EventType::GuildRoleUpdate => Event::GuildRoleUpdate(from_value(v)?),
+        EventType::InviteCreate => Event::InviteCreate(from_value(v)?),
+        EventType::InviteDelete => Event::InviteDelete(from_value(v)?),
+        EventType::GuildUpdate => Event::GuildUpdate(from_value(v)?),
+        EventType::MessageCreate => Event::MessageCreate(from_value(v)?),
+        EventType::MessageDelete => Event::MessageDelete(from_value(v)?),
+        EventType::MessageDeleteBulk => Event::MessageDeleteBulk(from_value(v)?),
+        EventType::ReactionAdd => Event::ReactionAdd(from_value(v)?),
+        EventType::ReactionRemove => Event::ReactionRemove(from_value(v)?),
+        EventType::ReactionRemoveAll => Event::ReactionRemoveAll(from_value(v)?),
+        EventType::MessageUpdate => Event::MessageUpdate(from_value(v)?),
+        EventType::PresenceUpdate => Event::PresenceUpdate(from_value(v)?),
+        EventType::PresencesReplace => Event::PresencesReplace(from_value(v)?),
+        EventType::Ready => Event::Ready(from_value(v)?),
+        EventType::Resumed => Event::Resumed(from_value(v)?),
+        EventType::TypingStart => Event::TypingStart(from_value(v)?),
+        EventType::UserUpdate => Event::UserUpdate(from_value(v)?),
+        EventType::VoiceServerUpdate => Event::VoiceServerUpdate(from_value(v)?),
+        EventType::VoiceStateUpdate => Event::VoiceStateUpdate(from_value(v)?),
+        EventType::WebhookUpdate => Event::WebhookUpdate(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
-        EventType::InteractionCreate => Event::InteractionCreate(serde_json::from_value(v)?),
+        EventType::InteractionCreate => Event::InteractionCreate(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
-        EventType::IntegrationCreate => Event::IntegrationCreate(serde_json::from_value(v)?),
+        EventType::IntegrationCreate => Event::IntegrationCreate(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
-        EventType::IntegrationUpdate => Event::IntegrationUpdate(serde_json::from_value(v)?),
+        EventType::IntegrationUpdate => Event::IntegrationUpdate(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
-        EventType::IntegrationDelete => Event::IntegrationDelete(serde_json::from_value(v)?),
+        EventType::IntegrationDelete => Event::IntegrationDelete(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
-        EventType::ApplicationCommandCreate => {
-            Event::ApplicationCommandCreate(serde_json::from_value(v)?)
-        },
+        EventType::ApplicationCommandCreate => Event::ApplicationCommandCreate(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
-        EventType::ApplicationCommandUpdate => {
-            Event::ApplicationCommandUpdate(serde_json::from_value(v)?)
-        },
+        EventType::ApplicationCommandUpdate => Event::ApplicationCommandUpdate(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
-        EventType::ApplicationCommandDelete => {
-            Event::ApplicationCommandDelete(serde_json::from_value(v)?)
-        },
-        EventType::StageInstanceCreate => Event::StageInstanceCreate(serde_json::from_value(v)?),
-        EventType::StageInstanceUpdate => Event::StageInstanceUpdate(serde_json::from_value(v)?),
-        EventType::StageInstanceDelete => Event::StageInstanceDelete(serde_json::from_value(v)?),
-        EventType::ThreadCreate => Event::ThreadCreate(serde_json::from_value(v)?),
-        EventType::ThreadUpdate => Event::ThreadUpdate(serde_json::from_value(v)?),
-        EventType::ThreadDelete => Event::ThreadDelete(serde_json::from_value(v)?),
-        EventType::ThreadListSync => Event::ThreadListSync(serde_json::from_value(v)?),
-        EventType::ThreadMemberUpdate => Event::ThreadMemberUpdate(serde_json::from_value(v)?),
-        EventType::ThreadMembersUpdate => Event::ThreadMembersUpdate(serde_json::from_value(v)?),
+        EventType::ApplicationCommandDelete => Event::ApplicationCommandDelete(from_value(v)?),
+        EventType::StageInstanceCreate => Event::StageInstanceCreate(from_value(v)?),
+        EventType::StageInstanceUpdate => Event::StageInstanceUpdate(from_value(v)?),
+        EventType::StageInstanceDelete => Event::StageInstanceDelete(from_value(v)?),
+        EventType::ThreadCreate => Event::ThreadCreate(from_value(v)?),
+        EventType::ThreadUpdate => Event::ThreadUpdate(from_value(v)?),
+        EventType::ThreadDelete => Event::ThreadDelete(from_value(v)?),
+        EventType::ThreadListSync => Event::ThreadListSync(from_value(v)?),
+        EventType::ThreadMemberUpdate => Event::ThreadMemberUpdate(from_value(v)?),
+        EventType::ThreadMembersUpdate => Event::ThreadMembersUpdate(from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
             value: v,
