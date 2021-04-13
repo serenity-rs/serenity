@@ -251,7 +251,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
 /// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a
 /// top-level key and another vector of `options`.
 ///
-/// Their resolved objects can be found on [`ApplicationCommandInteractionData::resolved`]
+/// Their resolved objects can be found on [`ApplicationCommandInteractionData::resolved`].
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataOption {
@@ -421,7 +421,7 @@ pub enum InteractionResponseType {
     DeferredChannelMessageWithSource = 5,
 }
 
-/// The flags for an interactions response.
+/// The flags for an interaction response.
 #[derive(Clone, Serialize)]
 #[non_exhaustive]
 pub struct InteractionApplicationCommandCallbackDataFlags {
