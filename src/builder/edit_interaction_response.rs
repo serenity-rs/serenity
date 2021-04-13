@@ -24,8 +24,8 @@ impl EditInteractionResponse {
         self
     }
 
-    /// Create an embed for the message.
-    pub fn embed<F>(&mut self, f: F) -> &mut Self
+    /// Creates an embed for the message.
+    pub fn create_embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
@@ -34,8 +34,8 @@ impl EditInteractionResponse {
         self.set_embed(embed)
     }
 
-    /// Set an embed for the message.
-    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+    /// Adds an embed for the message.
+    pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
@@ -43,6 +43,19 @@ impl EditInteractionResponse {
 
         if let Some(embeds) = embeds.as_array_mut() {
             embeds.push(embed);
+        }
+
+        self
+    }
+
+    /// Sets the embeds for the message.
+    pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        if self.0.contains_key("embeds") {
+            self.0.remove_entry("embeds");
+        }
+
+        for embed in embeds {
+            self.add_embed(embed);
         }
 
         self
