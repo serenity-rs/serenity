@@ -185,7 +185,7 @@ pub struct ApplicationCommandInteractionData {
 }
 
 /// The resolved data of a command data interaction payload.
-/// It contains the objects of the options given.
+/// It contains the objects of [`ApplicationCommandInteractionDataOption`]s.
 #[derive(Clone, Debug, Serialize, Default)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataResolved {
@@ -250,6 +250,8 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
 ///
 /// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a
 /// top-level key and another vector of `options`.
+///
+/// Their resolved objects can be found on [`ApplicationCommandInteractionData::resolved`]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataOption {
@@ -323,7 +325,7 @@ pub struct ApplicationCommand {
     pub default_permission: bool,
 }
 
-/// The parameters for a command.
+/// The parameters for an [`ApplicationCommand`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandOption {
@@ -341,7 +343,7 @@ pub struct ApplicationCommandOption {
     pub options: Vec<ApplicationCommandOption>,
 }
 
-/// An application command permission.
+/// An [`ApplicationCommand`] permission.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandPermission {
@@ -351,7 +353,7 @@ pub struct ApplicationCommandPermission {
     pub permissions: Vec<ApplicationCommandPermissionData>,
 }
 
-/// The permissions data.
+/// The [`ApplicationCommandPermission`] data.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandPermissionData {
@@ -361,7 +363,7 @@ pub struct ApplicationCommandPermissionData {
     pub permission: bool,
 }
 
-/// The type of an application command option.
+/// The type of an [`ApplicationCommandOption`].
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -387,7 +389,7 @@ enum_number!(ApplicationCommandOptionType {
     Role,
 });
 
-/// The type of an application command option.
+/// The type of an [`ApplicationCommandPermissionData`].
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -401,7 +403,7 @@ enum_number!(ApplicationCommandPermissionType {
     User
 });
 
-/// The only valid values a user can pick in a command option.
+/// The only valid values a user can pick in an [`ApplicationCommandOption`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandOptionChoice {
@@ -409,6 +411,7 @@ pub struct ApplicationCommandOptionChoice {
     pub value: Value,
 }
 
+/// The available responses types for an interaction response.
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -418,6 +421,7 @@ pub enum InteractionResponseType {
     DeferredChannelMessageWithSource = 5,
 }
 
+/// The flags for an interactions response.
 #[derive(Clone, Serialize)]
 #[non_exhaustive]
 pub struct InteractionApplicationCommandCallbackDataFlags {
@@ -426,7 +430,8 @@ pub struct InteractionApplicationCommandCallbackDataFlags {
 
 __impl_bitflags! {
     InteractionApplicationCommandCallbackDataFlags: u64 {
-        /// Interaction message will only be visible to sender
+        /// Interaction message will only be visible to sender and will
+        /// be quickly deleted.
         EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
     }
 }
