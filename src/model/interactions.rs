@@ -180,17 +180,19 @@ pub struct ApplicationCommandInteractionData {
     pub name: String,
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
-    pub resolved: Option<ApplicationCommandInteractionDataResolved>,
+    #[serde(default)]
+    pub resolved: ApplicationCommandInteractionDataResolved,
 }
 
 /// The resolved data of a command data interaction payload.
-#[derive(Clone, Debug, Serialize)]
+/// It contains the objects of the options given.
+#[derive(Clone, Debug, Serialize, Default)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataResolved {
-    pub users: Option<HashMap<UserId, User>>,
-    pub members: Option<HashMap<UserId, PartialMember>>,
-    pub roles: Option<HashMap<RoleId, Role>>,
-    pub channels: Option<HashMap<ChannelId, PartialChannel>>,
+    pub users: HashMap<UserId, User>,
+    pub members: HashMap<UserId, PartialMember>,
+    pub roles: HashMap<RoleId, Role>,
+    pub channels: HashMap<ChannelId, PartialChannel>,
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
@@ -200,43 +202,39 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
         println!("{:?}", map);
 
         let members = match map.contains_key("members") {
-            true => Some(
-                map.remove("members")
-                    .ok_or_else(|| DeError::custom("expected members"))
-                    .and_then(deserialize_partial_members_map)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
+            true => map
+                .remove("members")
+                .ok_or_else(|| DeError::custom("expected members"))
+                .and_then(deserialize_partial_members_map)
+                .map_err(DeError::custom)?,
+            false => HashMap::new(),
         };
 
         let users = match map.contains_key("users") {
-            true => Some(
-                map.remove("users")
-                    .ok_or_else(|| DeError::custom("expected users"))
-                    .and_then(deserialize_users)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
+            true => map
+                .remove("users")
+                .ok_or_else(|| DeError::custom("expected users"))
+                .and_then(deserialize_users)
+                .map_err(DeError::custom)?,
+            false => HashMap::new(),
         };
 
         let roles = match map.contains_key("roles") {
-            true => Some(
-                map.remove("roles")
-                    .ok_or_else(|| DeError::custom("expected roles"))
-                    .and_then(deserialize_roles_map)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
+            true => map
+                .remove("roles")
+                .ok_or_else(|| DeError::custom("expected roles"))
+                .and_then(deserialize_roles_map)
+                .map_err(DeError::custom)?,
+            false => HashMap::new(),
         };
 
         let channels = match map.contains_key("channels") {
-            true => Some(
-                map.remove("channels")
-                    .ok_or_else(|| DeError::custom("expected chanels"))
-                    .and_then(deserialize_channels_map)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
+            true => map
+                .remove("channels")
+                .ok_or_else(|| DeError::custom("expected chanels"))
+                .and_then(deserialize_channels_map)
+                .map_err(DeError::custom)?,
+            false => HashMap::new(),
         };
 
         Ok(Self {
