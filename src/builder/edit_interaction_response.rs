@@ -50,7 +50,7 @@ impl EditInteractionResponse {
 
     /// Sets the embeds for the message.
     ///
-    /// **Note**: You can only have 10 embeds per message.
+    /// **Note**: You can only have up to 10 embeds per message.
     pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
         if self.0.contains_key("embeds") {
             self.0.remove_entry("embeds");
