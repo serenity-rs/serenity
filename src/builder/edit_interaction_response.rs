@@ -31,7 +31,7 @@ impl EditInteractionResponse {
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.set_embed(embed)
+        self.add_embed(embed)
     }
 
     /// Adds an embed for the message.
