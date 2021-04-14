@@ -173,7 +173,7 @@ enum_number!(InteractionType {
 });
 
 /// The command data payload.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionData {
     pub id: CommandId,
@@ -182,6 +182,46 @@ pub struct ApplicationCommandInteractionData {
     pub options: Vec<ApplicationCommandInteractionDataOption>,
     #[serde(default)]
     pub resolved: ApplicationCommandInteractionDataResolved,
+}
+
+impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let name = map
+            .remove("name")
+            .ok_or_else(|| DeError::custom("expected value"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
+        let id = map
+            .remove("id")
+            .ok_or_else(|| DeError::custom("expected value"))
+            .and_then(CommandId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let resolved = map
+            .remove("resolved")
+            .ok_or_else(|| DeError::custom("expected type"))
+            .and_then(ApplicationCommandInteractionDataResolved::deserialize)
+            .map_err(DeError::custom)?;
+
+        let options = match map.contains_key("options") {
+            true => map
+                .remove("options")
+                .ok_or_else(|| DeError::custom("expected type"))
+                .and_then(|deserializer| deserialize_options_with_resolved(deserializer, &resolved))
+                .map_err(DeError::custom)?,
+            false => vec![],
+        };
+
+        Ok(Self {
+            name,
+            id,
+            options,
+            resolved,
+        })
+    }
 }
 
 /// The resolved data of a command data interaction payload.
@@ -261,6 +301,8 @@ pub struct ApplicationCommandInteractionDataOption {
     pub kind: ApplicationCommandOptionType,
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
+    #[serde(default)]
+    pub resolved: Option<ApplicationCommandInteractionDataOptionValue>,
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
@@ -303,8 +345,22 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
             value,
             kind,
             options,
+            resolved: None,
         })
     }
+}
+
+/// The value of an [`ApplicationCommandOption`].
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ApplicationCommandInteractionDataOptionValue {
+    String(String),
+    Integer(i64),
+    Boolean(bool),
+    User(User, Option<PartialMember>),
+    Channel(PartialChannel),
+    Role(Role),
 }
 
 fn default_permission_value() -> bool {

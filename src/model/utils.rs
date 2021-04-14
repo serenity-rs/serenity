@@ -114,6 +114,83 @@ pub fn deserialize_options<'de, D: Deserializer<'de>>(
     Ok(options)
 }
 
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
+    deserializer: D,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
+    let mut options: Vec<ApplicationCommandInteractionDataOption> =
+        Deserialize::deserialize(deserializer)?;
+
+    for option in options.iter_mut() {
+        loop_resolved(option, resolved);
+    }
+
+    dbg!(options.clone());
+
+    Ok(options)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+fn set_resolved(
+    mut options: &mut ApplicationCommandInteractionDataOption,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) {
+    if let Some(ref value) = options.value {
+        let string = value.as_str();
+
+        options.resolved = match options.kind {
+            ApplicationCommandOptionType::User => {
+                let id = &UserId(*&string.unwrap().parse().unwrap());
+
+                let user = resolved.users.get(id).unwrap().to_owned();
+                let member = match resolved.members.get(id) {
+                    Some(member) => Some(member.to_owned()),
+                    None => None,
+                };
+
+                Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
+            },
+            ApplicationCommandOptionType::Role => {
+                let id = &RoleId(*&string.unwrap().parse().unwrap());
+
+                let role = resolved.roles.get(id).unwrap().to_owned();
+
+                Some(ApplicationCommandInteractionDataOptionValue::Role(role))
+            },
+            ApplicationCommandOptionType::Channel => {
+                let id = &ChannelId(*&string.unwrap().parse().unwrap());
+
+                let channel = resolved.channels.get(id).unwrap().to_owned();
+
+                Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
+            },
+            ApplicationCommandOptionType::String => Some(
+                ApplicationCommandInteractionDataOptionValue::String(string.unwrap().to_owned()),
+            ),
+            ApplicationCommandOptionType::Integer => {
+                Some(ApplicationCommandInteractionDataOptionValue::Integer(value.as_i64().unwrap()))
+            },
+            ApplicationCommandOptionType::Boolean => Some(
+                ApplicationCommandInteractionDataOptionValue::Boolean(value.as_bool().unwrap()),
+            ),
+            _ => None,
+        }
+    }
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+fn loop_resolved(
+    options: &mut ApplicationCommandInteractionDataOption,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) {
+    set_resolved(options, resolved);
+
+    for option in options.options.iter_mut() {
+        loop_resolved(option, resolved);
+    }
+}
+
 pub fn deserialize_presences<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, Presence>, D::Error> {
