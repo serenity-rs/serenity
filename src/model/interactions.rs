@@ -301,6 +301,7 @@ pub struct ApplicationCommandInteractionDataOption {
     pub kind: ApplicationCommandOptionType,
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
+    /// The resolved object of the given `value`, if there is one.
     #[serde(default)]
     pub resolved: Option<ApplicationCommandInteractionDataOptionValue>,
 }
@@ -350,7 +351,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
     }
 }
 
-/// The value of an [`ApplicationCommandOption`].
+/// The resolved value of an [`ApplicationCommandInteractionDataOption`].
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 #[repr(u8)]
