@@ -126,8 +126,6 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
         loop_resolved(option, resolved);
     }
 
-    dbg!(options.clone());
-
     Ok(options)
 }
 
