@@ -550,7 +550,7 @@ impl Interaction {
     /// let _ = Interaction::create_global_application_command(&http, |a| {
     ///    a.name("echo")
     ///     .description("What is said is echoed")
-    ///     .create_interaction_option(|o| {
+    ///     .create_option(|o| {
     ///         o.name("to_say")
     ///          .description("What will be echoed")
     ///          .kind(ApplicationCommandOptionType::String)
