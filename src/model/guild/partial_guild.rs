@@ -20,10 +20,10 @@ use crate::model::utils::{deserialize_emojis, deserialize_roles};
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
     builder::{
-        CreateInteraction,
-        CreateInteractionPermissions,
-        CreateInteractions,
-        CreateInteractionsPermissions,
+        CreateApplicationCommand,
+        CreateApplicationCommandPermissionsData,
+        CreateApplicationCommands,
+        CreateApplicationCommandsPermissions,
     },
     model::interactions::{ApplicationCommand, Interaction},
 };
@@ -245,7 +245,7 @@ impl PartialGuild {
         f: F,
     ) -> Result<ApplicationCommand>
     where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         self.id.create_application_command(http, f).await
     }
@@ -262,7 +262,7 @@ impl PartialGuild {
         f: F,
     ) -> Result<Vec<ApplicationCommand>>
     where
-        F: FnOnce(&mut CreateInteractions) -> &mut CreateInteractions,
+        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
     {
         self.id.create_application_commands(http, f).await
     }
@@ -281,7 +281,9 @@ impl PartialGuild {
         f: F,
     ) -> Result<ApplicationCommandPermission>
     where
-        F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
+        F: FnOnce(
+            &mut CreateApplicationCommandPermissionsData,
+        ) -> &mut CreateApplicationCommandPermissionsData,
     {
         self.id.create_application_command_permission(http, command_id, f).await
     }
@@ -298,7 +300,9 @@ impl PartialGuild {
         f: F,
     ) -> Result<Vec<ApplicationCommandPermission>>
     where
-        F: FnOnce(&mut CreateInteractionsPermissions) -> &mut CreateInteractionsPermissions,
+        F: FnOnce(
+            &mut CreateApplicationCommandsPermissions,
+        ) -> &mut CreateApplicationCommandsPermissions,
     {
         self.id.create_application_commands_permissions(http, f).await
     }
@@ -334,7 +338,7 @@ impl PartialGuild {
         f: F,
     ) -> Result<ApplicationCommand>
     where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         self.id.edit_application_command(http, command_id, f).await
     }

@@ -27,10 +27,10 @@ use crate::utils;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
     builder::{
-        CreateInteraction,
-        CreateInteractionPermissions,
-        CreateInteractions,
-        CreateInteractionsPermissions,
+        CreateApplicationCommand,
+        CreateApplicationCommandPermissionsData,
+        CreateApplicationCommands,
+        CreateApplicationCommandsPermissions,
     },
     model::interactions::{ApplicationCommand, Interaction},
 };
@@ -1066,7 +1066,7 @@ impl GuildId {
         f: F,
     ) -> Result<ApplicationCommand>
     where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Interaction::build_interaction(f);
         http.as_ref().create_guild_application_command(self.0, &Value::Object(map)).await
@@ -1084,9 +1084,9 @@ impl GuildId {
         f: F,
     ) -> Result<Vec<ApplicationCommand>>
     where
-        F: FnOnce(&mut CreateInteractions) -> &mut CreateInteractions,
+        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
     {
-        let mut array = CreateInteractions::default();
+        let mut array = CreateApplicationCommands::default();
 
         f(&mut array);
 
@@ -1107,9 +1107,11 @@ impl GuildId {
         f: F,
     ) -> Result<ApplicationCommandPermission>
     where
-        F: FnOnce(&mut CreateInteractionPermissions) -> &mut CreateInteractionPermissions,
+        F: FnOnce(
+            &mut CreateApplicationCommandPermissionsData,
+        ) -> &mut CreateApplicationCommandPermissionsData,
     {
-        let mut map = CreateInteractionPermissions::default();
+        let mut map = CreateApplicationCommandPermissionsData::default();
         f(&mut map);
 
         http.as_ref()
@@ -1133,9 +1135,11 @@ impl GuildId {
         f: F,
     ) -> Result<Vec<ApplicationCommandPermission>>
     where
-        F: FnOnce(&mut CreateInteractionsPermissions) -> &mut CreateInteractionsPermissions,
+        F: FnOnce(
+            &mut CreateApplicationCommandsPermissions,
+        ) -> &mut CreateApplicationCommandsPermissions,
     {
-        let mut map = CreateInteractionsPermissions::default();
+        let mut map = CreateApplicationCommandsPermissions::default();
         f(&mut map);
 
         http.as_ref()
@@ -1174,7 +1178,7 @@ impl GuildId {
         f: F,
     ) -> Result<ApplicationCommand>
     where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Interaction::build_interaction(f);
         http.as_ref()

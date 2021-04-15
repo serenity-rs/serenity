@@ -6,11 +6,10 @@ use serde_json::{Map, Number, Value};
 
 use super::prelude::*;
 use crate::builder::{
-    CreateInteraction,
-    CreateInteractionPermissions,
+    CreateApplicationCommand,
+    CreateApplicationCommands,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
-    CreateInteractions,
     EditInteractionResponse,
 };
 use crate::http::Http;
@@ -580,7 +579,7 @@ impl Interaction {
         f: F,
     ) -> Result<ApplicationCommand>
     where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Interaction::build_interaction(f);
         http.as_ref().create_global_application_command(&Value::Object(map)).await
@@ -595,9 +594,9 @@ impl Interaction {
         f: F,
     ) -> Result<Vec<ApplicationCommand>>
     where
-        F: FnOnce(&mut CreateInteractions) -> &mut CreateInteractions,
+        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
     {
-        let mut array = CreateInteractions::default();
+        let mut array = CreateApplicationCommands::default();
 
         f(&mut array);
 
@@ -611,7 +610,7 @@ impl Interaction {
         f: F,
     ) -> Result<ApplicationCommand>
     where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
         let map = Interaction::build_interaction(f);
         http.as_ref().edit_global_application_command(command_id.into(), &Value::Object(map)).await
@@ -643,11 +642,11 @@ impl Interaction {
     #[inline]
     pub(crate) fn build_interaction<F>(f: F) -> Map<String, Value>
     where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
-        let mut create_interaction = CreateInteraction::default();
-        f(&mut create_interaction);
-        utils::hashmap_to_json_map(create_interaction.0)
+        let mut create_application_command = CreateApplicationCommand::default();
+        f(&mut create_application_command);
+        utils::hashmap_to_json_map(create_application_command.0)
     }
 
     /// Creates a response to the interaction received.
