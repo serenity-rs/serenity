@@ -41,9 +41,9 @@ use crate::model::prelude::*;
 use crate::{
     builder::{
         CreateApplicationCommand,
-        CreateApplicationCommandsPermissions,
         CreateApplicationCommandPermissionsData,
         CreateApplicationCommands,
+        CreateApplicationCommandsPermissions,
     },
     model::interactions::{ApplicationCommand, Interaction},
 };

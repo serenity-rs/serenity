@@ -207,7 +207,10 @@ impl CreateApplicationCommands {
     }
 
     /// Sets all the application commands.
-    pub fn set_application_commands(&mut self, interactions: Vec<CreateApplicationCommand>) -> &mut Self {
+    pub fn set_application_commands(
+        &mut self,
+        interactions: Vec<CreateApplicationCommand>,
+    ) -> &mut Self {
         let new_application_command = interactions
             .into_iter()
             .map(|f| Value::Object(utils::hashmap_to_json_map(f.0)))
