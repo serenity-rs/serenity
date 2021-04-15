@@ -102,7 +102,7 @@ impl<'de> Deserialize<'de> for Interaction {
 
         let application_id = map
             .remove("application_id")
-            .ok_or_else(|| DeError::custom("expected id"))
+            .ok_or_else(|| DeError::custom("expected application id"))
             .and_then(ApplicationId::deserialize)
             .map_err(DeError::custom)?;
 
@@ -112,10 +112,14 @@ impl<'de> Deserialize<'de> for Interaction {
             .and_then(InteractionType::deserialize)
             .map_err(DeError::custom)?;
 
-        let data = match map.remove("data") {
-            Some(v) => serde_json::from_value::<Option<ApplicationCommandInteractionData>>(v)
-                .map_err(DeError::custom)?,
-            None => None,
+        let data = match map.contains_key("data") {
+            true => Some(
+                map.remove("data")
+                    .ok_or_else(|| DeError::custom("expected data"))
+                    .and_then(ApplicationCommandInteractionData::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
         };
 
         let guild_id = match map.contains_key("guild_id") {
@@ -227,11 +231,14 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             .and_then(CommandId::deserialize)
             .map_err(DeError::custom)?;
 
-        let resolved = map
-            .remove("resolved")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(ApplicationCommandInteractionDataResolved::deserialize)
-            .map_err(DeError::custom)?;
+        let resolved = match map.contains_key("resolved") {
+            true => map
+                .remove("resolved")
+                .ok_or_else(|| DeError::custom("expected type"))
+                .and_then(ApplicationCommandInteractionDataResolved::deserialize)
+                .map_err(DeError::custom)?,
+            false => ApplicationCommandInteractionDataResolved::default(),
+        };
 
         let options = match map.contains_key("options") {
             true => map
