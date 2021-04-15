@@ -955,6 +955,18 @@
 <span id="952">952</span>
 <span id="953">953</span>
 <span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
@@ -1184,7 +1196,10 @@
         #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> (#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::serenity::futures::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
-            <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
+            <span class="kw">async</span> <span class="kw">move</span> {
+                <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
+                <span class="ident">output</span>
+            }.<span class="ident">boxed</span>()
         }
     })
     .<span class="ident">into</span>()
@@ -1476,7 +1491,10 @@
         <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">nn</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::serenity::futures::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
-            <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
+            <span class="kw">async</span> <span class="kw">move</span> {
+                <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
+                <span class="ident">output</span>
+            }.<span class="ident">boxed</span>()
         }
     })
     .<span class="ident">into</span>()
@@ -1752,7 +1770,10 @@
         #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">n</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::serenity::futures::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
             <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
-            <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
+            <span class="kw">async</span> <span class="kw">move</span> {
+                <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
+                <span class="ident">output</span>
+            }.<span class="ident">boxed</span>()
         }
     })
     .<span class="ident">into</span>()
@@ -1887,7 +1908,10 @@
                 #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">fun_name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::serenity::futures::future::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
                     <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
-                    <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
+                    <span class="kw">async</span> <span class="kw">move</span> {
+                        <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
+                        <span class="ident">output</span>
+                    }.<span class="ident">boxed</span>()
                 }
             })
                 .<span class="ident">into</span>()
