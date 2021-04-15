@@ -207,11 +207,15 @@ enum_number!(InteractionType {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionData {
+    /// The Id of the invoked command.
     pub id: CommandId,
+    /// The name of the invoked command.
     pub name: String,
     #[serde(default)]
+    /// The parameters and the given values.
     pub options: Vec<ApplicationCommandInteractionDataOption>,
     #[serde(default)]
+    /// The converted objects from the given options.
     pub resolved: ApplicationCommandInteractionDataResolved,
 }
 
@@ -234,7 +238,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
         let resolved = match map.contains_key("resolved") {
             true => map
                 .remove("resolved")
-                .ok_or_else(|| DeError::custom("expected type"))
+                .ok_or_else(|| DeError::custom("expected resolved"))
                 .and_then(ApplicationCommandInteractionDataResolved::deserialize)
                 .map_err(DeError::custom)?,
             false => ApplicationCommandInteractionDataResolved::default(),
@@ -243,7 +247,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
         let options = match map.contains_key("options") {
             true => map
                 .remove("options")
-                .ok_or_else(|| DeError::custom("expected type"))
+                .ok_or_else(|| DeError::custom("expected options"))
                 .and_then(|deserializer| deserialize_options_with_resolved(deserializer, &resolved))
                 .map_err(DeError::custom)?,
             false => vec![],
@@ -329,10 +333,17 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataOption {
+    /// The name of the parameter.
     pub name: String,
+    /// The given value.
     pub value: Option<Value>,
+    /// The value type.
     #[serde(rename = "type")]
     pub kind: ApplicationCommandOptionType,
+    /// The nested options.
+    ///
+    /// **Note**: It is only present if the option is
+    /// a group or a subcommand.
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
     /// The resolved object of the given `value`, if there is one.
@@ -406,12 +417,19 @@ fn default_permission_value() -> bool {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommand {
+    /// The command Id.
     pub id: CommandId,
+    /// The parent application Id.
     pub application_id: ApplicationId,
+    /// The command name.
     pub name: String,
+    /// The command description.
     pub description: String,
+    /// The parameters for the command.
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
+    /// Whether the command is enabled by default when
+    /// the application is added to a guild.
     #[serde(default = "self::default_permission_value")]
     pub default_permission: bool,
 }
@@ -420,16 +438,30 @@ pub struct ApplicationCommand {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandOption {
+    /// The option type.
     #[serde(rename = "type")]
     pub kind: ApplicationCommandOptionType,
+    /// The option name.
     pub name: String,
+    /// The option description.
     pub description: String,
-    #[serde(default)]
-    pub default: bool,
+    /// Whether the parameter is optional or required.
     #[serde(default)]
     pub required: bool,
+    /// Choices the user can pick from.
+    ///
+    /// **Note**: Only available for [`String`] and [`Integer`] [`ApplicationCommandOptionType`].
+    ///
+    /// [`String`]: ApplicationCommandOptionType::String
+    /// [`Integer`]: ApplicationCommandOptionType::Integer
     #[serde(default)]
     pub choices: Vec<ApplicationCommandOptionChoice>,
+    /// The nested options.
+    ///
+    /// **Note**: Only available for [`SubCommand`] or [`SubCommandGroup`].
+    ///
+    /// [`SubCommand`]: ApplicationCommandOptionType::SubCommand
+    /// [`SubCommandGroup`]: ApplicationCommandOptionType::SubCommandGroup
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
 }
@@ -438,9 +470,13 @@ pub struct ApplicationCommandOption {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandPermission {
-    pub id: InteractionId,
+    /// The id of the command.
+    pub id: CommandId,
+    /// The id of the application the command belongs to.
     pub application_id: ApplicationId,
+    /// The id of the guild.
     pub guild_id: GuildId,
+    /// The permissions for the command in the guild.
     pub permissions: Vec<ApplicationCommandPermissionData>,
 }
 
@@ -448,9 +484,15 @@ pub struct ApplicationCommandPermission {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandPermissionData {
+    /// The [`RoleId`] or [`UserId`], depends on `kind` value.
+    ///
+    /// [`RoleId`]: crate::model::id::RoleId
+    /// [`UserId`]: crate::model::id::UserId
+    pub id: CommandPermissionId,
+    /// The type of data this permissions applies to.
     #[serde(rename = "type")]
     pub kind: ApplicationCommandPermissionType,
-    pub id: CommandPermissionId,
+    /// Whether or not the provided data can use the command or not.
     pub permission: bool,
 }
 
@@ -498,7 +540,9 @@ enum_number!(ApplicationCommandPermissionType {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandOptionChoice {
+    /// The choice name.
     pub name: String,
+    /// The choice value.
     pub value: Value,
 }
 
@@ -532,10 +576,14 @@ __impl_bitflags! {
 /// [`Message`]: crate::model::channel::Message
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct MessageInteraction {
+    /// The id of the interaction.
     pub id: InteractionId,
+    /// The type of the interaction.
     #[serde(rename = "type")]
     pub kind: InteractionType,
+    /// The name of the [`ApplicationCommand`].
     pub name: String,
+    /// The user who invoked the interaction.
     pub user: User,
 }
 
