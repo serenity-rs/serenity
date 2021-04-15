@@ -23,15 +23,36 @@ use crate::utils;
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct Interaction {
+    /// Id of the interaction.
     pub id: InteractionId,
+    /// Id of the application this interaction is for.
+    pub application_id: ApplicationId,
+    /// The type of interaction.
     #[serde(rename = "type")]
     pub kind: InteractionType,
+    /// The data of the command which was triggered, if there is one.
+    ///
+    /// **Note**: It is always present if the interaction [`kind`] is
+    /// [`ApplicationCommand`].
+    ///
+    /// [`ApplicationCommand`]: self::InteractionType::ApplicationCommand
+    /// [`kind`]: Interaction::kind
     pub data: Option<ApplicationCommandInteractionData>,
+    /// The guild Id this interaction was sent from, if there is one.
     pub guild_id: Option<GuildId>,
+    /// The channel Id this interaction was sent from, if there is one.
     pub channel_id: Option<ChannelId>,
+    /// The `member` data for the invoking user.
+    ///
+    /// **Note**: It is only present if the interaction is triggered in a guild.
     pub member: Option<Member>,
+    /// The `user` object for the invoking user.
+    ///
+    /// It is only present if the interaction is triggered in DM.
     pub user: Option<User>,
+    /// A continuation token for responding to the interaction.
     pub token: String,
+    /// Always `1`.
     pub version: u8,
 }
 
@@ -77,6 +98,12 @@ impl<'de> Deserialize<'de> for Interaction {
             .remove("id")
             .ok_or_else(|| DeError::custom("expected id"))
             .and_then(InteractionId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let application_id = map
+            .remove("application_id")
+            .ok_or_else(|| DeError::custom("expected id"))
+            .and_then(ApplicationId::deserialize)
             .map_err(DeError::custom)?;
 
         let kind = map
@@ -145,6 +172,7 @@ impl<'de> Deserialize<'de> for Interaction {
 
         Ok(Self {
             id,
+            application_id,
             kind,
             data,
             guild_id,
