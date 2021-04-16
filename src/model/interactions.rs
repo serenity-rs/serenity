@@ -854,3 +854,27 @@ impl Interaction {
         http.as_ref().create_followup_message(application_id, &self.token, wait, &map).await
     }
 }
+
+impl CommandPermissionId {
+    /// Converts this [`CommandPermissionId`] to [`UserId`].
+    pub fn to_user_id(self) -> UserId {
+        UserId(self.0)
+    }
+
+    /// Converts this [`CommandPermissionId`] to [`RoleId`].
+    pub fn to_role_id(self) -> RoleId {
+        RoleId(self.0)
+    }
+}
+
+impl From<RoleId> for CommandPermissionId {
+    fn from(id: RoleId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl From<UserId> for CommandPermissionId {
+    fn from(id: UserId) -> Self {
+        Self(id.0)
+    }
+}

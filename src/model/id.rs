@@ -149,7 +149,8 @@ pub struct InteractionId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct CommandId(pub u64);
 
-/// An identifier for a slash command permission Id.
+/// An identifier for a slash command permission Id. Can contains
+/// a [`RoleId`] or [`UserId`]
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct CommandPermissionId(pub u64);
 
