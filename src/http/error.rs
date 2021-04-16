@@ -62,6 +62,10 @@ pub enum Error {
     InvalidHeader(InvalidHeaderValue),
     /// Reqwest's Error contain information on why sending a request failed.
     Request(ReqwestError),
+    /// When using a proxy with an invalid scheme.
+    InvalidScheme,
+    /// When using a proxy with an invalid port.
+    InvalidPort,
 }
 
 impl Error {
@@ -128,6 +132,8 @@ impl Display for Error {
             Error::Url(_) => f.write_str("Provided URL is incorrect."),
             Error::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
             Error::Request(_) => f.write_str("Error while sending HTTP request."),
+            Error::InvalidScheme => f.write_str("Invalid Url scheme."),
+            Error::InvalidPort => f.write_str("Invalid port."),
         }
     }
 }

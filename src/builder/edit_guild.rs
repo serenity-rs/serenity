@@ -264,4 +264,32 @@ impl EditGuild {
         let num = Value::Number(Number::from(verification_level.num()));
         self.0.insert("verification_level", num);
     }
+
+    /// Modifies the notifications that are sent by discord to the configured system channel.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::{http::Http, model::id::GuildId};
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
+    /// use serenity::model::guild::SystemChannelFlags;
+    ///
+    /// // assuming a `guild` has already been bound
+    ///
+    /// let edit = guild.edit(&http, |g| {
+    ///     g.system_channel_flags(SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS)
+    /// })
+    /// .await;
+    ///
+    /// if let Err(why) = edit {
+    ///     println!("Error setting verification level: {:?}", why);
+    /// }
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub fn system_channel_flags(&mut self, system_channel_flags: SystemChannelFlags) -> &mut Self {
+        self.0.insert("system_channel_flags", system_channel_flags.bits().into());
+        self
+    }
 }

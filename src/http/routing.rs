@@ -92,6 +92,12 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPinsMessageId(u64),
+    /// Route for the `/channels/:channel_id/message/:message_id/crosspost` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdCrosspostsMessageId(u64),
     /// Route for the `/channels/:channel_id/typing` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -343,6 +349,10 @@ impl Route {
 
     pub fn channel_message(channel_id: u64, message_id: u64) -> String {
         format!(api!("/channels/{}/messages/{}"), channel_id, message_id)
+    }
+
+    pub fn channel_message_crosspost(channel_id: u64, message_id: u64) -> String {
+        format!(api!("/channels/{}/messages/{}/crosspost"), channel_id, message_id)
     }
 
     pub fn channel_message_reaction<D, T>(
@@ -958,6 +968,10 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
     },
+    CrosspostMessage {
+        channel_id: u64,
+        message_id: u64,
+    },
     EditNickname {
         guild_id: u64,
     },
@@ -1305,6 +1319,14 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Post,
                 Route::GuildsIdRoles(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
+            ),
+            RouteInfo::CrosspostMessage {
+                channel_id,
+                message_id,
+            } => (
+                LightMethod::Post,
+                Route::ChannelsIdCrosspostsMessageId(channel_id),
+                Cow::from(Route::channel_message_crosspost(channel_id, message_id)),
             ),
             RouteInfo::CreateWebhook {
                 channel_id,

@@ -8,6 +8,7 @@ mod member;
 mod partial_guild;
 mod premium_tier;
 mod role;
+mod system_channel;
 
 use chrono::{DateTime, Utc};
 use futures::stream::StreamExt;
@@ -25,6 +26,7 @@ pub use self::member::*;
 pub use self::partial_guild::*;
 pub use self::premium_tier::*;
 pub use self::role::*;
+pub use self::system_channel::*;
 use super::utils::*;
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};

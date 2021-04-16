@@ -1,7 +1,16 @@
 #![allow(clippy::missing_errors_doc)]
-use std::{collections::BTreeMap, fmt, sync::Arc};
+use std::{
+    collections::BTreeMap,
+    fmt,
+    future::Future,
+    pin::Pin,
+    str::FromStr,
+    sync::Arc,
+    task::{Context as FutContext, Poll},
+};
 
 use bytes::buf::Buf;
+use futures::future::BoxFuture;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::{
     header::{HeaderMap as Headers, HeaderValue, AUTHORIZATION, CONTENT_TYPE, USER_AGENT},
@@ -28,6 +37,157 @@ use crate::http::routing::Route;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// A builder implementing [`Future`] building a [`Http`] client to perform
+/// requests to Discord's HTTP API. If you do not need to use a proxy or do not
+/// need to disable the rate limiter, you can use [`Http::new`] or
+/// [`Http::new_with_token`] instead.
+///
+/// ## Example
+///
+/// Create an instance of [`Http`] with a proxy and rate limiter disabled
+///
+/// ```rust
+/// # use serenity::http::HttpBuilder;
+/// # async fn run() {
+/// let http = HttpBuilder::new("token")
+///     .proxy("http://127.0.0.1:3000")
+///     .expect("Invalid proxy URL")
+///     .ratelimiter_disabled(true)
+///     .await
+///     .expect("Error creating Http");
+/// # }
+/// ```
+pub struct HttpBuilder<'a> {
+    client: Option<Arc<Client>>,
+    ratelimiter: Option<Ratelimiter>,
+    ratelimiter_disabled: Option<bool>,
+    token: Option<String>,
+    proxy: Option<Url>,
+    fut: Option<BoxFuture<'a, Result<Http>>>,
+}
+
+impl<'a> HttpBuilder<'a> {
+    fn _new() -> Self {
+        Self {
+            client: None,
+            ratelimiter: None,
+            ratelimiter_disabled: Some(false),
+            token: None,
+            proxy: None,
+            fut: None,
+        }
+    }
+
+    /// Construct a new builder to call methods on for the HTTP construction.
+    /// The `token` will automatically be prefixed "Bot " if not already.
+    pub fn new(token: impl AsRef<str>) -> Self {
+        Self::_new().token(token)
+    }
+
+    /// Sets a token for the bot. If the token is not prefixed "Bot ", this
+    /// method will automatically do so.
+    pub fn token(mut self, token: impl AsRef<str>) -> Self {
+        let token = token.as_ref().trim();
+
+        let token =
+            if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
+
+        self.token = Some(token);
+
+        self
+    }
+
+    /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
+    /// be used.
+    pub fn client(mut self, client: Arc<Client>) -> Self {
+        self.client = Some(client);
+
+        self
+    }
+
+    /// Sets the ratelimiter to be used. If one isn't provided, a default one
+    /// will be used.
+    pub fn ratelimiter(mut self, ratelimiter: Ratelimiter) -> Self {
+        self.ratelimiter = Some(ratelimiter);
+
+        self
+    }
+
+    /// Sets whether or not the ratelimiter is disabled. By default if this this
+    /// not used, it is enabled. In most cases, this should be used in
+    /// conjunction with [`Self::proxy`].
+    ///
+    /// **Note**: You should **not** disable the ratelimiter unless you have
+    /// another form of rate limiting. Disabling the ratelimiter has the main
+    /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
+    /// instead of the current process.
+    pub fn ratelimiter_disabled(mut self, ratelimiter_disabled: bool) -> Self {
+        self.ratelimiter_disabled = Some(ratelimiter_disabled);
+
+        self
+    }
+
+    /// Sets the proxy that Discord HTTP API requests will be passed to. This is
+    /// mainly intended for something like [`twilight-http-proxy`] where
+    /// multiple processes can make API requests while sharing a single
+    /// ratelimiter.
+    ///
+    /// The proxy should be in the form of the protocol and hostname, e.g.
+    /// `http://127.0.0.1:3000` or `http://myproxy.example`
+    ///
+    /// This will simply send HTTP API requests to the proxy instead of Discord
+    /// API to allow the proxy to intercept, rate limit, and forward requests.
+    /// This is different than a native proxy's behavior where it will tunnel
+    /// requests that use TLS via [`HTTP CONNECT`] method (e.g. using
+    /// [`reqwest::Proxy`]).
+    ///
+    /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
+    /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
+    pub fn proxy(mut self, proxy: impl Into<String>) -> Result<Self> {
+        let proxy = Url::from_str(&proxy.into()).map_err(|e| HttpError::Url(e))?;
+        self.proxy = Some(proxy);
+
+        Ok(self)
+    }
+}
+
+impl<'a> Future for HttpBuilder<'a> {
+    type Output = Result<Http>;
+
+    #[allow(clippy::unwrap_used)]
+    #[instrument(skip(self))]
+    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
+        if self.fut.is_none() {
+            let token = self.token.take().unwrap();
+
+            let client = self.client.take().unwrap_or_else(|| {
+                let builder = configure_client_backend(Client::builder());
+                Arc::new(builder.build().expect("Cannot build reqwest::Client"))
+            });
+
+            let ratelimiter = self.ratelimiter.take().unwrap_or_else(|| {
+                let client = Arc::clone(&client);
+                Ratelimiter::new(client, token.to_string())
+            });
+
+            let ratelimiter_disabled = self.ratelimiter_disabled.take().unwrap();
+            let proxy = self.proxy.take();
+
+            self.fut = Some(Box::pin(async move {
+                Ok(Http {
+                    client,
+                    ratelimiter,
+                    ratelimiter_disabled,
+                    proxy,
+                    token,
+                })
+            }))
+        }
+
+        self.fut.as_mut().unwrap().as_mut().poll(ctx)
+    }
+}
+
 /// **Note**: For all member functions that return a `Result`, the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
 ///
@@ -36,6 +196,8 @@ use crate::model::prelude::*;
 pub struct Http {
     pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
+    pub ratelimiter_disabled: bool,
+    pub proxy: Option<Url>,
     pub token: String,
 }
 
@@ -44,6 +206,8 @@ impl fmt::Debug for Http {
         f.debug_struct("Http")
             .field("client", &self.client)
             .field("ratelimiter", &self.ratelimiter)
+            .field("ratelimiter_disabled", &self.ratelimiter_disabled)
+            .field("proxy", &self.proxy)
             .finish()
     }
 }
@@ -55,6 +219,8 @@ impl Http {
         Http {
             client,
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
+            ratelimiter_disabled: false,
+            proxy: None,
             token: token.to_string(),
         }
     }
@@ -1026,6 +1192,21 @@ impl Http {
             body: Some(&body),
             headers: None,
             route: RouteInfo::EditMessage {
+                channel_id,
+                message_id,
+            },
+        })
+        .await
+    }
+
+    /// Crossposts a message by Id.
+    ///
+    /// **Note**: Only available on announcements channels.
+    pub async fn crosspost_message(&self, channel_id: u64, message_id: u64) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::CrosspostMessage {
                 channel_id,
                 message_id,
             },
@@ -2304,10 +2485,16 @@ impl Http {
         T: Into<AttachmentType<'a>>,
     {
         let uri = api!("/channels/{}/messages", channel_id);
-        let url = match Url::parse(&uri) {
+        let mut url = match Url::parse(&uri) {
             Ok(url) => url,
             Err(_) => return Err(Error::Url(uri)),
         };
+
+        if let Some(proxy) = &self.proxy {
+            url.set_host(proxy.host_str()).map_err(|e| HttpError::Url(e))?;
+            url.set_scheme(proxy.scheme()).map_err(|_| HttpError::InvalidScheme)?;
+            url.set_port(proxy.port()).map_err(|_| HttpError::InvalidPort)?;
+        }
 
         let mut multipart = reqwest::multipart::Form::new();
 
@@ -2624,8 +2811,13 @@ impl Http {
     /// [`fire`]: Self::fire
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
-        let ratelimiting_req = RatelimitedRequest::from(req);
-        let response = self.ratelimiter.perform(ratelimiting_req).await?;
+        let response = if self.ratelimiter_disabled {
+            let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
+            self.client.execute(request).await?
+        } else {
+            let ratelimiting_req = RatelimitedRequest::from(req);
+            self.ratelimiter.perform(ratelimiting_req).await?
+        };
 
         if response.status().is_success() {
             Ok(response)
@@ -2678,7 +2870,40 @@ impl Default for Http {
         Self {
             client,
             ratelimiter: Ratelimiter::new(client2, ""),
+            ratelimiter_disabled: false,
+            proxy: None,
             token: "".to_string(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::HttpBuilder;
+
+    #[tokio::test]
+    async fn test_http_builder_defaults() {
+        let http = HttpBuilder::new("is this dubu?").await.expect("Create Http");
+
+        assert!(!http.ratelimiter_disabled);
+        assert!(http.proxy.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_http_builder_with_proxy() {
+        let http = HttpBuilder::new("no it is token")
+            .ratelimiter_disabled(true)
+            .proxy("http://127.0.0.1:3000")
+            .expect("Set proxy")
+            .await
+            .expect("Create Http");
+
+        assert!(http.ratelimiter_disabled);
+
+        let proxy = http.proxy.expect("Http proxy missing");
+
+        assert_eq!(proxy.scheme(), "http");
+        assert_eq!(proxy.host_str(), Some("127.0.0.1"));
+        assert_eq!(proxy.port(), Some(3000));
     }
 }

@@ -548,6 +548,24 @@ impl ChannelId {
         http.as_ref().pin_message(self.0, message_id.into().0).await
     }
 
+    /// Crossposts a [`Message`].
+    ///
+    /// Requires either to be the message author or to have manage [Manage Messages] permissions on this channel.
+    ///
+    /// **Note**: Only available on announcements channels.
+    ///
+    /// # Errors
+    // Returns [`Error::Http`] if the current user lacks permission,
+    // and if the user is not the author of the message.
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    pub async fn crosspost(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<Message> {
+        http.as_ref().crosspost_message(self.0, message_id.into().0).await
+    }
+
     /// Gets the list of [`Message`]s which are pinned to the channel.
     ///
     /// **Note**: Returns an empty `Vec` if the current user does not
