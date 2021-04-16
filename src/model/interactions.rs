@@ -878,3 +878,15 @@ impl From<UserId> for CommandPermissionId {
         Self(id.0)
     }
 }
+
+impl From<CommandPermissionId> for RoleId {
+    fn from(id: CommandPermissionId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl From<CommandPermissionId> for UserId {
+    fn from(id: CommandPermissionId) -> Self {
+        Self(id.0)
+    }
+}
