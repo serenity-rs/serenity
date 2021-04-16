@@ -783,7 +783,7 @@ impl Http {
     /// use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// // Due to the `delete_webhook` function requiring you to authenticate, you
+    /// // Due to the [`delete_webhook`] function requiring you to authenticate, you
     /// // must have set the token first.
     /// let http = Http::default();
     ///
@@ -2484,11 +2484,11 @@ impl Http {
     ///
     /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
     /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after `stop` is called.
+    /// for a few seconds after [`Typing::stop`] is called.
     /// Typing is also stopped when the struct is dropped.
     ///
     /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.

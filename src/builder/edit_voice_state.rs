@@ -27,10 +27,11 @@ impl EditVoiceState {
     }
 
     /// Requests or clears a request to speak. This is equivalent to passing the
-    /// current time to `request_to_speak_timestamp`.
+    /// current time to [`request_to_speak_timestamp`].
     ///
     /// Requires the [Request to Speak] permission.
     ///
+    /// [`request_to_speak_timestamp`]: Self::request_to_speak_timestamp
     /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
     pub fn request_to_speak(&mut self, request: bool) -> &mut Self {
         if request {

@@ -59,7 +59,7 @@ impl MessageBuilder {
     ///
     /// # Examples
     ///
-    /// Create a new `MessageBuilder`:
+    /// Create a new [`MessageBuilder`]:
     ///
     /// ```rust
     /// use serenity::utils::MessageBuilder;
@@ -108,9 +108,9 @@ impl MessageBuilder {
     /// Mentions the [`GuildChannel`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`ChannelId`]. Refer to
-    /// `ChannelId`'s documentation for more information.
+    /// [`ChannelId`]'s documentation for more information.
     ///
-    /// Refer to `ChannelId`'s [Display implementation] for more information on
+    /// Refer to [`ChannelId`]'s [Display implementation] for more information on
     /// how this is formatted.
     ///
     /// # Examples
@@ -146,7 +146,7 @@ impl MessageBuilder {
 
     /// Displays the given emoji in the built message.
     ///
-    /// Refer to `Emoji`s [Display implementation] for more information on how
+    /// Refer to [`Emoji`]s [Display implementation] for more information on how
     /// this is formatted.
     ///
     /// # Examples
@@ -852,9 +852,9 @@ impl MessageBuilder {
     /// Mentions the [`Role`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`RoleId`]. Refer to
-    /// `RoleId`'s documentation for more information.
+    /// [`RoleId`]'s documentation for more information.
     ///
-    /// Refer to `RoleId`'s [Display implementation] for more information on how
+    /// Refer to [`RoleId`]'s [Display implementation] for more information on how
     /// this is formatted.
     ///
     /// [`Role`]: crate::model::guild::Role
@@ -870,9 +870,9 @@ impl MessageBuilder {
     /// Mentions the [`User`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`UserId`]. Refer to
-    /// `UserId`'s documentation for more information.
+    /// [`UserId`]'s documentation for more information.
     ///
-    /// Refer to `UserId`'s [Display implementation] for more information on how
+    /// Refer to [`UserId`]'s [Display implementation] for more information on how
     /// this is formatted.
     ///
     /// [`User`]: crate::model::user::User

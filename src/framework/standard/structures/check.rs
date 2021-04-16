@@ -50,7 +50,9 @@ pub struct Check {
     pub check_in_help: bool,
     /// Whether a check shall be listed in the help-system.
     /// `false` won't affect whether the check will be evaluated help,
-    /// solely `check_in_help` sets this.
+    /// solely [`check_in_help`] sets this.
+    ///
+    /// [`check_in_help`]: Self::check_in_help
     pub display_in_help: bool,
 }
 

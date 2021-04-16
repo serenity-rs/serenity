@@ -117,7 +117,7 @@ pub struct Guild {
     /// Users who are members of the guild.
     ///
     /// Members might not all be available when the [`ReadyEvent`] is received
-    /// if the [`member_count`] is greater than the `LARGE_THRESHOLD` set by
+    /// if the [`member_count`] is greater than the [`LARGE_THRESHOLD`] set by
     /// the library.
     ///
     /// [`member_count`]: Self::member_count
@@ -295,7 +295,7 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// In addition to the possible reasons `ban` may return an error, an [`Error::ExceededLimit`]
+    /// In addition to the possible reasons [`ban`] may return an error, an [`Error::ExceededLimit`]
     /// may also be returned if the reason is too long.
     ///
     /// [`ban`]: Self::ban
@@ -689,7 +689,7 @@ impl Guild {
 
     /// Edits the current guild with new data where specified.
     ///
-    /// Refer to `EditGuild`'s documentation for a full list of methods.
+    /// Refer to [`EditGuild`]'s documentation for a full list of methods.
     ///
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
@@ -1106,8 +1106,10 @@ impl Guild {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`kick`] may return an error,
     /// may also return an error if the reason is too long.
+    ///
+    /// [`kick`]: Self::kick
     pub async fn kick_with_reason(
         &self,
         http: impl AsRef<Http>,
@@ -1306,7 +1308,7 @@ impl Guild {
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
-    /// **Note**: Due to two fields of a `Member` being candidates for
+    /// **Note**: Due to two fields of a [`Member`] being candidates for
     /// the searched field, setting `sorted` to `true` will result in an overhead,
     /// as both fields have to be considered again for sorting.
     ///
@@ -1573,7 +1575,7 @@ impl Guild {
         Self::_user_permissions_in(channel, member, &self.roles, self.owner_id, self.id)
     }
 
-    /// Helper function that can also be used from `PartialGuild`.
+    /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn _user_permissions_in(
         channel: &GuildChannel,
         member: &Member,
@@ -1663,7 +1665,7 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Will return an [`Error::Model`] if the `Role` or `Channel` is not from this `Guild`.
+    /// Will return an [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
     ///
     /// [`Error::Model`]: crate::error::Error::Model
     #[inline]
@@ -1671,7 +1673,7 @@ impl Guild {
         Self::_role_permissions_in(channel, role, self.id)
     }
 
-    /// Helper function that can also be used from `PartialGuild`.
+    /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn _role_permissions_in(
         channel: &GuildChannel,
         role: &Role,
@@ -1855,7 +1857,7 @@ impl Guild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user does not have permission,
-    /// or if an `Integration` with that Id does not exist.
+    /// or if an [`Integration`] with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [`Error::Http`]: crate::error::Error::Http

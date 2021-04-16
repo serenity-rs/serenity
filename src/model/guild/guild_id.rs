@@ -74,7 +74,7 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `ban` may return an error, may
+    /// In addition to the reasons [`ban`] may return an error, may
     /// also return [`Error::ExceededLimit`] if `reason` is too long.
     ///
     /// [`ban`]: Self::ban
@@ -677,8 +677,10 @@ impl GuildId {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`kick`] may return an error,
     /// may also return an error if the reason is too long.
+    ///
+    /// [`kick`]: Self::kick
     pub async fn kick_with_reason(
         self,
         http: impl AsRef<Http>,
@@ -801,7 +803,7 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if the current user
     /// lacks permission, or if the member is not currently
-    /// in a voice channel for this `Guild`.
+    /// in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
@@ -949,7 +951,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an `Integration` with that Id does not exist.
+    /// or if an [`Integration`] with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]

@@ -96,7 +96,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `ban` may return an error,
+    /// In addition to the reasons [`ban`] may return an error,
     /// can also return an error if the reason is too long.
     ///
     /// [`ban`]: Self::ban
@@ -401,7 +401,7 @@ impl PartialGuild {
     /// Edits the properties of member of the guild, such as muting or
     /// nicknaming them.
     ///
-    /// Refer to `EditMember`'s documentation for a full list of methods and
+    /// Refer to [`EditMember`]'s documentation for a full list of methods and
     /// permission restrictions.
     ///
     /// # Examples
@@ -480,8 +480,10 @@ impl PartialGuild {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`kick`] may return an error,
     /// can also return an error if the reason is too long.
+    ///
+    /// [`kick`]: Self::kick
     pub async fn kick_with_reason(
         &self,
         http: impl AsRef<Http>,
@@ -510,7 +512,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if an `Emoji` with the given Id does
+    /// Returns [`Error::Http`] if an [`Emoji`] with the given Id does
     /// not exist for the guild.
     #[inline]
     pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
@@ -619,7 +621,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the Member has a non-existent `Role`
+    /// Returns [`Error::Model`] if the Member has a non-existent [`Role`]
     /// for some reason.
     #[inline]
     pub fn user_permissions_in(
@@ -634,7 +636,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the `Role` or `Channel` is not from this `Guild`.
+    /// Returns [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
     #[inline]
     pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
         Guild::_role_permissions_in(channel, role, self.id)

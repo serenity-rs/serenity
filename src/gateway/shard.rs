@@ -216,12 +216,14 @@ impl Shard {
     /// Sends a heartbeat to the gateway with the current sequence.
     ///
     /// This sets the last heartbeat time to now, and
-    /// `last_heartbeat_acknowledged` to `false`.
+    /// [`last_heartbeat_acknowledged`] to `false`.
     ///
     /// # Errors
     ///
     /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending
     /// a heartbeat.
+    ///
+    /// [`last_heartbeat_acknowledged`]: Self::last_heartbeat_acknowledged
     #[instrument(skip(self))]
     pub async fn heartbeat(&mut self) -> Result<()> {
         match self.client.send_heartbeat(&self.shard_info, Some(self.seq)).await {
@@ -494,16 +496,16 @@ impl Shard {
     ///
     /// # Errors
     ///
-    /// Returns a `GatewayError::InvalidAuthentication` if invalid
+    /// Returns a [`GatewayError::InvalidAuthentication`] if invalid
     /// authentication was sent in the IDENTIFY.
     ///
-    /// Returns a `GatewayError::InvalidShardData` if invalid shard data was
+    /// Returns a [`GatewayError::InvalidShardData`] if invalid shard data was
     /// sent in the IDENTIFY.
     ///
-    /// Returns a `GatewayError::NoAuthentication` if no authentication was sent
+    /// Returns a [`GatewayError::NoAuthentication`] if no authentication was sent
     /// in the IDENTIFY.
     ///
-    /// Returns a `GatewayError::OverloadedShard` if the shard would have too
+    /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too
     /// many guilds assigned to it.
     #[instrument(skip(self))]
     pub(crate) fn handle_event(
@@ -742,7 +744,7 @@ impl Shard {
     /// Sets the shard as going into identifying stage, which sets:
     ///
     /// - the time that the last heartbeat sent as being now
-    /// - the `stage` to `Identifying`
+    /// - the `stage` to [`ConnectionStage::Identifying`]
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client.send_identify(&self.shard_info, &self.token, self.intents).await?;

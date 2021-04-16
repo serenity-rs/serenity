@@ -5,7 +5,7 @@ use std::{fmt, str::FromStr};
 
 use uwl::Stream;
 
-/// Defines how an operation on an `Args` method failed.
+/// Defines how an operation on an [`Args`] method failed.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error<E> {
@@ -36,7 +36,7 @@ impl<E: fmt::Debug + fmt::Display> StdError for Error<E> {}
 
 type Result<T, E> = ::std::result::Result<T, Error<E>>;
 
-/// Dictates how `Args` should split arguments, if by one character, or a string.
+/// Dictates how [`Args`] should split arguments, if by one character, or a string.
 #[derive(Debug, Clone)]
 pub enum Delimiter {
     Single(char),
@@ -233,7 +233,7 @@ enum State {
 /// ```
 ///
 /// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same argument over and over.
-/// Is there a more sensible solution than rewinding...? Actually, there is! The `current` and `parse` methods:
+/// Is there a more sensible solution than rewinding...? Actually, there is! The [`current`] and [`parse`] methods:
 ///
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
@@ -254,6 +254,9 @@ enum State {
 /// assert_eq!(args.single::<String>().unwrap(), "quatre");
 /// assert_eq!(args.single::<String>().unwrap(), "six");
 /// ```
+///
+/// [`current`]: Args::current
+/// [`parse`]: Args::parse
 #[derive(Clone, Debug)]
 pub struct Args {
     message: String,
@@ -263,7 +266,7 @@ pub struct Args {
 }
 
 impl Args {
-    /// Create a new instance of `Args` for parsing arguments.
+    /// Create a new instance of [`Args`] for parsing arguments.
     ///
     /// For more reference, look at [`Args`]'s struct documentation.
     ///
@@ -418,7 +421,7 @@ impl Args {
     ///
     /// # Note
     ///
-    /// This borrows `Args` for the entire lifetime of the returned argument.
+    /// This borrows [`Args`] for the entire lifetime of the returned argument.
     ///
     /// # Examples
     ///
@@ -721,7 +724,7 @@ impl Args {
     ///
     /// # Note 2
     /// "Arguments queue" is the list which contains all arguments that were deemed unique as defined by quotations and delimiters.
-    /// The 'removed' argument can be, likewise, still accessed via `message`.
+    /// The 'removed' argument can be, likewise, still accessed via [`message`].
     ///
     /// # Examples
     ///
@@ -740,6 +743,7 @@ impl Args {
     /// Returns [`Error::Eos`] if no argument can be parsed.
     ///
     /// [`Error::Eos`]: Error::Eos
+    /// [`message`]: Self::message
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -844,7 +848,9 @@ impl Args {
     /// # Note
     ///
     /// The value returned is to be assumed to stay static.
-    /// However, if `find` was called previously, and was successful, then the value is substracted by one.
+    /// However, if [`find`] was called previously, and was successful, then the value is substracted by one.
+    ///
+    /// [`find`]: Self::find
     #[inline]
     pub fn len(&self) -> usize {
         self.args.len()

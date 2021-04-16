@@ -411,7 +411,7 @@ impl ReactionType {
 }
 
 impl From<char> for ReactionType {
-    /// Creates a `ReactionType` from a `char`.
+    /// Creates a [`ReactionType`] from a `char`.
     ///
     /// # Examples
     ///
@@ -497,11 +497,11 @@ impl TryFrom<String> for ReactionType {
 }
 
 impl<'a> TryFrom<&'a str> for ReactionType {
-    /// Creates a `ReactionType` from a string slice.
+    /// Creates a [`ReactionType`] from a string slice.
     ///
     /// # Examples
     ///
-    /// Creating a `ReactionType` from a `🍎`, modeling a similar API as the
+    /// Creating a [`ReactionType`] from a `🍎`, modeling a similar API as the
     /// rest of the library:
     ///
     /// ```rust
@@ -520,7 +520,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// foo("🍎");
     /// ```
     ///
-    /// Creating a `ReactionType` from a custom emoji argument in the following format:
+    /// Creating a [`ReactionType`] from a custom emoji argument in the following format:
     ///
     /// ```rust
     /// use std::convert::TryFrom;

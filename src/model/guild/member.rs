@@ -144,7 +144,7 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// In addition to the errors `ban` may return, can also return [`Error::ExceededLimit`]
+    /// In addition to the errors [`ban`] may return, can also return [`Error::ExceededLimit`]
     /// if the length of the reason is greater than 512.
     ///
     /// [`ban`]: Self::ban
@@ -328,10 +328,11 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`kick`] may return an error,
     /// can also return an error if the given reason is too long.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [`kick`]: Self::kick
     pub async fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {

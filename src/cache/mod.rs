@@ -818,7 +818,7 @@ impl Cache {
         self.settings.write().await.max_messages = max;
     }
 
-    /// Retrieves a `User` from the cache's [`users`] map, if it exists.
+    /// Retrieves a [`User`] from the cache's [`users`] map, if it exists.
     ///
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`UserId`].

@@ -37,7 +37,7 @@ use crate::model::channel::Channel;
 use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
 use crate::model::{id::EmojiId, misc::EmojiIdentifier};
 
-/// Converts a HashMap into a final `serde_json::Map` representation.
+/// Converts a HashMap into a final [`serde_json::Map`] representation.
 pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>) -> Map<String, Value>
 where
     H: BuildHasher,
@@ -243,7 +243,7 @@ pub fn parse_mention(mention: impl AsRef<str>) -> Option<u64> {
 }
 
 /// Retrieves the animated state, name and Id from an emoji mention, in the form of an
-/// `EmojiIdentifier`.
+/// [`EmojiIdentifier`].
 ///
 /// If the emoji usage is invalid, then `None` is returned.
 ///

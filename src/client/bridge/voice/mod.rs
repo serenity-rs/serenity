@@ -20,10 +20,12 @@ pub trait VoiceGatewayManager: Send + Sync {
     /// This will only occur once, and provides the bot's ID and shard count.
     async fn initialise(&self, shard_count: u64, user_id: UserId);
 
-    /// Handler fired in response to a `Ready` event.
+    /// Handler fired in response to a [`Ready`] event.
     ///
     /// This provides the voice plugin with a channel to send gateway messages to Discord,
     /// once per active shard.
+    /// 
+    /// [`Ready`]: crate::model::event::Event
     async fn register_shard(&self, shard_id: u64, sender: Sender<InterMessage>);
 
     /// Handler fired in response to a disconnect, reconnection, or rebalance.

@@ -51,12 +51,12 @@ pub struct ShardQueuer {
     ///
     /// [`Client::data`]: crate::Client::data
     pub data: Arc<RwLock<TypeMap>>,
-    /// A reference to an `EventHandler`, such as the one given to the
+    /// A reference to an [`EventHandler`], such as the one given to the
     /// [`Client`].
     ///
     /// [`Client`]: crate::Client
     pub event_handler: Option<Arc<dyn EventHandler>>,
-    /// A reference to an `RawEventHandler`, such as the one given to the
+    /// A reference to an [`RawEventHandler`], such as the one given to the
     /// [`Client`].
     ///
     /// [`Client`]: crate::Client

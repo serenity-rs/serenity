@@ -135,7 +135,10 @@ impl<'a> ExecuteWebhook<'a> {
     /// Sets a list of files to include in the webhook message.
     ///
     /// Calling this multiple times will overwrite the file list.
-    /// To append files, call `add_file` or `add_files` instead.
+    /// To append files, call [`add_file`] or [`add_files`] instead.
+    ///
+    /// [`add_file`]: Self::add_file
+    /// [`add_files`]: Self::add_files
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -228,7 +231,7 @@ impl<'a> Default for ExecuteWebhook<'a> {
     ///
     /// # Examples
     ///
-    /// Creating an `ExecuteWebhook` builder:
+    /// Creating an [`ExecuteWebhook`] builder:
     ///
     /// ```rust
     /// use serenity::builder::ExecuteWebhook;

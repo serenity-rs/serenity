@@ -17,7 +17,7 @@ pub struct CreateInteractionResponse(pub HashMap<&'static str, Value>);
 impl CreateInteractionResponse {
     /// Sets the InteractionResponseType of the message.
     ///
-    /// Defaults to `Acknowledge`.
+    /// Defaults to [`InteractionResponseType::ChannelMessageWithSource`].
     pub fn kind(&mut self, kind: InteractionResponseType) -> &mut Self {
         self.0.insert("type", Value::Number(serde_json::Number::from(kind as u8)));
         self

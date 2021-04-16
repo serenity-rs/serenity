@@ -74,7 +74,7 @@ pub struct Activity {
 
 #[cfg(feature = "model")]
 impl Activity {
-    /// Creates a `Activity` struct that appears as a `Playing <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -124,7 +124,7 @@ impl Activity {
         }
     }
 
-    /// Creates an `Activity` struct that appears as a `Streaming <name>`
+    /// Creates an [`Activity`] struct that appears as a `Streaming <name>`
     /// status.
     ///
     /// **Note**: Maximum `name` length is 128.
@@ -178,7 +178,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Listening to <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Listening to <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -228,7 +228,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Competing in <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Competing in <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///

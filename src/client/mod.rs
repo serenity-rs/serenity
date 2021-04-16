@@ -149,7 +149,7 @@ impl<'a> ClientBuilder<'a> {
     }
 
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
-    /// A `TypeMap` must not be constructed manually: [`type_map_insert`]
+    /// A [`TypeMap`] must not be constructed manually: [`type_map_insert`]
     /// can be used to insert one type at a time.
     ///
     /// [`type_map_insert`]: Self::type_map_insert
@@ -262,7 +262,7 @@ impl<'a> ClientBuilder<'a> {
 
     /// Sets all intents directly, replacing already set intents.
     ///
-    /// To enable privileged intents, `GatewayIntents::all` to
+    /// To enable privileged intents, [`GatewayIntents::all`] to
     ///
     /// *Info*:
     /// Intents are a bitflag, you can combine them by performing the
@@ -481,13 +481,14 @@ pub struct Client {
     /// # }
     /// ```
     ///
-    /// Refer to [example 05] for an example on using the `data` field.
+    /// Refer to [example 05] for an example on using the [`data`] field.
     ///
     /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
     /// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete
     /// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk
     /// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate
     /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework
+    /// [`data`]: Self::data
     pub data: Arc<RwLock<TypeMap>>,
     /// A HashMap of all shards instantiated by the Client.
     ///

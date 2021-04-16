@@ -1614,9 +1614,9 @@ impl Event {
     }
 }
 
-/// Deserializes a `serde_json::Value` into an `Event`.
+/// Deserializes a [`serde_json::Value`] into an [`Event`].
 ///
-/// The given `EventType` is used to determine what event to deserialize into.
+/// The given [`EventType`] is used to determine what event to deserialize into.
 /// For example, an [`EventType::ChannelCreate`] will cause the given value to
 /// attempt to be deserialized into a [`ChannelCreateEvent`].
 ///

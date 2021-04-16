@@ -385,7 +385,7 @@ impl Webhook {
     /// Returns an [`Error::Model`] if the [`token`] is `None`.
     ///
     /// May also return an [`Error::Http`] if the http client errors or if Discord returns an error.
-    /// Such as if the `Webhook` was deleted.
+    /// Such as if the [`Webhook`] was deleted.
     ///
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     ///
@@ -433,7 +433,7 @@ impl WebhookId {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the http client errors or if Discord returns an error.
-    /// Such as if the `WebhookId` does not exist.
+    /// Such as if the [`WebhookId`] does not exist.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserialising the response.
     ///

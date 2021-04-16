@@ -70,10 +70,13 @@ impl CreateChannel {
 
     /// How many seconds must a user wait before sending another message.
     ///
-    /// Bots, or users with the `MANAGE_MESSAGES` and/or`MANAGE_CHANNEL` permissions are exempt
+    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt
     /// from this restriction.
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
+    ///
+    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
+    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     pub fn rate_limit(&mut self, limit: u64) -> &mut Self {
         self.0.insert("rate_limit_per_user", Value::Number(Number::from(limit)));
 
@@ -148,17 +151,19 @@ impl CreateChannel {
 }
 
 impl Default for CreateChannel {
-    /// Creates a builder with default values, setting `kind` to `ChannelType::Text`.
+    /// Creates a builder with default values, setting [`kind`] to [`ChannelType::Text`].
     ///
     /// # Examples
     ///
-    /// Create a default `CreateChannel` builder:
+    /// Create a default [`CreateChannel`] builder:
     ///
     /// ```rust
     /// use serenity::builder::CreateChannel;
     ///
     /// let channel_builder = CreateChannel::default();
     /// ```
+    ///
+    /// [`kind`]: CreateChannel::kind
     fn default() -> Self {
         let mut builder = CreateChannel(HashMap::new());
         builder.kind(ChannelType::Text);

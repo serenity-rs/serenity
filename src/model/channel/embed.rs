@@ -72,7 +72,7 @@ pub struct Embed {
 
 #[cfg(feature = "model")]
 impl Embed {
-    /// Creates a fake Embed, giving back a `serde_json` map.
+    /// Creates a fake Embed, giving back a [`serde_json`] map.
     ///
     /// This should only be useful in conjunction with [`Webhook::execute`].
     ///

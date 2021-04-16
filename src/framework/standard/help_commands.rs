@@ -90,7 +90,7 @@ use crate::{
     Error,
 };
 
-/// Macro to format a command according to a `HelpBehaviour` or
+/// Macro to format a command according to a [`HelpBehaviour`] or
 /// continue to the next command-name upon hiding.
 #[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! format_command_name {
@@ -103,7 +103,7 @@ macro_rules! format_command_name {
     };
 }
 
-/// Wraps around `warn`-macro in order to keep
+/// Wraps around [`warn`]-macro in order to keep
 /// the literal same for all formats of help.
 #[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! warn_about_failed_send {
@@ -928,8 +928,8 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
     .boxed()
 }
 
-/// Iterates over all commands and forges them into a `CustomisedHelpData`,
-/// taking `HelpOptions` into consideration when deciding on whether a command
+/// Iterates over all commands and forges them into a [`CustomisedHelpData`],
+/// taking [`HelpOptions`] into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
 #[allow(clippy::implicit_hasher)]
@@ -1271,7 +1271,7 @@ async fn send_error_embed(
 ///
 /// # Examples
 ///
-/// Use the command with `exec_help`:
+/// Use the command with [`StandardFramework::help`]:
 ///
 /// ```rust,no_run
 /// # use serenity::prelude::*;
@@ -1297,6 +1297,8 @@ async fn send_error_embed(
 /// let framwork = StandardFramework::new()
 ///     .help(&MY_HELP);
 /// ```
+///
+/// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub async fn with_embeds(

@@ -509,7 +509,7 @@ impl Serialize for UserPublicFlags {
 }
 
 impl Default for User {
-    /// Initializes a `User` with default values. Setting the following:
+    /// Initializes a [`User`] with default values. Setting the following:
     /// - **id** to `UserId(210)`
     /// - **avatar** to `Some("abc")`
     /// - **bot** to `true`.
@@ -716,9 +716,9 @@ impl User {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the given `Guild` is unavailable,
-    /// if that `Role` does not exist in the given `Guild`, or if the
-    /// given `User` is not in that `Guild`.
+    /// Returns an [`Error::Http`] if the given [`Guild`] is unavailable,
+    /// if that [`Role`] does not exist in the given [`Guild`], or if the
+    /// given [`User`] is not in that [`Guild`].
     ///
     /// May also return an [`Error::Json`] if there is an error in
     /// deserializing the API response.
@@ -925,7 +925,7 @@ impl UserId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if a `User` with that `UserId` does not exist,
+    /// Returns [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,
     /// or is otherwise unavailable.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserializing
@@ -967,7 +967,7 @@ impl UserId {
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if a `User` with that `UserId` does not exist,
+    /// May return an [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,
     /// or otherwise cannot be fetched.
     ///
     /// May also return an [`Error::Json`] if there is an error in
@@ -1017,42 +1017,42 @@ impl<'a> From<&'a CurrentUser> for User {
 }
 
 impl From<CurrentUser> for UserId {
-    /// Gets the Id of a `CurrentUser` struct.
+    /// Gets the Id of a [`CurrentUser`] struct.
     fn from(current_user: CurrentUser) -> UserId {
         current_user.id
     }
 }
 
 impl<'a> From<&'a CurrentUser> for UserId {
-    /// Gets the Id of a `CurrentUser` struct.
+    /// Gets the Id of a [`CurrentUser`] struct.
     fn from(current_user: &CurrentUser) -> UserId {
         current_user.id
     }
 }
 
 impl From<Member> for UserId {
-    /// Gets the Id of a `Member`.
+    /// Gets the Id of a [`Member`].
     fn from(member: Member) -> UserId {
         member.user.id
     }
 }
 
 impl<'a> From<&'a Member> for UserId {
-    /// Gets the Id of a `Member`.
+    /// Gets the Id of a [`Member`].
     fn from(member: &Member) -> UserId {
         member.user.id
     }
 }
 
 impl From<User> for UserId {
-    /// Gets the Id of a `User`.
+    /// Gets the Id of a [`User`].
     fn from(user: User) -> UserId {
         user.id
     }
 }
 
 impl<'a> From<&'a User> for UserId {
-    /// Gets the Id of a `User`.
+    /// Gets the Id of a [`User`].
     fn from(user: &User) -> UserId {
         user.id
     }

@@ -48,7 +48,9 @@ pub struct VoiceState {
     pub user_id: UserId,
     /// When unsuppressed, non-bot users will have this set to the current time.
     /// Bot users will be set to `None`. When suppressed, the user will have
-    /// their `request_to_speak_timestamp` removed.
+    /// their [`request_to_speak_timestamp`] removed.
+    ///
+    /// [`request_to_speak_timestamp`]: Self::request_to_speak_timestamp
     pub request_to_speak_timestamp: Option<DateTime<Utc>>,
 }
 
