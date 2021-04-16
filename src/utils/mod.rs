@@ -883,6 +883,7 @@ mod test {
             name: "ferris-club-member".to_string(),
             permissions: Permissions::all(),
             position: 0,
+            tags: None,
         };
 
         let channel = GuildChannel {
@@ -912,7 +913,7 @@ mod test {
         cache.guilds.write().await.insert(guild.id, guild.clone());
         cache.channels.write().await.insert(channel.id, channel.clone());
 
-        let with_user_metions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
+        let with_user_mentions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
         <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
         <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
@@ -926,7 +927,7 @@ mod test {
 
         // User mentions
         let options = ContentSafeOptions::default();
-        assert_eq!(without_user_mentions, content_safe(&cache, with_user_metions, &options).await);
+        assert_eq!(without_user_mentions, content_safe(&cache, with_user_mentions, &options).await);
 
         let options = ContentSafeOptions::default();
         assert_eq!(
@@ -959,7 +960,7 @@ mod test {
         );
 
         let options = options.clean_user(false);
-        assert_eq!(with_user_metions, content_safe(&cache, with_user_metions, &options).await);
+        assert_eq!(with_user_mentions, content_safe(&cache, with_user_mentions, &options).await);
 
         // Channel mentions
         let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#0> \

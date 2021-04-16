@@ -2,6 +2,8 @@ use std::cmp::Ordering;
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use async_trait::async_trait;
+#[cfg(feature = "model")]
+use serde::de::{Deserialize, Deserializer, Error as DeError};
 
 #[cfg(feature = "model")]
 use crate::builder::EditRole;
@@ -70,6 +72,8 @@ pub struct Role {
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: i64,
+    /// The tags this role has.
+    pub tags: Option<RoleTags>,
 }
 
 #[cfg(feature = "model")]
@@ -226,5 +230,51 @@ impl FromStrAndCache for Role {
             },
             None => Err(RoleParseError::InvalidRole),
         }
+    }
+}
+
+/// The tags of a [`Role`]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct RoleTags {
+    /// The id of the bot this role belongs to.
+    pub bot_id: Option<UserId>,
+    /// The id of the integration this role belongs to.
+    pub integration_id: Option<IntegrationId>,
+    /// Whether this is the guild's premium subscriber role.
+    pub premium_subscriber: bool,
+}
+
+impl<'de> Deserialize<'de> for RoleTags {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let bot_id = match map.contains_key("bot_id") {
+            true => Some(
+                map.remove("bot_id")
+                    .ok_or_else(|| DeError::custom("expected bot_id"))
+                    .and_then(UserId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let integration_id = match map.contains_key("integration_id") {
+            true => Some(
+                map.remove("integration_id")
+                    .ok_or_else(|| DeError::custom("expected integration_id"))
+                    .and_then(IntegrationId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let premium_subscriber = map.contains_key("premium_subscriber");
+
+        Ok(Self {
+            bot_id,
+            integration_id,
+            premium_subscriber,
+        })
     }
 }
