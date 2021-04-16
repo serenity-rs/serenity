@@ -1210,11 +1210,11 @@ __impl_bitflags! {
         /// The source message for this crosspost has been deleted (via Channel Following).
         SOURCE_MESSAGE_DELETED = 0b0000_0000_0000_0000_0000_0000_0000_1000;
         /// This message came from the urgent message system.
-        URGENT = 0b0000_0000_0000_0000_0000_0000_0000_1000 = 0b0000_0000_0000_0000_0000_0000_0001_0000;
+        URGENT = 0b0000_0000_0000_0000_0000_0000_0001_0000;
         /// This message is only visible to the user who invoked the Interaction.
-        EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0000_1000 = 0b0000_0000_0000_0000_0000_0000_0100_0000;
+        EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
         /// This message is an Interaction Response and the bot is "thinking".
-        LOADING = 0b0000_0000_0000_0000_0000_0000_0000_1000 = 0b0000_0000_0000_0000_0000_0000_1000_0000;
+        LOADING = 0b0000_0000_0000_0000_0000_0000_1000_0000;
     }
 }
 
