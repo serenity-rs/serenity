@@ -237,9 +237,9 @@ impl FromStrAndCache for Role {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct RoleTags {
-    /// The id of the bot this role belongs to.
+    /// The Id of the bot the role belongs to.
     pub bot_id: Option<UserId>,
-    /// The id of the integration this role belongs to.
+    /// The Id of the integration this role belongs to.
     pub integration_id: Option<IntegrationId>,
     /// Whether this is the guild's premium subscriber role.
     pub premium_subscriber: bool,
