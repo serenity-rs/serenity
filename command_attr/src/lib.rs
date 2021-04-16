@@ -226,7 +226,10 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         #visibility fn #name<'fut> (#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
-            async move { #(#body)* }.boxed()
+            async move {
+                let output: #ret = { #(#body)* };
+                output
+            }.boxed()
         }
     })
     .into()
@@ -518,7 +521,10 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         pub fn #nn<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
-            async move { #(#body)* }.boxed()
+            async move {
+                let output: #ret = { #(#body)* };
+                output
+            }.boxed()
         }
     })
     .into()
@@ -794,7 +800,10 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
         #visibility fn #n<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
-            async move { #(#body)* }.boxed()
+            async move {
+                let output: #ret = { #(#body)* };
+                output
+            }.boxed()
         }
     })
     .into()
@@ -929,7 +938,10 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
                 #visibility fn #fun_name<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
                     use ::serenity::futures::future::FutureExt;
 
-                    async move { #(#body)* }.boxed()
+                    async move {
+                        let output: #ret = { #(#body)* };
+                        output
+                    }.boxed()
                 }
             })
                 .into()
