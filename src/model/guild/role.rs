@@ -73,7 +73,8 @@ pub struct Role {
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: i64,
     /// The tags this role has.
-    pub tags: Option<RoleTags>,
+    #[serde(default)]
+    pub tags: RoleTags,
 }
 
 #[cfg(feature = "model")]
@@ -234,14 +235,15 @@ impl FromStrAndCache for Role {
 }
 
 /// The tags of a [`Role`]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 #[non_exhaustive]
 pub struct RoleTags {
-    /// The Id of the bot the role belongs to.
+    /// The Id of the bot the [`Role`] belongs to.
     pub bot_id: Option<UserId>,
-    /// The Id of the integration this role belongs to.
+    /// The Id of the integration the [`Role`] belongs to.
     pub integration_id: Option<IntegrationId>,
     /// Whether this is the guild's premium subscriber role.
+    #[serde(default)]
     pub premium_subscriber: bool,
 }
 

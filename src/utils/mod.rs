@@ -883,7 +883,7 @@ mod test {
             name: "ferris-club-member".to_string(),
             permissions: Permissions::all(),
             position: 0,
-            tags: None,
+            tags: RoleTags::default(),
         };
 
         let channel = GuildChannel {
