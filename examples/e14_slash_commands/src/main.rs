@@ -3,7 +3,7 @@ use std::env;
 use serenity::{
     async_trait,
     client::bridge::gateway::GatewayIntents,
-    model::{gateway::Ready, interactions::{Interaction, InteractionResponseType}},
+    model::{gateway::Ready, interactions::{Interaction, InteractionResponseType, ApplicationCommand}},
     prelude::*,
 };
 
@@ -24,7 +24,7 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
-        let interactions = Interaction::get_global_application_commands(&ctx.http).await;
+        let interactions = ApplicationCommand::get_global_application_commands(&ctx.http).await;
 
         println!("I have the following global slash command(s): {:?}", interactions);
     }

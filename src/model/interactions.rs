@@ -434,6 +434,152 @@ pub struct ApplicationCommand {
     pub default_permission: bool,
 }
 
+impl ApplicationCommand {
+    /// Creates a global [`ApplicationCommand`],
+    /// overriding an existing one with the same name if it exists.
+    ///
+    /// When a created `ApplicationCommand` is used, the [`InteractionCreate`] event will be emitted.
+    ///
+    /// **Note**: Global commands may take up to an hour to become available.
+    ///
+    /// As such, it is recommended that guild application commands be used for testing purposes.
+    ///
+    /// # Examples
+    ///
+    /// Create a simple ping command
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() {
+    /// # let http = Arc::new(Http::default());
+    /// use serenity::model::{interactions::ApplicationCommand, id::ApplicationId};
+    ///
+    /// let _ = ApplicationCommand::create_global_application_command(&http, |a| {
+    ///    a.name("ping")
+    ///     .description("A simple ping command")
+    /// })
+    /// .await;
+    /// # }
+    /// ```
+    ///
+    /// Create a command that echoes what is inserted
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() {
+    /// # let http = Arc::new(Http::default());
+    /// use serenity::model::{
+    /// interactions::{ApplicationCommand, ApplicationCommandOptionType},
+    /// id::ApplicationId
+    /// };
+    ///
+    /// let _ = ApplicationCommand::create_global_application_command(&http, |a| {
+    ///    a.name("echo")
+    ///     .description("What is said is echoed")
+    ///     .create_option(|o| {
+    ///         o.name("to_say")
+    ///          .description("What will be echoed")
+    ///          .kind(ApplicationCommandOptionType::String)
+    ///          .required(true)
+    ///     })
+    /// })
+    /// .await;
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// May return an [`Error::Http`] if the `ApplicationCommand` is illformed,
+    /// such as if more than 10 `choices` are set. See the [API Docs] for further details.
+    ///
+    /// Can also return an [`Error::Json`] if there is an error in deserializing
+    /// the response.
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
+    /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn create_global_application_command<F>(
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    {
+        let map = ApplicationCommand::build_application_command(f);
+        http.as_ref().create_global_application_command(&Value::Object(map)).await
+    }
+
+    /// Same as [`create_global_application_command`] but allows
+    /// to create more than one global command per call.
+    ///
+    /// [`create_global_application_command`]: Self::create_global_application_command
+    pub async fn create_global_application_commands<F>(
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Vec<ApplicationCommand>>
+    where
+        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
+    {
+        let mut array = CreateApplicationCommands::default();
+
+        f(&mut array);
+
+        http.as_ref().create_global_application_commands(&Value::Array(array.0)).await
+    }
+
+    /// Edits a global command by its Id.
+    pub async fn edit_global_application_command<F>(
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    {
+        let map = ApplicationCommand::build_application_command(f);
+        http.as_ref().edit_global_application_command(command_id.into(), &Value::Object(map)).await
+    }
+
+    /// Gets all global commands.
+    pub async fn get_global_application_commands(
+        http: impl AsRef<Http>,
+    ) -> Result<Vec<ApplicationCommand>> {
+        http.as_ref().get_global_application_commands().await
+    }
+
+    /// Gets a global command by its Id.
+    pub async fn get_global_application_command(
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+    ) -> Result<ApplicationCommand> {
+        http.as_ref().get_global_application_command(command_id.into()).await
+    }
+
+    /// Deletes a global command by its Id.
+    pub async fn delete_global_application_command(
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+    ) -> Result<()> {
+        http.as_ref().delete_global_application_command(command_id.into()).await
+    }
+
+    #[inline]
+    pub(crate) fn build_application_command<F>(f: F) -> Map<String, Value>
+    where
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    {
+        let mut create_application_command = CreateApplicationCommand::default();
+        f(&mut create_application_command);
+        utils::hashmap_to_json_map(create_application_command.0)
+    }
+}
+
 /// The parameters for an [`ApplicationCommand`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -588,150 +734,6 @@ pub struct MessageInteraction {
 }
 
 impl Interaction {
-    /// Creates a global [`ApplicationCommand`],
-    /// overriding an existing one with the same name if it exists.
-    ///
-    /// When a created `ApplicationCommand` is used, the [`InteractionCreate`] event will be emitted.
-    ///
-    /// **Note**: Global commands may take up to an hour to become available.
-    ///
-    /// As such, it is recommended that guild application commands be used for testing purposes.
-    ///
-    /// # Examples
-    ///
-    /// Create a simple ping command
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
-    /// #
-    /// # async fn run() {
-    /// # let http = Arc::new(Http::default());
-    /// use serenity::model::{interactions::Interaction, id::ApplicationId};
-    ///
-    /// let _ = Interaction::create_global_application_command(&http, |a| {
-    ///    a.name("ping")
-    ///     .description("A simple ping command")
-    /// })
-    /// .await;
-    /// # }
-    /// ```
-    ///
-    /// Create a command that echoes what is inserted
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
-    /// #
-    /// # async fn run() {
-    /// # let http = Arc::new(Http::default());
-    /// use serenity::model::{
-    /// interactions::{Interaction, ApplicationCommandOptionType},
-    /// id::ApplicationId
-    /// };
-    ///
-    /// let _ = Interaction::create_global_application_command(&http, |a| {
-    ///    a.name("echo")
-    ///     .description("What is said is echoed")
-    ///     .create_option(|o| {
-    ///         o.name("to_say")
-    ///          .description("What will be echoed")
-    ///          .kind(ApplicationCommandOptionType::String)
-    ///          .required(true)
-    ///     })
-    /// })
-    /// .await;
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// May return an [`Error::Http`] if the `ApplicationCommand` is illformed,
-    /// such as if more than 10 `choices` are set. See the [API Docs] for further details.
-    ///
-    /// Can also return an [`Error::Json`] if there is an error in deserializing
-    /// the response.
-    ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
-    /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn create_global_application_command<F>(
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<ApplicationCommand>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let map = Interaction::build_interaction(f);
-        http.as_ref().create_global_application_command(&Value::Object(map)).await
-    }
-
-    /// Same as [`create_global_application_command`] but allows
-    /// to create more than one global command per call.
-    ///
-    /// [`create_global_application_command`]: Self::create_global_application_command
-    pub async fn create_global_application_commands<F>(
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Vec<ApplicationCommand>>
-    where
-        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
-    {
-        let mut array = CreateApplicationCommands::default();
-
-        f(&mut array);
-
-        http.as_ref().create_global_application_commands(&Value::Array(array.0)).await
-    }
-
-    /// Edits a global command by its Id.
-    pub async fn edit_global_application_command<F>(
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-        f: F,
-    ) -> Result<ApplicationCommand>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let map = Interaction::build_interaction(f);
-        http.as_ref().edit_global_application_command(command_id.into(), &Value::Object(map)).await
-    }
-
-    /// Gets all global commands.
-    pub async fn get_global_application_commands(
-        http: impl AsRef<Http>,
-    ) -> Result<Vec<ApplicationCommand>> {
-        http.as_ref().get_global_application_commands().await
-    }
-
-    /// Gets a global command by its Id.
-    pub async fn get_global_application_command(
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<ApplicationCommand> {
-        http.as_ref().get_global_application_command(command_id.into()).await
-    }
-
-    /// Deletes a global command by its Id.
-    pub async fn delete_global_application_command(
-        http: impl AsRef<Http>,
-        command_id: CommandId,
-    ) -> Result<()> {
-        http.as_ref().delete_global_application_command(command_id.into()).await
-    }
-
-    #[inline]
-    pub(crate) fn build_interaction<F>(f: F) -> Map<String, Value>
-    where
-        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
-    {
-        let mut create_application_command = CreateApplicationCommand::default();
-        f(&mut create_application_command);
-        utils::hashmap_to_json_map(create_application_command.0)
-    }
-
     /// Creates a response to the interaction received.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.

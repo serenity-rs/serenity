@@ -32,7 +32,7 @@ use crate::{
         CreateApplicationCommands,
         CreateApplicationCommandsPermissions,
     },
-    model::interactions::{ApplicationCommand, Interaction},
+    model::interactions::ApplicationCommand,
 };
 
 #[cfg(feature = "model")]
@@ -1057,7 +1057,7 @@ impl GuildId {
     /// Returns the same possible errors as [`create_global_application_command`].
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    /// [`create_global_application_command`]: crate::model::interactions::Interaction::create_global_application_command
+    /// [`create_global_application_command`]: crate::model::interactions::ApplicationCommand::create_global_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_command<F>(
@@ -1068,7 +1068,7 @@ impl GuildId {
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
-        let map = Interaction::build_interaction(f);
+        let map = ApplicationCommand::build_application_command(f);
         http.as_ref().create_guild_application_command(self.0, &Value::Object(map)).await
     }
 
@@ -1180,7 +1180,7 @@ impl GuildId {
     where
         F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
     {
-        let map = Interaction::build_interaction(f);
+        let map = ApplicationCommand::build_application_command(f);
         http.as_ref()
             .edit_guild_application_command(self.0.into(), command_id.into(), &Value::Object(map))
             .await
