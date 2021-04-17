@@ -72,6 +72,7 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     Ok(members)
 }
 
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
 pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, PartialMember>, D::Error> {
@@ -80,6 +81,7 @@ pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
 pub fn deserialize_users<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, User>, D::Error> {
@@ -88,6 +90,7 @@ pub fn deserialize_users<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
 pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<RoleId, Role>, D::Error> {
@@ -96,6 +99,7 @@ pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
 pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<ChannelId, PartialChannel>, D::Error> {
