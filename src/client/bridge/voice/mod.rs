@@ -24,7 +24,7 @@ pub trait VoiceGatewayManager: Send + Sync {
     ///
     /// This provides the voice plugin with a channel to send gateway messages to Discord,
     /// once per active shard.
-    /// 
+    ///
     /// [`Ready`]: crate::model::event::Event
     async fn register_shard(&self, shard_id: u64, sender: Sender<InterMessage>);
 

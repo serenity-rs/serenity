@@ -134,7 +134,7 @@ pub struct ApplicationCommandInteractionData {
 ///
 /// All options have names and an option can either be a parameter and input [`value`] or it can denote a sub-command or group, in which case it will contain a
 /// top-level key and another vector of [`options`].
-/// 
+///
 /// [`value`]: ApplicationCommandInteractionDataOption::value
 /// [`options`]: ApplicationCommandInteractionDataOption::options
 #[derive(Clone, Debug, Deserialize, Serialize)]
