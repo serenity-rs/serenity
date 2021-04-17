@@ -72,7 +72,10 @@ pub struct Role {
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: i64,
-    /// The tags this role has.
+    /// The tags this role has. It can be used to determine if this role is a special role in this guild
+    /// such as guild subscriber role, or if the role is linked to an [`Integration`] or a bot.
+    ///
+    /// [`Integration`]: super::Integration
     #[serde(default)]
     pub tags: RoleTags,
 }
@@ -234,7 +237,7 @@ impl FromStrAndCache for Role {
     }
 }
 
-/// The tags of a [`Role`]
+/// The tags of a [`Role`].
 #[derive(Clone, Debug, Default, Serialize)]
 #[non_exhaustive]
 pub struct RoleTags {
