@@ -44,7 +44,7 @@ impl EditVoiceState {
     }
 
     /// Sets the current bot user's request to speak timestamp. This can be any
-    /// present or future time. Set this to `None` to clear a request to speak.
+    /// present or future time. Set this to [`None`] to clear a request to speak.
     ///
     /// Requires the [Request to Speak] permission.
     ///

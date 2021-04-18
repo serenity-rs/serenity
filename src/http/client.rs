@@ -188,7 +188,7 @@ impl<'a> Future for HttpBuilder<'a> {
     }
 }
 
-/// **Note**: For all member functions that return a `Result`, the
+/// **Note**: For all member functions that return a [`Result`], the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
 ///
 /// [`Error::Http`]: crate::error::Error::Http
@@ -1216,7 +1216,7 @@ impl Http {
 
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     pub async fn edit_nickname(&self, guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
         let map = json!({ "nick": new_nickname });
         let body = serde_json::to_vec(&map)?;

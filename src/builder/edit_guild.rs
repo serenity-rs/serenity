@@ -19,7 +19,7 @@ impl EditGuild {
     /// Set the "AFK voice channel" that users are to move to if they have been
     /// AFK for an amount of time, configurable by [`afk_timeout`].
     ///
-    /// The given channel must be either some valid voice channel, or `None` to
+    /// The given channel must be either some valid voice channel, or [`None`] to
     /// not set an AFK channel. The library does not check if a channel is
     /// valid.
     ///
@@ -46,7 +46,7 @@ impl EditGuild {
         self
     }
 
-    /// Set the icon of the guild. Pass `None` to remove the icon.
+    /// Set the icon of the guild. Pass [`None`] to remove the icon.
     ///
     /// # Examples
     ///

@@ -114,7 +114,7 @@ impl Webhook {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    /// Returns an [`Error::Model`] if the [`token`] is [`None`].
     ///
     /// May also return an [`Error::Http`] if the webhook does not exist,
     /// the token is invalid, or if the webhook could not otherwise
@@ -131,7 +131,7 @@ impl Webhook {
 
     /// Edits the webhook in-place. All fields are optional.
     ///
-    /// To nullify the avatar, pass `Some("")`. Otherwise, passing `None` will
+    /// To nullify the avatar, pass `Some("")`. Otherwise, passing [`None`] will
     /// not modify the avatar.
     ///
     /// Refer to [`Http::edit_webhook`] for httprictions on editing webhooks.
@@ -180,7 +180,7 @@ impl Webhook {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    /// Returns an [`Error::Model`] if the [`token`] is [`None`].
     ///
     /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
     ///
@@ -285,7 +285,7 @@ impl Webhook {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    /// Returns an [`Error::Model`] if the [`token`] is [`None`].
     ///
     /// May also return an [`Error::Http`] if the content is malformed, or if the webhook's token is invalid.
     ///
@@ -324,7 +324,7 @@ impl Webhook {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    /// Returns an [`Error::Model`] if the [`token`] is [`None`].
     ///
     /// May also return an [`Error::Http`] if the content is malformed, the webhook's token is invalid, or
     /// the given message Id does not belong to the current webhook.
@@ -357,7 +357,7 @@ impl Webhook {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    /// Returns an [`Error::Model`] if the [`token`] is [`None`].
     ///
     /// May also return an [`Error::Http`] if the webhook's token is invalid or
     /// the given message Id does not belong to the current webhook.
@@ -382,7 +382,7 @@ impl Webhook {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    /// Returns an [`Error::Model`] if the [`token`] is [`None`].
     ///
     /// May also return an [`Error::Http`] if the http client errors or if Discord returns an error.
     /// Such as if the [`Webhook`] was deleted.
@@ -414,7 +414,7 @@ impl Webhook {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Model`] if the [`token`] is `None`.
+    /// Returns an [`Error::Model`] if the [`token`] is [`None`].
     ///
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`token`]: Self::token

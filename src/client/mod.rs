@@ -209,7 +209,7 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// This method allows to pass an `Arc`'ed `framework` - this step is
+    /// This method allows to pass an [`Arc`]'ed `framework` - this step is
     /// done for you in the [`framework`]-method, if you don't need the
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
@@ -244,7 +244,7 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// This method allows to pass an `Arc`'ed `voice_manager` - this step is
+    /// This method allows to pass an [`Arc`]'ed `voice_manager` - this step is
     /// done for you in the [`voice_manager`]-method, if you don't need the
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
@@ -548,7 +548,7 @@ pub struct Client {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
-    /// // Create a clone of the `Arc` containing the shard manager.
+    /// // Create a clone of the [`Arc`] containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
     /// // Create a thread which will sleep for 60 seconds and then have the

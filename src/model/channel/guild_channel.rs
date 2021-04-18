@@ -38,7 +38,7 @@ use crate::utils as serenity_utils;
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
 /// News channels are a subset of text channels and lack slow mode hence
-/// [`slow_mode_rate`] will be `None`.
+/// [`slow_mode_rate`] will be [`None`].
 ///
 /// [`slow_mode_rate`]: GuildChannel::slow_mode_rate
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -106,7 +106,7 @@ pub struct GuildChannel {
     pub slow_mode_rate: Option<u64>,
     /// The region override.
     ///
-    /// **Note**: This is only available for voice and stage channels. `None`
+    /// **Note**: This is only available for voice and stage channels. [`None`]
     /// for voice and stage channels means automatic region selection.
     pub rtc_region: Option<String>,
     /// The video quality mode for a voice channel.
@@ -456,7 +456,7 @@ impl GuildChannel {
         self.id.edit_message(&http, message_id, f).await
     }
 
-    /// Edits a voice state in a stage channel. Pass `None` for `user_id` to
+    /// Edits a voice state in a stage channel. Pass [`None`] for `user_id` to
     /// edit the current user's voice state.
     ///
     /// Requires the [Mute Members] permission to suppress another user or
@@ -638,7 +638,7 @@ impl GuildChannel {
     /// Refer to the [`GetMessages`]-builder for more information on how to
     /// use `builder`.
     ///
-    /// **Note**: Returns an empty `Vec` if the current user does not have the
+    /// **Note**: Returns an empty [`Vec`] if the current user does not have the
     /// [Read Message History] permission.
     ///
     /// # Errors
@@ -818,7 +818,7 @@ impl GuildChannel {
     /// Gets all channel's pins.
     ///
     /// **Note**: If the current user lacks the [Read Message History] permission
-    /// an empty `Vec` will be returned.
+    /// an empty [`Vec`] will be returned.
     ///
     /// # Errors
     ///

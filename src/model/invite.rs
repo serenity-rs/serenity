@@ -43,7 +43,7 @@ pub struct Invite {
     /// A representation of the minimal amount of information needed about the
     /// [`User`] that created the invite.
     ///
-    /// This can be `None` for invites created by Discord such as invite-widgets
+    /// This can be [`None`] for invites created by Discord such as invite-widgets
     /// or vanity invite links.
     pub inviter: Option<InviteUser>,
 }

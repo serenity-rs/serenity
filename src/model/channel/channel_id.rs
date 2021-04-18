@@ -444,7 +444,7 @@ impl ChannelId {
     ///
     /// Refer to [`GetMessages`] for more information on how to use `builder`.
     ///
-    /// **Note**: Returns an empty `Vec` if the current user
+    /// **Note**: Returns an empty [`Vec`] if the current user
     /// does not have the [Read Message History] permission.
     ///
     /// # Errors
@@ -568,7 +568,7 @@ impl ChannelId {
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
     ///
-    /// **Note**: Returns an empty `Vec` if the current user does not
+    /// **Note**: Returns an empty [`Vec`] if the current user does not
     /// have the [Read Message History] permission.
     ///
     /// # Errors
@@ -670,7 +670,7 @@ impl ChannelId {
     /// # }
     /// ```
     ///
-    /// Send files using `File`:
+    /// Send files using [`File`]:
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
@@ -710,6 +710,7 @@ impl ChannelId {
     /// [`CreateMessage::content`]: crate::builder::CreateMessage::content
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// [`File`]: std::fs::File
     #[cfg(feature = "utils")]
     pub async fn send_files<'a, F, T, It>(
         self,
@@ -969,7 +970,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// `self.before` so that the next call does not return duplicate items.
     ///
     /// If there are no more messages to be fetched, then this sets `self.before`
-    /// as `None`, indicating that no more calls ought to be made.
+    /// as [`None`], indicating that no more calls ought to be made.
     ///
     /// If this method is called with `self.before` as None, the last 100
     /// (or lower) messages sent in the channel are added in the buffer.

@@ -1927,7 +1927,7 @@ impl EventType {
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
-    /// case this method returns `None`.
+    /// case this method returns [`None`].
     pub fn name(&self) -> Option<&str> {
         match self {
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),

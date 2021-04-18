@@ -492,7 +492,7 @@ impl GuildId {
 
     /// Edits the current user's nickname for the guild.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     ///
     /// Requires the [Change Nickname] permission.
     ///

@@ -175,13 +175,13 @@ pub struct HelpOptions {
     /// Explains the user on how to use access a single command's details.
     pub individual_command_tip: &'static str,
     /// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`] for further information.
-    /// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to `None` during creation
+    /// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to [`None`] during creation
     /// inside of the help macro.
     ///
     /// **Note**: Text is only used in direct messages.
     pub strikethrough_commands_tip_in_dm: Option<&'static str>,
     /// Explains reasoning behind strikethrough-commands, see fields requiring [`HelpBehaviour`] for further information.
-    /// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to `None` during creation
+    /// If [`HelpBehaviour::Strike`] is unused, this field will evaluate to [`None`] during creation
     /// inside of the help macro.
     ///
     /// **Note**: Text is only used in guilds.

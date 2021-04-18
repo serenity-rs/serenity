@@ -295,7 +295,7 @@ impl Configuration {
     /// fetching a guild's prefix from a database accessible via
     /// [`Context::data`].
     ///
-    /// Return `None` to not have a special prefix for the dispatch and to only
+    /// Return [`None`] to not have a special prefix for the dispatch and to only
     /// use the configured prefix from [`prefix`] or [`prefixes`].
     ///
     /// This method can be called many times to add more dynamic prefix hooks.
@@ -407,7 +407,7 @@ impl Configuration {
         self
     }
 
-    /// A `HashSet` of user Ids checks won't apply to.
+    /// A [`HashSet`] of user Ids checks won't apply to.
     ///
     /// **Note**: Defaults to an empty HashSet.
     ///

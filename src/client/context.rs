@@ -238,7 +238,7 @@ impl Context {
         self.shard.set_status(OnlineStatus::Invisible);
     }
 
-    /// "Resets" the current user's presence, by setting the activity to `None`
+    /// "Resets" the current user's presence, by setting the activity to [`None`]
     /// and the online status to [`Online`].
     ///
     /// Use [`set_presence`] for fine-grained control over individual details.

@@ -154,7 +154,7 @@ pub struct Suggestions(pub Vec<SuggestedCommandName>);
 
 #[cfg(all(feature = "cache", feature = "http"))]
 impl Suggestions {
-    /// Immutably borrow inner `Vec`.
+    /// Immutably borrow inner [`Vec`].
     #[inline]
     pub fn as_vec(&self) -> &Vec<SuggestedCommandName> {
         &self.0
@@ -1374,7 +1374,7 @@ pub async fn with_embeds(
     }
 }
 
-/// Turns grouped commands into a `String` taking plain help format into account.
+/// Turns grouped commands into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::let_underscore_must_use)]
 fn grouped_commands_to_plain_string(
@@ -1395,7 +1395,7 @@ fn grouped_commands_to_plain_string(
     result
 }
 
-/// Turns a single command into a `String` taking plain help format into account.
+/// Turns a single command into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::let_underscore_must_use)]
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {

@@ -177,7 +177,7 @@ impl LightMethod {
     }
 }
 
-/// Enum that allows a user to pass a `Path` or a `File` type to [`send_files`]
+/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///
 /// [`send_files`]: crate::model::id::ChannelId::send_files
 #[derive(Clone, Debug)]
@@ -185,9 +185,9 @@ impl LightMethod {
 pub enum AttachmentType<'a> {
     /// Indicates that the [`AttachmentType`] is a byte slice with a filename.
     Bytes { data: Cow<'a, [u8]>, filename: String },
-    /// Indicates that the [`AttachmentType`] is a `File`
+    /// Indicates that the [`AttachmentType`] is a [`File`]
     File { file: &'a File, filename: String },
-    /// Indicates that the [`AttachmentType`] is a `Path`
+    /// Indicates that the [`AttachmentType`] is a [`Path`]
     Path(&'a Path),
     /// Indicates that the [`AttachmentType`] is an image URL.
     Image(&'a str),

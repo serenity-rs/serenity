@@ -189,7 +189,7 @@ impl Guild {
 
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
-    /// returns `None`)
+    /// returns [`None`])
     pub async fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
@@ -203,7 +203,7 @@ impl Guild {
 
     /// Returns the guaranteed "default" channel of the guild.
     /// (This returns the first channel that can be read by everyone, if there isn't one,
-    /// returns `None`)
+    /// returns [`None`])
     ///
     /// **Note**: This is very costly if used in a server with lots of channels,
     /// members, or both.
@@ -814,7 +814,7 @@ impl Guild {
 
     /// Edits the current user's nickname for the guild.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     ///
     /// **Note**: Requires the [Change Nickname] permission.
     ///
@@ -925,11 +925,11 @@ impl Guild {
     /// Hierarchy is essentially who has the [`Role`] with the highest
     /// [`position`].
     ///
-    /// Returns [`None`] if at least one of the given users' member instances
-    /// is not present. Returns `None` if the users have the same hierarchy, as
+    /// Returns [[`None`]] if at least one of the given users' member instances
+    /// is not present. Returns [`None`] if the users have the same hierarchy, as
     /// neither are greater than the other.
     ///
-    /// If both user IDs are the same, `None` is returned. If one of the users
+    /// If both user IDs are the same, [`None`] is returned. If one of the users
     /// is the guild owner, their ID is returned.
     ///
     /// [`position`]: Role::position
@@ -1236,7 +1236,7 @@ impl Guild {
         self.members.values().find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
     }
 
-    /// Retrieves all [`Member`] that start with a given `String`.
+    /// Retrieves all [`Member`] that start with a given [`String`].
     ///
     /// `sorted` decides whether the best early match of the `prefix`
     /// should be the criteria to sort the result.
@@ -1293,7 +1293,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves all [`Member`] containing a given `String` as
+    /// Retrieves all [`Member`] containing a given [`String`] as
     /// either username or nick, with a priority on username.
     ///
     /// If the substring is "yla", following results are possible:
@@ -1362,7 +1362,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves a tuple of [`Member`]s containing a given `String` in
+    /// Retrieves a tuple of [`Member`]s containing a given [`String`] in
     /// their username as the first field and the name used for sorting
     /// as the second field.
     ///
@@ -1422,7 +1422,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves all [`Member`] containing a given `String` in
+    /// Retrieves all [`Member`] containing a given [`String`] in
     /// their nick.
     ///
     /// If the substring is "yla", following results are possible:

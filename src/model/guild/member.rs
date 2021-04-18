@@ -46,7 +46,7 @@ pub struct Member {
     pub premium_since: Option<DateTime<Utc>>,
     /// The total permissions of the member in a channel, including overrides.
     ///
-    /// This is only `Some` when returned in an [`Interaction`] object.
+    /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
     /// [`Interaction`]: crate::model::interactions::Interaction
     #[cfg(feature = "unstable_discord_api")]
@@ -178,7 +178,7 @@ impl Member {
 
     /// Returns the "default channel" of the guild for the member.
     /// (This returns the first channel that can be read by the member, if there isn't
-    /// one returns `None`)
+    /// one returns [`None`])
     #[cfg(feature = "cache")]
     pub async fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
         let guild = self.guild_id.to_guild_cached(cache).await?;
@@ -233,7 +233,7 @@ impl Member {
     /// Retrieves the ID and position of the member's highest role in the
     /// hierarchy, if they have one.
     ///
-    /// This _may_ return `None` if:
+    /// This _may_ return [`None`] if:
     ///
     /// - the user has roles, but they are not present in the cache for cache
     /// inconsistency reasons
@@ -482,7 +482,7 @@ impl Member {
     ///
     /// This is shorthand for manually searching through the Cache.
     ///
-    /// If role data can not be found for the member, then `None` is returned.
+    /// If role data can not be found for the member, then [`None`] is returned.
     #[cfg(feature = "cache")]
     pub async fn roles(&self, cache: impl AsRef<Cache>) -> Option<Vec<Role>> {
         Some(

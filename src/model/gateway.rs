@@ -278,7 +278,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Competing in <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Competing in <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///

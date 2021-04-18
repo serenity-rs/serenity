@@ -148,7 +148,7 @@ impl CurrentUser {
     /// Retrieves the URL to the current user's avatar, falling back to the
     /// default avatar if needed.
     ///
-    /// This will call [`avatar_url`] first, and if that returns `None`, it
+    /// This will call [`avatar_url`] first, and if that returns [`None`], it
     /// then falls back to [`default_avatar_url`].
     ///
     /// [`avatar_url`]: Self::avatar_url
@@ -515,7 +515,7 @@ impl Default for User {
     /// - **bot** to `true`.
     /// - **discriminator** to `1432`.
     /// - **name** to `"test"`.
-    /// - **public_flags** to `None`.
+    /// - **public_flags** to [`None`].
     fn default() -> Self {
         User {
             id: UserId(210),
@@ -687,7 +687,7 @@ impl User {
     /// Retrieves the URL to the user's avatar, falling back to the default
     /// avatar if needed.
     ///
-    /// This will call [`avatar_url`] first, and if that returns `None`, it
+    /// This will call [`avatar_url`] first, and if that returns [`None`], it
     /// then falls back to [`default_avatar_url`].
     ///
     /// [`avatar_url`]: Self::avatar_url
@@ -844,7 +844,7 @@ impl User {
 
     /// Returns the user's nickname in the given `guild_id`.
     ///
-    /// If none is used, it returns `None`.
+    /// If none is used, it returns [`None`].
     #[inline]
     pub async fn nick_in(
         &self,

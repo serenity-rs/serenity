@@ -179,7 +179,7 @@ impl Message {
 
     /// Retrieves the related channel located in the cache.
     ///
-    /// Returns `None` if the channel is not in the cache.
+    /// Returns [`None`] if the channel is not in the cache.
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn channel(&self, cache: impl AsRef<Cache>) -> Option<Channel> {
@@ -453,7 +453,7 @@ impl Message {
 
     /// Returns the associated [`Guild`] for the message if one is in the cache.
     ///
-    /// Returns `None` if the guild's Id could not be found via [`guild_id`] or
+    /// Returns [`None`] if the guild's Id could not be found via [`guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
@@ -467,7 +467,7 @@ impl Message {
     /// Returns a field to the [`Guild`] for the message if one is in the cache.
     /// The field can be selected via the `field_accessor`.
     ///
-    /// Returns `None` if the guild's ID could not be found via [`guild_id`] or
+    /// Returns [`None`] if the guild's ID could not be found via [`guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
@@ -500,7 +500,7 @@ impl Message {
     ///
     /// # Errors
     ///
-    /// [`ModelError::ItemMissing`] is returned if [`guild_id`] is `None`.
+    /// [`ModelError::ItemMissing`] is returned if [`guild_id`] is [`None`].
     ///
     /// [`guild_id`]: Self::guild_id
     pub async fn member(&self, cache_http: impl CacheHttp) -> Result<Member> {
@@ -524,8 +524,8 @@ impl Message {
     /// Checks the length of a string to ensure that it is within Discord's
     /// maximum message length limit.
     ///
-    /// Returns `None` if the message is within the limit, otherwise returns
-    /// `Some` with an inner value of how many unicode code points the message
+    /// Returns [`None`] if the message is within the limit, otherwise returns
+    /// [`Some`] with an inner value of how many unicode code points the message
     /// is over.
     pub fn overflow_length(content: &str) -> Option<usize> {
         // Check if the content is over the maximum number of unicode code
@@ -852,7 +852,7 @@ impl Message {
 
     /// Tries to return author's nickname in the current channel's guild.
     ///
-    /// Refer to [`User::nick_in()`] inside and `None` outside of a guild.
+    /// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.
     #[inline]
     pub async fn author_nick(&self, cache_http: impl CacheHttp) -> Option<String> {
         self.author.nick_in(cache_http, self.guild_id?).await
