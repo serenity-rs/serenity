@@ -925,7 +925,7 @@ impl Guild {
     /// Hierarchy is essentially who has the [`Role`] with the highest
     /// [`position`].
     ///
-    /// Returns [[`None`]] if at least one of the given users' member instances
+    /// Returns [`None`] if at least one of the given users' member instances
     /// is not present. Returns [`None`] if the users have the same hierarchy, as
     /// neither are greater than the other.
     ///

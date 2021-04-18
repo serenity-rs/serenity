@@ -36,7 +36,7 @@ use crate::model::ModelError;
 pub type Result<T> = StdResult<T, Error>;
 
 /// A common error enum returned by most of the library's functionality within a
-/// custom [[`Result`]].
+/// custom [`Result`].
 ///
 /// The most common error types, the [`ClientError`] and [`GatewayError`]
 /// enums, are both wrapped around this in the form of the [`Client`] and
