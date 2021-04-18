@@ -708,7 +708,7 @@ impl ChannelId {
     /// [`CreateMessage::content`]: crate::builder::CreateMessage::content
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    /// [`File`]: std::fs::File
+    /// [`File`]: tokio::fs::File
     #[cfg(feature = "utils")]
     pub async fn send_files<'a, F, T, It>(
         self,
