@@ -331,7 +331,7 @@ impl Http {
     /// fields this requires.
     ///
     /// **Note**: Requires the [Manage Emojis] permission.
-    /// 
+    ///
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     pub async fn create_emoji(&self, guild_id: u64, map: &Value) -> Result<Emoji> {
         self.fire(Request {
