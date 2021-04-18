@@ -338,7 +338,7 @@ impl StandardFramework {
     ///     macros::{command, group},
     /// };
     ///
-    /// // For information regarding this macro, learn more about it in its documentation in [`command_attr`].
+    /// // For information regarding this macro, learn more about it in its documentation in `command_attr`.
     /// #[command]
     /// async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     ///     msg.channel_id.say(&ctx.http, "pong!").await?;

@@ -548,7 +548,7 @@ pub struct Client {
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
-    /// // Create a clone of the [`Arc`] containing the shard manager.
+    /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
     /// // Create a thread which will sleep for 60 seconds and then have the

@@ -949,7 +949,7 @@ impl Http {
     /// use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// // Due to the [`delete_webhook`] function requiring you to authenticate, you
+    /// // Due to the `delete_webhook` function requiring you to authenticate, you
     /// // must have set the token first.
     /// let http = Http::default();
     ///

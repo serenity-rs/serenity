@@ -179,7 +179,7 @@ enum State {
 ///
 /// let mut args = Args::new("hello world!", &[Delimiter::Single(' ')]); // A space is our delimiter.
 ///
-/// // Parse our argument as a [`String`] and assert that it's the "hello" part of the message.
+/// // Parse our argument as a `String` and assert that it's the "hello" part of the message.
 /// assert_eq!(args.single::<String>().unwrap(), "hello");
 /// // Same here.
 /// assert_eq!(args.single::<String>().unwrap(), "world!");
