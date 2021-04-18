@@ -44,9 +44,7 @@ pub struct Role {
     /// Indicator of whether the role is pinned above lesser roles.
     ///
     /// In the client, this causes [`Member`]s in the role to be seen above
-    /// those in roles with a lower [`position`].
-    ///
-    /// [`position`]: Self::position
+    /// those in roles with a lower [`Self::position`].
     pub hoist: bool,
     /// Indicator of whether the role is managed by an integration service.
     pub managed: bool,

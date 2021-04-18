@@ -66,9 +66,7 @@ pub struct Activity {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub session_id: Option<String>,
-    /// The Stream URL if [`kind`] is [`ActivityType::Streaming`].
-    ///
-    /// [`kind`]: Self::kind
+    /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     pub url: Option<String>,
 }
 

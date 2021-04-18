@@ -32,10 +32,8 @@ pub trait VoiceGatewayManager: Send + Sync {
     ///
     /// This event invalidates the last sender associated with `shard_id`.
     /// Unless the bot is fully disconnecting, this is often followed by a call
-    /// to [`register_shard`]. Users may wish to buffer manually any gateway messages
+    /// to [`Self::register_shard`]. Users may wish to buffer manually any gateway messages
     /// sent between these calls.
-    ///
-    /// [`register_shard`]: VoiceGatewayManager::register_shard
     async fn deregister_shard(&self, shard_id: u64);
 
     /// Handler for VOICE_SERVER_UPDATE messages.

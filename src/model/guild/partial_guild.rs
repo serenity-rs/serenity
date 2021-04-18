@@ -92,14 +92,12 @@ impl PartialGuild {
         self.ban_with_reason(&http, user, dmd, "").await
     }
 
-    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the reasons [`ban`] may return an error,
+    /// In addition to the reasons [`Self::ban`] may return an error,
     /// can also return an error if the reason is too long.
-    ///
-    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(
         &self,
@@ -480,10 +478,8 @@ impl PartialGuild {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons [`kick`] may return an error,
+    /// In addition to the reasons [`Self::kick`] may return an error,
     /// can also return an error if the reason is too long.
-    ///
-    /// [`kick`]: Self::kick
     pub async fn kick_with_reason(
         &self,
         http: impl AsRef<Http>,

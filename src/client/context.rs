@@ -21,7 +21,7 @@ use crate::model::prelude::*;
 /// [`Shard`] which received the event, or the low-level [`http`] module.
 ///
 /// The context contains "shortcuts", like for interacting with the shard.
-/// Methods like [`set_activity`] will unlock the shard and perform an update for
+/// Methods like [`Self::set_activity`] will unlock the shard and perform an update for
 /// you to save a bit of work.
 ///
 /// A context will only live for the event it was dispatched for. After the
@@ -29,7 +29,6 @@ use crate::model::prelude::*;
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
-/// [`set_activity`]: Self::set_activity
 #[derive(Clone)]
 pub struct Context {
     /// A clone of [`Client::data`]. Refer to its documentation for more
@@ -241,7 +240,7 @@ impl Context {
     /// "Resets" the current user's presence, by setting the activity to [`None`]
     /// and the online status to [`Online`].
     ///
-    /// Use [`set_presence`] for fine-grained control over individual details.
+    /// Use [`Self::set_presence`] for fine-grained control over individual details.
     ///
     /// # Examples
     ///
@@ -270,7 +269,6 @@ impl Context {
     ///
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
-    /// [`set_presence`]: Self::set_presence
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn reset_presence(&self) {

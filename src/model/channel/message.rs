@@ -74,19 +74,18 @@ pub struct Message {
     /// Channels specifically mentioned in this message.
     ///
     /// **Note**:
-    /// Not all channel mentions in a message will appear in [`mention_channels`]. Only textual
+    /// Not all channel mentions in a message will appear in [`Self::mention_channels`]. Only textual
     /// channels that are visible to everyone in a lurkable guild will ever be included.
     ///
     /// A lurkable guild is one that allows users to read public channels in a server without
     /// actually joining the server. It also allows users to look at these channels without being
     /// logged in to Discord.
     ///
-    /// Only crossposted messages (via Channel Following) currently include [`mention_channels`] at
+    /// Only crossposted messages (via Channel Following) currently include [`Self::mention_channels`] at
     /// all. If no mentions in the message meet these requirements, this field will not be sent.
     /// [Refer to Discord's documentation for more information][discord-docs].
     ///
     /// [discord-docs]: https://discord.com/developers/docs/resources/channel#message-object
-    /// [`mention_channels`]: Self::mention_channels
     #[serde(default = "Vec::new")]
     pub mention_channels: Vec<ChannelMention>,
     /// Array of users mentioned in the message.
@@ -453,12 +452,10 @@ impl Message {
 
     /// Returns the associated [`Guild`] for the message if one is in the cache.
     ///
-    /// Returns [`None`] if the guild's Id could not be found via [`guild_id`] or
+    /// Returns [`None`] if the guild's Id could not be found via [`Self::guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
-    ///
-    /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
         cache.as_ref().guild(self.guild_id?).await
@@ -467,12 +464,10 @@ impl Message {
     /// Returns a field to the [`Guild`] for the message if one is in the cache.
     /// The field can be selected via the `field_accessor`.
     ///
-    /// Returns [`None`] if the guild's ID could not be found via [`guild_id`] or
+    /// Returns [`None`] if the guild's ID could not be found via [`Self::guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
-    ///
-    /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild_field<Ret, Fun>(
         &self,
@@ -500,9 +495,7 @@ impl Message {
     ///
     /// # Errors
     ///
-    /// [`ModelError::ItemMissing`] is returned if [`guild_id`] is [`None`].
-    ///
-    /// [`guild_id`]: Self::guild_id
+    /// [`ModelError::ItemMissing`] is returned if [`Self::guild_id`] is [`None`].
     pub async fn member(&self, cache_http: impl CacheHttp) -> Result<Member> {
         let guild_id = match self.guild_id {
             Some(guild_id) => guild_id,
@@ -983,9 +976,8 @@ impl<'a> From<&'a Message> for MessageId {
 /// A representation of a reaction to a message.
 ///
 /// Multiple of the same [reaction type] are sent into one [`MessageReaction`],
-/// with an associated [`count`].
+/// with an associated [`Self::count`].
 ///
-/// [`count`]: Self::count
 /// [reaction type]: ReactionType
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

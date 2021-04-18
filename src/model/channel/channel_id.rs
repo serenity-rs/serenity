@@ -484,7 +484,7 @@ impl ChannelId {
 
     /// Streams over all the messages in a channel.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`messages`].
+    /// This is accomplished and equivalent to repeated calls to [`Self::messages`].
     /// A buffer of at most 100 messages is used to reduce the number of calls.
     /// necessary.
     ///
@@ -515,8 +515,6 @@ impl ChannelId {
     /// }
     /// # }
     /// ```
-    ///
-    /// [`messages`]: Self::messages
     pub fn messages_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Message>> {
         MessagesIter::<H>::stream(http, self)
     }
@@ -1007,7 +1005,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
     /// Streams over all the messages in a channel.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`messages`].
+    /// This is accomplished and equivalent to repeated calls to [`ChannelId::messages`].
     /// A buffer of at most 100 messages is used to reduce the number of calls.
     /// necessary.
     ///
@@ -1038,8 +1036,6 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// }
     /// # }
     /// ```
-    ///
-    /// [`messages`]: ChannelId::messages
     pub fn stream(
         http: impl AsRef<Http>,
         channel_id: ChannelId,

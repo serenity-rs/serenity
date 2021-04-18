@@ -85,7 +85,7 @@ impl<'a> ExecuteWebhook<'a> {
 
     /// Set the content of the message.
     ///
-    /// Note that when setting at least one embed via [`embeds`], this may be
+    /// Note that when setting at least one embed via [`Self::embeds`], this may be
     /// omitted.
     ///
     /// # Examples
@@ -110,8 +110,6 @@ impl<'a> ExecuteWebhook<'a> {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`embeds`]: Self::embeds
     pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
         self.0.insert("content", Value::String(content.to_string()));
         self
@@ -135,10 +133,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// Sets a list of files to include in the webhook message.
     ///
     /// Calling this multiple times will overwrite the file list.
-    /// To append files, call [`add_file`] or [`add_files`] instead.
-    ///
-    /// [`add_file`]: Self::add_file
-    /// [`add_files`]: Self::add_files
+    /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -227,7 +222,7 @@ impl<'a> ExecuteWebhook<'a> {
 impl<'a> Default for ExecuteWebhook<'a> {
     /// Returns a default set of values for a [`Webhook`] execution.
     ///
-    /// The only default value is [`tts`] being set to `false`.
+    /// The only default value is [`Self::tts`] being set to `false`.
     ///
     /// # Examples
     ///
@@ -240,7 +235,6 @@ impl<'a> Default for ExecuteWebhook<'a> {
     /// ```
     ///
     /// [`Webhook`]: crate::model::webhook::Webhook
-    /// [`tts`]: Self::tts
     fn default() -> ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));

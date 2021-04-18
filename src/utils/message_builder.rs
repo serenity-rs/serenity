@@ -13,11 +13,11 @@ use crate::model::{
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
 ///
-/// The finalized value can be accessed via [`build`] or the inner value.
+/// The finalized value can be accessed via [`Self::build`] or the inner value.
 ///
 /// # Examples
 ///
-/// Build a message, mentioning a [`user`] and an [`emoji`], and retrieving the
+/// Build a message, mentioning a [`Self::user`] and an [`Self::emoji`], and retrieving the
 /// value:
 ///
 /// ```rust,no_run
@@ -47,10 +47,6 @@ use crate::model::{
 ///     .build();
 /// # }
 /// ```
-///
-/// [`build`]: Self::build
-/// [`emoji`]: Self::emoji
-/// [`user`]: Self::user
 #[derive(Clone, Debug, Default)]
 pub struct MessageBuilder(pub String);
 
@@ -908,7 +904,7 @@ impl Display for MessageBuilder {
 /// creating content with additional functionality available only in embeds.
 ///
 /// Namely, this allows you to create named links via the non-escaping
-/// [`push_named_link`] method and the escaping [`push_named_link_safe`] method.
+/// [`Self::push_named_link`] method and the escaping [`Self::push_named_link_safe`] method.
 ///
 /// # Examples
 ///
@@ -929,9 +925,6 @@ impl Display for MessageBuilder {
 /// #[cfg(not(feature = "utils"))]
 /// {}
 /// ```
-///
-/// [`push_named_link`]: Self::push_named_link
-/// [`push_named_link_safe`]: Self::push_named_link_safe
 pub trait EmbedMessageBuilding {
     /// Pushes a named link to a message, intended for use in embeds.
     ///
@@ -960,7 +953,7 @@ pub trait EmbedMessageBuilding {
     /// Pushes a named link intended for use in an embed, but with a normalized
     /// name to avoid escaping issues.
     ///
-    /// Refer to [`push_named_link`] for more information.
+    /// Refer to [`Self::push_named_link`] for more information.
     ///
     /// # Examples
     ///
@@ -983,8 +976,6 @@ pub trait EmbedMessageBuilding {
     /// #[cfg(not(feature = "utils"))]
     /// {}
     /// ```
-    ///
-    /// [`push_named_link`]: Self::push_named_link
     fn push_named_link_safe<T: I, U: I>(&mut self, name: T, url: U) -> &mut Self;
 }
 

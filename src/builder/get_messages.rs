@@ -7,9 +7,9 @@ use crate::model::id::MessageId;
 /// This can have 2 different sets of parameters. The first set is around where
 /// to get the messages:
 ///
-/// - [`after`]
-/// - [`around`]
-/// - [`before`]
+/// - [`Self::after`]
+/// - [`Self::around`]
+/// - [`Self::before`]
 ///
 /// These can not be mixed, and the first in the list alphabetically will be
 /// used. If one is not specified, `most_recent` will be used.
@@ -43,9 +43,6 @@ use crate::model::id::MessageId;
 /// # }
 /// ```
 ///
-/// [`after`]: Self::after
-/// [`around`]: Self::around
-/// [`before`]: Self::before
 /// [`GuildChannel::messages`]: crate::model::channel::GuildChannel::messages
 #[derive(Clone, Debug, Default)]
 pub struct GetMessages(pub HashMap<&'static str, u64>);

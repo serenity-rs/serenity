@@ -7,11 +7,10 @@ use crate::model::prelude::*;
 
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].
 ///
-/// Except [`name`], all fields are optional.
+/// Except [`Self::name`], all fields are optional.
 ///
 /// [`GuildChannel`]: crate::model::channel::GuildChannel
 /// [`Guild`]: crate::model::guild::Guild
-/// [`name`]: Self::name
 #[derive(Debug, Clone)]
 pub struct CreateChannel(pub HashMap<&'static str, Value>);
 
@@ -151,7 +150,7 @@ impl CreateChannel {
 }
 
 impl Default for CreateChannel {
-    /// Creates a builder with default values, setting [`kind`] to [`ChannelType::Text`].
+    /// Creates a builder with default values, setting [`Self::kind`] to [`ChannelType::Text`].
     ///
     /// # Examples
     ///
@@ -162,8 +161,6 @@ impl Default for CreateChannel {
     ///
     /// let channel_builder = CreateChannel::default();
     /// ```
-    ///
-    /// [`kind`]: CreateChannel::kind
     fn default() -> Self {
         let mut builder = CreateChannel(HashMap::new());
         builder.kind(ChannelType::Text);

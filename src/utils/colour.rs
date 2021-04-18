@@ -23,7 +23,7 @@ macro_rules! colour {
 /// # Examples
 ///
 /// Passing in a role's colour, and then retrieving its green component
-/// via [`g`]:
+/// via [`Self::g`]:
 ///
 /// ```rust
 /// # extern crate serde_json;
@@ -58,7 +58,7 @@ macro_rules! colour {
 /// # }
 /// ```
 ///
-/// Creating an instance with the [`DARK_TEAL`] preset:
+/// Creating an instance with the [`Self::DARK_TEAL`] preset:
 ///
 /// ```rust
 /// use serenity::utils::Colour;
@@ -82,8 +82,6 @@ macro_rules! colour {
 /// ```
 ///
 /// [`Role`]: crate::model::guild::Role
-/// [`DARK_TEAL`]: Self::DARK_TEAL
-/// [`g`]: Self::g
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Colour(pub u32);
 
@@ -93,7 +91,7 @@ impl Colour {
     /// # Examples
     ///
     /// Create a new Colour, and then ensure that its inner value is equivalent
-    /// to a specific RGB value, retrieved via [`tuple`]:
+    /// to a specific RGB value, retrieved via [`Self::tuple`]:
     ///
     /// ```rust
     /// use serenity::utils::Colour;
@@ -102,8 +100,6 @@ impl Colour {
     ///
     /// assert_eq!(colour.tuple(), (100, 76, 67));
     /// ```
-    ///
-    /// [`tuple`]: Self::tuple
     #[inline]
     pub const fn new(value: u32) -> Colour {
         Colour(value)
@@ -183,7 +179,7 @@ impl Colour {
     /// Returns a tuple of the red, green, and blue components of this Colour.
     ///
     /// This is equivalent to creating a tuple with the return values of
-    /// [`r`], [`g`], and [`b`].
+    /// [`Self::r`], [`Self::g`], and [`Self::b`].
     ///
     /// # Examples
     ///
@@ -192,10 +188,6 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));
     /// ```
-    ///
-    /// [`r`]: Self::r
-    /// [`g`]: Self::g
-    /// [`b`]: Self::b
     pub const fn tuple(self) -> (u8, u8, u8) {
         (self.r(), self.g(), self.b())
     }

@@ -17,13 +17,11 @@ pub struct EditGuild(pub HashMap<&'static str, Value>);
 
 impl EditGuild {
     /// Set the "AFK voice channel" that users are to move to if they have been
-    /// AFK for an amount of time, configurable by [`afk_timeout`].
+    /// AFK for an amount of time, configurable by [`Self::afk_timeout`].
     ///
     /// The given channel must be either some valid voice channel, or [`None`] to
     /// not set an AFK channel. The library does not check if a channel is
     /// valid.
-    ///
-    /// [`afk_timeout`]: Self::afk_timeout
     #[inline]
     pub fn afk_channel<C: Into<ChannelId>>(&mut self, channel: Option<C>) -> &mut Self {
         self._afk_channel(channel.map(Into::into));
@@ -38,9 +36,7 @@ impl EditGuild {
     }
 
     /// Set the amount of time a user is to be moved to the AFK channel -
-    /// configured via [`afk_channel`] - after being AFK.
-    ///
-    /// [`afk_channel`]: Self::afk_channel
+    /// configured via [`Self::afk_channel`] - after being AFK.
     pub fn afk_timeout(&mut self, timeout: u64) -> &mut Self {
         self.0.insert("afk_timeout", Value::Number(Number::from(timeout)));
         self

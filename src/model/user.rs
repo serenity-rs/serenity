@@ -148,11 +148,8 @@ impl CurrentUser {
     /// Retrieves the URL to the current user's avatar, falling back to the
     /// default avatar if needed.
     ///
-    /// This will call [`avatar_url`] first, and if that returns [`None`], it
-    /// then falls back to [`default_avatar_url`].
-    ///
-    /// [`avatar_url`]: Self::avatar_url
-    /// [`default_avatar_url`]: Self::default_avatar_url
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
+    /// then falls back to [`Self::default_avatar_url`].
     #[inline]
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
@@ -349,9 +346,7 @@ impl CurrentUser {
 ///
 /// The default avatar is calculated via the result of `discriminator % 5`.
 ///
-/// The has of the avatar can be retrieved via calling [`name`] on the enum.
-///
-/// [`name`]: Self::name
+/// The has of the avatar can be retrieved via calling [`Self::name`] on the enum.
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
 #[non_exhaustive]
 pub enum DefaultAvatar {
@@ -440,9 +435,7 @@ pub struct User {
     #[serde(default)]
     pub bot: bool,
     /// The account's discriminator to differentiate the user from others with
-    /// the same [`name`]. The name+discriminator pair is always unique.
-    ///
-    /// [`name`]: Self::name
+    /// the same [`Self::name`]. The name+discriminator pair is always unique.
     #[serde(deserialize_with = "deserialize_u16")]
     pub discriminator: u16,
     /// The account's username. Changing username will trigger a discriminator
@@ -672,9 +665,7 @@ impl User {
         self.create_dm_channel(&cache_http).await?.send_message(&cache_http.http(), f).await
     }
 
-    /// This is an alias of [direct_message].
-    ///
-    /// [direct_message]: Self::direct_message
+    /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
@@ -687,11 +678,8 @@ impl User {
     /// Retrieves the URL to the user's avatar, falling back to the default
     /// avatar if needed.
     ///
-    /// This will call [`avatar_url`] first, and if that returns [`None`], it
-    /// then falls back to [`default_avatar_url`].
-    ///
-    /// [`avatar_url`]: Self::avatar_url
-    /// [`default_avatar_url`]: Self::default_avatar_url
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
+    /// then falls back to [`Self::default_avatar_url`].
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }

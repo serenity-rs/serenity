@@ -6,12 +6,9 @@ use crate::{model::interactions::ApplicationCommandOptionType, utils};
 
 /// A builder for creating a new [`ApplicationCommandInteractionDataOption`].
 ///
-/// [`kind`], [`name`], and [`description`] are required fields.
+/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
 /// [`ApplicationCommandInteractionDataOption`]: crate::model::interactions::ApplicationCommandInteractionDataOption
-/// [`kind`]: Self::kind
-/// [`name`]: Self::name
-/// [`description`]: Self::description
 #[derive(Clone, Debug, Default)]
 pub struct CreateInteractionOption(pub HashMap<&'static str, Value>);
 
@@ -107,11 +104,9 @@ impl CreateInteractionOption {
 
 /// A builder for creating a new [`ApplicationCommand`].
 ///
-/// [`name`] and [`description`] are required fields.
+/// [`Self::name`] and [`Self::description`] are required fields.
 ///
 /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-/// [`name`]: Self::name
-/// [`description`]: Self::description
 #[derive(Clone, Debug, Default)]
 pub struct CreateInteraction(pub HashMap<&'static str, Value>);
 

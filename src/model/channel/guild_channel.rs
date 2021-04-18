@@ -38,9 +38,7 @@ use crate::utils as serenity_utils;
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
 /// News channels are a subset of text channels and lack slow mode hence
-/// [`slow_mode_rate`] will be [`None`].
-///
-/// [`slow_mode_rate`]: GuildChannel::slow_mode_rate
+/// [`Self::slow_mode_rate`] will be [`None`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildChannel {
@@ -91,9 +89,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available for voice channels.
     pub user_limit: Option<u64>,
     /// Used to tell if the channel is not safe for work.
-    /// Note however, it's recommended to use [`is_nsfw`] as it's gonna be more accurate.
-    ///
-    /// [`is_nsfw`]: Self::is_nsfw
+    /// Note however, it's recommended to use [`Self::is_nsfw`] as it's gonna be more accurate.
     // This field can or can not be present sometimes, but if it isn't
     // default to `false`.
     #[serde(default)]
@@ -1153,10 +1149,8 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// In addition to the reasons [`create_webhook`] may return an [`Error::Http`],
+    /// In addition to the reasons [`Self::create_webhook`] may return an [`Error::Http`],
     /// if the image is too large.
-    ///
-    /// [`create_webhook`]: Self::create_webhook
     pub async fn create_webhook_with_avatar<'a>(
         &self,
         http: impl AsRef<Http>,

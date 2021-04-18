@@ -66,11 +66,8 @@ pub struct CreateAllowedMentions(pub HashMap<&'static str, Value>);
 impl CreateAllowedMentions {
     /// Add a value that's allowed to be mentioned.
     ///
-    /// If users or roles is specified, [`users`] and [`roles`] will not work.\
+    /// If users or roles is specified, [`Self::users`] and [`Self::roles`] will not work.\
     /// If you use either, do not specify it's same type here.
-    ///
-    /// [`users`]: Self::users
-    /// [`roles`]: Self::roles
     #[inline]
     pub fn parse(&mut self, value: ParseValue) -> &mut Self {
         let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
@@ -84,10 +81,7 @@ impl CreateAllowedMentions {
     /// Clear all the values that would be mentioned.
     ///
     /// If parse is empty, the message will not mention anyone, unless they are specified on
-    /// [`users`] or [`roles`].
-    ///
-    /// [`users`]: Self::users
-    /// [`roles`]: Self::roles
+    /// [`Self::users`] or [`Self::roles`].
     #[inline]
     pub fn empty_parse(&mut self) -> &mut Self {
         let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));

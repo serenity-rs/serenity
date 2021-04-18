@@ -132,11 +132,8 @@ pub struct ApplicationCommandInteractionData {
 
 /// A set of a parameter and a value from the user.
 ///
-/// All options have names and an option can either be a parameter and input [`value`] or it can denote a sub-command or group, in which case it will contain a
-/// top-level key and another vector of [`options`].
-///
-/// [`value`]: ApplicationCommandInteractionDataOption::value
-/// [`options`]: ApplicationCommandInteractionDataOption::options
+/// All options have names and an option can either be a parameter and input [`Self::value`] or it can denote a sub-command or group, in which case it will contain a
+/// top-level key and another vector of [`Self::options`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataOption {
@@ -334,10 +331,9 @@ impl Interaction {
     ///
     /// # Errors
     ///
-    /// Returns the same possible errors as [`create_global_application_command`].
+    /// Returns the same possible errors as [`Self::create_global_application_command`].
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    /// [`create_global_application_command`]: Self::create_global_application_command
     pub async fn create_guild_application_command<F>(
         http: impl AsRef<Http>,
         guild_id: GuildId,
@@ -396,7 +392,7 @@ impl Interaction {
 
     /// Edits the initial interaction response.
     ///
-    /// `application_id` will usually be the bot's `[UserId]`, except in cases of bots being very old.
+    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
     ///
     /// Refer to Discord's docs for Edit Webhook Message for field information.
     ///

@@ -39,11 +39,8 @@ pub type Result<T> = StdResult<T, Error>;
 /// custom [`Result`].
 ///
 /// The most common error types, the [`ClientError`] and [`GatewayError`]
-/// enums, are both wrapped around this in the form of the [`Client`] and
-/// [`Gateway`] variants.
-///
-/// [`Client`]: Error::Client
-/// [`Gateway`]: Error::Gateway
+/// enums, are both wrapped around this in the form of the [`Self::Client`] and
+/// [`Self::Gateway`] variants.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {

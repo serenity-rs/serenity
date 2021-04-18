@@ -119,10 +119,8 @@ pub struct Guild {
     /// Users who are members of the guild.
     ///
     /// Members might not all be available when the [`ReadyEvent`] is received
-    /// if the [`member_count`] is greater than the [`LARGE_THRESHOLD`] set by
+    /// if the [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by
     /// the library.
-    ///
-    /// [`member_count`]: Self::member_count
     #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
@@ -145,7 +143,7 @@ pub struct Guild {
     pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
-    /// If the [`"InviteSplash"`] feature is enabled, this can be used to generate
+    /// If the `InviteSplash` feature is enabled, this can be used to generate
     /// a URL to a splash image.
     pub splash: Option<String>,
     /// The ID of the channel to which system messages are sent.
@@ -293,14 +291,12 @@ impl Guild {
         self._ban_with_reason(cache_http, user.into(), dmd, "").await
     }
 
-    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the possible reasons [`ban`] may return an error, an [`Error::ExceededLimit`]
+    /// In addition to the possible reasons [`Self::ban`] may return an error, an [`Error::ExceededLimit`]
     /// may also be returned if the reason is too long.
-    ///
-    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(
         &self,
@@ -1108,10 +1104,8 @@ impl Guild {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons [`kick`] may return an error,
+    /// In addition to the reasons [`Self::kick`] may return an error,
     /// may also return an error if the reason is too long.
-    ///
-    /// [`kick`]: Self::kick
     pub async fn kick_with_reason(
         &self,
         http: impl AsRef<Http>,

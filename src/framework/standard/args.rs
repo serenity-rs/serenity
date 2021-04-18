@@ -233,7 +233,7 @@ enum State {
 /// ```
 ///
 /// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same argument over and over.
-/// Is there a more sensible solution than rewinding...? Actually, there is! The [`current`] and [`parse`] methods:
+/// Is there a more sensible solution than rewinding...? Actually, there is! The [`Self::current`] and [`Self::parse`] methods:
 ///
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
@@ -254,9 +254,6 @@ enum State {
 /// assert_eq!(args.single::<String>().unwrap(), "quatre");
 /// assert_eq!(args.single::<String>().unwrap(), "six");
 /// ```
-///
-/// [`current`]: Args::current
-/// [`parse`]: Args::parse
 #[derive(Clone, Debug)]
 pub struct Args {
     message: String,
@@ -417,7 +414,7 @@ impl Args {
 
     /// Retrieve the current argument.
     ///
-    /// Applies modifications set by [`trimmed`] and [`quoted`].
+    /// Applies modifications set by [`Self::trimmed`] and [`Self::quoted`].
     ///
     /// # Note
     ///
@@ -436,9 +433,6 @@ impl Args {
     /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
-    ///
-    /// [`trimmed`]: Self::trimmed
-    /// [`quoted`]: Self::quoted
     #[inline]
     pub fn current(&self) -> Option<&str> {
         if self.is_empty() {
@@ -482,9 +476,7 @@ impl Args {
     ///
     /// # Examples
     ///
-    /// Refer to [`trimmed`]'s examples.
-    ///
-    /// [`trimmed`]: Self::trimmed
+    /// Refer to [`Self::trimmed`]'s examples.
     pub fn untrimmed(&mut self) -> &mut Self {
         match self.state {
             State::Trimmed => self.state = State::None,
@@ -537,9 +529,7 @@ impl Args {
     ///
     /// # Examples
     ///
-    /// Refer to [`quoted`]'s examples.
-    ///
-    /// [`quoted`]: Self::quoted
+    /// Refer to [`Self::quoted`]'s examples.
     pub fn unquoted(&mut self) -> &mut Self {
         match self.state {
             State::Quoted => self.state = State::None,
@@ -552,7 +542,7 @@ impl Args {
 
     /// Parse the current argument.
     ///
-    /// Modifications of [`trimmed`] and [`quoted`] are also applied if they were called.
+    /// Modifications of [`Self::trimmed`] and [`Self::quoted`] are also applied if they were called.
     ///
     /// # Examples
     ///
@@ -569,11 +559,6 @@ impl Args {
     ///
     /// May return either [`Error::Parse`] if a parse error occurs, or
     /// [`Error::Eos`] if there are no further remaining args.
-    ///
-    /// [`trimmed`]: Self::trimmed
-    /// [`quoted`]: Self::quoted
-    /// [`Error::Parse`]: Error::Parse
-    /// [`Error::Eos`]: Error::Eos
     #[inline]
     pub fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
         T::from_str(self.current().ok_or(Error::Eos)?).map_err(Error::Parse)
@@ -581,8 +566,8 @@ impl Args {
 
     /// Parse the current argument and advance.
     ///
-    /// Shorthand for calling [`parse`], storing the result,
-    /// calling [`advance`] and returning the result.
+    /// Shorthand for calling [`Self::parse`], storing the result,
+    /// calling [`Self::advance`] and returning the result.
     ///
     /// # Examples
     ///
@@ -601,9 +586,6 @@ impl Args {
     /// # Errors
     ///
     /// May return the same errors as `parse`.
-    ///
-    /// [`parse`]: Self::parse
-    /// [`advance`]: Self::advance
     #[inline]
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.parse::<T>()?;
@@ -629,9 +611,7 @@ impl Args {
     ///
     /// # Errors
     ///
-    /// May return the same errors as [`parse`].
-    ///
-    /// [`parse`]: Self::parse
+    /// May return the same errors as [`Self::parse`].
     #[inline]
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.quoted().parse::<T>()?;
@@ -642,7 +622,7 @@ impl Args {
     /// By starting from the current offset, iterate over
     /// any available arguments until there are none.
     ///
-    /// Modifications of [`trimmed`] and [`quoted`] are also applied to all arguments if they were called.
+    /// Modifications of [`Iter::trimmed`] and [`Iter::quoted`] are also applied to all arguments if they were called.
     ///
     /// # Examples
     ///
@@ -661,9 +641,6 @@ impl Args {
     ///
     /// assert!(args.is_empty());
     /// ```
-    ///
-    /// [`trimmed`]: Iter::trimmed
-    /// [`quoted`]: Iter::quoted
     #[inline]
     pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T> {
         Iter {
@@ -724,7 +701,7 @@ impl Args {
     ///
     /// # Note 2
     /// "Arguments queue" is the list which contains all arguments that were deemed unique as defined by quotations and delimiters.
-    /// The 'removed' argument can be, likewise, still accessed via [`message`].
+    /// The 'removed' argument can be, likewise, still accessed via [`Self::message`].
     ///
     /// # Examples
     ///
@@ -743,7 +720,6 @@ impl Args {
     /// Returns [`Error::Eos`] if no argument can be parsed.
     ///
     /// [`Error::Eos`]: Error::Eos
-    /// [`message`]: Self::message
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -848,9 +824,7 @@ impl Args {
     /// # Note
     ///
     /// The value returned is to be assumed to stay static.
-    /// However, if [`find`] was called previously, and was successful, then the value is substracted by one.
-    ///
-    /// [`find`]: Self::find
+    /// However, if [`Self::find`] was called previously, and was successful, then the value is substracted by one.
     #[inline]
     pub fn len(&self) -> usize {
         self.args.len()

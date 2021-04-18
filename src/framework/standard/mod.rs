@@ -372,12 +372,10 @@ impl StandardFramework {
 
     /// Adds a group to be used by the framework. Primary use-case is runtime modification
     /// of groups in the framework; will _not_ mark the framework as initialized. Refer to
-    /// [`group`] for adding groups in initial configuration.
+    /// [`Self::group`] for adding groups in initial configuration.
     ///
     /// Note: does _not_ return [`Self`] like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
-    ///
-    /// [`group`]: Self::group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(
@@ -455,7 +453,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using [`before`] to log command usage:
+    /// Using [`Self::before`] to log command usage:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -497,8 +495,6 @@ impl StandardFramework {
     /// let framework = StandardFramework::new()
     ///     .before(before_hook);
     /// ```
-    ///
-    /// [`before`]: Self::before
     pub fn before(mut self, f: BeforeHook) -> Self {
         self.before = Some(f);
 
@@ -510,7 +506,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using [`after`] to log command usage:
+    /// Using [`Self::after`] to log command usage:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -530,8 +526,6 @@ impl StandardFramework {
     /// let framework = StandardFramework::new()
     ///     .after(after_hook);
     /// ```
-    ///
-    /// [`after`]: Self::after
     pub fn after(mut self, f: AfterHook) -> Self {
         self.after = Some(f);
 
@@ -542,7 +536,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using [`unrecognised_command`]:
+    /// Using [`Self::unrecognised_command`]:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -560,8 +554,6 @@ impl StandardFramework {
     /// let framework = StandardFramework::new()
     ///     .unrecognised_command(unrecognised_command_hook);
     /// ```
-    ///
-    /// [`unrecognised_command`]: Self::unrecognised_command
     pub fn unrecognised_command(mut self, f: UnrecognisedHook) -> Self {
         self.unrecognised_command = Some(f);
 
@@ -572,7 +564,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using [`normal_message`]:
+    /// Using [`Self::normal_message`]:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -588,8 +580,6 @@ impl StandardFramework {
     /// let framework = StandardFramework::new()
     ///     .normal_message(normal_message_hook);
     /// ```
-    ///
-    /// [`normal_message`]: Self::normal_message
     pub fn normal_message(mut self, f: NormalMessageHook) -> Self {
         self.normal_message = Some(f);
 
