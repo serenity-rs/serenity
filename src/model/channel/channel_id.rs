@@ -293,7 +293,7 @@ impl ChannelId {
 
     /// Edits the settings of a [`Channel`], optionally setting new values.
     ///
-    /// Refer to `EditChannel`'s documentation for its methods.
+    /// Refer to [`EditChannel`]'s documentation for its methods.
     ///
     /// Requires the [Manage Channel] permission.
     ///
@@ -444,7 +444,7 @@ impl ChannelId {
     ///
     /// Refer to [`GetMessages`] for more information on how to use `builder`.
     ///
-    /// **Note**: Returns an empty `Vec` if the current user
+    /// **Note**: Returns an empty [`Vec`] if the current user
     /// does not have the [Read Message History] permission.
     ///
     /// # Errors
@@ -484,7 +484,7 @@ impl ChannelId {
 
     /// Streams over all the messages in a channel.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`messages`].
+    /// This is accomplished and equivalent to repeated calls to [`Self::messages`].
     /// A buffer of at most 100 messages is used to reduce the number of calls.
     /// necessary.
     ///
@@ -515,8 +515,6 @@ impl ChannelId {
     /// }
     /// # }
     /// ```
-    ///
-    /// [`messages`]: Self::messages
     pub fn messages_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Message>> {
         MessagesIter::<H>::stream(http, self)
     }
@@ -568,7 +566,7 @@ impl ChannelId {
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
     ///
-    /// **Note**: Returns an empty `Vec` if the current user does not
+    /// **Note**: Returns an empty [`Vec`] if the current user does not
     /// have the [Read Message History] permission.
     ///
     /// # Errors
@@ -670,7 +668,7 @@ impl ChannelId {
     /// # }
     /// ```
     ///
-    /// Send files using `File`:
+    /// Send files using [`File`]:
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
@@ -710,6 +708,7 @@ impl ChannelId {
     /// [`CreateMessage::content`]: crate::builder::CreateMessage::content
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
+    /// [`File`]: tokio::fs::File
     #[cfg(feature = "utils")]
     pub async fn send_files<'a, F, T, It>(
         self,
@@ -785,11 +784,11 @@ impl ChannelId {
     ///
     /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
     /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after `stop` is called.
+    /// for a few seconds after [`Typing::stop`] is called.
     /// Typing is also stopped when the struct is dropped.
     ///
     /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.
@@ -898,14 +897,14 @@ impl ChannelId {
 }
 
 impl From<Channel> for ChannelId {
-    /// Gets the Id of a `Channel`.
+    /// Gets the Id of a [`Channel`].
     fn from(channel: Channel) -> ChannelId {
         channel.id()
     }
 }
 
 impl<'a> From<&'a Channel> for ChannelId {
-    /// Gets the Id of a `Channel`.
+    /// Gets the Id of a [`Channel`].
     fn from(channel: &Channel) -> ChannelId {
         channel.id()
     }
@@ -969,7 +968,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// `self.before` so that the next call does not return duplicate items.
     ///
     /// If there are no more messages to be fetched, then this sets `self.before`
-    /// as `None`, indicating that no more calls ought to be made.
+    /// as [`None`], indicating that no more calls ought to be made.
     ///
     /// If this method is called with `self.before` as None, the last 100
     /// (or lower) messages sent in the channel are added in the buffer.
@@ -1006,7 +1005,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
     /// Streams over all the messages in a channel.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`messages`].
+    /// This is accomplished and equivalent to repeated calls to [`ChannelId::messages`].
     /// A buffer of at most 100 messages is used to reduce the number of calls.
     /// necessary.
     ///
@@ -1037,8 +1036,6 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// }
     /// # }
     /// ```
-    ///
-    /// [`messages`]: ChannelId::messages
     pub fn stream(
         http: impl AsRef<Http>,
         channel_id: ChannelId,

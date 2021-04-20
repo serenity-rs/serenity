@@ -132,8 +132,8 @@ pub struct ApplicationCommandInteractionData {
 
 /// A set of a parameter and a value from the user.
 ///
-/// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a
-/// top-level key and another vector of `options`.
+/// All options have names and an option can either be a parameter and input [`Self::value`] or it can denote a sub-command or group, in which case it will contain a
+/// top-level key and another vector of [`Self::options`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataOption {
@@ -245,7 +245,7 @@ impl Interaction {
     /// Creates a global [`ApplicationCommand`],
     /// overriding an existing one with the same name if it exists.
     ///
-    /// When a created `ApplicationCommand` is used, the [`InteractionCreate`] event will be emitted.
+    /// When a created [`ApplicationCommand`] is used, the [`InteractionCreate`] event will be emitted.
     ///
     /// **Note**: Global commands may take up to an hour to become available.
     ///
@@ -301,8 +301,8 @@ impl Interaction {
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if the `ApplicationCommand` is illformed,
-    /// such as if more than 10 `choices` are set. See the [API Docs] for further details.
+    /// May return an [`Error::Http`] if the [`ApplicationCommand`] is illformed,
+    /// such as if more than 10 [`choices`] are set. See the [API Docs] for further details.
     ///
     /// Can also return an [`Error::Json`] if there is an error in deserializing
     /// the response.
@@ -312,6 +312,7 @@ impl Interaction {
     /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
+    /// [`choices`]: crate::model::interactions::ApplicationCommandOption::choices
     pub async fn create_global_application_command<F>(
         http: impl AsRef<Http>,
         application_id: u64,
@@ -326,11 +327,11 @@ impl Interaction {
 
     /// Creates a guild specific [`ApplicationCommand`]
     ///
-    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    /// **Note**: Unlike global [`ApplicationCommand`]s, guild commands will update instantly.
     ///
     /// # Errors
     ///
-    /// Returns the same possible errors as `create_global_application_command`.
+    /// Returns the same possible errors as [`Self::create_global_application_command`].
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
     pub async fn create_guild_application_command<F>(
@@ -391,7 +392,7 @@ impl Interaction {
 
     /// Edits the initial interaction response.
     ///
-    /// `application_id` will usually be the bot's `[UserId]`, except in cases of bots being very old.
+    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
     ///
     /// Refer to Discord's docs for Edit Webhook Message for field information.
     ///

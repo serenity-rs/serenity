@@ -151,8 +151,12 @@ impl Display for ConnectionStage {
 /// A message to be passed around within the library.
 ///
 /// As a user you usually don't need to worry about this, but when working with
-/// the lower-level internals of the `client`, `gateway, and `voice` modules it
+/// the lower-level internals of the [`client`], [`gateway`], and [`voice`] modules it
 /// may be necessary.
+///
+/// [`client`]: crate::client
+/// [`gateway`]: crate::gateway
+/// [`voice`]: crate::model::voice
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum InterMessage {

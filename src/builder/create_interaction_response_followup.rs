@@ -74,7 +74,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Sets a list of files to include in the message.
     ///
     /// Calling this multiple times will overwrite the file list.
-    /// To append files, call `add_file` or `add_files` instead.
+    /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,

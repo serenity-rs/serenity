@@ -74,14 +74,14 @@ pub struct Message {
     /// Channels specifically mentioned in this message.
     ///
     /// **Note**:
-    /// Not all channel mentions in a message will appear in `mention_channels`. Only textual
+    /// Not all channel mentions in a message will appear in [`Self::mention_channels`]. Only textual
     /// channels that are visible to everyone in a lurkable guild will ever be included.
     ///
     /// A lurkable guild is one that allows users to read public channels in a server without
     /// actually joining the server. It also allows users to look at these channels without being
     /// logged in to Discord.
     ///
-    /// Only crossposted messages (via Channel Following) currently include `mention_channels` at
+    /// Only crossposted messages (via Channel Following) currently include [`Self::mention_channels`] at
     /// all. If no mentions in the message meet these requirements, this field will not be sent.
     /// [Refer to Discord's documentation for more information][discord-docs].
     ///
@@ -178,7 +178,7 @@ impl Message {
 
     /// Retrieves the related channel located in the cache.
     ///
-    /// Returns `None` if the channel is not in the cache.
+    /// Returns [`None`] if the channel is not in the cache.
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn channel(&self, cache: impl AsRef<Cache>) -> Option<Channel> {
@@ -450,28 +450,24 @@ impl Message {
         self.channel_id.reaction_users(&http, self.id, reaction_type, limit, after).await
     }
 
-    /// Returns the associated `Guild` for the message if one is in the cache.
+    /// Returns the associated [`Guild`] for the message if one is in the cache.
     ///
-    /// Returns `None` if the guild's Id could not be found via [`guild_id`] or
+    /// Returns [`None`] if the guild's Id could not be found via [`Self::guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
-    ///
-    /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
         cache.as_ref().guild(self.guild_id?).await
     }
 
-    /// Returns a field to the `Guild` for the message if one is in the cache.
+    /// Returns a field to the [`Guild`] for the message if one is in the cache.
     /// The field can be selected via the `field_accessor`.
     ///
-    /// Returns `None` if the guild's ID could not be found via [`guild_id`] or
+    /// Returns [`None`] if the guild's ID could not be found via [`Self::guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
-    ///
-    /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild_field<Ret, Fun>(
         &self,
@@ -499,9 +495,7 @@ impl Message {
     ///
     /// # Errors
     ///
-    /// [`ModelError::ItemMissing`] is returned if [`guild_id`] is `None`.
-    ///
-    /// [`guild_id`]: Self::guild_id
+    /// [`ModelError::ItemMissing`] is returned if [`Self::guild_id`] is [`None`].
     pub async fn member(&self, cache_http: impl CacheHttp) -> Result<Member> {
         let guild_id = match self.guild_id {
             Some(guild_id) => guild_id,
@@ -523,8 +517,8 @@ impl Message {
     /// Checks the length of a string to ensure that it is within Discord's
     /// maximum message length limit.
     ///
-    /// Returns `None` if the message is within the limit, otherwise returns
-    /// `Some` with an inner value of how many unicode code points the message
+    /// Returns [`None`] if the message is within the limit, otherwise returns
+    /// [`Some`] with an inner value of how many unicode code points the message
     /// is over.
     pub fn overflow_length(content: &str) -> Option<usize> {
         // Check if the content is over the maximum number of unicode code
@@ -708,7 +702,7 @@ impl Message {
         self._reply(cache_http, format!("{} {}", self.author.mention(), content), None).await
     }
 
-    /// `inlined` decides whether this reply is inlinded and whether it pings.
+    /// `inlined` decides whether this reply is inlined and whether it pings.
     async fn _reply(
         &self,
         cache_http: impl CacheHttp,
@@ -851,7 +845,7 @@ impl Message {
 
     /// Tries to return author's nickname in the current channel's guild.
     ///
-    /// Refer to [`User::nick_in()`] inside and `None` outside of a guild.
+    /// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.
     #[inline]
     pub async fn author_nick(&self, cache_http: impl CacheHttp) -> Option<String> {
         self.author.nick_in(cache_http, self.guild_id?).await
@@ -966,14 +960,14 @@ impl AsRef<MessageId> for Message {
 }
 
 impl From<Message> for MessageId {
-    /// Gets the Id of a `Message`.
+    /// Gets the Id of a [`Message`].
     fn from(message: Message) -> MessageId {
         message.id
     }
 }
 
 impl<'a> From<&'a Message> for MessageId {
-    /// Gets the Id of a `Message`.
+    /// Gets the Id of a [`Message`].
     fn from(message: &Message) -> MessageId {
         message.id
     }
@@ -981,10 +975,9 @@ impl<'a> From<&'a Message> for MessageId {
 
 /// A representation of a reaction to a message.
 ///
-/// Multiple of the same [reaction type] are sent into one `MessageReaction`,
-/// with an associated [`count`].
+/// Multiple of the same [reaction type] are sent into one [`MessageReaction`],
+/// with an associated [`Self::count`].
 ///
-/// [`count`]: Self::count
 /// [reaction type]: ReactionType
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

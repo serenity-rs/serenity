@@ -263,14 +263,10 @@ pub struct AuditLogs {
 #[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct AuditLogEntry {
-    /// Determines to what entity an [`action`] was used on.
-    ///
-    /// [`action`]: Self::action
+    /// Determines to what entity an [`Self::action`] was used on.
     #[serde(with = "option_u64_handler")]
     pub target_id: Option<u64>,
-    /// Determines what action was done on a [`target_id`]
-    ///
-    /// [`target_id`]: Self::target_id
+    /// Determines what action was done on a [`Self::target_id`]
     #[serde(with = "action_handler", rename = "action_type")]
     pub action: Action,
     /// What was the reasoning by doing an action on a target? If there was one.

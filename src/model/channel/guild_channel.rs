@@ -38,7 +38,7 @@ use crate::utils as serenity_utils;
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
 /// News channels are a subset of text channels and lack slow mode hence
-/// `slow_mode_rate` will be `None`.
+/// [`Self::slow_mode_rate`] will be [`None`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildChannel {
@@ -89,9 +89,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available for voice channels.
     pub user_limit: Option<u64>,
     /// Used to tell if the channel is not safe for work.
-    /// Note however, it's recommended to use [`is_nsfw`] as it's gonna be more accurate.
-    ///
-    /// [`is_nsfw`]: Self::is_nsfw
+    /// Note however, it's recommended to use [`Self::is_nsfw`] as it's gonna be more accurate.
     // This field can or can not be present sometimes, but if it isn't
     // default to `false`.
     #[serde(default)]
@@ -104,7 +102,7 @@ pub struct GuildChannel {
     pub slow_mode_rate: Option<u64>,
     /// The region override.
     ///
-    /// **Note**: This is only available for voice and stage channels. `None`
+    /// **Note**: This is only available for voice and stage channels. [`None`]
     /// for voice and stage channels means automatic region selection.
     pub rtc_region: Option<String>,
     /// The video quality mode for a voice channel.
@@ -377,7 +375,7 @@ impl GuildChannel {
 
     /// Modifies a channel's settings, such as its position or name.
     ///
-    /// Refer to `EditChannel`s documentation for a full list of methods.
+    /// Refer to [`EditChannel`]s documentation for a full list of methods.
     ///
     /// # Examples
     ///
@@ -454,7 +452,7 @@ impl GuildChannel {
         self.id.edit_message(&http, message_id, f).await
     }
 
-    /// Edits a voice state in a stage channel. Pass `None` for `user_id` to
+    /// Edits a voice state in a stage channel. Pass [`None`] for `user_id` to
     /// edit the current user's voice state.
     ///
     /// Requires the [Mute Members] permission to suppress another user or
@@ -636,7 +634,7 @@ impl GuildChannel {
     /// Refer to the [`GetMessages`]-builder for more information on how to
     /// use `builder`.
     ///
-    /// **Note**: Returns an empty `Vec` if the current user does not have the
+    /// **Note**: Returns an empty [`Vec`] if the current user does not have the
     /// [Read Message History] permission.
     ///
     /// # Errors
@@ -816,7 +814,7 @@ impl GuildChannel {
     /// Gets all channel's pins.
     ///
     /// **Note**: If the current user lacks the [Read Message History] permission
-    /// an empty `Vec` will be returned.
+    /// an empty [`Vec`] will be returned.
     ///
     /// # Errors
     ///
@@ -946,11 +944,11 @@ impl GuildChannel {
     ///
     /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
     /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after `stop` is called.
+    /// for a few seconds after [`Typing::stop`] is called.
     /// Typing is also stopped when the struct is dropped.
     ///
     /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.
@@ -1151,7 +1149,7 @@ impl GuildChannel {
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `create_webhook` may return an [`Error::Http`],
+    /// In addition to the reasons [`Self::create_webhook`] may return an [`Error::Http`],
     /// if the image is too large.
     pub async fn create_webhook_with_avatar<'a>(
         &self,

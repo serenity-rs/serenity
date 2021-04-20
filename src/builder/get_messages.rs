@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use crate::model::id::MessageId;
 
-/// Builds a request for a request to the API to retrieve messages.
+/// Builds a request to the API to retrieve messages.
 ///
 /// This can have 2 different sets of parameters. The first set is around where
 /// to get the messages:
 ///
-/// - `after`
-/// - `around`
-/// - `before`
+/// - [`Self::after`]
+/// - [`Self::around`]
+/// - [`Self::before`]
 ///
 /// These can not be mixed, and the first in the list alphabetically will be
 /// used. If one is not specified, `most_recent` will be used.
@@ -22,7 +22,7 @@ use crate::model::id::MessageId;
 ///
 /// # Examples
 ///
-/// Creating a `GetMessages` builder to retrieve the first 25 messages after the
+/// Creating a [`GetMessages`] builder to retrieve the first 25 messages after the
 /// message with an Id of `158339864557912064`:
 ///
 /// ```rust,no_run

@@ -212,7 +212,7 @@ impl ShardManager {
     /// Creating a client and then restarting a shard by ID:
     ///
     /// _(note: in reality this precise code doesn't have an effect since the
-    /// shard would not yet have been initialized via [`initialize`], but the
+    /// shard would not yet have been initialized via [`Self::initialize`], but the
     /// concept is the same)_
     ///
     /// ```rust,no_run
@@ -235,7 +235,6 @@ impl ShardManager {
     /// ```
     ///
     /// [`ShardRunner`]: super::ShardRunner
-    /// [`initialize`]: Self::initialize
     #[instrument(skip(self))]
     pub async fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
@@ -295,9 +294,7 @@ impl ShardManager {
     /// for that are still known to be running.
     ///
     /// If you only need to shutdown a select number of shards, prefer looping
-    /// over the [`shutdown`] method.
-    ///
-    /// [`shutdown`]: Self::shutdown
+    /// over the [`Self::shutdown`] method.
     #[instrument(skip(self))]
     #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown_all(&mut self) {

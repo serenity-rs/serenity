@@ -317,7 +317,7 @@ impl StandardFramework {
 
     /// Adds a group which can organize several related commands.
     /// Groups are taken into account when using
-    /// `serenity::framework::standard::help_commands`.
+    /// [`serenity::framework::standard::help_commands`].
     ///
     /// # Examples
     ///
@@ -361,6 +361,8 @@ impl StandardFramework {
     ///     // Groups' names are changed to all uppercase, plus appended with `_GROUP`.
     ///     .group(&BINGBONG_GROUP);
     /// ```
+    ///
+    /// [`serenity::framework::standard::help_commands`]: crate::framework::standard::help_commands
     pub fn group(mut self, group: &'static CommandGroup) -> Self {
         self.group_add(group);
         self.initialized = true;
@@ -370,12 +372,10 @@ impl StandardFramework {
 
     /// Adds a group to be used by the framework. Primary use-case is runtime modification
     /// of groups in the framework; will _not_ mark the framework as initialized. Refer to
-    /// [`group`] for adding groups in initial configuration.
+    /// [`Self::group`] for adding groups in initial configuration.
     ///
-    /// Note: does _not_ return `Self` like many other commands. This is because
+    /// Note: does _not_ return [`Self`] like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
-    ///
-    /// [`group`]: Self::group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(
@@ -392,7 +392,7 @@ impl StandardFramework {
     /// Removes a group from being used in the framework. Primary use-case is runtime modification
     /// of groups in the framework.
     ///
-    /// Note: does _not_ return `Self` like many other commands. This is because
+    /// Note: does _not_ return [`Self`] like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
     pub fn group_remove(&mut self, group: &'static CommandGroup) {
         // Iterates through the vector and if a given group _doesn't_ match, we retain it
@@ -453,7 +453,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `before` to log command usage:
+    /// Using [`Self::before`] to log command usage:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -506,7 +506,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `after` to log command usage:
+    /// Using [`Self::after`] to log command usage:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -536,7 +536,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `unrecognised_command`:
+    /// Using [`Self::unrecognised_command`]:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -564,7 +564,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `normal_message`:
+    /// Using [`Self::normal_message`]:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
