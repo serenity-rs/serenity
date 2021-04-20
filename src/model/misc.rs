@@ -424,6 +424,7 @@ mod test {
                 name: "fake role".to_string(),
                 permissions: Permissions::empty(),
                 position: 1,
+                tags: RoleTags::default(),
             };
             let user = User {
                 id: UserId(6),
