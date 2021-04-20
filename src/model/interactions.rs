@@ -473,8 +473,8 @@ impl ApplicationCommand {
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::{
-    /// interactions::{ApplicationCommand, ApplicationCommandOptionType},
-    /// id::ApplicationId
+    ///     interactions::{ApplicationCommand, ApplicationCommandOptionType},
+    ///     id::ApplicationId
     /// };
     ///
     /// let _ = ApplicationCommand::create_global_application_command(&http, |a| {
