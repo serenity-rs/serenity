@@ -19,18 +19,18 @@ want some or all shards to be in the same process, allowing for a shared
 State. This is possible through this library.</p>
 <p>See <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">Discord’s documentation</a> for more information.</p>
 <p>If you are not using a bot account or do not require sharding - such as for
-a small bot - then use <a href="../../serenity/client/struct.Client.html#method.start"><code>Client::start</code></a>.</p>
+a small bot - then use <a href="../client/struct.Client.html#method.start"><code>Client::start</code></a>.</p>
 <p>There are a few methods of sharding available:</p>
 <ul>
-<li><a href="../../serenity/client/struct.Client.html#method.start_autosharded"><code>Client::start_autosharded</code></a>: retrieves the number of shards Discord
+<li><a href="../client/struct.Client.html#method.start_autosharded"><code>Client::start_autosharded</code></a>: retrieves the number of shards Discord
 recommends using from the API, and then automatically starts that number of
 shards.</li>
-<li><a href="../../serenity/client/struct.Client.html#method.start_shard"><code>Client::start_shard</code></a>: starts a single shard for use in the instance,
+<li><a href="../client/struct.Client.html#method.start_shard"><code>Client::start_shard</code></a>: starts a single shard for use in the instance,
 handled by the instance of the Client. Use this if you only want 1 shard
 handled by this instance.</li>
-<li><a href="../../serenity/client/struct.Client.html#method.start_shards"><code>Client::start_shards</code></a>: starts all shards in this instance. This is best
+<li><a href="../client/struct.Client.html#method.start_shards"><code>Client::start_shards</code></a>: starts all shards in this instance. This is best
 for when you want a completely shared State.</li>
-<li><a href="../../serenity/client/struct.Client.html#method.start_shard_range"><code>Client::start_shard_range</code></a>: start a range of shards within this
+<li><a href="../client/struct.Client.html#method.start_shard_range"><code>Client::start_shard_range</code></a>: start a range of shards within this
 instance. This should be used when you, for example, want to split 10 shards
 across 3 instances.</li>
 </ul>
@@ -40,11 +40,11 @@ gateway. The shard allows for sending and receiving messages over the
 websocket, such as setting the active activity, reconnecting, syncing
 guilds, and more.</p>
 </td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<table><tr class="module-item"><td><a class="enum" href="enum.ConnectionStage.html" title="serenity::gateway::ConnectionStage enum">ConnectionStage</a></td><td class="docblock-short"><p>Indicates the current connection stage of a <a href="../../serenity/gateway/struct.Shard.html" title="Shard"><code>Shard</code></a>.</p>
+<table><tr class="module-item"><td><a class="enum" href="enum.ConnectionStage.html" title="serenity::gateway::ConnectionStage enum">ConnectionStage</a></td><td class="docblock-short"><p>Indicates the current connection stage of a <a href="struct.Shard.html" title="Shard"><code>Shard</code></a>.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.GatewayError.html" title="serenity::gateway::GatewayError enum">GatewayError</a></td><td class="docblock-short"><p>An error that occurred while attempting to deal with the gateway.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.InterMessage.html" title="serenity::gateway::InterMessage enum">InterMessage</a></td><td class="docblock-short"><p>A message to be passed around within the library.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.ReconnectType.html" title="serenity::gateway::ReconnectType enum">ReconnectType</a></td><td class="docblock-short"><p>The type of reconnection that should be performed.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.ShardAction.html" title="serenity::gateway::ShardAction enum">ShardAction</a></td><td class="docblock-short"></td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
 <table><tr class="module-item"><td><a class="trait" href="trait.WebSocketGatewayClientExt.html" title="serenity::gateway::WebSocketGatewayClientExt trait">WebSocketGatewayClientExt</a></td><td class="docblock-short"></td></tr></table><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
-<table><tr class="module-item"><td><a class="type" href="type.CurrentPresence.html" title="serenity::gateway::CurrentPresence type">CurrentPresence</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="type" href="type.WsStream.html" title="serenity::gateway::WsStream type">WsStream</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-js="../../search-index.js"></div>
+<table><tr class="module-item"><td><a class="type" href="type.CurrentPresence.html" title="serenity::gateway::CurrentPresence type">CurrentPresence</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="type" href="type.WsStream.html" title="serenity::gateway::WsStream type">WsStream</a></td><td class="docblock-short"></td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script></body></html>

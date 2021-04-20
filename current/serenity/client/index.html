@@ -6,34 +6,34 @@ as event handlers. Dispatching events to configured handlers and starting
 the shards’ connections are handled directly via the client. In addition,
 the <code>http</code> module and <code>Cache</code> are also automatically handled by the
 Client module for you.</p>
-<p>A <a href="../../serenity/prelude/struct.Context.html" title="Context"><code>Context</code></a> is provided for every handler.</p>
+<p>A <a href="../prelude/struct.Context.html" title="Context"><code>Context</code></a> is provided for every handler.</p>
 <p>The <code>http</code> module is the lower-level method of interacting with the Discord
 REST API. Realistically, there should be little reason to use this yourself,
 as the Context will do this for you. A possible use case of using the <code>http</code>
 module is if you do not have a Cache, for purposes such as low memory
 requirements.</p>
-<p>Click <a href="../../serenity/client/struct.Client.html#examples">here</a> for an example on how to use a <code>Client</code>.</p>
+<p>Click <a href="struct.Client.html#examples">here</a> for an example on how to use a <code>Client</code>.</p>
 </div><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<table><tr><td><code>pub use crate::cache::<a class="struct" href="../../serenity/cache/struct.Cache.html" title="struct serenity::cache::Cache">Cache</a>;</code></td></tr><tr><td><code>pub use crate::<a class="struct" href="../../serenity/struct.CacheAndHttp.html" title="struct serenity::CacheAndHttp">CacheAndHttp</a>;</code></td></tr></table><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<table><tr class="module-item"><td><a class="mod" href="bridge/index.html" title="serenity::client::bridge mod">bridge</a></td><td class="docblock-short"><p>A collection of bridged support between the <a href="../../serenity/client/struct.Client.html"><code>client</code></a> module and other
+<table><tr><td><code>pub use crate::cache::<a class="struct" href="../cache/struct.Cache.html" title="struct serenity::cache::Cache">Cache</a>;</code></td></tr><tr><td><code>pub use crate::<a class="struct" href="../struct.CacheAndHttp.html" title="struct serenity::CacheAndHttp">CacheAndHttp</a>;</code></td></tr></table><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="bridge/index.html" title="serenity::client::bridge mod">bridge</a></td><td class="docblock-short"><p>A collection of bridged support between the <a href="struct.Client.html"><code>client</code></a> module and other
 modules.</p>
 </td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
 <table><tr class="module-item"><td><a class="struct" href="struct.Client.html" title="serenity::client::Client struct">Client</a></td><td class="docblock-short"><p>The Client is the way to be able to start sending authenticated requests
 over the REST API, as well as initializing a WebSocket connection through
-<a href="../../serenity/gateway/struct.Shard.html"><code>Shard</code></a>s. Refer to the <a href="../../serenity/gateway/index.html#sharding">documentation on using sharding</a>
+<a href="../gateway/struct.Shard.html"><code>Shard</code></a>s. Refer to the <a href="../gateway/index.html#sharding">documentation on using sharding</a>
 for more information.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.ClientBuilder.html" title="serenity::client::ClientBuilder struct">ClientBuilder</a></td><td class="docblock-short"><p>A builder implementing <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="Future"><code>Future</code></a> building a <a href="../../serenity/client/struct.Client.html" title="Client"><code>Client</code></a> to interact with Discord.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.ClientBuilder.html" title="serenity::client::ClientBuilder struct">ClientBuilder</a></td><td class="docblock-short"><p>A builder implementing <a href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html" title="Future"><code>Future</code></a> building a <a href="struct.Client.html" title="Client"><code>Client</code></a> to interact with Discord.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.Context.html" title="serenity::client::Context struct">Context</a></td><td class="docblock-short"><p>The context is a general utility struct provided on event dispatches, which
 helps with dealing with the current “context” of the event dispatch.
 The context also acts as a general high-level interface over the associated
-<a href="../../serenity/gateway/struct.Shard.html"><code>Shard</code></a> which received the event, or the low-level <a href="../../serenity/http/index.html"><code>http</code></a> module.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.Extras.html" title="serenity::client::Extras struct">Extras</a></td><td class="docblock-short"><p>A builder to extra things for altering the <a href="../../serenity/client/struct.Client.html"><code>Client</code></a>.</p>
+<a href="../gateway/struct.Shard.html"><code>Shard</code></a> which received the event, or the low-level <a href="../http/index.html"><code>http</code></a> module.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Extras.html" title="serenity::client::Extras struct">Extras</a></td><td class="docblock-short"><p>A builder to extra things for altering the <a href="struct.Client.html"><code>Client</code></a>.</p>
 </td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<table><tr class="module-item"><td><a class="enum" href="enum.ClientError.html" title="serenity::client::ClientError enum">ClientError</a></td><td class="docblock-short"><p>An error returned from the <a href="../../serenity/client/struct.Client.html"><code>Client</code></a>.</p>
+<table><tr class="module-item"><td><a class="enum" href="enum.ClientError.html" title="serenity::client::ClientError enum">ClientError</a></td><td class="docblock-short"><p>An error returned from the <a href="struct.Client.html"><code>Client</code></a>.</p>
 </td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
 <table><tr class="module-item"><td><a class="trait" href="trait.EventHandler.html" title="serenity::client::EventHandler trait">EventHandler</a></td><td class="docblock-short"><p>The core trait for handling events by serenity.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.RawEventHandler.html" title="serenity::client::RawEventHandler trait">RawEventHandler</a></td><td class="docblock-short"><p>This core trait for handling raw events</p>
 </td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
 <table><tr class="module-item"><td><a class="fn" href="fn.validate_token.html" title="serenity::client::validate_token fn">validate_token</a></td><td class="docblock-short"><p>Validates that a token is likely in a valid format.</p>
-</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-js="../../search-index.js"></div>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script></body></html>

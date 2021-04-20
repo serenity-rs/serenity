@@ -12,14 +12,14 @@ ratelimit, to ensure that no wasted requests are made.</p>
 <li>REST API requests, which require an authorization token;</li>
 <li>Other requests, which do not require an authorization token.</li>
 </ul>
-<p>The former require a <a href="../../serenity/client/struct.Client.html"><code>Client</code></a> to have logged in, while the latter may be
+<p>The former require a <a href="../client/struct.Client.html"><code>Client</code></a> to have logged in, while the latter may be
 made regardless of any other usage of the library.</p>
 <p>If a request spuriously fails, it will be retried once.</p>
-<p>Note that you may want to perform requests through a <a href="../../serenity/model/index.html">model</a>s’
+<p>Note that you may want to perform requests through a <a href="../model/index.html">model</a>s’
 instance methods where possible, as they each offer different
 levels of a high-level interface to the HTTP module.</p>
 </div><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<table><tr><td><code>pub use self::<a class="mod" href="../../serenity/http/client/index.html" title="mod serenity::http::client">client</a>::*;</code></td></tr><tr><td><code>pub use self::error::<a class="enum" href="../../serenity/http/error/enum.Error.html" title="enum serenity::http::error::Error">Error</a> as HttpError;</code></td></tr><tr><td><code>pub use self::<a class="mod" href="../../serenity/http/typing/index.html" title="mod serenity::http::typing">typing</a>::*;</code></td></tr></table><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr><td><code>pub use self::<a class="mod" href="client/index.html" title="mod serenity::http::client">client</a>::*;</code></td></tr><tr><td><code>pub use self::error::<a class="enum" href="error/enum.Error.html" title="enum serenity::http::error::Error">Error</a> as HttpError;</code></td></tr><tr><td><code>pub use self::<a class="mod" href="typing/index.html" title="mod serenity::http::typing">typing</a>::*;</code></td></tr></table><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
 <table><tr class="module-item"><td><a class="mod" href="client/index.html" title="serenity::http::client mod">client</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="error/index.html" title="serenity::http::error mod">error</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="mod" href="ratelimiting/index.html" title="serenity::http::ratelimiting mod">ratelimiting</a></td><td class="docblock-short"><p>Routes are used for ratelimiting. These are to differentiate between the
 different <em>types</em> of routes - such as getting the current user’s channels -
 for the most part, with the exception being major parameters.</p>
@@ -27,11 +27,11 @@ for the most part, with the exception being major parameters.</p>
 <table><tr class="module-item"><td><a class="struct" href="struct.StatusCode.html" title="serenity::http::StatusCode struct">StatusCode</a></td><td class="docblock-short"><p>An HTTP status code (<code>status-code</code> in RFC 7230 et al.).</p>
 </td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
 <table><tr class="module-item"><td><a class="enum" href="enum.AttachmentType.html" title="serenity::http::AttachmentType enum">AttachmentType</a></td><td class="docblock-short"><p>Enum that allows a user to pass a <code>Path</code> or a <code>File</code> type to <code>send_files</code></p>
-</td></tr><tr class="module-item"><td><a class="enum" href="enum.GuildPagination.html" title="serenity::http::GuildPagination enum">GuildPagination</a></td><td class="docblock-short"><p>Representation of the method of a query to send for the <a href="../../serenity/http/client/struct.Http.html#method.get_guilds"><code>get_guilds</code></a>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.GuildPagination.html" title="serenity::http::GuildPagination enum">GuildPagination</a></td><td class="docblock-short"><p>Representation of the method of a query to send for the <a href="client/struct.Http.html#method.get_guilds"><code>get_guilds</code></a>
 function.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.LightMethod.html" title="serenity::http::LightMethod enum">LightMethod</a></td><td class="docblock-short"><p>An method used for ratelimiting special routes.</p>
 </td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<table><tr class="module-item"><td><a class="trait" href="trait.CacheHttp.html" title="serenity::http::CacheHttp trait">CacheHttp</a></td><td class="docblock-short"><p>This trait will be required by functions that need <a href="../../serenity/http/client/struct.Http.html" title="Http"><code>Http</code></a> and can
-optionally use a <a href="../../serenity/cache/struct.Cache.html" title="Cache"><code>Cache</code></a> to potentially avoid REST-requests.</p>
-</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-js="../../search-index.js"></div>
+<table><tr class="module-item"><td><a class="trait" href="trait.CacheHttp.html" title="serenity::http::CacheHttp trait">CacheHttp</a></td><td class="docblock-short"><p>This trait will be required by functions that need <a href="client/struct.Http.html" title="Http"><code>Http</code></a> and can
+optionally use a <a href="../cache/struct.Cache.html" title="Cache"><code>Cache</code></a> to potentially avoid REST-requests.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script></body></html>
