@@ -956,25 +956,6 @@
 <span id="953">953</span>
 <span id="954">954</span>
 <span id="955">955</span>
-<span id="956">956</span>
-<span id="957">957</span>
-<span id="958">958</span>
-<span id="959">959</span>
-<span id="960">960</span>
-<span id="961">961</span>
-<span id="962">962</span>
-<span id="963">963</span>
-<span id="964">964</span>
-<span id="965">965</span>
-<span id="966">966</span>
-<span id="967">967</span>
-<span id="968">968</span>
-<span id="969">969</span>
-<span id="970">970</span>
-<span id="971">971</span>
-<span id="972">972</span>
-<span id="973">973</span>
-<span id="974">974</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
@@ -1087,11 +1068,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panic**:</span>
     <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
-    <span class="doccomment">/// a framework via the [`framework`] or [`framework_arc`] method,</span>
+    <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
     <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`framework`]: Self::framework</span>
-    <span class="doccomment">/// [`framework_arc`]: Self::framework_arc</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span><span class="ident">::_new</span>().<span class="ident">token</span>(<span class="ident">token</span>)
     }
@@ -1101,12 +1079,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panic**:</span>
     <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
-    <span class="doccomment">/// a framework via the [`framework`] or [`framework_arc`] method,</span>
+    <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
     <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Http`]: crate::http::Http</span>
-    <span class="doccomment">/// [`framework`]: Self::framework</span>
-    <span class="doccomment">/// [`framework_arc`]: Self::framework_arc</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_http</span>(<span class="ident">http</span>: <span class="ident">Http</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::_new</span>();
         <span class="ident">c</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>);
@@ -1127,10 +1103,8 @@
     }
 
     <span class="doccomment">/// Sets the entire [`TypeMap`] that will be available in [`Context`]s.</span>
-    <span class="doccomment">/// A `TypeMap` must not be constructed manually: [`type_map_insert`]</span>
+    <span class="doccomment">/// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]</span>
     <span class="doccomment">/// can be used to insert one type at a time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`type_map_insert`]: Self::type_map_insert</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_map</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">type_map</span>: <span class="ident">TypeMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">type_map</span>);
 
@@ -1174,9 +1148,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// *Info*:</span>
     <span class="doccomment">/// If a reference to the framework is required for manual dispatch,</span>
-    <span class="doccomment">/// use the [`framework_arc`]-method instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`framework_arc`]: Self::framework_arc</span>
+    <span class="doccomment">/// use the [`Self::framework_arc`]-method instead.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">framework</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">framework</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
@@ -1187,12 +1159,10 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// This method allows to pass an `Arc`&#39;ed `framework` - this step is</span>
-    <span class="doccomment">/// done for you in the [`framework`]-method, if you don&#39;t need the</span>
+    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `framework` - this step is</span>
+    <span class="doccomment">/// done for you in the [`Self::framework`]-method, if you don&#39;t need the</span>
     <span class="doccomment">/// extra control.</span>
     <span class="doccomment">/// You can provide a clone and keep the original to manually dispatch.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`framework`]: Self::framework</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">framework_arc</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
@@ -1209,9 +1179,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// *Info*:</span>
     <span class="doccomment">/// If a reference to the voice_manager is required for manual dispatch,</span>
-    <span class="doccomment">/// use the [`voice_manager_arc`]-method instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`voice_manager_arc`]: Self::voice_manager_arc</span>
+    <span class="doccomment">/// use the [`Self::voice_manager_arc`]-method instead.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_manager</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">voice_manager</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
@@ -1222,7 +1190,7 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// This method allows to pass an `Arc`&#39;ed `voice_manager` - this step is</span>
+    <span class="doccomment">/// This method allows to pass an [`Arc`]&#39;ed `voice_manager` - this step is</span>
     <span class="doccomment">/// done for you in the [`voice_manager`]-method, if you don&#39;t need the</span>
     <span class="doccomment">/// extra control.</span>
     <span class="doccomment">/// You can provide a clone and keep the original to manually dispatch.</span>
@@ -1240,7 +1208,7 @@
 
     <span class="doccomment">/// Sets all intents directly, replacing already set intents.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// To enable privileged intents, `GatewayIntents::all` to</span>
+    <span class="doccomment">/// To enable privileged intents, [`GatewayIntents::all`] to</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// *Info*:</span>
     <span class="doccomment">/// Intents are a bitflag, you can combine them by performing the</span>
@@ -1459,7 +1427,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [example 05] for an example on using the `data` field.</span>
+    <span class="doccomment">/// Refer to [example 05] for an example on using the [`Self::data`] field.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate</span>
     <span class="doccomment">/// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete</span>
@@ -1699,8 +1667,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Start shard 0 of 1 (you may also be interested in [`start`] or</span>
-    <span class="doccomment">/// [`start_autosharded`]):</span>
+    <span class="doccomment">/// Start shard 0 of 1 (you may also be interested in [`Self::start`] or</span>
+    <span class="doccomment">/// [`Self::start_autosharded`]):</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use std::error::Error;</span>
@@ -1727,8 +1695,6 @@
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`start`]: Self::start</span>
-    <span class="doccomment">/// [`start_autosharded`]: Self::start_autosharded</span>
     <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shard</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard</span>: <span class="ident">u64</span>, <span class="ident">shards</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -1742,7 +1708,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will create and handle all shards within this single process. If</span>
     <span class="doccomment">/// you only need to start a single shard within the process, or a range of</span>
-    <span class="doccomment">/// shards, use [`start_shard`] or [`start_shard_range`], respectively.</span>
+    <span class="doccomment">/// shards, use [`Self::start_shard`] or [`Self::start_shard_range`], respectively.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the [Gateway documentation][gateway docs] for more information</span>
     <span class="doccomment">/// on effectively using sharding.</span>
@@ -1776,8 +1742,6 @@
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`start_shard`]: Self::start_shard</span>
-    <span class="doccomment">/// [`start_shard_range`]: Self::start_shard_range</span>
     <span class="doccomment">/// [Gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shards</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">total_shards</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -1791,8 +1755,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will create and handle all shards within a given range within this</span>
     <span class="doccomment">/// single process. If you only need to start a single shard within the</span>
-    <span class="doccomment">/// process, or all shards within the process, use [`start_shard`] or</span>
-    <span class="doccomment">/// [`start_shards`], respectively.</span>
+    <span class="doccomment">/// process, or all shards within the process, use [`Self::start_shard`] or</span>
+    <span class="doccomment">/// [`Self::start_shards`], respectively.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the [Gateway documentation][gateway docs] for more</span>
     <span class="doccomment">/// information on effectively using sharding.</span>
@@ -1826,8 +1790,6 @@
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`start_shard`]: Self::start_shard</span>
-    <span class="doccomment">/// [`start_shards`]: Self::start_shards</span>
     <span class="doccomment">/// [Gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_shard_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">range</span>: [<span class="ident">u64</span>; <span class="number">2</span>], <span class="ident">total_shards</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {

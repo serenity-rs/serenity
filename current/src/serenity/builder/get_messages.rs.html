@@ -104,14 +104,14 @@
 
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id::MessageId</span>;
 
-<span class="doccomment">/// Builds a request for a request to the API to retrieve messages.</span>
+<span class="doccomment">/// Builds a request to the API to retrieve messages.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This can have 2 different sets of parameters. The first set is around where</span>
 <span class="doccomment">/// to get the messages:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// - `after`</span>
-<span class="doccomment">/// - `around`</span>
-<span class="doccomment">/// - `before`</span>
+<span class="doccomment">/// - [`Self::after`]</span>
+<span class="doccomment">/// - [`Self::around`]</span>
+<span class="doccomment">/// - [`Self::before`]</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// These can not be mixed, and the first in the list alphabetically will be</span>
 <span class="doccomment">/// used. If one is not specified, `most_recent` will be used.</span>
@@ -124,7 +124,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Creating a `GetMessages` builder to retrieve the first 25 messages after the</span>
+<span class="doccomment">/// Creating a [`GetMessages`] builder to retrieve the first 25 messages after the</span>
 <span class="doccomment">/// message with an Id of `158339864557912064`:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>

@@ -1203,7 +1203,7 @@
 
     <span class="doccomment">/// Adds a group which can organize several related commands.</span>
     <span class="doccomment">/// Groups are taken into account when using</span>
-    <span class="doccomment">/// `serenity::framework::standard::help_commands`.</span>
+    <span class="doccomment">/// [`serenity::framework::standard::help_commands`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1247,6 +1247,8 @@
     <span class="doccomment">///     // Groups&#39; names are changed to all uppercase, plus appended with `_GROUP`.</span>
     <span class="doccomment">///     .group(&amp;BINGBONG_GROUP);</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`serenity::framework::standard::help_commands`]: crate::framework::standard::help_commands</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">group_add</span>(<span class="ident">group</span>);
         <span class="self">self</span>.<span class="ident">initialized</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -1256,12 +1258,10 @@
 
     <span class="doccomment">/// Adds a group to be used by the framework. Primary use-case is runtime modification</span>
     <span class="doccomment">/// of groups in the framework; will _not_ mark the framework as initialized. Refer to</span>
-    <span class="doccomment">/// [`group`] for adding groups in initial configuration.</span>
+    <span class="doccomment">/// [`Self::group`] for adding groups in initial configuration.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: does _not_ return `Self` like many other commands. This is because</span>
+    <span class="doccomment">/// Note: does _not_ return [`Self`] like many other commands. This is because</span>
     <span class="doccomment">/// it&#39;s not intended to be chained as the other commands are.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`group`]: Self::group</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_add</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>() {
             <span class="ident">Map::Prefixless</span>(
@@ -1278,7 +1278,7 @@
     <span class="doccomment">/// Removes a group from being used in the framework. Primary use-case is runtime modification</span>
     <span class="doccomment">/// of groups in the framework.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: does _not_ return `Self` like many other commands. This is because</span>
+    <span class="doccomment">/// Note: does _not_ return [`Self`] like many other commands. This is because</span>
     <span class="doccomment">/// it&#39;s not intended to be chained as the other commands are.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
         <span class="comment">// Iterates through the vector and if a given group _doesn&#39;t_ match, we retain it</span>
@@ -1339,7 +1339,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Using `before` to log command usage:</span>
+    <span class="doccomment">/// Using [`Self::before`] to log command usage:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::prelude::*;</span>
@@ -1392,7 +1392,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Using `after` to log command usage:</span>
+    <span class="doccomment">/// Using [`Self::after`] to log command usage:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::prelude::*;</span>
@@ -1422,7 +1422,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Using `unrecognised_command`:</span>
+    <span class="doccomment">/// Using [`Self::unrecognised_command`]:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::prelude::*;</span>
@@ -1450,7 +1450,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Using `normal_message`:</span>
+    <span class="doccomment">/// Using [`Self::normal_message`]:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::prelude::*;</span>

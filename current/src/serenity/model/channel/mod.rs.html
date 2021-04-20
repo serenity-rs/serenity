@@ -594,11 +594,11 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Channel</span> {
-    <span class="doccomment">/// Converts from `Channel` to `Option&lt;GuildChannel&gt;`.</span>
+    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;GuildChannel&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Converts `self` into an `Option&lt;GuildChannel&gt;`, consuming</span>
-    <span class="doccomment">/// `self`, and discarding a `PrivateChannel`, or</span>
-    <span class="doccomment">/// `ChannelCategory`, if any.</span>
+    <span class="doccomment">/// `self`, and discarding a [`PrivateChannel`], or</span>
+    <span class="doccomment">/// [`ChannelCategory`], if any.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -629,10 +629,10 @@
         }
     }
 
-    <span class="doccomment">/// Converts from `Channel` to `Option&lt;PrivateChannel&gt;`.</span>
+    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;PrivateChannel&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Converts `self` into an `Option&lt;PrivateChannel&gt;`, consuming</span>
-    <span class="doccomment">/// `self`, and discarding a `GuildChannel`, or `ChannelCategory`,</span>
+    <span class="doccomment">/// `self`, and discarding a [`GuildChannel`], or [`ChannelCategory`],</span>
     <span class="doccomment">/// if any.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -664,11 +664,11 @@
         }
     }
 
-    <span class="doccomment">/// Converts from `Channel` to `Option&lt;ChannelCategory&gt;`.</span>
+    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;ChannelCategory&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Converts `self` into an `Option&lt;ChannelCategory&gt;`,</span>
-    <span class="doccomment">/// consuming `self`, and discarding a `GuildChannel`, or</span>
-    <span class="doccomment">/// `PrivateChannel`, if any.</span>
+    <span class="doccomment">/// consuming `self`, and discarding a [`GuildChannel`], or</span>
+    <span class="doccomment">/// [`PrivateChannel`], if any.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -838,7 +838,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: `NewsChannel` is serialized into a [`GuildChannel`]</span>
     <span class="ident">News</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// An indicator that the channel is a `StoreChannel`</span>
+    <span class="doccomment">/// An indicator that the channel is a `StoreChannel]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: `StoreChannel` is serialized into a [`GuildChannel`]</span>
     <span class="ident">Store</span> <span class="op">=</span> <span class="number">6</span>,

@@ -284,8 +284,6 @@
 <span id="281">281</span>
 <span id="282">282</span>
 <span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 
@@ -335,9 +333,7 @@
     <span class="doccomment">/// Indicator of whether the role is pinned above lesser roles.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// In the client, this causes [`Member`]s in the role to be seen above</span>
-    <span class="doccomment">/// those in roles with a lower [`position`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`position`]: Self::position</span>
+    <span class="doccomment">/// those in roles with a lower [`Self::position`].</span>
     <span class="kw">pub</span> <span class="ident">hoist</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Indicator of whether the role is managed by an integration service.</span>
     <span class="kw">pub</span> <span class="ident">managed</span>: <span class="ident">bool</span>,

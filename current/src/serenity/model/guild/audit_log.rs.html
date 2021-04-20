@@ -481,10 +481,6 @@
 <span id="478">478</span>
 <span id="479">479</span>
 <span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">fmt</span>, <span class="ident">mem::transmute</span>};
 
@@ -751,14 +747,10 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogEntry</span> {
-    <span class="doccomment">/// Determines to what entity an [`action`] was used on.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`action`]: Self::action</span>
+    <span class="doccomment">/// Determines to what entity an [`Self::action`] was used on.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;option_u64_handler&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">target_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Determines what action was done on a [`target_id`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`target_id`]: Self::target_id</span>
+    <span class="doccomment">/// Determines what action was done on a [`Self::target_id`]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;action_handler&quot;</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;action_type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">action</span>: <span class="ident">Action</span>,
     <span class="doccomment">/// What was the reasoning by doing an action on a target? If there was one.</span>

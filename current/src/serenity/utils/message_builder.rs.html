@@ -1560,15 +1560,6 @@
 <span id="1557">1557</span>
 <span id="1558">1558</span>
 <span id="1559">1559</span>
-<span id="1560">1560</span>
-<span id="1561">1561</span>
-<span id="1562">1562</span>
-<span id="1563">1563</span>
-<span id="1564">1564</span>
-<span id="1565">1565</span>
-<span id="1566">1566</span>
-<span id="1567">1567</span>
-<span id="1568">1568</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">default::Default</span>,
@@ -1585,11 +1576,11 @@
 <span class="doccomment">/// The Message Builder is an ergonomic utility to easily build a message,</span>
 <span class="doccomment">/// by adding text and mentioning mentionable structs.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The finalized value can be accessed via [`build`] or the inner value.</span>
+<span class="doccomment">/// The finalized value can be accessed via [`Self::build`] or the inner value.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Build a message, mentioning a [`user`] and an [`emoji`], and retrieving the</span>
+<span class="doccomment">/// Build a message, mentioning a [`Self::user`] and an [`Self::emoji`], and retrieving the</span>
 <span class="doccomment">/// value:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
@@ -1619,10 +1610,6 @@
 <span class="doccomment">///     .build();</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`build`]: Self::build</span>
-<span class="doccomment">/// [`emoji`]: Self::emoji</span>
-<span class="doccomment">/// [`user`]: Self::user</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageBuilder</span>(<span class="kw">pub</span> <span class="ident">String</span>);
 
@@ -1631,7 +1618,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a new `MessageBuilder`:</span>
+    <span class="doccomment">/// Create a new [`MessageBuilder`]:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// use serenity::utils::MessageBuilder;</span>
@@ -1680,9 +1667,9 @@
     <span class="doccomment">/// Mentions the [`GuildChannel`] in the built message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This accepts anything that converts _into_ a [`ChannelId`]. Refer to</span>
-    <span class="doccomment">/// `ChannelId`&#39;s documentation for more information.</span>
+    <span class="doccomment">/// [`ChannelId`]&#39;s documentation for more information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to `ChannelId`&#39;s [Display implementation] for more information on</span>
+    <span class="doccomment">/// Refer to [`ChannelId`]&#39;s [Display implementation] for more information on</span>
     <span class="doccomment">/// how this is formatted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -1718,7 +1705,7 @@
 
     <span class="doccomment">/// Displays the given emoji in the built message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to `Emoji`s [Display implementation] for more information on how</span>
+    <span class="doccomment">/// Refer to [`Emoji`]s [Display implementation] for more information on how</span>
     <span class="doccomment">/// this is formatted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -2424,9 +2411,9 @@
     <span class="doccomment">/// Mentions the [`Role`] in the built message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This accepts anything that converts _into_ a [`RoleId`]. Refer to</span>
-    <span class="doccomment">/// `RoleId`&#39;s documentation for more information.</span>
+    <span class="doccomment">/// [`RoleId`]&#39;s documentation for more information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to `RoleId`&#39;s [Display implementation] for more information on how</span>
+    <span class="doccomment">/// Refer to [`RoleId`]&#39;s [Display implementation] for more information on how</span>
     <span class="doccomment">/// this is formatted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Role`]: crate::model::guild::Role</span>
@@ -2442,9 +2429,9 @@
     <span class="doccomment">/// Mentions the [`User`] in the built message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This accepts anything that converts _into_ a [`UserId`]. Refer to</span>
-    <span class="doccomment">/// `UserId`&#39;s documentation for more information.</span>
+    <span class="doccomment">/// [`UserId`]&#39;s documentation for more information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to `UserId`&#39;s [Display implementation] for more information on how</span>
+    <span class="doccomment">/// Refer to [`UserId`]&#39;s [Display implementation] for more information on how</span>
     <span class="doccomment">/// this is formatted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`User`]: crate::model::user::User</span>
@@ -2480,7 +2467,7 @@
 <span class="doccomment">/// creating content with additional functionality available only in embeds.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Namely, this allows you to create named links via the non-escaping</span>
-<span class="doccomment">/// [`push_named_link`] method and the escaping [`push_named_link_safe`] method.</span>
+<span class="doccomment">/// [`Self::push_named_link`] method and the escaping [`Self::push_named_link_safe`] method.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -2501,9 +2488,6 @@
 <span class="doccomment">/// #[cfg(not(feature = &quot;utils&quot;))]</span>
 <span class="doccomment">/// {}</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`push_named_link`]: Self::push_named_link</span>
-<span class="doccomment">/// [`push_named_link_safe`]: Self::push_named_link_safe</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">EmbedMessageBuilding</span> {
     <span class="doccomment">/// Pushes a named link to a message, intended for use in embeds.</span>
     <span class="doccomment">///</span>
@@ -2532,7 +2516,7 @@
     <span class="doccomment">/// Pushes a named link intended for use in an embed, but with a normalized</span>
     <span class="doccomment">/// name to avoid escaping issues.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [`push_named_link`] for more information.</span>
+    <span class="doccomment">/// Refer to [`Self::push_named_link`] for more information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -2555,8 +2539,6 @@
     <span class="doccomment">/// #[cfg(not(feature = &quot;utils&quot;))]</span>
     <span class="doccomment">/// {}</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`push_named_link`]: Self::push_named_link</span>
     <span class="kw">fn</span> <span class="ident">push_named_link_safe</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
 }
 

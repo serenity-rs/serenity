@@ -1064,7 +1064,7 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">id::EmojiId</span>, <span class="ident">misc::EmojiIdentifier</span>};
 
-<span class="doccomment">/// Converts a HashMap into a final `serde_json::Map` representation.</span>
+<span class="doccomment">/// Converts a HashMap into a final [`serde_json::Map`] representation.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hashmap_to_json_map</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Value</span>, <span class="ident">H</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">H</span>: <span class="ident">BuildHasher</span>,
@@ -1121,7 +1121,7 @@
 
 <span class="doccomment">/// Retrieves an Id from a user mention.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the mention is invalid, then `None` is returned.</span>
+<span class="doccomment">/// If the mention is invalid, then [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1137,7 +1137,7 @@
 <span class="doccomment">/// assert_eq!(parse_username(&quot;&lt;@!114941315417899012&gt;&quot;), Some(114941315417899012));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid username or nickname mention returns `None`:</span>
+<span class="doccomment">/// Asserting that an invalid username or nickname mention returns [`None`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use serenity::utils::parse_username;</span>
@@ -1167,7 +1167,7 @@
 
 <span class="doccomment">/// Retrieves an Id from a role mention.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the mention is invalid, then `None` is returned.</span>
+<span class="doccomment">/// If the mention is invalid, then [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1179,7 +1179,7 @@
 <span class="doccomment">/// assert_eq!(parse_role(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(136107769680887808));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid role mention returns `None`:</span>
+<span class="doccomment">/// Asserting that an invalid role mention returns [`None`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use serenity::utils::parse_role;</span>
@@ -1205,7 +1205,7 @@
 
 <span class="doccomment">/// Retrieves an Id from a channel mention.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the channel mention is invalid, then `None` is returned.</span>
+<span class="doccomment">/// If the channel mention is invalid, then [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1217,7 +1217,7 @@
 <span class="doccomment">/// assert_eq!(parse_channel(&quot;&lt;#81384788765712384&gt;&quot;), Some(81384788765712384));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid channel mention returns `None`:</span>
+<span class="doccomment">/// Asserting that an invalid channel mention returns [`None`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use serenity::utils::parse_channel;</span>
@@ -1244,7 +1244,7 @@
 
 <span class="doccomment">/// Retrieve the ID number out of a channel, role, or user mention.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the mention is invalid, `None` is returned.</span>
+<span class="doccomment">/// If the mention is invalid, [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1270,9 +1270,9 @@
 }
 
 <span class="doccomment">/// Retrieves the animated state, name and Id from an emoji mention, in the form of an</span>
-<span class="doccomment">/// `EmojiIdentifier`.</span>
+<span class="doccomment">/// [`EmojiIdentifier`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the emoji usage is invalid, then `None` is returned.</span>
+<span class="doccomment">/// If the emoji usage is invalid, then [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1292,7 +1292,7 @@
 <span class="doccomment">/// assert_eq!(parse_emoji(&quot;&lt;:smugAnimeFace:302516740095606785&gt;&quot;).unwrap(), expected);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid emoji usage returns `None`:</span>
+<span class="doccomment">/// Asserting that an invalid emoji usage returns [`None`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use serenity::utils::parse_emoji;</span>

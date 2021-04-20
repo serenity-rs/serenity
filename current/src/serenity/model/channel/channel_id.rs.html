@@ -1057,9 +1057,6 @@
 <span id="1054">1054</span>
 <span id="1055">1055</span>
 <span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span> <span class="kw">as</span> <span class="ident">FmtWrite</span>;
@@ -1356,7 +1353,7 @@
 
     <span class="doccomment">/// Edits the settings of a [`Channel`], optionally setting new values.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to `EditChannel`&#39;s documentation for its methods.</span>
+    <span class="doccomment">/// Refer to [`EditChannel`]&#39;s documentation for its methods.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Channel] permission.</span>
     <span class="doccomment">///</span>
@@ -1507,7 +1504,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to [`GetMessages`] for more information on how to use `builder`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Returns an empty `Vec` if the current user</span>
+    <span class="doccomment">/// **Note**: Returns an empty [`Vec`] if the current user</span>
     <span class="doccomment">/// does not have the [Read Message History] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -1547,7 +1544,7 @@
 
     <span class="doccomment">/// Streams over all the messages in a channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is accomplished and equivalent to repeated calls to [`messages`].</span>
+    <span class="doccomment">/// This is accomplished and equivalent to repeated calls to [`Self::messages`].</span>
     <span class="doccomment">/// A buffer of at most 100 messages is used to reduce the number of calls.</span>
     <span class="doccomment">/// necessary.</span>
     <span class="doccomment">///</span>
@@ -1578,8 +1575,6 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`messages`]: Self::messages</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">messages_iter</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">MessagesIter</span>::<span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span><span class="ident">::stream</span>(<span class="ident">http</span>, <span class="self">self</span>)
     }
@@ -1631,7 +1626,7 @@
 
     <span class="doccomment">/// Gets the list of [`Message`]s which are pinned to the channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Returns an empty `Vec` if the current user does not</span>
+    <span class="doccomment">/// **Note**: Returns an empty [`Vec`] if the current user does not</span>
     <span class="doccomment">/// have the [Read Message History] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -1733,7 +1728,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Send files using `File`:</span>
+    <span class="doccomment">/// Send files using [`File`]:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
@@ -1773,6 +1768,7 @@
     <span class="doccomment">/// [`CreateMessage::content`]: crate::builder::CreateMessage::content</span>
     <span class="doccomment">/// [Attach Files]: Permissions::ATTACH_FILES</span>
     <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
+    <span class="doccomment">/// [`File`]: tokio::fs::File</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(
         <span class="self">self</span>,
@@ -1848,11 +1844,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called</span>
     <span class="doccomment">/// on the returned struct to stop typing. Note that on some clients, typing may persist</span>
-    <span class="doccomment">/// for a few seconds after `stop` is called.</span>
+    <span class="doccomment">/// for a few seconds after [`Typing::stop`] is called.</span>
     <span class="doccomment">/// Typing is also stopped when the struct is dropped.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If a message is sent while typing is triggered, the user will stop typing for a brief period</span>
-    <span class="doccomment">/// of time and then resume again until either `stop` is called or the struct is dropped.</span>
+    <span class="doccomment">/// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should rarely be used for bots, although it is a good indicator that a</span>
     <span class="doccomment">/// long-running command is still being processed.</span>
@@ -1961,14 +1957,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ChannelId</span> {
-    <span class="doccomment">/// Gets the Id of a `Channel`.</span>
+    <span class="doccomment">/// Gets the Id of a [`Channel`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">channel</span>: <span class="ident">Channel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ChannelId</span> {
         <span class="ident">channel</span>.<span class="ident">id</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ChannelId</span> {
-    <span class="doccomment">/// Gets the Id of a `Channel`.</span>
+    <span class="doccomment">/// Gets the Id of a [`Channel`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="ident">Channel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ChannelId</span> {
         <span class="ident">channel</span>.<span class="ident">id</span>()
     }
@@ -2032,7 +2028,7 @@
     <span class="doccomment">/// `self.before` so that the next call does not return duplicate items.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If there are no more messages to be fetched, then this sets `self.before`</span>
-    <span class="doccomment">/// as `None`, indicating that no more calls ought to be made.</span>
+    <span class="doccomment">/// as [`None`], indicating that no more calls ought to be made.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this method is called with `self.before` as None, the last 100</span>
     <span class="doccomment">/// (or lower) messages sent in the channel are added in the buffer.</span>
@@ -2069,7 +2065,7 @@
 
     <span class="doccomment">/// Streams over all the messages in a channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is accomplished and equivalent to repeated calls to [`messages`].</span>
+    <span class="doccomment">/// This is accomplished and equivalent to repeated calls to [`ChannelId::messages`].</span>
     <span class="doccomment">/// A buffer of at most 100 messages is used to reduce the number of calls.</span>
     <span class="doccomment">/// necessary.</span>
     <span class="doccomment">///</span>
@@ -2100,8 +2096,6 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`messages`]: ChannelId::messages</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,

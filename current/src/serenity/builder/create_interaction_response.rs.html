@@ -140,7 +140,7 @@
 <span class="kw">impl</span> <span class="ident">CreateInteractionResponse</span> {
     <span class="doccomment">/// Sets the InteractionResponseType of the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `Acknowledge`.</span>
+    <span class="doccomment">/// Defaults to [`InteractionResponseType::ChannelMessageWithSource`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">InteractionResponseType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>)));
         <span class="self">self</span>

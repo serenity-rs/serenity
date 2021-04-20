@@ -358,8 +358,8 @@
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
     <span class="doccomment">/// When unsuppressed, non-bot users will have this set to the current time.</span>
-    <span class="doccomment">/// Bot users will be set to `None`. When suppressed, the user will have</span>
-    <span class="doccomment">/// their `request_to_speak_timestamp` removed.</span>
+    <span class="doccomment">/// Bot users will be set to [`None`]. When suppressed, the user will have</span>
+    <span class="doccomment">/// their [`Self::request_to_speak_timestamp`] removed.</span>
     <span class="kw">pub</span> <span class="ident">request_to_speak_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 

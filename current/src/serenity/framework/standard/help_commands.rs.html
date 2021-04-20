@@ -1622,6 +1622,8 @@
 <span id="1619">1619</span>
 <span id="1620">1620</span>
 <span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -1715,7 +1717,7 @@
     <span class="ident">Error</span>,
 };
 
-<span class="doccomment">/// Macro to format a command according to a `HelpBehaviour` or</span>
+<span class="doccomment">/// Macro to format a command according to a [`HelpBehaviour`] or</span>
 <span class="doccomment">/// continue to the next command-name upon hiding.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="macro">macro_rules!</span> <span class="ident">format_command_name</span> {
@@ -1728,7 +1730,7 @@
     };
 }
 
-<span class="doccomment">/// Wraps around `warn`-macro in order to keep</span>
+<span class="doccomment">/// Wraps around [`warn`]-macro in order to keep</span>
 <span class="doccomment">/// the literal same for all formats of help.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="macro">macro_rules!</span> <span class="ident">warn_about_failed_send</span> {
@@ -1779,7 +1781,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">Suggestions</span> {
-    <span class="doccomment">/// Immutably borrow inner `Vec`.</span>
+    <span class="doccomment">/// Immutably borrow inner [`Vec`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_vec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
@@ -2553,8 +2555,8 @@
     .<span class="ident">boxed</span>()
 }
 
-<span class="doccomment">/// Iterates over all commands and forges them into a `CustomisedHelpData`,</span>
-<span class="doccomment">/// taking `HelpOptions` into consideration when deciding on whether a command</span>
+<span class="doccomment">/// Iterates over all commands and forges them into a [`CustomisedHelpData`],</span>
+<span class="doccomment">/// taking [`HelpOptions`] into consideration when deciding on whether a command</span>
 <span class="doccomment">/// shall be picked and in what textual format.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::implicit_hasher</span>)]</span>
@@ -2896,7 +2898,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Use the command with `exec_help`:</span>
+<span class="doccomment">/// Use the command with [`StandardFramework::help`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
 <span class="doccomment">/// # use serenity::prelude::*;</span>
@@ -2922,6 +2924,8 @@
 <span class="doccomment">/// let framwork = StandardFramework::new()</span>
 <span class="doccomment">///     .help(&amp;MY_HELP);</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::implicit_hasher</span>)]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_embeds</span>(
@@ -2997,7 +3001,7 @@
     }
 }
 
-<span class="doccomment">/// Turns grouped commands into a `String` taking plain help format into account.</span>
+<span class="doccomment">/// Turns grouped commands into a [`String`] taking plain help format into account.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
 <span class="kw">fn</span> <span class="ident">grouped_commands_to_plain_string</span>(
@@ -3018,7 +3022,7 @@
     <span class="ident">result</span>
 }
 
-<span class="doccomment">/// Turns a single command into a `String` taking plain help format into account.</span>
+<span class="doccomment">/// Turns a single command into a [`String`] taking plain help format into account.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
 <span class="kw">fn</span> <span class="ident">single_command_to_plain_string</span>(<span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>, <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {

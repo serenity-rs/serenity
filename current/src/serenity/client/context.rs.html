@@ -457,8 +457,6 @@
 <span id="454">454</span>
 <span id="455">455</span>
 <span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -483,7 +481,7 @@
 <span class="doccomment">/// [`Shard`] which received the event, or the low-level [`http`] module.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The context contains &quot;shortcuts&quot;, like for interacting with the shard.</span>
-<span class="doccomment">/// Methods like [`set_activity`] will unlock the shard and perform an update for</span>
+<span class="doccomment">/// Methods like [`Self::set_activity`] will unlock the shard and perform an update for</span>
 <span class="doccomment">/// you to save a bit of work.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// A context will only live for the event it was dispatched for. After the</span>
@@ -491,7 +489,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
 <span class="doccomment">/// [`http`]: crate::http</span>
-<span class="doccomment">/// [`set_activity`]: Self::set_activity</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
     <span class="doccomment">/// A clone of [`Client::data`]. Refer to its documentation for more</span>
@@ -700,10 +697,10 @@
         <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">OnlineStatus::Invisible</span>);
     }
 
-    <span class="doccomment">/// &quot;Resets&quot; the current user&#39;s presence, by setting the activity to `None`</span>
+    <span class="doccomment">/// &quot;Resets&quot; the current user&#39;s presence, by setting the activity to [`None`]</span>
     <span class="doccomment">/// and the online status to [`Online`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Use [`set_presence`] for fine-grained control over individual details.</span>
+    <span class="doccomment">/// Use [`Self::set_presence`] for fine-grained control over individual details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -732,7 +729,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Event::Resumed`]: crate::model::event::Event::Resumed</span>
     <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
-    <span class="doccomment">/// [`set_presence`]: Self::set_presence</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {

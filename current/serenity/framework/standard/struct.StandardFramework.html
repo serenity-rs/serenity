@@ -55,9 +55,9 @@ a 2 second delay inbetween invocations:</p>
 <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">StandardFramework::new</span>()
     .<span class="ident">bucket</span>(<span class="string">&quot;basic&quot;</span>, <span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">delay</span>(<span class="number">2</span>).<span class="ident">time_span</span>(<span class="number">10</span>).<span class="ident">limit</span>(<span class="number">3</span>))
     .<span class="kw">await</span>;</pre></div>
-</div><h4 id="method.group" class="method"><code>pub fn <a href="#method.group" class="fnname">group</a>(self, group: &amp;'static <a class="struct" href="struct.CommandGroup.html" title="struct serenity::framework::standard::CommandGroup">CommandGroup</a>) -&gt; Self</code><a href="#method.group" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#364-369" title="goto source code">[src]</a></h4><div class="docblock"><p>Adds a group which can organize several related commands.
+</div><h4 id="method.group" class="method"><code>pub fn <a href="#method.group" class="fnname">group</a>(self, group: &amp;'static <a class="struct" href="struct.CommandGroup.html" title="struct serenity::framework::standard::CommandGroup">CommandGroup</a>) -&gt; Self</code><a href="#method.group" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#366-371" title="goto source code">[src]</a></h4><div class="docblock"><p>Adds a group which can organize several related commands.
 Groups are taken into account when using
-<code>serenity::framework::standard::help_commands</code>.</p>
+<a href="help_commands/index.html"><code>serenity::framework::standard::help_commands</code></a>.</p>
 <h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
 <p>Add a group with ping and pong commands:</p>
 
@@ -94,12 +94,12 @@ Groups are taken into account when using
     .<span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">BINGBONG_GROUP</span>);</pre></div>
 </div><h4 id="method.group_add" class="method"><code>pub fn <a href="#method.group_add" class="fnname">group_add</a>(&amp;mut self, group: &amp;'static <a class="struct" href="struct.CommandGroup.html" title="struct serenity::framework::standard::CommandGroup">CommandGroup</a>)</code><a href="#method.group_add" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#379-390" title="goto source code">[src]</a></h4><div class="docblock"><p>Adds a group to be used by the framework. Primary use-case is runtime modification
 of groups in the framework; will <em>not</em> mark the framework as initialized. Refer to
-<a href="struct.StandardFramework.html#method.group"><code>group</code></a> for adding groups in initial configuration.</p>
-<p>Note: does <em>not</em> return <code>Self</code> like many other commands. This is because
+<a href="struct.StandardFramework.html#method.group" title="Self::group"><code>Self::group</code></a> for adding groups in initial configuration.</p>
+<p>Note: does <em>not</em> return <a href="struct.StandardFramework.html" title="Self"><code>Self</code></a> like many other commands. This is because
 it’s not intended to be chained as the other commands are.</p>
 </div><h4 id="method.group_remove" class="method"><code>pub fn <a href="#method.group_remove" class="fnname">group_remove</a>(&amp;mut self, group: &amp;'static <a class="struct" href="struct.CommandGroup.html" title="struct serenity::framework::standard::CommandGroup">CommandGroup</a>)</code><a href="#method.group_remove" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#397-400" title="goto source code">[src]</a></h4><div class="docblock"><p>Removes a group from being used in the framework. Primary use-case is runtime modification
 of groups in the framework.</p>
-<p>Note: does <em>not</em> return <code>Self</code> like many other commands. This is because
+<p>Note: does <em>not</em> return <a href="struct.StandardFramework.html" title="Self"><code>Self</code></a> like many other commands. This is because
 it’s not intended to be chained as the other commands are.</p>
 </div><h4 id="method.on_dispatch_error" class="method"><code>pub fn <a href="#method.on_dispatch_error" class="fnname">on_dispatch_error</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;f: for<'fut> <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.fn.html">fn</a>(_: &amp;'fut <a class="struct" href="../../prelude/struct.Context.html" title="struct serenity::prelude::Context">Context</a>, _: &amp;'fut <a class="struct" href="../../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>, _: <a class="enum" href="enum.DispatchError.html" title="enum serenity::framework::standard::DispatchError">DispatchError</a>) -&gt; BoxFuture&lt;'fut, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<br>) -&gt; Self</code><a href="#method.on_dispatch_error" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#438-442" title="goto source code">[src]</a></h4><div class="docblock"><p>Specify the function that’s called in case a command wasn’t executed for one reason or
 another.</p>
@@ -135,7 +135,7 @@ another.</p>
 </div><h4 id="method.before" class="method"><code>pub fn <a href="#method.before" class="fnname">before</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;f: for<'fut> <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.fn.html">fn</a>(_: &amp;'fut <a class="struct" href="../../prelude/struct.Context.html" title="struct serenity::prelude::Context">Context</a>, _: &amp;'fut <a class="struct" href="../../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>, _: &amp;'fut <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; BoxFuture&lt;'fut, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;<br>) -&gt; Self</code><a href="#method.before" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#498-502" title="goto source code">[src]</a></h4><div class="docblock"><p>Specify the function to be called prior to every command’s execution.
 If that function returns true, the command will be executed.</p>
 <h1 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h1>
-<p>Using <code>before</code> to log command usage:</p>
+<p>Using <a href="struct.StandardFramework.html#method.before" title="Self::before"><code>Self::before</code></a> to log command usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">serenity::framework::standard::macros::hook</span>;
@@ -173,7 +173,7 @@ If that function returns true, the command will be executed.</p>
 </div><h4 id="method.after" class="method"><code>pub fn <a href="#method.after" class="fnname">after</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;f: for<'fut> <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.fn.html">fn</a>(_: &amp;'fut <a class="struct" href="../../prelude/struct.Context.html" title="struct serenity::prelude::Context">Context</a>, _: &amp;'fut <a class="struct" href="../../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>, _: &amp;'fut <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, _: <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>, <a class="type" href="type.CommandError.html" title="type serenity::framework::standard::CommandError">CommandError</a>&gt;) -&gt; BoxFuture&lt;'fut, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<br>) -&gt; Self</code><a href="#method.after" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#529-533" title="goto source code">[src]</a></h4><div class="docblock"><p>Specify the function to be called after every command’s execution.
 Fourth argument exists if command returned an error which you can handle.</p>
 <h1 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h1>
-<p>Using <code>after</code> to log command usage:</p>
+<p>Using <a href="struct.StandardFramework.html#method.after" title="Self::after"><code>Self::after</code></a> to log command usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">serenity::framework::standard::macros::hook</span>;
@@ -192,7 +192,7 @@ Fourth argument exists if command returned an error which you can handle.</p>
     .<span class="ident">after</span>(<span class="ident">after_hook</span>);</pre></div>
 </div><h4 id="method.unrecognised_command" class="method"><code>pub fn <a href="#method.unrecognised_command" class="fnname">unrecognised_command</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;f: for<'fut> <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.fn.html">fn</a>(_: &amp;'fut <a class="struct" href="../../prelude/struct.Context.html" title="struct serenity::prelude::Context">Context</a>, _: &amp;'fut <a class="struct" href="../../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>, _: &amp;'fut <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; BoxFuture&lt;'fut, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<br>) -&gt; Self</code><a href="#method.unrecognised_command" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#557-561" title="goto source code">[src]</a></h4><div class="docblock"><p>Specify the function to be called if no command could be dispatched.</p>
 <h1 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h1>
-<p>Using <code>unrecognised_command</code>:</p>
+<p>Using <a href="struct.StandardFramework.html#method.unrecognised_command" title="Self::unrecognised_command"><code>Self::unrecognised_command</code></a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">serenity::framework::standard::macros::hook</span>;
@@ -209,7 +209,7 @@ Fourth argument exists if command returned an error which you can handle.</p>
     .<span class="ident">unrecognised_command</span>(<span class="ident">unrecognised_command_hook</span>);</pre></div>
 </div><h4 id="method.normal_message" class="method"><code>pub fn <a href="#method.normal_message" class="fnname">normal_message</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;f: for<'fut> <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.fn.html">fn</a>(_: &amp;'fut <a class="struct" href="../../prelude/struct.Context.html" title="struct serenity::prelude::Context">Context</a>, _: &amp;'fut <a class="struct" href="../../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>) -&gt; BoxFuture&lt;'fut, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;<br>) -&gt; Self</code><a href="#method.normal_message" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#583-587" title="goto source code">[src]</a></h4><div class="docblock"><p>Specify the function to be called if a message contains no command.</p>
 <h1 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h1>
-<p>Using <code>normal_message</code>:</p>
+<p>Using <a href="struct.StandardFramework.html#method.normal_message" title="Self::normal_message"><code>Self::normal_message</code></a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">serenity::framework::standard::macros::hook</span>;

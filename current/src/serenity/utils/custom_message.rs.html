@@ -358,7 +358,7 @@
 
     <span class="doccomment">/// Assign the dummy message the timestamp it was edited.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If not used, the default value is `None` (not all messages are edited).</span>
+    <span class="doccomment">/// If not used, the default value is [`None`] (not all messages are edited).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edited_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">edited_timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>);
@@ -381,7 +381,7 @@
 
     <span class="doccomment">/// Assign the dummy message its origin guild&#39;s ID.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If not used, the default value is `None` (not all messages are sent in guilds).</span>
+    <span class="doccomment">/// If not used, the default value is [`None`] (not all messages are sent in guilds).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">guild_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>);
@@ -401,7 +401,7 @@
 
     <span class="doccomment">/// Assign the dummy message member data pertaining to its [author].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If not used, the default value is `None` (not all messages are sent in guilds).</span>
+    <span class="doccomment">/// If not used, the default value is [`None`] (not all messages are sent in guilds).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [author]: Self::author</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -492,7 +492,7 @@
 
     <span class="doccomment">/// Assign the dummy message the webhook author&#39;s ID.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If not used, the default value is `None` (not all messages are sent by webhooks).</span>
+    <span class="doccomment">/// If not used, the default value is [`None`] (not all messages are sent by webhooks).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">WebhookId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">webhook_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);

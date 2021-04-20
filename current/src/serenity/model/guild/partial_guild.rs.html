@@ -993,8 +993,6 @@
 <span id="990">990</span>
 <span id="991">991</span>
 <span id="992">992</span>
-<span id="993">993</span>
-<span id="994">994</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 
@@ -1090,14 +1088,12 @@
         <span class="self">self</span>.<span class="ident">ban_with_reason</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">user</span>, <span class="ident">dmd</span>, <span class="string">&quot;&quot;</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.</span>
+    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the reasons `ban` may return an error,</span>
+    <span class="doccomment">/// In addition to the reasons [`Self::ban`] may return an error,</span>
     <span class="doccomment">/// can also return an error if the reason is too long.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ban`]: Self::ban</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ban_with_reason</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1399,7 +1395,7 @@
     <span class="doccomment">/// Edits the properties of member of the guild, such as muting or</span>
     <span class="doccomment">/// nicknaming them.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to `EditMember`&#39;s documentation for a full list of methods and</span>
+    <span class="doccomment">/// Refer to [`EditMember`]&#39;s documentation for a full list of methods and</span>
     <span class="doccomment">/// permission restrictions.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -1430,7 +1426,7 @@
 
     <span class="doccomment">/// Edits the current user&#39;s nickname for the guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Pass `None` to reset the nickname.</span>
+    <span class="doccomment">/// Pass [`None`] to reset the nickname.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Change Nickname] permission.</span>
     <span class="doccomment">///</span>
@@ -1478,7 +1474,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the reasons `kick` may return an error,</span>
+    <span class="doccomment">/// In addition to the reasons [`Self::kick`] may return an error,</span>
     <span class="doccomment">/// can also return an error if the reason is too long.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">kick_with_reason</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1508,7 +1504,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if an `Emoji` with the given Id does</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if an [`Emoji`] with the given Id does</span>
     <span class="doccomment">/// not exist for the guild.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="ident">EmojiId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
@@ -1617,7 +1613,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Model`] if the Member has a non-existent `Role`</span>
+    <span class="doccomment">/// Returns [`Error::Model`] if the Member has a non-existent [`Role`]</span>
     <span class="doccomment">/// for some reason.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_permissions_in</span>(
@@ -1632,7 +1628,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Model`] if the `Role` or `Channel` is not from this `Guild`.</span>
+    <span class="doccomment">/// Returns [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role_permissions_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="ident">GuildChannel</span>, <span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
         <span class="ident">Guild::_role_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">role</span>, <span class="self">self</span>.<span class="ident">id</span>)

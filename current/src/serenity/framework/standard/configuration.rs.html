@@ -615,17 +615,6 @@
 <span id="612">612</span>
 <span id="613">613</span>
 <span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
@@ -919,22 +908,22 @@
     }
 
     <span class="doccomment">/// Sets the prefix to respond to dynamically, in addition to the one</span>
-    <span class="doccomment">/// configured with [`prefix`] or [`prefixes`]. This is useful if you want</span>
+    <span class="doccomment">/// configured with [`Self::prefix`] or [`Self::prefixes`]. This is useful if you want</span>
     <span class="doccomment">/// to have user configurable per-guild or per-user prefixes, such as by</span>
     <span class="doccomment">/// fetching a guild&#39;s prefix from a database accessible via</span>
     <span class="doccomment">/// [`Context::data`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Return `None` to not have a special prefix for the dispatch and to only</span>
-    <span class="doccomment">/// use the configured prefix from [`prefix`] or [`prefixes`].</span>
+    <span class="doccomment">/// Return [`None`] to not have a special prefix for the dispatch and to only</span>
+    <span class="doccomment">/// use the configured prefix from [`Self::prefix`] or [`Self::prefixes`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method can be called many times to add more dynamic prefix hooks.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Defaults to no dynamic prefix check.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: If using dynamic_prefix *without* [`prefix`] or [`prefixes`],</span>
+    <span class="doccomment">/// **Note**: If using dynamic_prefix *without* [`Self::prefix`] or [`Self::prefixes`],</span>
     <span class="doccomment">/// there will still be the default framework prefix of `&quot;~&quot;`. You can disable</span>
     <span class="doccomment">/// the default prefix by setting the prefix to an empty string `&quot;&quot;` with</span>
-    <span class="doccomment">/// [`prefix`].</span>
+    <span class="doccomment">/// [`Self::prefix`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -977,9 +966,7 @@
     <span class="doccomment">///     );</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///  [`Context::data`]: crate::client::Context::data</span>
-    <span class="doccomment">///  [`prefix`]: Self::prefix</span>
-    <span class="doccomment">///  [`prefixes`]: Self::prefixes</span>
+    <span class="doccomment">/// [`Context::data`]: crate::client::Context::data</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynamic_prefix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dynamic_prefix</span>: <span class="ident">DynamicPrefixHook</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">dynamic_prefixes</span>.<span class="ident">push</span>(<span class="ident">dynamic_prefix</span>);
@@ -1010,7 +997,7 @@
 
     <span class="doccomment">/// Whether or not to respond to commands initiated with `id_to_mention`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: that this can be used in conjunction with [`prefix`].</span>
+    <span class="doccomment">/// **Note**: that this can be used in conjunction with [`Self::prefix`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Defaults to ignore mentions.</span>
     <span class="doccomment">///</span>
@@ -1028,15 +1015,13 @@
     <span class="doccomment">/// which aids mobile devices in determining whether to display a user&#39;s</span>
     <span class="doccomment">/// nickname. It has no real meaning for your bot, and the library</span>
     <span class="doccomment">/// encourages you to ignore differentiating between the two.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`prefix`]: Self::prefix</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_mention</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id_to_mention</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">on_mention</span> <span class="op">=</span> <span class="ident">id_to_mention</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">to_string</span>());
 
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// A `HashSet` of user Ids checks won&#39;t apply to.</span>
+    <span class="doccomment">/// A [`HashSet`] of user Ids checks won&#39;t apply to.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Defaults to an empty HashSet.</span>
     <span class="doccomment">///</span>
@@ -1079,7 +1064,7 @@
     <span class="doccomment">/// **Note**: Passing empty string `&quot;&quot;` will set no prefix.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This prefix will always be usable, even if there is a</span>
-    <span class="doccomment">/// [`dynamic_prefix`] configured.</span>
+    <span class="doccomment">/// [`Self::dynamic_prefix`] configured.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1091,8 +1076,6 @@
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
     <span class="doccomment">///     .prefix(&quot;!&quot;));</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`dynamic_prefix`]: Self::dynamic_prefix</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_empty</span>() { <span class="macro">vec!</span>[] } <span class="kw">else</span> { <span class="macro">vec!</span>[<span class="ident">prefix</span>.<span class="ident">to_string</span>()] };
 
@@ -1102,10 +1085,10 @@
     <span class="doccomment">/// Sets the prefixes to respond to. Each can be a string slice of any</span>
     <span class="doccomment">/// non-zero length.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Refer to [`prefix`] for the default value.</span>
+    <span class="doccomment">/// **Note**: Refer to [`Self::prefix`] for the default value.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: These prefixes will always be usable, even if there is a</span>
-    <span class="doccomment">/// [`dynamic_prefix`] configured.</span>
+    <span class="doccomment">/// [`Self::dynamic_prefix`] configured.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1117,9 +1100,6 @@
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
     <span class="doccomment">///     .prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`prefix`]: Self::prefix</span>
-    <span class="doccomment">/// [`dynamic_prefix`]: Self::dynamic_prefix</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefixes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefixes</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
@@ -1169,7 +1149,7 @@
     <span class="doccomment">/// Sets multiple delimiters to be used when splitting the content after a command.</span>
     <span class="doccomment">/// Additionally cleans the default delimiter from the vector.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Refer to [`delimiter`] for the default value.</span>
+    <span class="doccomment">/// **Note**: Refer to [`Self::delimiter`] for the default value.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1181,8 +1161,6 @@
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
     <span class="doccomment">///     .delimiters(vec![&quot;, &quot;, &quot; &quot;]));</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`delimiter`]: Self::delimiter</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiters</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delimiters</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span>,

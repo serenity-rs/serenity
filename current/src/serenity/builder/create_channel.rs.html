@@ -169,6 +169,8 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -179,11 +181,10 @@
 
 <span class="doccomment">/// A builder for creating a new [`GuildChannel`] in a [`Guild`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Except [`name`], all fields are optional.</span>
+<span class="doccomment">/// Except [`Self::name`], all fields are optional.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`GuildChannel`]: crate::model::channel::GuildChannel</span>
 <span class="doccomment">/// [`Guild`]: crate::model::guild::Guild</span>
-<span class="doccomment">/// [`name`]: Self::name</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateChannel</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -242,10 +243,13 @@
 
     <span class="doccomment">/// How many seconds must a user wait before sending another message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Bots, or users with the `MANAGE_MESSAGES` and/or`MANAGE_CHANNEL` permissions are exempt</span>
+    <span class="doccomment">/// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt</span>
     <span class="doccomment">/// from this restriction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rate_limit_per_user&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">limit</span>)));
 
@@ -320,11 +324,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateChannel</span> {
-    <span class="doccomment">/// Creates a builder with default values, setting `kind` to `ChannelType::Text`.</span>
+    <span class="doccomment">/// Creates a builder with default values, setting [`Self::kind`] to [`ChannelType::Text`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Create a default `CreateChannel` builder:</span>
+    <span class="doccomment">/// Create a default [`CreateChannel`] builder:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// use serenity::builder::CreateChannel;</span>

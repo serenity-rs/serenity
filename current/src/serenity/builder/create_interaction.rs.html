@@ -167,11 +167,6 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -181,12 +176,9 @@
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommandInteractionDataOption`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`kind`], [`name`], and [`description`] are required fields.</span>
+<span class="doccomment">/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandInteractionDataOption`]: crate::model::interactions::ApplicationCommandInteractionDataOption</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
-<span class="doccomment">/// [`name`]: Self::name</span>
-<span class="doccomment">/// [`description`]: Self::description</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInteractionOption</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -282,11 +274,9 @@
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommand`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`name`] and [`description`] are required fields.</span>
+<span class="doccomment">/// [`Self::name`] and [`Self::description`] are required fields.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand</span>
-<span class="doccomment">/// [`name`]: Self::name</span>
-<span class="doccomment">/// [`description`]: Self::description</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInteraction</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 

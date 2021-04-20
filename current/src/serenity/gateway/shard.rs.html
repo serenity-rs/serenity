@@ -840,9 +840,6 @@
 <span id="837">837</span>
 <span id="838">838</span>
 <span id="839">839</span>
-<span id="840">840</span>
-<span id="841">841</span>
-<span id="842">842</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync::Arc</span>,
@@ -898,7 +895,7 @@
 <span class="doccomment">/// you need to. For most use cases, you will not need to do this, and you can</span>
 <span class="doccomment">/// leave the client to do it.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This can be done by passing in the required parameters to [`new`]. You can</span>
+<span class="doccomment">/// This can be done by passing in the required parameters to [`Self::new`]. You can</span>
 <span class="doccomment">/// then manually handle the shard yourself and receive events via</span>
 <span class="doccomment">/// [`receive`].</span>
 <span class="doccomment">///</span>
@@ -907,10 +904,9 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// See the documentation for [`new`] on how to use this.</span>
+<span class="doccomment">/// See the documentation for [`Self::new`] on how to use this.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Client`]: crate::Client</span>
-<span class="doccomment">/// [`new`]: Self::new</span>
 <span class="doccomment">/// [`receive`]: #method.receive</span>
 <span class="doccomment">/// [docs]: https://discord.com/developers/docs/topics/gateway#sharding</span>
 <span class="doccomment">/// [module docs]: crate::gateway#sharding</span>
@@ -1062,7 +1058,7 @@
     <span class="doccomment">/// Sends a heartbeat to the gateway with the current sequence.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This sets the last heartbeat time to now, and</span>
-    <span class="doccomment">/// `last_heartbeat_acknowledged` to `false`.</span>
+    <span class="doccomment">/// [`Self::last_heartbeat_acknowledged`] to `false`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
@@ -1340,16 +1336,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a `GatewayError::InvalidAuthentication` if invalid</span>
+    <span class="doccomment">/// Returns a [`GatewayError::InvalidAuthentication`] if invalid</span>
     <span class="doccomment">/// authentication was sent in the IDENTIFY.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a `GatewayError::InvalidShardData` if invalid shard data was</span>
+    <span class="doccomment">/// Returns a [`GatewayError::InvalidShardData`] if invalid shard data was</span>
     <span class="doccomment">/// sent in the IDENTIFY.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a `GatewayError::NoAuthentication` if no authentication was sent</span>
+    <span class="doccomment">/// Returns a [`GatewayError::NoAuthentication`] if no authentication was sent</span>
     <span class="doccomment">/// in the IDENTIFY.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a `GatewayError::OverloadedShard` if the shard would have too</span>
+    <span class="doccomment">/// Returns a [`GatewayError::OverloadedShard`] if the shard would have too</span>
     <span class="doccomment">/// many guilds assigned to it.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle_event</span>(
@@ -1485,15 +1481,13 @@
 
     <span class="doccomment">/// Performs a deterministic reconnect.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The type of reconnect is deterministic on whether a [`session_id`].</span>
+    <span class="doccomment">/// The type of reconnect is deterministic on whether a [`Self::session_id`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the `session_id` still exists, then a RESUME is sent. If not, then</span>
     <span class="doccomment">/// an IDENTIFY is sent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that, if the shard is already in a stage of</span>
     <span class="doccomment">/// [`ConnectionStage::Connecting`], then no action will be performed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`session_id`]: Self::session_id</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_reconnect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReconnectType</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage::Connecting</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
@@ -1588,7 +1582,7 @@
     <span class="doccomment">/// Sets the shard as going into identifying stage, which sets:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// - the time that the last heartbeat sent as being now</span>
-    <span class="doccomment">/// - the `stage` to `Identifying`</span>
+    <span class="doccomment">/// - the `stage` to [`ConnectionStage::Identifying`]</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">identify</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_identify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="self">self</span>.<span class="ident">intents</span>).<span class="kw">await</span><span class="question-mark">?</span>;

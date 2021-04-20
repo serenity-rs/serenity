@@ -483,6 +483,7 @@
 <span id="480">480</span>
 <span id="481">481</span>
 <span id="482">482</span>
+<span id="483">483</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -618,8 +619,8 @@
 
 <span class="doccomment">/// A set of a parameter and a value from the user.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a</span>
-<span class="doccomment">/// top-level key and another vector of `options`.</span>
+<span class="doccomment">/// All options have names and an option can either be a parameter and input [`Self::value`] or it can denote a sub-command or group, in which case it will contain a</span>
+<span class="doccomment">/// top-level key and another vector of [`Self::options`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandInteractionDataOption</span> {
@@ -731,7 +732,7 @@
     <span class="doccomment">/// Creates a global [`ApplicationCommand`],</span>
     <span class="doccomment">/// overriding an existing one with the same name if it exists.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// When a created `ApplicationCommand` is used, the [`InteractionCreate`] event will be emitted.</span>
+    <span class="doccomment">/// When a created [`ApplicationCommand`] is used, the [`InteractionCreate`] event will be emitted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Global commands may take up to an hour to become available.</span>
     <span class="doccomment">///</span>
@@ -787,8 +788,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// May return an [`Error::Http`] if the `ApplicationCommand` is illformed,</span>
-    <span class="doccomment">/// such as if more than 10 `choices` are set. See the [API Docs] for further details.</span>
+    <span class="doccomment">/// May return an [`Error::Http`] if the [`ApplicationCommand`] is illformed,</span>
+    <span class="doccomment">/// such as if more than 10 [`choices`] are set. See the [API Docs] for further details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Can also return an [`Error::Json`] if there is an error in deserializing</span>
     <span class="doccomment">/// the response.</span>
@@ -798,6 +799,7 @@
     <span class="doccomment">/// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
+    <span class="doccomment">/// [`choices`]: crate::model::interactions::ApplicationCommandOption::choices</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
@@ -812,11 +814,11 @@
 
     <span class="doccomment">/// Creates a guild specific [`ApplicationCommand`]</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.</span>
+    <span class="doccomment">/// **Note**: Unlike global [`ApplicationCommand`]s, guild commands will update instantly.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the same possible errors as `create_global_application_command`.</span>
+    <span class="doccomment">/// Returns the same possible errors as [`Self::create_global_application_command`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -877,7 +879,7 @@
 
     <span class="doccomment">/// Edits the initial interaction response.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// `application_id` will usually be the bot&#39;s `[UserId]`, except in cases of bots being very old.</span>
+    <span class="doccomment">/// `application_id` will usually be the bot&#39;s [`UserId`], except in cases of bots being very old.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to Discord&#39;s docs for Edit Webhook Message for field information.</span>
     <span class="doccomment">///</span>

@@ -245,9 +245,6 @@
 <span id="242">242</span>
 <span id="243">243</span>
 <span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -336,7 +333,7 @@
 
     <span class="doccomment">/// Set the content of the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that when setting at least one embed via [`embeds`], this may be</span>
+    <span class="doccomment">/// Note that when setting at least one embed via [`Self::embeds`], this may be</span>
     <span class="doccomment">/// omitted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -361,8 +358,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`embeds`]: Self::embeds</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">content</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
@@ -386,7 +381,7 @@
     <span class="doccomment">/// Sets a list of files to include in the webhook message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Calling this multiple times will overwrite the file list.</span>
-    <span class="doccomment">/// To append files, call `add_file` or `add_files` instead.</span>
+    <span class="doccomment">/// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
@@ -475,11 +470,11 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Returns a default set of values for a [`Webhook`] execution.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The only default value is [`tts`] being set to `false`.</span>
+    <span class="doccomment">/// The only default value is [`Self::tts`] being set to `false`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Creating an `ExecuteWebhook` builder:</span>
+    <span class="doccomment">/// Creating an [`ExecuteWebhook`] builder:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// use serenity::builder::ExecuteWebhook;</span>
@@ -488,7 +483,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Webhook`]: crate::model::webhook::Webhook</span>
-    <span class="doccomment">/// [`tts`]: Self::tts</span>
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::Bool</span>(<span class="bool-val">false</span>));

@@ -179,9 +179,6 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -197,8 +194,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// There are two situations where different field requirements are present:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// 1. When sending an [`embed`], no other field is required;</span>
-<span class="doccomment">/// 2. Otherwise, [`content`] is the only required field that is required to be</span>
+<span class="doccomment">/// 1. When sending an [`Self::embed`], no other field is required;</span>
+<span class="doccomment">/// 2. Otherwise, [`Self::content`] is the only required field that is required to be</span>
 <span class="doccomment">/// set.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Note that if you only need to send the content of a message, without</span>
@@ -235,8 +232,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ChannelId::say`]: crate::model::id::ChannelId::say</span>
 <span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
-<span class="doccomment">/// [`content`]: Self::content</span>
-<span class="doccomment">/// [`embed`]: Self::embed</span>
 <span class="doccomment">/// [`Http::send_message`]: crate::http::client::Http::send_message</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
@@ -320,7 +315,7 @@
     <span class="doccomment">/// Sets a list of files to include in the message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Calling this multiple times will overwrite the file list.</span>
-    <span class="doccomment">/// To append files, call `add_file` or `add_files` instead.</span>
+    <span class="doccomment">/// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
@@ -352,11 +347,10 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a map for sending a [`Message`], setting [`tts`] to `false` by</span>
+    <span class="doccomment">/// Creates a map for sending a [`Message`], setting [`Self::tts`] to `false` by</span>
     <span class="doccomment">/// default.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Message`]: crate::model::channel::Message</span>
-    <span class="doccomment">/// [`tts`]: Self::tts</span>
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::Bool</span>(<span class="bool-val">false</span>));

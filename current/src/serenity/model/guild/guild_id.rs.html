@@ -1219,12 +1219,6 @@
 <span id="1216">1216</span>
 <span id="1217">1217</span>
 <span id="1218">1218</span>
-<span id="1219">1219</span>
-<span id="1220">1220</span>
-<span id="1221">1221</span>
-<span id="1222">1222</span>
-<span id="1223">1223</span>
-<span id="1224">1224</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1298,14 +1292,12 @@
         <span class="self">self</span>.<span class="ident">_ban_with_reason</span>(<span class="ident">http</span>, <span class="ident">user</span>.<span class="ident">into</span>(), <span class="ident">dmd</span>, <span class="string">&quot;&quot;</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.</span>
+    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the reasons `ban` may return an error, may</span>
+    <span class="doccomment">/// In addition to the reasons [`Self::ban`] may return an error, may</span>
     <span class="doccomment">/// also return [`Error::ExceededLimit`] if `reason` is too long.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ban`]: Self::ban</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ban_with_reason</span>(
         <span class="self">self</span>,
@@ -1720,7 +1712,7 @@
 
     <span class="doccomment">/// Edits the current user&#39;s nickname for the guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Pass `None` to reset the nickname.</span>
+    <span class="doccomment">/// Pass [`None`] to reset the nickname.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Change Nickname] permission.</span>
     <span class="doccomment">///</span>
@@ -1905,7 +1897,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the reasons `kick` may return an error,</span>
+    <span class="doccomment">/// In addition to the reasons [`Self::kick`] may return an error,</span>
     <span class="doccomment">/// may also return an error if the reason is too long.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">kick_with_reason</span>(
         <span class="self">self</span>,
@@ -1987,7 +1979,7 @@
 
     <span class="doccomment">/// Streams over all the members in a guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is accomplished and equivalent to repeated calls to [`members`].</span>
+    <span class="doccomment">/// This is accomplished and equivalent to repeated calls to [`Self::members`].</span>
     <span class="doccomment">/// A buffer of at most 1,000 members is used to reduce the number of calls</span>
     <span class="doccomment">/// necessary.</span>
     <span class="doccomment">///</span>
@@ -2015,8 +2007,6 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`members`]: Self::members</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">members_iter</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">MembersIter</span>::<span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span><span class="ident">::stream</span>(<span class="ident">http</span>, <span class="self">self</span>)
     }
@@ -2029,7 +2019,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an [`Error::Http`] if the current user</span>
     <span class="doccomment">/// lacks permission, or if the member is not currently</span>
-    <span class="doccomment">/// in a voice channel for this `Guild`.</span>
+    <span class="doccomment">/// in a voice channel for this [`Guild`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Move Members]: Permissions::MOVE_MEMBERS</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
@@ -2177,7 +2167,7 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
-    <span class="doccomment">/// or if an `Integration` with that Id does not exist.</span>
+    <span class="doccomment">/// or if an [`Integration`] with that Id does not exist.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -2405,7 +2395,7 @@
 
     <span class="doccomment">/// Streams over all the members in a guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is accomplished and equivalent to repeated calls to [`members`].</span>
+    <span class="doccomment">/// This is accomplished and equivalent to repeated calls to [`GuildId::members`].</span>
     <span class="doccomment">/// A buffer of at most 1,000 members is used to reduce the number of calls</span>
     <span class="doccomment">/// necessary.</span>
     <span class="doccomment">///</span>
@@ -2434,8 +2424,6 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`members`]: GuildId::members</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">init_state</span> <span class="op">=</span> <span class="ident">MembersIter::new</span>(<span class="ident">guild_id</span>, <span class="ident">http</span>);
 

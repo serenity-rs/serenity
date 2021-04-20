@@ -435,6 +435,10 @@
 <span id="432">432</span>
 <span id="433">433</span>
 <span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -525,9 +529,11 @@
     <span class="doccomment">/// Provides the partial data of the guild sent by discord,</span>
     <span class="doccomment">/// and the full data from the cache, if available.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The `unavailable` flag in the partial data determines the status of the guild.</span>
+    <span class="doccomment">/// The [`unavailable`] flag in the partial data determines the status of the guild.</span>
     <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
     <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`unavailable`]: GuildUnavailable::unavailable</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -541,9 +547,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the partial data of the guild sent by discord.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The `unavailable` flag in the partial data determines the status of the guild.</span>
+    <span class="doccomment">/// The [`unavailable`] flag in the partial data determines the status of the guild.</span>
     <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
     <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`unavailable`]: GuildUnavailable::unavailable</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">GuildUnavailable</span>) {}
 
