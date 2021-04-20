@@ -224,7 +224,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg?style=flat-square
 [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
-[guild]: https://discord.gg/9X7vCus
+[guild]: https://discord.gg/serenity-rs
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
 [project:lavalink-rs]: https://gitlab.com/nitsuga5124/lavalink-rs/
 [project:songbird]: https://github.com/serenity-rs/songbird
