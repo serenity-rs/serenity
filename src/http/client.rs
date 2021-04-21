@@ -244,17 +244,19 @@ impl Http {
     /// The timeout is applied from when the request starts connecting until the response body has finished.
     /// The connect_timeout is applied for only the connect phase.
     pub fn new_with_timeouts(
-        timeout: std::time::Duration,
-        connect_timeout: std::time::Duration,
+        timeout: Option<std::time::Duration>,
+        connect_timeout: Option<std::time::Duration>,
         token: &str,
     ) -> Self {
-        let builder = configure_client_backend(Client::builder())
-            .timeout(timeout)
-            .connect_timeout(connect_timeout);
+        let mut builder = configure_client_backend(Client::builder());
+        if let Some(t) = timeout {
+            builder = builder.timeout(t);
+        }
+        if let Some(t) = connect_timeout {
+            builder = builder.connect_timeout(t);
+        }
 
         let built = builder.build().expect("Cannot build reqwest::Client");
-        let client = Arc::new(built);
-        let client2 = Arc::clone(&client);
 
         let token = if token.trim().starts_with("Bot ") {
             token.to_string()
@@ -262,13 +264,7 @@ impl Http {
             format!("Bot {}", token)
         };
 
-        Self {
-            client,
-            ratelimiter: Ratelimiter::new(client2, ""),
-            ratelimiter_disabled: false,
-            proxy: None,
-            token,
-        }
+        Self::new(Arc::new(built), &token)
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
