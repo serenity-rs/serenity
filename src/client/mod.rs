@@ -27,7 +27,6 @@ mod event_handler;
 #[cfg(feature = "gateway")]
 mod extras;
 
-#[cfg(all(feature = "cache", feature = "gateway"))]
 use std::time::Duration;
 use std::{
     boxed::Box,
