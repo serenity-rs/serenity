@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/interactions.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>interactions.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -483,7 +483,6 @@
 <span id="480">480</span>
 <span id="481">481</span>
 <span id="482">482</span>
-<span id="483">483</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -619,8 +618,8 @@
 
 <span class="doccomment">/// A set of a parameter and a value from the user.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// All options have names and an option can either be a parameter and input [`Self::value`] or it can denote a sub-command or group, in which case it will contain a</span>
-<span class="doccomment">/// top-level key and another vector of [`Self::options`].</span>
+<span class="doccomment">/// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a</span>
+<span class="doccomment">/// top-level key and another vector of `options`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandInteractionDataOption</span> {
@@ -732,7 +731,7 @@
     <span class="doccomment">/// Creates a global [`ApplicationCommand`],</span>
     <span class="doccomment">/// overriding an existing one with the same name if it exists.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// When a created [`ApplicationCommand`] is used, the [`InteractionCreate`] event will be emitted.</span>
+    <span class="doccomment">/// When a created `ApplicationCommand` is used, the [`InteractionCreate`] event will be emitted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Global commands may take up to an hour to become available.</span>
     <span class="doccomment">///</span>
@@ -788,8 +787,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// May return an [`Error::Http`] if the [`ApplicationCommand`] is illformed,</span>
-    <span class="doccomment">/// such as if more than 10 [`choices`] are set. See the [API Docs] for further details.</span>
+    <span class="doccomment">/// May return an [`Error::Http`] if the `ApplicationCommand` is illformed,</span>
+    <span class="doccomment">/// such as if more than 10 `choices` are set. See the [API Docs] for further details.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Can also return an [`Error::Json`] if there is an error in deserializing</span>
     <span class="doccomment">/// the response.</span>
@@ -799,7 +798,6 @@
     <span class="doccomment">/// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="doccomment">/// [`choices`]: crate::model::interactions::ApplicationCommandOption::choices</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
@@ -814,11 +812,11 @@
 
     <span class="doccomment">/// Creates a guild specific [`ApplicationCommand`]</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Unlike global [`ApplicationCommand`]s, guild commands will update instantly.</span>
+    <span class="doccomment">/// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the same possible errors as [`Self::create_global_application_command`].</span>
+    <span class="doccomment">/// Returns the same possible errors as `create_global_application_command`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -879,7 +877,7 @@
 
     <span class="doccomment">/// Edits the initial interaction response.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// `application_id` will usually be the bot&#39;s [`UserId`], except in cases of bots being very old.</span>
+    <span class="doccomment">/// `application_id` will usually be the bot&#39;s `[UserId]`, except in cases of bots being very old.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to Discord&#39;s docs for Edit Webhook Message for field information.</span>
     <span class="doccomment">///</span>
