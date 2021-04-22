@@ -93,7 +93,6 @@ impl<'a> ClientBuilder<'a> {
             http: None,
             fut: None,
             intents: GatewayIntents::non_privileged(),
-            #[cfg(feature = "cache")]
             timeout: None,
             http_request_timeout: None,
             http_connect_timeout: None,
