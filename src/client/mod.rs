@@ -74,7 +74,6 @@ pub struct ClientBuilder<'a> {
     http: Option<Http>,
     fut: Option<BoxFuture<'a, Result<Client>>>,
     intents: GatewayIntents,
-    #[cfg(feature = "cache")]
     timeout: Option<Duration>,
     http_request_timeout: Option<Duration>,
     http_connect_timeout: Option<Duration>,
