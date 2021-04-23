@@ -266,8 +266,6 @@
 <span id="263">263</span>
 <span id="264">264</span>
 <span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
@@ -322,12 +320,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Client::data`]: crate::Client::data</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A reference to an `EventHandler`, such as the one given to the</span>
+    <span class="doccomment">/// A reference to an [`EventHandler`], such as the one given to the</span>
     <span class="doccomment">/// [`Client`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Client`]: crate::Client</span>
     <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A reference to an `RawEventHandler`, such as the one given to the</span>
+    <span class="doccomment">/// A reference to an [`RawEventHandler`], such as the one given to the</span>
     <span class="doccomment">/// [`Client`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Client`]: crate::Client</span>
@@ -364,7 +362,7 @@
 <span class="kw">impl</span> <span class="ident">ShardQueuer</span> {
     <span class="doccomment">/// Begins the shard queuer loop.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will loop over the internal [`rx`] for [`ShardQueuerMessage`]s,</span>
+    <span class="doccomment">/// This will loop over the internal [`Self::rx`] for [`ShardQueuerMessage`]s,</span>
     <span class="doccomment">/// blocking for messages on what to do.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If a [`ShardQueuerMessage::Start`] is received, this will:</span>
@@ -379,8 +377,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This should be run in its own thread due to the blocking</span>
     <span class="doccomment">/// nature of the loop.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`rx`]: Self::rx</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="comment">// The duration to timeout from reads over the Rx channel. This can be</span>

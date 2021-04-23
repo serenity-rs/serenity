@@ -758,11 +758,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called</span>
     <span class="doccomment">/// on the returned struct to stop typing. Note that on some clients, typing may persist</span>
-    <span class="doccomment">/// for a few seconds after `stop` is called.</span>
+    <span class="doccomment">/// for a few seconds after [`Typing::stop`] is called.</span>
     <span class="doccomment">/// Typing is also stopped when the struct is dropped.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If a message is sent while typing is triggered, the user will stop typing for a brief period</span>
-    <span class="doccomment">/// of time and then resume again until either `stop` is called or the struct is dropped.</span>
+    <span class="doccomment">/// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should rarely be used for bots, although it is a good indicator that a</span>
     <span class="doccomment">/// long-running command is still being processed.</span>

@@ -181,6 +181,10 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -</span>
 <span class="doccomment">//! responsible for maintaing a WebSocket connection with Discord.</span>
@@ -335,8 +339,12 @@
 <span class="doccomment">/// A message to be passed around within the library.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// As a user you usually don&#39;t need to worry about this, but when working with</span>
-<span class="doccomment">/// the lower-level internals of the `client`, `gateway, and `voice` modules it</span>
+<span class="doccomment">/// the lower-level internals of the [`client`], [`gateway`], and [`voice`] modules it</span>
 <span class="doccomment">/// may be necessary.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`client`]: crate::client</span>
+<span class="doccomment">/// [`gateway`]: crate::gateway</span>
+<span class="doccomment">/// [`voice`]: crate::model::voice</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InterMessage</span> {

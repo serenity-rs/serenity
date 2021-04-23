@@ -156,12 +156,6 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -231,11 +225,8 @@
 <span class="kw">impl</span> <span class="ident">CreateAllowedMentions</span> {
     <span class="doccomment">/// Add a value that&#39;s allowed to be mentioned.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If users or roles is specified, [`users`] and [`roles`] will not work.\</span>
+    <span class="doccomment">/// If users or roles is specified, [`Self::users`] and [`Self::roles`] will not work.\</span>
     <span class="doccomment">/// If you use either, do not specify it&#39;s same type here.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`users`]: Self::users</span>
-    <span class="doccomment">/// [`roles`]: Self::roles</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">ParseValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;parse&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
@@ -249,10 +240,7 @@
     <span class="doccomment">/// Clear all the values that would be mentioned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If parse is empty, the message will not mention anyone, unless they are specified on</span>
-    <span class="doccomment">/// [`users`] or [`roles`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`users`]: Self::users</span>
-    <span class="doccomment">/// [`roles`]: Self::roles</span>
+    <span class="doccomment">/// [`Self::users`] or [`Self::roles`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;parse&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));

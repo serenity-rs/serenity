@@ -1225,13 +1225,6 @@
 <span id="1222">1222</span>
 <span id="1223">1223</span>
 <span id="1224">1224</span>
-<span id="1225">1225</span>
-<span id="1226">1226</span>
-<span id="1227">1227</span>
-<span id="1228">1228</span>
-<span id="1229">1229</span>
-<span id="1230">1230</span>
-<span id="1231">1231</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1309,14 +1302,14 @@
     <span class="doccomment">/// Channels specifically mentioned in this message.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**:</span>
-    <span class="doccomment">/// Not all channel mentions in a message will appear in `mention_channels`. Only textual</span>
+    <span class="doccomment">/// Not all channel mentions in a message will appear in [`Self::mention_channels`]. Only textual</span>
     <span class="doccomment">/// channels that are visible to everyone in a lurkable guild will ever be included.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A lurkable guild is one that allows users to read public channels in a server without</span>
     <span class="doccomment">/// actually joining the server. It also allows users to look at these channels without being</span>
     <span class="doccomment">/// logged in to Discord.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Only crossposted messages (via Channel Following) currently include `mention_channels` at</span>
+    <span class="doccomment">/// Only crossposted messages (via Channel Following) currently include [`Self::mention_channels`] at</span>
     <span class="doccomment">/// all. If no mentions in the message meet these requirements, this field will not be sent.</span>
     <span class="doccomment">/// [Refer to Discord&#39;s documentation for more information][discord-docs].</span>
     <span class="doccomment">///</span>
@@ -1413,7 +1406,7 @@
 
     <span class="doccomment">/// Retrieves the related channel located in the cache.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the channel is not in the cache.</span>
+    <span class="doccomment">/// Returns [`None`] if the channel is not in the cache.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
@@ -1685,28 +1678,24 @@
         <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">reaction_users</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">reaction_type</span>, <span class="ident">limit</span>, <span class="ident">after</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Returns the associated `Guild` for the message if one is in the cache.</span>
+    <span class="doccomment">/// Returns the associated [`Guild`] for the message if one is in the cache.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the guild&#39;s Id could not be found via [`guild_id`] or</span>
+    <span class="doccomment">/// Returns [`None`] if the guild&#39;s Id could not be found via [`Self::guild_id`] or</span>
     <span class="doccomment">/// if the Guild itself is not cached.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the `cache` feature be enabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
         <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Returns a field to the `Guild` for the message if one is in the cache.</span>
+    <span class="doccomment">/// Returns a field to the [`Guild`] for the message if one is in the cache.</span>
     <span class="doccomment">/// The field can be selected via the `field_accessor`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the guild&#39;s ID could not be found via [`guild_id`] or</span>
+    <span class="doccomment">/// Returns [`None`] if the guild&#39;s ID could not be found via [`Self::guild_id`] or</span>
     <span class="doccomment">/// if the Guild itself is not cached.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the `cache` feature be enabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1734,9 +1723,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::ItemMissing`] is returned if [`guild_id`] is `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
+    <span class="doccomment">/// [`ModelError::ItemMissing`] is returned if [`Self::guild_id`] is [`None`].</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">member</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
             <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">guild_id</span>,
@@ -1758,8 +1745,8 @@
     <span class="doccomment">/// Checks the length of a string to ensure that it is within Discord&#39;s</span>
     <span class="doccomment">/// maximum message length limit.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the message is within the limit, otherwise returns</span>
-    <span class="doccomment">/// `Some` with an inner value of how many unicode code points the message</span>
+    <span class="doccomment">/// Returns [`None`] if the message is within the limit, otherwise returns</span>
+    <span class="doccomment">/// [`Some`] with an inner value of how many unicode code points the message</span>
     <span class="doccomment">/// is over.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overflow_length</span>(<span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="comment">// Check if the content is over the maximum number of unicode code</span>
@@ -1943,7 +1930,7 @@
         <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>(), <span class="ident">content</span>), <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// `inlined` decides whether this reply is inlinded and whether it pings.</span>
+    <span class="doccomment">/// `inlined` decides whether this reply is inlined and whether it pings.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_reply</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
@@ -2086,7 +2073,7 @@
 
     <span class="doccomment">/// Tries to return author&#39;s nickname in the current channel&#39;s guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [`User::nick_in()`] inside and `None` outside of a guild.</span>
+    <span class="doccomment">/// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">author_nick</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">nick_in</span>(<span class="ident">cache_http</span>, <span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>).<span class="kw">await</span>
@@ -2201,14 +2188,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageId</span> {
-    <span class="doccomment">/// Gets the Id of a `Message`.</span>
+    <span class="doccomment">/// Gets the Id of a [`Message`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageId</span> {
         <span class="ident">message</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageId</span> {
-    <span class="doccomment">/// Gets the Id of a `Message`.</span>
+    <span class="doccomment">/// Gets the Id of a [`Message`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageId</span> {
         <span class="ident">message</span>.<span class="ident">id</span>
     }
@@ -2216,10 +2203,9 @@
 
 <span class="doccomment">/// A representation of a reaction to a message.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Multiple of the same [reaction type] are sent into one `MessageReaction`,</span>
-<span class="doccomment">/// with an associated [`count`].</span>
+<span class="doccomment">/// Multiple of the same [reaction type] are sent into one [`MessageReaction`],</span>
+<span class="doccomment">/// with an associated [`Self::count`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`count`]: Self::count</span>
 <span class="doccomment">/// [reaction type]: ReactionType</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>

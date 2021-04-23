@@ -1144,17 +1144,6 @@
 <span id="1141">1141</span>
 <span id="1142">1142</span>
 <span id="1143">1143</span>
-<span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -1466,19 +1455,13 @@
 
     <span class="doccomment">/// Retrieves a [`Channel`] from the cache based on the given Id.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will search the [`channels`] map, then the [`private_channels`] map.</span>
+    <span class="doccomment">/// This will search the [`Self::channels`] map, then the [`Self::private_channels`] map.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If you know what type of channel you&#39;re looking for, you should instead</span>
     <span class="doccomment">/// manually retrieve from one of the respective maps or methods:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// - [`GuildChannel`]: [`guild_channel`] or [`channels`]</span>
-    <span class="doccomment">/// - [`PrivateChannel`]: [`private_channel`] or [`private_channels`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`channels`]: Self::channels</span>
-    <span class="doccomment">/// [`guild_channel`]: Self::guild_channel</span>
-    <span class="doccomment">/// [`private_channel`]: Self::private_channel</span>
-    <span class="doccomment">/// [`groups`]: Self::groups</span>
-    <span class="doccomment">/// [`private_channels`]: Self::private_channels</span>
+    <span class="doccomment">/// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::channels`]</span>
+    <span class="doccomment">/// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
@@ -1499,9 +1482,8 @@
 
     <span class="doccomment">/// Clones an entire guild from the cache based on the given `id`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In order to clone only a field of the guild, use [`guild_field`].</span>
+    <span class="doccomment">/// In order to clone only a field of the guild, use [`Self::guild_field`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`guild_field`]: Self::guild_field</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1573,7 +1555,7 @@
         <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">len</span>()
     }
 
-    <span class="doccomment">/// Retrieves a reference to a [`Guild`]&#39;s channel. Unlike [`channel`],</span>
+    <span class="doccomment">/// Retrieves a reference to a [`Guild`]&#39;s channel. Unlike [`Self::channel`],</span>
     <span class="doccomment">/// this will only search guilds for the given channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The only advantage of this method is that you can pass in anything that</span>
@@ -1618,7 +1600,6 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Client::on_message`]: ../client/struct.Client.html#method.on_message</span>
-    <span class="doccomment">/// [`channel`]: Self::channel</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_guild_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
@@ -1872,7 +1853,7 @@
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">messages</span><span class="op">|</span> <span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message_id</span>).<span class="ident">cloned</span>())
     }
 
-    <span class="doccomment">/// Retrieves a [`PrivateChannel`] from the cache&#39;s [`private_channels`]</span>
+    <span class="doccomment">/// Retrieves a [`PrivateChannel`] from the cache&#39;s [`Self::private_channels`]</span>
     <span class="doccomment">/// map, if it exists.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The only advantage of this method is that you can pass in anything that</span>
@@ -1898,8 +1879,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`private_channels`]: Self::private_channels</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">private_channel</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1976,13 +1955,12 @@
         <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">max_messages</span> <span class="op">=</span> <span class="ident">max</span>;
     }
 
-    <span class="doccomment">/// Retrieves a `User` from the cache&#39;s [`users`] map, if it exists.</span>
+    <span class="doccomment">/// Retrieves a [`User`] from the cache&#39;s [`Self::users`] map, if it exists.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The only advantage of this method is that you can pass in anything that</span>
     <span class="doccomment">/// is indirectly a [`UserId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
-    <span class="doccomment">/// [`users`]: Self::users</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>

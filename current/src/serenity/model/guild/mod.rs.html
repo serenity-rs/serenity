@@ -2677,10 +2677,6 @@
 <span id="2674">2674</span>
 <span id="2675">2675</span>
 <span id="2676">2676</span>
-<span id="2677">2677</span>
-<span id="2678">2678</span>
-<span id="2679">2679</span>
-<span id="2680">2680</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -2803,10 +2799,8 @@
     <span class="doccomment">/// Users who are members of the guild.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Members might not all be available when the [`ReadyEvent`] is received</span>
-    <span class="doccomment">/// if the [`member_count`] is greater than the `LARGE_THRESHOLD` set by</span>
+    <span class="doccomment">/// if the [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by</span>
     <span class="doccomment">/// the library.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`member_count`]: Self::member_count</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Member</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of whether the guild requires multi-factor authentication for</span>
@@ -2829,7 +2823,7 @@
     <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
     <span class="doccomment">/// An identifying hash of the guild&#39;s splash icon.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If the [`&quot;InviteSplash&quot;`] feature is enabled, this can be used to generate</span>
+    <span class="doccomment">/// If the `InviteSplash` feature is enabled, this can be used to generate</span>
     <span class="doccomment">/// a URL to a splash image.</span>
     <span class="kw">pub</span> <span class="ident">splash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The ID of the channel to which system messages are sent.</span>
@@ -2873,7 +2867,7 @@
 
     <span class="doccomment">/// Returns the &quot;default&quot; channel of the guild for the passed user id.</span>
     <span class="doccomment">/// (This returns the first channel that can be read by the user, if there isn&#39;t one,</span>
-    <span class="doccomment">/// returns `None`)</span>
+    <span class="doccomment">/// returns [`None`])</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">default_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uid</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">uid</span>)<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">values</span>() {
@@ -2887,7 +2881,7 @@
 
     <span class="doccomment">/// Returns the guaranteed &quot;default&quot; channel of the guild.</span>
     <span class="doccomment">/// (This returns the first channel that can be read by everyone, if there isn&#39;t one,</span>
-    <span class="doccomment">/// returns `None`)</span>
+    <span class="doccomment">/// returns [`None`])</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is very costly if used in a server with lots of channels,</span>
     <span class="doccomment">/// members, or both.</span>
@@ -2977,14 +2971,12 @@
         <span class="self">self</span>.<span class="ident">_ban_with_reason</span>(<span class="ident">cache_http</span>, <span class="ident">user</span>.<span class="ident">into</span>(), <span class="ident">dmd</span>, <span class="string">&quot;&quot;</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.</span>
+    <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the possible reasons `ban` may return an error, an [`Error::ExceededLimit`]</span>
+    <span class="doccomment">/// In addition to the possible reasons [`Self::ban`] may return an error, an [`Error::ExceededLimit`]</span>
     <span class="doccomment">/// may also be returned if the reason is too long.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ban`]: Self::ban</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ban_with_reason</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -3375,7 +3367,7 @@
 
     <span class="doccomment">/// Edits the current guild with new data where specified.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to `EditGuild`&#39;s documentation for a full list of methods.</span>
+    <span class="doccomment">/// Refer to [`EditGuild`]&#39;s documentation for a full list of methods.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the current user to have the [Manage Guild]</span>
     <span class="doccomment">/// permission.</span>
@@ -3498,7 +3490,7 @@
 
     <span class="doccomment">/// Edits the current user&#39;s nickname for the guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Pass `None` to reset the nickname.</span>
+    <span class="doccomment">/// Pass [`None`] to reset the nickname.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Change Nickname] permission.</span>
     <span class="doccomment">///</span>
@@ -3610,10 +3602,10 @@
     <span class="doccomment">/// [`position`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`None`] if at least one of the given users&#39; member instances</span>
-    <span class="doccomment">/// is not present. Returns `None` if the users have the same hierarchy, as</span>
+    <span class="doccomment">/// is not present. Returns [`None`] if the users have the same hierarchy, as</span>
     <span class="doccomment">/// neither are greater than the other.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If both user IDs are the same, `None` is returned. If one of the users</span>
+    <span class="doccomment">/// If both user IDs are the same, [`None`] is returned. If one of the users</span>
     <span class="doccomment">/// is the guild owner, their ID is returned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`position`]: Role::position</span>
@@ -3792,7 +3784,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the reasons `kick` may return an error,</span>
+    <span class="doccomment">/// In addition to the reasons [`Self::kick`] may return an error,</span>
     <span class="doccomment">/// may also return an error if the reason is too long.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">kick_with_reason</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -3918,7 +3910,7 @@
         <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">nick</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">nick</span><span class="op">|</span> <span class="ident">nick</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>))
     }
 
-    <span class="doccomment">/// Retrieves all [`Member`] that start with a given `String`.</span>
+    <span class="doccomment">/// Retrieves all [`Member`] that start with a given [`String`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `sorted` decides whether the best early match of the `prefix`</span>
     <span class="doccomment">/// should be the criteria to sort the result.</span>
@@ -3975,7 +3967,7 @@
         }
     }
 
-    <span class="doccomment">/// Retrieves all [`Member`] containing a given `String` as</span>
+    <span class="doccomment">/// Retrieves all [`Member`] containing a given [`String`] as</span>
     <span class="doccomment">/// either username or nick, with a priority on username.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the substring is &quot;yla&quot;, following results are possible:</span>
@@ -3992,7 +3984,7 @@
     <span class="doccomment">/// It would be sorted:</span>
     <span class="doccomment">/// - &quot;zey&quot;, &quot;azey&quot;, &quot;zeyla&quot;, &quot;zeylaa&quot;, &quot;zeyzeyzey&quot;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Due to two fields of a `Member` being candidates for</span>
+    <span class="doccomment">/// **Note**: Due to two fields of a [`Member`] being candidates for</span>
     <span class="doccomment">/// the searched field, setting `sorted` to `true` will result in an overhead,</span>
     <span class="doccomment">/// as both fields have to be considered again for sorting.</span>
     <span class="doccomment">///</span>
@@ -4044,7 +4036,7 @@
         }
     }
 
-    <span class="doccomment">/// Retrieves a tuple of [`Member`]s containing a given `String` in</span>
+    <span class="doccomment">/// Retrieves a tuple of [`Member`]s containing a given [`String`] in</span>
     <span class="doccomment">/// their username as the first field and the name used for sorting</span>
     <span class="doccomment">/// as the second field.</span>
     <span class="doccomment">///</span>
@@ -4104,7 +4096,7 @@
         }
     }
 
-    <span class="doccomment">/// Retrieves all [`Member`] containing a given `String` in</span>
+    <span class="doccomment">/// Retrieves all [`Member`] containing a given [`String`] in</span>
     <span class="doccomment">/// their nick.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the substring is &quot;yla&quot;, following results are possible:</span>
@@ -4259,7 +4251,7 @@
         <span class="self">Self</span><span class="ident">::_user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">roles</span>, <span class="self">self</span>.<span class="ident">owner_id</span>, <span class="self">self</span>.<span class="ident">id</span>)
     }
 
-    <span class="doccomment">/// Helper function that can also be used from `PartialGuild`.</span>
+    <span class="doccomment">/// Helper function that can also be used from [`PartialGuild`].</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">_user_permissions_in</span>(
         <span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="ident">GuildChannel</span>,
         <span class="ident">member</span>: <span class="kw-2">&amp;</span><span class="ident">Member</span>,
@@ -4349,7 +4341,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Will return an [`Error::Model`] if the `Role` or `Channel` is not from this `Guild`.</span>
+    <span class="doccomment">/// Will return an [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -4357,7 +4349,7 @@
         <span class="self">Self</span><span class="ident">::_role_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">role</span>, <span class="self">self</span>.<span class="ident">id</span>)
     }
 
-    <span class="doccomment">/// Helper function that can also be used from `PartialGuild`.</span>
+    <span class="doccomment">/// Helper function that can also be used from [`PartialGuild`].</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">_role_permissions_in</span>(
         <span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="ident">GuildChannel</span>,
         <span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>,
@@ -4541,7 +4533,7 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an [`Error::Http`] if the current user does not have permission,</span>
-    <span class="doccomment">/// or if an `Integration` with that Id does not exist.</span>
+    <span class="doccomment">/// or if an [`Integration`] with that Id does not exist.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>

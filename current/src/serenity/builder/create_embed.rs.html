@@ -599,15 +599,6 @@
 <span id="596">596</span>
 <span id="597">597</span>
 <span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
@@ -675,9 +666,7 @@
 
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is an alias of [`colour`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`colour`]: Self::colour</span>
+    <span class="doccomment">/// This is an alias of [`Self::colour`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -701,8 +690,6 @@
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is an alias of [`colour`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`colour`]: Self::colour</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -757,9 +744,7 @@
 
     <span class="doccomment">/// Adds multiple fields at once.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is sugar to reduce the need of calling [`field`] manually multiple times.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`field`]: Self::field</span>
+    <span class="doccomment">/// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">bool</span>)<span class="op">&gt;</span>,
@@ -944,14 +929,12 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Same as calling [`image`] with &quot;attachment://filename.(jpg, png)&quot;.</span>
+    <span class="doccomment">/// Same as calling [`Self::image`] with &quot;attachment://filename.(jpg, png)&quot;.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])</span>
     <span class="doccomment">/// with the provided filename. Or else this won&#39;t work.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`image`]: Self::image</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attachment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filename</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">filename</span>.<span class="ident">to_string</span>();
@@ -1043,10 +1026,9 @@
 <span class="doccomment">/// A builder to create a fake [`Embed`] object&#39;s author, for use with the</span>
 <span class="doccomment">/// [`CreateEmbed::author`] method.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Requires that you specify a [`name`].</span>
+<span class="doccomment">/// Requires that you specify a [`Self::name`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Embed`]: crate::model::channel::Embed</span>
-<span class="doccomment">/// [`name`]: Self::name</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbedAuthor</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 

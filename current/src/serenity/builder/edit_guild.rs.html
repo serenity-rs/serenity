@@ -292,10 +292,6 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -316,13 +312,11 @@
 
 <span class="kw">impl</span> <span class="ident">EditGuild</span> {
     <span class="doccomment">/// Set the &quot;AFK voice channel&quot; that users are to move to if they have been</span>
-    <span class="doccomment">/// AFK for an amount of time, configurable by [`afk_timeout`].</span>
+    <span class="doccomment">/// AFK for an amount of time, configurable by [`Self::afk_timeout`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The given channel must be either some valid voice channel, or `None` to</span>
+    <span class="doccomment">/// The given channel must be either some valid voice channel, or [`None`] to</span>
     <span class="doccomment">/// not set an AFK channel. The library does not check if a channel is</span>
     <span class="doccomment">/// valid.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`afk_timeout`]: Self::afk_timeout</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">afk_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_afk_channel</span>(<span class="ident">channel</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>));
@@ -337,15 +331,13 @@
     }
 
     <span class="doccomment">/// Set the amount of time a user is to be moved to the AFK channel -</span>
-    <span class="doccomment">/// configured via [`afk_channel`] - after being AFK.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`afk_channel`]: Self::afk_channel</span>
+    <span class="doccomment">/// configured via [`Self::afk_channel`] - after being AFK.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">afk_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;afk_timeout&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">timeout</span>)));
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the icon of the guild. Pass `None` to remove the icon.</span>
+    <span class="doccomment">/// Set the icon of the guild. Pass [`None`] to remove the icon.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>

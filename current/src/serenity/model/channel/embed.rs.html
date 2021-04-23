@@ -224,13 +224,6 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder::CreateEmbed</span>;
@@ -283,10 +276,8 @@
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Provider information for the embed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, if the embed [`kind`] is `&quot;video&quot;`, the provider might</span>
+    <span class="doccomment">/// For example, if the embed [`Self::kind`] is `&quot;video&quot;`, the provider might</span>
     <span class="doccomment">/// contain information about YouTube.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`kind`]: Self::kind</span>
     <span class="kw">pub</span> <span class="ident">provider</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedProvider</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Thumbnail information of the embed.</span>
     <span class="kw">pub</span> <span class="ident">thumbnail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedThumbnail</span><span class="op">&gt;</span>,
@@ -298,15 +289,13 @@
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The embed&#39;s video information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is present if the [`kind`] is `&quot;video&quot;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`kind`]: Self::kind</span>
+    <span class="doccomment">/// This is present if the [`Self::kind`] is `&quot;video&quot;`.</span>
     <span class="kw">pub</span> <span class="ident">video</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedVideo</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Embed</span> {
-    <span class="doccomment">/// Creates a fake Embed, giving back a `serde_json` map.</span>
+    <span class="doccomment">/// Creates a fake Embed, giving back a [`serde_json`] map.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should only be useful in conjunction with [`Webhook::execute`].</span>
     <span class="doccomment">///</span>
@@ -373,11 +362,8 @@
 <span class="kw">impl</span> <span class="ident">EmbedField</span> {
     <span class="doccomment">/// Creates a new embed field.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Refer to the [`name`] and [`value`] documentation for maximum</span>
+    <span class="doccomment">/// **Note**: Refer to the [`Self::name`] and [`Self::value`] documentation for maximum</span>
     <span class="doccomment">/// lengths.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`name`]: Self::name</span>
-    <span class="doccomment">/// [`value`]: Self::value</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">value</span>: <span class="ident">U</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,

@@ -714,8 +714,6 @@
 <span id="711">711</span>
 <span id="712">712</span>
 <span id="713">713</span>
-<span id="714">714</span>
-<span id="715">715</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models pertaining to the gateway.</span>
 
@@ -785,15 +783,13 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The Stream URL if [`kind`] is [`ActivityType::Streaming`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`kind`]: Self::kind</span>
+    <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].</span>
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Activity</span> {
-    <span class="doccomment">/// Creates a `Activity` struct that appears as a `Playing &lt;name&gt;` status.</span>
+    <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Playing &lt;name&gt;` status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
     <span class="doccomment">///</span>
@@ -843,7 +839,7 @@
         }
     }
 
-    <span class="doccomment">/// Creates an `Activity` struct that appears as a `Streaming &lt;name&gt;`</span>
+    <span class="doccomment">/// Creates an [`Activity`] struct that appears as a `Streaming &lt;name&gt;`</span>
     <span class="doccomment">/// status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
@@ -897,7 +893,7 @@
         }
     }
 
-    <span class="doccomment">/// Creates a `Activity` struct that appears as a `Listening to &lt;name&gt;` status.</span>
+    <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Listening to &lt;name&gt;` status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
     <span class="doccomment">///</span>
@@ -947,7 +943,7 @@
         }
     }
 
-    <span class="doccomment">/// Creates a `Activity` struct that appears as a `Watching &lt;name&gt;` status.</span>
+    <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Watching &lt;name&gt;` status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
     <span class="doccomment">///</span>
@@ -997,7 +993,7 @@
         }
     }
 
-    <span class="doccomment">/// Creates a `Activity` struct that appears as a `Competing in &lt;name&gt;` status.</span>
+    <span class="doccomment">/// Creates a [`Activity`] struct that appears as a `Competing in &lt;name&gt;` status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
     <span class="doccomment">///</span>
@@ -1228,7 +1224,7 @@
     <span class="ident">Listening</span> <span class="op">=</span> <span class="number">2</span>,
     <span class="doccomment">/// An indicator that the user is watching something.</span>
     <span class="ident">Watching</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// An indicator that the user uses custum statuses</span>
+    <span class="doccomment">/// An indicator that the user uses custom statuses</span>
     <span class="ident">Custom</span> <span class="op">=</span> <span class="number">4</span>,
     <span class="doccomment">/// An indicator that the user is competing somewhere.</span>
     <span class="ident">Competing</span> <span class="op">=</span> <span class="number">5</span>,

@@ -579,7 +579,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Ratelimiter</span> {
-    <span class="doccomment">/// Creates a new ratelimiter, with a shared `reqwest` client and the</span>
+    <span class="doccomment">/// Creates a new ratelimiter, with a shared [`reqwest`] client and the</span>
     <span class="doccomment">/// bot&#39;s token.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The bot token must be prefixed with `&quot;Bot &quot;`. The ratelimiter does not</span>
@@ -853,7 +853,7 @@
 <span class="doccomment">/// This only contains the basic information needed by the ratelimiter to</span>
 <span class="doccomment">/// perform a full cycle of making the request and returning the response.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Use the `From` implementations for making one of these.</span>
+<span class="doccomment">/// Use the [`From`] implementations for making one of these.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RatelimitedRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,

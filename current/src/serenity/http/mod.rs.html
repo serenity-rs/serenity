@@ -266,6 +266,8 @@
 <span id="263">263</span>
 <span id="264">264</span>
 <span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The HTTP module which provides functions for performing requests to</span>
 <span class="doccomment">//! endpoints in Discord&#39;s API.</span>
@@ -419,7 +421,7 @@
 
 <span class="doccomment">/// An method used for ratelimiting special routes.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// This is needed because `reqwest`&#39;s `Method` enum does not derive Copy.</span>
+<span class="doccomment">/// This is needed because [`reqwest`]&#39;s [`Method`] enum does not derive Copy.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LightMethod</span> {
     <span class="doccomment">/// Indicates that a route is for the `DELETE` method only.</span>
@@ -446,17 +448,19 @@
     }
 }
 
-<span class="doccomment">/// Enum that allows a user to pass a `Path` or a `File` type to `send_files`</span>
+<span class="doccomment">/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`send_files`]: crate::model::id::ChannelId::send_files</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Indicates that the `AttachmentType` is a byte slice with a filename.</span>
+    <span class="doccomment">/// Indicates that the [`AttachmentType`] is a byte slice with a filename.</span>
     <span class="ident">Bytes</span> { <span class="ident">data</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">filename</span>: <span class="ident">String</span> },
-    <span class="doccomment">/// Indicates that the `AttachmentType` is a `File`</span>
+    <span class="doccomment">/// Indicates that the [`AttachmentType`] is a [`File`]</span>
     <span class="ident">File</span> { <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">File</span>, <span class="ident">filename</span>: <span class="ident">String</span> },
-    <span class="doccomment">/// Indicates that the `AttachmentType` is a `Path`</span>
+    <span class="doccomment">/// Indicates that the [`AttachmentType`] is a [`Path`]</span>
     <span class="ident">Path</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Path</span>),
-    <span class="doccomment">/// Indicates that the `AttachmentType` is an image URL.</span>
+    <span class="doccomment">/// Indicates that the [`AttachmentType`] is an image URL.</span>
     <span class="ident">Image</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
 }
 
@@ -470,7 +474,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs an `AttachmentType` from a string.</span>
+    <span class="doccomment">/// Constructs an [`AttachmentType`] from a string.</span>
     <span class="doccomment">/// This string may refer to the path of a file on disk, or the http url to an image on the internet.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&quot;http://&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&quot;https://&quot;</span>) {

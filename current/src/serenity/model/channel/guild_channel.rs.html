@@ -1218,8 +1218,6 @@
 <span id="1215">1215</span>
 <span id="1216">1216</span>
 <span id="1217">1217</span>
-<span id="1218">1218</span>
-<span id="1219">1219</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
@@ -1261,7 +1259,7 @@
 <span class="doccomment">/// Represents a guild&#39;s text, news, or voice channel. Some methods are available</span>
 <span class="doccomment">/// only for voice channels and some are only available for text channels.</span>
 <span class="doccomment">/// News channels are a subset of text channels and lack slow mode hence</span>
-<span class="doccomment">/// `slow_mode_rate` will be `None`.</span>
+<span class="doccomment">/// [`Self::slow_mode_rate`] will be [`None`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildChannel</span> {
@@ -1312,9 +1310,7 @@
     <span class="doccomment">/// **Note**: This is only available for voice channels.</span>
     <span class="kw">pub</span> <span class="ident">user_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Used to tell if the channel is not safe for work.</span>
-    <span class="doccomment">/// Note however, it&#39;s recommended to use [`is_nsfw`] as it&#39;s gonna be more accurate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`is_nsfw`]: Self::is_nsfw</span>
+    <span class="doccomment">/// Note however, it&#39;s recommended to use [`Self::is_nsfw`] as it&#39;s gonna be more accurate.</span>
     <span class="comment">// This field can or can not be present sometimes, but if it isn&#39;t</span>
     <span class="comment">// default to `false`.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
@@ -1327,7 +1323,7 @@
     <span class="kw">pub</span> <span class="ident">slow_mode_rate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The region override.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This is only available for voice and stage channels. `None`</span>
+    <span class="doccomment">/// **Note**: This is only available for voice and stage channels. [`None`]</span>
     <span class="doccomment">/// for voice and stage channels means automatic region selection.</span>
     <span class="kw">pub</span> <span class="ident">rtc_region</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The video quality mode for a voice channel.</span>
@@ -1600,7 +1596,7 @@
 
     <span class="doccomment">/// Modifies a channel&#39;s settings, such as its position or name.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to `EditChannel`s documentation for a full list of methods.</span>
+    <span class="doccomment">/// Refer to [`EditChannel`]s documentation for a full list of methods.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1677,7 +1673,7 @@
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">message_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edits a voice state in a stage channel. Pass `None` for `user_id` to</span>
+    <span class="doccomment">/// Edits a voice state in a stage channel. Pass [`None`] for `user_id` to</span>
     <span class="doccomment">/// edit the current user&#39;s voice state.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Mute Members] permission to suppress another user or</span>
@@ -1859,7 +1855,7 @@
     <span class="doccomment">/// Refer to the [`GetMessages`]-builder for more information on how to</span>
     <span class="doccomment">/// use `builder`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Returns an empty `Vec` if the current user does not have the</span>
+    <span class="doccomment">/// **Note**: Returns an empty [`Vec`] if the current user does not have the</span>
     <span class="doccomment">/// [Read Message History] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -2039,7 +2035,7 @@
     <span class="doccomment">/// Gets all channel&#39;s pins.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: If the current user lacks the [Read Message History] permission</span>
-    <span class="doccomment">/// an empty `Vec` will be returned.</span>
+    <span class="doccomment">/// an empty [`Vec`] will be returned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
@@ -2169,11 +2165,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called</span>
     <span class="doccomment">/// on the returned struct to stop typing. Note that on some clients, typing may persist</span>
-    <span class="doccomment">/// for a few seconds after `stop` is called.</span>
+    <span class="doccomment">/// for a few seconds after [`Typing::stop`] is called.</span>
     <span class="doccomment">/// Typing is also stopped when the struct is dropped.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If a message is sent while typing is triggered, the user will stop typing for a brief period</span>
-    <span class="doccomment">/// of time and then resume again until either `stop` is called or the struct is dropped.</span>
+    <span class="doccomment">/// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should rarely be used for bots, although it is a good indicator that a</span>
     <span class="doccomment">/// long-running command is still being processed.</span>
@@ -2374,7 +2370,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the reasons `create_webhook` may return an [`Error::Http`],</span>
+    <span class="doccomment">/// In addition to the reasons [`Self::create_webhook`] may return an [`Error::Http`],</span>
     <span class="doccomment">/// if the image is too large.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_webhook_with_avatar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,

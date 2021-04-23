@@ -1129,18 +1129,6 @@
 <span id="1126">1126</span>
 <span id="1127">1127</span>
 <span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! User information-related models.</span>
 
@@ -1292,11 +1280,8 @@
     <span class="doccomment">/// Retrieves the URL to the current user&#39;s avatar, falling back to the</span>
     <span class="doccomment">/// default avatar if needed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will call [`avatar_url`] first, and if that returns `None`, it</span>
-    <span class="doccomment">/// then falls back to [`default_avatar_url`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`avatar_url`]: Self::avatar_url</span>
-    <span class="doccomment">/// [`default_avatar_url`]: Self::default_avatar_url</span>
+    <span class="doccomment">/// This will call [`Self::avatar_url`] first, and if that returns [`None`], it</span>
+    <span class="doccomment">/// then falls back to [`Self::default_avatar_url`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">face</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">avatar_url</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">default_avatar_url</span>())
@@ -1493,9 +1478,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The default avatar is calculated via the result of `discriminator % 5`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The has of the avatar can be retrieved via calling [`name`] on the enum.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`name`]: Self::name</span>
+<span class="doccomment">/// The has of the avatar can be retrieved via calling [`Self::name`] on the enum.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DefaultAvatar</span> {
@@ -1584,9 +1567,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">bot</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with</span>
-    <span class="doccomment">/// the same [`name`]. The name+discriminator pair is always unique.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`name`]: Self::name</span>
+    <span class="doccomment">/// the same [`Self::name`]. The name+discriminator pair is always unique.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_u16&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">discriminator</span>: <span class="ident">u16</span>,
     <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator</span>
@@ -1653,13 +1634,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">User</span> {
-    <span class="doccomment">/// Initializes a `User` with default values. Setting the following:</span>
+    <span class="doccomment">/// Initializes a [`User`] with default values. Setting the following:</span>
     <span class="doccomment">/// - **id** to `UserId(210)`</span>
     <span class="doccomment">/// - **avatar** to `Some(&quot;abc&quot;)`</span>
     <span class="doccomment">/// - **bot** to `true`.</span>
     <span class="doccomment">/// - **discriminator** to `1432`.</span>
     <span class="doccomment">/// - **name** to `&quot;test&quot;`.</span>
-    <span class="doccomment">/// - **public_flags** to `None`.</span>
+    <span class="doccomment">/// - **public_flags** to [`None`].</span>
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">User</span> {
             <span class="ident">id</span>: <span class="ident">UserId</span>(<span class="number">210</span>),
@@ -1816,9 +1797,7 @@
         <span class="self">self</span>.<span class="ident">create_dm_channel</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">f</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// This is an alias of [direct_message].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [direct_message]: Self::direct_message</span>
+    <span class="doccomment">/// This is an alias of [`Self::direct_message`].</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
@@ -1831,11 +1810,8 @@
     <span class="doccomment">/// Retrieves the URL to the user&#39;s avatar, falling back to the default</span>
     <span class="doccomment">/// avatar if needed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will call [`avatar_url`] first, and if that returns `None`, it</span>
-    <span class="doccomment">/// then falls back to [`default_avatar_url`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`avatar_url`]: Self::avatar_url</span>
-    <span class="doccomment">/// [`default_avatar_url`]: Self::default_avatar_url</span>
+    <span class="doccomment">/// This will call [`Self::avatar_url`] first, and if that returns [`None`], it</span>
+    <span class="doccomment">/// then falls back to [`Self::default_avatar_url`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">face</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">avatar_url</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">default_avatar_url</span>())
     }
@@ -1860,9 +1836,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if the given `Guild` is unavailable,</span>
-    <span class="doccomment">/// if that `Role` does not exist in the given `Guild`, or if the</span>
-    <span class="doccomment">/// given `User` is not in that `Guild`.</span>
+    <span class="doccomment">/// Returns an [`Error::Http`] if the given [`Guild`] is unavailable,</span>
+    <span class="doccomment">/// if that [`Role`] does not exist in the given [`Guild`], or if the</span>
+    <span class="doccomment">/// given [`User`] is not in that [`Guild`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in</span>
     <span class="doccomment">/// deserializing the API response.</span>
@@ -1988,7 +1964,7 @@
 
     <span class="doccomment">/// Returns the user&#39;s nickname in the given `guild_id`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If none is used, it returns `None`.</span>
+    <span class="doccomment">/// If none is used, it returns [`None`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">nick_in</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2069,7 +2045,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if a `User` with that `UserId` does not exist,</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,</span>
     <span class="doccomment">/// or is otherwise unavailable.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserializing</span>
@@ -2111,7 +2087,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// May return an [`Error::Http`] if a `User` with that `UserId` does not exist,</span>
+    <span class="doccomment">/// May return an [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,</span>
     <span class="doccomment">/// or otherwise cannot be fetched.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in</span>
@@ -2161,42 +2137,42 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CurrentUser</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `CurrentUser` struct.</span>
+    <span class="doccomment">/// Gets the Id of a [`CurrentUser`] struct.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">current_user</span>: <span class="ident">CurrentUser</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">current_user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CurrentUser</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `CurrentUser` struct.</span>
+    <span class="doccomment">/// Gets the Id of a [`CurrentUser`] struct.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">current_user</span>: <span class="kw-2">&amp;</span><span class="ident">CurrentUser</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">current_user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `Member`.</span>
+    <span class="doccomment">/// Gets the Id of a [`Member`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">member</span>: <span class="ident">Member</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Member</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `Member`.</span>
+    <span class="doccomment">/// Gets the Id of a [`Member`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">member</span>: <span class="kw-2">&amp;</span><span class="ident">Member</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `User`.</span>
+    <span class="doccomment">/// Gets the Id of a [`User`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">user</span>: <span class="ident">User</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">User</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `User`.</span>
+    <span class="doccomment">/// Gets the Id of a [`User`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">user</span>.<span class="ident">id</span>
     }

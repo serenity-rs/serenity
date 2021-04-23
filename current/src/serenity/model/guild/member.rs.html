@@ -553,8 +553,6 @@
 <span id="550">550</span>
 <span id="551">551</span>
 <span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -604,7 +602,7 @@
     <span class="kw">pub</span> <span class="ident">premium_since</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The total permissions of the member in a channel, including overrides.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is only `Some` when returned in an [`Interaction`] object.</span>
+    <span class="doccomment">/// This is only [`Some`] when returned in an [`Interaction`] object.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Interaction`]: crate::model::interactions::Interaction</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -698,14 +696,12 @@
         <span class="self">self</span>.<span class="ident">ban_with_reason</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">dmd</span>, <span class="string">&quot;&quot;</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Ban the member from the guild with a reason. Refer to [`ban`] to further documentation.</span>
+    <span class="doccomment">/// Ban the member from the guild with a reason. Refer to [`Self::ban`] to further documentation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the errors `ban` may return, can also return [`Error::ExceededLimit`]</span>
+    <span class="doccomment">/// In addition to the errors [`Self::ban`] may return, can also return [`Error::ExceededLimit`]</span>
     <span class="doccomment">/// if the length of the reason is greater than 512.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ban`]: Self::ban</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ban_with_reason</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -736,7 +732,7 @@
 
     <span class="doccomment">/// Returns the &quot;default channel&quot; of the guild for the member.</span>
     <span class="doccomment">/// (This returns the first channel that can be read by the member, if there isn&#39;t</span>
-    <span class="doccomment">/// one returns `None`)</span>
+    <span class="doccomment">/// one returns [`None`])</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">default_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">to_guild_cached</span>(<span class="ident">cache</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -791,7 +787,7 @@
     <span class="doccomment">/// Retrieves the ID and position of the member&#39;s highest role in the</span>
     <span class="doccomment">/// hierarchy, if they have one.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This _may_ return `None` if:</span>
+    <span class="doccomment">/// This _may_ return [`None`] if:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// - the user has roles, but they are not present in the cache for cache</span>
     <span class="doccomment">/// inconsistency reasons</span>
@@ -886,7 +882,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// In addition to the reasons `kick` may return an error,</span>
+    <span class="doccomment">/// In addition to the reasons [`Self::kick`] may return an error,</span>
     <span class="doccomment">/// can also return an error if the given reason is too long.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
@@ -1039,7 +1035,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is shorthand for manually searching through the Cache.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If role data can not be found for the member, then `None` is returned.</span>
+    <span class="doccomment">/// If role data can not be found for the member, then [`None`] is returned.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(

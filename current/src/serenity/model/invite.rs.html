@@ -407,9 +407,6 @@
 <span id="404">404</span>
 <span id="405">405</span>
 <span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models for server and channel invites.</span>
 
@@ -456,7 +453,7 @@
     <span class="doccomment">/// A representation of the minimal amount of information needed about the</span>
     <span class="doccomment">/// [`User`] that created the invite.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be `None` for invites created by Discord such as invite-widgets</span>
+    <span class="doccomment">/// This can be [`None`] for invites created by Discord such as invite-widgets</span>
     <span class="doccomment">/// or vanity invite links.</span>
     <span class="kw">pub</span> <span class="ident">inviter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InviteUser</span><span class="op">&gt;</span>,
 }
@@ -718,14 +715,11 @@
     <span class="kw">pub</span> <span class="ident">max_age</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The maximum number of times that an invite may be used before it expires.</span>
 
-    <span class="doccomment">/// Note that this does not supersede the [`max_age`] value, if the value of</span>
-    <span class="doccomment">/// [`temporary`] is `true`. If the value of `temporary` is `false`, then the</span>
+    <span class="doccomment">/// Note that this does not supersede the [`Self::max_age`] value, if the value of</span>
+    <span class="doccomment">/// [`Self::temporary`] is `true`. If the value of `temporary` is `false`, then the</span>
     <span class="doccomment">/// invite _will_ self-expire after the given number of max uses.</span>
 
     <span class="doccomment">/// If the value is `0`, then the invite is permanent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`max_age`]: Self::max_age</span>
-    <span class="doccomment">/// [`temporary`]: Self::temporary</span>
     <span class="kw">pub</span> <span class="ident">max_uses</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Indicator of whether the invite self-expires after a certain amount of</span>
     <span class="doccomment">/// time or uses.</span>

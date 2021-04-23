@@ -122,6 +122,8 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The framework is a customizable method of separating commands.</span>
 <span class="doccomment">//!</span>
@@ -215,9 +217,11 @@
 <span class="doccomment">/// A trait for defining your own framework for serenity to use.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Should you implement this trait, or define a `message` handler, depends on you.</span>
-<span class="doccomment">/// However, using this will benefit you by abstracting the `EventHandler` away,</span>
+<span class="doccomment">/// However, using this will benefit you by abstracting the [`EventHandler`] away,</span>
 <span class="doccomment">/// and providing a reference to serenity&#39;s threadpool,</span>
 <span class="doccomment">/// so that you may run your commands in separate threads.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`EventHandler`]: crate::client::EventHandler</span>
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Framework</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">Message</span>);

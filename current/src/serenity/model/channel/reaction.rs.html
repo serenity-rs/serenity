@@ -665,7 +665,7 @@
     <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
     <span class="doccomment">/// The Id of the [`User`] that sent the reaction.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Set to `None` by [`Message::react`] when cache is not available.</span>
+    <span class="doccomment">/// Set to [`None`] by [`Message::react`] when cache is not available.</span>
     <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The optional Id of the [`Guild`] where the reaction was sent.</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
@@ -1050,7 +1050,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReactionType</span> {
-    <span class="doccomment">/// Creates a `ReactionType` from a `char`.</span>
+    <span class="doccomment">/// Creates a [`ReactionType`] from a `char`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1136,11 +1136,11 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReactionType</span> {
-    <span class="doccomment">/// Creates a `ReactionType` from a string slice.</span>
+    <span class="doccomment">/// Creates a [`ReactionType`] from a string slice.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Creating a `ReactionType` from a `🍎`, modeling a similar API as the</span>
+    <span class="doccomment">/// Creating a [`ReactionType`] from a `🍎`, modeling a similar API as the</span>
     <span class="doccomment">/// rest of the library:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
@@ -1159,7 +1159,7 @@
     <span class="doccomment">/// foo(&quot;🍎&quot;);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Creating a `ReactionType` from a custom emoji argument in the following format:</span>
+    <span class="doccomment">/// Creating a [`ReactionType`] from a custom emoji argument in the following format:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// use std::convert::TryFrom;</span>

@@ -441,13 +441,6 @@
 <span id="438">438</span>
 <span id="439">439</span>
 <span id="440">440</span>
-<span id="441">441</span>
-<span id="442">442</span>
-<span id="443">443</span>
-<span id="444">444</span>
-<span id="445">445</span>
-<span id="446">446</span>
-<span id="447">447</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Webhook model and implementations.</span>
 
@@ -565,14 +558,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the [`token`] is `None`.</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Http`] if the webhook does not exist,</span>
     <span class="doccomment">/// the token is invalid, or if the webhook could not otherwise</span>
     <span class="doccomment">/// be deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`token`]: Self::token</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -582,7 +574,7 @@
 
     <span class="doccomment">/// Edits the webhook in-place. All fields are optional.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// To nullify the avatar, pass `Some(&quot;&quot;)`. Otherwise, passing `None` will</span>
+    <span class="doccomment">/// To nullify the avatar, pass `Some(&quot;&quot;)`. Otherwise, passing [`None`] will</span>
     <span class="doccomment">/// not modify the avatar.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to [`Http::edit_webhook`] for httprictions on editing webhooks.</span>
@@ -631,14 +623,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the [`token`] is `None`.</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`token`]: Self::token</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span>(
@@ -736,14 +727,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the [`token`] is `None`.</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the webhook&#39;s token is invalid.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`token`]: Self::token</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -775,7 +765,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the [`token`] is `None`.</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, the webhook&#39;s token is invalid, or</span>
     <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
@@ -783,7 +773,6 @@
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`token`]: Self::token</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -808,13 +797,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the [`token`] is `None`.</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Http`] if the webhook&#39;s token is invalid or</span>
     <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`token`]: Self::token</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -833,15 +821,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the [`token`] is `None`.</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Http`] if the http client errors or if Discord returns an error.</span>
-    <span class="doccomment">/// Such as if the `Webhook` was deleted.</span>
+    <span class="doccomment">/// Such as if the [`Webhook`] was deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`token`]: Self::token</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">refresh</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -865,10 +852,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Model`] if the [`token`] is `None`.</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
-    <span class="doccomment">/// [`token`]: Self::token</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;https://discord.com/api/webhooks/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">token</span>))
@@ -884,7 +870,7 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an [`Error::Http`] if the http client errors or if Discord returns an error.</span>
-    <span class="doccomment">/// Such as if the `WebhookId` does not exist.</span>
+    <span class="doccomment">/// Such as if the [`WebhookId`] does not exist.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserialising the response.</span>
     <span class="doccomment">///</span>

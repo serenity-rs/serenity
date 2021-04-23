@@ -106,8 +106,6 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -145,10 +143,8 @@
 
     <span class="doccomment">/// Set the handler for raw events.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If you have set the specialised [`event_handler`], all events</span>
+    <span class="doccomment">/// If you have set the specialised [`Self::event_handler`], all events</span>
     <span class="doccomment">/// will be cloned for use to the raw event handler.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`event_handler`]: Self::event_handler</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_event_handler</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">H</span>: <span class="ident">RawEventHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
