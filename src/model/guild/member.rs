@@ -533,11 +533,13 @@ impl Display for Member {
 #[non_exhaustive]
 pub struct PartialMember {
     /// Indicator of whether the member can hear in voice channels.
-    pub deaf: Option<bool>,
+    #[serde(default)]
+    pub deaf: bool,
     /// Timestamp representing the date when the member joined.
     pub joined_at: Option<DateTime<Utc>>,
-    /// Indicator of whether the member can speak in voice channels.
-    pub mute: Option<bool>,
+    /// Indicator of whether the member can speak in voice channels
+    #[serde(default)]
+    pub mute: bool,
     /// The member's nickname, if present.
     ///
     /// Can't be longer than 32 characters.
