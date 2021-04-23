@@ -120,6 +120,7 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
+<span id="120">120</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -140,7 +141,7 @@
 <span class="kw">impl</span> <span class="ident">CreateInteractionResponse</span> {
     <span class="doccomment">/// Sets the InteractionResponseType of the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to [`InteractionResponseType::ChannelMessageWithSource`].</span>
+    <span class="doccomment">/// Defaults to `ChannelMessageWithSource`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">InteractionResponseType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>)));
         <span class="self">self</span>
@@ -235,6 +236,7 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Sets the flags for the message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">serde_json::Number::from</span>(<span class="ident">flags</span>.<span class="ident">bits</span>())));
         <span class="self">self</span>

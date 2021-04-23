@@ -553,6 +553,8 @@
 <span id="550">550</span>
 <span id="551">551</span>
 <span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -1089,10 +1091,12 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PartialMember</span> {
     <span class="doccomment">/// Indicator of whether the member can hear in voice channels.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">deaf</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Timestamp representing the date when the member joined.</span>
     <span class="kw">pub</span> <span class="ident">joined_at</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicator of whether the member can speak in voice channels.</span>
+    <span class="doccomment">/// Indicator of whether the member can speak in voice channels</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">mute</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The member&#39;s nickname, if present.</span>
     <span class="doccomment">///</span>

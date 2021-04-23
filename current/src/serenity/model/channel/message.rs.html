@@ -1225,6 +1225,14 @@
 <span id="1222">1222</span>
 <span id="1223">1223</span>
 <span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
+<span id="1232">1232</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -2428,6 +2436,14 @@
         <span class="ident">IS_CROSSPOST</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0010</span>;
         <span class="doccomment">/// Do not include any embeds when serializing this message.</span>
         <span class="ident">SUPPRESS_EMBEDS</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0100</span>;
+        <span class="doccomment">/// The source message for this crosspost has been deleted (via Channel Following).</span>
+        <span class="ident">SOURCE_MESSAGE_DELETED</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_1000</span>;
+        <span class="doccomment">/// This message came from the urgent message system.</span>
+        <span class="ident">URGENT</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0001_0000</span>;
+        <span class="doccomment">/// This message is only visible to the user who invoked the Interaction.</span>
+        <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0100_0000</span>;
+        <span class="doccomment">/// This message is an Interaction Response and the bot is &quot;thinking&quot;.</span>
+        <span class="ident">LOADING</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_1000_0000</span>;
     }
 }
 

@@ -65,6 +65,21 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -92,18 +107,18 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Create an embed for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embed</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="doccomment">/// Creates an embed for the message.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_embed</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbed</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed</span>);
-        <span class="self">self</span>.<span class="ident">set_embed</span>(<span class="ident">embed</span>)
+        <span class="self">self</span>.<span class="ident">add_embed</span>(<span class="ident">embed</span>)
     }
 
-    <span class="doccomment">/// Set an embed for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_embed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="doccomment">/// Adds an embed for the message.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Value::Object</span>(<span class="ident">map</span>);
 
@@ -111,6 +126,21 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">embeds</span>) <span class="op">=</span> <span class="ident">embeds</span>.<span class="ident">as_array_mut</span>() {
             <span class="ident">embeds</span>.<span class="ident">push</span>(<span class="ident">embed</span>);
+        }
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the embeds for the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: You can only have up to 10 embeds per message.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_embeds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">contains_key</span>(<span class="string">&quot;embeds&quot;</span>) {
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">remove_entry</span>(<span class="string">&quot;embeds&quot;</span>);
+        }
+
+        <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
+            <span class="self">self</span>.<span class="ident">add_embed</span>(<span class="ident">embed</span>);
         }
 
         <span class="self">self</span>

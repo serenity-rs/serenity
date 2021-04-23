@@ -659,6 +659,17 @@
 <span id="656">656</span>
 <span id="657">657</span>
 <span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
@@ -979,6 +990,8 @@
         <span class="ident">MANAGE_EMOJIS</span> <span class="op">=</span> <span class="number">0b0100_0000_0000_0000_0000_0000_0000_0000</span>;
         <span class="doccomment">/// Allows for requesting to speak in stage channels.</span>
         <span class="ident">REQUEST_TO_SPEAK</span> <span class="op">=</span> <span class="number">0b1_0000_0000_0000_0000_0000_0000_0000_0000</span>;
+        <span class="doccomment">/// Allows using slash commands.</span>
+        <span class="ident">USE_SLASH_COMMANDS</span> <span class="op">=</span> <span class="number">0b1000_0000_0000_0000_0000_0000_0000_0000</span>;
     }
 }
 
@@ -1013,6 +1026,7 @@
     <span class="ident">speak</span>: <span class="string">&quot;Speak&quot;</span>,
     <span class="ident">stream</span>: <span class="string">&quot;Stream&quot;</span>,
     <span class="ident">use_external_emojis</span>: <span class="string">&quot;Use External Emojis&quot;</span>,
+    <span class="ident">use_slash_commands</span>: <span class="string">&quot;Use Slash Commands&quot;</span>,
     <span class="ident">use_vad</span>: <span class="string">&quot;Use Voice Activity&quot;</span>,
     <span class="ident">view_audit_log</span>: <span class="string">&quot;View Audit Log&quot;</span>
 }
@@ -1265,6 +1279,14 @@
     <span class="doccomment">/// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_external_emojis</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span><span class="ident">::USE_EXTERNAL_EMOJIS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Use Slash Commands] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Use Slash Commands]: Self::USE_SLASH_COMMANDS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_slash_commands</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span><span class="ident">::USE_SLASH_COMMANDS</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
