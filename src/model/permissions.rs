@@ -317,6 +317,8 @@ __impl_bitflags! {
         MANAGE_EMOJIS = 0b0100_0000_0000_0000_0000_0000_0000_0000;
         /// Allows for requesting to speak in stage channels.
         REQUEST_TO_SPEAK = 0b1_0000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows using slash commands.
+        USE_SLASH_COMMANDS = 0b1000_0000_0000_0000_0000_0000_0000_0000;
     }
 }
 
@@ -351,6 +353,7 @@ generate_get_permission_names! {
     speak: "Speak",
     stream: "Stream",
     use_external_emojis: "Use External Emojis",
+    use_slash_commands: "Use Slash Commands",
     use_vad: "Use Voice Activity",
     view_audit_log: "View Audit Log"
 }
@@ -603,6 +606,14 @@ impl Permissions {
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     pub fn use_external_emojis(self) -> bool {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Use Slash Commands] permission.
+    ///
+    /// [Use Slash Commands]: Self::USE_SLASH_COMMANDS
+    pub fn use_slash_commands(self) -> bool {
+        self.contains(Self::USE_SLASH_COMMANDS)
     }
 
     /// Shorthand for checking that the set of permissions contains the

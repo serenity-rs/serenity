@@ -11,6 +11,8 @@ use super::prelude::*;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+use crate::model::interactions::ApplicationCommandInteractionDataOption;
 
 pub fn default_true() -> bool {
     true
@@ -68,6 +70,127 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     }
 
     Ok(members)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<UserId, PartialMember>, D::Error> {
+    let map: HashMap<UserId, PartialMember> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_users<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<UserId, User>, D::Error> {
+    let map: HashMap<UserId, User> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<RoleId, Role>, D::Error> {
+    let map: HashMap<RoleId, Role> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<ChannelId, PartialChannel>, D::Error> {
+    let map: HashMap<ChannelId, PartialChannel> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_options<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
+    let options: Vec<ApplicationCommandInteractionDataOption> =
+        Deserialize::deserialize(deserializer)?;
+
+    Ok(options)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
+    deserializer: D,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
+    let mut options: Vec<ApplicationCommandInteractionDataOption> =
+        Deserialize::deserialize(deserializer)?;
+
+    for option in options.iter_mut() {
+        loop_resolved(option, resolved);
+    }
+
+    Ok(options)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+fn set_resolved(
+    mut options: &mut ApplicationCommandInteractionDataOption,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) {
+    if let Some(ref value) = options.value {
+        let string = value.as_str();
+
+        options.resolved = match options.kind {
+            ApplicationCommandOptionType::User => {
+                let id = &UserId(*&string.unwrap().parse().unwrap());
+
+                let user = resolved.users.get(id).unwrap().to_owned();
+                let member = match resolved.members.get(id) {
+                    Some(member) => Some(member.to_owned()),
+                    None => None,
+                };
+
+                Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
+            },
+            ApplicationCommandOptionType::Role => {
+                let id = &RoleId(*&string.unwrap().parse().unwrap());
+
+                let role = resolved.roles.get(id).unwrap().to_owned();
+
+                Some(ApplicationCommandInteractionDataOptionValue::Role(role))
+            },
+            ApplicationCommandOptionType::Channel => {
+                let id = &ChannelId(*&string.unwrap().parse().unwrap());
+
+                let channel = resolved.channels.get(id).unwrap().to_owned();
+
+                Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
+            },
+            ApplicationCommandOptionType::String => Some(
+                ApplicationCommandInteractionDataOptionValue::String(string.unwrap().to_owned()),
+            ),
+            ApplicationCommandOptionType::Integer => {
+                Some(ApplicationCommandInteractionDataOptionValue::Integer(value.as_i64().unwrap()))
+            },
+            ApplicationCommandOptionType::Boolean => Some(
+                ApplicationCommandInteractionDataOptionValue::Boolean(value.as_bool().unwrap()),
+            ),
+            _ => None,
+        }
+    }
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+fn loop_resolved(
+    options: &mut ApplicationCommandInteractionDataOption,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) {
+    set_resolved(options, resolved);
+
+    for option in options.options.iter_mut() {
+        loop_resolved(option, resolved);
+    }
 }
 
 pub fn deserialize_presences<'de, D: Deserializer<'de>>(

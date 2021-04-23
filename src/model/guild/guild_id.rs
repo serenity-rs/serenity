@@ -26,8 +26,13 @@ use crate::model::prelude::*;
 use crate::utils;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
-    builder::CreateInteraction,
-    model::interactions::{ApplicationCommand, Interaction},
+    builder::{
+        CreateApplicationCommand,
+        CreateApplicationCommandPermissionsData,
+        CreateApplicationCommands,
+        CreateApplicationCommandsPermissions,
+    },
+    model::interactions::ApplicationCommand,
 };
 
 #[cfg(feature = "model")]
@@ -266,33 +271,6 @@ impl GuildId {
         });
 
         http.as_ref().create_guild_integration(self.0, integration_id.0, &map).await
-    }
-
-    /// Creates a new [`ApplicationCommand`] for the guild.
-    ///
-    /// See the documentation for [`Interaction::create_global_application_command`] on how to use this.
-    ///
-    /// **Note**: `application_id` is usually the bot's id, unless it's a very old bot.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if invalid data is given, may also return [`Error::Json`]
-    /// if there is an error in deserializing the API response.
-    ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    #[inline]
-    pub async fn create_application_command<F>(
-        self,
-        http: impl AsRef<Http>,
-        application_id: u64,
-        f: F,
-    ) -> Result<ApplicationCommand>
-    where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
-    {
-        Interaction::create_guild_application_command(http, self, application_id, f).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -1064,6 +1042,178 @@ impl GuildId {
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.0)
+    }
+
+    /// Creates a guild specific [`ApplicationCommand`]
+    ///
+    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    ///
+    /// # Errors
+    ///
+    /// Returns the same possible errors as [`create_global_application_command`].
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`create_global_application_command`]: crate::model::interactions::ApplicationCommand::create_global_application_command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_command<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    {
+        let map = ApplicationCommand::build_application_command(f);
+        http.as_ref().create_guild_application_command(self.0, &Value::Object(map)).await
+    }
+
+    /// Same as [`create_application_command`], but allows to create more
+    /// than one command per call.
+    ///
+    /// [`create_application_command`]: Self::create_application_command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_commands<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Vec<ApplicationCommand>>
+    where
+        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
+    {
+        let mut array = CreateApplicationCommands::default();
+
+        f(&mut array);
+
+        http.as_ref().create_guild_application_commands(self.0, &Value::Array(array.0)).await
+    }
+
+    /// Creates a guild specific [`ApplicationCommandPermission`].
+    ///
+    /// **Note**: It will update instantly.
+    ///
+    /// [`ApplicationCommandPermission`]: crate::model::interactions::ApplicationCommandPermission
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_command_permission<F>(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+        f: F,
+    ) -> Result<ApplicationCommandPermission>
+    where
+        F: FnOnce(
+            &mut CreateApplicationCommandPermissionsData,
+        ) -> &mut CreateApplicationCommandPermissionsData,
+    {
+        let mut map = CreateApplicationCommandPermissionsData::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_application_command_permissions(
+                self.0,
+                command_id.into(),
+                &Value::Object(utils::hashmap_to_json_map(map.0)),
+            )
+            .await
+    }
+
+    /// Same as [`create_application_command_permission`] but allows to create
+    /// more than one permission per call.
+    ///
+    /// [`create_application_command_permission`]: Self::create_application_command_permission
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_commands_permissions<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Vec<ApplicationCommandPermission>>
+    where
+        F: FnOnce(
+            &mut CreateApplicationCommandsPermissions,
+        ) -> &mut CreateApplicationCommandsPermissions,
+    {
+        let mut map = CreateApplicationCommandsPermissions::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_application_commands_permissions(self.0, &Value::Array(map.0))
+            .await
+    }
+
+    /// Get all guild application commands.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_commands(
+        &self,
+        http: impl AsRef<Http>,
+    ) -> Result<Vec<ApplicationCommand>> {
+        http.as_ref().get_guild_application_commands(self.0.into()).await
+    }
+
+    /// Get a specific guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_command(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+    ) -> Result<ApplicationCommand> {
+        http.as_ref().get_guild_application_command(self.0.into(), command_id.into()).await
+    }
+
+    /// Edit guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_application_command<F>(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    {
+        let map = ApplicationCommand::build_application_command(f);
+        http.as_ref()
+            .edit_guild_application_command(self.0.into(), command_id.into(), &Value::Object(map))
+            .await
+    }
+
+    /// Delete guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn delete_application_command(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+    ) -> Result<()> {
+        http.as_ref().delete_guild_application_command(self.0.into(), command_id.into()).await
+    }
+
+    /// Get all guild application commands permissions only.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_commands_permissions(
+        &self,
+        http: impl AsRef<Http>,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        http.as_ref().get_guild_application_commands_permissions(self.0.into()).await
+    }
+
+    /// Get permissions for specific guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_command_permissions(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+    ) -> Result<ApplicationCommandPermission> {
+        http.as_ref()
+            .get_guild_application_command_permissions(self.0.into(), command_id.into())
+            .await
     }
 }
 

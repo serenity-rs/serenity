@@ -428,6 +428,46 @@ pub trait EventHandler: Send + Sync {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn interaction_create(&self, _ctx: Context, _interaction: Interaction) {}
+
+    /// Dispatched when a guild integration is created.
+    ///
+    /// Provides the created integration and the id of the guild this integration belongs to.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_create(
+        &self,
+        _ctx: Context,
+        _integration: Integration,
+        _guild_id: GuildId,
+    ) {
+    }
+
+    /// Dispatched when a guild integration is updated.
+    ///
+    /// Provides the updated integration and the id of the guild this integration belongs to.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_update(
+        &self,
+        _ctx: Context,
+        _integration: Integration,
+        _guild_id: GuildId,
+    ) {
+    }
+
+    /// Dispatched when a guild integration is deleted.
+    ///
+    /// Provides the integration's id, the id of the guild it belongs to, and its associated application id
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_delete(
+        &self,
+        _ctx: Context,
+        _integration_id: IntegrationId,
+        _guild_id: GuildId,
+        _application_id: Option<ApplicationId>,
+    ) {
+    }
 }
 
 /// This core trait for handling raw events

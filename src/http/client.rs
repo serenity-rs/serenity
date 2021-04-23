@@ -64,6 +64,8 @@ pub struct HttpBuilder<'a> {
     token: Option<String>,
     proxy: Option<Url>,
     fut: Option<BoxFuture<'a, Result<Http>>>,
+    #[cfg(feature = "unstable_discord_api")]
+    application_id: Option<u64>,
 }
 
 impl<'a> HttpBuilder<'a> {
@@ -75,6 +77,8 @@ impl<'a> HttpBuilder<'a> {
             token: None,
             proxy: None,
             fut: None,
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: None,
         }
     }
 
@@ -82,6 +86,14 @@ impl<'a> HttpBuilder<'a> {
     /// The `token` will automatically be prefixed "Bot " if not already.
     pub fn new(token: impl AsRef<str>) -> Self {
         Self::_new().token(token)
+    }
+
+    /// Sets the application_id to use slash commands.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn application_id(mut self, application_id: u64) -> Self {
+        self.application_id = Some(application_id);
+
+        self
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
@@ -160,6 +172,11 @@ impl<'a> Future for HttpBuilder<'a> {
         if self.fut.is_none() {
             let token = self.token.take().unwrap();
 
+            #[cfg(feature = "unstable_discord_api")]
+            let application_id = self
+                .application_id
+                .expect("Expected application Id in order to use slash commands");
+
             let client = self.client.take().unwrap_or_else(|| {
                 let builder = configure_client_backend(Client::builder());
                 Arc::new(builder.build().expect("Cannot build reqwest::Client"))
@@ -180,6 +197,8 @@ impl<'a> Future for HttpBuilder<'a> {
                     ratelimiter_disabled,
                     proxy,
                     token,
+                    #[cfg(feature = "unstable_discord_api")]
+                    application_id,
                 })
             }))
         }
@@ -199,6 +218,8 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
+    #[cfg(feature = "unstable_discord_api")]
+    pub application_id: u64,
 }
 
 impl fmt::Debug for Http {
@@ -222,7 +243,21 @@ impl Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: token.to_string(),
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: 0,
         }
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn new_with_application_id(application_id: u64) -> Self {
+        let builder = configure_client_backend(Client::builder());
+        let built = builder.build().expect("Cannot build reqwest::Client");
+
+        let mut data = Self::new(Arc::new(built), "");
+
+        data.application_id = application_id;
+
+        data
     }
 
     pub fn new_with_token(token: &str) -> Self {
@@ -236,6 +271,15 @@ impl Http {
         };
 
         Self::new(Arc::new(built), &token)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn new_with_token_application_id(token: &str, application_id: u64) -> Self {
+        let mut base = Self::new_with_token(token);
+
+        base.application_id = application_id;
+
+        base
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -394,14 +438,49 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_global_application_command(
         &self,
-        application_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
+            },
+        })
+        .await
+    }
+
+    /// Creates new global application commands.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_global_application_commands(
+        &self,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateGlobalApplicationCommands {
+                application_id: self.application_id,
+            },
+        })
+        .await
+    }
+
+    /// Creates new guild application commands.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_guild_application_commands(
+        &self,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateGuildApplicationCommands {
+                application_id: self.application_id,
+                guild_id,
             },
         })
         .await
@@ -462,7 +541,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
@@ -470,7 +548,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
             },
         })
@@ -714,16 +792,12 @@ impl Http {
     /// Deletes a global command.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn delete_global_application_command(
-        &self,
-        application_id: u64,
-        command_id: u64,
-    ) -> Result<()> {
+    pub async fn delete_global_application_command(&self, command_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
             route: RouteInfo::DeleteGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 command_id,
             },
         })
@@ -747,7 +821,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
     ) -> Result<()> {
@@ -755,7 +828,7 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::DeleteGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
             },
@@ -1063,7 +1136,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_global_application_command(
         &self,
-        application_id: u64,
         command_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
@@ -1071,7 +1143,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 command_id,
             },
         })
@@ -1103,7 +1175,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
         map: &Value,
@@ -1112,9 +1183,61 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
+            },
+        })
+        .await
+    }
+
+    /// Edits a guild command permissions.
+    ///
+    /// Updates for guild commands will be available immediately.
+    ///
+    /// Refer to Discord's [documentation] for field information.
+    ///
+    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_guild_application_command_permissions(
+        &self,
+        guild_id: u64,
+        command_id: u64,
+        map: &Value,
+    ) -> Result<ApplicationCommandPermission> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditGuildApplicationCommandPermission {
+                application_id: self.application_id,
+                guild_id,
+                command_id,
+            },
+        })
+        .await
+    }
+
+    /// Edits a guild commands permissions.
+    ///
+    /// Updates for guild commands will be available immediately.
+    ///
+    /// Refer to Discord's [documentation] for field information.
+    ///
+    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_guild_application_commands_permissions(
+        &self,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditGuildApplicationCommandsPermissions {
+                application_id: self.application_id,
+                guild_id,
             },
         })
         .await
@@ -1908,15 +2031,30 @@ impl Http {
     /// Fetches all of the global commands for your application.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn get_global_application_commands(
-        &self,
-        application_id: u64,
-    ) -> Result<Vec<ApplicationCommand>> {
+    pub async fn get_global_application_commands(&self) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommands {
-                application_id,
+                application_id: self.application_id,
+            },
+        })
+        .await
+    }
+
+    /// Fetches a global commands for your application by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_global_application_command(
+        &self,
+        command_id: u64,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGlobalApplicationCommand {
+                application_id: self.application_id,
+                command_id,
             },
         })
         .await
@@ -1939,15 +2077,72 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_commands(
         &self,
-        application_id: u64,
         guild_id: u64,
     ) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommands {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Fetches a guild command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_command(
+        &self,
+        guild_id: u64,
+        command_id: u64,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommand {
+                application_id: self.application_id,
+                guild_id,
+                command_id,
+            },
+        })
+        .await
+    }
+
+    /// Fetches all of the guild commands permissions for your application for a specific guild.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_commands_permissions(
+        &self,
+        guild_id: u64,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommandsPermissions {
+                application_id: self.application_id,
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Gives the guild command permission for your application for a specific guild.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_command_permissions(
+        &self,
+        guild_id: u64,
+        command_id: u64,
+    ) -> Result<ApplicationCommandPermission> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommandPermissions {
+                application_id: self.application_id,
+                guild_id,
+                command_id,
             },
         })
         .await
@@ -2858,37 +3053,8 @@ impl Default for Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: 0,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::HttpBuilder;
-
-    #[tokio::test]
-    async fn test_http_builder_defaults() {
-        let http = HttpBuilder::new("is this dubu?").await.expect("Create Http");
-
-        assert!(!http.ratelimiter_disabled);
-        assert!(http.proxy.is_none());
-    }
-
-    #[tokio::test]
-    async fn test_http_builder_with_proxy() {
-        let http = HttpBuilder::new("no it is token")
-            .ratelimiter_disabled(true)
-            .proxy("http://127.0.0.1:3000")
-            .expect("Set proxy")
-            .await
-            .expect("Create Http");
-
-        assert!(http.ratelimiter_disabled);
-
-        let proxy = http.proxy.expect("Http proxy missing");
-
-        assert_eq!(proxy.scheme(), "http");
-        assert_eq!(proxy.host_str(), Some("127.0.0.1"));
-        assert_eq!(proxy.port(), Some(3000));
     }
 }

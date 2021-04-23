@@ -17,7 +17,7 @@ pub struct CreateInteractionResponse(pub HashMap<&'static str, Value>);
 impl CreateInteractionResponse {
     /// Sets the InteractionResponseType of the message.
     ///
-    /// Defaults to [`InteractionResponseType::ChannelMessageWithSource`].
+    /// Defaults to `ChannelMessageWithSource`.
     pub fn kind(&mut self, kind: InteractionResponseType) -> &mut Self {
         self.0.insert("type", Value::Number(serde_json::Number::from(kind as u8)));
         self
@@ -112,6 +112,7 @@ impl CreateInteractionResponseData {
         self
     }
 
+    /// Sets the flags for the message.
     pub fn flags(&mut self, flags: InteractionApplicationCommandCallbackDataFlags) -> &mut Self {
         self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits())));
         self

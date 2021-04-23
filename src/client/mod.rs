@@ -66,15 +66,20 @@ pub use crate::cache::Cache;
 use crate::framework::Framework;
 use crate::http::Http;
 use crate::internal::prelude::*;
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::id::ApplicationId;
 pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
 pub struct ClientBuilder<'a> {
+    token: Option<String>,
     data: Option<TypeMap>,
     http: Option<Http>,
     fut: Option<BoxFuture<'a, Result<Client>>>,
     intents: GatewayIntents,
+    #[cfg(feature = "unstable_discord_api")]
+    application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
     #[cfg(feature = "framework")]
@@ -89,10 +94,13 @@ pub struct ClientBuilder<'a> {
 impl<'a> ClientBuilder<'a> {
     fn _new() -> Self {
         Self {
+            token: None,
             data: Some(TypeMap::new()),
             http: None,
             fut: None,
             intents: GatewayIntents::non_privileged(),
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: None,
             #[cfg(feature = "cache")]
             timeout: None,
             #[cfg(feature = "framework")]
@@ -138,7 +146,20 @@ impl<'a> ClientBuilder<'a> {
         let token =
             if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
 
+        self.token = Some(token.clone());
+
         self.http = Some(Http::new_with_token(&token));
+
+        self
+    }
+
+    /// Sets the application id.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn application_id(mut self, application_id: u64) -> Self {
+        self.application_id = Some(ApplicationId(application_id));
+
+        self.http =
+            Some(Http::new_with_token_application_id(&self.token.clone().unwrap(), application_id));
 
         self
     }
@@ -293,6 +314,12 @@ impl<'a> Future for ClientBuilder<'a> {
             let raw_event_handler = self.raw_event_handler.take();
             let intents = self.intents;
             let http = Arc::new(self.http.take().unwrap());
+
+            #[cfg(feature = "unstable_discord_api")]
+            self.application_id.expect(
+                "Please provide an Application Id in order to use slash commands features.",
+            );
+
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();
 
