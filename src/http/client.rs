@@ -207,7 +207,7 @@ impl<'a> Future for HttpBuilder<'a> {
     }
 }
 
-/// **Note**: For all member functions that return a `Result`, the
+/// **Note**: For all member functions that return a [`Result`], the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
 ///
 /// [`Error::Http`]: crate::error::Error::Http
@@ -371,12 +371,11 @@ impl Http {
 
     /// Creates an emoji in the given [`Guild`] with the given data.
     ///
-    /// View the source code for [`Guild`]'s [`create_emoji`] method to see what
+    /// View the source code for [`Guild::create_emoji`] method to see what
     /// fields this requires.
     ///
     /// **Note**: Requires the [Manage Emojis] permission.
     ///
-    /// [`create_emoji`]: Guild::create_emoji
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     pub async fn create_emoji(&self, guild_id: u64, map: &Value) -> Result<Emoji> {
         self.fire(Request {
@@ -391,9 +390,7 @@ impl Http {
 
     /// Create a follow-up message for an Interaction.
     ///
-    /// Functions the same as [`execute_webhook`]
-    ///
-    /// [`execute_webhook`]: Self::execute_webhook
+    /// Functions the same as [`Self::execute_webhook`]
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_followup_message(
@@ -1011,7 +1008,7 @@ impl Http {
 
     /// Deletes a [`Webhook`] given its Id.
     ///
-    /// This method requires authentication, whereas [`delete_webhook_with_token`]
+    /// This method requires authentication, whereas [`Self::delete_webhook_with_token`]
     /// does not.
     ///
     /// # Examples
@@ -1030,8 +1027,6 @@ impl Http {
     ///       Ok(())
     /// # }
     /// ```
-    ///
-    /// [`delete_webhook_with_token`]: Self::delete_webhook_with_token
     pub async fn delete_webhook(&self, webhook_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1339,7 +1334,7 @@ impl Http {
 
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     pub async fn edit_nickname(&self, guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
         let map = json!({ "nick": new_nickname });
         let body = serde_json::to_vec(&map)?;
@@ -1555,9 +1550,9 @@ impl Http {
     /// - **name**: the name of the webhook, limited to between 2 and 100 characters
     ///   long.
     ///
-    /// Note that, unlike with [`create_webhook`], _all_ values are optional.
+    /// Note that, unlike with [`Self::create_webhook`], _all_ values are optional.
     ///
-    /// This method requires authentication, whereas [`edit_webhook_with_token`]
+    /// This method requires authentication, whereas [`Self::edit_webhook_with_token`]
     /// does not.
     ///
     /// # Examples
@@ -1580,9 +1575,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`create_webhook`]: Self::create_webhook
-    /// [`edit_webhook_with_token`]: Self::edit_webhook_with_token
     pub async fn edit_webhook(&self, webhook_id: u64, map: &Value) -> Result<Webhook> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
@@ -1596,7 +1588,7 @@ impl Http {
 
     /// Edits the webhook with the given data.
     ///
-    /// Refer to the documentation for [`edit_webhook`] for more information.
+    /// Refer to the documentation for [`Self::edit_webhook`] for more information.
     ///
     /// This method does _not_ require authentication.
     ///
@@ -1619,8 +1611,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`edit_webhook`]: Self::edit_webhook
     pub async fn edit_webhook_with_token(
         &self,
         webhook_id: u64,
@@ -2565,7 +2555,7 @@ impl Http {
 
     /// Retrieves a webhook given its Id.
     ///
-    /// This method requires authentication, whereas [`get_webhook_with_token`] does
+    /// This method requires authentication, whereas [`Self::get_webhook_with_token`] does
     /// not.
     ///
     /// # Examples
@@ -2582,8 +2572,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`get_webhook_with_token`]: Self::get_webhook_with_token
     pub async fn get_webhook(&self, webhook_id: u64) -> Result<Webhook> {
         self.fire(Request {
             body: None,
@@ -2866,11 +2854,11 @@ impl Http {
     ///
     /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
     /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after `stop` is called.
+    /// for a few seconds after [`Typing::stop`] is called.
     /// Typing is also stopped when the struct is dropped.
     ///
     /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.
@@ -2917,7 +2905,7 @@ impl Http {
     /// bound.
     ///
     /// If you don't need to deserialize the response and want the response instance
-    /// itself, use [`request`].
+    /// itself, use [`Self::request`].
     ///
     /// # Examples
     ///
@@ -2958,7 +2946,6 @@ impl Http {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     ///
-    /// [`request`]: Self::request
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
@@ -2969,7 +2956,7 @@ impl Http {
 
     /// Performs a request, ratelimiting it if necessary.
     ///
-    /// Returns the raw reqwest Response. Use [`fire`] to deserialize the response
+    /// Returns the raw reqwest Response. Use [`Self::fire`] to deserialize the response
     /// into some type.
     ///
     /// # Examples
@@ -3002,8 +2989,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`fire`]: Self::fire
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {

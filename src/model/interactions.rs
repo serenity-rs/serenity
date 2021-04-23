@@ -438,7 +438,7 @@ impl ApplicationCommand {
     /// Creates a global [`ApplicationCommand`],
     /// overriding an existing one with the same name if it exists.
     ///
-    /// When a created `ApplicationCommand` is used, the [`InteractionCreate`] event will be emitted.
+    /// When a created [`ApplicationCommand`] is used, the [`InteractionCreate`] event will be emitted.
     ///
     /// **Note**: Global commands may take up to an hour to become available.
     ///
@@ -493,8 +493,8 @@ impl ApplicationCommand {
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if the `ApplicationCommand` is illformed,
-    /// such as if more than 10 `choices` are set. See the [API Docs] for further details.
+    /// May return an [`Error::Http`] if the [`ApplicationCommand`] is illformed,
+    /// such as if more than 10 [`choices`] are set. See the [API Docs] for further details.
     ///
     /// Can also return an [`Error::Json`] if there is an error in deserializing
     /// the response.
@@ -504,6 +504,7 @@ impl ApplicationCommand {
     /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
+    /// [`choices`]: crate::model::interactions::ApplicationCommandOption::choices
     pub async fn create_global_application_command<F>(
         http: impl AsRef<Http>,
         f: F,
@@ -767,7 +768,7 @@ impl Interaction {
 
     /// Edits the initial interaction response.
     ///
-    /// `application_id` will usually be the bot's `[UserId]`, except in cases of bots being very old.
+    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
     ///
     /// Refer to Discord's docs for Edit Webhook Message for field information.
     ///

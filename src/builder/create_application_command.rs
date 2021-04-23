@@ -6,7 +6,7 @@ use crate::{model::interactions::ApplicationCommandOptionType, utils};
 
 /// A builder for creating a new [`ApplicationCommandOption`].
 ///
-/// [`kind`], [`name`], and [`description`] are required fields.
+/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
 /// [`ApplicationCommandOption`]: crate::model::interactions::ApplicationCommandOption
 /// [`kind`]: Self::kind
@@ -107,11 +107,9 @@ impl CreateApplicationCommandOption {
 
 /// A builder for creating a new [`ApplicationCommand`].
 ///
-/// [`name`] and [`description`] are required fields.
+/// [`Self::name`] and [`Self::description`] are required fields.
 ///
 /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-/// [`name`]: Self::name
-/// [`description`]: Self::description
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommand(pub HashMap<&'static str, Value>);
 

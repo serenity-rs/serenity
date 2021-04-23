@@ -124,10 +124,8 @@ pub struct Guild {
     /// Users who are members of the guild.
     ///
     /// Members might not all be available when the [`ReadyEvent`] is received
-    /// if the [`member_count`] is greater than the `LARGE_THRESHOLD` set by
+    /// if the [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by
     /// the library.
-    ///
-    /// [`member_count`]: Self::member_count
     #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
@@ -150,7 +148,7 @@ pub struct Guild {
     pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
-    /// If the [`"InviteSplash"`] feature is enabled, this can be used to generate
+    /// If the `InviteSplash` feature is enabled, this can be used to generate
     /// a URL to a splash image.
     pub splash: Option<String>,
     /// The ID of the channel to which system messages are sent.
@@ -194,7 +192,7 @@ impl Guild {
 
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
-    /// returns `None`)
+    /// returns [`None`])
     pub async fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
@@ -208,7 +206,7 @@ impl Guild {
 
     /// Returns the guaranteed "default" channel of the guild.
     /// (This returns the first channel that can be read by everyone, if there isn't one,
-    /// returns `None`)
+    /// returns [`None`])
     ///
     /// **Note**: This is very costly if used in a server with lots of channels,
     /// members, or both.
@@ -298,14 +296,12 @@ impl Guild {
         self._ban_with_reason(cache_http, user.into(), dmd, "").await
     }
 
-    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the possible reasons `ban` may return an error, an [`Error::ExceededLimit`]
+    /// In addition to the possible reasons [`Self::ban`] may return an error, an [`Error::ExceededLimit`]
     /// may also be returned if the reason is too long.
-    ///
-    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(
         &self,
@@ -822,7 +818,7 @@ impl Guild {
 
     /// Edits the current guild with new data where specified.
     ///
-    /// Refer to `EditGuild`'s documentation for a full list of methods.
+    /// Refer to [`EditGuild`]'s documentation for a full list of methods.
     ///
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
@@ -945,7 +941,7 @@ impl Guild {
 
     /// Edits the current user's nickname for the guild.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     ///
     /// **Note**: Requires the [Change Nickname] permission.
     ///
@@ -1057,10 +1053,10 @@ impl Guild {
     /// [`position`].
     ///
     /// Returns [`None`] if at least one of the given users' member instances
-    /// is not present. Returns `None` if the users have the same hierarchy, as
+    /// is not present. Returns [`None`] if the users have the same hierarchy, as
     /// neither are greater than the other.
     ///
-    /// If both user IDs are the same, `None` is returned. If one of the users
+    /// If both user IDs are the same, [`None`] is returned. If one of the users
     /// is the guild owner, their ID is returned.
     ///
     /// [`position`]: Role::position
@@ -1239,7 +1235,7 @@ impl Guild {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`Self::kick`] may return an error,
     /// may also return an error if the reason is too long.
     pub async fn kick_with_reason(
         &self,
@@ -1365,7 +1361,7 @@ impl Guild {
         self.members.values().find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
     }
 
-    /// Retrieves all [`Member`] that start with a given `String`.
+    /// Retrieves all [`Member`] that start with a given [`String`].
     ///
     /// `sorted` decides whether the best early match of the `prefix`
     /// should be the criteria to sort the result.
@@ -1422,7 +1418,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves all [`Member`] containing a given `String` as
+    /// Retrieves all [`Member`] containing a given [`String`] as
     /// either username or nick, with a priority on username.
     ///
     /// If the substring is "yla", following results are possible:
@@ -1439,7 +1435,7 @@ impl Guild {
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
-    /// **Note**: Due to two fields of a `Member` being candidates for
+    /// **Note**: Due to two fields of a [`Member`] being candidates for
     /// the searched field, setting `sorted` to `true` will result in an overhead,
     /// as both fields have to be considered again for sorting.
     ///
@@ -1491,7 +1487,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves a tuple of [`Member`]s containing a given `String` in
+    /// Retrieves a tuple of [`Member`]s containing a given [`String`] in
     /// their username as the first field and the name used for sorting
     /// as the second field.
     ///
@@ -1551,7 +1547,7 @@ impl Guild {
         }
     }
 
-    /// Retrieves all [`Member`] containing a given `String` in
+    /// Retrieves all [`Member`] containing a given [`String`] in
     /// their nick.
     ///
     /// If the substring is "yla", following results are possible:
@@ -1706,7 +1702,7 @@ impl Guild {
         Self::_user_permissions_in(channel, member, &self.roles, self.owner_id, self.id)
     }
 
-    /// Helper function that can also be used from `PartialGuild`.
+    /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn _user_permissions_in(
         channel: &GuildChannel,
         member: &Member,
@@ -1796,7 +1792,7 @@ impl Guild {
     ///
     /// # Errors
     ///
-    /// Will return an [`Error::Model`] if the `Role` or `Channel` is not from this `Guild`.
+    /// Will return an [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
     ///
     /// [`Error::Model`]: crate::error::Error::Model
     #[inline]
@@ -1804,7 +1800,7 @@ impl Guild {
         Self::_role_permissions_in(channel, role, self.id)
     }
 
-    /// Helper function that can also be used from `PartialGuild`.
+    /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn _role_permissions_in(
         channel: &GuildChannel,
         role: &Role,
@@ -1988,7 +1984,7 @@ impl Guild {
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the current user does not have permission,
-    /// or if an `Integration` with that Id does not exist.
+    /// or if an [`Integration`] with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [`Error::Http`]: crate::error::Error::Http

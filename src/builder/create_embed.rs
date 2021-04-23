@@ -64,9 +64,7 @@ impl CreateEmbed {
 
     /// Set the colour of the left-hand side of the embed.
     ///
-    /// This is an alias of [`colour`].
-    ///
-    /// [`colour`]: Self::colour
+    /// This is an alias of [`Self::colour`].
     #[cfg(feature = "utils")]
     #[inline]
     pub fn color<C: Into<Colour>>(&mut self, colour: C) -> &mut Self {
@@ -90,8 +88,6 @@ impl CreateEmbed {
     /// Set the colour of the left-hand side of the embed.
     ///
     /// This is an alias of [`colour`].
-    ///
-    /// [`colour`]: Self::colour
     #[cfg(not(feature = "utils"))]
     #[inline]
     pub fn color(&mut self, colour: u32) -> &mut Self {
@@ -146,9 +142,7 @@ impl CreateEmbed {
 
     /// Adds multiple fields at once.
     ///
-    /// This is sugar to reduce the need of calling [`field`] manually multiple times.
-    ///
-    /// [`field`]: Self::field
+    /// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.
     pub fn fields<T, U, It>(&mut self, fields: It) -> &mut Self
     where
         It: IntoIterator<Item = (T, U, bool)>,
@@ -333,14 +327,12 @@ impl CreateEmbed {
         self
     }
 
-    /// Same as calling [`image`] with "attachment://filename.(jpg, png)".
+    /// Same as calling [`Self::image`] with "attachment://filename.(jpg, png)".
     ///
     /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
     /// with the provided filename. Or else this won't work.
     ///
     /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
-    ///
-    /// [`image`]: Self::image
     #[inline]
     pub fn attachment<S: ToString>(&mut self, filename: S) -> &mut Self {
         let mut filename = filename.to_string();
@@ -432,10 +424,9 @@ impl From<Embed> for CreateEmbed {
 /// A builder to create a fake [`Embed`] object's author, for use with the
 /// [`CreateEmbed::author`] method.
 ///
-/// Requires that you specify a [`name`].
+/// Requires that you specify a [`Self::name`].
 ///
 /// [`Embed`]: crate::model::channel::Embed
-/// [`name`]: Self::name
 #[derive(Clone, Debug, Default)]
 pub struct CreateEmbedAuthor(pub HashMap<&'static str, Value>);
 

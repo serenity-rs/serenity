@@ -97,14 +97,12 @@ impl PartialGuild {
         self.ban_with_reason(&http, user, dmd, "").await
     }
 
-    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `ban` may return an error,
+    /// In addition to the reasons [`Self::ban`] may return an error,
     /// can also return an error if the reason is too long.
-    ///
-    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(
         &self,
@@ -532,7 +530,7 @@ impl PartialGuild {
     /// Edits the properties of member of the guild, such as muting or
     /// nicknaming them.
     ///
-    /// Refer to `EditMember`'s documentation for a full list of methods and
+    /// Refer to [`EditMember`]'s documentation for a full list of methods and
     /// permission restrictions.
     ///
     /// # Examples
@@ -563,7 +561,7 @@ impl PartialGuild {
 
     /// Edits the current user's nickname for the guild.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     ///
     /// **Note**: Requires the [Change Nickname] permission.
     ///
@@ -611,7 +609,7 @@ impl PartialGuild {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`Self::kick`] may return an error,
     /// can also return an error if the reason is too long.
     pub async fn kick_with_reason(
         &self,
@@ -641,7 +639,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if an `Emoji` with the given Id does
+    /// Returns [`Error::Http`] if an [`Emoji`] with the given Id does
     /// not exist for the guild.
     #[inline]
     pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
@@ -750,7 +748,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the Member has a non-existent `Role`
+    /// Returns [`Error::Model`] if the Member has a non-existent [`Role`]
     /// for some reason.
     #[inline]
     pub fn user_permissions_in(
@@ -765,7 +763,7 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Model`] if the `Role` or `Channel` is not from this `Guild`.
+    /// Returns [`Error::Model`] if the [`Role`] or [`Channel`] is not from this [`Guild`].
     #[inline]
     pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
         Guild::_role_permissions_in(channel, role, self.id)

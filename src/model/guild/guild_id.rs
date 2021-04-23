@@ -75,14 +75,12 @@ impl GuildId {
         self._ban_with_reason(http, user.into(), dmd, "").await
     }
 
-    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `ban` may return an error, may
+    /// In addition to the reasons [`Self::ban`] may return an error, may
     /// also return [`Error::ExceededLimit`] if `reason` is too long.
-    ///
-    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(
         self,
@@ -470,7 +468,7 @@ impl GuildId {
 
     /// Edits the current user's nickname for the guild.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     ///
     /// Requires the [Change Nickname] permission.
     ///
@@ -655,7 +653,7 @@ impl GuildId {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`Self::kick`] may return an error,
     /// may also return an error if the reason is too long.
     pub async fn kick_with_reason(
         self,
@@ -737,7 +735,7 @@ impl GuildId {
 
     /// Streams over all the members in a guild.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`members`].
+    /// This is accomplished and equivalent to repeated calls to [`Self::members`].
     /// A buffer of at most 1,000 members is used to reduce the number of calls
     /// necessary.
     ///
@@ -765,8 +763,6 @@ impl GuildId {
     /// }
     /// # }
     /// ```
-    ///
-    /// [`members`]: Self::members
     pub fn members_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Member>> {
         MembersIter::<H>::stream(http, self)
     }
@@ -779,7 +775,7 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if the current user
     /// lacks permission, or if the member is not currently
-    /// in a voice channel for this `Guild`.
+    /// in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
@@ -927,7 +923,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an `Integration` with that Id does not exist.
+    /// or if an [`Integration`] with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -1327,7 +1323,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
     /// Streams over all the members in a guild.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`members`].
+    /// This is accomplished and equivalent to repeated calls to [`GuildId::members`].
     /// A buffer of at most 1,000 members is used to reduce the number of calls
     /// necessary.
     ///
@@ -1356,8 +1352,6 @@ impl<H: AsRef<Http>> MembersIter<H> {
     /// }
     /// # }
     /// ```
-    ///
-    /// [`members`]: GuildId::members
     pub fn stream(http: impl AsRef<Http>, guild_id: GuildId) -> impl Stream<Item = Result<Member>> {
         let init_state = MembersIter::new(guild_id, http);
 

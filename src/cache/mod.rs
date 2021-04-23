@@ -308,19 +308,13 @@ impl Cache {
 
     /// Retrieves a [`Channel`] from the cache based on the given Id.
     ///
-    /// This will search the [`channels`] map, then the [`private_channels`] map.
+    /// This will search the [`Self::channels`] map, then the [`Self::private_channels`] map.
     ///
     /// If you know what type of channel you're looking for, you should instead
     /// manually retrieve from one of the respective maps or methods:
     ///
-    /// - [`GuildChannel`]: [`guild_channel`] or [`channels`]
-    /// - [`PrivateChannel`]: [`private_channel`] or [`private_channels`]
-    ///
-    /// [`channels`]: Self::channels
-    /// [`guild_channel`]: Self::guild_channel
-    /// [`private_channel`]: Self::private_channel
-    /// [`groups`]: Self::groups
-    /// [`private_channels`]: Self::private_channels
+    /// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::channels`]
+    /// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]
     #[inline]
     pub async fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
         self._channel(id.into()).await
@@ -341,9 +335,8 @@ impl Cache {
 
     /// Clones an entire guild from the cache based on the given `id`.
     ///
-    /// In order to clone only a field of the guild, use [`guild_field`].
+    /// In order to clone only a field of the guild, use [`Self::guild_field`].
     ///
-    /// [`guild_field`]: Self::guild_field
     ///
     /// # Examples
     ///
@@ -415,7 +408,7 @@ impl Cache {
         self.guilds.read().await.len()
     }
 
-    /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`channel`],
+    /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`Self::channel`],
     /// this will only search guilds for the given channel.
     ///
     /// The only advantage of this method is that you can pass in anything that
@@ -460,7 +453,6 @@ impl Cache {
     /// ```
     ///
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
-    /// [`channel`]: Self::channel
     #[inline]
     pub async fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannel> {
         self._guild_channel(id.into()).await
@@ -714,7 +706,7 @@ impl Cache {
             .and_then(|messages| messages.get(&message_id).cloned())
     }
 
-    /// Retrieves a [`PrivateChannel`] from the cache's [`private_channels`]
+    /// Retrieves a [`PrivateChannel`] from the cache's [`Self::private_channels`]
     /// map, if it exists.
     ///
     /// The only advantage of this method is that you can pass in anything that
@@ -740,8 +732,6 @@ impl Cache {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`private_channels`]: Self::private_channels
     #[inline]
     pub async fn private_channel(
         &self,
@@ -818,13 +808,12 @@ impl Cache {
         self.settings.write().await.max_messages = max;
     }
 
-    /// Retrieves a `User` from the cache's [`users`] map, if it exists.
+    /// Retrieves a [`User`] from the cache's [`Self::users`] map, if it exists.
     ///
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`UserId`].
     ///
     /// [`UserId`]: crate::model::id::UserId
-    /// [`users`]: Self::users
     ///
     /// # Examples
     ///

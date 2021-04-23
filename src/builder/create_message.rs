@@ -12,8 +12,8 @@ use crate::utils;
 ///
 /// There are two situations where different field requirements are present:
 ///
-/// 1. When sending an [`embed`], no other field is required;
-/// 2. Otherwise, [`content`] is the only required field that is required to be
+/// 1. When sending an [`Self::embed`], no other field is required;
+/// 2. Otherwise, [`Self::content`] is the only required field that is required to be
 /// set.
 ///
 /// Note that if you only need to send the content of a message, without
@@ -50,8 +50,6 @@ use crate::utils;
 ///
 /// [`ChannelId::say`]: crate::model::id::ChannelId::say
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
-/// [`content`]: Self::content
-/// [`embed`]: Self::embed
 /// [`Http::send_message`]: crate::http::client::Http::send_message
 #[derive(Clone, Debug)]
 pub struct CreateMessage<'a>(
@@ -135,7 +133,7 @@ impl<'a> CreateMessage<'a> {
     /// Sets a list of files to include in the message.
     ///
     /// Calling this multiple times will overwrite the file list.
-    /// To append files, call `add_file` or `add_files` instead.
+    /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -167,11 +165,10 @@ impl<'a> CreateMessage<'a> {
 }
 
 impl<'a> Default for CreateMessage<'a> {
-    /// Creates a map for sending a [`Message`], setting [`tts`] to `false` by
+    /// Creates a map for sending a [`Message`], setting [`Self::tts`] to `false` by
     /// default.
     ///
     /// [`Message`]: crate::model::channel::Message
-    /// [`tts`]: Self::tts
     fn default() -> CreateMessage<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));

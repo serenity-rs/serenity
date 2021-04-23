@@ -150,7 +150,7 @@ impl AsRef<Http> for (&Arc<Cache>, &Http) {
 
 /// An method used for ratelimiting special routes.
 ///
-/// This is needed because `reqwest`'s `Method` enum does not derive Copy.
+/// This is needed because [`reqwest`]'s [`Method`] enum does not derive Copy.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum LightMethod {
     /// Indicates that a route is for the `DELETE` method only.
@@ -177,17 +177,19 @@ impl LightMethod {
     }
 }
 
-/// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
+/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
+///
+/// [`send_files`]: crate::model::id::ChannelId::send_files
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum AttachmentType<'a> {
-    /// Indicates that the `AttachmentType` is a byte slice with a filename.
+    /// Indicates that the [`AttachmentType`] is a byte slice with a filename.
     Bytes { data: Cow<'a, [u8]>, filename: String },
-    /// Indicates that the `AttachmentType` is a `File`
+    /// Indicates that the [`AttachmentType`] is a [`File`]
     File { file: &'a File, filename: String },
-    /// Indicates that the `AttachmentType` is a `Path`
+    /// Indicates that the [`AttachmentType`] is a [`Path`]
     Path(&'a Path),
-    /// Indicates that the `AttachmentType` is an image URL.
+    /// Indicates that the [`AttachmentType`] is an image URL.
     Image(&'a str),
 }
 
@@ -201,7 +203,7 @@ impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
-    /// Constructs an `AttachmentType` from a string.
+    /// Constructs an [`AttachmentType`] from a string.
     /// This string may refer to the path of a file on disk, or the http url to an image on the internet.
     fn from(s: &'a str) -> AttachmentType<'_> {
         if s.starts_with("http://") || s.starts_with("https://") {

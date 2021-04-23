@@ -450,9 +450,7 @@ impl BucketBuilder {
         self
     }
 
-    /// Number of invocations allowed per [`time_span`].
-    ///
-    /// [`time_span`]: Self::time_span
+    /// Number of invocations allowed per [`Self::time_span`].
     #[inline]
     pub fn limit(&mut self, n: u32) -> &mut Self {
         self.limit = n;

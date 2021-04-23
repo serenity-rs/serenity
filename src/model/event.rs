@@ -1704,9 +1704,9 @@ impl Event {
     }
 }
 
-/// Deserializes a `serde_json::Value` into an `Event`.
+/// Deserializes a [`serde_json::Value`] into an [`Event`].
 ///
-/// The given `EventType` is used to determine what event to deserialize into.
+/// The given [`EventType`] is used to determine what event to deserialize into.
 /// For example, an [`EventType::ChannelCreate`] will cause the given value to
 /// attempt to be deserialized into a [`ChannelCreateEvent`].
 ///
@@ -2041,7 +2041,7 @@ impl EventType {
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
-    /// case this method returns `None`.
+    /// case this method returns [`None`].
     pub fn name(&self) -> Option<&str> {
         match self {
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),

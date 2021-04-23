@@ -61,11 +61,11 @@ pub enum Channel {
 
 #[cfg(feature = "model")]
 impl Channel {
-    /// Converts from `Channel` to `Option<GuildChannel>`.
+    /// Converts from [`Channel`] to `Option<GuildChannel>`.
     ///
     /// Converts `self` into an `Option<GuildChannel>`, consuming
-    /// `self`, and discarding a `PrivateChannel`, or
-    /// `ChannelCategory`, if any.
+    /// `self`, and discarding a [`PrivateChannel`], or
+    /// [`ChannelCategory`], if any.
     ///
     /// # Examples
     ///
@@ -96,10 +96,10 @@ impl Channel {
         }
     }
 
-    /// Converts from `Channel` to `Option<PrivateChannel>`.
+    /// Converts from [`Channel`] to `Option<PrivateChannel>`.
     ///
     /// Converts `self` into an `Option<PrivateChannel>`, consuming
-    /// `self`, and discarding a `GuildChannel`, or `ChannelCategory`,
+    /// `self`, and discarding a [`GuildChannel`], or [`ChannelCategory`],
     /// if any.
     ///
     /// # Examples
@@ -131,11 +131,11 @@ impl Channel {
         }
     }
 
-    /// Converts from `Channel` to `Option<ChannelCategory>`.
+    /// Converts from [`Channel`] to `Option<ChannelCategory>`.
     ///
     /// Converts `self` into an `Option<ChannelCategory>`,
-    /// consuming `self`, and discarding a `GuildChannel`, or
-    /// `PrivateChannel`, if any.
+    /// consuming `self`, and discarding a [`GuildChannel`], or
+    /// [`PrivateChannel`], if any.
     ///
     /// # Examples
     ///
@@ -305,7 +305,7 @@ pub enum ChannelType {
     ///
     /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
     News = 5,
-    /// An indicator that the channel is a `StoreChannel`
+    /// An indicator that the channel is a `StoreChannel]
     ///
     /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
     Store = 6,

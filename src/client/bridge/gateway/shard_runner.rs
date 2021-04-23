@@ -182,7 +182,7 @@ impl ShardRunner {
     /// is accepted by them.
     #[cfg(feature = "collector")]
     fn handle_filters(&mut self, event: &Event) {
-        /// Unlike `Vec`'s `retain`, allows mutable references in `f`.
+        /// Unlike [`Vec`]'s `retain`, allows mutable references in `f`.
         fn retain<T, F>(vec: &mut Vec<T>, mut f: F)
         where
             F: FnMut(&mut T) -> bool,

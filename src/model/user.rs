@@ -148,11 +148,8 @@ impl CurrentUser {
     /// Retrieves the URL to the current user's avatar, falling back to the
     /// default avatar if needed.
     ///
-    /// This will call [`avatar_url`] first, and if that returns `None`, it
-    /// then falls back to [`default_avatar_url`].
-    ///
-    /// [`avatar_url`]: Self::avatar_url
-    /// [`default_avatar_url`]: Self::default_avatar_url
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
+    /// then falls back to [`Self::default_avatar_url`].
     #[inline]
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
@@ -349,9 +346,7 @@ impl CurrentUser {
 ///
 /// The default avatar is calculated via the result of `discriminator % 5`.
 ///
-/// The has of the avatar can be retrieved via calling [`name`] on the enum.
-///
-/// [`name`]: Self::name
+/// The has of the avatar can be retrieved via calling [`Self::name`] on the enum.
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
 #[non_exhaustive]
 pub enum DefaultAvatar {
@@ -440,9 +435,7 @@ pub struct User {
     #[serde(default)]
     pub bot: bool,
     /// The account's discriminator to differentiate the user from others with
-    /// the same [`name`]. The name+discriminator pair is always unique.
-    ///
-    /// [`name`]: Self::name
+    /// the same [`Self::name`]. The name+discriminator pair is always unique.
     #[serde(deserialize_with = "deserialize_u16")]
     pub discriminator: u16,
     /// The account's username. Changing username will trigger a discriminator
@@ -509,13 +502,13 @@ impl Serialize for UserPublicFlags {
 }
 
 impl Default for User {
-    /// Initializes a `User` with default values. Setting the following:
+    /// Initializes a [`User`] with default values. Setting the following:
     /// - **id** to `UserId(210)`
     /// - **avatar** to `Some("abc")`
     /// - **bot** to `true`.
     /// - **discriminator** to `1432`.
     /// - **name** to `"test"`.
-    /// - **public_flags** to `None`.
+    /// - **public_flags** to [`None`].
     fn default() -> Self {
         User {
             id: UserId(210),
@@ -672,9 +665,7 @@ impl User {
         self.create_dm_channel(&cache_http).await?.send_message(&cache_http.http(), f).await
     }
 
-    /// This is an alias of [direct_message].
-    ///
-    /// [direct_message]: Self::direct_message
+    /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
@@ -687,11 +678,8 @@ impl User {
     /// Retrieves the URL to the user's avatar, falling back to the default
     /// avatar if needed.
     ///
-    /// This will call [`avatar_url`] first, and if that returns `None`, it
-    /// then falls back to [`default_avatar_url`].
-    ///
-    /// [`avatar_url`]: Self::avatar_url
-    /// [`default_avatar_url`]: Self::default_avatar_url
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
+    /// then falls back to [`Self::default_avatar_url`].
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }
@@ -716,9 +704,9 @@ impl User {
     ///
     /// # Errors
     ///
-    /// Returns an [`Error::Http`] if the given `Guild` is unavailable,
-    /// if that `Role` does not exist in the given `Guild`, or if the
-    /// given `User` is not in that `Guild`.
+    /// Returns an [`Error::Http`] if the given [`Guild`] is unavailable,
+    /// if that [`Role`] does not exist in the given [`Guild`], or if the
+    /// given [`User`] is not in that [`Guild`].
     ///
     /// May also return an [`Error::Json`] if there is an error in
     /// deserializing the API response.
@@ -844,7 +832,7 @@ impl User {
 
     /// Returns the user's nickname in the given `guild_id`.
     ///
-    /// If none is used, it returns `None`.
+    /// If none is used, it returns [`None`].
     #[inline]
     pub async fn nick_in(
         &self,
@@ -925,7 +913,7 @@ impl UserId {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if a `User` with that `UserId` does not exist,
+    /// Returns [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,
     /// or is otherwise unavailable.
     ///
     /// May also return an [`Error::Json`] if there is an error in deserializing
@@ -967,7 +955,7 @@ impl UserId {
     ///
     /// # Errors
     ///
-    /// May return an [`Error::Http`] if a `User` with that `UserId` does not exist,
+    /// May return an [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,
     /// or otherwise cannot be fetched.
     ///
     /// May also return an [`Error::Json`] if there is an error in
@@ -1017,42 +1005,42 @@ impl<'a> From<&'a CurrentUser> for User {
 }
 
 impl From<CurrentUser> for UserId {
-    /// Gets the Id of a `CurrentUser` struct.
+    /// Gets the Id of a [`CurrentUser`] struct.
     fn from(current_user: CurrentUser) -> UserId {
         current_user.id
     }
 }
 
 impl<'a> From<&'a CurrentUser> for UserId {
-    /// Gets the Id of a `CurrentUser` struct.
+    /// Gets the Id of a [`CurrentUser`] struct.
     fn from(current_user: &CurrentUser) -> UserId {
         current_user.id
     }
 }
 
 impl From<Member> for UserId {
-    /// Gets the Id of a `Member`.
+    /// Gets the Id of a [`Member`].
     fn from(member: Member) -> UserId {
         member.user.id
     }
 }
 
 impl<'a> From<&'a Member> for UserId {
-    /// Gets the Id of a `Member`.
+    /// Gets the Id of a [`Member`].
     fn from(member: &Member) -> UserId {
         member.user.id
     }
 }
 
 impl From<User> for UserId {
-    /// Gets the Id of a `User`.
+    /// Gets the Id of a [`User`].
     fn from(user: User) -> UserId {
         user.id
     }
 }
 
 impl<'a> From<&'a User> for UserId {
-    /// Gets the Id of a `User`.
+    /// Gets the Id of a [`User`].
     fn from(user: &User) -> UserId {
         user.id
     }

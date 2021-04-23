@@ -117,11 +117,8 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// **Panic**:
     /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`framework`] or [`framework_arc`] method,
+    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
-    ///
-    /// [`framework`]: Self::framework
-    /// [`framework_arc`]: Self::framework_arc
     pub fn new(token: impl AsRef<str>) -> Self {
         Self::_new().token(token)
     }
@@ -131,12 +128,10 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// **Panic**:
     /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`framework`] or [`framework_arc`] method,
+    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
     ///
     /// [`Http`]: crate::http::Http
-    /// [`framework`]: Self::framework
-    /// [`framework_arc`]: Self::framework_arc
     pub fn new_with_http(http: Http) -> Self {
         let mut c = Self::_new();
         c.http = Some(http);
@@ -170,10 +165,8 @@ impl<'a> ClientBuilder<'a> {
     }
 
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
-    /// A `TypeMap` must not be constructed manually: [`type_map_insert`]
+    /// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]
     /// can be used to insert one type at a time.
-    ///
-    /// [`type_map_insert`]: Self::type_map_insert
     pub fn type_map(mut self, type_map: TypeMap) -> Self {
         self.data = Some(type_map);
 
@@ -217,9 +210,7 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// *Info*:
     /// If a reference to the framework is required for manual dispatch,
-    /// use the [`framework_arc`]-method instead.
-    ///
-    /// [`framework_arc`]: Self::framework_arc
+    /// use the [`Self::framework_arc`]-method instead.
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
     where
@@ -230,12 +221,10 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// This method allows to pass an `Arc`'ed `framework` - this step is
-    /// done for you in the [`framework`]-method, if you don't need the
+    /// This method allows to pass an [`Arc`]'ed `framework` - this step is
+    /// done for you in the [`Self::framework`]-method, if you don't need the
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
-    ///
-    /// [`framework`]: Self::framework
     #[cfg(feature = "framework")]
     pub fn framework_arc(
         mut self,
@@ -252,9 +241,7 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// *Info*:
     /// If a reference to the voice_manager is required for manual dispatch,
-    /// use the [`voice_manager_arc`]-method instead.
-    ///
-    /// [`voice_manager_arc`]: Self::voice_manager_arc
+    /// use the [`Self::voice_manager_arc`]-method instead.
     #[cfg(feature = "voice")]
     pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
     where
@@ -265,7 +252,7 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// This method allows to pass an `Arc`'ed `voice_manager` - this step is
+    /// This method allows to pass an [`Arc`]'ed `voice_manager` - this step is
     /// done for you in the [`voice_manager`]-method, if you don't need the
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
@@ -283,7 +270,7 @@ impl<'a> ClientBuilder<'a> {
 
     /// Sets all intents directly, replacing already set intents.
     ///
-    /// To enable privileged intents, `GatewayIntents::all` to
+    /// To enable privileged intents, [`GatewayIntents::all`] to
     ///
     /// *Info*:
     /// Intents are a bitflag, you can combine them by performing the
@@ -508,7 +495,7 @@ pub struct Client {
     /// # }
     /// ```
     ///
-    /// Refer to [example 05] for an example on using the `data` field.
+    /// Refer to [example 05] for an example on using the [`Self::data`] field.
     ///
     /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
     /// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete
@@ -748,8 +735,8 @@ impl Client {
     /// # }
     /// ```
     ///
-    /// Start shard 0 of 1 (you may also be interested in [`start`] or
-    /// [`start_autosharded`]):
+    /// Start shard 0 of 1 (you may also be interested in [`Self::start`] or
+    /// [`Self::start_autosharded`]):
     ///
     /// ```rust,no_run
     /// # use std::error::Error;
@@ -776,8 +763,6 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`start`]: Self::start
-    /// [`start_autosharded`]: Self::start_autosharded
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
@@ -791,7 +776,7 @@ impl Client {
     ///
     /// This will create and handle all shards within this single process. If
     /// you only need to start a single shard within the process, or a range of
-    /// shards, use [`start_shard`] or [`start_shard_range`], respectively.
+    /// shards, use [`Self::start_shard`] or [`Self::start_shard_range`], respectively.
     ///
     /// Refer to the [Gateway documentation][gateway docs] for more information
     /// on effectively using sharding.
@@ -825,8 +810,6 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`start_shard`]: Self::start_shard
-    /// [`start_shard_range`]: Self::start_shard_range
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start_shards(&mut self, total_shards: u64) -> Result<()> {
@@ -840,8 +823,8 @@ impl Client {
     ///
     /// This will create and handle all shards within a given range within this
     /// single process. If you only need to start a single shard within the
-    /// process, or all shards within the process, use [`start_shard`] or
-    /// [`start_shards`], respectively.
+    /// process, or all shards within the process, use [`Self::start_shard`] or
+    /// [`Self::start_shards`], respectively.
     ///
     /// Refer to the [Gateway documentation][gateway docs] for more
     /// information on effectively using sharding.
@@ -875,8 +858,6 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`start_shard`]: Self::start_shard
-    /// [`start_shards`]: Self::start_shards
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
