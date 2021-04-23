@@ -507,7 +507,7 @@ pub enum ActivityType {
     Listening = 2,
     /// An indicator that the user is watching something.
     Watching = 3,
-    /// An indicator that the user uses custum statuses
+    /// An indicator that the user uses custom statuses
     Custom = 4,
     /// An indicator that the user is competing somewhere.
     Competing = 5,
