@@ -277,8 +277,6 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        println!("{:?}", map);
-
         let members = match map.contains_key("members") {
             true => map
                 .remove("members")
