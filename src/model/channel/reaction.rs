@@ -32,7 +32,7 @@ pub struct Reaction {
     pub user_id: Option<UserId>,
     /// The optional Id of the [`Guild`] where the reaction was sent.
     pub guild_id: Option<GuildId>,
-    /// The optional object of the member which added the reaction..
+    /// The optional object of the member which added the reaction.
     pub member: Option<PartialMember>,
 }
 
