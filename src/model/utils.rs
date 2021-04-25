@@ -219,6 +219,14 @@ pub fn serialize_presences<S: Serializer>(
     seq.end()
 }
 
+pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Vec<ActivityButton>, D::Error> {
+    let buttons: Vec<ActivityButton> = Deserialize::deserialize(deserializer)?;
+
+    Ok(buttons)
+}
+
 pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
