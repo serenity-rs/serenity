@@ -983,6 +983,9 @@
 <span id="980">980</span>
 <span id="981">981</span>
 <span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
@@ -1059,6 +1062,9 @@
 <span class="doccomment">/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="comment">// FIXME: Remove this allow attribute once `application_id` is no longer feature-gated</span>
+    <span class="comment">// under `unstable_discord_api`.</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="ident">token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span>,
     <span class="ident">http</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
