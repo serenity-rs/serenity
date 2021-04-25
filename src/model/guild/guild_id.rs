@@ -1215,6 +1215,11 @@ impl GuildId {
             .get_guild_application_command_permissions(self.0.into(), command_id.into())
             .await
     }
+
+    /// Get the guild welcome screen
+    pub async fn get_welcome_screen(&self, http: impl AsRef<Http>) -> Result<GuildWelcomeScreen> {
+        http.as_ref().get_guild_welcome_screen(self.0.into()).await
+    }
 }
 
 impl From<PartialGuild> for GuildId {

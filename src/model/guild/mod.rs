@@ -13,6 +13,7 @@ mod system_channel;
 use chrono::{DateTime, Utc};
 use futures::stream::StreamExt;
 use serde::de::Error as DeError;
+use serde::{Serialize, Serializer};
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
 #[cfg(feature = "model")]
@@ -173,6 +174,10 @@ pub struct Guild {
     /// The preferred locale of this guild only set if guild has the "DISCOVERABLE"
     /// feature, defaults to en-US.
     pub preferred_locale: String,
+    /// The welcome screen of the guild.
+    ///
+    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
+    pub welcome_screen: Option<GuildWelcomeScreen>,
 }
 
 #[cfg(feature = "model")]
@@ -2321,6 +2326,16 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
 
+        let welcome_screen = match map.contains_key("welcome_screen") {
+            true => Some(
+                map.remove("welcome_screen")
+                    .ok_or_else(|| DeError::custom("expected welcome_screen"))
+                    .and_then(GuildWelcomeScreen::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
         Ok(Self {
             afk_channel_id,
             application_id,
@@ -2352,6 +2367,7 @@ impl<'de> Deserialize<'de> for Guild {
             banner,
             vanity_url_code,
             preferred_locale,
+            welcome_screen,
         })
     }
 }
@@ -2411,6 +2427,111 @@ pub struct GuildEmbed {
     pub channel_id: ChannelId,
     /// Whether the widget embed is enabled.
     pub enabled: bool,
+}
+
+/// Information relating to a guild's welcome screen.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct GuildWelcomeScreen {
+    /// The server description shown in the welcome screen.
+    pub description: Option<String>,
+    /// The channels shown in the welcome screen.
+    ///
+    /// **Note**: There can only be only up to 5 channels.
+    pub welcome_channels: Vec<GuildWelcomeChannel>,
+}
+
+/// A channel shown in the [`GuildWelcomeScreen`].
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub struct GuildWelcomeChannel {
+    /// The channel Id.
+    pub channel_id: ChannelId,
+    /// The description shown for the channel.
+    pub description: String,
+    /// The emoji shown, if there is one.
+    pub emoji: Option<GuildWelcomeScreenEmoji>,
+}
+
+impl<'de> Deserialize<'de> for GuildWelcomeChannel {
+    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let channel_id = map
+            .remove("channel_id")
+            .ok_or_else(|| DeError::custom("expected channel_id"))
+            .and_then(ChannelId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let description = map
+            .remove("description")
+            .ok_or_else(|| DeError::custom("expected description"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
+        let mut emoji = None;
+
+        let emoji_id =
+            map.remove("emoji_id").ok_or_else(|| DeError::custom("expected emoji_id"))?;
+
+        let emoji_name =
+            map.remove("emoji_name").ok_or_else(|| DeError::custom("expected emoji_name"))?;
+
+        if emoji_id != Value::Null {
+            emoji = Some(GuildWelcomeScreenEmoji::Custom(EmojiId::deserialize(emoji_id).unwrap()));
+        }
+
+        if emoji_name != Value::Null {
+            emoji =
+                Some(GuildWelcomeScreenEmoji::Unicode(String::deserialize(emoji_name).unwrap()));
+        }
+
+        Ok(Self {
+            channel_id,
+            description,
+            emoji,
+        })
+    }
+}
+
+impl Serialize for GuildWelcomeChannel {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut map = JsonMap::new();
+
+        map.insert("channel_id".to_owned(), Value::String(self.channel_id.to_string()));
+        map.insert("description".to_owned(), Value::String(self.description.to_string()));
+
+        map.insert("emoji_id".to_owned(), Value::Null);
+        map.insert("emoji_name".to_owned(), Value::Null);
+
+        if let Some(emoji) = self.emoji.to_owned() {
+            match emoji {
+                GuildWelcomeScreenEmoji::Custom(id) => {
+                    map.insert("emoji_id".to_owned(), Value::String(id.to_string()))
+                },
+                GuildWelcomeScreenEmoji::Unicode(name) => {
+                    map.insert("emoji_name".to_owned(), Value::String(name.to_string()))
+                },
+            };
+        };
+
+        map.serialize(serializer)
+    }
+}
+
+/// A [`GuildWelcomeScreen`] emoji.
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[non_exhaustive]
+pub enum GuildWelcomeScreenEmoji {
+    /// A custom emoji.
+    Custom(EmojiId),
+    /// A unicode emoji.
+    Unicode(String),
 }
 
 /// Representation of the number of members that would be pruned by a guild
@@ -2783,6 +2904,7 @@ mod test {
                 banner: None,
                 vanity_url_code: Some("bruhmoment".to_string()),
                 preferred_locale: "en-US".to_string(),
+                welcome_screen: None,
             }
         }
 

@@ -2160,6 +2160,18 @@ impl Http {
         .await
     }
 
+    /// Gets a guild welcome screen information.
+    pub async fn get_guild_welcome_screen(&self, guild_id: u64) -> Result<GuildWelcomeScreen> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildWelcomeScreen {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Gets integrations that a guild has.
     pub async fn get_guild_integrations(&self, guild_id: u64) -> Result<Vec<Integration>> {
         self.fire(Request {

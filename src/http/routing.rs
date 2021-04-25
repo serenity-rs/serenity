@@ -260,6 +260,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdWebhooks(u64),
+    /// Route for the `/guilds/:guild_id/welcome-screen` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdWelcomeScreen(u64),
     /// Route for the `/invites/:code` path.
     InvitesCode,
     /// Route for the `/users/:user_id` path.
@@ -612,6 +618,10 @@ impl Route {
 
     pub fn guild_webhooks(guild_id: u64) -> String {
         format!(api!("/guilds/{}/webhooks"), guild_id)
+    }
+
+    pub fn guild_welcome_screen(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/welcome-screen"), guild_id)
     }
 
     pub fn guilds() -> &'static str {
@@ -1019,6 +1029,9 @@ pub enum RouteInfo<'a> {
     EditGuildEmbed {
         guild_id: u64,
     },
+    EditGuildWelcomeScreen {
+        guild_id: u64,
+    },
     EditMember {
         guild_id: u64,
         user_id: u64,
@@ -1147,6 +1160,9 @@ pub enum RouteInfo<'a> {
         command_id: u64,
     },
     GetGuildEmbed {
+        guild_id: u64,
+    },
+    GetGuildWelcomeScreen {
         guild_id: u64,
     },
     GetGuildIntegrations {
@@ -1683,6 +1699,13 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdEmbed(guild_id),
                 Cow::from(Route::guild_embed(guild_id)),
             ),
+            RouteInfo::EditGuildWelcomeScreen {
+                guild_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdWelcomeScreen(guild_id),
+                Cow::from(Route::guild_welcome_screen(guild_id)),
+            ),
             RouteInfo::EditMember {
                 guild_id,
                 user_id,
@@ -1928,6 +1951,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::GuildsIdEmbed(guild_id),
                 Cow::from(Route::guild_embed(guild_id)),
+            ),
+            RouteInfo::GetGuildWelcomeScreen {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdWelcomeScreen(guild_id),
+                Cow::from(Route::guild_welcome_screen(guild_id)),
             ),
             RouteInfo::GetGuildIntegrations {
                 guild_id,
