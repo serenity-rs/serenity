@@ -1120,6 +1120,7 @@ mod test {
                     banner: None,
                     vanity_url_code: Some("bruhmoment".to_string()),
                     preferred_locale: "en-US".to_string(),
+                    welcome_screen: None
                 },
             }
         };

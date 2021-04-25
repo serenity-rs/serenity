@@ -2494,12 +2494,12 @@ impl<'de> Deserialize<'de> for GuildWelcomeChannel {
             map.remove("emoji_name").ok_or_else(|| DeError::custom("expected emoji_name"))?;
 
         if emoji_id != Value::Null {
-            emoji = Some(GuildWelcomeScreenEmoji::Custom(EmojiId::deserialize(emoji_id).unwrap()));
+            emoji = Some(GuildWelcomeScreenEmoji::Custom(EmojiId::deserialize(emoji_id).expect("expected emoji_id")));
         }
 
         if emoji_name != Value::Null {
             emoji =
-                Some(GuildWelcomeScreenEmoji::Unicode(String::deserialize(emoji_name).unwrap()));
+                Some(GuildWelcomeScreenEmoji::Unicode(String::deserialize(emoji_name).expect("expected emoji_name")));
         }
 
         Ok(Self {
