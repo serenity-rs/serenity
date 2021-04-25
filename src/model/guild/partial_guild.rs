@@ -582,6 +582,11 @@ impl PartialGuild {
 
     /// Edits the [`GuildWelcomeScreen`].
     ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if some mandatory fields are not provided.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
     pub async fn edit_welcome_screen<F>(
         &self,

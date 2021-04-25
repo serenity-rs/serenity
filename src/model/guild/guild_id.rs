@@ -554,6 +554,11 @@ impl GuildId {
 
     /// Edits the [`GuildWelcomeScreen`].
     ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if some mandatory fields are not provided.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
     pub async fn edit_welcome_screen<F>(
         &self,
@@ -1235,7 +1240,11 @@ impl GuildId {
             .await
     }
 
-    /// Get the guild welcome screen
+    /// Get the guild welcome screen.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the guild does not have a welcome screen.
     pub async fn get_welcome_screen(&self, http: impl AsRef<Http>) -> Result<GuildWelcomeScreen> {
         http.as_ref().get_guild_welcome_screen(self.0.into()).await
     }
