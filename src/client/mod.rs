@@ -73,6 +73,9 @@ pub use crate::CacheAndHttp;
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
 pub struct ClientBuilder<'a> {
+    // FIXME: Remove this allow attribute once `application_id` is no longer feature-gated
+    // under `unstable_discord_api`.
+    #[allow(dead_code)]
     token: Option<String>,
     data: Option<TypeMap>,
     http: Option<Http>,
