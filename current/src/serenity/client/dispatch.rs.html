@@ -777,6 +777,20 @@
 <span id="774">774</span>
 <span id="775">775</span>
 <span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -980,10 +994,16 @@
                         <span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>.<span class="ident">cache</span>,
                     );
 
-                    <span class="ident">dispatch_message</span>(<span class="ident">context</span>.<span class="ident">clone</span>(), <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">clone</span>(), <span class="ident">h</span>).<span class="kw">await</span>;
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>))]</span>
+                    {
+                        <span class="comment">// Avoid cloning if there will be no framework dispatch.</span>
+                        <span class="ident">dispatch_message</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">message</span>, <span class="ident">h</span>).<span class="kw">await</span>;
+                    }
 
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
                     {
+                        <span class="ident">dispatch_message</span>(<span class="ident">context</span>.<span class="ident">clone</span>(), <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">clone</span>(), <span class="ident">h</span>).<span class="kw">await</span>;
+
                         <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">framework</span>);
 
                         <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
@@ -1013,8 +1033,10 @@
                     );
 
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>))]</span>
-                    <span class="comment">// No clone needed, as there will be no framework disaptch.</span>
-                    <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
+                    {
+                        <span class="comment">// No clone needed, as there will be no framework dispatch.</span>
+                        <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
+                    }
 
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
                     {
@@ -1029,7 +1051,7 @@
                                 <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">message</span>).<span class="kw">await</span>;
                             });
                         } <span class="kw">else</span> {
-                            <span class="comment">// Avoid cloning, if there is no framework-dispatch.</span>
+                            <span class="comment">// Avoid cloning if there will be no framework dispatch.</span>
                             <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
                         }
                     }
@@ -1050,10 +1072,16 @@
 
                 <span class="kw">match</span> <span class="ident">event</span> {
                     <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::MessageCreate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="ident">dispatch_message</span>(<span class="ident">context</span>.<span class="ident">clone</span>(), <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">clone</span>(), <span class="ident">handler</span>).<span class="kw">await</span>;
+                        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>))]</span>
+                        {
+                            <span class="comment">// Avoid cloning if there will be no framework dispatch.</span>
+                            <span class="ident">dispatch_message</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">message</span>, <span class="ident">handler</span>).<span class="kw">await</span>;
+                        }
 
                         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
                         {
+                            <span class="ident">dispatch_message</span>(<span class="ident">context</span>.<span class="ident">clone</span>(), <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">clone</span>(), <span class="ident">handler</span>).<span class="kw">await</span>;
+
                             <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">framework</span>);
                             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">message</span>;
                             <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
