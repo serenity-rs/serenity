@@ -222,7 +222,15 @@ pub fn serialize_presences<S: Serializer>(
 pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<ActivityButton>, D::Error> {
-    let buttons: Vec<ActivityButton> = Deserialize::deserialize(deserializer)?;
+    let labels: Vec<String> = Deserialize::deserialize(deserializer)?;
+    let mut buttons = vec![];
+
+    for label in labels {
+        buttons.push(ActivityButton {
+            label,
+            url: "".to_owned()
+        });
+    }
 
     Ok(buttons)
 }
