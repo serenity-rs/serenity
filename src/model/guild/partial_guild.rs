@@ -1,7 +1,7 @@
 use serde::de::Error as DeError;
 
 #[cfg(feature = "model")]
-use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
+use crate::builder::{CreateChannel, EditGuild, EditGuildWelcomeScreen, EditMember, EditRole};
 #[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -578,6 +578,20 @@ impl PartialGuild {
         new_nickname: Option<&str>,
     ) -> Result<()> {
         self.id.edit_nickname(&http, new_nickname).await
+    }
+
+    /// Edits the [`GuildWelcomeScreen`].
+    ///
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_welcome_screen<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildWelcomeScreen>
+    where
+        F: FnOnce(&mut EditGuildWelcomeScreen) -> &mut EditGuildWelcomeScreen,
+    {
+        self.id.edit_welcome_screen(http, f).await
     }
 
     /// Gets a partial amount of guild data by its Id.

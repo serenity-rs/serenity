@@ -5,7 +5,7 @@ use serde_json::json;
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{EditGuild, EditGuildWelcomeScreen, EditMember, EditRole};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -550,6 +550,25 @@ impl GuildId {
         position: u64,
     ) -> Result<Vec<Role>> {
         http.as_ref().edit_role_position(self.0, role_id.into().0, position).await
+    }
+
+    /// Edits the [`GuildWelcomeScreen`].
+    ///
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_welcome_screen<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildWelcomeScreen>
+    where
+        F: FnOnce(&mut EditGuildWelcomeScreen) -> &mut EditGuildWelcomeScreen,
+    {
+        let mut map = EditGuildWelcomeScreen::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_welcome_screen(self.0, &Value::Object(utils::hashmap_to_json_map(map.0)))
+            .await
     }
 
     /// Tries to find the [`Guild`] by its Id in the cache.

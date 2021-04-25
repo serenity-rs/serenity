@@ -30,7 +30,7 @@ pub use self::role::*;
 pub use self::system_channel::*;
 use super::utils::*;
 #[cfg(feature = "model")]
-use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
+use crate::builder::{CreateChannel, EditGuild, EditGuildWelcomeScreen, EditMember, EditRole};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "model")]
@@ -1035,6 +1035,20 @@ impl Guild {
         position: u64,
     ) -> Result<Vec<Role>> {
         self.id.edit_role_position(&http, role_id, position).await
+    }
+
+    /// Edits the [`GuildWelcomeScreen`].
+    ///
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_welcome_screen<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildWelcomeScreen>
+    where
+        F: FnOnce(&mut EditGuildWelcomeScreen) -> &mut EditGuildWelcomeScreen,
+    {
+        self.id.edit_welcome_screen(http, f).await
     }
 
     /// Gets a partial amount of guild data by its Id.
