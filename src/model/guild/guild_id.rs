@@ -5,7 +5,7 @@ use serde_json::json;
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditGuildWelcomeScreen, EditMember, EditRole};
+use crate::builder::{EditGuild, EditGuildWelcomeScreen, EditGuildWidget, EditMember, EditRole};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -576,6 +576,27 @@ impl GuildId {
             .await
     }
 
+    /// Edits the [`GuildWidget`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`
+    /// permission.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_widget<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildWidget>
+    where
+        F: FnOnce(&mut EditGuildWidget) -> &mut EditGuildWidget,
+    {
+        let mut map = EditGuildWidget::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_widget(self.0, &Value::Object(utils::hashmap_to_json_map(map.0)))
+            .await
+    }
+
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
@@ -596,6 +617,24 @@ impl GuildId {
     #[inline]
     pub async fn to_partial_guild(self, http: impl AsRef<Http>) -> Result<PartialGuild> {
         http.as_ref().get_guild(self.0).await
+    }
+
+    /// Requests [`PartialGuild`] over REST API with counts.
+    ///
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send
+    /// all data with a guild retrieval.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn to_partial_guild_with_counts(
+        self,
+        http: impl AsRef<Http>,
+    ) -> Result<PartialGuild> {
+        http.as_ref().get_guild_with_counts(self.0).await
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
@@ -1247,6 +1286,15 @@ impl GuildId {
     /// Returns [`Error::Http`] if the guild does not have a welcome screen.
     pub async fn get_welcome_screen(&self, http: impl AsRef<Http>) -> Result<GuildWelcomeScreen> {
         http.as_ref().get_guild_welcome_screen(self.0.into()).await
+    }
+
+    /// Get the guild widget.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the bot does not have `MANAGE_MESSAGES` permission.
+    pub async fn get_widget(&self, http: impl AsRef<Http>) -> Result<GuildWidget> {
+        http.as_ref().get_guild_widget(self.0).await
     }
 }
 
