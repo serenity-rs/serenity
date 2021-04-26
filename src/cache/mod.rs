@@ -1131,7 +1131,7 @@ mod test {
                     max_video_channel_users: None,
                     max_presences: None,
                     max_members: None,
-                    widget_enabled: false,
+                    widget_enabled: Some(false),
                     widget_channel_id: None,
                 },
             }

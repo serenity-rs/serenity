@@ -219,7 +219,7 @@ pub struct Guild {
     /// The maximum number of members for the guild.
     pub max_members: Option<u64>,
     /// Whether or not the guild widget is enabled.
-    pub widget_enabled: bool,
+    pub widget_enabled: Option<bool>,
     /// The channel id that the widget will generate an invite to, or null if set to no invite
     pub widget_channel_id: Option<ChannelId>,
 }
@@ -2399,6 +2399,7 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let preferred_locale = map
             .remove("preferred_locale")
             .ok_or_else(|| DeError::custom("expected preferred locale"))
@@ -2471,11 +2472,10 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(bool::deserialize)
             .map_err(DeError::custom)?;
 
-        let widget_enabled = map
-            .remove("widget_enabled")
-            .ok_or_else(|| DeError::custom("expected widget_enabled"))
-            .and_then(bool::deserialize)
-            .map_err(DeError::custom)?;
+        let widget_enabled = match map.remove("widget_enabled") {
+            Some(v) => Option::<bool>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
 
         let widget_channel_id = match map.remove("widget_channel_id") {
             Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
@@ -3091,7 +3091,7 @@ mod test {
                 max_video_channel_users: None,
                 max_presences: None,
                 max_members: None,
-                widget_enabled: false,
+                widget_enabled: Some(false),
                 discovery_splash: None,
                 widget_channel_id: None,
                 public_updates_channel_id: None,
