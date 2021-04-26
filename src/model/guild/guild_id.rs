@@ -1296,6 +1296,11 @@ impl GuildId {
     pub async fn get_widget(&self, http: impl AsRef<Http>) -> Result<GuildWidget> {
         http.as_ref().get_guild_widget(self.0).await
     }
+
+    /// Get the widget image URL.
+    pub fn widget_image_url(&self, style: GuildWidgetStyle) -> String {
+        format!(api!("/guilds/{}/widget.png?style={}"), self.0.to_string(), style.to_string())
+    }
 }
 
 impl From<PartialGuild> for GuildId {
@@ -1445,5 +1450,29 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
             state.buffer.pop().map(|entry| (Ok(entry), state))
         })
+    }
+}
+
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[non_exhaustive]
+#[cfg(feature = "model")]
+pub enum GuildWidgetStyle {
+    Shield,
+    Banner1,
+    Banner2,
+    Banner3,
+    Banner4,
+}
+
+#[cfg(feature = "model")]
+impl Display for GuildWidgetStyle {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            GuildWidgetStyle::Shield => write!(f, "shield"),
+            GuildWidgetStyle::Banner1 => write!(f, "banner1"),
+            GuildWidgetStyle::Banner2 => write!(f, "banner2"),
+            GuildWidgetStyle::Banner3 => write!(f, "banner3"),
+            GuildWidgetStyle::Banner4 => write!(f, "banner4"),
+        }
     }
 }
