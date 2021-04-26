@@ -155,9 +155,6 @@ impl EditGuild {
 
     /// Set the channel ID where welcome messages and boost events will be
     /// posted.
-    ///
-    /// **Note**:
-    /// This feature is for Community guilds only.
     pub fn system_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
         let channel_id = channel_id.map_or(Value::Null, |x| Value::from(x.0));
         self.0.insert("system_channel_id", channel_id);
