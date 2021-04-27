@@ -511,7 +511,7 @@ pub enum ActivityType {
     Custom = 4,
     /// An indicator that the user is competing somewhere.
     Competing = 5,
-    /// An indicator that the activity of unknown type.
+    /// An indicator that the activity is of unknown type.
     Unknown = !0,
 }
 

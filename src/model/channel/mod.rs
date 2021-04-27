@@ -420,7 +420,7 @@ pub enum VideoQualityMode {
     Auto = 1,
     /// An indicator that the video quality is 720p.
     Full = 2,
-    /// An indicator that video quality of unknown type.
+    /// An indicator that video quality is of unknown type.
     Unknown = !0,
 }
 
