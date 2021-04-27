@@ -3,13 +3,13 @@
 mod audit_log;
 mod emoji;
 mod guild_id;
+mod guild_preview;
 mod integration;
 mod member;
 mod partial_guild;
 mod premium_tier;
 mod role;
 mod system_channel;
-mod guild_preview;
 
 use chrono::{DateTime, Utc};
 use futures::stream::StreamExt;
@@ -25,13 +25,13 @@ use tracing::warn;
 pub use self::audit_log::*;
 pub use self::emoji::*;
 pub use self::guild_id::*;
+pub use self::guild_preview::*;
 pub use self::integration::*;
 pub use self::member::*;
 pub use self::partial_guild::*;
 pub use self::premium_tier::*;
 pub use self::role::*;
 pub use self::system_channel::*;
-pub use self::guild_preview::*;
 use super::utils::*;
 #[cfg(feature = "model")]
 use crate::builder::{

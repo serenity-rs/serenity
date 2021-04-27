@@ -2201,7 +2201,7 @@ impl Http {
                 guild_id,
             },
         })
-            .await
+        .await
     }
 
     /// Gets a guild welcome screen information.

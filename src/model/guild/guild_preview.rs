@@ -1,5 +1,5 @@
-use crate::model::id::GuildId;
 use crate::model::guild::Emoji;
+use crate::model::id::GuildId;
 
 /// Preview [`Guild`] information.
 ///
@@ -28,5 +28,5 @@ pub struct GuildPreview {
     /// Approximate number of online members in this guild.
     pub approximate_presence_count: u64,
     /// The description for the guild, if the guild has the `DISCOVERABLE` feature.
-    pub description: Option<String>
+    pub description: Option<String>,
 }

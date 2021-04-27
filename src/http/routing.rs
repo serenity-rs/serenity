@@ -1180,7 +1180,7 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
     },
     GetGuildPreview {
-      guild_id: u64
+        guild_id: u64,
     },
     GetGuildWelcomeScreen {
         guild_id: u64,
