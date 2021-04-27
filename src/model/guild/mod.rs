@@ -92,29 +92,29 @@ pub struct Guild {
     pub emojis: HashMap<EmojiId, Emoji>,
     /// Default explicit content filter level.
     pub explicit_content_filter: ExplicitContentFilter,
-    /// VIP features enabled for the guild. Can be obtained through the
-    /// [Discord Partnership] website.
+    /// The guild features. More information available at
+    /// [`discord documentation`].
     ///
     /// The following is a list of known features:
     ///
+    /// - `ANIMATED_ICON`
+    /// - `BANNER`
+    /// - `COMMERCE`
+    /// - `COMMUNITY`
+    /// - `DISCOVERABLE`
+    /// - `FEATURABLE`
     /// - `INVITE_SPLASH`
+    /// - `MEMBER_VERIFICATION_GATE_ENABLED`
+    /// - `NEWS`
+    /// - `PARTNERED`
+    /// - `PREVIEW_ENABLED`
     /// - `VANITY_URL`
     /// - `VERIFIED`
     /// - `VIP_REGIONS`
-    /// - `PARTNERED`
-    /// - `MORE_EMOJI`
-    /// - `DISCOVERABLE`
-    /// - `FEATURABLE`
-    /// - `COMMERCE`
-    /// - `PUBLIC`
-    /// - `NEWS`
-    /// - `BANNER`
-    /// - `ANIMATED_ICON`
-    /// - `PUBLIC_DISABLED`
-    /// - `COMMUNITY`
     /// - `WELCOME_SCREEN_ENABLED`
     ///
-    /// [Discord Partnership]: https://discord.com/partners
+    ///
+    /// [discord documentation]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
     /// The hash of the icon used by the guild.
     ///
