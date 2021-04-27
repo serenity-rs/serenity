@@ -43,16 +43,3 @@ enum_number!(StickerFormatType {
     Apng,
     Lottie
 });
-
-impl StickerFormatType {
-    pub fn num(self) -> u64 {
-        use self::StickerFormatType::*;
-
-        match self {
-            Png => 1,
-            Apng => 2,
-            Lottie => 3,
-            Unknown => !0,
-        }
-    }
-}

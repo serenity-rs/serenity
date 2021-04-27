@@ -524,22 +524,6 @@ enum_number!(ActivityType {
     Competing
 });
 
-impl ActivityType {
-    pub fn num(self) -> u64 {
-        use self::ActivityType::*;
-
-        match self {
-            Playing => 0,
-            Streaming => 1,
-            Listening => 2,
-            Watching => 3,
-            Custom => 4,
-            Competing => 5,
-            Unknown => !0,
-        }
-    }
-}
-
 impl Default for ActivityType {
     fn default() -> Self {
         ActivityType::Playing

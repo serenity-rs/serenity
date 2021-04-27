@@ -2531,16 +2531,6 @@ enum_number!(DefaultMessageNotificationLevel {
     Mentions
 });
 
-impl DefaultMessageNotificationLevel {
-    pub fn num(self) -> u64 {
-        match self {
-            DefaultMessageNotificationLevel::All => 0,
-            DefaultMessageNotificationLevel::Mentions => 1,
-            DefaultMessageNotificationLevel::Unknown => !0,
-        }
-    }
-}
-
 /// Setting used to filter explicit messages from members.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
@@ -2561,17 +2551,6 @@ enum_number!(ExplicitContentFilter {
     All
 });
 
-impl ExplicitContentFilter {
-    pub fn num(self) -> u64 {
-        match self {
-            ExplicitContentFilter::None => 0,
-            ExplicitContentFilter::WithoutRole => 1,
-            ExplicitContentFilter::All => 2,
-            ExplicitContentFilter::Unknown => !0,
-        }
-    }
-}
-
 /// Multi-Factor Authentication level for guild moderators.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
@@ -2588,16 +2567,6 @@ enum_number!(MfaLevel {
     None,
     Elevated
 });
-
-impl MfaLevel {
-    pub fn num(self) -> u64 {
-        match self {
-            MfaLevel::None => 0,
-            MfaLevel::Elevated => 1,
-            MfaLevel::Unknown => !0,
-        }
-    }
-}
 
 /// The name of a region that a voice server can be located in.
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
@@ -2692,19 +2661,6 @@ enum_number!(VerificationLevel {
     High,
     Higher
 });
-
-impl VerificationLevel {
-    pub fn num(self) -> u64 {
-        match self {
-            VerificationLevel::None => 0,
-            VerificationLevel::Low => 1,
-            VerificationLevel::Medium => 2,
-            VerificationLevel::High => 3,
-            VerificationLevel::Higher => 4,
-            VerificationLevel::Unknown => !0,
-        }
-    }
-}
 
 #[cfg(test)]
 mod test {

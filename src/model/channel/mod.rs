@@ -336,21 +336,7 @@ impl ChannelType {
             ChannelType::News => "news",
             ChannelType::Store => "store",
             ChannelType::Stage => "stage",
-            ChannelType::Unknown => "Unknown",
-        }
-    }
-
-    #[inline]
-    pub fn num(self) -> u64 {
-        match self {
-            ChannelType::Text => 0,
-            ChannelType::Private => 1,
-            ChannelType::Voice => 2,
-            ChannelType::Category => 4,
-            ChannelType::News => 5,
-            ChannelType::Store => 6,
-            ChannelType::Stage => 13,
-            ChannelType::Unknown => !0,
+            ChannelType::Unknown => "unknown",
         }
     }
 }

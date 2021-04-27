@@ -116,26 +116,6 @@ enum_number!(OpCode {
     HeartbeatAck,
 });
 
-impl OpCode {
-    pub fn num(self) -> u64 {
-        match self {
-            OpCode::Event => 0,
-            OpCode::Heartbeat => 1,
-            OpCode::Identify => 2,
-            OpCode::StatusUpdate => 3,
-            OpCode::VoiceStateUpdate => 4,
-            OpCode::VoiceServerPing => 5,
-            OpCode::Resume => 6,
-            OpCode::Reconnect => 7,
-            OpCode::GetGuildMembers => 8,
-            OpCode::InvalidSession => 9,
-            OpCode::Hello => 10,
-            OpCode::HeartbeatAck => 11,
-            OpCode::Unknown => !0,
-        }
-    }
-}
-
 pub mod close_codes {
     /// Unknown error; try reconnecting?
     ///

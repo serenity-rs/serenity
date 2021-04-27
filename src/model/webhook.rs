@@ -51,15 +51,6 @@ impl WebhookType {
             WebhookType::Unknown => "unknown",
         }
     }
-
-    #[inline]
-    pub fn num(self) -> u64 {
-        match self {
-            WebhookType::Incoming => 1,
-            WebhookType::ChannelFollower => 2,
-            WebhookType::Unknown => !0,
-        }
-    }
 }
 
 /// A representation of a webhook, which is a low-effort way to post messages to
