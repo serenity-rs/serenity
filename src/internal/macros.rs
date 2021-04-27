@@ -74,9 +74,11 @@ macro_rules! enum_number {
                         // number to an enum, so use a big `match`.
                         match value {
                             $( v if v == $name::$variant as u64 => Ok($name::$variant), )*
-                            _ => Err(E::custom(
-                                format!("unknown {} value: {}",
-                                stringify!($name), value))),
+                            _ => {
+                                tracing::warn!("Unknown {} value: {}", stringify!($name), value);
+
+                                Ok($name::Unknown)
+                            }
                         }
                     }
                 }

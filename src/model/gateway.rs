@@ -511,6 +511,8 @@ pub enum ActivityType {
     Custom = 4,
     /// An indicator that the user is competing somewhere.
     Competing = 5,
+    /// An indicator that the activity of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(ActivityType {
@@ -533,6 +535,7 @@ impl ActivityType {
             Watching => 3,
             Custom => 4,
             Competing => 5,
+            Unknown => !0,
         }
     }
 }

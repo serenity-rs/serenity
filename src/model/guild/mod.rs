@@ -2522,6 +2522,8 @@ pub enum DefaultMessageNotificationLevel {
     All = 0,
     /// Receive only mentions.
     Mentions = 1,
+    /// Unknown notification level.
+    Unknown = !0,
 }
 
 enum_number!(DefaultMessageNotificationLevel {
@@ -2534,6 +2536,7 @@ impl DefaultMessageNotificationLevel {
         match self {
             DefaultMessageNotificationLevel::All => 0,
             DefaultMessageNotificationLevel::Mentions => 1,
+            DefaultMessageNotificationLevel::Unknown => !0,
         }
     }
 }
@@ -2548,6 +2551,8 @@ pub enum ExplicitContentFilter {
     WithoutRole = 1,
     /// Scan messages sent by all members.
     All = 2,
+    /// Unknown content filter.
+    Unknown = !0,
 }
 
 enum_number!(ExplicitContentFilter {
@@ -2562,6 +2567,7 @@ impl ExplicitContentFilter {
             ExplicitContentFilter::None => 0,
             ExplicitContentFilter::WithoutRole => 1,
             ExplicitContentFilter::All => 2,
+            ExplicitContentFilter::Unknown => !0,
         }
     }
 }
@@ -2574,6 +2580,8 @@ pub enum MfaLevel {
     None = 0,
     /// MFA is enabled.
     Elevated = 1,
+    /// Unknown MFA level.
+    Unknown = !0,
 }
 
 enum_number!(MfaLevel {
@@ -2586,6 +2594,7 @@ impl MfaLevel {
         match self {
             MfaLevel::None => 0,
             MfaLevel::Elevated => 1,
+            MfaLevel::Unknown => !0,
         }
     }
 }
@@ -2672,6 +2681,8 @@ pub enum VerificationLevel {
     High = 3,
     /// Must have a verified phone on the user's Discord account.
     Higher = 4,
+    /// Unknown verification level.
+    Unknown = !0,
 }
 
 enum_number!(VerificationLevel {
@@ -2690,6 +2701,7 @@ impl VerificationLevel {
             VerificationLevel::Medium => 2,
             VerificationLevel::High => 3,
             VerificationLevel::Higher => 4,
+            VerificationLevel::Unknown => !0,
         }
     }
 }

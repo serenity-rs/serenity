@@ -7,6 +7,7 @@ pub enum PremiumTier {
     Tier1,
     Tier2,
     Tier3,
+    Unknown = !0,
 }
 
 enum_number!(PremiumTier {
@@ -23,6 +24,7 @@ impl PremiumTier {
             PremiumTier::Tier1 => 1,
             PremiumTier::Tier2 => 2,
             PremiumTier::Tier3 => 3,
+            PremiumTier::Unknown => !0,
         }
     }
 }

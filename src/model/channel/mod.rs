@@ -311,6 +311,8 @@ pub enum ChannelType {
     Store = 6,
     /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
+    /// An indicator that the channel is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(ChannelType {
@@ -334,6 +336,7 @@ impl ChannelType {
             ChannelType::News => "news",
             ChannelType::Store => "store",
             ChannelType::Stage => "stage",
+            ChannelType::Unknown => "Unknown",
         }
     }
 
@@ -347,6 +350,7 @@ impl ChannelType {
             ChannelType::News => 5,
             ChannelType::Store => 6,
             ChannelType::Stage => 13,
+            ChannelType::Unknown => !0,
         }
     }
 }
@@ -430,6 +434,8 @@ pub enum VideoQualityMode {
     Auto = 1,
     /// An indicator that the video quality is 720p.
     Full = 2,
+    /// An indicator that video quality of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(VideoQualityMode {

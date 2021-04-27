@@ -1032,6 +1032,8 @@ pub enum MessageType {
     ApplicationCommand = 20,
     /// Server setup tips.
     GuildInviteReminder = 22,
+    /// An indicator that the message is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(MessageType {
@@ -1077,6 +1079,7 @@ impl MessageType {
             InlineReply => 19,
             ApplicationCommand => 20,
             GuildInviteReminder => 22,
+            Unknown => !0,
         }
     }
 }
@@ -1089,6 +1092,7 @@ pub enum MessageActivityKind {
     LISTEN = 3,
     #[allow(non_camel_case_types)]
     JOIN_REQUEST = 5,
+    Unknown = !0,
 }
 
 enum_number!(MessageActivityKind {
@@ -1107,6 +1111,7 @@ impl MessageActivityKind {
             SPECTATE => 2,
             LISTEN => 3,
             JOIN_REQUEST => 5,
+            Unknown => !0,
         }
     }
 }

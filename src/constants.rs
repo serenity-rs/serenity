@@ -97,6 +97,8 @@ pub enum OpCode {
     Hello = 10,
     /// Sent immediately following a client heartbeat that was received.
     HeartbeatAck = 11,
+    /// Unknown opcode.
+    Unknown = !0,
 }
 
 enum_number!(OpCode {
@@ -129,6 +131,7 @@ impl OpCode {
             OpCode::InvalidSession => 9,
             OpCode::Hello => 10,
             OpCode::HeartbeatAck => 11,
+            OpCode::Unknown => !0,
         }
     }
 }

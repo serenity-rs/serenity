@@ -34,6 +34,8 @@ pub enum StickerFormatType {
     Apng = 2,
     /// A LOTTIE format animated sticker.
     Lottie = 3,
+    /// Unknown sticker format type.
+    Unknown = !0,
 }
 
 enum_number!(StickerFormatType {
@@ -50,6 +52,7 @@ impl StickerFormatType {
             Png => 1,
             Apng => 2,
             Lottie => 3,
+            Unknown => !0,
         }
     }
 }
