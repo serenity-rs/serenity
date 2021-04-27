@@ -148,6 +148,7 @@ impl EditGuild {
     /// #     Ok(())
     /// # }
     /// ```
+    #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
     pub fn region(&mut self, region: Region) -> &mut Self {
         self.0.insert("region", Value::String(region.name().to_string()));
         self
