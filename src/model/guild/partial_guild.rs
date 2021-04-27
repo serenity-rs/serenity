@@ -81,10 +81,7 @@ pub struct PartialGuild {
     #[serde(default)]
     pub owner: bool,
     /// The region that the voice servers that the guild uses are located in.
-    #[deprecated(
-        since = "0.10.6",
-        note = "Regions are now set per voice channel instead of globally."
-    )]
+    #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
     pub region: String,
     /// A mapping of the guild's roles.
     #[serde(serialize_with = "serialize_roles", deserialize_with = "deserialize_roles")]
