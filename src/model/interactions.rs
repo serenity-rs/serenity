@@ -196,6 +196,7 @@ impl<'de> Deserialize<'de> for Interaction {
 pub enum InteractionType {
     Ping = 1,
     ApplicationCommand = 2,
+    Unknown = !0,
 }
 
 enum_number!(InteractionType {
@@ -654,6 +655,7 @@ pub enum ApplicationCommandOptionType {
     User = 6,
     Channel = 7,
     Role = 8,
+    Unknown = !0,
 }
 
 enum_number!(ApplicationCommandOptionType {
@@ -674,6 +676,7 @@ enum_number!(ApplicationCommandOptionType {
 pub enum ApplicationCommandPermissionType {
     Role = 1,
     User = 2,
+    Unknown = !0,
 }
 
 enum_number!(ApplicationCommandPermissionType {
