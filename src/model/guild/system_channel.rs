@@ -6,12 +6,10 @@ use crate::model::utils::U64Visitor;
 
 /// Describes a system channel flags.
 #[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash, Default)]
-#[cfg_attr(not(feature = "model"), derive(Debug, Deserialize, Serialize))]
 pub struct SystemChannelFlags {
     pub bits: u64,
 }
 
-#[cfg(feature = "model")]
 __impl_bitflags! {
     SystemChannelFlags: u64 {
         /// Suppress member join notifications.
@@ -23,7 +21,6 @@ __impl_bitflags! {
     }
 }
 
-#[cfg(feature = "model")]
 impl<'de> Deserialize<'de> for SystemChannelFlags {
     fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
     where
@@ -33,7 +30,6 @@ impl<'de> Deserialize<'de> for SystemChannelFlags {
     }
 }
 
-#[cfg(feature = "model")]
 impl Serialize for SystemChannelFlags {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
     where

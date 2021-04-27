@@ -1467,7 +1467,6 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
-#[cfg(feature = "model")]
 pub enum GuildWidgetStyle {
     Shield,
     Banner1,
@@ -1476,7 +1475,6 @@ pub enum GuildWidgetStyle {
     Banner4,
 }
 
-#[cfg(feature = "model")]
 impl Display for GuildWidgetStyle {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {

@@ -1154,8 +1154,6 @@ impl Http {
     pub async fn edit_guild(&self, guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
         let body = serde_json::to_vec(map)?;
 
-        dbg!(map.clone());
-
         self.fire(Request {
             body: Some(&body),
             headers: None,
