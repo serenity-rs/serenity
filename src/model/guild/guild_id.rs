@@ -1288,6 +1288,18 @@ impl GuildId {
         http.as_ref().get_guild_welcome_screen(self.0.into()).await
     }
 
+    /// Get the guild preview.
+    ///
+    /// **Note**: The bot need either to be part of the guild
+    /// or the guild needs to have the `DISCOVERABLE` feature.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the bot cannot see the guild preview, see the note.
+    pub async fn get_preview(&self, http: impl AsRef<Http>) -> Result<GuildPreview> {
+        http.as_ref().get_guild_preview(self.0).await
+    }
+
     /// Get the guild widget.
     ///
     /// # Errors

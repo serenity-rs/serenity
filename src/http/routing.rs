@@ -151,6 +151,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdWidget(u64),
+    /// Route for the `/guilds/:guild_id/preview` path.
+    ///
+    /// The data is the relevant [`GuildPreview`].
+    ///
+    /// [`GuildPreview`]: crate::model::guild::GuildPreview
+    GuildsIdPreview(u64),
     /// Route for the `/guilds/:guild_id/emojis` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -534,6 +540,10 @@ impl Route {
 
     pub fn guild_widget(guild_id: u64) -> String {
         format!(api!("/guilds/{}/widget"), guild_id)
+    }
+
+    pub fn guild_preview(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/preview"), guild_id)
     }
 
     pub fn guild_emojis(guild_id: u64) -> String {
@@ -1168,6 +1178,9 @@ pub enum RouteInfo<'a> {
     },
     GetGuildWidget {
         guild_id: u64,
+    },
+    GetGuildPreview {
+      guild_id: u64
     },
     GetGuildWelcomeScreen {
         guild_id: u64,
@@ -1965,6 +1978,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::GuildsIdWidget(guild_id),
                 Cow::from(Route::guild_widget(guild_id)),
+            ),
+            RouteInfo::GetGuildPreview {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdPreview(guild_id),
+                Cow::from(Route::guild_preview(guild_id)),
             ),
             RouteInfo::GetGuildWelcomeScreen {
                 guild_id,

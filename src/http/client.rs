@@ -2192,6 +2192,18 @@ impl Http {
         .await
     }
 
+    /// Gets a guild preview.
+    pub async fn get_guild_preview(&self, guild_id: u64) -> Result<GuildPreview> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildPreview {
+                guild_id,
+            },
+        })
+            .await
+    }
+
     /// Gets a guild welcome screen information.
     pub async fn get_guild_welcome_screen(&self, guild_id: u64) -> Result<GuildWelcomeScreen> {
         self.fire(Request {

@@ -9,6 +9,7 @@ mod partial_guild;
 mod premium_tier;
 mod role;
 mod system_channel;
+mod guild_preview;
 
 use chrono::{DateTime, Utc};
 use futures::stream::StreamExt;
@@ -30,6 +31,7 @@ pub use self::partial_guild::*;
 pub use self::premium_tier::*;
 pub use self::role::*;
 pub use self::system_channel::*;
+pub use self::guild_preview::*;
 use super::utils::*;
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -114,7 +116,7 @@ pub struct Guild {
     /// - `WELCOME_SCREEN_ENABLED`
     ///
     ///
-    /// [discord documentation]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
+    /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
     /// The hash of the icon used by the guild.
     ///
