@@ -40,29 +40,59 @@ use crate::{
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct PartialGuild {
+    /// Application ID of the guild creator if it is bot-created.
     pub application_id: Option<ApplicationId>,
+    /// The unique Id identifying the guild.
+    ///
+    /// This is equivilant to the Id of the default role (`@everyone`) and also
+    /// that of the default channel (typically `#general`).
     pub id: GuildId,
+    /// Id of a voice channel that's considered the AFK channel.
     pub afk_channel_id: Option<ChannelId>,
+    /// The amount of seconds a user can not show any activity in a voice
+    /// channel before being moved to an AFK channel -- if one exists.
     pub afk_timeout: u64,
+    /// Indicator of whether notifications for all messages are enabled by
+    /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
+    /// Whether or not the guild widget is enabled.
+    pub widget_enabled: Option<bool>,
+    /// The channel id that the widget will generate an invite to, or null if set to no invite
     pub widget_channel_id: Option<ChannelId>,
-    pub widget_enabled: bool,
+    /// All of the guild's custom emojis.
     #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
     /// Features enabled for the guild.
     ///
     /// Refer to [`Guild::features`] for more information.
     pub features: Vec<String>,
+    /// The hash of the icon used by the guild.
+    ///
+    /// In the client, this appears on the guild list on the left-hand side.
     pub icon: Option<String>,
+    /// Indicator of whether the guild requires multi-factor authentication for
+    /// [`Role`]s or [`User`]s with moderation permissions.
     pub mfa_level: MfaLevel,
+    /// The name of the guild.
     pub name: String,
+    /// The Id of the [`User`] who owns the guild.
     pub owner_id: UserId,
     /// Whether or not the user is the owner of the guild.
     #[serde(default)]
     pub owner: bool,
+    /// The region that the voice servers that the guild uses are located in.
+    #[deprecated(
+        since = "0.10.6",
+        note = "Regions are now set per voice channel instead of globally."
+    )]
     pub region: String,
+    /// A mapping of the guild's roles.
     #[serde(serialize_with = "serialize_roles", deserialize_with = "deserialize_roles")]
     pub roles: HashMap<RoleId, Role>,
+    /// An identifying hash of the guild's splash icon.
+    ///
+    /// If the `InviteSplash` feature is enabled, this can be used to generate
+    /// a URL to a splash image.
     pub splash: Option<String>,
     /// An identifying hash of the guild discovery's splash icon.
     ///
@@ -81,13 +111,20 @@ pub struct PartialGuild {
     ///
     /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
     pub public_updates_channel_id: Option<ChannelId>,
+    /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
+    /// The guild's description, if it has one.
     pub description: Option<String>,
+    /// The server's premium boosting level.
+    #[serde(default)]
     pub premium_tier: PremiumTier,
+    /// The total number of users currently boosting this server.
     // In some cases Discord returns `null` rather than 0.
     #[serde(deserialize_with = "deserialize_u64_or_zero")]
     pub premium_subscription_count: u64,
+    /// The guild's banner, if it has one.
     pub banner: Option<String>,
+    /// The vanity url code for the guild, if it has one.
     pub vanity_url_code: Option<String>,
     /// The welcome screen of the guild.
     ///
@@ -109,6 +146,8 @@ pub struct PartialGuild {
     pub max_presences: Option<u64>,
     /// The maximum number of members for the guild.
     pub max_members: Option<u64>,
+    /// The user permissions in the guild.
+    pub permissions: Option<String>,
 }
 
 #[cfg(feature = "model")]
@@ -1260,14 +1299,18 @@ impl<'de> Deserialize<'de> for PartialGuild {
             None => None,
         };
 
-        let widget_enabled = map
-            .remove("widget_enabled")
-            .ok_or_else(|| DeError::custom("expected widget_enabled"))
-            .and_then(bool::deserialize)
-            .map_err(DeError::custom)?;
+        let widget_enabled = match map.remove("widget_enabled") {
+            Some(v) => Option::<bool>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
 
         let widget_channel_id = match map.remove("widget_channel_id") {
             Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        let permissions = match map.remove("permissions") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
 
@@ -1317,6 +1360,7 @@ impl<'de> Deserialize<'de> for PartialGuild {
             max_video_channel_users,
             max_presences,
             max_members,
+            permissions,
         })
     }
 }

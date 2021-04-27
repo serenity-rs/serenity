@@ -154,6 +154,7 @@ pub struct Guild {
     #[serde(serialize_with = "serialize_gen_map")]
     pub presences: HashMap<UserId, Presence>,
     /// The region that the voice servers that the guild uses are located in.
+    #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
     pub region: String,
     /// A mapping of the guild's roles.
     #[serde(serialize_with = "serialize_gen_map")]
@@ -185,7 +186,7 @@ pub struct Guild {
     /// A mapping of [`User`]s to their current voice state.
     #[serde(serialize_with = "serialize_gen_map")]
     pub voice_states: HashMap<UserId, VoiceState>,
-    /// The server's description
+    /// The server's description, if it has one.
     pub description: Option<String>,
     /// The server's premium boosting level.
     #[serde(default)]
@@ -193,9 +194,9 @@ pub struct Guild {
     /// The total number of users currently boosting this server.
     #[serde(default)]
     pub premium_subscription_count: u64,
-    /// The server's banner.
+    /// The guild's banner, if it has one.
     pub banner: Option<String>,
-    /// The vanity url code for the guild.
+    /// The vanity url code for the guild, if it has one.
     pub vanity_url_code: Option<String>,
     /// The preferred locale of this guild only set if guild has the "DISCOVERABLE"
     /// feature, defaults to en-US.
