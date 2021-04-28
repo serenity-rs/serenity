@@ -166,6 +166,7 @@ pub struct TeamMember {
 pub enum MembershipState {
     Invited = 1,
     Accepted = 2,
+    Unknown = !0,
 }
 
 enum_number!(MembershipState {

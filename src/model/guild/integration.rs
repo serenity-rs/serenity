@@ -30,6 +30,7 @@ pub struct Integration {
 pub enum IntegrationExpireBehaviour {
     RemoveRole = 0,
     Kick = 1,
+    Unknown = !0,
 }
 
 enum_number!(IntegrationExpireBehaviour {

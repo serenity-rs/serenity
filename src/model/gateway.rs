@@ -511,6 +511,8 @@ pub enum ActivityType {
     Custom = 4,
     /// An indicator that the user is competing somewhere.
     Competing = 5,
+    /// An indicator that the activity is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(ActivityType {
@@ -521,21 +523,6 @@ enum_number!(ActivityType {
     Custom,
     Competing
 });
-
-impl ActivityType {
-    pub fn num(self) -> u64 {
-        use self::ActivityType::*;
-
-        match self {
-            Playing => 0,
-            Streaming => 1,
-            Listening => 2,
-            Watching => 3,
-            Custom => 4,
-            Competing => 5,
-        }
-    }
-}
 
 impl Default for ActivityType {
     fn default() -> Self {

@@ -33,6 +33,8 @@ pub enum WebhookType {
     /// An indicator that the webhook is managed by Discord for posting new
     /// messages to channels without a token.
     ChannelFollower = 2,
+    /// An indicator that the webhook is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(WebhookType {
@@ -46,14 +48,7 @@ impl WebhookType {
         match self {
             WebhookType::Incoming => "incoming",
             WebhookType::ChannelFollower => "channel follower",
-        }
-    }
-
-    #[inline]
-    pub fn num(self) -> u64 {
-        match self {
-            WebhookType::Incoming => 1,
-            WebhookType::ChannelFollower => 2,
+            WebhookType::Unknown => "unknown",
         }
     }
 }

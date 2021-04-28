@@ -1033,6 +1033,8 @@ pub enum MessageType {
     ApplicationCommand = 20,
     /// Server setup tips.
     GuildInviteReminder = 22,
+    /// An indicator that the message is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(MessageType {
@@ -1055,33 +1057,6 @@ enum_number!(MessageType {
     ApplicationCommand,
 });
 
-impl MessageType {
-    pub fn num(self) -> u64 {
-        use self::MessageType::*;
-
-        match self {
-            Regular => 0,
-            GroupRecipientAddition => 1,
-            GroupRecipientRemoval => 2,
-            GroupCallCreation => 3,
-            GroupNameUpdate => 4,
-            GroupIconUpdate => 5,
-            PinsAdd => 6,
-            MemberJoin => 7,
-            NitroBoost => 8,
-            NitroTier1 => 9,
-            NitroTier2 => 10,
-            NitroTier3 => 11,
-            ChannelFollowAdd => 12,
-            GuildDiscoveryDisqualified => 14,
-            GuildDiscoveryRequalified => 15,
-            InlineReply => 19,
-            ApplicationCommand => 20,
-            GuildInviteReminder => 22,
-        }
-    }
-}
-
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum MessageActivityKind {
@@ -1090,6 +1065,7 @@ pub enum MessageActivityKind {
     LISTEN = 3,
     #[allow(non_camel_case_types)]
     JOIN_REQUEST = 5,
+    Unknown = !0,
 }
 
 enum_number!(MessageActivityKind {
@@ -1098,19 +1074,6 @@ enum_number!(MessageActivityKind {
     LISTEN,
     JOIN_REQUEST
 });
-
-impl MessageActivityKind {
-    pub fn num(self) -> u64 {
-        use self::MessageActivityKind::*;
-
-        match self {
-            JOIN => 1,
-            SPECTATE => 2,
-            LISTEN => 3,
-            JOIN_REQUEST => 5,
-        }
-    }
-}
 
 /// Rich Presence application information.
 #[derive(Clone, Debug, Deserialize, Serialize)]
