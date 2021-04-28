@@ -1233,6 +1233,7 @@
 <span id="1230">1230</span>
 <span id="1231">1231</span>
 <span id="1232">1232</span>
+<span id="1233">1233</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1852,6 +1853,7 @@
             <span class="ident">message_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
             <span class="ident">user_id</span>,
             <span class="ident">guild_id</span>: <span class="self">self</span>.<span class="ident">guild_id</span>,
+            <span class="ident">member</span>: <span class="self">self</span>.<span class="ident">member</span>.<span class="ident">clone</span>(),
         })
     }
 
