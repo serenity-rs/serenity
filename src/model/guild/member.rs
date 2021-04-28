@@ -551,4 +551,16 @@ pub struct PartialMember {
     pub pending: bool,
     /// Timestamp representing the date since the member is boosting the guild.
     pub premium_since: Option<DateTime<Utc>>,
+    /// The unique Id of the guild that the member is a part of.
+    pub guild_id: Option<GuildId>,
+    /// Attached User struct.
+    pub user: Option<User>,
+    /// The total permissions of the member in a channel, including overrides.
+    ///
+    /// This is only [`Some`] when returned in an [`Interaction`] object.
+    ///
+    /// [`Interaction`]: crate::model::interactions::Interaction
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub permissions: Option<String>,
 }
