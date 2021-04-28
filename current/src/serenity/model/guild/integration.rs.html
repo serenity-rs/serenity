@@ -66,6 +66,7 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
@@ -99,6 +100,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IntegrationExpireBehaviour</span> {
     <span class="ident">RemoveRole</span> <span class="op">=</span> <span class="number">0</span>,
     <span class="ident">Kick</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">IntegrationExpireBehaviour</span> {

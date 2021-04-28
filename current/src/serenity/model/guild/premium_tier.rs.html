@@ -25,16 +25,6 @@
 <span id="22">22</span>
 <span id="23">23</span>
 <span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">/// The guild&#39;s premium tier, depends on the amount of users boosting the guild currently</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>)]</span>
@@ -45,6 +35,7 @@
     <span class="ident">Tier1</span>,
     <span class="ident">Tier2</span>,
     <span class="ident">Tier3</span>,
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">PremiumTier</span> {
@@ -53,17 +44,6 @@
     <span class="ident">Tier2</span>,
     <span class="ident">Tier3</span>
 });
-
-<span class="kw">impl</span> <span class="ident">PremiumTier</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PremiumTier::Tier0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">PremiumTier::Tier1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">PremiumTier::Tier2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">PremiumTier::Tier3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-        }
-    }
-}
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PremiumTier</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {

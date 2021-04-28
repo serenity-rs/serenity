@@ -436,11 +436,6 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
-<span id="439">439</span>
-<span id="440">440</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Webhook model and implementations.</span>
 
@@ -477,6 +472,8 @@
     <span class="doccomment">/// An indicator that the webhook is managed by Discord for posting new</span>
     <span class="doccomment">/// messages to channels without a token.</span>
     <span class="ident">ChannelFollower</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// An indicator that the webhook is of unknown type.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">WebhookType</span> {
@@ -490,14 +487,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">WebhookType::Incoming</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;incoming&quot;</span>,
             <span class="ident">WebhookType::ChannelFollower</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;channel follower&quot;</span>,
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">WebhookType::Incoming</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">WebhookType::ChannelFollower</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
+            <span class="ident">WebhookType::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;unknown&quot;</span>,
         }
     }
 }

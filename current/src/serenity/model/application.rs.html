@@ -175,6 +175,7 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
+<span id="175">175</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models about OAuth2 applications.</span>
 
@@ -344,6 +345,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MembershipState</span> {
     <span class="ident">Invited</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">Accepted</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">MembershipState</span> {

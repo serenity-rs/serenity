@@ -701,19 +701,6 @@
 <span id="698">698</span>
 <span id="699">699</span>
 <span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
-<span id="708">708</span>
-<span id="709">709</span>
-<span id="710">710</span>
-<span id="711">711</span>
-<span id="712">712</span>
-<span id="713">713</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models pertaining to the gateway.</span>
 
@@ -1228,6 +1215,8 @@
     <span class="ident">Custom</span> <span class="op">=</span> <span class="number">4</span>,
     <span class="doccomment">/// An indicator that the user is competing somewhere.</span>
     <span class="ident">Competing</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="doccomment">/// An indicator that the activity is of unknown type.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">ActivityType</span> {
@@ -1238,21 +1227,6 @@
     <span class="ident">Custom</span>,
     <span class="ident">Competing</span>
 });
-
-<span class="kw">impl</span> <span class="ident">ActivityType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">use</span> <span class="self">self</span><span class="ident">::ActivityType</span>::<span class="kw-2">*</span>;
-
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Playing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">Streaming</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">Listening</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">Watching</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">Custom</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">Competing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-        }
-    }
-}
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ActivityType</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {

@@ -894,6 +894,9 @@
 <span id="891">891</span>
 <span id="892">892</span>
 <span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -1093,6 +1096,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InteractionType</span> {
     <span class="ident">Ping</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">InteractionType</span> {
@@ -1551,6 +1555,7 @@
     <span class="ident">User</span> <span class="op">=</span> <span class="number">6</span>,
     <span class="ident">Channel</span> <span class="op">=</span> <span class="number">7</span>,
     <span class="ident">Role</span> <span class="op">=</span> <span class="number">8</span>,
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">ApplicationCommandOptionType</span> {
@@ -1571,6 +1576,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ApplicationCommandPermissionType</span> {
     <span class="ident">Role</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">User</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">ApplicationCommandPermissionType</span> {

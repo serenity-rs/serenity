@@ -2776,38 +2776,6 @@
 <span id="2773">2773</span>
 <span id="2774">2774</span>
 <span id="2775">2775</span>
-<span id="2776">2776</span>
-<span id="2777">2777</span>
-<span id="2778">2778</span>
-<span id="2779">2779</span>
-<span id="2780">2780</span>
-<span id="2781">2781</span>
-<span id="2782">2782</span>
-<span id="2783">2783</span>
-<span id="2784">2784</span>
-<span id="2785">2785</span>
-<span id="2786">2786</span>
-<span id="2787">2787</span>
-<span id="2788">2788</span>
-<span id="2789">2789</span>
-<span id="2790">2790</span>
-<span id="2791">2791</span>
-<span id="2792">2792</span>
-<span id="2793">2793</span>
-<span id="2794">2794</span>
-<span id="2795">2795</span>
-<span id="2796">2796</span>
-<span id="2797">2797</span>
-<span id="2798">2798</span>
-<span id="2799">2799</span>
-<span id="2800">2800</span>
-<span id="2801">2801</span>
-<span id="2802">2802</span>
-<span id="2803">2803</span>
-<span id="2804">2804</span>
-<span id="2805">2805</span>
-<span id="2806">2806</span>
-<span id="2807">2807</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -5333,21 +5301,14 @@
     <span class="ident">All</span> <span class="op">=</span> <span class="number">0</span>,
     <span class="doccomment">/// Receive only mentions.</span>
     <span class="ident">Mentions</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="doccomment">/// Unknown notification level.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">DefaultMessageNotificationLevel</span> {
     <span class="ident">All</span>,
     <span class="ident">Mentions</span>
 });
-
-<span class="kw">impl</span> <span class="ident">DefaultMessageNotificationLevel</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DefaultMessageNotificationLevel::All</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">DefaultMessageNotificationLevel::Mentions</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-        }
-    }
-}
 
 <span class="doccomment">/// Setting used to filter explicit messages from members.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -5359,6 +5320,8 @@
     <span class="ident">WithoutRole</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="doccomment">/// Scan messages sent by all members.</span>
     <span class="ident">All</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// Unknown content filter.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">ExplicitContentFilter</span> {
@@ -5366,16 +5329,6 @@
     <span class="ident">WithoutRole</span>,
     <span class="ident">All</span>
 });
-
-<span class="kw">impl</span> <span class="ident">ExplicitContentFilter</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ExplicitContentFilter::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">ExplicitContentFilter::WithoutRole</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">ExplicitContentFilter::All</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-        }
-    }
-}
 
 <span class="doccomment">/// Multi-Factor Authentication level for guild moderators.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -5385,21 +5338,14 @@
     <span class="prelude-val">None</span> <span class="op">=</span> <span class="number">0</span>,
     <span class="doccomment">/// MFA is enabled.</span>
     <span class="ident">Elevated</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="doccomment">/// Unknown MFA level.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">MfaLevel</span> {
     <span class="prelude-val">None</span>,
     <span class="ident">Elevated</span>
 });
-
-<span class="kw">impl</span> <span class="ident">MfaLevel</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MfaLevel::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">MfaLevel::Elevated</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-        }
-    }
-}
 
 <span class="doccomment">/// The name of a region that a voice server can be located in.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
@@ -5483,6 +5429,8 @@
     <span class="ident">High</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="doccomment">/// Must have a verified phone on the user&#39;s Discord account.</span>
     <span class="ident">Higher</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="doccomment">/// Unknown verification level.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">VerificationLevel</span> {
@@ -5492,18 +5440,6 @@
     <span class="ident">High</span>,
     <span class="ident">Higher</span>
 });
-
-<span class="kw">impl</span> <span class="ident">VerificationLevel</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">VerificationLevel::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">VerificationLevel::Low</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">VerificationLevel::Medium</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">VerificationLevel::High</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">VerificationLevel::Higher</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-        }
-    }
-}
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {

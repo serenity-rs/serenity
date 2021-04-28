@@ -1197,43 +1197,6 @@
 <span id="1194">1194</span>
 <span id="1195">1195</span>
 <span id="1196">1196</span>
-<span id="1197">1197</span>
-<span id="1198">1198</span>
-<span id="1199">1199</span>
-<span id="1200">1200</span>
-<span id="1201">1201</span>
-<span id="1202">1202</span>
-<span id="1203">1203</span>
-<span id="1204">1204</span>
-<span id="1205">1205</span>
-<span id="1206">1206</span>
-<span id="1207">1207</span>
-<span id="1208">1208</span>
-<span id="1209">1209</span>
-<span id="1210">1210</span>
-<span id="1211">1211</span>
-<span id="1212">1212</span>
-<span id="1213">1213</span>
-<span id="1214">1214</span>
-<span id="1215">1215</span>
-<span id="1216">1216</span>
-<span id="1217">1217</span>
-<span id="1218">1218</span>
-<span id="1219">1219</span>
-<span id="1220">1220</span>
-<span id="1221">1221</span>
-<span id="1222">1222</span>
-<span id="1223">1223</span>
-<span id="1224">1224</span>
-<span id="1225">1225</span>
-<span id="1226">1226</span>
-<span id="1227">1227</span>
-<span id="1228">1228</span>
-<span id="1229">1229</span>
-<span id="1230">1230</span>
-<span id="1231">1231</span>
-<span id="1232">1232</span>
-<span id="1233">1233</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -2270,6 +2233,8 @@
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">20</span>,
     <span class="doccomment">/// Server setup tips.</span>
     <span class="ident">GuildInviteReminder</span> <span class="op">=</span> <span class="number">22</span>,
+    <span class="doccomment">/// An indicator that the message is of unknown type.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">MessageType</span> {
@@ -2292,33 +2257,6 @@
     <span class="ident">ApplicationCommand</span>,
 });
 
-<span class="kw">impl</span> <span class="ident">MessageType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">use</span> <span class="self">self</span><span class="ident">::MessageType</span>::<span class="kw-2">*</span>;
-
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Regular</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">GroupRecipientAddition</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">GroupRecipientRemoval</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">GroupCallCreation</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">GroupNameUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">GroupIconUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-            <span class="ident">PinsAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
-            <span class="ident">MemberJoin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">7</span>,
-            <span class="ident">NitroBoost</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">8</span>,
-            <span class="ident">NitroTier1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">9</span>,
-            <span class="ident">NitroTier2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">10</span>,
-            <span class="ident">NitroTier3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">11</span>,
-            <span class="ident">ChannelFollowAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">12</span>,
-            <span class="ident">GuildDiscoveryDisqualified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">14</span>,
-            <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">15</span>,
-            <span class="ident">InlineReply</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">19</span>,
-            <span class="ident">ApplicationCommand</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-            <span class="ident">GuildInviteReminder</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">22</span>,
-        }
-    }
-}
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageActivityKind</span> {
@@ -2327,6 +2265,7 @@
     <span class="ident">LISTEN</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
     <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">MessageActivityKind</span> {
@@ -2335,19 +2274,6 @@
     <span class="ident">LISTEN</span>,
     <span class="ident">JOIN_REQUEST</span>
 });
-
-<span class="kw">impl</span> <span class="ident">MessageActivityKind</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">use</span> <span class="self">self</span><span class="ident">::MessageActivityKind</span>::<span class="kw-2">*</span>;
-
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">JOIN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">SPECTATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">LISTEN</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">3</span>,
-            <span class="ident">JOIN_REQUEST</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-        }
-    }
-}
 
 <span class="doccomment">/// Rich Presence application information.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
