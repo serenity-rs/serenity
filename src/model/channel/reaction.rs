@@ -17,7 +17,7 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// An emoji reaction to a message.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct Reaction {
     /// The [`Channel`] of the associated [`Message`].
@@ -32,6 +32,79 @@ pub struct Reaction {
     pub user_id: Option<UserId>,
     /// The optional Id of the [`Guild`] where the reaction was sent.
     pub guild_id: Option<GuildId>,
+    /// The optional object of the member which added the reaction.
+    pub member: Option<PartialMember>,
+}
+
+impl<'de> Deserialize<'de> for Reaction {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let channel_id = map
+            .remove("channel_id")
+            .ok_or_else(|| DeError::custom("expected channel_id"))
+            .and_then(ChannelId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let message_id = map
+            .remove("message_id")
+            .ok_or_else(|| DeError::custom("expected message_id"))
+            .and_then(MessageId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let emoji = map
+            .remove("emoji")
+            .ok_or_else(|| DeError::custom("expected emoji"))
+            .and_then(ReactionType::deserialize)
+            .map_err(DeError::custom)?;
+
+        let user_id = match map.contains_key("user_id") {
+            true => Some(
+                map.remove("user_id")
+                    .ok_or_else(|| DeError::custom("expected user_id"))
+                    .and_then(UserId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let guild_id = match map.contains_key("guild_id") {
+            true => Some(
+                map.remove("guild_id")
+                    .ok_or_else(|| DeError::custom("expected guild_id"))
+                    .and_then(GuildId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        if let Some(id) = guild_id {
+            if let Some(member) = map.get_mut("member") {
+                if let Some(object) = member.as_object_mut() {
+                    object.insert("guild_id".to_owned(), Value::String(id.to_string()));
+                }
+            }
+        }
+
+        let member = match map.contains_key("member") {
+            true => Some(
+                map.remove("member")
+                    .ok_or_else(|| DeError::custom("expected member"))
+                    .and_then(PartialMember::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        Ok(Self {
+            channel_id,
+            emoji,
+            message_id,
+            user_id,
+            guild_id,
+            member,
+        })
+    }
 }
 
 #[cfg(feature = "model")]

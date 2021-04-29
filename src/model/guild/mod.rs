@@ -2824,21 +2824,14 @@ pub enum DefaultMessageNotificationLevel {
     All = 0,
     /// Receive only mentions.
     Mentions = 1,
+    /// Unknown notification level.
+    Unknown = !0,
 }
 
 enum_number!(DefaultMessageNotificationLevel {
     All,
     Mentions
 });
-
-impl DefaultMessageNotificationLevel {
-    pub fn num(self) -> u64 {
-        match self {
-            DefaultMessageNotificationLevel::All => 0,
-            DefaultMessageNotificationLevel::Mentions => 1,
-        }
-    }
-}
 
 /// Setting used to filter explicit messages from members.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
@@ -2850,6 +2843,8 @@ pub enum ExplicitContentFilter {
     WithoutRole = 1,
     /// Scan messages sent by all members.
     All = 2,
+    /// Unknown content filter.
+    Unknown = !0,
 }
 
 enum_number!(ExplicitContentFilter {
@@ -2857,16 +2852,6 @@ enum_number!(ExplicitContentFilter {
     WithoutRole,
     All
 });
-
-impl ExplicitContentFilter {
-    pub fn num(self) -> u64 {
-        match self {
-            ExplicitContentFilter::None => 0,
-            ExplicitContentFilter::WithoutRole => 1,
-            ExplicitContentFilter::All => 2,
-        }
-    }
-}
 
 /// Multi-Factor Authentication level for guild moderators.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
@@ -2876,21 +2861,14 @@ pub enum MfaLevel {
     None = 0,
     /// MFA is enabled.
     Elevated = 1,
+    /// Unknown MFA level.
+    Unknown = !0,
 }
 
 enum_number!(MfaLevel {
     None,
     Elevated
 });
-
-impl MfaLevel {
-    pub fn num(self) -> u64 {
-        match self {
-            MfaLevel::None => 0,
-            MfaLevel::Elevated => 1,
-        }
-    }
-}
 
 /// The name of a region that a voice server can be located in.
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
@@ -2974,6 +2952,8 @@ pub enum VerificationLevel {
     High = 3,
     /// Must have a verified phone on the user's Discord account.
     Higher = 4,
+    /// Unknown verification level.
+    Unknown = !0,
 }
 
 enum_number!(VerificationLevel {
@@ -2983,18 +2963,6 @@ enum_number!(VerificationLevel {
     High,
     Higher
 });
-
-impl VerificationLevel {
-    pub fn num(self) -> u64 {
-        match self {
-            VerificationLevel::None => 0,
-            VerificationLevel::Low => 1,
-            VerificationLevel::Medium => 2,
-            VerificationLevel::High => 3,
-            VerificationLevel::Higher => 4,
-        }
-    }
-}
 
 #[cfg(test)]
 mod test {

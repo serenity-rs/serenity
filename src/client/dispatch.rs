@@ -200,10 +200,16 @@ pub(crate) fn dispatch<'rec>(
                         &cache_and_http.cache,
                     );
 
-                    dispatch_message(context.clone(), event.message.clone(), h).await;
+                    #[cfg(not(feature = "framework"))]
+                    {
+                        // Avoid cloning if there will be no framework dispatch.
+                        dispatch_message(context, event.message, h).await;
+                    }
 
                     #[cfg(feature = "framework")]
                     {
+                        dispatch_message(context.clone(), event.message.clone(), h).await;
+
                         let framework = Arc::clone(&framework);
 
                         tokio::spawn(async move {
@@ -233,8 +239,10 @@ pub(crate) fn dispatch<'rec>(
                     );
 
                     #[cfg(not(feature = "framework"))]
-                    // No clone needed, as there will be no framework disaptch.
-                    event_handler.raw_event(context, event).await;
+                    {
+                        // No clone needed, as there will be no framework dispatch.
+                        event_handler.raw_event(context, event).await;
+                    }
 
                     #[cfg(feature = "framework")]
                     {
@@ -249,7 +257,7 @@ pub(crate) fn dispatch<'rec>(
                                 framework.dispatch(context, message).await;
                             });
                         } else {
-                            // Avoid cloning, if there is no framework-dispatch.
+                            // Avoid cloning if there will be no framework dispatch.
                             event_handler.raw_event(context, event).await;
                         }
                     }
@@ -270,10 +278,16 @@ pub(crate) fn dispatch<'rec>(
 
                 match event {
                     DispatchEvent::Model(Event::MessageCreate(event)) => {
-                        dispatch_message(context.clone(), event.message.clone(), handler).await;
+                        #[cfg(not(feature = "framework"))]
+                        {
+                            // Avoid cloning if there will be no framework dispatch.
+                            dispatch_message(context, event.message, handler).await;
+                        }
 
                         #[cfg(feature = "framework")]
                         {
+                            dispatch_message(context.clone(), event.message.clone(), handler).await;
+
                             let framework = Arc::clone(&framework);
                             let message = event.message;
                             tokio::spawn(async move {

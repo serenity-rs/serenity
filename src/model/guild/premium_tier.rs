@@ -7,6 +7,7 @@ pub enum PremiumTier {
     Tier1,
     Tier2,
     Tier3,
+    Unknown = !0,
 }
 
 enum_number!(PremiumTier {
@@ -15,17 +16,6 @@ enum_number!(PremiumTier {
     Tier2,
     Tier3
 });
-
-impl PremiumTier {
-    pub fn num(self) -> u64 {
-        match self {
-            PremiumTier::Tier0 => 0,
-            PremiumTier::Tier1 => 1,
-            PremiumTier::Tier2 => 2,
-            PremiumTier::Tier3 => 3,
-        }
-    }
-}
 
 impl Default for PremiumTier {
     fn default() -> Self {
