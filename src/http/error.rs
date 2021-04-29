@@ -48,12 +48,6 @@ impl<'de> Deserialize<'de> for DiscordJsonError {
     }
 }
 
-// impl std::fmt::Debug for DiscordJsonError {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f, "\"{}\"", self.message)
-//     }
-// }
-
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct DiscordJsonSingleError {
     pub code: String,
