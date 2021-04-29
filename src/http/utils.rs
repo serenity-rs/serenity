@@ -8,6 +8,10 @@ pub fn deserialize_errors<'de, D: Deserializer<'de>>(
 ) -> StdResult<Vec<DiscordJsonSingleError>, D::Error> {
     let map: Value = Value::deserialize(deserializer)?;
 
+    if !map.is_object() {
+        return Ok(vec![]);
+    }
+
     let mut errors: Vec<DiscordJsonSingleError> = vec![];
 
     loop_errors(map, &mut errors, &mut Vec::new());
