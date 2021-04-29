@@ -5,19 +5,63 @@ use std::{
 
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url};
 use url::ParseError as UrlError;
+use serde::de::{Deserialize, Deserializer, Error as DeError};
+use crate::internal::prelude::{JsonMap, StdResult};
+use std::path::{Path, PathBuf};
+use crate::http::utils::deserialize_errors;
 
-#[derive(Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Serialize, PartialEq, Debug)]
 pub struct DiscordJsonError {
     pub code: isize,
     pub message: String,
+    pub errors: Vec<DiscordJsonSingleError>,
     #[serde(skip)]
     non_exhaustive: (),
 }
 
-impl std::fmt::Debug for DiscordJsonError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\"{}\"", self.message)
+impl<'de> Deserialize<'de> for DiscordJsonError {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let code = map
+            .remove("code")
+            .ok_or_else(|| DeError::custom("expected code"))
+            .and_then(isize::deserialize)
+            .map_err(DeError::custom)?;
+
+        let message = map
+            .remove("message")
+            .ok_or_else(|| DeError::custom("expected message"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
+        let errors = map
+            .remove("errors")
+            .ok_or_else(|| DeError::custom("expected errors"))
+            .and_then(deserialize_errors)
+            .map_err(DeError::custom)?;
+
+        Ok(Self {
+            code,
+            message,
+            errors,
+            non_exhaustive: ()
+        })
     }
+}
+
+// impl std::fmt::Debug for DiscordJsonError {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//         write!(f, "\"{}\"", self.message)
+//     }
+// }
+
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+pub struct DiscordJsonSingleError {
+    pub code: String,
+    pub message: String,
+
+    pub path: String
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -31,16 +75,23 @@ impl ErrorResponse {
     // We need a freestanding from-function since we cannot implement an async
     // From-trait.
     pub async fn from_response(r: Response) -> Self {
+
+        let status_code = r.status();
+        let url = r.url().clone();
+
+        let json = r.json().await.unwrap_or_else(|_| DiscordJsonError {
+            code: -1,
+            message:
+            "[Serenity] Could not decode json when receiving error response from discord!"
+                .to_string(),
+            errors: vec![],
+            non_exhaustive: (),
+        });
+
         ErrorResponse {
-            status_code: r.status(),
-            url: r.url().clone(),
-            error: r.json().await.unwrap_or_else(|_| DiscordJsonError {
-                code: -1,
-                message:
-                    "[Serenity] Could not decode json when receiving error response from discord!"
-                        .to_string(),
-                non_exhaustive: (),
-            }),
+            status_code,
+            url,
+            error: json
         }
     }
 }
