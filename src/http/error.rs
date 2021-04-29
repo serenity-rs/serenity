@@ -11,12 +11,11 @@ use std::path::{Path, PathBuf};
 use crate::http::utils::deserialize_errors;
 
 #[derive(Clone, Serialize, PartialEq, Debug)]
+#[non_exhaustive]
 pub struct DiscordJsonError {
     pub code: isize,
     pub message: String,
     pub errors: Vec<DiscordJsonSingleError>,
-    #[serde(skip)]
-    non_exhaustive: (),
 }
 
 impl<'de> Deserialize<'de> for DiscordJsonError {
@@ -44,8 +43,7 @@ impl<'de> Deserialize<'de> for DiscordJsonError {
         Ok(Self {
             code,
             message,
-            errors,
-            non_exhaustive: ()
+            errors
         })
     }
 }
@@ -84,8 +82,7 @@ impl ErrorResponse {
             message:
             "[Serenity] Could not decode json when receiving error response from discord!"
                 .to_string(),
-            errors: vec![],
-            non_exhaustive: (),
+            errors: vec![]
         });
 
         ErrorResponse {
@@ -212,7 +209,7 @@ mod test {
         let error = DiscordJsonError {
             code: 43121215,
             message: String::from("This is a Ferris error"),
-            non_exhaustive: (),
+            errors: vec![]
         };
 
         let mut builder = Builder::new();
