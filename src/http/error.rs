@@ -17,7 +17,7 @@ pub struct DiscordJsonError {
     pub code: isize,
     /// The error message.
     pub message: String,
-    /// The full explaned errors with their path in the request
+    /// The full explained errors with their path in the request
     /// body.
     pub errors: Vec<DiscordJsonSingleError>,
 }
