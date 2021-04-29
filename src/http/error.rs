@@ -73,20 +73,16 @@ impl ErrorResponse {
     // We need a freestanding from-function since we cannot implement an async
     // From-trait.
     pub async fn from_response(r: Response) -> Self {
-        let status_code = r.status();
-        let url = r.url().clone();
-
-        let json = r.json().await.unwrap_or_else(|_| DiscordJsonError {
-            code: -1,
-            message: "[Serenity] Could not decode json when receiving error response from discord!"
-                .to_string(),
-            errors: vec![]
-        });
-
         ErrorResponse {
-            status_code,
-            url,
-            error: json,
+            status_code: r.status(),
+            url: r.url().clone(),
+            error: r.json().await.unwrap_or_else(|_| DiscordJsonError {
+                code: -1,
+                message:
+                    "[Serenity] Could not decode json when receiving error response from discord!"
+                        .to_string(),
+                errors: vec![],
+            }),
         }
     }
 }
@@ -207,7 +203,7 @@ mod test {
         let error = DiscordJsonError {
             code: 43121215,
             message: String::from("This is a Ferris error"),
-            errors: vec![]
+            errors: vec![],
         };
 
         let mut builder = Builder::new();
