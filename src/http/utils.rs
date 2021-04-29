@@ -1,7 +1,7 @@
-use serde::{Deserialize, Deserializer};
-
 use crate::http::error::DiscordJsonSingleError;
-use crate::internal::prelude::{StdResult, Value};
+use crate::internal::prelude::*;
+use crate::prelude::*;
+use serde::de::{Deserializer, Deserialize};
 
 pub fn deserialize_errors<'de, D: Deserializer<'de>>(
     deserializer: D,
@@ -20,19 +20,19 @@ pub fn deserialize_errors<'de, D: Deserializer<'de>>(
 }
 
 fn loop_errors(value: Value, errors: &mut Vec<DiscordJsonSingleError>, path: &mut Vec<String>) {
-    for (key, looped) in value.as_object().unwrap().iter() {
-        let object = looped.as_object().unwrap();
+    for (key, looped) in value.as_object().expect("expected object").iter() {
+        let object = looped.as_object().expect("expected object");
         if object.contains_key("_errors") {
-            let found_errors = object.get("_errors").unwrap().as_array().unwrap().to_owned();
+            let found_errors = object.get("_errors").expect("expected _errors").as_array().expect("expected array").to_owned();
             for error in found_errors {
-                let real_object = error.as_object().unwrap();
+                let real_object = error.as_object().expect("expected object");
                 let mut object_path = path.clone();
 
                 object_path.push(key.to_string());
 
                 errors.push(DiscordJsonSingleError {
-                    code: real_object.get("code").unwrap().as_str().unwrap().to_owned(),
-                    message: real_object.get("message").unwrap().as_str().unwrap().to_owned(),
+                    code: real_object.get("code").expect("expected code").as_str().expect("expected string").to_owned(),
+                    message: real_object.get("message").expect("expected message").as_str().expect("expected string").to_owned(),
                     path: object_path.join("."),
                 });
             }
