@@ -32,19 +32,19 @@ fn loop_errors(value: Value, errors: &mut Vec<DiscordJsonSingleError>, path: &mu
                 .expect("expected array")
                 .to_owned();
             for error in found_errors {
-                let real_object = error.as_object().expect("expected object");
+                let error_object = error.as_object().expect("expected object");
                 let mut object_path = path.clone();
 
                 object_path.push(key.to_string());
 
                 errors.push(DiscordJsonSingleError {
-                    code: real_object
+                    code: error_object
                         .get("code")
                         .expect("expected code")
                         .as_str()
                         .expect("expected string")
                         .to_owned(),
-                    message: real_object
+                    message: error_object
                         .get("message")
                         .expect("expected message")
                         .as_str()

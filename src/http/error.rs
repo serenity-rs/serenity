@@ -13,8 +13,12 @@ use crate::internal::prelude::{JsonMap, StdResult};
 #[derive(Clone, Serialize, PartialEq, Debug)]
 #[non_exhaustive]
 pub struct DiscordJsonError {
+    /// The error code.
     pub code: isize,
+    /// The error message.
     pub message: String,
+    /// The full explaned errors with their path in the request
+    /// body.
     pub errors: Vec<DiscordJsonSingleError>,
 }
 
@@ -50,9 +54,11 @@ impl<'de> Deserialize<'de> for DiscordJsonError {
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct DiscordJsonSingleError {
+    /// The error code.
     pub code: String,
+    /// The error message.
     pub message: String,
-    /// The path to the error in the request itself, dot separated.
+    /// The path to the error in the request body itself, dot separated.
     pub path: String,
 }
 
