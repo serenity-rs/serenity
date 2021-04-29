@@ -4,11 +4,11 @@ use std::{
 };
 
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url};
-use url::ParseError as UrlError;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
-use crate::internal::prelude::{JsonMap, StdResult};
-use std::path::{Path, PathBuf};
+use url::ParseError as UrlError;
+
 use crate::http::utils::deserialize_errors;
+use crate::internal::prelude::{JsonMap, StdResult};
 
 #[derive(Clone, Serialize, PartialEq, Debug)]
 #[non_exhaustive]
@@ -43,7 +43,7 @@ impl<'de> Deserialize<'de> for DiscordJsonError {
         Ok(Self {
             code,
             message,
-            errors
+            errors,
         })
     }
 }
@@ -58,8 +58,8 @@ impl<'de> Deserialize<'de> for DiscordJsonError {
 pub struct DiscordJsonSingleError {
     pub code: String,
     pub message: String,
-
-    pub path: String
+    /// The path to the error in the request itself, dot separated.
+    pub path: String,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -73,14 +73,12 @@ impl ErrorResponse {
     // We need a freestanding from-function since we cannot implement an async
     // From-trait.
     pub async fn from_response(r: Response) -> Self {
-
         let status_code = r.status();
         let url = r.url().clone();
 
         let json = r.json().await.unwrap_or_else(|_| DiscordJsonError {
             code: -1,
-            message:
-            "[Serenity] Could not decode json when receiving error response from discord!"
+            message: "[Serenity] Could not decode json when receiving error response from discord!"
                 .to_string(),
             errors: vec![]
         });
@@ -88,7 +86,7 @@ impl ErrorResponse {
         ErrorResponse {
             status_code,
             url,
-            error: json
+            error: json,
         }
     }
 }
