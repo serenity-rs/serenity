@@ -76,6 +76,10 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
@@ -105,6 +109,8 @@
 <span class="kw">mod</span> <span class="ident">create_message</span>;
 <span class="kw">mod</span> <span class="ident">edit_channel</span>;
 <span class="kw">mod</span> <span class="ident">edit_guild</span>;
+<span class="kw">mod</span> <span class="ident">edit_guild_welcome_screen</span>;
+<span class="kw">mod</span> <span class="ident">edit_guild_widget</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">edit_interaction_response</span>;
@@ -126,6 +132,8 @@
     <span class="ident">create_message::CreateMessage</span>,
     <span class="ident">edit_channel::EditChannel</span>,
     <span class="ident">edit_guild::EditGuild</span>,
+    <span class="ident">edit_guild_welcome_screen::EditGuildWelcomeScreen</span>,
+    <span class="ident">edit_guild_widget::EditGuildWidget</span>,
     <span class="ident">edit_member::EditMember</span>,
     <span class="ident">edit_message::EditMessage</span>,
     <span class="ident">edit_profile::EditProfile</span>,

@@ -1144,6 +1144,19 @@
 <span id="1141">1141</span>
 <span id="1142">1142</span>
 <span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -2257,7 +2270,11 @@
                     <span class="ident">region</span>: <span class="ident">String::new</span>(),
                     <span class="ident">roles</span>: <span class="ident">HashMap::new</span>(),
                     <span class="ident">splash</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">discovery_splash</span>: <span class="prelude-val">None</span>,
                     <span class="ident">system_channel_id</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">system_channel_flags</span>: <span class="ident">Default::default</span>(),
+                    <span class="ident">rules_channel_id</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">public_updates_channel_id</span>: <span class="prelude-val">None</span>,
                     <span class="ident">verification_level</span>: <span class="ident">VerificationLevel::Low</span>,
                     <span class="ident">voice_states</span>: <span class="ident">HashMap::new</span>(),
                     <span class="ident">description</span>: <span class="prelude-val">None</span>,
@@ -2267,6 +2284,15 @@
                     <span class="ident">banner</span>: <span class="prelude-val">None</span>,
                     <span class="ident">vanity_url_code</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;bruhmoment&quot;</span>.<span class="ident">to_string</span>()),
                     <span class="ident">preferred_locale</span>: <span class="string">&quot;en-US&quot;</span>.<span class="ident">to_string</span>(),
+                    <span class="ident">welcome_screen</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">approximate_member_count</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">approximate_presence_count</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
+                    <span class="ident">max_video_channel_users</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">max_presences</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">max_members</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">widget_enabled</span>: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+                    <span class="ident">widget_channel_id</span>: <span class="prelude-val">None</span>,
                 },
             }
         };

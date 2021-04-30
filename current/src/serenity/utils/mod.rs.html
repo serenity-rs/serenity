@@ -1024,6 +1024,19 @@
 <span id="1021">1021</span>
 <span id="1022">1022</span>
 <span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
@@ -1875,7 +1888,11 @@
             <span class="ident">region</span>: <span class="string">&quot;Ferris Island&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">roles</span>: <span class="ident">HashMap::new</span>(),
             <span class="ident">splash</span>: <span class="prelude-val">None</span>,
+            <span class="ident">discovery_splash</span>: <span class="prelude-val">None</span>,
             <span class="ident">system_channel_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">system_channel_flags</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">rules_channel_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">public_updates_channel_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">verification_level</span>: <span class="ident">VerificationLevel::None</span>,
             <span class="ident">voice_states</span>: <span class="ident">HashMap::new</span>(),
             <span class="ident">description</span>: <span class="prelude-val">None</span>,
@@ -1884,6 +1901,15 @@
             <span class="ident">banner</span>: <span class="prelude-val">None</span>,
             <span class="ident">vanity_url_code</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;bruhmoment1&quot;</span>.<span class="ident">to_string</span>()),
             <span class="ident">preferred_locale</span>: <span class="string">&quot;en-US&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">welcome_screen</span>: <span class="prelude-val">None</span>,
+            <span class="ident">approximate_member_count</span>: <span class="prelude-val">None</span>,
+            <span class="ident">approximate_presence_count</span>: <span class="prelude-val">None</span>,
+            <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
+            <span class="ident">max_video_channel_users</span>: <span class="prelude-val">None</span>,
+            <span class="ident">max_presences</span>: <span class="prelude-val">None</span>,
+            <span class="ident">max_members</span>: <span class="prelude-val">None</span>,
+            <span class="ident">widget_enabled</span>: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+            <span class="ident">widget_channel_id</span>: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">Member</span> {

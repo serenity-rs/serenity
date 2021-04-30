@@ -292,6 +292,46 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -378,6 +418,34 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Set the description of the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled.</span>
+    <span class="doccomment">/// You can check this through a guild&#39;s [`features`] list.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set the features of the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled.</span>
+    <span class="doccomment">/// You can check this through a guild&#39;s [`features`] list.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">features</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+
+        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">features</span> {
+            <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">Value::String</span>(<span class="ident">value</span>));
+        }
+
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;features&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">values</span>));
+        <span class="self">self</span>
+    }
+
     <span class="doccomment">/// Transfers the ownership of the guild to another user by Id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: The current user must be the owner of the guild.</span>
@@ -415,6 +483,7 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Regions are now set per voice channel instead of globally.&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">region</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">region</span>: <span class="ident">Region</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;region&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">region</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()));
         <span class="self">self</span>
@@ -429,6 +498,20 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splash</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">splash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">splash</span> <span class="op">=</span> <span class="ident">splash</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;splash&quot;</span>, <span class="ident">splash</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set the splash image of the guild on the discovery page.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `splash` must be base64-encoded 1024x1024 png/jpeg/gif image-data.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Requires that the guild have the `DISCOVERABLE` feature enabled.</span>
+    <span class="doccomment">/// You can check this through a guild&#39;s [`features`] list.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`features`]: crate::model::guild::Guild::features</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">discovery_splash</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">splash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">splash</span> <span class="op">=</span> <span class="ident">splash</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;splash&quot;</span>, <span class="ident">splash</span>);
         <span class="self">self</span>
@@ -450,9 +533,6 @@
 
     <span class="doccomment">/// Set the channel ID where welcome messages and boost events will be</span>
     <span class="doccomment">/// posted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**:</span>
-    <span class="doccomment">/// This feature is for Community guilds only.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">system_channel_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="ident">Value::Null</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">x</span>.<span class="number">0</span>));
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;system_channel_id&quot;</span>, <span class="ident">channel_id</span>);

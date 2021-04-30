@@ -2168,6 +2168,70 @@
 <span id="2165">2165</span>
 <span id="2166">2166</span>
 <span id="2167">2167</span>
+<span id="2168">2168</span>
+<span id="2169">2169</span>
+<span id="2170">2170</span>
+<span id="2171">2171</span>
+<span id="2172">2172</span>
+<span id="2173">2173</span>
+<span id="2174">2174</span>
+<span id="2175">2175</span>
+<span id="2176">2176</span>
+<span id="2177">2177</span>
+<span id="2178">2178</span>
+<span id="2179">2179</span>
+<span id="2180">2180</span>
+<span id="2181">2181</span>
+<span id="2182">2182</span>
+<span id="2183">2183</span>
+<span id="2184">2184</span>
+<span id="2185">2185</span>
+<span id="2186">2186</span>
+<span id="2187">2187</span>
+<span id="2188">2188</span>
+<span id="2189">2189</span>
+<span id="2190">2190</span>
+<span id="2191">2191</span>
+<span id="2192">2192</span>
+<span id="2193">2193</span>
+<span id="2194">2194</span>
+<span id="2195">2195</span>
+<span id="2196">2196</span>
+<span id="2197">2197</span>
+<span id="2198">2198</span>
+<span id="2199">2199</span>
+<span id="2200">2200</span>
+<span id="2201">2201</span>
+<span id="2202">2202</span>
+<span id="2203">2203</span>
+<span id="2204">2204</span>
+<span id="2205">2205</span>
+<span id="2206">2206</span>
+<span id="2207">2207</span>
+<span id="2208">2208</span>
+<span id="2209">2209</span>
+<span id="2210">2210</span>
+<span id="2211">2211</span>
+<span id="2212">2212</span>
+<span id="2213">2213</span>
+<span id="2214">2214</span>
+<span id="2215">2215</span>
+<span id="2216">2216</span>
+<span id="2217">2217</span>
+<span id="2218">2218</span>
+<span id="2219">2219</span>
+<span id="2220">2220</span>
+<span id="2221">2221</span>
+<span id="2222">2222</span>
+<span id="2223">2223</span>
+<span id="2224">2224</span>
+<span id="2225">2225</span>
+<span id="2226">2226</span>
+<span id="2227">2227</span>
+<span id="2228">2228</span>
+<span id="2229">2229</span>
+<span id="2230">2230</span>
+<span id="2231">2231</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
@@ -2316,12 +2380,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdChannels</span>(<span class="ident">u64</span>),
-    <span class="doccomment">/// Route for the `/guilds/:guild_id/embed` path.</span>
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/widget` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
-    <span class="ident">GuildsIdEmbed</span>(<span class="ident">u64</span>),
+    <span class="ident">GuildsIdWidget</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/preview` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildPreview`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildPreview`]: crate::model::guild::GuildPreview</span>
+    <span class="ident">GuildsIdPreview</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/emojis` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
@@ -2431,6 +2501,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdWebhooks</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/welcome-screen` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdWelcomeScreen</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/invites/:code` path.</span>
     <span class="ident">InvitesCode</span>,
     <span class="doccomment">/// Route for the `/users/:user_id` path.</span>
@@ -2636,6 +2712,10 @@
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}&quot;</span>), <span class="ident">guild_id</span>)
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_with_counts</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}?with_counts=true&quot;</span>), <span class="ident">guild_id</span>)
+    }
+
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_audit_logs</span>(
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -2693,8 +2773,12 @@
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/channels&quot;</span>), <span class="ident">guild_id</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_embed</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/embed&quot;</span>), <span class="ident">guild_id</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_widget</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget&quot;</span>), <span class="ident">guild_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_preview</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/preview&quot;</span>), <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emojis</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
@@ -2783,6 +2867,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/webhooks&quot;</span>), <span class="ident">guild_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_welcome_screen</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/welcome-screen&quot;</span>), <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guilds</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
@@ -3187,7 +3275,10 @@
     <span class="ident">EditGuildChannels</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
-    <span class="ident">EditGuildEmbed</span> {
+    <span class="ident">EditGuildWidget</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditGuildWelcomeScreen</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditMember</span> {
@@ -3291,6 +3382,9 @@
     <span class="ident">GetGuild</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">GetGuildWithCounts</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">GetGuildApplicationCommands</span> {
@@ -3317,7 +3411,13 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     },
-    <span class="ident">GetGuildEmbed</span> {
+    <span class="ident">GetGuildWidget</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetGuildPreview</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetGuildWelcomeScreen</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetGuildIntegrations</span> {
@@ -3847,12 +3947,19 @@
                 <span class="ident">Route::GuildsIdChannels</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_channels</span>(<span class="ident">guild_id</span>)),
             ),
-            <span class="ident">RouteInfo::EditGuildEmbed</span> {
+            <span class="ident">RouteInfo::EditGuildWidget</span> {
                 <span class="ident">guild_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (
                 <span class="ident">LightMethod::Patch</span>,
-                <span class="ident">Route::GuildsIdEmbed</span>(<span class="ident">guild_id</span>),
-                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_embed</span>(<span class="ident">guild_id</span>)),
+                <span class="ident">Route::GuildsIdWidget</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_widget</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="ident">RouteInfo::EditGuildWelcomeScreen</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::GuildsIdWelcomeScreen</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_welcome_screen</span>(<span class="ident">guild_id</span>)),
             ),
             <span class="ident">RouteInfo::EditMember</span> {
                 <span class="ident">guild_id</span>,
@@ -4051,6 +4158,13 @@
             <span class="ident">RouteInfo::GetGuild</span> {
                 <span class="ident">guild_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::GuildsId</span>(<span class="ident">guild_id</span>), <span class="ident">Cow::from</span>(<span class="ident">Route::guild</span>(<span class="ident">guild_id</span>))),
+            <span class="ident">RouteInfo::GetGuildWithCounts</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_with_counts</span>(<span class="ident">guild_id</span>)),
+            ),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::GetGuildApplicationCommands</span> {
                 <span class="ident">application_id</span>,
@@ -4093,12 +4207,26 @@
                     <span class="ident">command_id</span>,
                 )),
             ),
-            <span class="ident">RouteInfo::GetGuildEmbed</span> {
+            <span class="ident">RouteInfo::GetGuildWidget</span> {
                 <span class="ident">guild_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (
                 <span class="ident">LightMethod::Get</span>,
-                <span class="ident">Route::GuildsIdEmbed</span>(<span class="ident">guild_id</span>),
-                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_embed</span>(<span class="ident">guild_id</span>)),
+                <span class="ident">Route::GuildsIdWidget</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_widget</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="ident">RouteInfo::GetGuildPreview</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdPreview</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_preview</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="ident">RouteInfo::GetGuildWelcomeScreen</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdWelcomeScreen</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_welcome_screen</span>(<span class="ident">guild_id</span>)),
             ),
             <span class="ident">RouteInfo::GetGuildIntegrations</span> {
                 <span class="ident">guild_id</span>,
