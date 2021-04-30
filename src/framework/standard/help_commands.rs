@@ -579,9 +579,11 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                     });
                 }
 
-                let available_text = if options.only_in == OnlyIn::Dm {
+                let is_only = |only| group.options.only_in == only || options.only_in == only;
+
+                let available_text = if is_only(OnlyIn::Dm) {
                     &help_options.dm_only_text
-                } else if options.only_in == OnlyIn::Guild {
+                } else if is_only(OnlyIn::Guild) {
                     &help_options.guild_only_text
                 } else {
                     &help_options.dm_and_guild_text
