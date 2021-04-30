@@ -450,13 +450,13 @@ impl<'de> Deserialize<'de> for Activity {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
 pub struct ActivityButton {
     /// The text shown on the button.
     pub label: String,
     /// The url opened when clicking the button.
     ///
-    /// **Note**: Bots cannot access activity button URL, they can only
-    /// send it.
+    /// **Note**: Bots cannot access activity button URL.
     #[serde(default)]
     pub url: String,
 }
