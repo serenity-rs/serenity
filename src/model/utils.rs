@@ -146,10 +146,7 @@ fn set_resolved(
                 let id = &UserId(*&string.unwrap().parse().unwrap());
 
                 let user = resolved.users.get(id).unwrap().to_owned();
-                let member = match resolved.members.get(id) {
-                    Some(member) => Some(member.to_owned()),
-                    None => None,
-                };
+                let member = resolved.members.get(id).map(|m| m.to_owned());
 
                 Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
             },
@@ -172,10 +169,7 @@ fn set_resolved(
 
                 if resolved.users.contains_key(&UserId(id)) {
                     let user = resolved.users.get(&UserId(id)).unwrap().to_owned();
-                    let member = match resolved.members.get(&UserId(id)) {
-                        Some(member) => Some(member.to_owned()),
-                        None => None,
-                    };
+                    let member = resolved.members.get(&UserId(id)).map(|m| m.to_owned());
 
                     Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
                 } else {
