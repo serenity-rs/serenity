@@ -801,7 +801,6 @@ impl CacheUpdate for GuildUpdateEvent {
 
             #[allow(deprecated)]
             {
-
                 guild.region.clone_from(&self.guild.region);
             }
 
