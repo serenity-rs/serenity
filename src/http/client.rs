@@ -1257,14 +1257,32 @@ impl Http {
         .await
     }
 
-    /// Edits a [`Guild`]'s embed setting.
-    pub async fn edit_guild_embed(&self, guild_id: u64, map: &Value) -> Result<GuildEmbed> {
+    /// Edits a [`Guild`]'s widget.
+    pub async fn edit_guild_widget(&self, guild_id: u64, map: &Value) -> Result<GuildWidget> {
         let body = serde_json::to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
             headers: None,
-            route: RouteInfo::EditGuildEmbed {
+            route: RouteInfo::EditGuildWidget {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Edits a guild welcome screen.
+    pub async fn edit_guild_welcome_screen(
+        &self,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<GuildWelcomeScreen> {
+        let body = serde_json::to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::EditGuildWelcomeScreen {
                 guild_id,
             },
         })
@@ -2072,6 +2090,18 @@ impl Http {
         .await
     }
 
+    /// Gets guild information with counts.
+    pub async fn get_guild_with_counts(&self, guild_id: u64) -> Result<PartialGuild> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildWithCounts {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Fetches all of the guild commands for your application for a specific guild.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
@@ -2148,12 +2178,36 @@ impl Http {
         .await
     }
 
-    /// Gets a guild embed information.
-    pub async fn get_guild_embed(&self, guild_id: u64) -> Result<GuildEmbed> {
+    /// Gets a guild widget information.
+    pub async fn get_guild_widget(&self, guild_id: u64) -> Result<GuildWidget> {
         self.fire(Request {
             body: None,
             headers: None,
-            route: RouteInfo::GetGuildEmbed {
+            route: RouteInfo::GetGuildWidget {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Gets a guild preview.
+    pub async fn get_guild_preview(&self, guild_id: u64) -> Result<GuildPreview> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildPreview {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Gets a guild welcome screen information.
+    pub async fn get_guild_welcome_screen(&self, guild_id: u64) -> Result<GuildWelcomeScreen> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildWelcomeScreen {
                 guild_id,
             },
         })
