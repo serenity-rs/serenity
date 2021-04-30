@@ -1624,6 +1624,8 @@
 <span id="1621">1621</span>
 <span id="1622">1622</span>
 <span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -2206,9 +2208,11 @@
                     });
                 }
 
-                <span class="kw">let</span> <span class="ident">available_text</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlyIn::Dm</span> {
+                <span class="kw">let</span> <span class="ident">is_only</span> <span class="op">=</span> <span class="op">|</span><span class="ident">only</span><span class="op">|</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">only</span> <span class="op">|</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">only</span>;
+
+                <span class="kw">let</span> <span class="ident">available_text</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_only</span>(<span class="ident">OnlyIn::Dm</span>) {
                     <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">dm_only_text</span>
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlyIn::Guild</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_only</span>(<span class="ident">OnlyIn::Guild</span>) {
                     <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">guild_only_text</span>
                 } <span class="kw">else</span> {
                     <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">dm_and_guild_text</span>
