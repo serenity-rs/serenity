@@ -1364,6 +1364,12 @@
 <span id="1361">1361</span>
 <span id="1362">1362</span>
 <span id="1363">1363</span>
+<span id="1364">1364</span>
+<span id="1365">1365</span>
+<span id="1366">1366</span>
+<span id="1367">1367</span>
+<span id="1368">1368</span>
+<span id="1369">1369</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 
@@ -1944,7 +1950,12 @@
                 <span class="self">self</span>.<span class="ident">mfa_level</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">mfa_level</span>;
                 <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">name</span>;
                 <span class="self">self</span>.<span class="ident">owner_id</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">owner_id</span>;
-                <span class="self">self</span>.<span class="ident">region</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">region</span>;
+
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+                {
+                    <span class="self">self</span>.<span class="ident">region</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">region</span>;
+                }
+
                 <span class="self">self</span>.<span class="ident">roles</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">roles</span>;
                 <span class="self">self</span>.<span class="ident">splash</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">splash</span>;
                 <span class="self">self</span>.<span class="ident">verification_level</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">verification_level</span>;
@@ -2688,6 +2699,7 @@
             <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
 
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">application_id</span>,
             <span class="ident">afk_channel_id</span>,

@@ -3091,6 +3091,12 @@
 <span id="3088">3088</span>
 <span id="3089">3089</span>
 <span id="3090">3090</span>
+<span id="3091">3091</span>
+<span id="3092">3092</span>
+<span id="3093">3093</span>
+<span id="3094">3094</span>
+<span id="3095">3095</span>
+<span id="3096">3096</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -4018,7 +4024,12 @@
                 <span class="self">self</span>.<span class="ident">mfa_level</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">mfa_level</span>;
                 <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">name</span>;
                 <span class="self">self</span>.<span class="ident">owner_id</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">owner_id</span>;
-                <span class="self">self</span>.<span class="ident">region</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">region</span>;
+
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+                {
+                    <span class="self">self</span>.<span class="ident">region</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">region</span>;
+                }
+
                 <span class="self">self</span>.<span class="ident">roles</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">roles</span>;
                 <span class="self">self</span>.<span class="ident">splash</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">splash</span>;
                 <span class="self">self</span>.<span class="ident">verification_level</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">verification_level</span>;
@@ -5595,6 +5606,7 @@
             .<span class="ident">and_then</span>(<span class="ident">SystemChannelFlags::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">afk_channel_id</span>,
             <span class="ident">application_id</span>,

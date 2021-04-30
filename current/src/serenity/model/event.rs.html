@@ -2171,6 +2171,11 @@
 <span id="2168">2168</span>
 <span id="2169">2169</span>
 <span id="2170">2170</span>
+<span id="2171">2171</span>
+<span id="2172">2172</span>
+<span id="2173">2173</span>
+<span id="2174">2174</span>
+<span id="2175">2175</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -2972,7 +2977,12 @@
             <span class="ident">guild</span>.<span class="ident">icon</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">icon</span>);
             <span class="ident">guild</span>.<span class="ident">name</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">name</span>);
             <span class="ident">guild</span>.<span class="ident">owner_id</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">owner_id</span>);
-            <span class="ident">guild</span>.<span class="ident">region</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">region</span>);
+
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+            {
+                <span class="ident">guild</span>.<span class="ident">region</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">region</span>);
+            }
+
             <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">roles</span>);
             <span class="ident">guild</span>.<span class="ident">verification_level</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">verification_level</span>;
         }
