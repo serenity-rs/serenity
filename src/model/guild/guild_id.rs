@@ -5,7 +5,7 @@ use serde_json::json;
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{EditGuild, EditGuildWelcomeScreen, EditGuildWidget, EditMember, EditRole};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -552,6 +552,51 @@ impl GuildId {
         http.as_ref().edit_role_position(self.0, role_id.into().0, position).await
     }
 
+    /// Edits the [`GuildWelcomeScreen`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if some mandatory fields are not provided.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_welcome_screen<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildWelcomeScreen>
+    where
+        F: FnOnce(&mut EditGuildWelcomeScreen) -> &mut EditGuildWelcomeScreen,
+    {
+        let mut map = EditGuildWelcomeScreen::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_welcome_screen(self.0, &Value::Object(utils::hashmap_to_json_map(map.0)))
+            .await
+    }
+
+    /// Edits the [`GuildWidget`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`
+    /// permission.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_widget<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildWidget>
+    where
+        F: FnOnce(&mut EditGuildWidget) -> &mut EditGuildWidget,
+    {
+        let mut map = EditGuildWidget::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_widget(self.0, &Value::Object(utils::hashmap_to_json_map(map.0)))
+            .await
+    }
+
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
@@ -572,6 +617,24 @@ impl GuildId {
     #[inline]
     pub async fn to_partial_guild(self, http: impl AsRef<Http>) -> Result<PartialGuild> {
         http.as_ref().get_guild(self.0).await
+    }
+
+    /// Requests [`PartialGuild`] over REST API with counts.
+    ///
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send
+    /// all data with a guild retrieval.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn to_partial_guild_with_counts(
+        self,
+        http: impl AsRef<Http>,
+    ) -> Result<PartialGuild> {
+        http.as_ref().get_guild_with_counts(self.0).await
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
@@ -1215,6 +1278,41 @@ impl GuildId {
             .get_guild_application_command_permissions(self.0.into(), command_id.into())
             .await
     }
+
+    /// Get the guild welcome screen.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the guild does not have a welcome screen.
+    pub async fn get_welcome_screen(&self, http: impl AsRef<Http>) -> Result<GuildWelcomeScreen> {
+        http.as_ref().get_guild_welcome_screen(self.0.into()).await
+    }
+
+    /// Get the guild preview.
+    ///
+    /// **Note**: The bot need either to be part of the guild
+    /// or the guild needs to have the `DISCOVERABLE` feature.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the bot cannot see the guild preview, see the note.
+    pub async fn get_preview(&self, http: impl AsRef<Http>) -> Result<GuildPreview> {
+        http.as_ref().get_guild_preview(self.0).await
+    }
+
+    /// Get the guild widget.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the bot does not have `MANAGE_MESSAGES` permission.
+    pub async fn get_widget(&self, http: impl AsRef<Http>) -> Result<GuildWidget> {
+        http.as_ref().get_guild_widget(self.0).await
+    }
+
+    /// Get the widget image URL.
+    pub fn widget_image_url(&self, style: GuildWidgetStyle) -> String {
+        format!(api!("/guilds/{}/widget.png?style={}"), self.0.to_string(), style.to_string())
+    }
 }
 
 impl From<PartialGuild> for GuildId {
@@ -1364,5 +1462,27 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
             state.buffer.pop().map(|entry| (Ok(entry), state))
         })
+    }
+}
+
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[non_exhaustive]
+pub enum GuildWidgetStyle {
+    Shield,
+    Banner1,
+    Banner2,
+    Banner3,
+    Banner4,
+}
+
+impl Display for GuildWidgetStyle {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            GuildWidgetStyle::Shield => write!(f, "shield"),
+            GuildWidgetStyle::Banner1 => write!(f, "banner1"),
+            GuildWidgetStyle::Banner2 => write!(f, "banner2"),
+            GuildWidgetStyle::Banner3 => write!(f, "banner3"),
+            GuildWidgetStyle::Banner4 => write!(f, "banner4"),
+        }
     }
 }

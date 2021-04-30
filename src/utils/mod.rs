@@ -848,7 +848,11 @@ mod test {
             region: "Ferris Island".to_string(),
             roles: HashMap::new(),
             splash: None,
+            discovery_splash: None,
             system_channel_id: None,
+            system_channel_flags: Default::default(),
+            rules_channel_id: None,
+            public_updates_channel_id: None,
             verification_level: VerificationLevel::None,
             voice_states: HashMap::new(),
             description: None,
@@ -857,6 +861,15 @@ mod test {
             banner: None,
             vanity_url_code: Some("bruhmoment1".to_string()),
             preferred_locale: "en-US".to_string(),
+            welcome_screen: None,
+            approximate_member_count: None,
+            approximate_presence_count: None,
+            nsfw: false,
+            max_video_channel_users: None,
+            max_presences: None,
+            max_members: None,
+            widget_enabled: Some(false),
+            widget_channel_id: None,
         };
 
         let member = Member {

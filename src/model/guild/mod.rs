@@ -3,6 +3,7 @@
 mod audit_log;
 mod emoji;
 mod guild_id;
+mod guild_preview;
 mod integration;
 mod member;
 mod partial_guild;
@@ -13,14 +14,18 @@ mod system_channel;
 use chrono::{DateTime, Utc};
 use futures::stream::StreamExt;
 use serde::de::Error as DeError;
+use serde::{Serialize, Serializer};
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
 #[cfg(feature = "model")]
-use tracing::{error, warn};
+use tracing::error;
+#[cfg(all(feature = "model", feature = "cache"))]
+use tracing::warn;
 
 pub use self::audit_log::*;
 pub use self::emoji::*;
 pub use self::guild_id::*;
+pub use self::guild_preview::*;
 pub use self::integration::*;
 pub use self::member::*;
 pub use self::partial_guild::*;
@@ -29,7 +34,14 @@ pub use self::role::*;
 pub use self::system_channel::*;
 use super::utils::*;
 #[cfg(feature = "model")]
-use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
+use crate::builder::{
+    CreateChannel,
+    EditGuild,
+    EditGuildWelcomeScreen,
+    EditGuildWidget,
+    EditMember,
+    EditRole,
+};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "model")]
@@ -82,29 +94,29 @@ pub struct Guild {
     pub emojis: HashMap<EmojiId, Emoji>,
     /// Default explicit content filter level.
     pub explicit_content_filter: ExplicitContentFilter,
-    /// VIP features enabled for the guild. Can be obtained through the
-    /// [Discord Partnership] website.
+    /// The guild features. More information available at
+    /// [`discord documentation`].
     ///
     /// The following is a list of known features:
     ///
+    /// - `ANIMATED_ICON`
+    /// - `BANNER`
+    /// - `COMMERCE`
+    /// - `COMMUNITY`
+    /// - `DISCOVERABLE`
+    /// - `FEATURABLE`
     /// - `INVITE_SPLASH`
+    /// - `MEMBER_VERIFICATION_GATE_ENABLED`
+    /// - `NEWS`
+    /// - `PARTNERED`
+    /// - `PREVIEW_ENABLED`
     /// - `VANITY_URL`
     /// - `VERIFIED`
     /// - `VIP_REGIONS`
-    /// - `PARTNERED`
-    /// - `MORE_EMOJI`
-    /// - `DISCOVERABLE`
-    /// - `FEATURABLE`
-    /// - `COMMERCE`
-    /// - `PUBLIC`
-    /// - `NEWS`
-    /// - `BANNER`
-    /// - `ANIMATED_ICON`
-    /// - `PUBLIC_DISABLED`
-    /// - `COMMUNITY`
     /// - `WELCOME_SCREEN_ENABLED`
     ///
-    /// [Discord Partnership]: https://discord.com/partners
+    ///
+    /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
     pub features: Vec<String>,
     /// The hash of the icon used by the guild.
     ///
@@ -142,6 +154,7 @@ pub struct Guild {
     #[serde(serialize_with = "serialize_gen_map")]
     pub presences: HashMap<UserId, Presence>,
     /// The region that the voice servers that the guild uses are located in.
+    #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
     pub region: String,
     /// A mapping of the guild's roles.
     #[serde(serialize_with = "serialize_gen_map")]
@@ -151,14 +164,29 @@ pub struct Guild {
     /// If the `InviteSplash` feature is enabled, this can be used to generate
     /// a URL to a splash image.
     pub splash: Option<String>,
+    /// An identifying hash of the guild discovery's splash icon.
+    ///
+    /// **Note**: Only present for guilds with the `DISCOVERABLE` feature.
+    pub discovery_splash: Option<String>,
     /// The ID of the channel to which system messages are sent.
     pub system_channel_id: Option<ChannelId>,
+    /// System channel flags.
+    pub system_channel_flags: SystemChannelFlags,
+    /// The id of the channel where rules and/or guidelines are displayed.
+    ///
+    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
+    pub rules_channel_id: Option<ChannelId>,
+    /// The id of the channel where admins and moderators of Community guilds
+    /// receive notices from Discord.
+    ///
+    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
+    pub public_updates_channel_id: Option<ChannelId>,
     /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
     /// A mapping of [`User`]s to their current voice state.
     #[serde(serialize_with = "serialize_gen_map")]
     pub voice_states: HashMap<UserId, VoiceState>,
-    /// The server's description
+    /// The server's description, if it has one.
     pub description: Option<String>,
     /// The server's premium boosting level.
     #[serde(default)]
@@ -166,13 +194,37 @@ pub struct Guild {
     /// The total number of users currently boosting this server.
     #[serde(default)]
     pub premium_subscription_count: u64,
-    /// The server's banner.
+    /// The guild's banner, if it has one.
     pub banner: Option<String>,
-    /// The vanity url code for the guild.
+    /// The vanity url code for the guild, if it has one.
     pub vanity_url_code: Option<String>,
     /// The preferred locale of this guild only set if guild has the "DISCOVERABLE"
     /// feature, defaults to en-US.
     pub preferred_locale: String,
+    /// The welcome screen of the guild.
+    ///
+    /// **Note**: Only available on `COMMUNITY` guild, see [`Self::features`].
+    pub welcome_screen: Option<GuildWelcomeScreen>,
+    /// Approximate number of members in this guild.
+    pub approximate_member_count: Option<u64>,
+    /// Approximate number of non-offline members in this guild.
+    pub approximate_presence_count: Option<u64>,
+    /// Whether or not this guild is designated as NSFW. See [`discord support article`].
+    ///
+    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    pub nsfw: bool,
+    /// The maximum amount of users in a video channel.
+    pub max_video_channel_users: Option<u64>,
+    /// The maximum number of presences for the guild. The default value is currently 25000.
+    ///
+    /// **Note**: It is in effect when it is `None`.
+    pub max_presences: Option<u64>,
+    /// The maximum number of members for the guild.
+    pub max_members: Option<u64>,
+    /// Whether or not the guild widget is enabled.
+    pub widget_enabled: Option<bool>,
+    /// The channel id that the widget will generate an invite to, or null if set to no invite
+    pub widget_channel_id: Option<ChannelId>,
 }
 
 #[cfg(feature = "model")]
@@ -1030,6 +1082,41 @@ impl Guild {
         position: u64,
     ) -> Result<Vec<Role>> {
         self.id.edit_role_position(&http, role_id, position).await
+    }
+
+    /// Edits the [`GuildWelcomeScreen`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if some mandatory fields are not provided.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_welcome_screen<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildWelcomeScreen>
+    where
+        F: FnOnce(&mut EditGuildWelcomeScreen) -> &mut EditGuildWelcomeScreen,
+    {
+        self.id.edit_welcome_screen(http, f).await
+    }
+
+    /// Edits the [`GuildWidget`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`
+    /// permission.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_widget<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildWidget>
+    where
+        F: FnOnce(&mut EditGuildWidget) -> &mut EditGuildWidget,
+    {
+        self.id.edit_widget(http, f).await
     }
 
     /// Gets a partial amount of guild data by its Id.
@@ -2315,10 +2402,103 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let preferred_locale = map
             .remove("preferred_locale")
             .ok_or_else(|| DeError::custom("expected preferred locale"))
             .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
+        let welcome_screen = match map.contains_key("welcome_screen") {
+            true => Some(
+                map.remove("welcome_screen")
+                    .ok_or_else(|| DeError::custom("expected welcome_screen"))
+                    .and_then(GuildWelcomeScreen::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let approximate_member_count = match map.contains_key("approximate_member_count") {
+            true => Some(
+                map.remove("approximate_member_count")
+                    .ok_or_else(|| DeError::custom("expected approximate_member_count"))
+                    .and_then(u64::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let approximate_presence_count = match map.contains_key("approximate_presence_count") {
+            true => Some(
+                map.remove("approximate_presence_count")
+                    .ok_or_else(|| DeError::custom("expected approximate_presence_count"))
+                    .and_then(u64::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let max_video_channel_users = match map.contains_key("max_video_channel_users") {
+            true => Some(
+                map.remove("max_video_channel_users")
+                    .ok_or_else(|| DeError::custom("expected max_video_channel_users"))
+                    .and_then(u64::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let max_presences = match map.remove("max_presences") {
+            Some(v) => Option::<u64>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        let max_members = match map.contains_key("max_members") {
+            true => Some(
+                map.remove("max_members")
+                    .ok_or_else(|| DeError::custom("expected max_members"))
+                    .and_then(u64::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let discovery_splash = match map.remove("discovery_splash") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        let nsfw = map
+            .remove("nsfw")
+            .ok_or_else(|| DeError::custom("expected nsfw"))
+            .and_then(bool::deserialize)
+            .map_err(DeError::custom)?;
+
+        let widget_enabled = match map.remove("widget_enabled") {
+            Some(v) => Option::<bool>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        let widget_channel_id = match map.remove("widget_channel_id") {
+            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        let rules_channel_id = match map.remove("rules_channel_id") {
+            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        let public_updates_channel_id = match map.remove("public_updates_channel_id") {
+            Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        let system_channel_flags = map
+            .remove("system_channel_flags")
+            .ok_or_else(|| DeError::custom("expected system_channel_flags"))
+            .and_then(SystemChannelFlags::deserialize)
             .map_err(DeError::custom)?;
 
         Ok(Self {
@@ -2343,7 +2523,11 @@ impl<'de> Deserialize<'de> for Guild {
             region,
             roles,
             splash,
+            discovery_splash,
             system_channel_id,
+            system_channel_flags,
+            rules_channel_id,
+            public_updates_channel_id,
             verification_level,
             voice_states,
             description,
@@ -2352,6 +2536,15 @@ impl<'de> Deserialize<'de> for Guild {
             banner,
             vanity_url_code,
             preferred_locale,
+            welcome_screen,
+            approximate_member_count,
+            approximate_presence_count,
+            nsfw,
+            max_video_channel_users,
+            max_members,
+            max_presences,
+            widget_enabled,
+            widget_channel_id,
         })
     }
 }
@@ -2404,13 +2597,122 @@ pub enum GuildContainer {
     Id(GuildId),
 }
 
-/// Information relating to a guild's widget embed.
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct GuildEmbed {
-    /// The Id of the channel to show the embed for.
+/// Information relating to a guild's welcome screen.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct GuildWelcomeScreen {
+    /// The server description shown in the welcome screen.
+    pub description: Option<String>,
+    /// The channels shown in the welcome screen.
+    ///
+    /// **Note**: There can only be only up to 5 channels.
+    pub welcome_channels: Vec<GuildWelcomeChannel>,
+}
+
+/// A channel shown in the [`GuildWelcomeScreen`].
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub struct GuildWelcomeChannel {
+    /// The channel Id.
     pub channel_id: ChannelId,
-    /// Whether the widget embed is enabled.
+    /// The description shown for the channel.
+    pub description: String,
+    /// The emoji shown, if there is one.
+    pub emoji: Option<GuildWelcomeScreenEmoji>,
+}
+
+impl<'de> Deserialize<'de> for GuildWelcomeChannel {
+    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let channel_id = map
+            .remove("channel_id")
+            .ok_or_else(|| DeError::custom("expected channel_id"))
+            .and_then(ChannelId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let description = map
+            .remove("description")
+            .ok_or_else(|| DeError::custom("expected description"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
+        let mut emoji = None;
+
+        let emoji_id =
+            map.remove("emoji_id").ok_or_else(|| DeError::custom("expected emoji_id"))?;
+
+        let emoji_name =
+            map.remove("emoji_name").ok_or_else(|| DeError::custom("expected emoji_name"))?;
+
+        if emoji_id != Value::Null {
+            emoji = Some(GuildWelcomeScreenEmoji::Custom(
+                EmojiId::deserialize(emoji_id).expect("expected emoji_id"),
+            ));
+        }
+
+        if emoji_name != Value::Null {
+            emoji = Some(GuildWelcomeScreenEmoji::Unicode(
+                String::deserialize(emoji_name).expect("expected emoji_name"),
+            ));
+        }
+
+        Ok(Self {
+            channel_id,
+            description,
+            emoji,
+        })
+    }
+}
+
+impl Serialize for GuildWelcomeChannel {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut map = JsonMap::new();
+
+        map.insert("channel_id".to_owned(), Value::String(self.channel_id.to_string()));
+        map.insert("description".to_owned(), Value::String(self.description.to_string()));
+
+        map.insert("emoji_id".to_owned(), Value::Null);
+        map.insert("emoji_name".to_owned(), Value::Null);
+
+        if let Some(emoji) = self.emoji.to_owned() {
+            match emoji {
+                GuildWelcomeScreenEmoji::Custom(id) => {
+                    map.insert("emoji_id".to_owned(), Value::String(id.to_string()))
+                },
+                GuildWelcomeScreenEmoji::Unicode(name) => {
+                    map.insert("emoji_name".to_owned(), Value::String(name.to_string()))
+                },
+            };
+        };
+
+        map.serialize(serializer)
+    }
+}
+
+/// A [`GuildWelcomeScreen`] emoji.
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[non_exhaustive]
+pub enum GuildWelcomeScreenEmoji {
+    /// A custom emoji.
+    Custom(EmojiId),
+    /// A unicode emoji.
+    Unicode(String),
+}
+
+/// A [`Guild`] widget.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct GuildWidget {
+    /// Whether the widget is enabled.
     pub enabled: bool,
+    /// The widget channel id.
+    pub channel_id: Option<ChannelId>,
 }
 
 /// Representation of the number of members that would be pruned by a guild
@@ -2747,10 +3049,23 @@ mod test {
                 application_id: Some(ApplicationId(0)),
                 explicit_content_filter: ExplicitContentFilter::None,
                 system_channel_id: Some(ChannelId(0)),
+                system_channel_flags: Default::default(),
+                rules_channel_id: None,
                 premium_subscription_count: 12,
                 banner: None,
                 vanity_url_code: Some("bruhmoment".to_string()),
                 preferred_locale: "en-US".to_string(),
+                welcome_screen: None,
+                approximate_member_count: None,
+                approximate_presence_count: None,
+                nsfw: false,
+                max_video_channel_users: None,
+                max_presences: None,
+                max_members: None,
+                widget_enabled: Some(false),
+                discovery_splash: None,
+                widget_channel_id: None,
+                public_updates_channel_id: None,
             }
         }
 
