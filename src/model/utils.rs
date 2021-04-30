@@ -167,8 +167,8 @@ fn set_resolved(
             ApplicationCommandOptionType::Mentionable => {
                 let id: u64 = string.unwrap().parse().unwrap();
 
-                if resolved.users.contains_key(&UserId(id)) {
-                    let user = resolved.users.get(&UserId(id)).unwrap().to_owned();
+                if let Some(user) = resolved.users.get(&UserId(id)) {
+                    let user = user.to_owned();
                     let member = resolved.members.get(&UserId(id)).map(|m| m.to_owned());
 
                     Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
