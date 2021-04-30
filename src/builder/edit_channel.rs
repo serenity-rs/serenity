@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde_json::{json, Value};
 
 use crate::internal::prelude::*;
-use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType};
+use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType, VideoQualityMode};
 use crate::model::id::ChannelId;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
@@ -41,6 +41,30 @@ impl EditChannel {
     /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn bitrate(&mut self, bitrate: u64) -> &mut Self {
         self.0.insert("bitrate", Value::Number(Number::from(bitrate)));
+        self
+    }
+
+    /// The camera video quality mode of the channel.
+    ///
+    /// This is for [voice] channels only.
+    ///
+    /// [voice]: crate::model::channel::ChannelType::Voice
+    pub fn video_quality_mode(&mut self, quality: VideoQualityMode) -> &mut Self {
+        self.0.insert("video_quality_mode", Value::Number(Number::from(quality as u8)));
+        self
+    }
+
+    /// The voice region of the channel.
+    /// It is automatic when `None`.
+    ///
+    /// This is for [voice] channels only.
+    ///
+    /// [voice]: crate::model::channel::ChannelType::Voice
+    pub fn voice_region(&mut self, id: Option<String>) -> &mut Self {
+        self.0.insert("rtc_region", match id {
+            Some(region) => Value::String(region),
+            None => Value::Null,
+        });
         self
     }
 
