@@ -83,6 +83,34 @@ impl EditGuild {
         self
     }
 
+    /// Set the description of the guild.
+    ///
+    /// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled.
+    /// You can check this through a guild's [`features`] list.
+    ///
+    /// [`features`]: crate::model::guild::Guild::features
+    pub fn description<S: ToString>(&mut self, name: S) -> &mut Self {
+        self.0.insert("name", Value::String(name.to_string()));
+        self
+    }
+
+    /// Set the features of the guild.
+    ///
+    /// **Note**: Requires that the guild have the `DISCOVERABLE` feature enabled.
+    /// You can check this through a guild's [`features`] list.
+    ///
+    /// [`features`]: crate::model::guild::Guild::features
+    pub fn features(&mut self, features: Vec<String>) -> &mut Self {
+        let mut values: Vec<Value> = vec![];
+
+        for value in features {
+            values.push(Value::String(value));
+        }
+
+        self.0.insert("features", Value::Array(values));
+        self
+    }
+
     /// Transfers the ownership of the guild to another user by Id.
     ///
     /// **Note**: The current user must be the owner of the guild.
@@ -120,6 +148,7 @@ impl EditGuild {
     /// #     Ok(())
     /// # }
     /// ```
+    #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
     pub fn region(&mut self, region: Region) -> &mut Self {
         self.0.insert("region", Value::String(region.name().to_string()));
         self
@@ -134,6 +163,20 @@ impl EditGuild {
     ///
     /// [`features`]: crate::model::guild::Guild::features
     pub fn splash(&mut self, splash: Option<&str>) -> &mut Self {
+        let splash = splash.map_or(Value::Null, |x| Value::String(x.to_string()));
+        self.0.insert("splash", splash);
+        self
+    }
+
+    /// Set the splash image of the guild on the discovery page.
+    ///
+    /// The `splash` must be base64-encoded 1024x1024 png/jpeg/gif image-data.
+    ///
+    /// Requires that the guild have the `DISCOVERABLE` feature enabled.
+    /// You can check this through a guild's [`features`] list.
+    ///
+    /// [`features`]: crate::model::guild::Guild::features
+    pub fn discovery_splash(&mut self, splash: Option<&str>) -> &mut Self {
         let splash = splash.map_or(Value::Null, |x| Value::String(x.to_string()));
         self.0.insert("splash", splash);
         self
@@ -155,9 +198,6 @@ impl EditGuild {
 
     /// Set the channel ID where welcome messages and boost events will be
     /// posted.
-    ///
-    /// **Note**:
-    /// This feature is for Community guilds only.
     pub fn system_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
         let channel_id = channel_id.map_or(Value::Null, |x| Value::from(x.0));
         self.0.insert("system_channel_id", channel_id);

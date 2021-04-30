@@ -26,6 +26,8 @@ mod create_invite;
 mod create_message;
 mod edit_channel;
 mod edit_guild;
+mod edit_guild_welcome_screen;
+mod edit_guild_widget;
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod edit_interaction_response;
@@ -47,6 +49,8 @@ pub use self::{
     create_message::CreateMessage,
     edit_channel::EditChannel,
     edit_guild::EditGuild,
+    edit_guild_welcome_screen::EditGuildWelcomeScreen,
+    edit_guild_widget::EditGuildWidget,
     edit_member::EditMember,
     edit_message::EditMessage,
     edit_profile::EditProfile,
