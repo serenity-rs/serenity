@@ -655,6 +655,7 @@ pub enum ApplicationCommandOptionType {
     User = 6,
     Channel = 7,
     Role = 8,
+    Mentionable = 9,
     Unknown = !0,
 }
 
@@ -667,6 +668,7 @@ enum_number!(ApplicationCommandOptionType {
     User,
     Channel,
     Role,
+    Mentionable,
 });
 
 /// The type of an [`ApplicationCommandPermissionData`].

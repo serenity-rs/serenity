@@ -146,10 +146,7 @@ fn set_resolved(
                 let id = &UserId(*&string.unwrap().parse().unwrap());
 
                 let user = resolved.users.get(id).unwrap().to_owned();
-                let member = match resolved.members.get(id) {
-                    Some(member) => Some(member.to_owned()),
-                    None => None,
-                };
+                let member = resolved.members.get(id).map(|m| m.to_owned());
 
                 Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
             },
@@ -166,6 +163,20 @@ fn set_resolved(
                 let channel = resolved.channels.get(id).unwrap().to_owned();
 
                 Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
+            },
+            ApplicationCommandOptionType::Mentionable => {
+                let id: u64 = string.unwrap().parse().unwrap();
+
+                if let Some(user) = resolved.users.get(&UserId(id)) {
+                    let user = user.to_owned();
+                    let member = resolved.members.get(&UserId(id)).map(|m| m.to_owned());
+
+                    Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
+                } else {
+                    let role = resolved.roles.get(&RoleId(id)).unwrap().to_owned();
+
+                    Some(ApplicationCommandInteractionDataOptionValue::Role(role))
+                }
             },
             ApplicationCommandOptionType::String => Some(
                 ApplicationCommandInteractionDataOptionValue::String(string.unwrap().to_owned()),
