@@ -798,7 +798,12 @@ impl CacheUpdate for GuildUpdateEvent {
             guild.icon.clone_from(&self.guild.icon);
             guild.name.clone_from(&self.guild.name);
             guild.owner_id.clone_from(&self.guild.owner_id);
-            guild.region.clone_from(&self.guild.region);
+
+            #[allow(deprecated)]
+            {
+                guild.region.clone_from(&self.guild.region);
+            }
+
             guild.roles.clone_from(&self.guild.roles);
             guild.verification_level = self.guild.verification_level;
         }

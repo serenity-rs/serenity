@@ -924,7 +924,12 @@ impl Guild {
                 self.mfa_level = guild.mfa_level;
                 self.name = guild.name;
                 self.owner_id = guild.owner_id;
-                self.region = guild.region;
+
+                #[allow(deprecated)]
+                {
+                    self.region = guild.region;
+                }
+
                 self.roles = guild.roles;
                 self.splash = guild.splash;
                 self.verification_level = guild.verification_level;
@@ -2501,6 +2506,7 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(SystemChannelFlags::deserialize)
             .map_err(DeError::custom)?;
 
+        #[allow(deprecated)]
         Ok(Self {
             afk_channel_id,
             application_id,

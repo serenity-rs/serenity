@@ -2,7 +2,6 @@ use serde::de::{Deserialize, Deserializer};
 
 use crate::http::error::DiscordJsonSingleError;
 use crate::internal::prelude::*;
-use crate::prelude::*;
 
 #[allow(clippy::missing_errors_doc)]
 pub fn deserialize_errors<'de, D: Deserializer<'de>>(
