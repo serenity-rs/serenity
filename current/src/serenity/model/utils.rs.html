@@ -475,6 +475,17 @@
 <span id="472">472</span>
 <span id="473">473</span>
 <span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">hash::Hash</span>};
 
@@ -624,10 +635,7 @@
                 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="kw-2">*</span><span class="kw-2">&amp;</span><span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>());
 
                 <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
-                <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="ident">id</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>.<span class="ident">to_owned</span>()),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                };
+                <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">to_owned</span>());
 
                 <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::User</span>(<span class="ident">user</span>, <span class="ident">member</span>))
             },
@@ -644,6 +652,20 @@
                 <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
 
                 <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::Channel</span>(<span class="ident">channel</span>))
+            },
+            <span class="ident">ApplicationCommandOptionType::Mentionable</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">id</span>)) {
+                    <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">to_owned</span>();
+                    <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">id</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">to_owned</span>());
+
+                    <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::User</span>(<span class="ident">user</span>, <span class="ident">member</span>))
+                } <span class="kw">else</span> {
+                    <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">id</span>)).<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
+
+                    <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::Role</span>(<span class="ident">role</span>))
+                }
             },
             <span class="ident">ApplicationCommandOptionType::String</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(
                 <span class="ident">ApplicationCommandInteractionDataOptionValue::String</span>(<span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">to_owned</span>()),
