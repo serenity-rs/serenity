@@ -38,11 +38,14 @@ impl<'de> Deserialize<'de> for DiscordJsonError {
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
 
-        let errors = map
-            .remove("errors")
-            .ok_or_else(|| DeError::custom("expected errors"))
-            .and_then(deserialize_errors)
-            .map_err(DeError::custom)?;
+        let errors = match map.contains_key("errors") {
+            true => map
+                .remove("errors")
+                .ok_or_else(|| DeError::custom("expected errors"))
+                .and_then(deserialize_errors)
+                .map_err(DeError::custom)?,
+            false => vec![],
+        };
 
         Ok(Self {
             code,
