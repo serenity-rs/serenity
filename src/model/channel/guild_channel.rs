@@ -105,6 +105,17 @@ pub struct GuildChannel {
     pub rtc_region: Option<String>,
     /// The video quality mode for a voice channel.
     pub video_quality_mode: Option<VideoQualityMode>,
+    /// An approximate count of messages in the thread, stops counting at 50.
+    ///
+    /// **Note**: This is only available on thread channels.
+    pub message_count: Option<u8>,
+    /// An approximate count of users in a thread, stops counting at 50.
+    ///
+    /// **Note**: This is only available on thread channels.
+    pub member_count: Option<u8>,
+    /// Thread member object for the current user, if they have joined the thread,
+    /// only included on certain API endpoints.
+    pub member: Option<ThreadMember>
 }
 
 #[cfg(feature = "model")]

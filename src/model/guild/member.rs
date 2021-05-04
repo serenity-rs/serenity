@@ -3,6 +3,8 @@ use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
+#[cfg(feature = "model")]
+use bitflags::__impl_bitflags;
 use chrono::{DateTime, Utc};
 
 #[cfg(feature = "model")]
@@ -597,4 +599,31 @@ fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Opti
 
         cdn!("/guilds/{}/users/{}/avatars/{}.{}?size=1024", guild_id.0, user_id.0, hash, ext)
     })
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ThreadMember {
+    /// The id of the thread.
+    pub id: ChannelId,
+    /// The id of the user.
+    pub user_id: Option<UserId>,
+    /// The time the current user last joined the thread.
+    pub join_timestamp: DateTime<Utc>,
+    /// Any user-thread settings, currently only used for notifications
+    pub flags: ThreadMemberFlags,
+}
+
+/// Describes extra features of the message.
+#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct ThreadMemberFlags {
+    pub bits: u64,
+}
+
+#[cfg(feature = "model")]
+__impl_bitflags! {
+    ThreadMemberFlags: u64 {
+        // Not documented.
+        NOTIFICATIONS = 0b0000_0000_0000_0000_0000_0000_0000_0001;
+    }
 }

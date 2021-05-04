@@ -1074,6 +1074,9 @@ mod test {
             slow_mode_rate: Some(0),
             rtc_region: None,
             video_quality_mode: None,
+            message_count: None,
+            member_count: None,
+            member: None
         };
 
         // Add a channel delete event to the cache, the cached messages for that

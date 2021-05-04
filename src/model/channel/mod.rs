@@ -16,6 +16,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::de::{Error as DeError, Unexpected};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
@@ -245,9 +246,11 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 | 5 | 6 | 13 => serde_json::from_value::<GuildChannel>(Value::Object(v))
-                .map(Channel::Guild)
-                .map_err(DeError::custom),
+            0 | 2 | 5 | 6 | 10 | 11 | 12 | 13 => {
+                serde_json::from_value::<GuildChannel>(Value::Object(v))
+                    .map(Channel::Guild)
+                    .map_err(DeError::custom)
+            },
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
                 .map(Channel::Private)
                 .map_err(DeError::custom),
@@ -305,10 +308,16 @@ pub enum ChannelType {
     ///
     /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
     News = 5,
-    /// An indicator that the channel is a `StoreChannel]
+    /// An indicator that the channel is a `StoreChannel`
     ///
     /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
     Store = 6,
+    /// An indicator that the channel is a news thread [`GuildChannel`].
+    NewsThread = 10,
+    /// An indicator that the channel is a news thread [`GuildChannel`].
+    PublicThread = 11,
+    /// An indicator that the channel is a news thread [`GuildChannel`].
+    PrivateThread = 12,
     /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
     /// An indicator that the channel is of unknown type.
@@ -322,6 +331,9 @@ enum_number!(ChannelType {
     Category,
     News,
     Store,
+    NewsThread,
+    PublicThread,
+    PrivateThread,
     Stage
 });
 
@@ -335,6 +347,9 @@ impl ChannelType {
             ChannelType::Category => "category",
             ChannelType::News => "news",
             ChannelType::Store => "store",
+            ChannelType::NewsThread => "news_thread",
+            ChannelType::PublicThread => "public_thread",
+            ChannelType::PrivateThread => "private_thread",
             ChannelType::Stage => "stage",
             ChannelType::Unknown => "unknown",
         }
@@ -442,6 +457,24 @@ pub struct StageInstance {
     pub topic: String,
 }
 
+/// A thread data.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[non_exhaustive]pub struct ThreadMetadata {
+    /// Whether the thread is archived.
+    pub archived: bool,
+    /// Id of the user that last archived or unarchived the thread.
+    pub archiver_id: Option<UserId>,
+    /// Duration in minutes to automatically archive the thread after recent activity.
+    ///
+    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
+    pub auto_archive_duration: Option<u64>,
+    /// Timestamp when the thread's archive status was last changed, used for calculating recent activity.
+    pub archive_timestamp: Option<DateTime<Utc>>,
+    /// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
+    #[serde(default)]
+    pub locked: bool,
+}
+
 #[cfg(test)]
 mod test {
     #[cfg(all(feature = "model", feature = "utils"))]
@@ -466,6 +499,9 @@ mod test {
                 slow_mode_rate: Some(0),
                 rtc_region: None,
                 video_quality_mode: None,
+                message_count: None,
+                member_count: None,
+                member: None
             }
         }
 

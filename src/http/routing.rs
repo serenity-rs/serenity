@@ -110,6 +110,60 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdWebhooks(u64),
+    /// Route for the `/channels/:channel_id/messages/:message_id/threads` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdMessagesIdThreads(u64),
+    /// Route for the `/channels/:channel_id/threads` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdThreads(u64),
+    /// Route for the `/channels/:channel_id/thread-members/@me` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdThreadMembersMe(u64),
+    /// Route for the `/channels/:channel_id/thread-members/:user_id` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdThreadMembersUserId(u64),
+    /// Route for the `/channels/channel_id/thread-members` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdThreadMembers(u64),
+    /// Route for the `/channels/:channel_id/threads/active` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdActiveThreads(u64),
+    /// Route for the `/channels/:channel_id/threads/archived/public` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdPublicArchivedThreads(u64),
+    /// Route for the `/channels/:channel_id/threads/archived/private` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdPrivateArchivedThreads(u64),
+    /// Route for the `/channels/:channel_id/users/@me/threads/archived/private` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdMeJoindedPrivateArchivedThreads(u64),
     /// Route for the `/gateway` path.
     Gateway,
     /// Route for the `/gateway/bot` path.
@@ -489,6 +543,38 @@ impl Route {
 
     pub fn channel_webhooks(channel_id: u64) -> String {
         format!(api!("/channels/{}/webhooks"), channel_id)
+    }
+
+    pub fn channel_public_threads(channel_id: u64, message_id: u64) -> String {
+        format!(api!("/channels/{}/messages/{}/threads"), channel_id, message_id)
+    }
+
+    pub fn channel_private_threads(channel_id: u64) -> String {
+        format!(api!("/channels/{}/threads"), channel_id)
+    }
+
+    pub fn channel_thread_member(channel_id: u64, user_id: u64) -> String {
+        format!(api!("/channels/{}/thread-members/{}"), channel_id, user_id)
+    }
+
+    pub fn channel_thread_members(channel_id: u64) -> String {
+        format!(api!("/channels/{}/thread-members"), channel_id)
+    }
+
+    pub fn channel_active_threads(channel_id: u64) -> String {
+        format!(api!("/channels/{}/threads/active"), channel_id)
+    }
+
+    pub fn channel_public_archived_threads(channel_id: u64) -> String {
+        format!(api!("/channels/{}/threads/archived/public"), channel_id)
+    }
+
+    pub fn channel_private_archived_threads(channel_id: u64) -> String {
+        format!(api!("/channels/{}/threads/archived/private"), channel_id)
+    }
+
+    pub fn channel_private_joined_threads(channel_id: u64) -> String {
+        format!(api!("channels/{}/users/@me/threads/archived/private"), channel_id)
     }
 
     pub fn gateway() -> &'static str {

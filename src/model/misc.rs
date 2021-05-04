@@ -404,6 +404,9 @@ mod test {
                 slow_mode_rate: Some(0),
                 rtc_region: None,
                 video_quality_mode: None,
+                message_count: None,
+                member_count: None,
+                member: None
             });
             let emoji = Emoji {
                 animated: false,
