@@ -475,6 +475,18 @@ pub struct StageInstance {
     pub locked: bool,
 }
 
+/// A response to getting several threads channels.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct ThreadsData {
+    /// The threads channels.
+    pub threads: Vec<GuildChannel>,
+    /// A thread member for each returned thread the current user has joined.
+    pub members: Vec<ThreadMember>,
+    /// Whether there are potentially additional threads that could be returned on a subsequent call.
+    pub has_more: bool,
+}
+
 #[cfg(test)]
 mod test {
     #[cfg(all(feature = "model", feature = "utils"))]

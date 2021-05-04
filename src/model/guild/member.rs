@@ -620,7 +620,6 @@ pub struct ThreadMemberFlags {
     pub bits: u64,
 }
 
-#[cfg(feature = "model")]
 __impl_bitflags! {
     ThreadMemberFlags: u64 {
         // Not documented.

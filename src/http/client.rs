@@ -1984,6 +1984,137 @@ impl Http {
         .await
     }
 
+    /// Gets all thread members for a thread.
+    pub async fn get_channel_thread_members(&self, channel_id: u64) -> Result<Vec<ThreadMember>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetChannelThreadMembers {
+                channel_id,
+            },
+        })
+        .await
+    }
+
+    /// Gets all active threads from a channel.
+    pub async fn get_channel_active_threads(&self, channel_id: u64) -> Result<ThreadsData> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetChannelActiveThreads {
+                channel_id,
+            },
+        })
+        .await
+    }
+
+    /// Gets all archived public threads from a channel.
+    pub async fn get_channel_archived_public_threads(
+        &self,
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetChannelArchivedPublicThreads {
+                channel_id,
+                before,
+                limit,
+            },
+        })
+        .await
+    }
+
+    /// Gets all archived private threads from a channel.
+    pub async fn get_channel_archived_private_threads(
+        &self,
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetChannelArchivedPrivateThreads {
+                channel_id,
+                before,
+                limit,
+            },
+        })
+        .await
+    }
+
+    /// Gets all archived private threads joined from a channel.
+    pub async fn get_channel_joined_archived_private_threads(
+        &self,
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetChannelJoinedPrivateArchivedThreads {
+                channel_id,
+                before,
+                limit,
+            },
+        })
+        .await
+    }
+
+    /// Joins a thread channel.
+    pub async fn join_thread_channel(&self, channel_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::JoinThread {
+                channel_id,
+            },
+        })
+        .await
+    }
+
+    /// Leaves a thread channel.
+    pub async fn leave_thread_channel(&self, channel_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::LeaveThread {
+                channel_id,
+            },
+        })
+        .await
+    }
+
+    /// Adds a user to a thread channel.
+    pub async fn add_thread_channel_user(&self, channel_id: u64, user_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::AddThreadUser {
+                channel_id,
+                user_id,
+            },
+        })
+        .await
+    }
+
+    /// Removes a user to a thread channel.
+    pub async fn remove_thread_channel_user(&self, channel_id: u64, user_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::RemoveThreadUser {
+                channel_id,
+                user_id,
+            },
+        })
+        .await
+    }
+
     /// Retrieves the webhooks for the given [channel][`GuildChannel`]'s Id.
     ///
     /// This method requires authentication.
