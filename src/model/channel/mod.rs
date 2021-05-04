@@ -501,7 +501,7 @@ mod test {
                 video_quality_mode: None,
                 message_count: None,
                 member_count: None,
-                member: None
+                member: None,
             }
         }
 

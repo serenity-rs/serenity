@@ -115,7 +115,7 @@ pub struct GuildChannel {
     pub member_count: Option<u8>,
     /// Thread member object for the current user, if they have joined the thread,
     /// only included on certain API endpoints.
-    pub member: Option<ThreadMember>
+    pub member: Option<ThreadMember>,
 }
 
 #[cfg(feature = "model")]
