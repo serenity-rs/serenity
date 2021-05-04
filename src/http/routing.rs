@@ -1027,6 +1027,13 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
     },
     CreateStageInstance,
+    CreatePublicThread {
+        channel_id: u64,
+        message_id: u64,
+    },
+    CreatePrivateThread {
+        channel_id: u64,
+    },
     CreateEmoji {
         guild_id: u64,
     },
@@ -1584,6 +1591,21 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::CreateStageInstance => {
                 (LightMethod::Post, Route::StageInstances, Cow::from(Route::stage_instances()))
             },
+            RouteInfo::CreatePublicThread {
+                channel_id,
+                message_id,
+            } => (
+                LightMethod::Post,
+                Route::ChannelsIdMessagesIdThreads(channel_id),
+                Cow::from(Route::channel_public_threads(channel_id, message_id)),
+            ),
+            RouteInfo::CreatePrivateThread {
+                channel_id,
+            } => (
+                LightMethod::Post,
+                Route::ChannelsIdThreads(channel_id),
+                Cow::from(Route::channel_private_threads(channel_id)),
+            ),
             RouteInfo::CreateEmoji {
                 guild_id,
             } => (

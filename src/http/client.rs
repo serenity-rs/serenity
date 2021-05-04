@@ -370,12 +370,52 @@ impl Http {
         .await
     }
 
+
     /// Creates a stage instance.
     pub async fn create_stage_instance(&self, map: &Value) -> Result<StageInstance> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateStageInstance,
+        })
+        .await
+    }
+
+    /// Creates a public thread channel in the [`GuildChannel`] given its Id,
+    /// with a base message Id.
+    pub async fn create_public_thread(
+        &self,
+        channel_id: u64,
+        message_id: u64,
+        map: &JsonMap,
+    ) -> Result<GuildChannel> {
+        let body = serde_json::to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::CreatePublicThread {
+                channel_id,
+                message_id,
+            },
+        })
+        .await
+    }
+
+    /// Creates a private thread channel in the [`GuildChannel`] given its Id.
+    pub async fn create_private_thread(
+        &self,
+        channel_id: u64,
+        map: &JsonMap,
+    ) -> Result<GuildChannel> {
+        let body = serde_json::to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::CreatePrivateThread {
+                channel_id,
+            },
         })
         .await
     }
