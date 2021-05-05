@@ -420,6 +420,10 @@ pub struct ApplicationCommand {
     pub id: CommandId,
     /// The parent application Id.
     pub application_id: ApplicationId,
+    /// The command guild Id, if there is one.
+    ///
+    /// **Note**: It is only present if it is received through the gateway.
+    pub guild_id: Option<GuildId>,
     /// The command name.
     pub name: String,
     /// The command description.

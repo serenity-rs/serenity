@@ -468,6 +468,42 @@ pub trait EventHandler: Send + Sync {
         _application_id: Option<ApplicationId>,
     ) {
     }
+
+    /// Dispatched when an application command is created.
+    ///
+    /// Provides the application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_create(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
+    ) {
+    }
+
+    /// Dispatched when an application command is updated.
+    ///
+    /// Provides the application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_update(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
+    ) {
+    }
+
+    /// Dispatched when an application command is deleted.
+    ///
+    /// Provides the application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_delete(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
+    ) {
+    }
 }
 
 /// This core trait for handling raw events
