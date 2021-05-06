@@ -765,7 +765,7 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
-                event_handler.integration_create(context, event.integration, event.guild_id).await;
+                event_handler.integration_create(context, event.integration).await;
             });
         },
         #[cfg(feature = "unstable_discord_api")]
@@ -773,7 +773,7 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
-                event_handler.integration_update(context, event.integration, event.guild_id).await;
+                event_handler.integration_update(context, event.integration).await;
             });
         },
         #[cfg(feature = "unstable_discord_api")]

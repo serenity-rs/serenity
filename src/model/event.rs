@@ -1388,7 +1388,6 @@ impl Serialize for InteractionCreateEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct IntegrationCreateEvent {
-    pub guild_id: GuildId,
     pub integration: Integration,
 }
 
@@ -1396,17 +1395,10 @@ pub struct IntegrationCreateEvent {
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 impl<'de> Deserialize<'de> for IntegrationCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .ok_or_else(|| DeError::custom("expected guild_id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
+        let integration = Integration::deserialize(deserializer)?;
 
         Ok(Self {
-            guild_id,
-            integration: Integration::deserialize(Value::Object(map)).map_err(DeError::custom)?,
+            integration,
         })
     }
 }
@@ -1416,7 +1408,6 @@ impl<'de> Deserialize<'de> for IntegrationCreateEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct IntegrationUpdateEvent {
-    pub guild_id: GuildId,
     pub integration: Integration,
 }
 
@@ -1424,17 +1415,10 @@ pub struct IntegrationUpdateEvent {
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 impl<'de> Deserialize<'de> for IntegrationUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .ok_or_else(|| DeError::custom("expected guild_id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
+        let integration = Integration::deserialize(deserializer)?;
 
         Ok(Self {
-            guild_id,
-            integration: Integration::deserialize(Value::Object(map)).map_err(DeError::custom)?,
+            integration,
         })
     }
 }
