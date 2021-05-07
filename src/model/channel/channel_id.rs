@@ -364,11 +364,9 @@ impl ChannelId {
         let mut msg = EditMessage::default();
         f(&mut msg);
 
-        if let Some(content) = msg.0.get(&"content") {
-            if let Value::String(ref content) = *content {
-                if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-                }
+        if let Some(Value::String(ref content)) = msg.0.get("content") {
+            if let Some(length_over) = Message::overflow_length(content) {
+                return Err(Error::Model(ModelError::MessageTooLong(length_over)));
             }
         }
 

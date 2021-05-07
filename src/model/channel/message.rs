@@ -892,11 +892,9 @@ impl Message {
     }
 
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
-        if let Some(content) = map.get("content") {
-            if let Value::String(ref content) = *content {
-                if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-                }
+        if let Some(Value::String(ref content)) = map.get("content") {
+            if let Some(length_over) = Message::overflow_length(content) {
+                return Err(Error::Model(ModelError::MessageTooLong(length_over)));
             }
         }
 
