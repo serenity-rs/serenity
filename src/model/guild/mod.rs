@@ -2509,8 +2509,8 @@ impl<'de> Deserialize<'de> for Guild {
         #[allow(deprecated)]
         Ok(Self {
             afk_channel_id,
-            application_id,
             afk_timeout,
+            application_id,
             channels,
             default_message_notifications,
             emojis,
@@ -2547,8 +2547,8 @@ impl<'de> Deserialize<'de> for Guild {
             approximate_presence_count,
             nsfw,
             max_video_channel_users,
-            max_members,
             max_presences,
+            max_members,
             widget_enabled,
             widget_channel_id,
         })

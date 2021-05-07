@@ -137,11 +137,11 @@ impl ChannelCategory {
                 id,
                 guild_id,
                 category_id,
-                permission_overwrites,
-                nsfw,
-                name,
                 position,
                 kind,
+                name,
+                nsfw,
+                permission_overwrites,
                 ..
             } = channel;
 
@@ -149,11 +149,11 @@ impl ChannelCategory {
                 id,
                 guild_id,
                 category_id,
-                permission_overwrites,
-                nsfw,
-                name,
                 position,
                 kind,
+                name,
+                nsfw,
+                permission_overwrites,
             };
         })
     }
