@@ -228,7 +228,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
 [project:lavalink-rs]: https://gitlab.com/nitsuga5124/lavalink-rs/
 [project:songbird]: https://github.com/serenity-rs/songbird
-[repo:lavalink]: https://github.com/Frederikam/Lavalink
+[repo:lavalink]: https://github.com/freyacodes/Lavalink
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
 [rust 1.48.0+ badge]: https://img.shields.io/badge/rust-1.48.0+-93450a.svg?style=flat-square
