@@ -156,7 +156,7 @@ impl<'a> HttpBuilder<'a> {
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
     pub fn proxy(mut self, proxy: impl Into<String>) -> Result<Self> {
-        let proxy = Url::from_str(&proxy.into()).map_err(|e| HttpError::Url(e))?;
+        let proxy = Url::from_str(&proxy.into()).map_err(HttpError::Url)?;
         self.proxy = Some(proxy);
 
         Ok(self)
@@ -2728,7 +2728,7 @@ impl Http {
         };
 
         if let Some(proxy) = &self.proxy {
-            url.set_host(proxy.host_str()).map_err(|e| HttpError::Url(e))?;
+            url.set_host(proxy.host_str()).map_err(HttpError::Url)?;
             url.set_scheme(proxy.scheme()).map_err(|_| HttpError::InvalidScheme)?;
             url.set_port(proxy.port()).map_err(|_| HttpError::InvalidPort)?;
         }
