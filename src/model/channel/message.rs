@@ -1058,8 +1058,11 @@ enum_number!(MessageType {
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum MessageActivityKind {
+    #[allow(clippy::upper_case_acronyms)]
     JOIN = 1,
+    #[allow(clippy::upper_case_acronyms)]
     SPECTATE = 2,
+    #[allow(clippy::upper_case_acronyms)]
     LISTEN = 3,
     #[allow(non_camel_case_types)]
     JOIN_REQUEST = 5,
