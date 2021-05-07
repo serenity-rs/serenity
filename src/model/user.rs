@@ -999,7 +999,7 @@ impl<'a> From<&'a CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name.clone(),
-            public_flags: user.public_flags.clone(),
+            public_flags: user.public_flags,
         }
     }
 }
