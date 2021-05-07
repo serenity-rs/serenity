@@ -1434,7 +1434,7 @@ impl Guild {
                 Err(_) => (name, None),
             }
         } else {
-            (&name[..], None)
+            (name, None)
         };
 
         for member in self.members.values() {
