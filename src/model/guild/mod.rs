@@ -2692,7 +2692,7 @@ impl Serialize for GuildWelcomeChannel {
                     map.insert("emoji_id".to_owned(), Value::String(id.to_string()))
                 },
                 GuildWelcomeScreenEmoji::Unicode(name) => {
-                    map.insert("emoji_name".to_owned(), Value::String(name.to_string()))
+                    map.insert("emoji_name".to_owned(), Value::String(name))
                 },
             };
         };
