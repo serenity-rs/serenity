@@ -1382,7 +1382,7 @@ impl Http {
                 interaction_token,
             },
         })
-            .await
+        .await
     }
 
     /// Edits the initial interaction response.

@@ -738,7 +738,6 @@ pub struct MessageInteraction {
 }
 
 impl Interaction {
-
     /// Gets the interaction response.
     ///
     /// # Errors
@@ -816,9 +815,7 @@ impl Interaction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref()
-            .edit_original_interaction_response(&self.token, &Value::Object(map))
-            .await
+        http.as_ref().edit_original_interaction_response(&self.token, &Value::Object(map)).await
     }
 
     /// Deletes the initial interaction response.
@@ -827,10 +824,7 @@ impl Interaction {
     ///
     /// May return [`Error::Http`] if the API returns an error.
     /// Such as if the response was already deleted.
-    pub async fn delete_original_interaction_response(
-        &self,
-        http: impl AsRef<Http>,
-    ) -> Result<()> {
+    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_original_interaction_response(&self.token).await
     }
 
