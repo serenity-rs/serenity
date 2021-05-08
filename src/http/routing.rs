@@ -1063,6 +1063,12 @@ pub enum RouteInfo<'a> {
     },
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    GetOriginalInteractionResponse {
+        application_id: u64,
+        interaction_token: &'a str,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     EditOriginalInteractionResponse {
         application_id: u64,
         interaction_token: &'a str,
@@ -1748,6 +1754,18 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::GuildsIdMembersMeNick(guild_id),
                 Cow::from(Route::guild_nickname(guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetOriginalInteractionResponse {
+                application_id,
+                interaction_token,
+            } => (
+                LightMethod::Get,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_original_interaction_response(
+                    application_id,
+                    interaction_token,
+                )),
             ),
             #[cfg(feature = "unstable_discord_api")]
             RouteInfo::EditOriginalInteractionResponse {

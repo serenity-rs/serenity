@@ -738,6 +738,18 @@ pub struct MessageInteraction {
 }
 
 impl Interaction {
+
+    /// Gets the interaction response.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if there is no interaction response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    pub async fn get_interaction_response(&self, http: impl AsRef<Http>) -> Result<Message> {
+        http.as_ref().get_original_interaction_response(&self.token).await
+    }
+
     /// Creates a response to the interaction received.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
@@ -791,7 +803,6 @@ impl Interaction {
     pub async fn edit_original_interaction_response<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: u64,
         f: F,
     ) -> Result<Message>
     where
@@ -806,7 +817,7 @@ impl Interaction {
         Message::check_embed_length(&map)?;
 
         http.as_ref()
-            .edit_original_interaction_response(application_id, &self.token, &Value::Object(map))
+            .edit_original_interaction_response(&self.token, &Value::Object(map))
             .await
     }
 
@@ -819,9 +830,8 @@ impl Interaction {
     pub async fn delete_original_interaction_response(
         &self,
         http: impl AsRef<Http>,
-        application_id: u64,
     ) -> Result<()> {
-        http.as_ref().delete_original_interaction_response(application_id, &self.token).await
+        http.as_ref().delete_original_interaction_response(&self.token).await
     }
 
     /// Creates a followup response to the response sent.
@@ -840,7 +850,6 @@ impl Interaction {
     pub async fn create_followup_message<'a, F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: u64,
         wait: bool,
         f: F,
     ) -> Result<Option<Message>>
@@ -857,7 +866,7 @@ impl Interaction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_followup_message(application_id, &self.token, wait, &map).await
+        http.as_ref().create_followup_message(&self.token, wait, &map).await
     }
 }
 

@@ -395,7 +395,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
         wait: bool,
         map: &JsonMap,
@@ -410,7 +409,7 @@ impl Http {
                 body: Some(&body),
                 headers: Some(headers),
                 route: RouteInfo::CreateFollowupMessage {
-                    application_id,
+                    application_id: self.application_id,
                     interaction_token,
                     wait,
                 },
@@ -773,7 +772,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
         message_id: u64,
     ) -> Result<()> {
@@ -781,7 +779,7 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::DeleteFollowupMessage {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
                 message_id,
             },
@@ -941,14 +939,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_original_interaction_response(
         &self,
-        application_id: u64,
         interaction_token: &str,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
             route: RouteInfo::DeleteOriginalInteractionResponse {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
             },
         })
@@ -1108,7 +1105,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
         message_id: u64,
         map: &Value,
@@ -1117,7 +1113,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
                 message_id,
             },
@@ -1367,6 +1363,28 @@ impl Http {
         .await
     }
 
+    /// Gets the initial interaction response.
+    ///
+    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_original_interaction_response(
+        &self,
+        interaction_token: &str,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetOriginalInteractionResponse {
+                application_id: self.application_id,
+                interaction_token,
+            },
+        })
+            .await
+    }
+
     /// Edits the initial interaction response.
     ///
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
@@ -1376,7 +1394,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_original_interaction_response(
         &self,
-        application_id: u64,
         interaction_token: &str,
         map: &Value,
     ) -> Result<Message> {
@@ -1384,7 +1401,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
             },
         })
