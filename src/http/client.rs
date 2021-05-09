@@ -1364,10 +1364,6 @@ impl Http {
     }
 
     /// Gets the initial interaction response.
-    ///
-    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
-    ///
-    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_original_interaction_response(
