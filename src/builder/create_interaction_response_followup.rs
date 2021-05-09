@@ -4,6 +4,7 @@ use serde_json::Value;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::{http::AttachmentType, utils};
+use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 
 #[derive(Clone, Debug, Default)]
 pub struct CreateInteractionResponseFollowup<'a>(
@@ -22,6 +23,11 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
 
     fn _content(&mut self, content: String) -> &mut Self {
         self.0.insert("content", Value::String(content));
+        self
+    }
+
+    pub fn flags(&mut self, flags: InteractionApplicationCommandCallbackDataFlags) -> &mut Self {
+        self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits())));
         self
     }
 
