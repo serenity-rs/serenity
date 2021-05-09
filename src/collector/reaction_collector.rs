@@ -1,32 +1,27 @@
 use std::{
     boxed::Box,
     future::Future,
-    sync::Arc,
-    time::Duration,
     pin::Pin,
+    sync::Arc,
     task::{Context as FutContext, Poll},
+    time::Duration,
 };
-use tokio::{
-    sync::mpsc::{
-        unbounded_channel,
-        UnboundedReceiver as Receiver,
-        UnboundedSender as Sender,
-    },
-};
+
 use futures::{
     future::BoxFuture,
     stream::{Stream, StreamExt},
 };
-use crate::{
-    client::bridge::gateway::ShardMessenger,
-    model::channel::Reaction,
-    model::id::UserId,
+use tokio::sync::mpsc::{
+    unbounded_channel,
+    UnboundedReceiver as Receiver,
+    UnboundedSender as Sender,
 };
 #[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::{Delay as Sleep, delay_for as sleep};
-
+use tokio::time::{delay_for as sleep, Delay as Sleep};
 #[cfg(feature = "tokio")]
-use tokio::time::{Sleep, sleep};
+use tokio::time::{sleep, Sleep};
+
+use crate::{client::bridge::gateway::ShardMessenger, model::channel::Reaction, model::id::UserId};
 
 macro_rules! impl_reaction_collector {
     ($($name:ident;)*) => {
@@ -202,32 +197,38 @@ impl ReactionFilter {
     /// be sent by a specific author or in a specifc guild.
     fn is_passing_constraints(&self, reaction: &Arc<ReactionAction>) -> bool {
         let reaction = match **reaction {
-            ReactionAction::Added(ref reaction) => if self.options.accept_added {
-                reaction
-            } else {
-                return false;
+            ReactionAction::Added(ref reaction) => {
+                if self.options.accept_added {
+                    reaction
+                } else {
+                    return false;
+                }
             },
-            ReactionAction::Removed(ref reaction) => if self.options.accept_removed {
-                reaction
-            } else {
-                return false;
+            ReactionAction::Removed(ref reaction) => {
+                if self.options.accept_removed {
+                    reaction
+                } else {
+                    return false;
+                }
             },
         };
 
-        self.options.guild_id.map_or(true, |id| { Some(id) == reaction.guild_id.map(|g| g.0) })
-        && self.options.message_id.map_or(true, |id| { id == reaction.message_id.0 })
-        && self.options.channel_id.map_or(true, |id| { id == reaction.channel_id.0 })
-        && self.options.author_id.map_or(true, |id| { id == reaction.user_id.unwrap_or(UserId(0)).0 })
-        && self.options.filter.as_ref().map_or(true, |f| f(&reaction))
+        self.options.guild_id.map_or(true, |id| Some(id) == reaction.guild_id.map(|g| g.0))
+            && self.options.message_id.map_or(true, |id| id == reaction.message_id.0)
+            && self.options.channel_id.map_or(true, |id| id == reaction.channel_id.0)
+            && self
+                .options
+                .author_id
+                .map_or(true, |id| id == reaction.user_id.unwrap_or(UserId(0)).0)
+            && self.options.filter.as_ref().map_or(true, |f| f(&reaction))
     }
-
 
     /// Checks if the filter is within set receive and collect limits.
     /// A reaction is considered *received* even when it does not meet the
     /// constraints.
     fn is_within_limits(&self) -> bool {
-        self.options.filter_limit.map_or(true, |limit| { self.filtered < limit })
-        && self.options.collect_limit.map_or(true, |limit| { self.collected < limit })
+        self.options.filter_limit.map_or(true, |limit| self.filtered < limit)
+            && self.options.collect_limit.map_or(true, |limit| self.collected < limit)
     }
 }
 
@@ -288,7 +289,7 @@ impl<'a> ReactionCollectorBuilder<'a> {
 
 impl<'a> Future for ReactionCollectorBuilder<'a> {
     type Output = ReactionCollector;
-
+    #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
@@ -329,7 +330,7 @@ impl<'a> CollectReaction<'a> {
 
 impl<'a> Future for CollectReaction<'a> {
     type Output = Option<Arc<ReactionAction>>;
-
+    #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
@@ -342,7 +343,9 @@ impl<'a> Future for CollectReaction<'a> {
                 ReactionCollector {
                     receiver: Box::pin(receiver),
                     timeout,
-                }.next().await
+                }
+                .next()
+                .await
             }))
         }
 
@@ -383,7 +386,6 @@ impl Stream for ReactionCollector {
     type Item = Arc<ReactionAction>;
     fn poll_next(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Option<Self::Item>> {
         if let Some(ref mut timeout) = self.timeout {
-
             match timeout.as_mut().poll(ctx) {
                 Poll::Ready(_) => {
                     return Poll::Ready(None);

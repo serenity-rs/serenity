@@ -1,20 +1,19 @@
+use async_tungstenite::tungstenite::Message;
+use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
+
+use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionFilter};
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
-use super::{ShardClientMessage, ShardRunnerMessage, ChunkGuildFilter};
-use futures::channel::mpsc::{UnboundedSender as Sender, TrySendError};
-use async_tungstenite::tungstenite::Message;
-#[cfg(feature = "collector")]
-use crate::collector::{ReactionFilter, MessageFilter};
 
 /// A lightweight wrapper around an mpsc sender.
 ///
 /// This is used to cleanly communicate with a shard's respective
 /// [`ShardRunner`]. This can be used for actions such as setting the activity
-/// via [`set_activity`] or shutting down via [`shutdown_clean`].
+/// via [`Self::set_activity`] or shutting down via [`Self::shutdown_clean`].
 ///
 /// [`ShardRunner`]: super::ShardRunner
-/// [`set_activity`]: Self::set_activity
-/// [`shutdown_clean`]: Self::shutdown_clean
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
     pub(crate) tx: Sender<InterMessage>,
@@ -98,6 +97,7 @@ impl ShardMessenger {
         filter: ChunkGuildFilter,
         nonce: Option<String>,
     ) {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::ChunkGuild {
             guild_id,
             limit,
@@ -132,6 +132,7 @@ impl ShardMessenger {
     /// # }
     /// ```
     pub fn set_activity(&self, activity: Option<Activity>) {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetActivity(activity));
     }
 
@@ -168,6 +169,7 @@ impl ShardMessenger {
             status = OnlineStatus::Invisible;
         }
 
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetPresence(status, activity));
     }
 
@@ -209,12 +211,14 @@ impl ShardMessenger {
             online_status = OnlineStatus::Invisible;
         }
 
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetStatus(online_status));
     }
 
     /// Shuts down the websocket by attempting to cleanly close the
     /// connection.
     pub fn shutdown_clean(&self) {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::Close(1000, None));
     }
 
@@ -224,30 +228,35 @@ impl ShardMessenger {
     ///
     /// You should only use this if you know what you're doing. If you're
     /// wanting to, for example, send a presence update, prefer the usage of
-    /// the [`set_presence`] method.
-    ///
-    /// [`set_presence`]: Self::set_presence
+    /// the [`Self::set_presence`] method.
     pub fn websocket_message(&self, message: Message) {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::Message(message));
     }
 
     /// Sends a message to the shard.
+    /// # Errors
+    ///
+    /// Returns a [`TrySendError`] if the shard's receiver was closed.
     #[inline]
-    pub fn send_to_shard(&self, msg: ShardRunnerMessage)
-        -> Result<(), TrySendError<InterMessage>> {
+    pub fn send_to_shard(&self, msg: ShardRunnerMessage) -> Result<(), TrySendError<InterMessage>> {
         self.tx.unbounded_send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
     }
 
     /// Sets a new filter for a message collector.
     #[inline]
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn set_message_filter(&self, collector: MessageFilter) {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector));
     }
 
     /// Sets a new filter for a message collector.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn set_reaction_filter(&self, collector: ReactionFilter) {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector));
     }
 }

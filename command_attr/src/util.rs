@@ -1,17 +1,26 @@
-use crate::structures::CommandFun;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote, ToTokens};
 use syn::{
-    braced, bracketed, parenthesized,
+    braced,
+    bracketed,
+    parenthesized,
     parse::{Error, Parse, ParseStream, Result as SynResult},
     parse_quote,
     punctuated::Punctuated,
     spanned::Spanned,
     token::{Comma, Mut},
-    Ident, Lifetime, Lit, Type,
+    Attribute,
+    Ident,
+    Lifetime,
+    Lit,
+    Path,
+    PathSegment,
+    Type,
 };
+
+use crate::structures::CommandFun;
 
 pub trait LitExt {
     fn to_str(&self) -> String;
@@ -34,9 +43,7 @@ impl LitExt for Lit {
         if let Lit::Bool(b) = self {
             b.value
         } else {
-            self.to_str()
-                .parse()
-                .unwrap_or_else(|_| panic!("expected bool from {:?}", self))
+            self.to_str().parse().unwrap_or_else(|_| panic!("expected bool from {:?}", self))
         }
     }
 
@@ -245,5 +252,33 @@ pub fn populate_fut_lifetimes_on_refs(args: &mut Vec<Argument>) {
         if let Type::Reference(reference) = &mut arg.kind {
             reference.lifetime = Some(Lifetime::new("'fut", Span::call_site()));
         }
+    }
+}
+
+/// Renames all attributes that have a specific `name` to the `target`.
+pub fn rename_attributes(attributes: &mut Vec<Attribute>, name: &str, target: &str) {
+    for attr in attributes {
+        if attr.path.is_ident(name) {
+            attr.path = Path::from(PathSegment::from(Ident::new(target, Span::call_site())));
+        }
+    }
+}
+
+pub fn append_line(desc: &mut AsOption<String>, mut line: String) {
+    if line.starts_with(' ') {
+        line.remove(0);
+    }
+
+    let desc = desc.0.get_or_insert_with(String::default);
+
+    match line.rfind("\\$") {
+        Some(i) => {
+            desc.push_str(line[..i].trim_end());
+            desc.push(' ');
+        },
+        None => {
+            desc.push_str(&line);
+            desc.push('\n');
+        },
     }
 }

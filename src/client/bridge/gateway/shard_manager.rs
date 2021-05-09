@@ -1,14 +1,15 @@
-use crate::internal::prelude::*;
-use crate::CacheAndHttp;
-use tokio::time::timeout;
-use tokio::sync::{Mutex, RwLock};
 use std::{
     collections::{HashMap, VecDeque},
     sync::Arc,
 };
-use futures::channel::mpsc::{self, UnboundedSender as Sender, UnboundedReceiver as Receiver};
+
+use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
-use crate::client::{EventHandler, RawEventHandler};
+use tokio::sync::{Mutex, RwLock};
+use tokio::time::timeout;
+use tracing::{info, instrument, warn};
+use typemap_rev::TypeMap;
+
 use super::{
     GatewayIntents,
     ShardId,
@@ -18,13 +19,13 @@ use super::{
     ShardQueuerMessage,
     ShardRunnerInfo,
 };
-use tracing::{info, warn, instrument};
-
-use typemap_rev::TypeMap;
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
+use crate::client::{EventHandler, RawEventHandler};
+#[cfg(feature = "framework")]
+use crate::framework::Framework;
+use crate::internal::prelude::*;
+use crate::CacheAndHttp;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -211,7 +212,7 @@ impl ShardManager {
     /// Creating a client and then restarting a shard by ID:
     ///
     /// _(note: in reality this precise code doesn't have an effect since the
-    /// shard would not yet have been initialized via [`initialize`], but the
+    /// shard would not yet have been initialized via [`Self::initialize`], but the
     /// concept is the same)_
     ///
     /// ```rust,no_run
@@ -234,7 +235,6 @@ impl ShardManager {
     /// ```
     ///
     /// [`ShardRunner`]: super::ShardRunner
-    /// [`initialize`]: Self::initialize
     #[instrument(skip(self))]
     pub async fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
@@ -265,6 +265,7 @@ impl ShardManager {
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
     #[instrument(skip(self))]
+    #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
@@ -272,19 +273,18 @@ impl ShardManager {
 
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
         match timeout(TIMEOUT, self.shard_shutdown.next()).await {
-            Ok(Some(shutdown_shard_id)) =>
+            Ok(Some(shutdown_shard_id)) => {
                 if shutdown_shard_id != shard_id {
                     warn!(
                         "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
                         shard_id,
                     );
-                },
+                }
+            },
             Ok(None) => (),
-            Err(why) => warn!(
-                "Failed to cleanly shutdown shard {}, reached timeout: {:?}",
-                shard_id,
-                why,
-            ),
+            Err(why) => {
+                warn!("Failed to cleanly shutdown shard {}, reached timeout: {:?}", shard_id, why,)
+            },
         }
 
         self.runners.lock().await.remove(&shard_id);
@@ -294,10 +294,9 @@ impl ShardManager {
     /// for that are still known to be running.
     ///
     /// If you only need to shutdown a select number of shards, prefer looping
-    /// over the [`shutdown`] method.
-    ///
-    /// [`shutdown`]: Self::shutdown
+    /// over the [`Self::shutdown`] method.
     #[instrument(skip(self))]
+    #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown_all(&mut self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -324,6 +323,8 @@ impl ShardManager {
         info!("Telling shard queuer to start shard {}", shard_info[0]);
 
         let msg = ShardQueuerMessage::Start(shard_info[0], shard_info[1]);
+
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.shard_queuer.unbounded_send(msg);
     }
 }
@@ -335,6 +336,7 @@ impl Drop for ShardManager {
     /// [`ShardQueuer`] to shutdown.
     ///
     /// [`ShardRunner`]: super::ShardRunner
+    #[allow(clippy::let_underscore_must_use)]
     fn drop(&mut self) {
         let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown);
         let _ = self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated);

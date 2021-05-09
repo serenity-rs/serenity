@@ -1,12 +1,14 @@
-use tokio::sync::Mutex;
 use std::sync::Arc;
+
+use futures::{
+    channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},
+    StreamExt,
+};
+use tokio::sync::Mutex;
+use tracing::{debug, instrument, warn};
+
 use super::{ShardManager, ShardManagerMessage};
 use crate::client::bridge::gateway::ShardId;
-use tracing::{debug, warn, instrument};
-use futures::{
-    StreamExt,
-    channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},
-};
 
 /// The shard manager monitor monitors the shard manager and performs actions
 /// on it as received.
@@ -61,9 +63,15 @@ impl ShardManagerMonitor {
             match value {
                 ShardManagerMessage::Restart(shard_id) => {
                     self.manager.lock().await.restart(shard_id).await;
-                    let _  = self.shutdown.unbounded_send(shard_id);
+
+                    #[allow(clippy::let_underscore_must_use)]
+                    let _ = self.shutdown.unbounded_send(shard_id);
                 },
-                ShardManagerMessage::ShardUpdate { id, latency, stage } => {
+                ShardManagerMessage::ShardUpdate {
+                    id,
+                    latency,
+                    stage,
+                } => {
                     let manager = self.manager.lock().await;
                     let mut runners = manager.runners.lock().await;
 
@@ -71,10 +79,12 @@ impl ShardManagerMonitor {
                         runner.latency = latency;
                         runner.stage = stage;
                     }
-                }
+                },
                 ShardManagerMessage::Shutdown(shard_id, code) => {
                     self.manager.lock().await.shutdown(shard_id, code).await;
-                    let _  = self.shutdown.unbounded_send(shard_id);
+
+                    #[allow(clippy::let_underscore_must_use)]
+                    let _ = self.shutdown.unbounded_send(shard_id);
                 },
                 ShardManagerMessage::ShutdownAll => {
                     self.manager.lock().await.shutdown_all().await;
@@ -90,7 +100,7 @@ impl ShardManagerMonitor {
                             why
                         );
                     }
-                }
+                },
                 ShardManagerMessage::ShardInvalidAuthentication => {
                     self.manager.lock().await.shutdown_all().await;
                     return Err(ShardManagerError::InvalidToken);

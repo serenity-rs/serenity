@@ -1,11 +1,8 @@
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    }
+    fmt::{Display, Formatter, Result as FmtResult},
 };
+
 use async_tungstenite::tungstenite::protocol::CloseFrame;
 
 /// An error that occurred while attempting to deal with the gateway.
@@ -76,7 +73,9 @@ impl Display for Error {
             Error::OverloadedShard => f.write_str("Shard has too many guilds"),
             Error::ReconnectFailure => f.write_str("Failed to Reconnect"),
             Error::InvalidGatewayIntents => f.write_str("Invalid gateway intents were provided"),
-            Error::DisallowedGatewayIntents => f.write_str("Disallowed gateway intents were provided"),
+            Error::DisallowedGatewayIntents => {
+                f.write_str("Disallowed gateway intents were provided")
+            },
         }
     }
 }

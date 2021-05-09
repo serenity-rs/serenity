@@ -1,30 +1,31 @@
-use crate::internal::prelude::*;
-use crate::model::ModelError;
-use serde_json::Error as JsonError;
 use std::{
     error::Error as StdError,
-    fmt::{
-        self,
-        Display,
-        Error as FormatError
-    },
+    fmt::{self, Display, Error as FormatError},
     io::Error as IoError,
-    num::ParseIntError
+    num::ParseIntError,
 };
-use tracing::instrument;
 
-#[cfg(feature = "http")]
-use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "gateway")]
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;
+#[cfg(feature = "http")]
+use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
+use serde_json::Error as JsonError;
+use tracing::instrument;
+
 #[cfg(feature = "client")]
 use crate::client::ClientError;
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
-#[cfg(all(feature = "gateway", feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+use crate::internal::prelude::*;
+#[cfg(all(
+    feature = "gateway",
+    feature = "rustls_backend_marker",
+    not(feature = "native_tls_backend_marker")
+))]
 use crate::internal::ws_impl::RustlsError;
+use crate::model::ModelError;
 
 /// The common result type between most library functions.
 ///
@@ -38,11 +39,8 @@ pub type Result<T> = StdResult<T, Error>;
 /// custom [`Result`].
 ///
 /// The most common error types, the [`ClientError`] and [`GatewayError`]
-/// enums, are both wrapped around this in the form of the [`Client`] and
-/// [`Gateway`] variants.
-///
-/// [`Client`]: Error::Client
-/// [`Gateway`]: Error::Gateway
+/// enums, are both wrapped around this in the form of the [`Self::Client`] and
+/// [`Self::Gateway`] variants.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
@@ -50,9 +48,9 @@ pub enum Error {
     Decode(&'static str, Value),
     /// There was an error with a format.
     Format(FormatError),
-    /// An `std::io` error.
+    /// An [`std::io`] error.
     Io(IoError),
-    /// An error from the `serde_json` crate.
+    /// An error from the [`serde_json`] crate.
     Json(JsonError),
     /// An error from the [`model`] module.
     ///
@@ -63,26 +61,35 @@ pub enum Error {
     /// Input exceeded a limit.
     /// Providing the input and the limit that's not supposed to be exceeded.
     ///
-    /// *This only exists for the `GuildId::ban` and `Member::ban` functions. For their cases,
+    /// *This only exists for the [`GuildId::ban`] and [`Member::ban`] functions. For their cases,
     /// it's the "reason".*
+    ///
+    /// [`GuildId::ban`]: crate::model::id::GuildId::ban
+    /// [`Member::ban`]: crate::model::guild::Member::ban
     ExceededLimit(String, u32),
     /// The input is not in the specified range.
-    /// Returned by `GuildId::members`, `Guild::members` and `PartialGuild::members`
+    /// Returned by [`GuildId::members`], [`Guild::members`] and [`PartialGuild::members`]
     ///
     /// (param_name, value, range_min, range_max)
+    ///
+    /// [`GuildId::members`]: crate::model::id::GuildId::members
+    /// [`Guild::members`]: crate::model::guild::Guild::members
+    /// [`PartialGuild::members`]: crate::model::guild::PartialGuild::members
     NotInRange(&'static str, u64, u64, u64),
     /// Some other error. This is only used for "Expected value <TYPE>" errors,
     /// when a more detailed error can not be easily provided via the
     /// [`Error::Decode`] variant.
     Other(&'static str),
-    /// An error from the `url` crate.
+    /// An error from the [`url`] crate.
     Url(String),
     /// A [client] error.
     ///
     /// [client]: crate::client
     #[cfg(feature = "client")]
     Client(ClientError),
-    /// An error from the `gateway` module.
+    /// An error from the [`gateway`] module.
+    ///
+    /// [`gateway`]: crate::gateway
     #[cfg(feature = "gateway")]
     Gateway(GatewayError),
     /// An error from the [`http`] module.
@@ -91,7 +98,11 @@ pub enum Error {
     #[cfg(feature = "http")]
     Http(Box<HttpError>),
     /// An error occuring in rustls
-    #[cfg(all(feature = "gateway", feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+    #[cfg(all(
+        feature = "gateway",
+        feature = "rustls_backend_marker",
+        not(feature = "native_tls_backend_marker")
+    ))]
     Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
@@ -99,53 +110,79 @@ pub enum Error {
 }
 
 impl From<FormatError> for Error {
-    fn from(e: FormatError) -> Error { Error::Format(e) }
+    fn from(e: FormatError) -> Error {
+        Error::Format(e)
+    }
 }
 
 #[cfg(feature = "gateway")]
 impl From<GatewayError> for Error {
-    fn from(e: GatewayError) -> Error { Error::Gateway(e) }
+    fn from(e: GatewayError) -> Error {
+        Error::Gateway(e)
+    }
 }
 
 impl From<IoError> for Error {
-    fn from(e: IoError) -> Error { Error::Io(e) }
+    fn from(e: IoError) -> Error {
+        Error::Io(e)
+    }
 }
 
 impl From<JsonError> for Error {
-    fn from(e: JsonError) -> Error { Error::Json(e) }
+    fn from(e: JsonError) -> Error {
+        Error::Json(e)
+    }
 }
 
 impl From<ParseIntError> for Error {
-    fn from(e: ParseIntError) -> Error { Error::Num(e) }
+    fn from(e: ParseIntError) -> Error {
+        Error::Num(e)
+    }
 }
 
 impl From<ModelError> for Error {
-    fn from(e: ModelError) -> Error { Error::Model(e) }
+    fn from(e: ModelError) -> Error {
+        Error::Model(e)
+    }
 }
 
-#[cfg(all(feature = "gateway", feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(
+    feature = "gateway",
+    feature = "rustls_backend_marker",
+    not(feature = "native_tls_backend_marker")
+))]
 impl From<RustlsError> for Error {
-    fn from(e: RustlsError) -> Error { Error::Rustls(e) }
+    fn from(e: RustlsError) -> Error {
+        Error::Rustls(e)
+    }
 }
 
 #[cfg(feature = "gateway")]
 impl From<TungsteniteError> for Error {
-    fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
+    fn from(e: TungsteniteError) -> Error {
+        Error::Tungstenite(e)
+    }
 }
 
 #[cfg(feature = "http")]
 impl From<HttpError> for Error {
-    fn from(e: HttpError) -> Error { Error::Http(Box::new(e)) }
+    fn from(e: HttpError) -> Error {
+        Error::Http(Box::new(e))
+    }
 }
 
 #[cfg(feature = "http")]
 impl From<InvalidHeaderValue> for Error {
-    fn from(e: InvalidHeaderValue) -> Error { HttpError::InvalidHeader(e).into() }
+    fn from(e: InvalidHeaderValue) -> Error {
+        HttpError::InvalidHeader(e).into()
+    }
 }
 
 #[cfg(feature = "http")]
 impl From<ReqwestError> for Error {
-    fn from(e: ReqwestError) -> Error { HttpError::Request(e).into() }
+    fn from(e: ReqwestError) -> Error {
+        HttpError::Request(e).into()
+    }
 }
 
 impl Display for Error {
@@ -189,7 +226,11 @@ impl StdError for Error {
             Error::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
             Error::Http(inner) => Some(inner),
-            #[cfg(all(feature = "gateway", feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+            #[cfg(all(
+                feature = "gateway",
+                feature = "rustls_backend_marker",
+                not(feature = "native_tls_backend_marker")
+            ))]
             Error::Rustls(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => Some(inner),

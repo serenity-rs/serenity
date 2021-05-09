@@ -6,9 +6,10 @@
 
 pub type JsonMap = Map<String, Value>;
 
-pub use crate::error::{Error, Result};
-pub use serde_json::{Map, Number, Value};
 pub use std::result::Result as StdResult;
+
+pub use serde_json::{Map, Number, Value};
 
 #[cfg(feature = "client")]
 pub use crate::client::ClientError;
+pub use crate::error::{Error, Result};

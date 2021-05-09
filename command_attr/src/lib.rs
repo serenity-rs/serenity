@@ -6,10 +6,13 @@ use proc_macro2::Span;
 use quote::quote;
 use syn::{
     parse::{Error, Parse, ParseStream, Result},
-    parse_macro_input, parse_quote,
+    parse_macro_input,
+    parse_quote,
     punctuated::Punctuated,
     spanned::Spanned,
-    Ident, Lit, Token,
+    Ident,
+    Lit,
+    Token,
 };
 
 pub(crate) mod attributes;
@@ -78,7 +81,8 @@ macro_rules! match_options {
 /// Documentation comments (`///`) applied onto the function are interpreted as sugar for the
 /// `#[description]` option. When more than one application of the option is performed,
 /// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
-/// which are sugar for the `#[doc = "..."]` attribute.
+/// which are sugar for the `#[doc = "..."]` attribute. If you wish to join lines together,
+/// however, you have to end the previous lines with `\$`.
 ///
 /// # Notes
 /// The name of the command is parsed from the applied function,
@@ -118,26 +122,14 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
                 options.min_args = AsOption(Some(args));
                 options.max_args = AsOption(Some(args));
-            }
+            },
             "example" => {
-                options
-                    .examples
-                    .push(propagate_err!(attributes::parse(values)));
-            }
+                options.examples.push(propagate_err!(attributes::parse(values)));
+            },
             "description" => {
-                let mut arg: String = propagate_err!(attributes::parse(values));
-                if arg.starts_with(' ') {
-                    arg.remove(0);
-                }
-
-                if let Some(desc) = &mut options.description.0 {
-                    use std::fmt::Write;
-
-                    let _ = write!(desc, "\n{}", arg);
-                } else {
-                    options.description = AsOption(Some(arg));
-                }
-            }
+                let line: String = propagate_err!(attributes::parse(values));
+                util::append_line(&mut options.description, line);
+            },
             _ => {
                 match_options!(name, values, options, span => [
                     checks;
@@ -155,7 +147,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                     owner_privilege;
                     sub_commands
                 ]);
-            }
+            },
         }
     }
 
@@ -186,10 +178,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let visibility = fun.visibility;
     let name = fun.name.clone();
     let options = name.with_suffix(COMMAND_OPTIONS);
-    let sub_commands = sub_commands
-        .into_iter()
-        .map(|i| i.with_suffix(COMMAND))
-        .collect::<Vec<_>>();
+    let sub_commands = sub_commands.into_iter().map(|i| i.with_suffix(COMMAND)).collect::<Vec<_>>();
     let body = fun.body;
     let ret = fun.ret;
 
@@ -237,7 +226,10 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         #visibility fn #name<'fut> (#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
-            async move { #(#body)* }.boxed()
+            async move {
+                let output: #ret = { #(#body)* };
+                output
+            }.boxed()
         }
     })
     .into()
@@ -275,6 +267,8 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[lacking_role(s)]` </br> `#[lacking_role = s]`                                                                                              | If a user lacks required roles, this will treat how commands will be displayed.                                                                                                                                                                  | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
 /// | `#[lacking_ownership(s)]` </br> `#[lacking_ownership = s]`                                                                                    | If a user lacks ownership, this will treat how these commands will be displayed.                                                                                                                                                                 | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
 /// | `#[lacking_permissions(s)]` </br> `#[lacking_permissions = s]`                                                                                | If a user lacks permissions, this will treat how commands will be displayed.                                                                                                                                                                     | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
+/// | `#[lacking_conditions(s)]` </br> `#[lacking_conditions = s]`                                                                                  | If conditions (of a check) may be lacking by the user, this will treat how these commands will be displayed.                                                                                                                                     | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
+/// | `#[wrong_channel(s)]` </br> `#[wrong_channel = s]`                                                                                            | If a user is using the help-command in a channel where a command is not available, this behaviour will be executed.                                                                                                                              | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
 /// | `#[embed_error_colour(n)]`                                                                                                                    | Colour that the help-embed will use upon an error.                                                                                                                                                                                               | `n` is a name to one of the provided constants of the `Colour` struct or an RGB value `#RRGGBB`.           |
 /// | `#[embed_success_colour(n)]`                                                                                                                  | Colour that the help-embed will use normally.                                                                                                                                                                                                    | `n` is a name to one of the provided constants of the `Colour` struct or an RGB value `#RRGGBB`.           |
 /// | `#[max_levenshtein_distance(n)]`                                                                                                              | How much should the help command search for a similiar name.</br> Indicator for a nested guild. The prefix will be repeated based on what kind of level the item sits. A sub-group would be level two, a sub-sub-group would be level three.     | `n` is a 64-bit, unsigned integer.                                                                         |
@@ -300,6 +294,24 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     } else {
         vec!["help".to_string()]
     };
+
+    // Revert the change for the names of documentation attributes done when
+    // parsing the function input with `CommandFun`.
+    util::rename_attributes(&mut fun.attributes, "description", "doc");
+
+    // Additionally, place the documentation attributes to the `cooked` list
+    // to prevent the macro from rejecting them as invalid attributes.
+    {
+        let mut i = 0;
+        while i < fun.attributes.len() {
+            if fun.attributes[i].path.is_ident("doc") {
+                fun.cooked.push(fun.attributes.remove(i));
+                continue;
+            }
+
+            i += 1;
+        }
+    }
 
     let mut options = HelpOptions::default();
 
@@ -509,7 +521,10 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         pub fn #nn<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
-            async move { #(#body)* }.boxed()
+            async move {
+                let output: #ret = { #(#body)* };
+                output
+            }.boxed()
         }
     })
     .into()
@@ -531,7 +546,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// This group macro purports all of the said purposes above, applied onto a `struct`:
 ///
-/// ```rust,no_run
+/// ```rust,ignore
 /// use command_attr::{command, group};
 ///
 /// # type CommandResult = ();
@@ -584,6 +599,12 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[description(desc)]` </br> `#[description = desc]` | The group's description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |
 /// | `#[summary(desc)]` </br> `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |
 ///
+/// Documentation comments (`///`) applied onto the struct are interpreted as sugar for the
+/// `#[description]` option. When more than one application of the option is performed,
+/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
+/// which are sugar for the `#[doc = "..."]` attribute. If you wish to join lines together,
+/// however, you have to end the previous lines with `\$`.
+///
 /// Similarly to [`command`], this macro generates static instances of the group
 /// and its options. The identifiers of these instances are based off the name of the struct to differentiate
 /// this group from others. This name is given as the default value of the group's `name` field,
@@ -614,18 +635,11 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         match name {
             "prefix" => {
                 options.prefixes = vec![propagate_err!(attributes::parse(values))];
-            }
+            },
             "description" => {
-                let arg: String = propagate_err!(attributes::parse(values));
-
-                if let Some(desc) = &mut options.description.0 {
-                    use std::fmt::Write;
-
-                    let _ = write!(desc, "\n{}", arg.trim_matches(' '));
-                } else {
-                    options.description = AsOption(Some(arg));
-                }
-            }
+                let line: String = propagate_err!(attributes::parse(values));
+                util::append_line(&mut options.description, line);
+            },
             "summary" => {
                 let arg: String = propagate_err!(attributes::parse(values));
 
@@ -636,7 +650,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
                 } else {
                     options.summary = AsOption(Some(arg));
                 }
-            }
+            },
             _ => match_options!(name, values, options, span => [
                 prefixes;
                 only_in;
@@ -679,15 +693,9 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         quote!(&#i)
     });
 
-    let commands = commands
-        .into_iter()
-        .map(|c| c.with_suffix(COMMAND))
-        .collect::<Vec<_>>();
+    let commands = commands.into_iter().map(|c| c.with_suffix(COMMAND)).collect::<Vec<_>>();
 
-    let sub_groups = sub_groups
-        .into_iter()
-        .map(|c| c.with_suffix(GROUP))
-        .collect::<Vec<_>>();
+    let sub_groups = sub_groups.into_iter().map(|c| c.with_suffix(GROUP)).collect::<Vec<_>>();
 
     let options = group.name.with_suffix(GROUP_OPTIONS);
     let options_path = quote!(serenity::framework::standard::GroupOptions);
@@ -756,7 +764,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
                 return Error::new(span, format_args!("invalid attribute: {:?}", n))
                     .to_compile_error()
                     .into();
-            }
+            },
         }
     }
 
@@ -768,11 +776,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let n = fun.name.clone();
     let n2 = name.clone();
     let visibility = fun.visibility;
-    let name = if name == "<fn>" {
-        fun.name.clone()
-    } else {
-        Ident::new(&name, Span::call_site())
-    };
+    let name = if name == "<fn>" { fun.name.clone() } else { Ident::new(&name, Span::call_site()) };
     let name = name.with_suffix(CHECK);
 
     let check = quote!(serenity::framework::standard::Check);
@@ -796,12 +800,123 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
         #visibility fn #n<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
-            async move { #(#body)* }.boxed()
+            async move {
+                let output: #ret = { #(#body)* };
+                output
+            }.boxed()
         }
     })
     .into()
 }
 
+/// A macro that transforms `async` functions (and closures) into plain functions, whose
+/// return type is a boxed [`Future`].
+///
+/// # Transformation
+///
+/// The macro transforms an `async` function, which may look like this:
+///
+/// ```rust,no_run
+/// async fn foo(n: i32) -> i32 {
+///     n + 4
+/// }
+/// ```
+///
+/// into this (some details omitted):
+///
+/// ```rust,no_run
+/// use std::future::Future;
+/// use std::pin::Pin;
+///
+/// fn foo(n: i32) -> Pin<Box<dyn std::future::Future<Output = i32>>> {
+///     Box::pin(async move {
+///         n + 4
+///     })
+/// }
+/// ```
+///
+/// This transformation also applies to closures, which are converted more simply. For instance,
+/// this closure:
+///
+/// ```rust,no_run
+/// # #![feature(async_closure)]
+/// #
+/// async move |x: i32| {
+///     x * 2 + 4
+/// }
+/// # ;
+/// ```
+///
+/// is changed to:
+///
+/// ```rust,no_run
+/// |x: i32| {
+///     Box::pin(async move {
+///         x * 2 + 4
+///     })
+/// }
+/// # ;
+/// ```
+///
+/// ## How references are handled
+///
+/// When a function contains references, their lifetimes are constrained to the returned
+/// [`Future`]. If the above `foo` function had `&i32` as a parameter, the transformation would be
+/// instead this:
+///
+/// ```rust,no_run
+/// use std::future::Future;
+/// use std::pin::Pin;
+///
+/// fn foo<'fut>(n: &'fut i32) -> Pin<Box<dyn std::future::Future<Output = i32> + 'fut>> {
+///     Box::pin(async move {
+///         *n + 4
+///     })
+/// }
+/// ```
+///
+/// Explicitly specifying lifetimes (in the parameters or in the return type) or complex usage of
+/// lifetimes (e.g. `'a: 'b`) is not supported.
+///
+/// # Necessity for the macro
+///
+/// The macro performs the transformation to permit the framework to store and invoke the functions.
+///
+/// Functions marked with the `async` keyword will wrap their return type with the [`Future`] trait,
+/// which a state-machine generated by the compiler for the function will implement. This complicates
+/// matters for the framework, as [`Future`] is a trait. Depending on a type that implements a trait
+/// is done with two methods in Rust:
+///
+/// 1. static dispatch - generics
+/// 2. dynamic dispatch - trait objects
+///
+/// First method is infeasible for the framework. Typically, the framework will contain a plethora
+/// of different commands that will be stored in a single list. And due to the nature of generics,
+/// generic types can only resolve to a single concrete type. If commands had a generic type for
+/// their function's return type, the framework would be unable to store commands, as only a single
+/// [`Future`] type from one of the commands would get resolved, preventing other commands from being
+/// stored.
+///
+/// Second method involves heap allocations, but is the only working solution. If a trait is
+/// object-safe (which [`Future`] is), the compiler can generate a table of function pointers
+/// (a vtable) that correspond to certain implementations of the trait. This allows to decide
+/// which implementation to use at runtime. Thus, we can use the interface for the [`Future`] trait,
+/// and avoid depending on the underlying value (such as its size). To opt-in to dynamic dispatch,
+/// trait objects must be used with a pointer, like references (`&` and `&mut`) or `Box`. The
+/// latter is what's used by the macro, as the ownership of the value (the state-machine) must be
+/// given to the caller, the framework in this case.
+///
+/// The macro exists to retain the normal syntax of `async` functions (and closures), while
+/// granting the user the ability to pass those functions to the framework, like command functions
+/// and hooks (`before`, `after`, `on_dispatch_error`, etc.).
+///
+/// # Notes
+///
+/// If applying the macro on an `async` closure, you will need to enable the `async_closure`
+/// feature. Inputs to procedural macro attributes must be valid Rust code, and `async`
+/// closures are not stable yet.
+///
+/// [`Future`]: std::future::Future
 #[proc_macro_attribute]
 pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let hook = parse_macro_input!(input as Hook);
@@ -823,7 +938,10 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
                 #visibility fn #fun_name<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
                     use ::serenity::futures::future::FutureExt;
 
-                    async move { #(#body)* }.boxed()
+                    async move {
+                        let output: #ret = { #(#body)* };
+                        output
+                    }.boxed()
                 }
             })
                 .into()
@@ -841,8 +959,8 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
                     async move { #body }.boxed()
                 }
-            }).into()
+            })
+            .into()
         },
     }
-
 }

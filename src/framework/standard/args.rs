@@ -1,11 +1,11 @@
-use uwl::Stream;
-
+use std::borrow::Cow;
 use std::error::Error as StdError;
 use std::marker::PhantomData;
 use std::{fmt, str::FromStr};
-use std::borrow::Cow;
 
-/// Defines how an operation on an `Args` method failed.
+use uwl::Stream;
+
+/// Defines how an operation on an [`Args`] method failed.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error<E> {
@@ -36,7 +36,7 @@ impl<E: fmt::Debug + fmt::Display> StdError for Error<E> {}
 
 type Result<T, E> = ::std::result::Result<T, Error<E>>;
 
-/// Dictates how `Args` should split arguments, if by one character, or a string.
+/// Dictates how [`Args`] should split arguments, if by one character, or a string.
 #[derive(Debug, Clone)]
 pub enum Delimiter {
     Single(char),
@@ -96,7 +96,10 @@ struct Token {
 impl Token {
     #[inline]
     fn new(kind: TokenKind, start: usize, end: usize) -> Self {
-        Token { kind, span: (start, end) }
+        Token {
+            kind,
+            span: (start, end),
+        }
     }
 }
 
@@ -180,7 +183,6 @@ enum State {
 /// assert_eq!(args.single::<String>().unwrap(), "hello");
 /// // Same here.
 /// assert_eq!(args.single::<String>().unwrap(), "world!");
-///
 /// ```
 ///
 /// We can also parse "quoted arguments" (no pun intended):
@@ -231,7 +233,7 @@ enum State {
 /// ```
 ///
 /// Hmm, taking a glance at the prior example, it seems we have an issue with reading the same argument over and over.
-/// Is there a more sensible solution than rewinding...? Actually, there is! The `current` and `parse` methods:
+/// Is there a more sensible solution than rewinding...? Actually, there is! The [`Self::current`] and [`Self::parse`] methods:
 ///
 /// ```rust
 /// use serenity::framework::standard::{Args, Delimiter};
@@ -261,7 +263,7 @@ pub struct Args {
 }
 
 impl Args {
-    /// Create a new instance of `Args` for parsing arguments.
+    /// Create a new instance of [`Args`] for parsing arguments.
     ///
     /// For more reference, look at [`Args`]'s struct documentation.
     ///
@@ -390,21 +392,21 @@ impl Args {
         let mut s = s;
 
         match self.state {
-            State::None => {}
+            State::None => {},
             State::Quoted => {
                 s = remove_quotes(s);
-            }
+            },
             State::Trimmed => {
                 s = trim(s);
-            }
+            },
             State::QuotedTrimmed => {
                 s = remove_quotes(s);
                 s = trim(s);
-            }
+            },
             State::TrimmedQuoted => {
                 s = trim(s);
                 s = remove_quotes(s);
-            }
+            },
         }
 
         s
@@ -412,11 +414,11 @@ impl Args {
 
     /// Retrieve the current argument.
     ///
-    /// Applies modifications set by [`trimmed`] and [`quoted`].
+    /// Applies modifications set by [`Self::trimmed`] and [`Self::quoted`].
     ///
     /// # Note
     ///
-    /// This borrows `Args` for the entire lifetime of the returned argument.
+    /// This borrows [`Args`] for the entire lifetime of the returned argument.
     ///
     /// # Examples
     ///
@@ -431,9 +433,6 @@ impl Args {
     /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
-    ///
-    /// [`trimmed`]: Self::trimmed
-    /// [`quoted`]: Self::quoted
     #[inline]
     pub fn current(&self) -> Option<&str> {
         if self.is_empty() {
@@ -467,7 +466,7 @@ impl Args {
         match self.state {
             State::None => self.state = State::Trimmed,
             State::Quoted => self.state = State::QuotedTrimmed,
-            _ => {}
+            _ => {},
         }
 
         self
@@ -477,14 +476,12 @@ impl Args {
     ///
     /// # Examples
     ///
-    /// Refer to [`trimmed`]'s examples.
-    ///
-    /// [`trimmed`]: Self::trimmed
+    /// Refer to [`Self::trimmed`]'s examples.
     pub fn untrimmed(&mut self) -> &mut Self {
         match self.state {
             State::Trimmed => self.state = State::None,
             State::QuotedTrimmed | State::TrimmedQuoted => self.state = State::Quoted,
-            _ => {}
+            _ => {},
         }
 
         self
@@ -521,7 +518,7 @@ impl Args {
             match self.state {
                 State::None => self.state = State::Quoted,
                 State::Trimmed => self.state = State::TrimmedQuoted,
-                _ => {}
+                _ => {},
             }
         }
 
@@ -532,14 +529,12 @@ impl Args {
     ///
     /// # Examples
     ///
-    /// Refer to [`quoted`]'s examples.
-    ///
-    /// [`quoted`]: Self::quoted
+    /// Refer to [`Self::quoted`]'s examples.
     pub fn unquoted(&mut self) -> &mut Self {
         match self.state {
             State::Quoted => self.state = State::None,
             State::QuotedTrimmed | State::TrimmedQuoted => self.state = State::Trimmed,
-            _ => {}
+            _ => {},
         }
 
         self
@@ -547,7 +542,7 @@ impl Args {
 
     /// Parse the current argument.
     ///
-    /// Modifications of [`trimmed`] and [`quoted`] are also applied if they were called.
+    /// Modifications of [`Self::trimmed`] and [`Self::quoted`] are also applied if they were called.
     ///
     /// # Examples
     ///
@@ -560,8 +555,10 @@ impl Args {
     /// assert_eq!(args.current(), Some("4"));
     /// ```
     ///
-    /// [`trimmed`]: Self::trimmed
-    /// [`quoted`]: Self::quoted
+    /// # Errors
+    ///
+    /// May return either [`Error::Parse`] if a parse error occurs, or
+    /// [`Error::Eos`] if there are no further remaining args.
     #[inline]
     pub fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
         T::from_str(self.current().ok_or(Error::Eos)?).map_err(Error::Parse)
@@ -569,8 +566,8 @@ impl Args {
 
     /// Parse the current argument and advance.
     ///
-    /// Shorthand for calling [`parse`], storing the result,
-    /// calling [`advance`] and returning the result.
+    /// Shorthand for calling [`Self::parse`], storing the result,
+    /// calling [`Self::advance`] and returning the result.
     ///
     /// # Examples
     ///
@@ -586,8 +583,9 @@ impl Args {
     /// assert!(args.is_empty());
     /// ```
     ///
-    /// [`parse`]: Self::parse
-    /// [`advance`]: Self::advance
+    /// # Errors
+    ///
+    /// May return the same errors as `parse`.
     #[inline]
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.parse::<T>()?;
@@ -611,6 +609,9 @@ impl Args {
     /// assert!(args.is_empty());
     /// ```
     ///
+    /// # Errors
+    ///
+    /// May return the same errors as [`Self::parse`].
     #[inline]
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.quoted().parse::<T>()?;
@@ -621,7 +622,7 @@ impl Args {
     /// By starting from the current offset, iterate over
     /// any available arguments until there are none.
     ///
-    /// Modifications of [`trimmed`] and [`quoted`] are also applied to all arguments if they were called.
+    /// Modifications of [`Iter::trimmed`] and [`Iter::quoted`] are also applied to all arguments if they were called.
     ///
     /// # Examples
     ///
@@ -640,9 +641,6 @@ impl Args {
     ///
     /// assert!(args.is_empty());
     /// ```
-    ///
-    /// [`trimmed`]: Iter::trimmed
-    /// [`quoted`]: Iter::quoted
     #[inline]
     pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T> {
         Iter {
@@ -703,7 +701,7 @@ impl Args {
     ///
     /// # Note 2
     /// "Arguments queue" is the list which contains all arguments that were deemed unique as defined by quotations and delimiters.
-    /// The 'removed' argument can be, likewise, still accessed via `message`.
+    /// The 'removed' argument can be, likewise, still accessed via [`Self::message`].
     ///
     /// # Examples
     ///
@@ -716,6 +714,12 @@ impl Args {
     /// assert_eq!(args.single::<String>().unwrap(), "c4");
     /// assert!(args.is_empty());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Eos`] if no argument can be parsed.
+    ///
+    /// [`Error::Eos`]: Error::Eos
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -758,6 +762,12 @@ impl Args {
     /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Eos`] if no argument can be parsed.
+    ///
+    /// [`Error::Eos`]: Error::Eos
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -796,7 +806,7 @@ impl Args {
 
     /// Starting from the offset, return the remainder of available arguments.
     ///
-    /// Returns `None` if there are no remaining arguments.
+    /// Returns [`None`] if there are no remaining arguments.
     #[inline]
     pub fn remains(&self) -> Option<&str> {
         if self.is_empty() {
@@ -814,7 +824,7 @@ impl Args {
     /// # Note
     ///
     /// The value returned is to be assumed to stay static.
-    /// However, if `find` was called previously, and was successful, then the value is substracted by one.
+    /// However, if [`Self::find`] was called previously, and was successful, then the value is substracted by one.
     #[inline]
     pub fn len(&self) -> usize {
         self.args.len()
@@ -844,6 +854,7 @@ pub struct Iter<'a, T: FromStr> {
     _marker: PhantomData<T>,
 }
 
+#[allow(clippy::missing_errors_doc)]
 impl<'a, T: FromStr> Iter<'a, T> {
     /// Retrieve the current argument.
     pub fn current(&mut self) -> Option<&str> {
@@ -863,7 +874,7 @@ impl<'a, T: FromStr> Iter<'a, T> {
         match self.state {
             State::None => self.state = State::Quoted,
             State::Trimmed => self.state = State::TrimmedQuoted,
-            _ => {}
+            _ => {},
         }
 
         self
@@ -875,7 +886,7 @@ impl<'a, T: FromStr> Iter<'a, T> {
         match self.state {
             State::None => self.state = State::Trimmed,
             State::Quoted => self.state = State::QuotedTrimmed,
-            _ => {}
+            _ => {},
         }
 
         self

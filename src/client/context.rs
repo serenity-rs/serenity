@@ -1,18 +1,19 @@
-#[cfg(feature = "gateway")]
-use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(feature = "gateway")]
-use crate::gateway::InterMessage;
-use crate::model::prelude::*;
 use std::sync::Arc;
-use tokio::sync::RwLock;
+
 use futures::channel::mpsc::UnboundedSender as Sender;
-use crate::http::Http;
+use tokio::sync::RwLock;
 use typemap_rev::TypeMap;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
+#[cfg(feature = "gateway")]
+use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionFilter};
+#[cfg(feature = "gateway")]
+use crate::gateway::InterMessage;
+use crate::http::Http;
+use crate::model::prelude::*;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -20,7 +21,7 @@ use crate::collector::{MessageFilter, ReactionFilter};
 /// [`Shard`] which received the event, or the low-level [`http`] module.
 ///
 /// The context contains "shortcuts", like for interacting with the shard.
-/// Methods like [`set_activity`] will unlock the shard and perform an update for
+/// Methods like [`Self::set_activity`] will unlock the shard and perform an update for
 /// you to save a bit of work.
 ///
 /// A context will only live for the event it was dispatched for. After the
@@ -28,7 +29,6 @@ use crate::collector::{MessageFilter, ReactionFilter};
 ///
 /// [`Shard`]: crate::gateway::Shard
 /// [`http`]: crate::http
-/// [`set_activity`]: Self::set_activity
 #[derive(Clone)]
 pub struct Context {
     /// A clone of [`Client::data`]. Refer to its documentation for more
@@ -65,11 +65,7 @@ impl Context {
     }
 
     #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
-    pub fn easy(
-        data: Arc<RwLock<TypeMap>>,
-        shard_id: u64,
-        http: Arc<Http>,
-    ) -> Context {
+    pub fn easy(data: Arc<RwLock<TypeMap>>, shard_id: u64, http: Arc<Http>) -> Context {
         Context {
             shard_id,
             data,
@@ -241,10 +237,10 @@ impl Context {
         self.shard.set_status(OnlineStatus::Invisible);
     }
 
-    /// "Resets" the current user's presence, by setting the activity to `None`
+    /// "Resets" the current user's presence, by setting the activity to [`None`]
     /// and the online status to [`Online`].
     ///
-    /// Use [`set_presence`] for fine-grained control over individual details.
+    /// Use [`Self::set_presence`] for fine-grained control over individual details.
     ///
     /// # Examples
     ///
@@ -273,7 +269,6 @@ impl Context {
     ///
     /// [`Event::Resumed`]: crate::model::event::Event::Resumed
     /// [`Online`]: OnlineStatus::Online
-    /// [`set_presence`]: Self::set_presence
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn reset_presence(&self) {
@@ -392,6 +387,7 @@ impl Context {
     /// sent back to `filter`'s paired receiver.
     #[inline]
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub async fn set_message_filter(&self, filter: MessageFilter) {
         self.shard.set_message_filter(filter);
     }
@@ -400,21 +396,28 @@ impl Context {
     /// sent back to `filter`'s paired receiver.
     #[inline]
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
         self.shard.set_reaction_filter(filter);
     }
 }
 
 impl AsRef<Http> for Context {
-    fn as_ref(&self) -> &Http { &self.http }
+    fn as_ref(&self) -> &Http {
+        &self.http
+    }
 }
 
 impl AsRef<Http> for Arc<Context> {
-    fn as_ref(&self) -> &Http { &self.http }
+    fn as_ref(&self) -> &Http {
+        &self.http
+    }
 }
 
 impl AsRef<Arc<Http>> for Context {
-    fn as_ref(&self) -> &Arc<Http> { &self.http }
+    fn as_ref(&self) -> &Arc<Http> {
+        &self.http
+    }
 }
 
 #[cfg(feature = "cache")]

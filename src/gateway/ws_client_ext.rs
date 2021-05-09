@@ -1,15 +1,17 @@
+use std::env::consts;
+use std::time::SystemTime;
+
+use async_trait::async_trait;
+use serde_json::json;
+use tracing::instrument;
+use tracing::{debug, trace};
+
 use crate::client::bridge::gateway::{ChunkGuildFilter, GatewayIntents};
 use crate::constants::{self, OpCode};
 use crate::gateway::{CurrentPresence, WsStream};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
 use crate::model::id::GuildId;
-use async_trait::async_trait;
-use serde_json::json;
-use std::env::consts;
-use std::time::SystemTime;
-use tracing::instrument;
-use tracing::{debug, trace};
 
 #[async_trait]
 pub trait WebSocketGatewayClientExt {
@@ -22,11 +24,14 @@ pub trait WebSocketGatewayClientExt {
         nonce: Option<&str>,
     ) -> Result<()>;
 
-    async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
-        -> Result<()>;
+    async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>) -> Result<()>;
 
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: GatewayIntents)
-        -> Result<()>;
+    async fn send_identify(
+        &mut self,
+        shard_info: &[u64; 2],
+        token: &str,
+        intents: GatewayIntents,
+    ) -> Result<()>;
 
     async fn send_presence_update(
         &mut self,
@@ -59,14 +64,14 @@ impl WebSocketGatewayClientExt for WsStream {
         let mut payload = json!({
             "op": OpCode::GetGuildMembers.num(),
             "d": {
-                "guild_id": [guild_id.as_ref().0],
+                "guild_id": guild_id.as_ref().0.to_string(),
                 "limit": limit.unwrap_or(0),
                 "nonce": nonce.unwrap_or(""),
             },
         });
 
         match filter {
-            ChunkGuildFilter::None => {},
+            ChunkGuildFilter::None => payload["d"]["query"] = json!(""),
             ChunkGuildFilter::Query(query) => payload["d"]["query"] = json!(query),
             ChunkGuildFilter::UserIds(user_ids) => {
                 let ids = user_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
@@ -78,19 +83,24 @@ impl WebSocketGatewayClientExt for WsStream {
     }
 
     #[instrument(skip(self))]
-    async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
-        -> Result<()> {
+    async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>) -> Result<()> {
         trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
         self.send_json(&json!({
             "d": seq,
             "op": OpCode::Heartbeat.num(),
-        })).await.map_err(From::from)
+        }))
+        .await
+        .map_err(From::from)
     }
 
     #[instrument(skip(self, token))]
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: GatewayIntents)
-        -> Result<()> {
+    async fn send_identify(
+        &mut self,
+        shard_info: &[u64; 2],
+        token: &str,
+        intents: GatewayIntents,
+    ) -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
         self.send_json(&json!({
@@ -108,7 +118,8 @@ impl WebSocketGatewayClientExt for WsStream {
                     "$os": consts::OS,
                 },
             },
-        })).await
+        }))
+        .await
     }
 
     #[instrument(skip(self))]
@@ -134,10 +145,11 @@ impl WebSocketGatewayClientExt for WsStream {
                     "url": x.url,
                 })),
             },
-        })).await
+        }))
+        .await
     }
 
-    #[instrument(skip(self))]
+    #[instrument(skip(self, token))]
     async fn send_resume(
         &mut self,
         shard_info: &[u64; 2],
@@ -154,6 +166,8 @@ impl WebSocketGatewayClientExt for WsStream {
                 "seq": seq,
                 "token": token,
             },
-        })).await.map_err(From::from)
+        }))
+        .await
+        .map_err(From::from)
     }
 }

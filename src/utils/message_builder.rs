@@ -1,22 +1,23 @@
-use crate::model::{
-    guild::Emoji,
-    id::{ChannelId, RoleId, UserId},
-    misc::Mentionable
-};
 use std::{
     default::Default,
     fmt::{self, Display, Write},
-    ops::Add
+    ops::Add,
+};
+
+use crate::model::{
+    guild::Emoji,
+    id::{ChannelId, RoleId, UserId},
+    misc::Mentionable,
 };
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
 ///
-/// The finalized value can be accessed via [`build`] or the inner value.
+/// The finalized value can be accessed via [`Self::build`] or the inner value.
 ///
 /// # Examples
 ///
-/// Build a message, mentioning a [`user`] and an [`emoji`], and retrieving the
+/// Build a message, mentioning a [`Self::user`] and an [`Self::emoji`], and retrieving the
 /// value:
 ///
 /// ```rust,no_run
@@ -46,10 +47,6 @@ use std::{
 ///     .build();
 /// # }
 /// ```
-///
-/// [`build`]: Self::build
-/// [`emoji`]: Self::emoji
-/// [`user`]: Self::user
 #[derive(Clone, Debug, Default)]
 pub struct MessageBuilder(pub String);
 
@@ -58,7 +55,7 @@ impl MessageBuilder {
     ///
     /// # Examples
     ///
-    /// Create a new `MessageBuilder`:
+    /// Create a new [`MessageBuilder`]:
     ///
     /// ```rust
     /// use serenity::utils::MessageBuilder;
@@ -68,7 +65,9 @@ impl MessageBuilder {
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
-    pub fn new() -> MessageBuilder { MessageBuilder::default() }
+    pub fn new() -> MessageBuilder {
+        MessageBuilder::default()
+    }
 
     /// Pulls the inner value out of the builder.
     ///
@@ -83,10 +82,7 @@ impl MessageBuilder {
     ///
     /// let channel_id = ChannelId(81384788765712384);
     ///
-    /// let content = MessageBuilder::new()
-    ///     .channel(channel_id)
-    ///     .push("!")
-    ///     .build();
+    /// let content = MessageBuilder::new().channel(channel_id).push("!").build();
     ///
     /// assert_eq!(content, "<#81384788765712384>!");
     /// ```
@@ -101,14 +97,16 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content.build(), "test");
     /// ```
-    pub fn build(&mut self) -> String { self.clone().0 }
+    pub fn build(&mut self) -> String {
+        self.clone().0
+    }
 
     /// Mentions the [`GuildChannel`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`ChannelId`]. Refer to
-    /// `ChannelId`'s documentation for more information.
+    /// [`ChannelId`]'s documentation for more information.
     ///
-    /// Refer to `ChannelId`'s [Display implementation] for more information on
+    /// Refer to [`ChannelId`]'s [Display implementation] for more information on
     /// how this is formatted.
     ///
     /// # Examples
@@ -121,10 +119,7 @@ impl MessageBuilder {
     ///
     /// let channel_id = ChannelId(81384788765712384);
     ///
-    /// let content = MessageBuilder::new()
-    ///     .push("The channel is: ")
-    ///     .channel(channel_id)
-    ///     .build();
+    /// let content = MessageBuilder::new().push("The channel is: ").channel(channel_id).build();
     ///
     /// assert_eq!(content, "The channel is: <#81384788765712384>");
     /// ```
@@ -138,14 +133,16 @@ impl MessageBuilder {
     }
 
     fn _channel(&mut self, channel: ChannelId) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", channel.mention());
+        // should not error, ignoring
 
         self
     }
 
     /// Displays the given emoji in the built message.
     ///
-    /// Refer to `Emoji`s [Display implementation] for more information on how
+    /// Refer to [`Emoji`]s [Display implementation] for more information on how
     /// this is formatted.
     ///
     /// # Examples
@@ -171,11 +168,7 @@ impl MessageBuilder {
     /// #     "roles": Vec::<Role>::new(),
     /// # })).unwrap();
     ///
-    /// let message = MessageBuilder::new()
-    ///     .push("foo ")
-    ///     .emoji(&emoji)
-    ///     .push(".")
-    ///     .build();
+    /// let message = MessageBuilder::new().push("foo ").emoji(&emoji).push(".").build();
     ///
     /// assert_eq!(message, "foo <:smugAnimeFace:302516740095606785>.");
     /// # }
@@ -183,14 +176,18 @@ impl MessageBuilder {
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
     pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", emoji);
+        // should not error, ignoring
 
         self
     }
 
     /// Mentions something that implements the [`Mentionable`] trait.
     pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", item.mention());
+        // should not error, ignoring
 
         self
     }
@@ -209,7 +206,13 @@ impl MessageBuilder {
     /// let mut message = MessageBuilder::new();
     /// message.push("test");
     ///
-    /// assert_eq!({ message.push("ing"); message.build() }, "testing");
+    /// assert_eq!(
+    ///     {
+    ///         message.push("ing");
+    ///         message.build()
+    ///     },
+    ///     "testing"
+    /// );
     /// ```
     #[inline]
     pub fn push<D: I>(&mut self, content: D) -> &mut Self {
@@ -249,9 +252,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, expected);
     /// ```
-    ///
+    /// 
     /// Pushing a codeblock without a language:
-    ///
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
@@ -295,9 +297,7 @@ impl MessageBuilder {
     ///     .push(".")
     ///     .build();
     ///
-    /// let expected = format!("The setting `{}` for this server is `{}`.",
-    ///                        key,
-    ///                        value);
+    /// let expected = format!("The setting `{}` for this server is `{}`.", key, value);
     ///
     /// assert_eq!(content, expected);
     /// ```
@@ -547,10 +547,8 @@ impl MessageBuilder {
     pub fn push_safe<C: I>(&mut self, content: C) -> &mut Self {
         {
             let mut c = content.into();
-            c.inner = normalize(&c.inner)
-                .replace('*', "\\*")
-                .replace('`', "\\`")
-                .replace('_', "\\_");
+            c.inner =
+                normalize(&c.inner).replace('*', "\\*").replace('`', "\\`").replace('_', "\\_");
 
             self.0.push_str(&c.to_string());
         }
@@ -676,9 +674,8 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new().push_line_safe("Hello @everyone")
-    ///                                    .push("How are you?")
-    ///                                    .build();
+    /// let content =
+    ///     MessageBuilder::new().push_line_safe("Hello @everyone").push("How are you?").build();
     ///
     /// assert_eq!(content, "Hello @\u{200B}everyone\nHow are you?");
     /// ```
@@ -698,9 +695,8 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_mono_line_safe("`hello @everyone`")
-    ///                 .push("world").build();
+    /// let content =
+    ///     MessageBuilder::new().push_mono_line_safe("`hello @everyone`").push("world").build();
     ///
     /// assert_eq!(content, "`'hello @\u{200B}everyone'`\nworld");
     /// ```
@@ -720,9 +716,8 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_italic_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let content =
+    ///     MessageBuilder::new().push_italic_line_safe("@everyone").push("Isn't a mention.").build();
     ///
     /// assert_eq!(content, "_@\u{200B}everyone_\nIsn't a mention.");
     /// ```
@@ -742,9 +737,8 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_bold_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let content =
+    ///     MessageBuilder::new().push_bold_line_safe("@everyone").push("Isn't a mention.").build();
     ///
     /// assert_eq!(content, "**@\u{200B}everyone**\nIsn't a mention.");
     /// ```
@@ -765,8 +759,9 @@ impl MessageBuilder {
     /// use serenity::utils::MessageBuilder;
     ///
     /// let content = MessageBuilder::new()
-    ///                 .push_underline_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    ///     .push_underline_line_safe("@everyone")
+    ///     .push("Isn't a mention.")
+    ///     .build();
     ///
     /// assert_eq!(content, "__@\u{200B}everyone__\nIsn't a mention.");
     /// ```
@@ -787,9 +782,8 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_strike_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let content =
+    ///     MessageBuilder::new().push_strike_line_safe("@everyone").push("Isn't a mention.").build();
     ///
     /// assert_eq!(content, "~~@\u{200B}everyone~~\nIsn't a mention.");
     /// ```
@@ -810,9 +804,8 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_spoiler_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let content =
+    ///     MessageBuilder::new().push_spoiler_line_safe("@everyone").push("Isn't a mention.").build();
     ///
     /// assert_eq!(content, "||@\u{200B}everyone||\nIsn't a mention.");
     /// ```
@@ -833,9 +826,8 @@ impl MessageBuilder {
     /// ```rust
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let content = MessageBuilder::new()
-    ///                 .push_quote_line_safe("@everyone")
-    ///                 .push("Isn't a mention.").build();
+    /// let content =
+    ///     MessageBuilder::new().push_quote_line_safe("@everyone").push("Isn't a mention.").build();
     ///
     /// assert_eq!(content, "> @\u{200B}everyone\nIsn't a mention.");
     /// ```
@@ -856,15 +848,17 @@ impl MessageBuilder {
     /// Mentions the [`Role`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`RoleId`]. Refer to
-    /// `RoleId`'s documentation for more information.
+    /// [`RoleId`]'s documentation for more information.
     ///
-    /// Refer to `RoleId`'s [Display implementation] for more information on how
+    /// Refer to [`RoleId`]'s [Display implementation] for more information on how
     /// this is formatted.
     ///
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
     pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", role.into().mention());
+        // should not error, ignoring
 
         self
     }
@@ -872,15 +866,17 @@ impl MessageBuilder {
     /// Mentions the [`User`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`UserId`]. Refer to
-    /// `UserId`'s documentation for more information.
+    /// [`UserId`]'s documentation for more information.
     ///
-    /// Refer to `UserId`'s [Display implementation] for more information on how
+    /// Refer to [`UserId`]'s [Display implementation] for more information on how
     /// this is formatted.
     ///
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
     pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", user.into().mention());
+        // should not error, ignoring
 
         self
     }
@@ -899,16 +895,16 @@ impl Display for MessageBuilder {
     ///
     /// ```rust
     /// use serenity::utils::MessageBuilder;
-    ///
-    ///
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
+    }
 }
 
 /// A trait with additional functionality over the [`MessageBuilder`] for
 /// creating content with additional functionality available only in embeds.
 ///
 /// Namely, this allows you to create named links via the non-escaping
-/// [`push_named_link`] method and the escaping [`push_named_link_safe`] method.
+/// [`Self::push_named_link`] method and the escaping [`Self::push_named_link_safe`] method.
 ///
 /// # Examples
 ///
@@ -917,21 +913,18 @@ impl Display for MessageBuilder {
 /// ```rust
 /// #[cfg(feature = "utils")]
 /// {
-/// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
 ///
-/// let msg = MessageBuilder::new()
-///     .push_named_link("Rust's GitHub", "https://github.com/rust-lang")
-///     .build();
+///     let msg = MessageBuilder::new()
+///         .push_named_link("Rust's GitHub", "https://github.com/rust-lang")
+///         .build();
 ///
-/// assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
+///     assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
 /// }
 ///
 /// #[cfg(not(feature = "utils"))]
 /// {}
 /// ```
-///
-/// [`push_named_link`]: Self::push_named_link
-/// [`push_named_link_safe`]: Self::push_named_link_safe
 pub trait EmbedMessageBuilding {
     /// Pushes a named link to a message, intended for use in embeds.
     ///
@@ -942,14 +935,14 @@ pub trait EmbedMessageBuilding {
     /// ```rust
     /// #[cfg(feature = "utils")]
     /// {
-    /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+    ///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    /// let mut msg = MessageBuilder::new();
-    /// msg.push("Rust's website: ");
-    /// msg.push_named_link("Homepage", "https://rust-lang.org");
-    /// let content = msg.build();
+    ///     let mut msg = MessageBuilder::new();
+    ///     msg.push("Rust's website: ");
+    ///     msg.push_named_link("Homepage", "https://rust-lang.org");
+    ///     let content = msg.build();
     ///
-    /// assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
+    ///     assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
     /// }
     ///
     /// #[cfg(not(feature = "utils"))]
@@ -960,28 +953,29 @@ pub trait EmbedMessageBuilding {
     /// Pushes a named link intended for use in an embed, but with a normalized
     /// name to avoid escaping issues.
     ///
-    /// Refer to [`push_named_link`] for more information.
+    /// Refer to [`Self::push_named_link`] for more information.
     ///
     /// # Examples
     ///
     /// ```rust
     /// #[cfg(feature = "utils")]
     /// {
-    /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+    ///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    /// let mut msg = MessageBuilder::new();
-    /// msg.push("A weird website name: ");
-    /// msg.push_named_link_safe("Try to ] break links (](", "https://rust-lang.org");
-    /// let content = msg.build();
+    ///     let mut msg = MessageBuilder::new();
+    ///     msg.push("A weird website name: ");
+    ///     msg.push_named_link_safe("Try to ] break links (](", "https://rust-lang.org");
+    ///     let content = msg.build();
     ///
-    /// assert_eq!(content, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
+    ///     assert_eq!(
+    ///         content,
+    ///         "A weird website name: [Try to   break links ( (](https://rust-lang.org)"
+    ///     );
     /// }
     ///
     /// #[cfg(not(feature = "utils"))]
     /// {}
     /// ```
-    ///
-    /// [`push_named_link`]: Self::push_named_link
     fn push_named_link_safe<T: I, U: I>(&mut self, name: T, url: U) -> &mut Self;
 }
 
@@ -990,7 +984,9 @@ impl EmbedMessageBuilding for MessageBuilder {
         let name = name.into().to_string();
         let url = url.into().to_string();
 
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "[{}]({})", name, url);
+        // error cannot be returned, ignoring instead
 
         self
     }
@@ -1141,14 +1137,13 @@ impl Content {
             }
         }
 
-        let capacity =
-            self.inner.len() +
-            self.spoiler.unwrap_with(4) +
-            self.bold.unwrap_with(4) +
-            self.italic.unwrap_with(2) +
-            self.strikethrough.unwrap_with(4) +
-            self.underline.unwrap_with(4) +
-            self.code.unwrap_with(2);
+        let capacity = self.inner.len()
+            + self.spoiler.unwrap_with(4)
+            + self.bold.unwrap_with(4)
+            + self.italic.unwrap_with(2)
+            + self.strikethrough.unwrap_with(4)
+            + self.underline.unwrap_with(4)
+            + self.code.unwrap_with(2);
 
         let mut new_str = String::with_capacity(capacity);
 
@@ -1207,12 +1202,15 @@ impl Content {
 }
 
 impl From<ContentModifier> for Content {
-    fn from(cm: ContentModifier) -> Content { cm.to_content() }
+    fn from(cm: ContentModifier) -> Content {
+        cm.to_content()
+    }
 }
 
 mod private {
-    use super::{Content, ContentModifier};
     use std::fmt;
+
+    use super::{Content, ContentModifier};
 
     pub trait A {}
 
@@ -1220,7 +1218,6 @@ mod private {
     impl A for Content {}
     impl<T: fmt::Display> A for T {}
 }
-
 
 /// This trait exists for the purpose of bypassing the "conflicting implementations" error from the compiler.
 pub trait I: self::private::A {
@@ -1242,11 +1239,15 @@ impl<T: fmt::Display> I for T {
 }
 
 impl I for ContentModifier {
-    fn into(self) -> Content { self.to_content() }
+    fn into(self) -> Content {
+        self.to_content()
+    }
 }
 
 impl I for Content {
-    fn into(self) -> Content { self }
+    fn into(self) -> Content {
+        self
+    }
 }
 
 fn normalize(text: &str) -> String {
@@ -1273,11 +1274,11 @@ fn normalize(text: &str) -> String {
 
 #[cfg(test)]
 mod test {
-    use crate::model::prelude::*;
     use super::{
-        ContentModifier::{Spoiler, Bold, Code, Italic},
+        ContentModifier::{Bold, Code, Italic, Spoiler},
         MessageBuilder,
     };
+    use crate::model::prelude::*;
 
     macro_rules! gen {
         ($($fn:ident => [$($text:expr => $expected:expr),+]),+) => ({
@@ -1291,17 +1292,13 @@ mod test {
 
     #[test]
     fn code_blocks() {
-        let content = MessageBuilder::new()
-            .push_codeblock("test", Some("rb"))
-            .build();
+        let content = MessageBuilder::new().push_codeblock("test", Some("rb")).build();
         assert_eq!(content, "```rb\ntest\n```");
     }
 
     #[test]
     fn safe_content() {
-        let content = MessageBuilder::new()
-            .push_safe("@everyone discord.gg/discord-api")
-            .build();
+        let content = MessageBuilder::new().push_safe("@everyone discord.gg/discord-api").build();
         assert_ne!(content, "@everyone discord.gg/discord-api");
     }
 
@@ -1316,19 +1313,17 @@ mod test {
         let content_emoji = MessageBuilder::new()
             .emoji(&Emoji {
                 animated: false,
+                available: true,
                 id: EmojiId(32),
                 name: "Rohrkatze".to_string(),
                 managed: false,
                 require_colons: true,
                 roles: vec![],
+                user: None,
             })
             .build();
-        let content_mentions = MessageBuilder::new()
-            .channel(1)
-            .mention(&UserId(2))
-            .role(3)
-            .user(4)
-            .build();
+        let content_mentions =
+            MessageBuilder::new().channel(1).mention(&UserId(2)).role(3).user(4).build();
         assert_eq!(content_mentions, "<#1><@2><@&3><@4>");
         assert_eq!(content_emoji, "<:Rohrkatze:32>");
     }
@@ -1352,18 +1347,14 @@ mod test {
 
     #[test]
     fn message_content() {
-        let message_content = MessageBuilder::new()
-            .push(Bold + Italic + Code + "Fun!")
-            .build();
+        let message_content = MessageBuilder::new().push(Bold + Italic + Code + "Fun!").build();
 
         assert_eq!(message_content, "***`Fun!`***");
     }
 
     #[test]
     fn message_content_safe() {
-        let message_content = MessageBuilder::new()
-            .push_safe(Bold + Italic + "test**test")
-            .build();
+        let message_content = MessageBuilder::new().push_safe(Bold + Italic + "test**test").build();
 
         assert_eq!(message_content, "***test\\*\\*test***");
     }
@@ -1379,9 +1370,7 @@ mod test {
         let content = &MessageBuilder::new().push_codeblock("foo", None).0.clone();
         assert_eq!(content, "```\nfoo\n```");
 
-        let content = &MessageBuilder::new()
-            .push_codeblock("fn main() { }", Some("rs"))
-            .0.clone();
+        let content = &MessageBuilder::new().push_codeblock("fn main() { }", Some("rs")).0.clone();
         assert_eq!(content, "```rs\nfn main() { }\n```");
     }
 
@@ -1391,22 +1380,13 @@ mod test {
             MessageBuilder::new().push_codeblock_safe("foo", Some("rs")).0,
             "```rs\nfoo\n```",
         );
-        assert_eq!(
-            MessageBuilder::new().push_codeblock_safe("", None).0,
-            "```\n\n```",
-        );
-        assert_eq!(
-            MessageBuilder::new().push_codeblock_safe("1 * 2", None).0,
-            "```\n1 * 2\n```",
-        );
+        assert_eq!(MessageBuilder::new().push_codeblock_safe("", None).0, "```\n\n```",);
+        assert_eq!(MessageBuilder::new().push_codeblock_safe("1 * 2", None).0, "```\n1 * 2\n```",);
         assert_eq!(
             MessageBuilder::new().push_codeblock_safe("`1 * 3`", None).0,
             "```\n`1 * 3`\n```",
         );
-        assert_eq!(
-            MessageBuilder::new().push_codeblock_safe("```.```", None).0,
-            "```\n . \n```",
-        );
+        assert_eq!(MessageBuilder::new().push_codeblock_safe("```.```", None).0, "```\n . \n```",);
     }
 
     #[test]

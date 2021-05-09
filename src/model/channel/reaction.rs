@@ -1,29 +1,23 @@
-use crate::model::prelude::*;
-use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
-use serde::ser::{SerializeMap, Serialize, Serializer};
-use std::{
-    error::Error as StdError,
-    fmt::{
-        self,
-        Display,
-        Formatter,
-        Result as FmtResult,
-        Write as FmtWrite
-    },
-    cmp::Ordering
-};
-
-use crate::internal::prelude::*;
-
-#[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp};
-#[cfg(feature = "model")]
-use tracing::warn;
 use std::convert::TryFrom;
 use std::str::FromStr;
+use std::{
+    cmp::Ordering,
+    error::Error as StdError,
+    fmt::{self, Display, Formatter, Result as FmtResult, Write as FmtWrite},
+};
+
+use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
+use serde::ser::{Serialize, SerializeMap, Serializer};
+#[cfg(feature = "model")]
+use tracing::warn;
+
+#[cfg(feature = "model")]
+use crate::http::{CacheHttp, Http};
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 
 /// An emoji reaction to a message.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct Reaction {
     /// The [`Channel`] of the associated [`Message`].
@@ -34,10 +28,83 @@ pub struct Reaction {
     pub message_id: MessageId,
     /// The Id of the [`User`] that sent the reaction.
     ///
-    /// Set to `None` by [`Message::react`] when cache is not available.
+    /// Set to [`None`] by [`Message::react`] when cache is not available.
     pub user_id: Option<UserId>,
     /// The optional Id of the [`Guild`] where the reaction was sent.
     pub guild_id: Option<GuildId>,
+    /// The optional object of the member which added the reaction.
+    pub member: Option<PartialMember>,
+}
+
+impl<'de> Deserialize<'de> for Reaction {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let channel_id = map
+            .remove("channel_id")
+            .ok_or_else(|| DeError::custom("expected channel_id"))
+            .and_then(ChannelId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let message_id = map
+            .remove("message_id")
+            .ok_or_else(|| DeError::custom("expected message_id"))
+            .and_then(MessageId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let emoji = map
+            .remove("emoji")
+            .ok_or_else(|| DeError::custom("expected emoji"))
+            .and_then(ReactionType::deserialize)
+            .map_err(DeError::custom)?;
+
+        let user_id = match map.contains_key("user_id") {
+            true => Some(
+                map.remove("user_id")
+                    .ok_or_else(|| DeError::custom("expected user_id"))
+                    .and_then(UserId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let guild_id = match map.contains_key("guild_id") {
+            true => Some(
+                map.remove("guild_id")
+                    .ok_or_else(|| DeError::custom("expected guild_id"))
+                    .and_then(GuildId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        if let Some(id) = guild_id {
+            if let Some(member) = map.get_mut("member") {
+                if let Some(object) = member.as_object_mut() {
+                    object.insert("guild_id".to_owned(), Value::String(id.to_string()));
+                }
+            }
+        }
+
+        let member = match map.contains_key("member") {
+            true => Some(
+                map.remove("member")
+                    .ok_or_else(|| DeError::custom("expected member"))
+                    .and_then(PartialMember::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        Ok(Self {
+            channel_id,
+            emoji,
+            message_id,
+            user_id,
+            guild_id,
+            member,
+        })
+    }
 }
 
 #[cfg(feature = "model")]
@@ -49,6 +116,11 @@ impl Reaction {
     /// request over the REST API for the channel.
     ///
     /// Requires the [Read Message History] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if the channel no longer exists.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
@@ -68,6 +140,8 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permissions].
     ///
+    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: super::permissions
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
@@ -83,11 +157,13 @@ impl Reaction {
                 }
 
                 if user_id.is_some() {
-                    let req = Permissions::MANAGE_MESSAGES;
-
-                    if !utils::user_has_perms(cache, self.channel_id, None, req).await.unwrap_or(true) {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )
+                    .await?;
                 }
             }
         }
@@ -108,17 +184,21 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permissions].
     ///
+    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: super::permissions
     pub async fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_MESSAGES;
-
-                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                utils::user_has_perms_cache(
+                    cache,
+                    self.channel_id,
+                    self.guild_id,
+                    Permissions::MANAGE_MESSAGES,
+                )
+                .await?;
             }
         }
         cache_http
@@ -136,6 +216,11 @@ impl Reaction {
     /// your own message cache or otherwise having the message available if
     /// possible.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission to
+    /// read message history, or if the message was deleted.
+    ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
@@ -147,6 +232,11 @@ impl Reaction {
     /// If the cache is enabled, this will search for the already-cached user.
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the user that made the reaction is unable to be
+    /// retrieved from the API.
     pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
         match self.user_id {
             Some(id) => id.to_user(cache_http).await,
@@ -161,7 +251,7 @@ impl Reaction {
                 }
 
                 Ok(cache_http.http().get_current_user().await?.into())
-            }
+            },
         }
     }
 
@@ -187,13 +277,17 @@ impl Reaction {
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [permissions]: super::permissions
     #[inline]
-    pub async fn users<R, U>(&self,
-                       http: impl AsRef<Http>,
-                       reaction_type: R,
-                       limit: Option<u8>,
-                       after: Option<U>)
-                       -> Result<Vec<User>>
-        where R: Into<ReactionType>, U: Into<UserId> {
+    pub async fn users<R, U>(
+        &self,
+        http: impl AsRef<Http>,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: Option<U>,
+    ) -> Result<Vec<User>>
+    where
+        R: Into<ReactionType>,
+        U: Into<UserId>,
+    {
         self._users(&http, &reaction_type.into(), limit, after.map(Into::into)).await
     }
 
@@ -211,13 +305,15 @@ impl Reaction {
             warn!("Rection users limit clamped to 100! (API Restriction)");
         }
 
-        http.as_ref().get_reaction_users(
-            self.channel_id.0,
-            self.message_id.0,
-            reaction_type,
-            limit,
-            after.map(|u| u.0),
-        ).await
+        http.as_ref()
+            .get_reaction_users(
+                self.channel_id.0,
+                self.message_id.0,
+                reaction_type,
+                limit,
+                after.map(|u| u.0),
+            )
+            .await
     }
 }
 
@@ -241,6 +337,7 @@ pub enum ReactionType {
 }
 
 impl<'de> Deserialize<'de> for ReactionType {
+    #[allow(clippy::unwrap_used)] // allow unwrap here because name being none is unreachable
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
@@ -313,9 +410,15 @@ impl<'de> Deserialize<'de> for ReactionType {
 
 impl Serialize for ReactionType {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         match *self {
-            ReactionType::Custom { animated, id, ref name } => {
+            ReactionType::Custom {
+                animated,
+                id,
+                ref name,
+            } => {
                 let mut map = serializer.serialize_map(Some(3))?;
 
                 map.serialize_entry("animated", &animated)?;
@@ -350,7 +453,9 @@ impl ReactionType {
                 id,
                 ref name,
                 ..
-            } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
+            } => {
+                format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id)
+            },
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
     }
@@ -359,33 +464,29 @@ impl ReactionType {
     /// having to perform any allocation.
     /// Will always return false if the reaction was not a unicode reaction.
     pub fn unicode_eq(&self, other: &str) -> bool {
-
         if let ReactionType::Unicode(unicode) = &self {
             unicode == other
         } else {
             // Always return false if not a unicode reaction
             false
         }
-
     }
 
     /// Helper function to allow comparing unicode emojis without having
     /// to perform any allocation.
     /// Will return None if the reaction was not a unicode reaction.
     pub fn unicode_partial_cmp(&self, other: &str) -> Option<Ordering> {
-
         if let ReactionType::Unicode(unicode) = &self {
             Some(unicode.as_str().cmp(other))
         } else {
             // Always return None if not a unicode reaction
             None
         }
-
     }
 }
 
 impl From<char> for ReactionType {
-    /// Creates a `ReactionType` from a `char`.
+    /// Creates a [`ReactionType`] from a `char`.
     ///
     /// # Examples
     ///
@@ -409,7 +510,9 @@ impl From<char> for ReactionType {
     /// #
     /// # fn main() {}
     /// ```
-    fn from(ch: char) -> ReactionType { ReactionType::Unicode(ch.to_string()) }
+    fn from(ch: char) -> ReactionType {
+        ReactionType::Unicode(ch.to_string())
+    }
 }
 
 impl From<Emoji> for ReactionType {
@@ -427,7 +530,7 @@ impl From<EmojiId> for ReactionType {
         ReactionType::Custom {
             animated: false,
             id: emoji_id,
-            name: None
+            name: None,
         }
     }
 }
@@ -437,7 +540,7 @@ impl From<EmojiIdentifier> for ReactionType {
         ReactionType::Custom {
             animated: emoji_id.animated,
             id: emoji_id.id,
-            name: Some(emoji_id.name)
+            name: Some(emoji_id.name),
         }
     }
 }
@@ -458,31 +561,33 @@ impl TryFrom<String> for ReactionType {
 
     fn try_from(emoji_string: String) -> std::result::Result<Self, Self::Error> {
         if emoji_string.is_empty() {
-            return Err(ReactionConversionError)
+            return Err(ReactionConversionError);
         }
 
         if !emoji_string.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_string))
+            return Ok(ReactionType::Unicode(emoji_string));
         }
         ReactionType::try_from(&emoji_string[..])
     }
 }
 
 impl<'a> TryFrom<&'a str> for ReactionType {
-    /// Creates a `ReactionType` from a string slice.
+    /// Creates a [`ReactionType`] from a string slice.
     ///
     /// # Examples
     ///
-    /// Creating a `ReactionType` from a `🍎`, modeling a similar API as the
+    /// Creating a [`ReactionType`] from a `🍎`, modeling a similar API as the
     /// rest of the library:
     ///
     /// ```rust
-    /// use serenity::model::channel::ReactionType;
     /// use std::convert::TryInto;
     /// use std::fmt::Debug;
     ///
+    /// use serenity::model::channel::ReactionType;
+    ///
     /// fn foo<R: TryInto<ReactionType>>(bar: R)
-    ///     where R::Error: Debug
+    /// where
+    ///     R::Error: Debug,
     /// {
     ///     println!("{:?}", bar.try_into().unwrap());
     /// }
@@ -490,12 +595,13 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// foo("🍎");
     /// ```
     ///
-    /// Creating a `ReactionType` from a custom emoji argument in the following format:
+    /// Creating a [`ReactionType`] from a custom emoji argument in the following format:
     ///
     /// ```rust
+    /// use std::convert::TryFrom;
+    ///
     /// use serenity::model::channel::ReactionType;
     /// use serenity::model::id::EmojiId;
-    /// use std::convert::TryFrom;
     ///
     /// let emoji_string = "<:customemoji:600404340292059257>";
     /// let reaction = ReactionType::try_from(emoji_string).unwrap();
@@ -512,11 +618,11 @@ impl<'a> TryFrom<&'a str> for ReactionType {
 
     fn try_from(emoji_str: &str) -> std::result::Result<Self, Self::Error> {
         if emoji_str.is_empty() {
-            return Err(ReactionConversionError)
+            return Err(ReactionConversionError);
         }
 
         if !emoji_str.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_str.to_string()))
+            return Ok(ReactionType::Unicode(emoji_str.to_string()));
         }
 
         if !emoji_str.ends_with('>') {
@@ -529,11 +635,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
 
         let animated = split_iter.next().ok_or(ReactionConversionError)? == "a";
 
-        let name = split_iter
-            .next()
-            .ok_or(ReactionConversionError)?
-            .to_string()
-            .into();
+        let name = split_iter.next().ok_or(ReactionConversionError)?.to_string().into();
 
         let id = split_iter
             .next()
@@ -586,7 +688,7 @@ impl Display for ReactionType {
             ReactionType::Custom {
                 animated,
                 id,
-                ref name
+                ref name,
             } => {
                 if animated {
                     f.write_str("<a:")?;

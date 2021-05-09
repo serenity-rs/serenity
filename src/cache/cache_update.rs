@@ -1,5 +1,6 @@
-use super::Cache;
 use async_trait::async_trait;
+
+use super::Cache;
 
 /// Trait used for updating the cache with a type.
 ///
@@ -67,7 +68,7 @@ use async_trait::async_trait;
 ///                 Some(old_user)
 ///             },
 ///             Entry::Vacant(entry) => {
-///                 // We can convert a `serde_json::Value` to a User for test
+///                 // We can convert a [`serde_json::Value`] to a User for test
 ///                 // purposes.
 ///                 let user = serde_json::from_value::<User>(json!({
 ///                     "id": self.user_id,

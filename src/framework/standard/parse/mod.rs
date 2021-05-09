@@ -4,14 +4,13 @@ use crate::model::prelude::*;
 
 pub mod map;
 
-use map::{CommandMap, GroupMap, ParseMap};
-
-use uwl::Stream;
-use futures::future::{BoxFuture, FutureExt};
-use tracing::{error, warn};
-
 use std::borrow::Cow;
 use std::collections::HashMap;
+
+use futures::future::{BoxFuture, FutureExt};
+use map::{CommandMap, GroupMap, ParseMap};
+use tracing::{error, warn};
+use uwl::Stream;
 
 // FIXME: Add the `http` parameter to `Guild::user_permissions_in`.
 //
@@ -34,7 +33,8 @@ async fn permissions_in(
     member: &Member,
     roles: &HashMap<RoleId, Role>,
 ) -> Permissions {
-    if ctx.cache.guild_field(guild_id, |guild| member.user.id == guild.owner_id).await == Some(true) {
+    if ctx.cache.guild_field(guild_id, |guild| member.user.id == guild.owner_id).await == Some(true)
+    {
         return Permissions::all();
     }
 
@@ -61,22 +61,17 @@ async fn permissions_in(
         return Permissions::all();
     }
 
-    if let Some(Some(channel)) = ctx
-        .cache
-        .guild_field(
-            guild_id,
-            |guild| guild.channels.get(&channel_id).cloned()
-        )
-        .await
+    if let Some(Some(channel)) =
+        ctx.cache.guild_field(guild_id, |guild| guild.channels.get(&channel_id).cloned()).await
     {
         if channel.kind == ChannelType::Text {
             permissions &= !(Permissions::CONNECT
-                             | Permissions::SPEAK
-                             | Permissions::MUTE_MEMBERS
-                             | Permissions::DEAFEN_MEMBERS
-                             | Permissions::MOVE_MEMBERS
-                             | Permissions::USE_VAD
-                             | Permissions::STREAM);
+                | Permissions::SPEAK
+                | Permissions::MUTE_MEMBERS
+                | Permissions::DEAFEN_MEMBERS
+                | Permissions::MOVE_MEMBERS
+                | Permissions::USE_VAD
+                | Permissions::STREAM);
         }
 
         let mut data = Vec::with_capacity(member.roles.len());
@@ -149,7 +144,7 @@ fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
 
 /// Parse a mention in the message that is of either the direct (`<@id>`) or nickname (`<@!id>`) syntax,
 /// and compare the encoded `id` with the id from [`Configuration::on_mention`] for a match.
-/// Returns `Some(<id>)` on success, `None` otherwise.
+/// Returns `Some(<id>)` on success, [`None`] otherwise.
 pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'a str> {
     let on_mention = config.on_mention.as_deref()?;
 
@@ -247,8 +242,7 @@ pub async fn prefix<'a>(
 
 /// Checked per valid group or command in the message.
 async fn check_discrepancy(
-    #[allow(unused_variables)]
-    ctx: &Context,
+    #[allow(unused_variables)] ctx: &Context,
     msg: &Message,
     config: &Configuration,
     options: &impl CommonOptions,
@@ -268,7 +262,11 @@ async fn check_discrepancy(
     #[cfg(feature = "cache")]
     {
         if let Some(guild_id) = msg.guild_id {
-            let member = match ctx.cache.guild_field(guild_id, |guild| guild.members.get(&msg.author.id).cloned()).await {
+            let member = match ctx
+                .cache
+                .guild_field(guild_id, |guild| guild.members.get(&msg.author.id).cloned())
+                .await
+            {
                 Some(Some(member)) => member,
                 // Member not found.
                 Some(None) => match ctx.http.get_member(guild_id.0, msg.author.id.0).await {
@@ -278,18 +276,15 @@ async fn check_discrepancy(
                 // Guild not found.
                 None => return Ok(()),
             };
-
+            #[allow(clippy::unwrap_used)] // Allowing unwrap because should always return Some()
             let roles = ctx.cache.guild_field(guild_id, |guild| guild.roles.clone()).await.unwrap();
             let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles).await;
 
-            if !(perms.contains(*options.required_permissions()) || options.owner_privilege()
-                && config.owners.contains(&msg.author.id))
+            if !(perms.contains(*options.required_permissions())
+                || options.owner_privilege() && config.owners.contains(&msg.author.id))
             {
-                return Err(DispatchError::LackingPermissions(
-                    *options.required_permissions(),
-                ));
+                return Err(DispatchError::LackingPermissions(*options.required_permissions()));
             }
-
 
             if !perms.administrator() && !has_correct_roles(options, &roles, &member) {
                 return Err(DispatchError::LackingRole);
@@ -338,9 +333,8 @@ fn parse_cmd<'a>(
     map: &'a CommandMap,
 ) -> BoxFuture<'a, Result<&'static Command, ParseError>> {
     async move {
-        let (n, r) = try_parse(stream, map, config.by_space, |s| {
-            to_lowercase(config, s).into_owned()
-        });
+        let (n, r) =
+            try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).into_owned());
 
         if config.disabled_commands.contains(&n) {
             return Err(ParseError::Dispatch(DispatchError::CommandDisabled(n)));
@@ -366,7 +360,8 @@ fn parse_cmd<'a>(
         }
 
         Err(ParseError::UnrecognisedCommand(Some(n.to_string())))
-    }.boxed()
+    }
+    .boxed()
 }
 
 fn parse_group<'a>(
@@ -399,7 +394,8 @@ fn parse_group<'a>(
         }
 
         Err(ParseError::UnrecognisedCommand(None))
-    }.boxed()
+    }
+    .boxed()
 }
 
 #[inline]
@@ -412,9 +408,15 @@ async fn handle_command<'a>(
     group: &'static CommandGroup,
 ) -> Result<Invoke, ParseError> {
     match parse_cmd(stream, ctx, msg, config, map).await {
-        Ok(command) => Ok(Invoke::Command { group, command }),
+        Ok(command) => Ok(Invoke::Command {
+            group,
+            command,
+        }),
         Err(err) => match group.options.default_command {
-            Some(command) => Ok(Invoke::Command { group, command }),
+            Some(command) => Ok(Invoke::Command {
+                group,
+                command,
+            }),
             None => Err(err),
         },
     }
@@ -499,7 +501,7 @@ pub async fn command(
                 if !is_prefixless {
                     last = res;
                 }
-            }
+            },
             Map::Prefixless(subgroups, commands) => {
                 is_prefixless = true;
 
@@ -518,7 +520,7 @@ pub async fn command(
                 }
 
                 last = res;
-            }
+            },
         }
     }
 
@@ -527,9 +529,6 @@ pub async fn command(
 
 #[derive(Debug)]
 pub enum Invoke {
-    Command {
-        group: &'static CommandGroup,
-        command: &'static Command,
-    },
+    Command { group: &'static CommandGroup, command: &'static Command },
     Help(&'static str),
 }

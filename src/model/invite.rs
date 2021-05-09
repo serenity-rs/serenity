@@ -5,19 +5,18 @@ use std::ops::Deref;
 use chrono::{DateTime, Utc};
 
 use super::prelude::*;
-
+#[cfg(all(feature = "cache", feature = "model"))]
+use super::{utils as model_utils, Permissions};
 #[cfg(feature = "model")]
 use crate::builder::CreateInvite;
-#[cfg(feature = "model")]
-use crate::internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use super::{Permissions, utils as model_utils};
-#[cfg(feature = "model")]
-use crate::utils;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp};
+use crate::http::{CacheHttp, Http};
+#[cfg(feature = "model")]
+use crate::internal::prelude::*;
+#[cfg(feature = "model")]
+use crate::utils;
 
 /// Information about an invite code.
 ///
@@ -44,7 +43,7 @@ pub struct Invite {
     /// A representation of the minimal amount of information needed about the
     /// [`User`] that created the invite.
     ///
-    /// This can be `None` for invites created by Discord such as invite-widgets
+    /// This can be [`None`] for invites created by Discord such as invite-widgets
     /// or vanity invite links.
     pub inviter: Option<InviteUser>,
 }
@@ -71,20 +70,23 @@ impl Invite {
     pub async fn create<F>(
         cache_http: impl CacheHttp,
         channel_id: impl Into<ChannelId>,
-        f: F
+        f: F,
     ) -> Result<RichInvite>
-    where F: FnOnce(CreateInvite) -> CreateInvite
+    where
+        F: FnOnce(CreateInvite) -> CreateInvite,
     {
         let channel_id = channel_id.into();
 
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::CREATE_INVITE;
-
-                if !model_utils::user_has_perms(cache, channel_id, None, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                model_utils::user_has_perms_cache(
+                    cache,
+                    channel_id,
+                    None,
+                    Permissions::CREATE_INVITE,
+                )
+                .await?;
             }
         }
 
@@ -102,18 +104,24 @@ impl Invite {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
+    /// Otherwise may return [`Error::Http`] if permissions are lacking,
+    /// or if the invite is invalid.
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
+    /// [`Error::Http`]: crate::error::Error::Http
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_GUILD;
-
                 let guild_id = self.guild.as_ref().map(|g| g.id);
-                if !model_utils::user_has_perms(cache, self.channel.id, guild_id, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                model_utils::user_has_perms_cache(
+                    cache,
+                    self.channel.id,
+                    guild_id,
+                    Permissions::MANAGE_GUILD,
+                )
+                .await?;
             }
         }
 
@@ -121,6 +129,12 @@ impl Invite {
     }
 
     /// Gets the information about an invite.
+    ///
+    /// # Errors
+    ///
+    /// May return an [`Error::Http`] if the invite is invalid.
+    /// Can also return an [`Error::Json`] if there is an error
+    /// deserializing the API response.
     pub async fn get(http: impl AsRef<Http>, code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 
@@ -174,7 +188,9 @@ impl Invite {
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// # }
     /// ```
-    pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
+    pub fn url(&self) -> String {
+        format!("https://discord.gg/{}", self.code)
+    }
 }
 
 /// A minimal amount of information about the inviter (person who created the invite).
@@ -182,8 +198,10 @@ impl Invite {
 #[non_exhaustive]
 pub struct InviteUser {
     pub id: UserId,
-    #[serde(rename = "username")] pub name: String,
-    #[serde(deserialize_with = "deserialize_u16")] pub discriminator: u16,
+    #[serde(rename = "username")]
+    pub name: String,
+    #[serde(deserialize_with = "deserialize_u16")]
+    pub discriminator: u16,
     pub avatar: Option<String>,
 }
 
@@ -203,7 +221,8 @@ impl Deref for InviteUser {
 pub struct InviteChannel {
     pub id: ChannelId,
     pub name: String,
-    #[serde(rename = "type")] pub kind: ChannelType,
+    #[serde(rename = "type")]
+    pub kind: ChannelType,
 }
 
 /// A minimal amount of information about the guild an invite points to.
@@ -286,14 +305,11 @@ pub struct RichInvite {
     pub max_age: u64,
     /// The maximum number of times that an invite may be used before it expires.
 
-    /// Note that this does not supersede the [`max_age`] value, if the value of
-    /// [`temporary`] is `true`. If the value of `temporary` is `false`, then the
+    /// Note that this does not supersede the [`Self::max_age`] value, if the value of
+    /// [`Self::temporary`] is `true`. If the value of `temporary` is `false`, then the
     /// invite _will_ self-expire after the given number of max uses.
 
     /// If the value is `0`, then the invite is permanent.
-    ///
-    /// [`max_age`]: Self::max_age
-    /// [`temporary`]: Self::temporary
     pub max_uses: u64,
     /// Indicator of whether the invite self-expires after a certain amount of
     /// time or uses.
@@ -322,12 +338,15 @@ impl RichInvite {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_GUILD;
-
                 let guild_id = self.guild.as_ref().map(|g| g.id);
-                if !model_utils::user_has_perms(cache, self.channel.id, guild_id, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+
+                model_utils::user_has_perms_cache(
+                    cache,
+                    self.channel.id,
+                    guild_id,
+                    Permissions::MANAGE_GUILD,
+                )
+                .await?;
             }
         }
 
@@ -370,6 +389,7 @@ impl RichInvite {
     /// #         "discriminator": 3,
     /// #         "id": UserId(4),
     /// #         "username": "qux",
+    /// #         "public_flags": None::<UserPublicFlags>,
     /// #     },
     /// #     "max_age": 5,
     /// #     "max_uses": 6,
@@ -380,5 +400,7 @@ impl RichInvite {
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// # }
     /// ```
-    pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
+    pub fn url(&self) -> String {
+        format!("https://discord.gg/{}", self.code)
+    }
 }

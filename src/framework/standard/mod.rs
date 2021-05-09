@@ -1,6 +1,6 @@
 pub mod help_commands;
 pub mod macros {
-    pub use command_attr::{command, group, help, check, hook};
+    pub use command_attr::{check, command, group, help, hook};
 }
 
 mod args;
@@ -8,48 +8,38 @@ mod configuration;
 mod parse;
 mod structures;
 
-pub use args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
-pub use configuration::{Configuration, WithWhiteSpace};
-pub use structures::*;
-
-use structures::buckets::{Bucket, RateLimitAction};
-pub use structures::buckets::BucketBuilder;
-
-use parse::{ParseError, Invoke};
-use parse::map::{CommandMap, GroupMap, Map};
-
-use self::buckets::{RateLimitInfo, RevertBucket};
-
-use super::Framework;
-use crate::client::Context;
-use crate::model::{
-    channel::Message,
-    permissions::Permissions,
-};
-
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use tokio::sync::Mutex;
-use futures::future::BoxFuture;
-use uwl::Stream;
+pub use args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
 use async_trait::async_trait;
+pub use configuration::{Configuration, WithWhiteSpace};
+use futures::future::BoxFuture;
+use parse::map::{CommandMap, GroupMap, Map};
+use parse::{Invoke, ParseError};
+pub use structures::buckets::BucketBuilder;
+use structures::buckets::{Bucket, RateLimitAction};
+pub use structures::*;
+use tokio::sync::Mutex;
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
+use tokio::time::delay_for as sleep;
+#[cfg(feature = "tokio")]
+use tokio::time::sleep;
 use tracing::instrument;
+use uwl::Stream;
 
+use self::buckets::{RateLimitInfo, RevertBucket};
+use super::Framework;
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
+use crate::client::Context;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
-#[cfg(feature = "cache")]
 use crate::model::guild::Member;
+use crate::model::{channel::Message, permissions::Permissions};
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
-
-#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::delay_for as sleep;
-
-#[cfg(feature = "tokio")]
-use tokio::time::sleep;
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
@@ -86,10 +76,17 @@ pub enum DispatchError {
     TooManyArguments { max: u16, given: usize },
 }
 
-type DispatchHook = for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut , ()>;
+type DispatchHook =
+    for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut, ()>;
 type BeforeHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, bool>;
-type AfterHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str, Result<(), CommandError>) -> BoxFuture<'fut, ()>;
-type UnrecognisedHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, ()>;
+type AfterHook = for<'fut> fn(
+    &'fut Context,
+    &'fut Message,
+    &'fut str,
+    Result<(), CommandError>,
+) -> BoxFuture<'fut, ()>;
+type UnrecognisedHook =
+    for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, ()>;
 type NormalMessageHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
 type PrefixOnlyHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
 
@@ -201,24 +198,21 @@ impl StandardFramework {
     #[inline]
     pub async fn bucket<F>(self, name: &str, f: F) -> Self
     where
-        F: FnOnce(&mut BucketBuilder) -> &mut BucketBuilder
+        F: FnOnce(&mut BucketBuilder) -> &mut BucketBuilder,
     {
         let mut builder = BucketBuilder::default();
 
         f(&mut builder);
 
-        self.buckets.lock().await.insert(
-            name.to_string(),
-            builder.construct(),
-        );
+        self.buckets.lock().await.insert(name.to_string(), builder.construct());
 
         self
     }
 
     /// Whether the message should be ignored because it is from a bot or webhook.
     fn should_ignore(&self, msg: &Message) -> bool {
-        (self.config.ignore_bots && msg.author.bot) ||
-            (self.config.ignore_webhooks && msg.webhook_id.is_some())
+        (self.config.ignore_bots && msg.author.bot)
+            || (self.config.ignore_webhooks && msg.webhook_id.is_some())
     }
 
     async fn should_fail<'a>(
@@ -274,8 +268,9 @@ impl StandardFramework {
             }
         }
 
-        if !self.config.allowed_channels.is_empty() &&
-           !self.config.allowed_channels.contains(&msg.channel_id) {
+        if !self.config.allowed_channels.is_empty()
+            && !self.config.allowed_channels.contains(&msg.channel_id)
+        {
             return Some(DispatchError::BlockedChannel);
         }
 
@@ -289,13 +284,14 @@ impl StandardFramework {
             {
                 let mut buckets = self.buckets.lock().await;
 
-                if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
-
+                if let Some(ref mut bucket) =
+                    command.bucket.as_ref().and_then(|b| buckets.get_mut(*b))
+                {
                     if let Some(rate_limit_info) = bucket.take(ctx, msg).await {
-
                         duration = match rate_limit_info.action {
-                            RateLimitAction::Cancelled | RateLimitAction::FailedDelay =>
-                                return Some(DispatchError::Ratelimited(rate_limit_info)),
+                            RateLimitAction::Cancelled | RateLimitAction::FailedDelay => {
+                                return Some(DispatchError::Ratelimited(rate_limit_info))
+                            },
                             RateLimitAction::Delayed => Some(rate_limit_info.rate_limit),
                         };
                     }
@@ -321,7 +317,7 @@ impl StandardFramework {
 
     /// Adds a group which can organize several related commands.
     /// Groups are taken into account when using
-    /// `serenity::framework::standard::help_commands`.
+    /// [`serenity::framework::standard::help_commands`].
     ///
     /// # Examples
     ///
@@ -365,6 +361,8 @@ impl StandardFramework {
     ///     // Groups' names are changed to all uppercase, plus appended with `_GROUP`.
     ///     .group(&BINGBONG_GROUP);
     /// ```
+    ///
+    /// [`serenity::framework::standard::help_commands`]: crate::framework::standard::help_commands
     pub fn group(mut self, group: &'static CommandGroup) -> Self {
         self.group_add(group);
         self.initialized = true;
@@ -374,12 +372,10 @@ impl StandardFramework {
 
     /// Adds a group to be used by the framework. Primary use-case is runtime modification
     /// of groups in the framework; will _not_ mark the framework as initialized. Refer to
-    /// [`group`] for adding groups in initial configuration.
+    /// [`Self::group`] for adding groups in initial configuration.
     ///
-    /// Note: does _not_ return `Self` like many other commands. This is because
+    /// Note: does _not_ return [`Self`] like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
-    ///
-    /// [`group`]: Self::group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(
@@ -396,7 +392,7 @@ impl StandardFramework {
     /// Removes a group from being used in the framework. Primary use-case is runtime modification
     /// of groups in the framework.
     ///
-    /// Note: does _not_ return `Self` like many other commands. This is because
+    /// Note: does _not_ return [`Self`] like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
     pub fn group_remove(&mut self, group: &'static CommandGroup) {
         // Iterates through the vector and if a given group _doesn't_ match, we retain it
@@ -457,7 +453,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `before` to log command usage:
+    /// Using [`Self::before`] to log command usage:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -510,7 +506,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `after` to log command usage:
+    /// Using [`Self::after`] to log command usage:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -540,7 +536,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `unrecognised_command`:
+    /// Using [`Self::unrecognised_command`]:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -568,7 +564,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `normal_message`:
+    /// Using [`Self::normal_message`]:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -637,7 +633,8 @@ impl Framework for StandardFramework {
             &self.groups,
             &self.config,
             self.help.as_ref().map(|h| h.options.names),
-        ).await;
+        )
+        .await;
 
         let invoke = match invocation {
             Ok(i) => i,
@@ -653,24 +650,29 @@ impl Framework for StandardFramework {
                 }
 
                 return;
-            }
+            },
             Err(ParseError::Dispatch(error)) => {
                 if let Some(dispatch) = &self.dispatch {
                     dispatch(&mut ctx, &msg, error).await;
                 }
 
                 return;
-            }
+            },
         };
 
         match invoke {
             Invoke::Help(name) => {
+                if !self.config.allow_dm && msg.is_private() {
+                    return;
+                }
+
                 let args = Args::new(stream.rest(), &self.config.delimiters);
 
                 let owners = self.config.owners.clone();
                 let groups = self.groups.iter().map(|(g, _)| *g).collect::<Vec<_>>();
 
                 // `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
+                #[allow(clippy::unwrap_used)]
                 let help = self.help.unwrap();
 
                 if let Some(before) = &self.before {
@@ -684,8 +686,11 @@ impl Framework for StandardFramework {
                 if let Some(after) = &self.after {
                     after(&mut ctx, &msg, name, res).await;
                 }
-            }
-            Invoke::Command { command, group } => {
+            },
+            Invoke::Command {
+                command,
+                group,
+            } => {
                 let mut args = {
                     use std::borrow::Cow;
 
@@ -698,6 +703,8 @@ impl Framework for StandardFramework {
 
                         for delim in command.options.delimiters {
                             if delim.len() == 1 {
+                                // Should always be Some() in this case
+                                #[allow(clippy::unwrap_used)]
                                 v.push(Delimiter::Single(delim.chars().next().unwrap()));
                             } else {
                                 // This too.
@@ -735,7 +742,9 @@ impl Framework for StandardFramework {
                 if matches!(res, Err(ref e) if e.is::<RevertBucket>()) {
                     let mut buckets = self.buckets.lock().await;
 
-                    if let Some(ref mut bucket) = command.options.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
+                    if let Some(ref mut bucket) =
+                        command.options.bucket.as_ref().and_then(|b| buckets.get_mut(*b))
+                    {
                         bucket.give(&ctx, &msg).await;
                     }
                 }
@@ -743,7 +752,7 @@ impl Framework for StandardFramework {
                 if let Some(after) = &self.after {
                     after(&mut ctx, &msg, name, res).await;
                 }
-            }
+            },
         }
     }
 }
@@ -840,13 +849,13 @@ pub(crate) async fn has_correct_permissions(
             Ok(perms) => perms,
             Err(e) => {
                 tracing::error!(
-                    "(╯°□°）╯︵ ┻━┻ error getting permissions for user {} in channel {}: {}",
+                    "Error getting permissions for user {} in channel {}: {}",
                     member.user.id,
                     channel.id,
                     e
                 );
                 return false;
-            }
+            },
         };
 
         perms.contains(*options.required_permissions())
@@ -859,12 +868,13 @@ pub(crate) async fn has_correct_permissions(
 pub(crate) fn has_correct_roles(
     options: &impl CommonOptions,
     roles: &HashMap<RoleId, Role>,
-    member: &Member)
--> bool {
+    member: &Member,
+) -> bool {
     if options.allowed_roles().is_empty() {
         true
     } else {
-        options.allowed_roles()
+        options
+            .allowed_roles()
             .iter()
             .flat_map(|r| roles.values().find(|role| *r == role.name))
             .any(|g| member.roles.contains(&g.id))

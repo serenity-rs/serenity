@@ -1,6 +1,7 @@
-use crate::model::prelude::*;
 use chrono::{DateTime, Utc};
 use serde_json::Value;
+
+use crate::model::prelude::*;
 
 /// A builder for constructing a personal [`Message`] instance.
 /// This can be useful for emitting a manual [`dispatch`] to the framework,
@@ -76,7 +77,7 @@ impl CustomMessage {
 
     /// Assign the dummy message the timestamp it was edited.
     ///
-    /// If not used, the default value is `None` (not all messages are edited).
+    /// If not used, the default value is [`None`] (not all messages are edited).
     #[inline]
     pub fn edited_timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
         self.msg.edited_timestamp = Some(timestamp);
@@ -99,7 +100,7 @@ impl CustomMessage {
 
     /// Assign the dummy message its origin guild's ID.
     ///
-    /// If not used, the default value is `None` (not all messages are sent in guilds).
+    /// If not used, the default value is [`None`] (not all messages are sent in guilds).
     #[inline]
     pub fn guild_id(&mut self, guild_id: GuildId) -> &mut Self {
         self.msg.guild_id = Some(guild_id);
@@ -119,7 +120,7 @@ impl CustomMessage {
 
     /// Assign the dummy message member data pertaining to its [author].
     ///
-    /// If not used, the default value is `None` (not all messages are sent in guilds).
+    /// If not used, the default value is [`None`] (not all messages are sent in guilds).
     ///
     /// [author]: Self::author
     #[inline]
@@ -210,7 +211,7 @@ impl CustomMessage {
 
     /// Assign the dummy message the webhook author's ID.
     ///
-    /// If not used, the default value is `None` (not all messages are sent by webhooks).
+    /// If not used, the default value is [`None`] (not all messages are sent by webhooks).
     #[inline]
     pub fn webhook_id(&mut self, id: WebhookId) -> &mut Self {
         self.msg.webhook_id = Some(id);
@@ -245,6 +246,7 @@ fn dummy_message() -> Message {
             bot: false,
             discriminator: 0x0000,
             name: String::new(),
+            public_flags: None,
         },
         channel_id: ChannelId::default(),
         content: String::new(),
@@ -269,5 +271,7 @@ fn dummy_message() -> Message {
         flags: None,
         stickers: Vec::new(),
         referenced_message: None,
+        #[cfg(feature = "unstable_discord_api")]
+        interaction: None,
     }
 }

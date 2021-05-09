@@ -1,14 +1,14 @@
 //! Miscellaneous helper traits, enums, and structs for models.
 
-use super::prelude::*;
-
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
+use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
-use std::fmt;
+
+use super::prelude::*;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
 use crate::utils;
 
@@ -37,16 +37,18 @@ pub trait Mentionable {
     ///     to_channel: GuildChannel,
     ///     rules_channel: ChannelId,
     /// ) -> Result<(), Error> {
-    ///     to_channel.id.send_message(
-    ///         ctx,
-    ///         |m| m.content(format_args!(
-    ///             "Hi {member}, welcome to the server! \
+    ///     to_channel
+    ///         .id
+    ///         .send_message(ctx, |m| {
+    ///             m.content(format_args!(
+    ///                 "Hi {member}, welcome to the server! \
     ///                 Please refer to {rules} for our code of conduct, \
     ///                 and enjoy your stay.",
-    ///             member = member.mention(),
-    ///             rules = rules_channel.mention(),
-    ///         )),
-    ///     ).await?;
+    ///                 member = member.mention(),
+    ///                 rules = rules_channel.mention(),
+    ///             ))
+    ///         })
+    ///         .await?;
     ///     Ok(())
     /// }
     /// # }
@@ -59,12 +61,7 @@ pub trait Mentionable {
     /// let role: RoleId = 3.into();
     /// assert_eq!(
     ///     "<@1> <#2> <@&3>",
-    ///     format!(
-    ///         "{} {} {}",
-    ///         user.mention(),
-    ///         channel.mention(),
-    ///         role.mention(),
-    ///     ),
+    ///     format!("{} {} {}", user.mention(), channel.mention(), role.mention(),),
     /// )
     /// ```
     fn mention(&self) -> Mention;
@@ -89,12 +86,7 @@ pub trait Mentionable {
 /// let role: RoleId = 3.into();
 /// assert_eq!(
 ///     "<@1> <#2> <@&3>",
-///     format!(
-///         "{} {} {}",
-///         Mention::from(user),
-///         Mention::from(channel),
-///         Mention::from(role),
-///     ),
+///     format!("{} {} {}", Mention::from(user), Mention::from(channel), Mention::from(role),),
 /// )
 /// ```
 pub struct Mention(MentionableImpl);
@@ -139,18 +131,12 @@ mention!(value:
 impl Display for Mention {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self.0 {
-            MentionableImpl::Channel(id) =>
-                f.write_fmt(format_args!("<#{}>", id.0)),
-            MentionableImpl::User(id) =>
-                f.write_fmt(format_args!("<@{}>", id.0)),
-            MentionableImpl::Role(id) =>
-                f.write_fmt(format_args!("<@&{}>", id.0)),
-            MentionableImpl::Emoji(id, animated) =>
-                f.write_fmt(format_args!(
-                    "<{}:_:{}>",
-                    if animated { "a" } else { "" },
-                    id.0,
-                )),
+            MentionableImpl::Channel(id) => f.write_fmt(format_args!("<#{}>", id.0)),
+            MentionableImpl::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
+            MentionableImpl::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
+            MentionableImpl::Emoji(id, animated) => {
+                f.write_fmt(format_args!("<{}:_:{}>", if animated { "a" } else { "" }, id.0,))
+            },
         }
     }
 }
@@ -306,9 +292,10 @@ impl EmojiIdentifier {
 impl FromStr for EmojiIdentifier {
     type Err = ();
 
-    fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or(()) }
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        utils::parse_emoji(s).ok_or(())
+    }
 }
-
 
 /// A component that was affected during a service incident.
 ///
@@ -414,14 +401,18 @@ mod test {
                 user_limit: None,
                 nsfw: false,
                 slow_mode_rate: Some(0),
+                rtc_region: None,
+                video_quality_mode: None,
             });
             let emoji = Emoji {
                 animated: false,
+                available: true,
                 id: EmojiId(5),
                 name: "a".to_string(),
                 managed: true,
                 require_colons: true,
                 roles: vec![],
+                user: None,
             };
             let role = Role {
                 id: RoleId(2),
@@ -433,6 +424,7 @@ mod test {
                 name: "fake role".to_string(),
                 permissions: Permissions::empty(),
                 position: 1,
+                tags: RoleTags::default(),
             };
             let user = User {
                 id: UserId(6),
@@ -440,6 +432,7 @@ mod test {
                 bot: false,
                 discriminator: 4132,
                 name: "fake".to_string(),
+                public_flags: None,
             };
             let member = Member {
                 deaf: false,
@@ -449,6 +442,10 @@ mod test {
                 nick: None,
                 roles: vec![],
                 user: user.clone(),
+                pending: false,
+                premium_since: None,
+                #[cfg(feature = "unstable_discord_api")]
+                permissions: None,
             };
 
             assert_eq!(ChannelId(1).mention().to_string(), "<#1>");
@@ -462,6 +459,7 @@ mod test {
         }
 
         #[test]
+        #[allow(clippy::unwrap_used)]
         fn parse_mentions() {
             assert_eq!("<@1234>".parse::<UserId>().unwrap(), UserId(1234));
             assert_eq!("<@&1234>".parse::<RoleId>().unwrap(), RoleId(1234));

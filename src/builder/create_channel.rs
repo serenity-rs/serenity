@@ -1,17 +1,16 @@
-use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use std::collections::HashMap;
 
 use serde_json::{json, Value};
 
-use std::collections::HashMap;
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].
 ///
-/// Except [`name`], all fields are optional.
+/// Except [`Self::name`], all fields are optional.
 ///
 /// [`GuildChannel`]: crate::model::channel::GuildChannel
 /// [`Guild`]: crate::model::guild::Guild
-/// [`name`]: Self::name
 #[derive(Debug, Clone)]
 pub struct CreateChannel(pub HashMap<&'static str, Value>);
 
@@ -70,10 +69,13 @@ impl CreateChannel {
 
     /// How many seconds must a user wait before sending another message.
     ///
-    /// Bots, or users with the `MANAGE_MESSAGES` and/or`MANAGE_CHANNEL` permissions are exempt
+    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt
     /// from this restriction.
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
+    ///
+    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
+    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
     pub fn rate_limit(&mut self, limit: u64) -> &mut Self {
         self.0.insert("rate_limit_per_user", Value::Number(Number::from(limit)));
 
@@ -106,11 +108,11 @@ impl CreateChannel {
     /// use serenity::model::permissions::Permissions;
     ///
     /// // Assuming a guild has already been bound.
-    /// let permissions = Some(PermissionOverwrite {
+    /// let permissions = vec![PermissionOverwrite {
     ///     allow: Permissions::READ_MESSAGES,
     ///     deny: Permissions::SEND_TTS_MESSAGES,
     ///     kind: PermissionOverwriteType::Member(UserId(1234)),
-    /// });
+    /// }];
     ///
     /// guild.create_channel(http, |c| {
     ///     c.name("my_new_cool_channel")
@@ -121,21 +123,25 @@ impl CreateChannel {
     /// # }
     /// ```
     pub fn permissions<I>(&mut self, perms: I) -> &mut Self
-        where I: IntoIterator<Item=PermissionOverwrite>
+    where
+        I: IntoIterator<Item = PermissionOverwrite>,
     {
-        let overwrites = perms.into_iter().map(|perm| {
-            let (id, kind) = match perm.kind {
-                PermissionOverwriteType::Member(id) => (id.0, "member"),
-                PermissionOverwriteType::Role(id) => (id.0, "role"),
-            };
+        let overwrites = perms
+            .into_iter()
+            .map(|perm| {
+                let (id, kind) = match perm.kind {
+                    PermissionOverwriteType::Member(id) => (id.0, "member"),
+                    PermissionOverwriteType::Role(id) => (id.0, "role"),
+                };
 
-            json!({
-                "allow": perm.allow.bits(),
-                "deny": perm.deny.bits(),
-                "id": id,
-                "type": kind,
+                json!({
+                    "allow": perm.allow.bits(),
+                    "deny": perm.deny.bits(),
+                    "id": id,
+                    "type": kind,
+                })
             })
-        }).collect();
+            .collect();
 
         self.0.insert("permission_overwrites", Value::Array(overwrites));
 
@@ -144,11 +150,11 @@ impl CreateChannel {
 }
 
 impl Default for CreateChannel {
-    /// Creates a builder with default values, setting `kind` to `ChannelType::Text`.
+    /// Creates a builder with default values, setting [`Self::kind`] to [`ChannelType::Text`].
     ///
     /// # Examples
     ///
-    /// Create a default `CreateChannel` builder:
+    /// Create a default [`CreateChannel`] builder:
     ///
     /// ```rust
     /// use serenity::builder::CreateChannel;

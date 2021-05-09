@@ -17,17 +17,16 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, _: Context, ready: Ready) {
-        // Log at the INFO level. This is a macro from the `log` crate.
+        // Log at the INFO level. This is a macro from the `tracing` crate.
         info!("{} is connected!", ready.user.name);
     }
 
     // For instrument to work, all parameters must implement Debug.
     //
     // Handler doesn't implement Debug here, so we specify to skip that argument.
-    // Context doesn't implement Debug either, but since it's ignored already, it
-    // doesn't need to be skipped.
-    #[instrument(skip(self))]
-    async fn resume(&self, _: Context, resume: ResumedEvent) {
+    // Context doesn't implement Debug either, so it is also skipped.
+    #[instrument(skip(self, _ctx))]
+    async fn resume(&self, _ctx: Context, resume: ResumedEvent) {
         // Log at the DEBUG level.
         //
         // In this example, this will not show up in the logs because DEBUG is
@@ -57,8 +56,8 @@ struct General;
 #[tokio::main]
 #[instrument]
 async fn main() {
-    // Call tracing_subscriber's initialize function, which configures `log` via
-    // environment variables.
+    // Call tracing_subscriber's initialize function, which configures `tracing`
+    // via environment variables.
     //
     // For example, you can say to log all levels INFO and up via setting the
     // environment variable `RUST_LOG` to `INFO`.

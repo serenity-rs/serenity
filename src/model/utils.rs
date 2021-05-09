@@ -1,27 +1,26 @@
+use std::{collections::HashMap, hash::Hash};
+
 use serde::de::Error as DeError;
 use serde::de::MapAccess;
-use serde::ser::{SerializeSeq, Serialize, Serializer};
-use std::{
-    collections::HashMap,
-    hash::Hash,
-};
-use super::prelude::*;
-
-#[cfg(feature = "cache")]
-use crate::internal::prelude::*;
+use serde::ser::{Serialize, SerializeSeq, Serializer};
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::permissions::Permissions;
+use super::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use crate::internal::prelude::*;
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+use crate::model::interactions::ApplicationCommandInteractionDataOption;
 
 pub fn default_true() -> bool {
     true
 }
 
 pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
     let vec: Vec<Emoji> = Deserialize::deserialize(deserializer)?;
     let mut emojis = HashMap::new();
 
@@ -34,7 +33,8 @@ pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
 
 pub fn serialize_emojis<S: Serializer>(
     emojis: &HashMap<EmojiId, Emoji>,
-    serializer: S) -> StdResult<S::Ok, S::Error> {
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(emojis.len()))?;
 
     for emoji in emojis.values() {
@@ -45,8 +45,8 @@ pub fn serialize_emojis<S: Serializer>(
 }
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
     let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
 
@@ -57,10 +57,9 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
-
 pub fn deserialize_members<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<UserId, Member>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<UserId, Member>, D::Error> {
     let vec: Vec<Member> = Deserialize::deserialize(deserializer)?;
     let mut members = HashMap::new();
 
@@ -73,9 +72,141 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     Ok(members)
 }
 
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<UserId, PartialMember>, D::Error> {
+    let map: HashMap<UserId, PartialMember> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_users<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<UserId, User>, D::Error> {
+    let map: HashMap<UserId, User> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<RoleId, Role>, D::Error> {
+    let map: HashMap<RoleId, Role> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<ChannelId, PartialChannel>, D::Error> {
+    let map: HashMap<ChannelId, PartialChannel> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_options<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
+    let options: Vec<ApplicationCommandInteractionDataOption> =
+        Deserialize::deserialize(deserializer)?;
+
+    Ok(options)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
+    deserializer: D,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
+    let mut options: Vec<ApplicationCommandInteractionDataOption> =
+        Deserialize::deserialize(deserializer)?;
+
+    for option in options.iter_mut() {
+        loop_resolved(option, resolved);
+    }
+
+    Ok(options)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+fn set_resolved(
+    mut options: &mut ApplicationCommandInteractionDataOption,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) {
+    if let Some(ref value) = options.value {
+        let string = value.as_str();
+
+        options.resolved = match options.kind {
+            ApplicationCommandOptionType::User => {
+                let id = &UserId(*&string.unwrap().parse().unwrap());
+
+                let user = resolved.users.get(id).unwrap().to_owned();
+                let member = resolved.members.get(id).map(|m| m.to_owned());
+
+                Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
+            },
+            ApplicationCommandOptionType::Role => {
+                let id = &RoleId(*&string.unwrap().parse().unwrap());
+
+                let role = resolved.roles.get(id).unwrap().to_owned();
+
+                Some(ApplicationCommandInteractionDataOptionValue::Role(role))
+            },
+            ApplicationCommandOptionType::Channel => {
+                let id = &ChannelId(*&string.unwrap().parse().unwrap());
+
+                let channel = resolved.channels.get(id).unwrap().to_owned();
+
+                Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
+            },
+            ApplicationCommandOptionType::Mentionable => {
+                let id: u64 = string.unwrap().parse().unwrap();
+
+                if let Some(user) = resolved.users.get(&UserId(id)) {
+                    let user = user.to_owned();
+                    let member = resolved.members.get(&UserId(id)).map(|m| m.to_owned());
+
+                    Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
+                } else {
+                    let role = resolved.roles.get(&RoleId(id)).unwrap().to_owned();
+
+                    Some(ApplicationCommandInteractionDataOptionValue::Role(role))
+                }
+            },
+            ApplicationCommandOptionType::String => Some(
+                ApplicationCommandInteractionDataOptionValue::String(string.unwrap().to_owned()),
+            ),
+            ApplicationCommandOptionType::Integer => {
+                Some(ApplicationCommandInteractionDataOptionValue::Integer(value.as_i64().unwrap()))
+            },
+            ApplicationCommandOptionType::Boolean => Some(
+                ApplicationCommandInteractionDataOptionValue::Boolean(value.as_bool().unwrap()),
+            ),
+            _ => None,
+        }
+    }
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+fn loop_resolved(
+    options: &mut ApplicationCommandInteractionDataOption,
+    resolved: &ApplicationCommandInteractionDataResolved,
+) {
+    set_resolved(options, resolved);
+
+    for option in options.options.iter_mut() {
+        loop_resolved(option, resolved);
+    }
+}
+
 pub fn deserialize_presences<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<UserId, Presence>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<UserId, Presence>, D::Error> {
     let vec: Vec<Presence> = Deserialize::deserialize(deserializer)?;
     let mut presences = HashMap::new();
 
@@ -88,7 +219,7 @@ pub fn deserialize_presences<'de, D: Deserializer<'de>>(
 
 pub fn serialize_presences<S: Serializer>(
     presences: &HashMap<UserId, Presence>,
-    serializer: S
+    serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(presences.len()))?;
 
@@ -100,8 +231,8 @@ pub fn serialize_presences<S: Serializer>(
 }
 
 pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
     let vec: Vec<Channel> = Deserialize::deserialize(deserializer)?;
     let mut private_channels = HashMap::new();
 
@@ -120,7 +251,7 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
 pub fn serialize_private_channels<S: Serializer>(
     private_channels: &HashMap<ChannelId, Channel>,
-    serializer: S
+    serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(private_channels.len()))?;
 
@@ -132,8 +263,8 @@ pub fn serialize_private_channels<S: Serializer>(
 }
 
 pub fn deserialize_roles<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<RoleId, Role>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<RoleId, Role>, D::Error> {
     let vec: Vec<Role> = Deserialize::deserialize(deserializer)?;
     let mut roles = HashMap::new();
 
@@ -146,7 +277,7 @@ pub fn deserialize_roles<'de, D: Deserializer<'de>>(
 
 pub fn serialize_roles<S: Serializer>(
     roles: &HashMap<RoleId, Role>,
-    serializer: S
+    serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(roles.len()))?;
 
@@ -158,8 +289,8 @@ pub fn serialize_roles<S: Serializer>(
 }
 
 pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<User, D::Error> {
+    deserializer: D,
+) -> StdResult<User, D::Error> {
     let mut users: Vec<User> = Deserialize::deserialize(deserializer)?;
     let user = if users.is_empty() {
         return Err(DeError::custom("Expected a single recipient"));
@@ -195,8 +326,8 @@ pub fn serialize_u64<S: Serializer>(data: &u64, ser: S) -> StdResult<S::Ok, S::E
 }
 
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
     let vec: Vec<VoiceState> = Deserialize::deserialize(deserializer)?;
     let mut voice_states = HashMap::new();
 
@@ -220,12 +351,33 @@ pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
     seq.end()
 }
 
+/// Tries to find a user's permissions using the cache.
+/// Unlike [`user_has_perms`], this function will return `true` even when
+/// the permissions are not in the cache.
+#[cfg(all(feature = "cache", feature = "model"))]
+#[inline]
+pub async fn user_has_perms_cache(
+    cache: impl AsRef<Cache>,
+    channel_id: ChannelId,
+    guild_id: Option<GuildId>,
+    permissions: Permissions,
+) -> Result<()> {
+    if match user_has_perms(cache, channel_id, guild_id, permissions).await {
+        Err(Error::Model(err)) => err.is_cache_err(),
+        result => result?,
+    } {
+        Ok(())
+    } else {
+        Err(Error::Model(ModelError::InvalidPermissions(permissions)))
+    }
+}
+
 #[cfg(all(feature = "cache", feature = "model"))]
 pub async fn user_has_perms(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
     guild_id: Option<GuildId>,
-    mut permissions: Permissions
+    mut permissions: Permissions,
 ) -> Result<bool> {
     let cache = cache.as_ref();
 
@@ -249,7 +401,7 @@ pub async fn user_has_perms(
         Channel::Private(_) => match guild_id {
             Some(_) => return Err(Error::Model(ModelError::InvalidChannelType)),
             None => return Ok(true),
-        }
+        },
     };
 
     let guild = match cache.guild(guild_id).await {
@@ -330,4 +482,4 @@ macro_rules! num_visitors {
     }
 }
 
-num_visitors!(U16Visitor: u16, U64Visitor: u64);
+num_visitors!(U16Visitor: u16, U32Visitor: u32, U64Visitor: u64);

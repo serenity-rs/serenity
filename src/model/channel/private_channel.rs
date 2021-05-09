@@ -1,23 +1,16 @@
+use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature = "model")]
+use std::sync::Arc;
+
 use chrono::{DateTime, Utc};
-use crate::model::prelude::*;
-use std::fmt::{
-    Display,
-    Formatter,
-    Result as FmtResult
-};
 
 #[cfg(feature = "model")]
-use crate::builder::{
-    CreateMessage,
-    EditMessage,
-    GetMessages
-};
+use crate::builder::{CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
 #[cfg(feature = "http")]
 use crate::http::{Http, Typing};
-#[cfg(feature = "model")]
-use std::sync::Arc;
+use crate::model::prelude::*;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -37,15 +30,22 @@ pub struct PrivateChannel {
     #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The recipient to the private channel.
-    #[serde(deserialize_with = "deserialize_single_recipient",
-            serialize_with = "serialize_single_recipient",
-            rename = "recipients")]
+    #[serde(
+        deserialize_with = "deserialize_single_recipient",
+        serialize_with = "serialize_single_recipient",
+        rename = "recipients"
+    )]
     pub recipient: User,
 }
 
 #[cfg(feature = "model")]
 impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
+    ///
+    /// See [ChannelId::broadcast_typing] for more details.
+    ///
+    /// [`ChannelId::broadcast_typing`]: crate::model::channel::ChannelId::broadcast_typing
+    #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
         self.id.broadcast_typing(&http).await
@@ -56,24 +56,24 @@ impl PrivateChannel {
     /// [`Message::react`] may be a more suited method of reacting in most
     /// cases.
     ///
-    /// Requires the [Add Reactions] permission, _if_ the current user is the
-    /// first user to perform a react with a certain emoji.
+    /// # Errors
     ///
-    /// [Add Reactions]: Permissions::ADD_REACTIONS
+    /// Returns [`Error::Http`] if the reaction cannot be added,
+    /// or if a message with that Id does not exist.
     #[inline]
     pub async fn create_reaction(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        reaction_type: impl Into<ReactionType>
-    ) -> Result<()>
-    {
+        reaction_type: impl Into<ReactionType>,
+    ) -> Result<()> {
         self.id.create_reaction(&http, message_id, reaction_type).await
     }
 
     /// Deletes the channel. This does not delete the contents of the channel,
     /// and is equivalent to closing a private channel on the client, which can
     /// be re-opened.
+    #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> {
         self.id.delete(&http).await
@@ -95,12 +95,14 @@ impl PrivateChannel {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(
+    pub async fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item = T>>(
         &self,
         http: impl AsRef<Http>,
-        message_ids: It
+        message_ids: It,
     ) -> Result<()>
-    where T: AsRef<MessageId>, It: IntoIterator<Item=T>,
+    where
+        T: AsRef<MessageId>,
+        It: IntoIterator<Item = T>,
     {
         self.id.delete_messages(&http, message_ids).await
     }
@@ -111,17 +113,25 @@ impl PrivateChannel {
     /// **Note**: Requires the [Manage Channel] permission.
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
+    #[allow(clippy::missing_errors_doc)]
     #[inline]
-    pub async fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+    pub async fn delete_permission(
+        &self,
+        http: impl AsRef<Http>,
+        permission_type: PermissionOverwriteType,
+    ) -> Result<()> {
         self.id.delete_permission(&http, permission_type).await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
     ///
-    /// **Note**: Requires the [Manage Messages] permission, _if_ the current
-    /// user did not perform the reaction.
+    /// **Note**: In private channels, the current user may only
+    /// delete it's own reactions.
     ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the reaction is not from
+    /// the current user.
     #[inline]
     pub async fn delete_reaction(
         &self,
@@ -129,8 +139,7 @@ impl PrivateChannel {
         message_id: impl Into<MessageId>,
         user_id: Option<UserId>,
         reaction_type: impl Into<ReactionType>,
-    ) -> Result<()>
-    {
+    ) -> Result<()> {
         self.id.delete_reaction(&http, message_id, user_id, reaction_type).await
     }
 
@@ -149,6 +158,8 @@ impl PrivateChannel {
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
+    /// Returns [`Error::Http`] if the current user is not the owner of the message.
+    ///
     /// [`EditMessage`]: crate::builder::EditMessage
     /// [`the limit`]: crate::builder::EditMessage::content
     #[inline]
@@ -156,9 +167,10 @@ impl PrivateChannel {
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F
+        f: F,
     ) -> Result<Message>
-    where F: FnOnce(&mut EditMessage) -> &mut EditMessage
+    where
+        F: FnOnce(&mut EditMessage) -> &mut EditMessage,
     {
         self.id.edit_message(&http, message_id, f).await
     }
@@ -168,15 +180,22 @@ impl PrivateChannel {
     /// **Note**: This method is for consistency. This will always return
     /// `false`, due to DMs not being considered NSFW.
     #[inline]
-    pub fn is_nsfw(&self) -> bool { false }
+    pub fn is_nsfw(&self) -> bool {
+        false
+    }
 
     /// Gets a message from the channel.
     ///
-    /// Requires the [Read Message History] permission.
+    /// # Errors
     ///
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+    /// Returns [`Error::Http`] if a message with that Id does not
+    /// exist in this channel.
     #[inline]
-    pub async fn message(&self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<Message> {
+    pub async fn message(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<Message> {
         self.id.message(&http, message_id).await
     }
 
@@ -184,19 +203,23 @@ impl PrivateChannel {
     ///
     /// Refer to [`GetMessages`] for more information on how to use `builder`.
     ///
-    /// Requires the [Read Message History] permission.
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if an invalid value is set in the builder.
     ///
     /// [`GetMessages`]: crate::builder::GetMessages
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where F: FnOnce(&mut GetMessages) -> &mut GetMessages
+    where
+        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
     {
         self.id.messages(&http, builder).await
     }
 
     /// Returns "DM with $username#discriminator".
-    pub fn name(&self) -> String { format!("DM with {}", self.recipient.tag()) }
+    pub fn name(&self) -> String {
+        format!("DM with {}", self.recipient.tag())
+    }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -208,29 +231,40 @@ impl PrivateChannel {
     /// The optional `after` attribute is to retrieve the users after a certain
     /// user. This is useful for pagination.
     ///
-    /// **Note**: Requires the [Read Message History] permission.
+    /// # Errors
     ///
-    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+    /// Returns [`Error::Http`] if a message with the given Id does not exist
+    /// in the channel.
     #[inline]
-    pub async fn reaction_users<M, R, U>(&self,
+    pub async fn reaction_users<M, R, U>(
+        &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
         reaction_type: impl Into<ReactionType>,
         limit: Option<u8>,
         after: impl Into<Option<UserId>>,
-    ) -> Result<Vec<User>>
-    {
+    ) -> Result<Vec<User>> {
         self.id.reaction_users(&http, message_id, reaction_type, limit, after).await
     }
 
     /// Pins a [`Message`] to the channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the number of pinned messages
+    /// would exceed the 50 message limit.
     #[inline]
-    pub async fn pin(&self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
+    pub async fn pin(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<()> {
         self.id.pin(&http, message_id).await
     }
 
     /// Retrieves the list of messages that have been pinned in the private
     /// channel.
+    #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
         self.id.pins(&http).await
@@ -244,7 +278,11 @@ impl PrivateChannel {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     #[inline]
-    pub async fn say(&self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
+    pub async fn say(
+        &self,
+        http: impl AsRef<Http>,
+        content: impl std::fmt::Display,
+    ) -> Result<Message> {
         self.id.say(&http, content).await
     }
 
@@ -262,12 +300,18 @@ impl PrivateChannel {
     /// [`ModelError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
-    /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
-    pub async fn send_files<'a, F, T, It>(&self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
-    where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-          T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>
+    pub async fn send_files<'a, F, T, It>(
+        &self,
+        http: impl AsRef<Http>,
+        files: It,
+        f: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+        T: Into<AttachmentType<'a>>,
+        It: IntoIterator<Item = T>,
     {
         self.id.send_files(&http, files, f).await
     }
@@ -286,7 +330,8 @@ impl PrivateChannel {
     /// [`CreateMessage`]: crate::builder::CreateMessage
     #[inline]
     pub async fn send_message<'a, F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
-    where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>
+    where
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
     {
         self.id.send_message(&http, f).await
     }
@@ -295,11 +340,11 @@ impl PrivateChannel {
     ///
     /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
     /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after `stop` is called.
+    /// for a few seconds after [`Typing::stop`] is called.
     /// Typing is also stopped when the struct is dropped.
     ///
     /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.
@@ -335,17 +380,28 @@ impl PrivateChannel {
     /// # Ok(())
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the current user cannot send a direct message
+    /// to this user.
     pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
         http.start_typing(self.id.0)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
     ///
-    /// Requires the [Manage Messages] permission.
+    /// # Errors
     ///
-    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// if the message was deleted, or if the channel already has the limit of
+    /// 50 pinned messages.
     #[inline]
-    pub async fn unpin(&self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
+    pub async fn unpin(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<()> {
         self.id.unpin(&http, message_id).await
     }
 }

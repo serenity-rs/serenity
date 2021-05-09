@@ -1,11 +1,10 @@
-use crate::model::prelude::*;
-
 #[cfg(feature = "model")]
 use crate::builder::EditChannel;
+#[cfg(feature = "model")]
+use crate::http::{CacheHttp, Http};
+use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils as serenity_utils;
-#[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp};
 
 /// A category of [`GuildChannel`]s.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -37,23 +36,55 @@ pub struct ChannelCategory {
 #[cfg(feature = "model")]
 impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
+    ///
+    /// Also requires the [Manage Roles] permission if
+    /// not modifying the permissions for only the current user.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid value was set.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub async fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
+    pub async fn create_permission(
+        &self,
+        http: impl AsRef<Http>,
+        target: &PermissionOverwrite,
+    ) -> Result<()> {
         self.id.create_permission(&http, target).await
     }
 
     /// Deletes all permission overrides in the category from the channels.
     ///
-    /// **Note**: Requires the [Manage Channel] permission.
+    /// **Note**: Requires the [Manage Roles] permission.
     ///
-    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+    pub async fn delete_permission(
+        &self,
+        http: impl AsRef<Http>,
+        permission_type: PermissionOverwriteType,
+    ) -> Result<()> {
         self.id.delete_permission(&http, permission_type).await
     }
 
-
-    /// Deletes this category if required permissions are met.
+    /// Deletes this category.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         self.id.delete(&cache_http.http()).await.map(|_| ())
@@ -61,7 +92,11 @@ impl ChannelCategory {
 
     /// Modifies the category's settings, such as its position or name.
     ///
-    /// Refer to `EditChannel`s documentation for a full list of methods.
+    /// Refer to [`EditChannel`]s documentation for a full list of methods.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission,
+    /// also requires the [Manage Roles] permission if modifying
+    /// permissions for the category.
     ///
     /// # Examples
     ///
@@ -76,9 +111,18 @@ impl ChannelCategory {
     /// category.edit(&http, |c| c.name("test").bitrate(86400)).await;
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if an invalid value is set,
+    /// or if the current user lacks the necessary permissions.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[cfg(feature = "utils")]
     pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-        where F: FnOnce(&mut EditChannel) -> &mut EditChannel
+    where
+        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
     {
         let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
@@ -120,5 +164,7 @@ impl ChannelCategory {
     }
 
     /// Returns the name of the category.
-    pub fn name(&self) -> &str { &self.name }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
 }

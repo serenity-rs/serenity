@@ -2,12 +2,9 @@
 
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    }
+    fmt::{Display, Formatter, Result as FmtResult},
 };
+
 use super::Permissions;
 
 /// An error returned from the [`model`] module.
@@ -103,6 +100,18 @@ pub enum Error {
     /// [`ChannelId`]: super::id::ChannelId
     /// [`Cache`]: crate::cache::Cache
     ChannelNotFound,
+    /// An indication that a [`Message`] has already been crossposted,
+    /// and cannot be crossposted twice.
+    ///
+    /// [`Message`]: super::channel::Message
+    MessageAlreadyCrossposted,
+    /// An indication that you cannot crosspost a [`Message`].
+    ///
+    /// For instance, you cannot crosspost a system message or a
+    /// message coming from the crosspost feature.
+    ///
+    /// [`Message`]: super::channel::Message
+    CannotCrosspostMessage,
     /// Indicates that there are hierarchy problems restricting an action.
     ///
     /// For example, when banning a user, if the other user has a role with an
@@ -148,6 +157,26 @@ pub enum Error {
     NameTooShort,
     /// Indicates that the webhook name is over the 100 characters limit.
     NameTooLong,
+    /// Indicates that the bot is not author of the message.
+    /// This error is returned in private/direct channels.
+    NotAuthor,
+    /// Indicates that the webhook token is missing.
+    NoTokenSet,
+}
+
+impl Error {
+    /// Return `true` if the model error is related to an item missing in the
+    /// cache.
+    pub fn is_cache_err(&self) -> bool {
+        match self {
+            Self::ItemMissing
+            | Self::ChannelNotFound
+            | Self::RoleNotFound
+            | Self::GuildNotFound
+            | Self::MemberNotFound => true,
+            _ => false,
+        }
+    }
 }
 
 impl Display for Error {
@@ -165,13 +194,15 @@ impl Display for Error {
             Error::InvalidPermissions(_) => f.write_str("Invalid permissions."),
             Error::InvalidUser => f.write_str("The current user cannot perform the action."),
             Error::ItemMissing => f.write_str("The required item is missing from the cache."),
-            Error::WrongGuild => {
-                f.write_str("Provided member or channel is from the wrong guild.")
-            }
+            Error::WrongGuild => f.write_str("Provided member or channel is from the wrong guild."),
             Error::MessageTooLong(_) => f.write_str("Message too large."),
+            Error::MessageAlreadyCrossposted => f.write_str("Message already crossposted."),
+            Error::CannotCrosspostMessage => f.write_str("Cannot crosspost this message type."),
             Error::MessagingBot => f.write_str("Attempted to message another bot user."),
             Error::NameTooShort => f.write_str("Name is under the character limit."),
             Error::NameTooLong => f.write_str("Name is over the character limit."),
+            Error::NotAuthor => f.write_str("The bot is not author of this message."),
+            Error::NoTokenSet => f.write_str("Token is not set."),
         }
     }
 }

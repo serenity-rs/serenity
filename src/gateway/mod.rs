@@ -50,25 +50,22 @@ mod error;
 mod shard;
 mod ws_client_ext;
 
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
+use serde_json::Value;
+
 pub use self::{
     error::Error as GatewayError,
     shard::Shard,
-    ws_client_ext::WebSocketGatewayClientExt
+    ws_client_ext::WebSocketGatewayClientExt,
 };
-
-use crate::model::{
-    gateway::Activity,
-    user::OnlineStatus,
-};
-use serde_json::Value;
-use std::fmt::{Display, Formatter, Result as FmtResult};
-
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
+use crate::model::{gateway::Activity, user::OnlineStatus};
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 
-use async_tungstenite::{WebSocketStream, tokio::ConnectStream};
+use async_tungstenite::{tokio::ConnectStream, WebSocketStream};
 
 pub type WsStream = WebSocketStream<ConnectStream>;
 
@@ -154,8 +151,12 @@ impl Display for ConnectionStage {
 /// A message to be passed around within the library.
 ///
 /// As a user you usually don't need to worry about this, but when working with
-/// the lower-level internals of the `client`, `gateway, and `voice` modules it
+/// the lower-level internals of the [`client`], [`gateway`], and [`voice`] modules it
 /// may be necessary.
+///
+/// [`client`]: crate::client
+/// [`gateway`]: crate::gateway
+/// [`voice`]: crate::model::voice
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum InterMessage {
@@ -164,6 +165,7 @@ pub enum InterMessage {
     Json(Value),
 }
 
+#[derive(Debug)]
 #[non_exhaustive]
 pub enum ShardAction {
     Heartbeat,
@@ -172,6 +174,7 @@ pub enum ShardAction {
 }
 
 /// The type of reconnection that should be performed.
+#[derive(Debug)]
 #[non_exhaustive]
 pub enum ReconnectType {
     /// Indicator that a new connection should be made by sending an IDENTIFY.

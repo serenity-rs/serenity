@@ -1,9 +1,9 @@
-use crate::model::id::AttachmentId;
-
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
+
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+use crate::model::id::AttachmentId;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
@@ -26,6 +26,10 @@ pub struct Attachment {
     pub url: String,
     /// If the attachment is an image, then the width of the image is provided.
     pub width: Option<u64>,
+    /// The attachment's [media type].
+    ///
+    /// [media type]: https://en.wikipedia.org/wiki/Media_type
+    pub content_type: Option<String>,
 }
 
 #[cfg(feature = "model")]
@@ -33,8 +37,7 @@ impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height
     /// in pixels is returned.
     pub fn dimensions(&self) -> Option<(u64, u64)> {
-        self.width
-            .and_then(|width| self.height.map(|height| (width, height)))
+        self.width.and_then(|width| self.height.map(|height| (width, height)))
     }
 
     /// Downloads the attachment, returning back a vector of bytes.
@@ -115,13 +118,6 @@ impl Attachment {
     pub async fn download(&self) -> Result<Vec<u8>> {
         let reqwest = ReqwestClient::new();
 
-        Ok(reqwest
-           .get(&self.url)
-           .send()
-           .await?
-           .bytes()
-           .await?
-           .into_iter()
-           .collect::<Vec<u8>>())
+        Ok(reqwest.get(&self.url).send().await?.bytes().await?.into_iter().collect::<Vec<u8>>())
     }
 }

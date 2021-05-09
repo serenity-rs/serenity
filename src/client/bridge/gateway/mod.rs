@@ -44,30 +44,26 @@
 
 pub mod event;
 
+mod intents;
 mod shard_manager;
 mod shard_manager_monitor;
 mod shard_messenger;
 mod shard_queuer;
 mod shard_runner;
 mod shard_runner_message;
-mod intents;
 
+use std::{
+    fmt::{Display, Formatter, Result as FmtResult},
+    time::Duration as StdDuration,
+};
+
+pub use self::intents::GatewayIntents;
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
-pub use self::shard_manager_monitor::{ShardManagerMonitor, ShardManagerError};
+pub use self::shard_manager_monitor::{ShardManagerError, ShardManagerMonitor};
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
-pub use self::shard_runner_message::{ShardRunnerMessage, ChunkGuildFilter};
-pub use self::intents::GatewayIntents;
-
-use std::{
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    },
-    time::Duration as StdDuration
-};
+pub use self::shard_runner_message::{ChunkGuildFilter, ShardRunnerMessage};
 use crate::gateway::ConnectionStage;
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
@@ -87,11 +83,7 @@ pub enum ShardManagerMessage {
     /// Indicator that a [`ShardManagerMonitor`] should restart a shard.
     Restart(ShardId),
     /// An update from a shard runner,
-    ShardUpdate {
-        id: ShardId,
-        latency: Option<StdDuration>,
-        stage: ConnectionStage,
-    },
+    ShardUpdate { id: ShardId, latency: Option<StdDuration>, stage: ConnectionStage },
     /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard
     /// without bringing it back up.
     Shutdown(ShardId, u16),

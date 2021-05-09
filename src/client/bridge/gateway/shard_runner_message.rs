@@ -1,12 +1,12 @@
+use async_tungstenite::tungstenite::Message;
+
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionFilter};
 use crate::model::{
     gateway::Activity,
     id::{GuildId, UserId},
     user::OnlineStatus,
 };
-
-#[cfg(feature = "collector")]
-use crate::collector::{MessageFilter, ReactionFilter};
-use async_tungstenite::tungstenite::Message;
 
 #[derive(Clone, Debug)]
 pub enum ChunkGuildFilter {
@@ -61,8 +61,10 @@ pub enum ShardRunnerMessage {
     SetStatus(OnlineStatus),
     /// Sends a new filter for messages to the shard.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     SetMessageFilter(MessageFilter),
     /// Sends a new filter for reactions to the shard.
     #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     SetReactionFilter(ReactionFilter),
 }

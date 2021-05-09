@@ -1,10 +1,16 @@
-use super::Delimiter;
-use crate::client::Context;
-use crate::model::{channel::Message, id::{UserId, GuildId, ChannelId}};
 use std::collections::HashSet;
+
 use futures::future::BoxFuture;
 
-type DynamicPrefixHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
+use super::Delimiter;
+use crate::client::Context;
+use crate::model::{
+    channel::Message,
+    id::{ChannelId, GuildId, UserId},
+};
+
+type DynamicPrefixHook =
+    for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
 
 /// A configuration struct for deciding whether the framework
 /// should allow optional whitespace between prefixes, group prefixes and command names.
@@ -177,7 +183,7 @@ impl Configuration {
         self
     }
 
-       /// HashSet of channels Ids where commands will be working.
+    /// HashSet of channels Ids where commands will be working.
     ///
     /// **Note**: Defaults to an empty HashSet.
     ///
@@ -284,22 +290,22 @@ impl Configuration {
     }
 
     /// Sets the prefix to respond to dynamically, in addition to the one
-    /// configured with [`prefix`] or [`prefixes`]. This is useful if you want
+    /// configured with [`Self::prefix`] or [`Self::prefixes`]. This is useful if you want
     /// to have user configurable per-guild or per-user prefixes, such as by
     /// fetching a guild's prefix from a database accessible via
     /// [`Context::data`].
     ///
-    /// Return `None` to not have a special prefix for the dispatch and to only
-    /// use the configured prefix from [`prefix`] or [`prefixes`].
+    /// Return [`None`] to not have a special prefix for the dispatch and to only
+    /// use the configured prefix from [`Self::prefix`] or [`Self::prefixes`].
     ///
     /// This method can be called many times to add more dynamic prefix hooks.
     ///
     /// **Note**: Defaults to no dynamic prefix check.
     ///
-    /// **Note**: If using dynamic_prefix *without* [`prefix`] or [`prefixes`],
+    /// **Note**: If using dynamic_prefix *without* [`Self::prefix`] or [`Self::prefixes`],
     /// there will still be the default framework prefix of `"~"`. You can disable
     /// the default prefix by setting the prefix to an empty string `""` with
-    /// [`prefix`].
+    /// [`Self::prefix`].
     ///
     /// # Examples
     ///
@@ -338,13 +344,11 @@ impl Configuration {
     ///             }.to_string())
     ///         }))
     ///         // This disables the default prefix "~"
-    ///         .prefix("") 
+    ///         .prefix("")
     ///     );
     /// ```
     ///
-    ///  [`Context::data`]: crate::client::Context::data
-    ///  [`prefix`]: Self::prefix
-    ///  [`prefixes`]: Self::prefixes
+    /// [`Context::data`]: crate::client::Context::data
     #[inline]
     pub fn dynamic_prefix(&mut self, dynamic_prefix: DynamicPrefixHook) -> &mut Self {
         self.dynamic_prefixes.push(dynamic_prefix);
@@ -375,7 +379,7 @@ impl Configuration {
 
     /// Whether or not to respond to commands initiated with `id_to_mention`.
     ///
-    /// **Note**: that this can be used in conjunction with [`prefix`].
+    /// **Note**: that this can be used in conjunction with [`Self::prefix`].
     ///
     /// **Note**: Defaults to ignore mentions.
     ///
@@ -393,15 +397,13 @@ impl Configuration {
     /// which aids mobile devices in determining whether to display a user's
     /// nickname. It has no real meaning for your bot, and the library
     /// encourages you to ignore differentiating between the two.
-    ///
-    /// [`prefix`]: Self::prefix
     pub fn on_mention(&mut self, id_to_mention: Option<UserId>) -> &mut Self {
         self.on_mention = id_to_mention.map(|id| id.to_string());
 
         self
     }
 
-    /// A `HashSet` of user Ids checks won't apply to.
+    /// A [`HashSet`] of user Ids checks won't apply to.
     ///
     /// **Note**: Defaults to an empty HashSet.
     ///
@@ -444,7 +446,7 @@ impl Configuration {
     /// **Note**: Passing empty string `""` will set no prefix.
     ///
     /// **Note**: This prefix will always be usable, even if there is a
-    /// [`dynamic_prefix`] configured.
+    /// [`Self::dynamic_prefix`] configured.
     ///
     /// # Examples
     ///
@@ -456,14 +458,8 @@ impl Configuration {
     /// let framework = StandardFramework::new().configure(|c| c
     ///     .prefix("!"));
     /// ```
-    ///
-    /// [`dynamic_prefix`]: Self::dynamic_prefix
     pub fn prefix(&mut self, prefix: &str) -> &mut Self {
-        self.prefixes = if prefix.is_empty() {
-            vec![]
-        } else {
-            vec![prefix.to_string()]
-        };
+        self.prefixes = if prefix.is_empty() { vec![] } else { vec![prefix.to_string()] };
 
         self
     }
@@ -471,10 +467,10 @@ impl Configuration {
     /// Sets the prefixes to respond to. Each can be a string slice of any
     /// non-zero length.
     ///
-    /// **Note**: Refer to [`prefix`] for the default value.
+    /// **Note**: Refer to [`Self::prefix`] for the default value.
     ///
     /// **Note**: These prefixes will always be usable, even if there is a
-    /// [`dynamic_prefix`] configured.
+    /// [`Self::dynamic_prefix`] configured.
     ///
     /// # Examples
     ///
@@ -486,22 +482,18 @@ impl Configuration {
     /// let framework = StandardFramework::new().configure(|c| c
     ///     .prefixes(vec!["!", ">", "+"]));
     /// ```
-    ///
-    /// [`prefix`]: Self::prefix
-    /// [`dynamic_prefix`]: Self::dynamic_prefix
     #[inline]
     pub fn prefixes<T, It>(&mut self, prefixes: It) -> &mut Self
     where
         T: ToString,
         It: IntoIterator<Item = T>,
     {
-
         self.prefixes = prefixes.into_iter().map(|p| p.to_string()).collect();
 
         self
     }
 
-    /// Sets whether command execution can done without a prefix. Works only in private channels.
+    /// Sets whether command execution can be done without a prefix. Works only in private channels.
     ///
     /// **Note**: Defaults to `false`.
     ///
@@ -539,7 +531,7 @@ impl Configuration {
     /// Sets multiple delimiters to be used when splitting the content after a command.
     /// Additionally cleans the default delimiter from the vector.
     ///
-    /// **Note**: Refer to [`delimiter`] for the default value.
+    /// **Note**: Refer to [`Self::delimiter`] for the default value.
     ///
     /// # Examples
     ///
@@ -551,16 +543,13 @@ impl Configuration {
     /// let framework = StandardFramework::new().configure(|c| c
     ///     .delimiters(vec![", ", " "]));
     /// ```
-    ///
-    /// [`delimiter`]: Self::delimiter
     pub fn delimiters<T, It>(&mut self, delimiters: It) -> &mut Self
     where
         T: Into<Delimiter>,
         It: IntoIterator<Item = T>,
     {
         self.delimiters.clear();
-        self.delimiters
-            .extend(delimiters.into_iter().map(|s| s.into()));
+        self.delimiters.extend(delimiters.into_iter().map(|s| s.into()));
 
         self
     }

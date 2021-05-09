@@ -1,35 +1,32 @@
-use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction, GatewayError};
-use crate::internal::prelude::*;
-use crate::internal::ws_impl::{ReceiverExt, SenderExt};
-use crate::model::event::{Event, GatewayEvent};
-use crate::CacheAndHttp;
-use tokio::sync::RwLock;
-use serde::Deserialize;
-use std::{
-    borrow::Cow,
-    sync::Arc,
-};
-use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
-use futures::{SinkExt, StreamExt};
-use crate::client::dispatch::{DispatchEvent, dispatch};
-use crate::client::{EventHandler, RawEventHandler};
-use super::event::{ClientEvent, ShardStageUpdateEvent};
-use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
+use std::{borrow::Cow, sync::Arc};
+
 use async_tungstenite::tungstenite::{
     self,
     error::Error as TungsteniteError,
     protocol::frame::CloseFrame,
 };
-
+use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use futures::{SinkExt, StreamExt};
+use serde::Deserialize;
+use tokio::sync::RwLock;
+use tracing::{debug, error, info, instrument, trace, warn};
 use typemap_rev::TypeMap;
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
+
+use super::event::{ClientEvent, ShardStageUpdateEvent};
+use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
+use crate::client::dispatch::{dispatch, DispatchEvent};
+use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
-
-use tracing::{trace, error, debug, warn, info, instrument};
+#[cfg(feature = "framework")]
+use crate::framework::Framework;
+use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
+use crate::internal::prelude::*;
+use crate::internal::ws_impl::{ReceiverExt, SenderExt};
+use crate::model::event::{Event, GatewayEvent};
+use crate::CacheAndHttp;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 pub struct ShardRunner {
@@ -113,10 +110,7 @@ impl ShardRunner {
 
             // check heartbeat
             if !self.shard.check_heartbeat().await {
-                warn!(
-                    "[ShardRunner {:?}] Error heartbeating",
-                    self.shard.shard_info(),
-                );
+                warn!("[ShardRunner {:?}] Error heartbeating", self.shard.shard_info(),);
 
                 return self.request_restart().await;
             }
@@ -142,7 +136,28 @@ impl ShardRunner {
                     return self.request_restart().await;
                 },
                 Some(other) => {
-                    let _ = self.action(&other).await;
+                    if let Err(e) = self.action(&other).await {
+                        debug!(
+                            "[ShardRunner {:?}] Reconnecting due to error performing {:?}: {:?}",
+                            self.shard.shard_info(),
+                            other,
+                            e
+                        );
+                        match self.shard.reconnection_type() {
+                            ReconnectType::Reidentify => return self.request_restart().await,
+                            ReconnectType::Resume => {
+                                if let Err(why) = self.shard.resume().await {
+                                    warn!(
+                                        "[ShardRunner {:?}] Resume failed, reidentifying: {:?}",
+                                        self.shard.shard_info(),
+                                        why
+                                    );
+
+                                    return self.request_restart().await;
+                                }
+                            },
+                        };
+                    }
                 },
                 None => {},
             }
@@ -167,7 +182,7 @@ impl ShardRunner {
     /// is accepted by them.
     #[cfg(feature = "collector")]
     fn handle_filters(&mut self, event: &Event) {
-        /// Unlike `Vec`'s `retain`, allows mutable references in `f`.
+        /// Unlike [`Vec`]'s `retain`, allows mutable references in `f`.
         fn retain<T, F>(vec: &mut Vec<T>, mut f: F)
         where
             F: FnMut(&mut T) -> bool,
@@ -178,7 +193,6 @@ impl ShardRunner {
                 let v = &mut **vec;
 
                 for i in 0..len {
-
                     if !f(&mut v[i]) {
                         del += 1;
                     } else if del > 0 {
@@ -194,7 +208,6 @@ impl ShardRunner {
 
         // Avoid the clone if there is no message filter.
         if !self.message_filters.is_empty() {
-
             if let Event::MessageCreate(ref msg_event) = &event {
                 let msg = Arc::new(msg_event.message.clone());
 
@@ -205,10 +218,12 @@ impl ShardRunner {
         // Avoid the clone if there is no reacton filter.
         if !self.reaction_filters.is_empty() {
             let reaction = Arc::new(match &event {
-                Event::ReactionAdd(ref reaction_event) =>
-                    ReactionAction::Added(Arc::new(reaction_event.reaction.clone())),
-                Event::ReactionRemove(ref reaction_event) =>
-                    ReactionAction::Removed(Arc::new(reaction_event.reaction.clone())),
+                Event::ReactionAdd(ref reaction_event) => {
+                    ReactionAction::Added(Arc::new(reaction_event.reaction.clone()))
+                },
+                Event::ReactionRemove(ref reaction_event) => {
+                    ReactionAction::Removed(Arc::new(reaction_event.reaction.clone()))
+                },
                 _ => return,
             });
 
@@ -258,10 +273,15 @@ impl ShardRunner {
         }
 
         // Send a Close Frame to Discord, which allows a bot to "log off"
-        let _ = self.shard.client.close(Some(CloseFrame {
-            code: close_code.into(),
-            reason: Cow::from(""),
-        })).await;
+        #[allow(clippy::let_underscore_must_use)]
+        let _ = self
+            .shard
+            .client
+            .close(Some(CloseFrame {
+                code: close_code.into(),
+                reason: Cow::from(""),
+            }))
+            .await;
 
         // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
         // disconnected from Discord.
@@ -274,13 +294,14 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
                     break;
-                }
+                },
                 _ => continue,
             }
         }
 
         // Inform the manager that shutdown for this shard has finished.
-        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id)) {
+        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id))
+        {
             warn!(
                 "[ShardRunner {:?}] Could not send ShutdownFinished: {:#?}",
                 self.shard.shard_info(),
@@ -303,7 +324,8 @@ impl ShardRunner {
             &self.runner_tx,
             self.shard.shard_info()[0],
             Arc::clone(&self.cache_and_http),
-        ).await;
+        )
+        .await;
     }
 
     // Handles a received value over the shard runner rx channel.
@@ -316,20 +338,21 @@ impl ShardRunner {
     async fn handle_rx_value(&mut self, value: InterMessage) -> bool {
         match value {
             InterMessage::Client(value) => match *value {
-                ShardClientMessage::Manager(ShardManagerMessage::Restart(id)) =>
-                    self.checked_shutdown(id, 4000).await,
-                ShardClientMessage::Manager(ShardManagerMessage::Shutdown(id, code)) =>
-                    self.checked_shutdown(id, code).await,
+                ShardClientMessage::Manager(ShardManagerMessage::Restart(id)) => {
+                    self.checked_shutdown(id, 4000).await
+                },
+                ShardClientMessage::Manager(ShardManagerMessage::Shutdown(id, code)) => {
+                    self.checked_shutdown(id, code).await
+                },
                 ShardClientMessage::Manager(ShardManagerMessage::ShutdownAll) => {
                     // This variant should never be received.
-                    warn!(
-                        "[ShardRunner {:?}] Received a ShutdownAll?",
-                        self.shard.shard_info(),
-                    );
+                    warn!("[ShardRunner {:?}] Received a ShutdownAll?", self.shard.shard_info(),);
 
                     true
                 },
-                ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate { .. }) => {
+                ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate {
+                    ..
+                }) => {
                     // nb: not sent here
 
                     true
@@ -345,23 +368,20 @@ impl ShardRunner {
                     true
                 },
                 ShardClientMessage::Manager(ShardManagerMessage::ShardDisallowedGatewayIntents)
-                    | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidAuthentication)
-                    | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidGatewayIntents) => {
-                        // These variants should never be received.
-                        warn!(
-                            "[ShardRunner {:?}] Received a ShardError?",
-                            self.shard.shard_info(),
-                        );
+                | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidAuthentication)
+                | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidGatewayIntents) => {
+                    // These variants should never be received.
+                    warn!("[ShardRunner {:?}] Received a ShardError?", self.shard.shard_info(),);
 
-                        true
-                    },
-                ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuild { guild_id, limit, filter, nonce }) => {
-                    self.shard.chunk_guild(
-                        guild_id,
-                        limit,
-                        filter,
-                        nonce.as_deref(),
-                    ).await.is_ok()
+                    true
+                },
+                ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuild {
+                    guild_id,
+                    limit,
+                    filter,
+                    nonce,
+                }) => {
+                    self.shard.chunk_guild(guild_id, limit, filter, nonce.as_deref()).await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::Close(code, reason)) => {
                     let reason = reason.unwrap_or_else(String::new);
@@ -428,10 +448,9 @@ impl ShardRunner {
         if let Some(voice_manager) = &self.voice_manager {
             match *event {
                 Event::Ready(_) => {
-                    voice_manager.register_shard(
-                        self.shard.shard_info()[0],
-                        self.runner_tx.clone(),
-                    ).await;
+                    voice_manager
+                        .register_shard(self.shard.shard_info()[0], self.runner_tx.clone())
+                        .await;
                 },
                 Event::VoiceServerUpdate(ref event) => {
                     if let Some(guild_id) = event.guild_id {
@@ -472,6 +491,7 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
 
+                    #[allow(clippy::let_underscore_must_use)]
                     let _ = self.request_restart().await;
 
                     return Ok(false);
@@ -490,9 +510,7 @@ impl ShardRunner {
     #[instrument(skip(self))]
     async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
         let gw_event = match self.shard.client.recv_json().await {
-            Ok(Some(value)) => {
-                GatewayEvent::deserialize(value).map(Some).map_err(From::from)
-            },
+            Ok(Some(value)) => GatewayEvent::deserialize(value).map(Some).map_err(From::from),
             Ok(None) => Ok(None),
             Err(Error::Tungstenite(TungsteniteError::Io(_))) => {
                 debug!("Attempting to auto-reconnect");
@@ -527,24 +545,37 @@ impl ShardRunner {
 
                 match why {
                     Error::Gateway(GatewayError::InvalidAuthentication) => {
-                        if self.manager_tx.unbounded_send(
-                            ShardManagerMessage::ShardInvalidAuthentication).is_err() {
-                            panic!("Failed sending InvalidAuthentication error to the shard manager.");
+                        if self
+                            .manager_tx
+                            .unbounded_send(ShardManagerMessage::ShardInvalidAuthentication)
+                            .is_err()
+                        {
+                            panic!(
+                                "Failed sending InvalidAuthentication error to the shard manager."
+                            );
                         }
 
                         return Err(why);
                     },
                     Error::Gateway(GatewayError::InvalidGatewayIntents) => {
-                        if self.manager_tx.unbounded_send(
-                            ShardManagerMessage::ShardInvalidGatewayIntents).is_err() {
-                            panic!("Failed sending InvalidGatewayIntents error to the shard manager.");
+                        if self
+                            .manager_tx
+                            .unbounded_send(ShardManagerMessage::ShardInvalidGatewayIntents)
+                            .is_err()
+                        {
+                            panic!(
+                                "Failed sending InvalidGatewayIntents error to the shard manager."
+                            );
                         }
 
                         return Err(why);
                     },
                     Error::Gateway(GatewayError::DisallowedGatewayIntents) => {
-                        if self.manager_tx.unbounded_send(
-                            ShardManagerMessage::ShardDisallowedGatewayIntents).is_err() {
+                        if self
+                            .manager_tx
+                            .unbounded_send(ShardManagerMessage::ShardDisallowedGatewayIntents)
+                            .is_err()
+                        {
                             panic!("Failed sending DisallowedGatewayIntents error to the shard manager.");
                         }
 
@@ -578,10 +609,7 @@ impl ShardRunner {
     async fn request_restart(&mut self) -> Result<()> {
         self.update_manager();
 
-        debug!(
-            "[ShardRunner {:?}] Requesting restart",
-            self.shard.shard_info(),
-        );
+        debug!("[ShardRunner {:?}] Requesting restart", self.shard.shard_info(),);
         let shard_id = ShardId(self.shard.shard_info()[0]);
         let msg = ShardManagerMessage::Restart(shard_id);
 
@@ -599,6 +627,7 @@ impl ShardRunner {
 
     #[instrument(skip(self))]
     fn update_manager(&self) {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
             id: ShardId(self.shard.shard_info()[0]),
             latency: self.shard.latency(),

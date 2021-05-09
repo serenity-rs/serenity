@@ -1,9 +1,11 @@
-use crate::model::prelude::*;
-use serde_json::Value;
 use std::collections::HashMap;
+
+use async_trait::async_trait;
+use serde_json::Value;
+
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
-use async_trait::async_trait;
+use crate::model::prelude::*;
 
 /// The core trait for handling events by serenity.
 #[async_trait]
@@ -85,28 +87,44 @@ pub trait EventHandler: Send + Sync {
     /// Provides the partial data of the guild sent by discord,
     /// and the full data from the cache, if available.
     ///
-    /// The `unavailable` flag in the partial data determines the status of the guild.
+    /// The [`unavailable`] flag in the partial data determines the status of the guild.
     /// If the flag is false, the bot was removed from the guild, either by being
     /// kicked or banned. If the flag is true, the guild went offline.
+    ///
+    /// [`unavailable`]: GuildUnavailable::unavailable
     #[cfg(feature = "cache")]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: GuildUnavailable, _full: Option<Guild>) {}
+    async fn guild_delete(
+        &self,
+        _ctx: Context,
+        _incomplete: GuildUnavailable,
+        _full: Option<Guild>,
+    ) {
+    }
 
     /// Dispatched when a guild is deleted.
     ///
     /// Provides the partial data of the guild sent by discord.
     ///
-    /// The `unavailable` flag in the partial data determines the status of the guild.
+    /// The [`unavailable`] flag in the partial data determines the status of the guild.
     /// If the flag is false, the bot was removed from the guild, either by being
     /// kicked or banned. If the flag is true, the guild went offline.
+    ///
+    /// [`unavailable`]: GuildUnavailable::unavailable
     #[cfg(not(feature = "cache"))]
     async fn guild_delete(&self, _ctx: Context, _incomplete: GuildUnavailable) {}
 
-    /* the emojis were updated. */
+    // the emojis were updated.
 
     /// Dispatched when the emojis are updated.
     ///
     /// Provides the guild's id and the new state of the emojis in the guild.
-    async fn guild_emojis_update(&self, _ctx: Context, _guild_id: GuildId, _current_state: HashMap<EmojiId, Emoji>) {}
+    async fn guild_emojis_update(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _current_state: HashMap<EmojiId, Emoji>,
+    ) {
+    }
 
     /// Dispatched when a guild's integration is added, updated or removed.
     ///
@@ -128,7 +146,14 @@ pub trait EventHandler: Send + Sync {
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
     #[cfg(feature = "cache")]
-    async fn guild_member_removal(&self, _ctx: Context, _guild_id: GuildId, _user: User, _member_data_if_available: Option<Member>) {}
+    async fn guild_member_removal(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _user: User,
+        _member_data_if_available: Option<Member>,
+    ) {
+    }
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
@@ -146,7 +171,13 @@ pub trait EventHandler: Send + Sync {
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
     #[cfg(feature = "cache")]
-    async fn guild_member_update(&self, _ctx: Context, _old_if_available: Option<Member>, _new: Member) {}
+    async fn guild_member_update(
+        &self,
+        _ctx: Context,
+        _old_if_available: Option<Member>,
+        _new: Member,
+    ) {
+    }
 
     /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
@@ -171,19 +202,34 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's id, the role's id and its data if available.
     #[cfg(feature = "cache")]
-    async fn guild_role_delete(&self, _ctx: Context, _guild_id: GuildId, _removed_role_id: RoleId, _removed_role_data_if_available: Option<Role>) {}
+    async fn guild_role_delete(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _removed_role_id: RoleId,
+        _removed_role_data_if_available: Option<Role>,
+    ) {
+    }
 
     /// Dispatched when a role is deleted.
     ///
     /// Provides the guild's id, the role's id.
     #[cfg(not(feature = "cache"))]
-    async fn guild_role_delete(&self, _ctx: Context, _guild_id: GuildId, _removed_role_id: RoleId) {}
+    async fn guild_role_delete(&self, _ctx: Context, _guild_id: GuildId, _removed_role_id: RoleId) {
+    }
 
     /// Dispatched when a role is updated.
     ///
     /// Provides the guild's id, the role's old (if available) and new data.
     #[cfg(feature = "cache")]
-    async fn guild_role_update(&self, _ctx: Context, _guild_id: GuildId, _old_data_if_available: Option<Role>, _new: Role) {}
+    async fn guild_role_update(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _old_data_if_available: Option<Role>,
+        _new: Role,
+    ) {
+    }
 
     /// Dispatched when a role is updated.
     ///
@@ -200,7 +246,13 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's old full data (if available) and the new, albeit partial data.
     #[cfg(feature = "cache")]
-    async fn guild_update(&self, _ctx: Context, _old_data_if_available: Option<Guild>, _new_but_incomplete: PartialGuild) {}
+    async fn guild_update(
+        &self,
+        _ctx: Context,
+        _old_data_if_available: Option<Guild>,
+        _new_but_incomplete: PartialGuild,
+    ) {
+    }
 
     /// Dispatched when the guild is updated.
     ///
@@ -226,12 +278,26 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a message is deleted.
     ///
     /// Provides the guild's id, the channel's id and the message's id.
-    async fn message_delete(&self, _ctx: Context, _channel_id: ChannelId, _deleted_message_id: MessageId, _guild_id: Option<GuildId>) {}
+    async fn message_delete(
+        &self,
+        _ctx: Context,
+        _channel_id: ChannelId,
+        _deleted_message_id: MessageId,
+        _guild_id: Option<GuildId>,
+    ) {
+    }
 
     /// Dispatched when multiple messages were deleted at once.
     ///
     /// Provides the guild's id, channel's id and the deleted messages' ids.
-    async fn message_delete_bulk(&self, _ctx: Context, _channel_id: ChannelId, _multiple_deleted_messages_ids: Vec<MessageId>, _guild_id: Option<GuildId>) {}
+    async fn message_delete_bulk(
+        &self,
+        _ctx: Context,
+        _channel_id: ChannelId,
+        _multiple_deleted_messages_ids: Vec<MessageId>,
+        _guild_id: Option<GuildId>,
+    ) {
+    }
 
     /// Dispatched when a message is updated.
     ///
@@ -239,7 +305,14 @@ pub trait EventHandler: Send + Sync {
     /// the new message as an option in case of cache inconsistencies,
     /// and the raw [`MessageUpdateEvent`] as a fallback.
     #[cfg(feature = "cache")]
-    async fn message_update(&self, _ctx: Context, _old_if_available: Option<Message>, _new: Option<Message>, _event: MessageUpdateEvent) {}
+    async fn message_update(
+        &self,
+        _ctx: Context,
+        _old_if_available: Option<Message>,
+        _new: Option<Message>,
+        _event: MessageUpdateEvent,
+    ) {
+    }
 
     /// Dispatched when a message is updated.
     ///
@@ -260,7 +333,13 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when all reactions of a message are detached from a message.
     ///
     /// Provides the channel's id and the message's id.
-    async fn reaction_remove_all(&self, _ctx: Context, _channel_id: ChannelId, _removed_from_message_id: MessageId) {}
+    async fn reaction_remove_all(
+        &self,
+        _ctx: Context,
+        _channel_id: ChannelId,
+        _removed_from_message_id: MessageId,
+    ) {
+    }
 
     /// This event is legacy, and likely no longer sent by discord.
     async fn presence_replace(&self, _ctx: Context, _: Vec<Presence>) {}
@@ -316,7 +395,14 @@ pub trait EventHandler: Send + Sync {
     /// Provides the guild's id (if available) and
     /// the old and the new state of the guild's voice channels.
     #[cfg(feature = "cache")]
-    async fn voice_state_update(&self, _ctx: Context, _: Option<GuildId>, _old: Option<VoiceState>, _new: VoiceState) {}
+    async fn voice_state_update(
+        &self,
+        _ctx: Context,
+        _: Option<GuildId>,
+        _old: Option<VoiceState>,
+        _new: VoiceState,
+    ) {
+    }
 
     /// Dispatched when a user joins, leaves or moves to a voice channel.
     ///
@@ -328,7 +414,13 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a guild's webhook is updated.
     ///
     /// Provides the guild's id and the channel's id the webhook belongs in.
-    async fn webhook_update(&self, _ctx: Context, _guild_id: GuildId, _belongs_to_channel_id: ChannelId) {}
+    async fn webhook_update(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _belongs_to_channel_id: ChannelId,
+    ) {
+    }
 
     /// Dispatched when a user used a slash command.
     ///
@@ -336,6 +428,46 @@ pub trait EventHandler: Send + Sync {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn interaction_create(&self, _ctx: Context, _interaction: Interaction) {}
+
+    /// Dispatched when a guild integration is created.
+    ///
+    /// Provides the created integration and the id of the guild this integration belongs to.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_create(
+        &self,
+        _ctx: Context,
+        _integration: Integration,
+        _guild_id: GuildId,
+    ) {
+    }
+
+    /// Dispatched when a guild integration is updated.
+    ///
+    /// Provides the updated integration and the id of the guild this integration belongs to.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_update(
+        &self,
+        _ctx: Context,
+        _integration: Integration,
+        _guild_id: GuildId,
+    ) {
+    }
+
+    /// Dispatched when a guild integration is deleted.
+    ///
+    /// Provides the integration's id, the id of the guild it belongs to, and its associated application id
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_delete(
+        &self,
+        _ctx: Context,
+        _integration_id: IntegrationId,
+        _guild_id: GuildId,
+        _application_id: Option<ApplicationId>,
+    ) {
+    }
 }
 
 /// This core trait for handling raw events

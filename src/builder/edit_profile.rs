@@ -1,5 +1,6 @@
-use crate::internal::prelude::*;
 use std::collections::HashMap;
+
+use crate::internal::prelude::*;
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
@@ -9,7 +10,7 @@ use std::collections::HashMap;
 pub struct EditProfile(pub HashMap<&'static str, Value>);
 
 impl EditProfile {
-    /// Sets the avatar of the current user. `None` can be passed to remove an
+    /// Sets the avatar of the current user. [`None`] can be passed to remove an
     /// avatar.
     ///
     /// A base64-encoded string is accepted as the avatar content.

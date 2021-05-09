@@ -26,6 +26,7 @@ pub const USER_AGENT: &str = concat!(
 );
 
 /// List of messages Discord shows on member join.
+#[allow(clippy::non_ascii_literal)] // allow for discord join messages
 pub static JOIN_MESSAGES: &[&str] = &[
     "$user just joined the server - glhf!",
     "$user just joined. Everyone, look busy!",
@@ -96,43 +97,24 @@ pub enum OpCode {
     Hello = 10,
     /// Sent immediately following a client heartbeat that was received.
     HeartbeatAck = 11,
+    /// Unknown opcode.
+    Unknown = !0,
 }
 
-enum_number!(
-    OpCode {
-        Event,
-        Heartbeat,
-        Identify,
-        StatusUpdate,
-        VoiceStateUpdate,
-        VoiceServerPing,
-        Resume,
-        Reconnect,
-        GetGuildMembers,
-        InvalidSession,
-        Hello,
-        HeartbeatAck,
-    }
-);
-
-impl OpCode {
-    pub fn num(self) -> u64 {
-        match self {
-            OpCode::Event => 0,
-            OpCode::Heartbeat => 1,
-            OpCode::Identify => 2,
-            OpCode::StatusUpdate => 3,
-            OpCode::VoiceStateUpdate => 4,
-            OpCode::VoiceServerPing => 5,
-            OpCode::Resume => 6,
-            OpCode::Reconnect => 7,
-            OpCode::GetGuildMembers => 8,
-            OpCode::InvalidSession => 9,
-            OpCode::Hello => 10,
-            OpCode::HeartbeatAck => 11,
-        }
-    }
-}
+enum_number!(OpCode {
+    Event,
+    Heartbeat,
+    Identify,
+    StatusUpdate,
+    VoiceStateUpdate,
+    VoiceServerPing,
+    Resume,
+    Reconnect,
+    GetGuildMembers,
+    InvalidSession,
+    Hello,
+    HeartbeatAck,
+});
 
 pub mod close_codes {
     /// Unknown error; try reconnecting?

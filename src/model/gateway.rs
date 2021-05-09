@@ -1,10 +1,11 @@
 //! Models pertaining to the gateway.
 
-use serde::de::Error as DeError;
-use serde::ser::{SerializeStruct, Serialize, Serializer};
-use super::utils::*;
-use super::prelude::*;
 use bitflags::bitflags;
+use serde::de::Error as DeError;
+use serde::ser::{Serialize, SerializeStruct, Serializer};
+
+use super::prelude::*;
+use super::utils::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -65,15 +66,13 @@ pub struct Activity {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub session_id: Option<String>,
-    /// The Stream URL if [`kind`] is [`ActivityType::Streaming`].
-    ///
-    /// [`kind`]: Self::kind
+    /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     pub url: Option<String>,
 }
 
 #[cfg(feature = "model")]
 impl Activity {
-    /// Creates a `Activity` struct that appears as a `Playing <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -98,7 +97,10 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn playing(name: &str) -> Activity {
+    pub fn playing<N>(name: N) -> Activity
+    where
+        N: ToString,
+    {
         Activity {
             application_id: None,
             assets: None,
@@ -120,7 +122,7 @@ impl Activity {
         }
     }
 
-    /// Creates an `Activity` struct that appears as a `Streaming <name>`
+    /// Creates an [`Activity`] struct that appears as a `Streaming <name>`
     /// status.
     ///
     /// **Note**: Maximum `name` length is 128.
@@ -148,7 +150,11 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming(name: &str, url: &str) -> Activity {
+    pub fn streaming<N, U>(name: N, url: U) -> Activity
+    where
+        N: ToString,
+        U: ToString,
+    {
         Activity {
             application_id: None,
             assets: None,
@@ -170,7 +176,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Listening to <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Listening to <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -195,7 +201,10 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn listening(name: &str) -> Activity {
+    pub fn listening<N>(name: N) -> Activity
+    where
+        N: ToString,
+    {
         Activity {
             application_id: None,
             assets: None,
@@ -217,7 +226,57 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Competing in <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Watching <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current cometing status:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::gateway::Activity;
+    /// use serenity::model::channel::Message;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
+    /// # #[cfg(feature = "client")]
+    /// use serenity::client::Context;
+    ///
+    /// # #[cfg(feature = "framework")]
+    /// #[command]
+    /// async fn watch(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    ///     let name = args.message();
+    ///     ctx.set_activity(Activity::watching(&name)).await;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn watching<N>(name: N) -> Activity
+    where
+        N: ToString,
+    {
+        Activity {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind: ActivityType::Watching,
+            name: name.to_string(),
+            party: None,
+            secrets: None,
+            state: None,
+            emoji: None,
+            timestamps: None,
+            #[cfg(feature = "unstable_discord_api")]
+            sync_id: None,
+            #[cfg(feature = "unstable_discord_api")]
+            session_id: None,
+            url: None,
+        }
+    }
+
+    /// Creates a [`Activity`] struct that appears as a `Competing in <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -242,7 +301,10 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn competing(name: &str) -> Activity {
+    pub fn competing<N>(name: N) -> Activity
+    where
+        N: ToString,
+    {
         Activity {
             application_id: None,
             assets: None,
@@ -296,11 +358,13 @@ impl<'de> Deserialize<'de> for Activity {
             None => None,
         };
 
-        let kind = map.remove("type")
+        let kind = map
+            .remove("type")
             .and_then(|v| ActivityType::deserialize(v).ok())
             .unwrap_or(ActivityType::Playing);
 
-        let name = map.remove("name")
+        let name = map
+            .remove("name")
             .and_then(|v| String::deserialize(v).ok())
             .unwrap_or_else(String::new);
 
@@ -341,8 +405,7 @@ impl<'de> Deserialize<'de> for Activity {
             None => None,
         };
 
-        let url = map.remove("url")
-            .and_then(|v| serde_json::from_value::<String>(v).ok());
+        let url = map.remove("url").and_then(|v| serde_json::from_value::<String>(v).ok());
 
         Ok(Activity {
             application_id,
@@ -433,7 +496,6 @@ pub struct ActivityEmoji {
     pub animated: Option<bool>,
 }
 
-
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[non_exhaustive]
 pub enum ActivityType {
@@ -443,38 +505,29 @@ pub enum ActivityType {
     Streaming = 1,
     /// An indicator that the user is listening to something.
     Listening = 2,
-    /// An indicator that the user uses custum statuses
+    /// An indicator that the user is watching something.
+    Watching = 3,
+    /// An indicator that the user uses custom statuses
     Custom = 4,
     /// An indicator that the user is competing somewhere.
     Competing = 5,
+    /// An indicator that the activity is of unknown type.
+    Unknown = !0,
 }
 
-enum_number!(
-    ActivityType {
-        Playing,
-        Streaming,
-        Listening,
-        Custom,
-        Competing,
-    }
-);
-
-impl ActivityType {
-    pub fn num(self) -> u64 {
-        use self::ActivityType::*;
-
-        match self {
-            Playing => 0,
-            Streaming => 1,
-            Listening => 2,
-            Custom => 4,
-            Competing => 5,
-        }
-    }
-}
+enum_number!(ActivityType {
+    Playing,
+    Streaming,
+    Listening,
+    Watching,
+    Custom,
+    Competing
+});
 
 impl Default for ActivityType {
-    fn default() -> Self { ActivityType::Playing }
+    fn default() -> Self {
+        ActivityType::Playing
+    }
 }
 
 /// A representation of the data retrieved from the gateway endpoint.
@@ -517,14 +570,14 @@ pub struct Presence {
 impl<'de> Deserialize<'de> for Presence {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Presence, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
-        let mut user_map = map.remove("user")
+        let mut user_map = map
+            .remove("user")
             .ok_or_else(|| DeError::custom("expected presence user"))
             .and_then(JsonMap::deserialize)
             .map_err(DeError::custom)?;
 
         let (user_id, user) = if user_map.len() > 1 {
-            let user = User::deserialize(Value::Object(user_map))
-                .map_err(DeError::custom)?;
+            let user = User::deserialize(Value::Object(user_map)).map_err(DeError::custom)?;
 
             (user.id, Some(user))
         } else {
@@ -538,21 +591,19 @@ impl<'de> Deserialize<'de> for Presence {
         };
 
         let activities = match map.remove("activities") {
-            Some(v) => serde_json::from_value::<Vec<Activity>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Vec<Activity>>(v).map_err(DeError::custom)?,
             None => Vec::new(),
         };
 
         let client_status = match map.remove("client_status") {
             Some(v) => {
                 serde_json::from_value::<Option<ClientStatus>>(v).map_err(DeError::custom)?
-            }
+            },
             None => None,
         };
 
         let last_modified = match map.remove("last_modified") {
-            Some(v) => serde_json::from_value::<Option<u64>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<u64>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
@@ -575,7 +626,9 @@ impl<'de> Deserialize<'de> for Presence {
 
 impl Serialize for Presence {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         #[derive(Serialize)]
         struct UserId {
             id: u64,
@@ -589,12 +642,9 @@ impl Serialize for Presence {
         if let Some(user) = &self.user {
             state.serialize_field("user", &user)?;
         } else {
-            state.serialize_field(
-                "user",
-                &UserId {
-                    id: self.user_id.0,
-                },
-            )?;
+            state.serialize_field("user", &UserId {
+                id: self.user_id.0,
+            })?;
         }
 
         state.end()
@@ -607,9 +657,17 @@ impl Serialize for Presence {
 pub struct Ready {
     pub application: PartialCurrentApplicationInfo,
     pub guilds: Vec<GuildStatus>,
-    #[serde(default, serialize_with = "serialize_presences", deserialize_with = "deserialize_presences")]
+    #[serde(
+        default,
+        serialize_with = "serialize_presences",
+        deserialize_with = "deserialize_presences"
+    )]
     pub presences: HashMap<UserId, Presence>,
-    #[serde(default, serialize_with = "serialize_private_channels", deserialize_with = "deserialize_private_channels")]
+    #[serde(
+        default,
+        serialize_with = "serialize_private_channels",
+        deserialize_with = "deserialize_private_channels"
+    )]
     pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,

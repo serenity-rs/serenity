@@ -1,13 +1,15 @@
 //! Representations of voice information.
 
+use std::fmt;
+
+use chrono::{DateTime, Utc};
+use serde::de::{self, Deserialize, Deserializer, IgnoredAny, MapAccess, Visitor};
+
 use super::{
     guild::Member,
     id::{ChannelId, GuildId, RoleId, UserId},
     user::User,
 };
-use chrono::{DateTime, Utc};
-use serde::de::{self, Deserialize, Deserializer, Visitor, MapAccess, IgnoredAny};
-use std::fmt;
 
 /// Information about an available voice region.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -44,8 +46,11 @@ pub struct VoiceState {
     pub suppress: bool,
     pub token: Option<String>,
     pub user_id: UserId,
+    /// When unsuppressed, non-bot users will have this set to the current time.
+    /// Bot users will be set to [`None`]. When suppressed, the user will have
+    /// their [`Self::request_to_speak_timestamp`] removed.
+    pub request_to_speak_timestamp: Option<DateTime<Utc>>,
 }
-
 
 impl fmt::Debug for VoiceState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -62,14 +67,13 @@ impl fmt::Debug for VoiceState {
             .field("session_id", &self.session_id)
             .field("suppress", &self.suppress)
             .field("user_id", &self.user_id)
+            .field("request_to_speak_timestamp", &self.request_to_speak_timestamp)
             .finish()
     }
 }
 
-
 impl<'de> Deserialize<'de> for VoiceState {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
         enum Field {
@@ -86,6 +90,7 @@ impl<'de> Deserialize<'de> for VoiceState {
             Suppress,
             Token,
             UserId,
+            RequestToSpeakTimestamp,
         }
 
         #[derive(Deserialize)]
@@ -97,6 +102,11 @@ impl<'de> Deserialize<'de> for VoiceState {
             nick: Option<String>,
             roles: Vec<RoleId>,
             user: User,
+            #[serde(default)]
+            pending: bool,
+            premium_since: Option<DateTime<Utc>>,
+            #[cfg(feature = "unstable_discord_api")]
+            permissions: Option<String>,
         }
 
         struct VoiceStateVisitor;
@@ -122,6 +132,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                 let mut suppress = None;
                 let mut token = None;
                 let mut user_id = None;
+                let mut request_to_speak_timestamp = None;
 
                 loop {
                     let key = match map.next_key() {
@@ -130,7 +141,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                         Err(_) => {
                             map.next_value::<IgnoredAny>()?;
                             continue;
-                        }
+                        },
                     };
 
                     match key {
@@ -139,19 +150,19 @@ impl<'de> Deserialize<'de> for VoiceState {
                                 return Err(de::Error::duplicate_field("channel_id"));
                             }
                             channel_id = map.next_value()?;
-                        }
+                        },
                         Field::Deaf => {
                             if deaf.is_some() {
                                 return Err(de::Error::duplicate_field("deaf"));
                             }
                             deaf = Some(map.next_value()?);
-                        }
+                        },
                         Field::GuildId => {
                             if guild_id.is_some() {
                                 return Err(de::Error::duplicate_field("guild_id"));
                             }
                             guild_id = map.next_value()?;
-                        }
+                        },
                         Field::Member => {
                             if member.is_some() {
                                 return Err(de::Error::duplicate_field("member"));
@@ -167,63 +178,75 @@ impl<'de> Deserialize<'de> for VoiceState {
                                     nick: partial_member.nick,
                                     roles: partial_member.roles,
                                     user: partial_member.user,
+                                    pending: partial_member.pending,
+                                    premium_since: partial_member.premium_since,
+                                    #[cfg(feature = "unstable_discord_api")]
+                                    permissions: partial_member.permissions,
                                 });
                             }
-                        }
+                        },
                         Field::Mute => {
                             if mute.is_some() {
                                 return Err(de::Error::duplicate_field("mute"));
                             }
                             mute = Some(map.next_value()?);
-                        }
+                        },
                         Field::SelfDeaf => {
                             if self_deaf.is_some() {
                                 return Err(de::Error::duplicate_field("self_deaf"));
                             }
                             self_deaf = Some(map.next_value()?);
-                        }
+                        },
                         Field::SelfMute => {
                             if self_mute.is_some() {
                                 return Err(de::Error::duplicate_field("self_mute"));
                             }
                             self_mute = Some(map.next_value()?);
-                        }
+                        },
                         Field::SelfStream => {
                             if self_stream.is_some() {
                                 return Err(de::Error::duplicate_field("self_stream"));
                             }
                             self_stream = map.next_value()?;
-                        }
+                        },
                         Field::SelfVideo => {
                             if self_video.is_some() {
                                 return Err(de::Error::duplicate_field("self_video"));
                             }
                             self_video = Some(map.next_value()?);
-                        }
+                        },
                         Field::SessionId => {
                             if session_id.is_some() {
                                 return Err(de::Error::duplicate_field("session_id"));
                             }
                             session_id = Some(map.next_value()?);
-                        }
+                        },
                         Field::Suppress => {
                             if suppress.is_some() {
                                 return Err(de::Error::duplicate_field("suppress"));
                             }
                             suppress = Some(map.next_value()?);
-                        }
+                        },
                         Field::Token => {
                             if token.is_some() {
                                 return Err(de::Error::duplicate_field("token"));
                             }
                             token = map.next_value()?;
-                        }
+                        },
                         Field::UserId => {
                             if user_id.is_some() {
                                 return Err(de::Error::duplicate_field("user_id"));
                             }
                             user_id = Some(map.next_value()?);
-                        }
+                        },
+                        Field::RequestToSpeakTimestamp => {
+                            if request_to_speak_timestamp.is_some() {
+                                return Err(de::Error::duplicate_field(
+                                    "request_to_speak_timestamp",
+                                ));
+                            }
+                            request_to_speak_timestamp = Some(map.next_value()?);
+                        },
                     }
                 }
 
@@ -231,12 +254,15 @@ impl<'de> Deserialize<'de> for VoiceState {
                 let mute = mute.ok_or_else(|| de::Error::missing_field("mute"))?;
                 let self_deaf = self_deaf.ok_or_else(|| de::Error::missing_field("self_deaf"))?;
                 let self_mute = self_mute.ok_or_else(|| de::Error::missing_field("self_mute"))?;
-                let self_video = self_video.ok_or_else(|| de::Error::missing_field("self_video"))?;
-                let session_id = session_id.ok_or_else(|| de::Error::missing_field("session_id"))?;
+                let self_video =
+                    self_video.ok_or_else(|| de::Error::missing_field("self_video"))?;
+                let session_id =
+                    session_id.ok_or_else(|| de::Error::missing_field("session_id"))?;
                 let suppress = suppress.ok_or_else(|| de::Error::missing_field("suppress"))?;
                 let user_id = user_id.ok_or_else(|| de::Error::missing_field("user_id"))?;
+                let request_to_speak_timestamp = request_to_speak_timestamp.unwrap_or(None);
 
-                if let (Some(guild_id), Some( member)) = (guild_id, member.as_mut()) {
+                if let (Some(guild_id), Some(member)) = (guild_id, member.as_mut()) {
                     member.guild_id = guild_id;
                 }
 
@@ -254,6 +280,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                     suppress,
                     token,
                     user_id,
+                    request_to_speak_timestamp,
                 })
             }
         }
@@ -272,6 +299,7 @@ impl<'de> Deserialize<'de> for VoiceState {
             "suppress",
             "token",
             "user_id",
+            "request_to_speak_timestamp",
         ];
 
         deserializer.deserialize_struct("VoiceState", FIELDS, VoiceStateVisitor)

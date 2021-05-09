@@ -1,9 +1,9 @@
 use std::collections::HashMap;
+
 use serde_json::Value;
 
-use crate::utils;
-
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::utils;
 
 #[derive(Clone, Debug, Default)]
 pub struct EditInteractionResponse(pub HashMap<&'static str, Value>);
@@ -23,27 +23,51 @@ impl EditInteractionResponse {
         self.0.insert("content", Value::String(content));
         self
     }
-    
-    /// Create an embed for the message.
-    pub fn embed<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
+
+    /// Creates an embed for the message.
+    pub fn create_embed<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.set_embed(embed)
+        self.add_embed(embed)
     }
 
-    /// Set an embed for the message.
-    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+    /// Adds an embed for the message.
+    pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
-        self.0.insert("embed", embed);
+        let embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(vec![]));
+
+        if let Some(embeds) = embeds.as_array_mut() {
+            embeds.push(embed);
+        }
+
+        self
+    }
+
+    /// Sets the embeds for the message.
+    ///
+    /// **Note**: You can only have up to 10 embeds per message.
+    pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        if self.0.contains_key("embeds") {
+            self.0.remove_entry("embeds");
+        }
+
+        for embed in embeds {
+            self.add_embed(embed);
+        }
+
         self
     }
 
     /// Set the allowed mentions for the message.
     pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions {
+    where
+        F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
+    {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);

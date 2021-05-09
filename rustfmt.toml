@@ -1,0 +1,16 @@
+unstable_features = true
+use_small_heuristics = "Max"
+# Turn on once the rustfmt supporting these becomes available on rustup
+# width_heuristics = "Max"
+# imports_granularity = "Module"
+group_imports = "StdExternalCrate"
+imports_layout = "HorizontalVertical"
+struct_lit_single_line = false
+match_arm_blocks = true
+match_block_trailing_comma = true
+overflow_delimited_expr = true
+newline_style = "Unix"
+use_field_init_shorthand = true
+use_try_shorthand = true
+normalize_comments = true
+format_code_in_doc_comments = true
