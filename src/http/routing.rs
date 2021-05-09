@@ -759,12 +759,8 @@ impl Route {
 
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub fn webhook_followup_messages<D: Display>(
-        application_id: u64,
-        token: D,
-        wait: bool,
-    ) -> String {
-        format!(api!("/webhooks/{}/{}?wait={}"), application_id, token, wait)
+    pub fn webhook_followup_messages<D: Display>(application_id: u64, token: D) -> String {
+        format!(api!("/webhooks/{}/{}"), application_id, token)
     }
 
     #[cfg(feature = "unstable_discord_api")]
@@ -852,7 +848,6 @@ pub enum RouteInfo<'a> {
     CreateFollowupMessage {
         application_id: u64,
         interaction_token: &'a str,
-        wait: bool,
     },
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
@@ -1357,15 +1352,10 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::CreateFollowupMessage {
                 application_id,
                 interaction_token,
-                wait,
             } => (
                 LightMethod::Post,
                 Route::WebhooksId(application_id),
-                Cow::from(Route::webhook_followup_messages(
-                    application_id,
-                    interaction_token,
-                    wait,
-                )),
+                Cow::from(Route::webhook_followup_messages(application_id, interaction_token)),
             ),
             #[cfg(feature = "unstable_discord_api")]
             RouteInfo::CreateGlobalApplicationCommand {

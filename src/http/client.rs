@@ -396,31 +396,17 @@ impl Http {
     pub async fn create_followup_message(
         &self,
         interaction_token: &str,
-        wait: bool,
-        map: &JsonMap,
-    ) -> Result<Option<Message>> {
-        let body = serde_json::to_vec(map)?;
-
-        let mut headers = Headers::new();
-        headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
-
-        let response = self
-            .request(Request {
-                body: Some(&body),
-                headers: Some(headers),
-                route: RouteInfo::CreateFollowupMessage {
-                    application_id: self.application_id,
-                    interaction_token,
-                    wait,
-                },
-            })
-            .await?;
-
-        if response.status() == StatusCode::NO_CONTENT {
-            return Ok(None);
-        }
-
-        response.json::<Message>().await.map(Some).map_err(From::from)
+        map: &Value,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateFollowupMessage {
+                application_id: self.application_id,
+                interaction_token,
+            },
+        })
+        .await
     }
 
     /// Creates a new global command.

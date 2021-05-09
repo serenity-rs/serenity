@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 use crate::{http::AttachmentType, utils};
 
 #[derive(Clone, Debug, Default)]
@@ -113,6 +114,12 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         let allowed_mentions = Value::Object(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
+        self
+    }
+
+    /// Sets the flags for the response.
+    pub fn flags(&mut self, flags: InteractionApplicationCommandCallbackDataFlags) -> &mut Self {
+        self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits())));
         self
     }
 }
