@@ -431,14 +431,14 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a guild integration is created.
     ///
-    /// Provides the created integration and the id of the guild this integration belongs to.
+    /// Provides the created integration.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn integration_create(&self, _ctx: Context, _integration: Integration) {}
 
     /// Dispatched when a guild integration is updated.
     ///
-    /// Provides the updated integration and the id of the guild this integration belongs to.
+    /// Provides the updated integration.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn integration_update(&self, _ctx: Context, _integration: Integration) {}
@@ -459,7 +459,7 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when an application command is created.
     ///
-    /// Provides the application command.
+    /// Provides the created application command.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn application_command_create(
@@ -471,7 +471,7 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when an application command is updated.
     ///
-    /// Provides the application command.
+    /// Provides the updated application command.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn application_command_update(
@@ -483,7 +483,7 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when an application command is deleted.
     ///
-    /// Provides the application command.
+    /// Provides the deleted application command.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn application_command_delete(
