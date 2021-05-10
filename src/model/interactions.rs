@@ -738,6 +738,17 @@ pub struct MessageInteraction {
 }
 
 impl Interaction {
+    /// Gets the interaction response.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if there is no interaction response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    pub async fn get_interaction_response(&self, http: impl AsRef<Http>) -> Result<Message> {
+        http.as_ref().get_original_interaction_response(&self.token).await
+    }
+
     /// Creates a response to the interaction received.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
@@ -791,7 +802,6 @@ impl Interaction {
     pub async fn edit_original_interaction_response<F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: u64,
         f: F,
     ) -> Result<Message>
     where
@@ -805,9 +815,7 @@ impl Interaction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref()
-            .edit_original_interaction_response(application_id, &self.token, &Value::Object(map))
-            .await
+        http.as_ref().edit_original_interaction_response(&self.token, &Value::Object(map)).await
     }
 
     /// Deletes the initial interaction response.
@@ -816,12 +824,8 @@ impl Interaction {
     ///
     /// May return [`Error::Http`] if the API returns an error.
     /// Such as if the response was already deleted.
-    pub async fn delete_original_interaction_response(
-        &self,
-        http: impl AsRef<Http>,
-        application_id: u64,
-    ) -> Result<()> {
-        http.as_ref().delete_original_interaction_response(application_id, &self.token).await
+    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().delete_original_interaction_response(&self.token).await
     }
 
     /// Creates a followup response to the response sent.
@@ -840,10 +844,8 @@ impl Interaction {
     pub async fn create_followup_message<'a, F>(
         &self,
         http: impl AsRef<Http>,
-        application_id: u64,
-        wait: bool,
         f: F,
-    ) -> Result<Option<Message>>
+    ) -> Result<Message>
     where
         for<'b> F: FnOnce(
             &'b mut CreateInteractionResponseFollowup<'a>,
@@ -857,7 +859,58 @@ impl Interaction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_followup_message(application_id, &self.token, wait, &map).await
+        http.as_ref().create_followup_message(&self.token, &Value::Object(map)).await
+    }
+
+    /// Edits a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Will return [`Error::Model`] if the content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or a [`Error::Json`] if there is an error in deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+        f: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(
+            &'b mut CreateInteractionResponseFollowup<'a>,
+        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
+    {
+        let mut interaction_response = CreateInteractionResponseFollowup::default();
+        f(&mut interaction_response);
+
+        let map = utils::hashmap_to_json_map(interaction_response.0);
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
+        http.as_ref()
+            .edit_followup_message(&self.token, message_id.into().into(), &Value::Object(map))
+            .await
+    }
+
+    /// Deletes a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    pub async fn delete_followup_message<M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+    ) -> Result<()> {
+        http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
     }
 }
 

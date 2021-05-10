@@ -395,33 +395,18 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
-        wait: bool,
-        map: &JsonMap,
-    ) -> Result<Option<Message>> {
-        let body = serde_json::to_vec(map)?;
-
-        let mut headers = Headers::new();
-        headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
-
-        let response = self
-            .request(Request {
-                body: Some(&body),
-                headers: Some(headers),
-                route: RouteInfo::CreateFollowupMessage {
-                    application_id,
-                    interaction_token,
-                    wait,
-                },
-            })
-            .await?;
-
-        if response.status() == StatusCode::NO_CONTENT {
-            return Ok(None);
-        }
-
-        response.json::<Message>().await.map(Some).map_err(From::from)
+        map: &Value,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateFollowupMessage {
+                application_id: self.application_id,
+                interaction_token,
+            },
+        })
+        .await
     }
 
     /// Creates a new global command.
@@ -773,7 +758,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
         message_id: u64,
     ) -> Result<()> {
@@ -781,7 +765,7 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::DeleteFollowupMessage {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
                 message_id,
             },
@@ -941,14 +925,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_original_interaction_response(
         &self,
-        application_id: u64,
         interaction_token: &str,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
             route: RouteInfo::DeleteOriginalInteractionResponse {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
             },
         })
@@ -1108,7 +1091,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
         message_id: u64,
         map: &Value,
@@ -1117,7 +1099,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
                 message_id,
             },
@@ -1367,6 +1349,24 @@ impl Http {
         .await
     }
 
+    /// Gets the initial interaction response.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_original_interaction_response(
+        &self,
+        interaction_token: &str,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetOriginalInteractionResponse {
+                application_id: self.application_id,
+                interaction_token,
+            },
+        })
+        .await
+    }
+
     /// Edits the initial interaction response.
     ///
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
@@ -1376,7 +1376,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_original_interaction_response(
         &self,
-        application_id: u64,
         interaction_token: &str,
         map: &Value,
     ) -> Result<Message> {
@@ -1384,7 +1383,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
             },
         })
