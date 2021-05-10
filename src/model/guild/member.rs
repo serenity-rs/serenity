@@ -13,6 +13,8 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::utils;
@@ -51,7 +53,7 @@ pub struct Member {
     /// [`Interaction`]: crate::model::interactions::Interaction
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub permissions: Option<String>,
+    pub permissions: Option<Permissions>,
 }
 
 #[cfg(feature = "model")]
@@ -562,5 +564,5 @@ pub struct PartialMember {
     /// [`Interaction`]: crate::model::interactions::Interaction
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub permissions: Option<String>,
+    pub permissions: Option<Permissions>,
 }

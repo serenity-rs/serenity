@@ -10,6 +10,8 @@ use super::{
     id::{ChannelId, GuildId, RoleId, UserId},
     user::User,
 };
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::permissions::Permissions;
 
 /// Information about an available voice region.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -106,7 +108,7 @@ impl<'de> Deserialize<'de> for VoiceState {
             pending: bool,
             premium_since: Option<DateTime<Utc>>,
             #[cfg(feature = "unstable_discord_api")]
-            permissions: Option<String>,
+            permissions: Option<Permissions>,
         }
 
         struct VoiceStateVisitor;
