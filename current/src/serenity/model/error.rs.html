@@ -382,14 +382,14 @@
     <span class="doccomment">/// Return `true` if the model error is related to an item missing in the</span>
     <span class="doccomment">/// cache.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cache_err</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
+        <span class="macro">matches!</span>(
+            <span class="self">self</span>,
             <span class="self">Self</span><span class="ident">::ItemMissing</span>
-            <span class="op">|</span> <span class="self">Self</span><span class="ident">::ChannelNotFound</span>
-            <span class="op">|</span> <span class="self">Self</span><span class="ident">::RoleNotFound</span>
-            <span class="op">|</span> <span class="self">Self</span><span class="ident">::GuildNotFound</span>
-            <span class="op">|</span> <span class="self">Self</span><span class="ident">::MemberNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        }
+                <span class="op">|</span> <span class="self">Self</span><span class="ident">::ChannelNotFound</span>
+                <span class="op">|</span> <span class="self">Self</span><span class="ident">::RoleNotFound</span>
+                <span class="op">|</span> <span class="self">Self</span><span class="ident">::GuildNotFound</span>
+                <span class="op">|</span> <span class="self">Self</span><span class="ident">::MemberNotFound</span>
+        )
     }
 }
 

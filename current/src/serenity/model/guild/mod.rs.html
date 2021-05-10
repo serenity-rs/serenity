@@ -4534,7 +4534,7 @@
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">name</span>, <span class="prelude-val">None</span>),
             }
         } <span class="kw">else</span> {
-            (<span class="kw-2">&amp;</span><span class="ident">name</span>[..], <span class="prelude-val">None</span>)
+            (<span class="ident">name</span>, <span class="prelude-val">None</span>)
         };
 
         <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">values</span>() {
@@ -5609,8 +5609,8 @@
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">afk_channel_id</span>,
-            <span class="ident">application_id</span>,
             <span class="ident">afk_timeout</span>,
+            <span class="ident">application_id</span>,
             <span class="ident">channels</span>,
             <span class="ident">default_message_notifications</span>,
             <span class="ident">emojis</span>,
@@ -5647,8 +5647,8 @@
             <span class="ident">approximate_presence_count</span>,
             <span class="ident">nsfw</span>,
             <span class="ident">max_video_channel_users</span>,
-            <span class="ident">max_members</span>,
             <span class="ident">max_presences</span>,
+            <span class="ident">max_members</span>,
             <span class="ident">widget_enabled</span>,
             <span class="ident">widget_channel_id</span>,
         })
@@ -5792,7 +5792,7 @@
                     <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;emoji_id&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()))
                 },
                 <span class="ident">GuildWelcomeScreenEmoji::Unicode</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;emoji_name&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()))
+                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;emoji_name&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Value::String</span>(<span class="ident">name</span>))
                 },
             };
         };

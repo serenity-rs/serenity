@@ -2173,9 +2173,6 @@
 <span id="2170">2170</span>
 <span id="2171">2171</span>
 <span id="2172">2172</span>
-<span id="2173">2173</span>
-<span id="2174">2174</span>
-<span id="2175">2175</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -3369,10 +3366,7 @@
                 <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="ident">user</span>).<span class="kw">await</span>;
             }
 
-            <span class="ident">presence</span>.<span class="ident">user</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">user_id</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>),
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            };
+            <span class="ident">presence</span>.<span class="ident">user</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">user_id</span>).<span class="kw">await</span>;
         }
 
         <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">extend</span>(<span class="ident">ready</span>.<span class="ident">presences</span>);
