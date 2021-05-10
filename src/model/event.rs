@@ -2146,8 +2146,6 @@ impl EventType {
     /// the information to recover the original event name for these events, in which
     /// case this method returns [`None`].
     pub fn name(&self) -> Option<&str> {
-        dbg!(self);
-
         match self {
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
             Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
