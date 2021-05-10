@@ -1329,15 +1329,15 @@ impl<'de> Deserialize<'de> for PartialGuild {
         #[allow(deprecated)]
         Ok(Self {
             application_id,
+            id,
             afk_channel_id,
             afk_timeout,
             default_message_notifications,
-            widget_channel_id,
             widget_enabled,
+            widget_channel_id,
             emojis,
             features,
             icon,
-            id,
             mfa_level,
             name,
             owner_id,

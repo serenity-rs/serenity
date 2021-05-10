@@ -618,8 +618,8 @@ impl<'de> Deserialize<'de> for Presence {
             client_status,
             last_modified,
             status,
-            user,
             user_id,
+            user,
         })
     }
 }

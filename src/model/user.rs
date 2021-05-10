@@ -455,31 +455,31 @@ pub struct UserPublicFlags {
 __impl_bitflags! {
     UserPublicFlags: u32 {
         /// User's flag as discord employee
-        DISCORD_EMPLOYEE = 0b00000000_00000000_00000000_00000001;
+        DISCORD_EMPLOYEE = 0b0000_0000_0000_0000_0000_0000_0000_0001;
         /// User's flag as partnered server owner
-        PARTNERED_SERVER_OWNER = 0b00000000_00000000_00000000_00000010;
+        PARTNERED_SERVER_OWNER = 0b0000_0000_0000_0000_0000_0000_0000_0010;
         /// User's flag as hypesquad events
-        HYPESQUAD_EVENTS = 0b00000000_00000000_00000000_00000100;
+        HYPESQUAD_EVENTS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
         /// User's flag as bug hunter level 1
-        BUG_HUNTER_LEVEL_1 = 0b00000000_00000000_00000000_00001000;
+        BUG_HUNTER_LEVEL_1 = 0b0000_0000_0000_0000_0000_0000_0000_1000;
         /// User's flag as house bravery
-        HOUSE_BRAVERY = 0b00000000_00000000_00000000_01000000;
+        HOUSE_BRAVERY = 0b0000_0000_0000_0000_0000_0000_0100_0000;
         /// User's flag as house brilliance
-        HOUSE_BRILLIANCE = 0b00000000_00000000_00000000_10000000;
+        HOUSE_BRILLIANCE = 0b0000_0000_0000_0000_0000_0000_1000_0000;
         /// User's flag as house balance
-        HOUSE_BALANCE = 0b00000000_00000000_00000001_00000000;
+        HOUSE_BALANCE = 0b0000_0000_0000_0000_0000_0001_0000_0000;
         /// User's flag as early supporter
-        EARLY_SUPPORTER = 0b00000000_00000000_00000010_00000000;
+        EARLY_SUPPORTER = 0b0000_0000_0000_0000_0000_0010_0000_0000;
         /// User's flag as team user
-        TEAM_USER = 0b00000000_00000000_00000100_00000000;
+        TEAM_USER = 0b0000_0000_0000_0000_0000_0100_0000_0000;
         /// User's flag as system
-        SYSTEM = 0b00000000_00000000_00010000_00000000;
+        SYSTEM = 0b0000_0000_0000_0000_0001_0000_0000_0000;
         /// User's flag as bug hunter level 2
-        BUG_HUNTER_LEVEL_2 = 0b00000000_00000000_01000000_00000000;
+        BUG_HUNTER_LEVEL_2 = 0b0000_0000_0000_0000_0100_0000_0000_0000;
         /// User's flag as verified bot
-        VERIFIED_BOT = 0b00000000_00000001_00000000_00000000;
+        VERIFIED_BOT = 0b0000_0000_0000_0001_0000_0000_0000_0000;
         /// User's flag as early verified bot developer
-        EARLY_VERIFIED_BOT_DEVELOPER = 0b00000000_00000010_00000000_00000000;
+        EARLY_VERIFIED_BOT_DEVELOPER = 0b0000_0000_0000_0010_0000_0000_0000_0000;
     }
 }
 
@@ -999,7 +999,7 @@ impl<'a> From<&'a CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name.clone(),
-            public_flags: user.public_flags.clone(),
+            public_flags: user.public_flags,
         }
     }
 }

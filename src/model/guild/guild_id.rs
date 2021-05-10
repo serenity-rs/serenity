@@ -1213,7 +1213,7 @@ impl GuildId {
         &self,
         http: impl AsRef<Http>,
     ) -> Result<Vec<ApplicationCommand>> {
-        http.as_ref().get_guild_application_commands(self.0.into()).await
+        http.as_ref().get_guild_application_commands(self.0).await
     }
 
     /// Get a specific guild application command by its Id.
@@ -1224,7 +1224,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<ApplicationCommand> {
-        http.as_ref().get_guild_application_command(self.0.into(), command_id.into()).await
+        http.as_ref().get_guild_application_command(self.0, command_id.into()).await
     }
 
     /// Edit guild application command by its Id.
@@ -1241,7 +1241,7 @@ impl GuildId {
     {
         let map = ApplicationCommand::build_application_command(f);
         http.as_ref()
-            .edit_guild_application_command(self.0.into(), command_id.into(), &Value::Object(map))
+            .edit_guild_application_command(self.0, command_id.into(), &Value::Object(map))
             .await
     }
 
@@ -1253,7 +1253,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<()> {
-        http.as_ref().delete_guild_application_command(self.0.into(), command_id.into()).await
+        http.as_ref().delete_guild_application_command(self.0, command_id.into()).await
     }
 
     /// Get all guild application commands permissions only.
@@ -1263,7 +1263,7 @@ impl GuildId {
         &self,
         http: impl AsRef<Http>,
     ) -> Result<Vec<ApplicationCommandPermission>> {
-        http.as_ref().get_guild_application_commands_permissions(self.0.into()).await
+        http.as_ref().get_guild_application_commands_permissions(self.0).await
     }
 
     /// Get permissions for specific guild application command by its Id.
@@ -1274,9 +1274,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         command_id: CommandId,
     ) -> Result<ApplicationCommandPermission> {
-        http.as_ref()
-            .get_guild_application_command_permissions(self.0.into(), command_id.into())
-            .await
+        http.as_ref().get_guild_application_command_permissions(self.0, command_id.into()).await
     }
 
     /// Get the guild welcome screen.
@@ -1285,7 +1283,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the guild does not have a welcome screen.
     pub async fn get_welcome_screen(&self, http: impl AsRef<Http>) -> Result<GuildWelcomeScreen> {
-        http.as_ref().get_guild_welcome_screen(self.0.into()).await
+        http.as_ref().get_guild_welcome_screen(self.0).await
     }
 
     /// Get the guild preview.

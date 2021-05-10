@@ -168,14 +168,14 @@ impl Error {
     /// Return `true` if the model error is related to an item missing in the
     /// cache.
     pub fn is_cache_err(&self) -> bool {
-        match self {
+        matches!(
+            self,
             Self::ItemMissing
-            | Self::ChannelNotFound
-            | Self::RoleNotFound
-            | Self::GuildNotFound
-            | Self::MemberNotFound => true,
-            _ => false,
-        }
+                | Self::ChannelNotFound
+                | Self::RoleNotFound
+                | Self::GuildNotFound
+                | Self::MemberNotFound
+        )
     }
 }
 

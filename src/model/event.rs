@@ -1190,10 +1190,7 @@ impl CacheUpdate for ReadyEvent {
                 cache.update_user_entry(user).await;
             }
 
-            presence.user = match cache.user(user_id).await {
-                Some(user) => Some(user),
-                None => None,
-            };
+            presence.user = cache.user(user_id).await;
         }
 
         cache.presences.write().await.extend(ready.presences);
