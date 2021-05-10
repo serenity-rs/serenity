@@ -899,6 +899,59 @@
 <span id="896">896</span>
 <span id="897">897</span>
 <span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -1640,6 +1693,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Interaction</span> {
+    <span class="doccomment">/// Gets the interaction response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an [`Error::Http`] if there is no interaction response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Creates a response to the interaction received.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
@@ -1693,7 +1757,6 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_original_interaction_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -1707,9 +1770,7 @@
         <span class="ident">Message::check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
         <span class="ident">Message::check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">edit_original_interaction_response</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="ident">map</span>))
-            .<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes the initial interaction response.</span>
@@ -1718,12 +1779,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
     <span class="doccomment">/// Such as if the response was already deleted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_original_interaction_response</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">application_id</span>: <span class="ident">u64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_original_interaction_response</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a followup response to the response sent.</span>
@@ -1742,10 +1799,8 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">application_id</span>: <span class="ident">u64</span>,
-        <span class="ident">wait</span>: <span class="ident">bool</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(
             <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
@@ -1759,7 +1814,58 @@
         <span class="ident">Message::check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
         <span class="ident">Message::check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_followup_message</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">wait</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Edits a followup response to the response sent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Will return [`Error::Model`] if the content is too long.</span>
+    <span class="doccomment">/// May also return [`Error::Http`] if the API returns an error,</span>
+    <span class="doccomment">/// or a [`Error::Json`] if there is an error in deserializing the response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">message_id</span>: <span class="ident">M</span>,
+        <span class="ident">f</span>: <span class="ident">F</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(
+            <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponseFollowup::default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">interaction_response</span>);
+
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
+
+        <span class="ident">Message::check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
+        <span class="ident">Message::check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
+
+        <span class="ident">http</span>.<span class="ident">as_ref</span>()
+            .<span class="ident">edit_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="ident">map</span>))
+            .<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Deletes a followup message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
+    <span class="doccomment">/// Such as if the response was already deleted.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_followup_message</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">message_id</span>: <span class="ident">M</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_followup_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="ident">into</span>()).<span class="kw">await</span>
     }
 }
 

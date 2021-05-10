@@ -2232,6 +2232,14 @@
 <span id="2229">2229</span>
 <span id="2230">2230</span>
 <span id="2231">2231</span>
+<span id="2232">2232</span>
+<span id="2233">2233</span>
+<span id="2234">2234</span>
+<span id="2235">2235</span>
+<span id="2236">2236</span>
+<span id="2237">2237</span>
+<span id="2238">2238</span>
+<span id="2239">2239</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
@@ -2994,12 +3002,8 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_followup_messages</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(
-        <span class="ident">application_id</span>: <span class="ident">u64</span>,
-        <span class="ident">token</span>: <span class="ident">D</span>,
-        <span class="ident">wait</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}?wait={}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_followup_messages</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">token</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -3087,7 +3091,6 @@
     <span class="ident">CreateFollowupMessage</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">wait</span>: <span class="ident">bool</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
@@ -3295,6 +3298,12 @@
     },
     <span class="ident">EditNickname</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="ident">GetOriginalInteractionResponse</span> {
+        <span class="ident">application_id</span>: <span class="ident">u64</span>,
+        <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
@@ -3586,15 +3595,10 @@
             <span class="ident">RouteInfo::CreateFollowupMessage</span> {
                 <span class="ident">application_id</span>,
                 <span class="ident">interaction_token</span>,
-                <span class="ident">wait</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (
                 <span class="ident">LightMethod::Post</span>,
                 <span class="ident">Route::WebhooksId</span>(<span class="ident">application_id</span>),
-                <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_followup_messages</span>(
-                    <span class="ident">application_id</span>,
-                    <span class="ident">interaction_token</span>,
-                    <span class="ident">wait</span>,
-                )),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_followup_messages</span>(<span class="ident">application_id</span>, <span class="ident">interaction_token</span>)),
             ),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::CreateGlobalApplicationCommand</span> {
@@ -3983,6 +3987,18 @@
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::GuildsIdMembersMeNick</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_nickname</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="ident">RouteInfo::GetOriginalInteractionResponse</span> {
+                <span class="ident">application_id</span>,
+                <span class="ident">interaction_token</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::WebhooksApplicationId</span>(<span class="ident">application_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_original_interaction_response</span>(
+                    <span class="ident">application_id</span>,
+                    <span class="ident">interaction_token</span>,
+                )),
             ),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">RouteInfo::EditOriginalInteractionResponse</span> {
