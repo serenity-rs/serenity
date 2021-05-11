@@ -3,15 +3,15 @@ use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
+#[cfg(feature = "model")]
+use bytes::buf::Buf;
 use futures::stream::Stream;
+#[cfg(feature = "model")]
+use reqwest::Url;
 #[cfg(feature = "model")]
 use serde_json::json;
 #[cfg(feature = "model")]
 use tokio::{fs::File, io::AsyncReadExt};
-#[cfg(feature = "model")]
-use reqwest::Url;
-#[cfg(feature = "model")]
-use bytes::buf::Buf;
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateInvite, CreateMessage, EditChannel, EditMessage, GetMessages};
