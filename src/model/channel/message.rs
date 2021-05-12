@@ -865,6 +865,31 @@ impl Message {
         }
     }
 
+    /// Same as [`Self::link`] but tries to find the channel
+    /// if discord does not provide it.
+    #[inline]
+    pub async fn link_ensured(&self, cache_http: impl CacheHttp) -> String {
+        let mut guild_id = self.guild_id;
+
+        if guild_id.is_none() {
+            let found_channel = self.channel_id.to_channel(cache_http).await;
+
+            if let Ok(channel) = found_channel {
+                if let Some(c) = channel.guild() {
+                        guild_id = Some(c.guild_id);
+                }
+            }
+        }
+        
+        match guild_id {
+            Some(guild_id) => format!(
+                "https://discord.com/channels/{}/{}/{}",
+                guild_id.0, self.channel_id.0, self.id.0
+            ),
+            None => format!("https://discord.com/channels/@me/{}/{}", self.channel_id.0, self.id.0),
+        }
+    }
+
     /// Await a single reaction on this message.
     #[cfg(feature = "collector")]
     #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
