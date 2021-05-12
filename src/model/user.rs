@@ -303,7 +303,7 @@ impl CurrentUser {
     /// use serenity::model::Permissions;
     /// use serenity::model::oauth2::Oauth2Scope;
     ///
-    /// let scopes = vec![Oauth2Scope::Bot, Oauth2Scope::ApplicationsCommand];
+    /// let scopes = vec![Oauth2Scope::Bot, Oauth2Scope::ApplicationsCommands];
     ///
     /// // assuming the user has been bound
     /// let url = match user.invite_url_with_oauth2_scopes(&http, Permissions::empty(), &scopes).await {
@@ -316,7 +316,7 @@ impl CurrentUser {
     /// };
     ///
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&scope=bot%20application.command");
+    ///                  client_id=249608697955745802&scope=bot%20applications.commands");
     /// # }
     /// ```
     pub async fn invite_url_with_oauth2_scopes(
