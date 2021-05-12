@@ -860,7 +860,7 @@ impl Message {
     }
 
     /// Same as [`Self::link`] but tries to find the [`GuildId`]
-    /// if discord does not provide it.
+    /// if Discord does not provide it.
     ///
     /// [`guild_id`]: Self::guild_id
     #[inline]
