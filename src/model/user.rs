@@ -211,6 +211,9 @@ impl CurrentUser {
     ///
     /// If the permissions passed are empty, the permissions part will be dropped.
     ///
+    /// Only the `bot` scope is used, if you wish to use more, such as slash commands, see
+    /// [`Self::invite_url_with_oauth2_scopes`]
+    ///
     /// # Examples
     ///
     /// Get the invite url with no permissions set:
@@ -281,11 +284,58 @@ impl CurrentUser {
         http: impl AsRef<Http>,
         permissions: Permissions,
     ) -> Result<String> {
+        self.invite_url_with_oauth2_scopes(http, permissions, &vec![Oauth2Scope::Bot]).await
+    }
+
+    /// Generate an invite url, but with custom scopes.
+    ///
+    /// # Examples
+    ///
+    /// Get the invite url with no permissions set:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
+    /// #
+    /// # async fn run() {
+    /// #     let user = CurrentUser::default();
+    /// #     let http = Http::default();
+    /// use serenity::model::Permissions;
+    /// use serenity::model::oauth2::Oauth2Scope;
+    ///
+    /// let scopes = vec![Oauth2Scope::Bot, Oauth2Scope::ApplicationCommand];
+    ///
+    /// // assuming the user has been bound
+    /// let url = match user.invite_url_with_oauth2_scopes(&http, Permissions::empty(), &scopes).await {
+    ///     Ok(v) => v,
+    ///     Err(why) => {
+    ///         println!("Error getting invite url: {:?}", why);
+    ///
+    ///         return;
+    ///     },
+    /// };
+    ///
+    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
+    ///                  client_id=249608697955745802&scope=bot");
+    /// # }
+    /// ```
+    pub async fn invite_url_with_oauth2_scopes(
+        &self,
+        http: impl AsRef<Http>,
+        permissions: Permissions,
+        scopes: &[Oauth2Scope],
+    ) -> Result<String> {
         let bits = permissions.bits();
         let client_id = http.as_ref().get_current_application_info().await.map(|v| v.id)?;
 
-        let mut url =
-            format!("https://discord.com/api/oauth2/authorize?client_id={}&scope=bot", client_id);
+        let mut url = format!("https://discord.com/api/oauth2/authorize?client_id={}", client_id);
+
+        // Replace with `Iterator::intersperse_with` after stable.
+        write!(
+            url,
+            "&scope={}",
+            scopes.iter().map(|i| i.to_string()).collect::<Vec<_>>().join("%20")
+        )?;
 
         if bits != 0 {
             write!(url, "&permissions={}", bits)?;
