@@ -111,10 +111,7 @@ impl GuildChannel {
     /// Whether or not this channel is text-based, meaning that
     /// it is possible to send messages.
     pub fn is_text_based(&self) -> bool {
-        match self.kind {
-            ChannelType::Text | ChannelType::News => true,
-            _ => false,
-        }
+        matches!(self.kind, ChannelType::Text | ChannelType::News)
     }
 
     /// Broadcasts to the channel that the current user is typing.
