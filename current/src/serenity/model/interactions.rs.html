@@ -952,6 +952,10 @@
 <span id="949">949</span>
 <span id="950">950</span>
 <span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -1375,6 +1379,10 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">CommandId</span>,
     <span class="doccomment">/// The parent application Id.</span>
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">ApplicationId</span>,
+    <span class="doccomment">/// The command guild Id, if it is a guild command.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: It may only be present if it is received through the gateway.</span>
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The command name.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The command description.</span>

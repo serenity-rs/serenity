@@ -2173,6 +2173,116 @@
 <span id="2170">2170</span>
 <span id="2171">2171</span>
 <span id="2172">2172</span>
+<span id="2173">2173</span>
+<span id="2174">2174</span>
+<span id="2175">2175</span>
+<span id="2176">2176</span>
+<span id="2177">2177</span>
+<span id="2178">2178</span>
+<span id="2179">2179</span>
+<span id="2180">2180</span>
+<span id="2181">2181</span>
+<span id="2182">2182</span>
+<span id="2183">2183</span>
+<span id="2184">2184</span>
+<span id="2185">2185</span>
+<span id="2186">2186</span>
+<span id="2187">2187</span>
+<span id="2188">2188</span>
+<span id="2189">2189</span>
+<span id="2190">2190</span>
+<span id="2191">2191</span>
+<span id="2192">2192</span>
+<span id="2193">2193</span>
+<span id="2194">2194</span>
+<span id="2195">2195</span>
+<span id="2196">2196</span>
+<span id="2197">2197</span>
+<span id="2198">2198</span>
+<span id="2199">2199</span>
+<span id="2200">2200</span>
+<span id="2201">2201</span>
+<span id="2202">2202</span>
+<span id="2203">2203</span>
+<span id="2204">2204</span>
+<span id="2205">2205</span>
+<span id="2206">2206</span>
+<span id="2207">2207</span>
+<span id="2208">2208</span>
+<span id="2209">2209</span>
+<span id="2210">2210</span>
+<span id="2211">2211</span>
+<span id="2212">2212</span>
+<span id="2213">2213</span>
+<span id="2214">2214</span>
+<span id="2215">2215</span>
+<span id="2216">2216</span>
+<span id="2217">2217</span>
+<span id="2218">2218</span>
+<span id="2219">2219</span>
+<span id="2220">2220</span>
+<span id="2221">2221</span>
+<span id="2222">2222</span>
+<span id="2223">2223</span>
+<span id="2224">2224</span>
+<span id="2225">2225</span>
+<span id="2226">2226</span>
+<span id="2227">2227</span>
+<span id="2228">2228</span>
+<span id="2229">2229</span>
+<span id="2230">2230</span>
+<span id="2231">2231</span>
+<span id="2232">2232</span>
+<span id="2233">2233</span>
+<span id="2234">2234</span>
+<span id="2235">2235</span>
+<span id="2236">2236</span>
+<span id="2237">2237</span>
+<span id="2238">2238</span>
+<span id="2239">2239</span>
+<span id="2240">2240</span>
+<span id="2241">2241</span>
+<span id="2242">2242</span>
+<span id="2243">2243</span>
+<span id="2244">2244</span>
+<span id="2245">2245</span>
+<span id="2246">2246</span>
+<span id="2247">2247</span>
+<span id="2248">2248</span>
+<span id="2249">2249</span>
+<span id="2250">2250</span>
+<span id="2251">2251</span>
+<span id="2252">2252</span>
+<span id="2253">2253</span>
+<span id="2254">2254</span>
+<span id="2255">2255</span>
+<span id="2256">2256</span>
+<span id="2257">2257</span>
+<span id="2258">2258</span>
+<span id="2259">2259</span>
+<span id="2260">2260</span>
+<span id="2261">2261</span>
+<span id="2262">2262</span>
+<span id="2263">2263</span>
+<span id="2264">2264</span>
+<span id="2265">2265</span>
+<span id="2266">2266</span>
+<span id="2267">2267</span>
+<span id="2268">2268</span>
+<span id="2269">2269</span>
+<span id="2270">2270</span>
+<span id="2271">2271</span>
+<span id="2272">2272</span>
+<span id="2273">2273</span>
+<span id="2274">2274</span>
+<span id="2275">2275</span>
+<span id="2276">2276</span>
+<span id="2277">2277</span>
+<span id="2278">2278</span>
+<span id="2279">2279</span>
+<span id="2280">2280</span>
+<span id="2281">2281</span>
+<span id="2282">2282</span>
 </pre><pre class="rust">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -3561,7 +3671,6 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntegrationCreateEvent</span> {
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">integration</span>: <span class="ident">Integration</span>,
 }
 
@@ -3569,17 +3678,10 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntegrationCreateEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected guild_id&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="ident">GuildId::deserialize</span>)
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">integration</span> <span class="op">=</span> <span class="ident">Integration::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">guild_id</span>,
-            <span class="ident">integration</span>: <span class="ident">Integration::deserialize</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
+            <span class="ident">integration</span>,
         })
     }
 }
@@ -3589,7 +3691,6 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntegrationUpdateEvent</span> {
-    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">integration</span>: <span class="ident">Integration</span>,
 }
 
@@ -3597,17 +3698,10 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntegrationUpdateEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected guild_id&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="ident">GuildId::deserialize</span>)
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">integration</span> <span class="op">=</span> <span class="ident">Integration::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">guild_id</span>,
-            <span class="ident">integration</span>: <span class="ident">Integration::deserialize</span>(<span class="ident">Value::Object</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
+            <span class="ident">integration</span>,
         })
     }
 }
@@ -3620,6 +3714,66 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">IntegrationId</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandCreateEvent</span> {
+    <span class="kw">pub</span> <span class="ident">application_command</span>: <span class="ident">ApplicationCommand</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandCreateEvent</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">application_command</span> <span class="op">=</span> <span class="ident">ApplicationCommand::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">application_command</span>,
+        })
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandUpdateEvent</span> {
+    <span class="kw">pub</span> <span class="ident">application_command</span>: <span class="ident">ApplicationCommand</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandUpdateEvent</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">application_command</span> <span class="op">=</span> <span class="ident">ApplicationCommand::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">application_command</span>,
+        })
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandDeleteEvent</span> {
+    <span class="kw">pub</span> <span class="ident">application_command</span>: <span class="ident">ApplicationCommand</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandDeleteEvent</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">application_command</span> <span class="op">=</span> <span class="ident">ApplicationCommand::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">application_command</span>,
+        })
+    }
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
@@ -3824,6 +3978,18 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">IntegrationDelete</span>(<span class="ident">IntegrationDeleteEvent</span>),
+    <span class="doccomment">/// An application command was created</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="ident">ApplicationCommandCreate</span>(<span class="ident">ApplicationCommandCreateEvent</span>),
+    <span class="doccomment">/// An application command was updated</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="ident">ApplicationCommandUpdate</span>(<span class="ident">ApplicationCommandUpdateEvent</span>),
+    <span class="doccomment">/// An application command was deleted</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="ident">ApplicationCommandDelete</span>(<span class="ident">ApplicationCommandDeleteEvent</span>),
     <span class="doccomment">/// An event type not covered by the above</span>
     <span class="ident">Unknown</span>(<span class="ident">UnknownEvent</span>),
 }
@@ -3877,6 +4043,12 @@
             <span class="self">Self</span><span class="ident">::IntegrationUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationUpdate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="self">Self</span><span class="ident">::IntegrationDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationDelete</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="self">Self</span><span class="ident">::ApplicationCommandCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandCreate</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="self">Self</span><span class="ident">::ApplicationCommandUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandUpdate</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="self">Self</span><span class="ident">::ApplicationCommandDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandDelete</span>,
             <span class="self">Self</span><span class="ident">::Unknown</span>(<span class="ident">unknown</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Other</span>(<span class="ident">unknown</span>.<span class="ident">kind</span>.<span class="ident">clone</span>()),
         }
     }
@@ -3968,6 +4140,18 @@
         <span class="ident">EventType::IntegrationUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::IntegrationUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">EventType::IntegrationDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::IntegrationDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="ident">EventType::ApplicationCommandCreate</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::ApplicationCommandCreate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
+        },
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="ident">EventType::ApplicationCommandUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::ApplicationCommandUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
+        },
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="ident">EventType::ApplicationCommandDelete</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Event::ApplicationCommandDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
+        },
         <span class="ident">EventType::Other</span>(<span class="ident">kind</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::Unknown</span>(<span class="ident">UnknownEvent</span> {
             <span class="ident">kind</span>,
             <span class="ident">value</span>: <span class="ident">v</span>,
@@ -4154,6 +4338,21 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">IntegrationDelete</span>,
+    <span class="doccomment">/// Indicator that an application command was created.</span>
+    <span class="doccomment">/// This maps to [`ApplicationCommandCreateEvent`].</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="ident">ApplicationCommandCreate</span>,
+    <span class="doccomment">/// Indicator that an application command was updated.</span>
+    <span class="doccomment">/// This maps to [`ApplicationCommandUpdateEvent`].</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="ident">ApplicationCommandUpdate</span>,
+    <span class="doccomment">/// Indicator that an application command was deleted.</span>
+    <span class="doccomment">/// This maps to [`ApplicationCommandDeleteEvent`].</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="ident">ApplicationCommandDelete</span>,
     <span class="doccomment">/// An unknown event was received over the gateway.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should be logged so that support for it can be added in the</span>
@@ -4216,6 +4415,15 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">const</span> <span class="ident">INTEGRATION_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;INTEGRATION_DELETE&quot;</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="kw">const</span> <span class="ident">APPLICATION_COMMAND_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;APPLICATION_COMMAND_CREATE&quot;</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="kw">const</span> <span class="ident">APPLICATION_COMMAND_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;APPLICATION_COMMAND_UPDATE&quot;</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+    <span class="kw">const</span> <span class="ident">APPLICATION_COMMAND_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;APPLICATION_COMMAND_DELETE&quot;</span>;
 
     <span class="doccomment">/// Return the event name of this event. Some events are synthetic, and we lack</span>
     <span class="doccomment">/// the information to recover the original event name for these events, in which</span>
@@ -4266,6 +4474,12 @@
             <span class="self">Self</span><span class="ident">::IntegrationUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::INTEGRATION_UPDATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="self">Self</span><span class="ident">::IntegrationDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::INTEGRATION_DELETE</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="self">Self</span><span class="ident">::ApplicationCommandCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::APPLICATION_COMMAND_CREATE</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="self">Self</span><span class="ident">::ApplicationCommandUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::APPLICATION_COMMAND_UPDATE</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="self">Self</span><span class="ident">::ApplicationCommandDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::APPLICATION_COMMAND_DELETE</span>),
             <span class="comment">// GuildUnavailable is a synthetic event type, corresponding to either</span>
             <span class="comment">// `GUILD_CREATE` or `GUILD_DELETE`, but we don&#39;t have enough information</span>
             <span class="comment">// to recover the name here, so we return `None` instead.</span>
@@ -4338,6 +4552,12 @@
                     <span class="ident">EventType::INTEGRATION_UPDATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationUpdate</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">EventType::INTEGRATION_DELETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationDelete</span>,
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                    <span class="ident">EventType::APPLICATION_COMMAND_CREATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandCreate</span>,
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                    <span class="ident">EventType::APPLICATION_COMMAND_UPDATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandUpdate</span>,
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                    <span class="ident">EventType::APPLICATION_COMMAND_DELETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandDelete</span>,
                     <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Other</span>(<span class="ident">other</span>.<span class="ident">to_owned</span>()),
                 })
             }

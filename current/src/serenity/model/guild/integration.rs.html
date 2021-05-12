@@ -67,6 +67,7 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
@@ -75,6 +76,7 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Integration</span> {
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">IntegrationId</span>,
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">account</span>: <span class="ident">IntegrationAccount</span>,
     <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;expire_behaviour&quot;</span>)]</span>
