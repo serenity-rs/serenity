@@ -876,11 +876,11 @@ impl Message {
 
             if let Ok(channel) = found_channel {
                 if let Some(c) = channel.guild() {
-                        guild_id = Some(c.guild_id);
+                    guild_id = Some(c.guild_id);
                 }
             }
         }
-        
+
         match guild_id {
             Some(guild_id) => format!(
                 "https://discord.com/channels/{}/{}/{}",
