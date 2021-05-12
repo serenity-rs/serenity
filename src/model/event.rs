@@ -1385,7 +1385,6 @@ impl Serialize for InteractionCreateEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct IntegrationCreateEvent {
-    pub guild_id: GuildId,
     pub integration: Integration,
 }
 
@@ -1393,17 +1392,10 @@ pub struct IntegrationCreateEvent {
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 impl<'de> Deserialize<'de> for IntegrationCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .ok_or_else(|| DeError::custom("expected guild_id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
+        let integration = Integration::deserialize(deserializer)?;
 
         Ok(Self {
-            guild_id,
-            integration: Integration::deserialize(Value::Object(map)).map_err(DeError::custom)?,
+            integration,
         })
     }
 }
@@ -1413,7 +1405,6 @@ impl<'de> Deserialize<'de> for IntegrationCreateEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct IntegrationUpdateEvent {
-    pub guild_id: GuildId,
     pub integration: Integration,
 }
 
@@ -1421,17 +1412,10 @@ pub struct IntegrationUpdateEvent {
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 impl<'de> Deserialize<'de> for IntegrationUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .ok_or_else(|| DeError::custom("expected guild_id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
+        let integration = Integration::deserialize(deserializer)?;
 
         Ok(Self {
-            guild_id,
-            integration: Integration::deserialize(Value::Object(map)).map_err(DeError::custom)?,
+            integration,
         })
     }
 }
@@ -1444,6 +1428,66 @@ pub struct IntegrationDeleteEvent {
     pub id: IntegrationId,
     pub guild_id: GuildId,
     pub application_id: Option<ApplicationId>,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandCreateEvent {
+    pub application_command: ApplicationCommand,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+impl<'de> Deserialize<'de> for ApplicationCommandCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let application_command = ApplicationCommand::deserialize(deserializer)?;
+
+        Ok(Self {
+            application_command,
+        })
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandUpdateEvent {
+    pub application_command: ApplicationCommand,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+impl<'de> Deserialize<'de> for ApplicationCommandUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let application_command = ApplicationCommand::deserialize(deserializer)?;
+
+        Ok(Self {
+            application_command,
+        })
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandDeleteEvent {
+    pub application_command: ApplicationCommand,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+impl<'de> Deserialize<'de> for ApplicationCommandDeleteEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let application_command = ApplicationCommand::deserialize(deserializer)?;
+
+        Ok(Self {
+            application_command,
+        })
+    }
 }
 
 #[allow(clippy::large_enum_variant)]
@@ -1648,6 +1692,18 @@ pub enum Event {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     IntegrationDelete(IntegrationDeleteEvent),
+    /// An application command was created
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandCreate(ApplicationCommandCreateEvent),
+    /// An application command was updated
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandUpdate(ApplicationCommandUpdateEvent),
+    /// An application command was deleted
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandDelete(ApplicationCommandDeleteEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
 }
@@ -1701,6 +1757,12 @@ impl Event {
             Self::IntegrationUpdate(_) => EventType::IntegrationUpdate,
             #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationDelete(_) => EventType::IntegrationDelete,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandCreate(_) => EventType::ApplicationCommandCreate,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandUpdate(_) => EventType::ApplicationCommandUpdate,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandDelete(_) => EventType::ApplicationCommandDelete,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
     }
@@ -1792,6 +1854,18 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::IntegrationUpdate => Event::IntegrationUpdate(serde_json::from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
         EventType::IntegrationDelete => Event::IntegrationDelete(serde_json::from_value(v)?),
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::ApplicationCommandCreate => {
+            Event::ApplicationCommandCreate(serde_json::from_value(v)?)
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::ApplicationCommandUpdate => {
+            Event::ApplicationCommandUpdate(serde_json::from_value(v)?)
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::ApplicationCommandDelete => {
+            Event::ApplicationCommandDelete(serde_json::from_value(v)?)
+        },
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
             value: v,
@@ -1978,6 +2052,21 @@ pub enum EventType {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     IntegrationDelete,
+    /// Indicator that an application command was created.
+    /// This maps to [`ApplicationCommandCreateEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandCreate,
+    /// Indicator that an application command was updated.
+    /// This maps to [`ApplicationCommandUpdateEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandUpdate,
+    /// Indicator that an application command was deleted.
+    /// This maps to [`ApplicationCommandDeleteEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandDelete,
     /// An unknown event was received over the gateway.
     ///
     /// This should be logged so that support for it can be added in the
@@ -2040,6 +2129,15 @@ impl EventType {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     const INTEGRATION_DELETE: &'static str = "INTEGRATION_DELETE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const APPLICATION_COMMAND_CREATE: &'static str = "APPLICATION_COMMAND_CREATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const APPLICATION_COMMAND_UPDATE: &'static str = "APPLICATION_COMMAND_UPDATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const APPLICATION_COMMAND_DELETE: &'static str = "APPLICATION_COMMAND_DELETE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
@@ -2090,6 +2188,12 @@ impl EventType {
             Self::IntegrationUpdate => Some(Self::INTEGRATION_UPDATE),
             #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationDelete => Some(Self::INTEGRATION_DELETE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandCreate => Some(Self::APPLICATION_COMMAND_CREATE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandUpdate => Some(Self::APPLICATION_COMMAND_UPDATE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandDelete => Some(Self::APPLICATION_COMMAND_DELETE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
             // to recover the name here, so we return `None` instead.
@@ -2162,6 +2266,12 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::INTEGRATION_UPDATE => EventType::IntegrationUpdate,
                     #[cfg(feature = "unstable_discord_api")]
                     EventType::INTEGRATION_DELETE => EventType::IntegrationDelete,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::APPLICATION_COMMAND_CREATE => EventType::ApplicationCommandCreate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::APPLICATION_COMMAND_UPDATE => EventType::ApplicationCommandUpdate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::APPLICATION_COMMAND_DELETE => EventType::ApplicationCommandDelete,
                     other => EventType::Other(other.to_owned()),
                 })
             }

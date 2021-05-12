@@ -765,7 +765,7 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
-                event_handler.integration_create(context, event.integration, event.guild_id).await;
+                event_handler.integration_create(context, event.integration).await;
             });
         },
         #[cfg(feature = "unstable_discord_api")]
@@ -773,7 +773,7 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
-                event_handler.integration_update(context, event.integration, event.guild_id).await;
+                event_handler.integration_update(context, event.integration).await;
             });
         },
         #[cfg(feature = "unstable_discord_api")]
@@ -784,6 +784,30 @@ async fn handle_event(
                 event_handler
                     .integration_delete(context, event.id, event.guild_id, event.application_id)
                     .await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::ApplicationCommandCreate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.application_command_create(context, event.application_command).await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::ApplicationCommandUpdate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.application_command_update(context, event.application_command).await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::ApplicationCommandDelete(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.application_command_delete(context, event.application_command).await;
             });
         },
     }
