@@ -13,7 +13,7 @@ use serde_json::json;
 use super::prelude::*;
 use super::utils::deserialize_u16;
 #[cfg(feature = "model")]
-use crate::builder::{CreateMessage, EditProfile};
+use crate::builder::{CreateBotAuthParameters, CreateMessage, EditProfile};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -211,6 +211,9 @@ impl CurrentUser {
     ///
     /// If the permissions passed are empty, the permissions part will be dropped.
     ///
+    /// Only the `bot` scope is used, if you wish to use more, such as slash commands, see
+    /// [`Self::invite_url_with_oauth2_scopes`]
+    ///
     /// # Examples
     ///
     /// Get the invite url with no permissions set:
@@ -273,7 +276,7 @@ impl CurrentUser {
     /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
     /// If the user is not authorized for this end point.
     ///
-    /// May return [`Error::Format`] while writing url to the buffer.
+    /// Should never return [`Error::Url`] as all the data is controlled over.
     ///
     /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
     pub async fn invite_url(
@@ -281,17 +284,63 @@ impl CurrentUser {
         http: impl AsRef<Http>,
         permissions: Permissions,
     ) -> Result<String> {
-        let bits = permissions.bits();
-        let client_id = http.as_ref().get_current_application_info().await.map(|v| v.id)?;
+        self.invite_url_with_oauth2_scopes(http, permissions, &[OAuth2Scope::Bot]).await
+    }
 
-        let mut url =
-            format!("https://discord.com/api/oauth2/authorize?client_id={}&scope=bot", client_id);
+    /// Generate an invite url, but with custom scopes.
+    ///
+    /// # Examples
+    ///
+    /// Get the invite url with no permissions set and slash commands support:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
+    /// #
+    /// # async fn run() {
+    /// #     let user = CurrentUser::default();
+    /// #     let http = Http::default();
+    /// use serenity::model::Permissions;
+    /// use serenity::model::oauth2::OAuth2Scope;
+    ///
+    /// let scopes = vec![OAuth2Scope::Bot, OAuth2Scope::ApplicationsCommands];
+    ///
+    /// // assuming the user has been bound
+    /// let url = match user.invite_url_with_oauth2_scopes(&http, Permissions::empty(), &scopes).await {
+    ///     Ok(v) => v,
+    ///     Err(why) => {
+    ///         println!("Error getting invite url: {:?}", why);
+    ///
+    ///         return;
+    ///     },
+    /// };
+    ///
+    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
+    ///                  client_id=249608697955745802&scope=bot%20applications.commands");
+    /// # }
+    /// ```
+    /// # Errors
+    ///
+    /// Returns an
+    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
+    /// If the user is not authorized for this end point.
+    ///
+    /// Should never return [`Error::Url`] as all the data is controlled over.
+    ///
+    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
+    pub async fn invite_url_with_oauth2_scopes(
+        &self,
+        http: impl AsRef<Http>,
+        permissions: Permissions,
+        scopes: &[OAuth2Scope],
+    ) -> Result<String> {
+        let mut builder = CreateBotAuthParameters::default();
 
-        if bits != 0 {
-            write!(url, "&permissions={}", bits)?;
-        }
+        builder.permissions(permissions);
+        builder.auto_client_id(http).await?;
+        builder.scopes(scopes);
 
-        Ok(url)
+        Ok(builder.build())
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.

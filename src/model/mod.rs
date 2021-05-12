@@ -35,6 +35,7 @@ pub mod id;
 pub mod interactions;
 pub mod invite;
 pub mod misc;
+pub mod oauth2;
 pub mod permissions;
 pub mod prelude;
 pub mod user;

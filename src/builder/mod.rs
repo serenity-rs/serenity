@@ -15,6 +15,7 @@ mod create_application_command;
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod create_application_command_permission;
 
+mod bot_auth_parameters;
 mod create_allowed_mentions;
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
@@ -47,6 +48,7 @@ mod execute_webhook;
 mod get_messages;
 
 pub use self::{
+    bot_auth_parameters::CreateBotAuthParameters,
     create_allowed_mentions::CreateAllowedMentions,
     create_allowed_mentions::ParseValue,
     create_channel::CreateChannel,

@@ -1649,13 +1649,9 @@ impl Guild {
             .filter_map(|member| async move {
                 let name = &member.user.name;
 
-                if case_sensitive {
-                    if name.contains(substring) {
-                        Some((member, name.to_string()))
-                    } else {
-                        None
-                    }
-                } else if contains_case_insensitive(name, substring) {
+                if (case_sensitive && name.contains(substring))
+                    || contains_case_insensitive(name, substring)
+                {
                     Some((member, name.to_string()))
                 } else {
                     None
