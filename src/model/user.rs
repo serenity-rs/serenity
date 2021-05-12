@@ -303,7 +303,7 @@ impl CurrentUser {
     /// use serenity::model::Permissions;
     /// use serenity::model::oauth2::Oauth2Scope;
     ///
-    /// let scopes = vec![Oauth2Scope::Bot, Oauth2Scope::ApplicationCommand];
+    /// let scopes = vec![Oauth2Scope::Bot, Oauth2Scope::ApplicationsCommand];
     ///
     /// // assuming the user has been bound
     /// let url = match user.invite_url_with_oauth2_scopes(&http, Permissions::empty(), &scopes).await {
