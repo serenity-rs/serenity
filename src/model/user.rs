@@ -291,7 +291,7 @@ impl CurrentUser {
     ///
     /// # Examples
     ///
-    /// Get the invite url with no permissions set:
+    /// Get the invite url with no permissions set and slash commands support:
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
@@ -316,7 +316,7 @@ impl CurrentUser {
     /// };
     ///
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&scope=bot");
+    ///                  client_id=249608697955745802&scope=bot%20application.command");
     /// # }
     /// ```
     pub async fn invite_url_with_oauth2_scopes(
