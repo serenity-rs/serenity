@@ -11,27 +11,117 @@ use crate::prelude::*;
 ///
 /// Useful for implementing argument parsing in command frameworks.
 #[async_trait::async_trait]
-pub trait Parse: Sized {
+pub trait ArgumentConvert: Sized {
     /// The associated error which can be returned from parsing.
     type Err;
 
     /// Parses a string `s` as a command parameter of this type.
-    async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err>;
+    async fn convert(
+        ctx: &Context,
+        guild_id: Option<GuildId>,
+        channel_id: Option<ChannelId>,
+        s: &str,
+    ) -> Result<Self, Self::Err>;
 }
 
 #[async_trait::async_trait]
-impl<T: std::str::FromStr> Parse for T {
+impl<T: std::str::FromStr> ArgumentConvert for T {
     type Err = <T as std::str::FromStr>::Err;
 
-    async fn parse(_: &Context, _: &Message, s: &str) -> Result<Self, Self::Err> {
+    async fn convert(
+        _: &Context,
+        _: Option<GuildId>,
+        _: Option<ChannelId>,
+        s: &str,
+    ) -> Result<Self, Self::Err> {
         T::from_str(s)
     }
 }
 
-/// Error that can be returned from [`Member::parse`].
+// The following few parse_XXX methods are in here (parse.rs) because they need to be gated
+// behind the model feature and it's just convenient to put them here then
+
+/// Retrieves the username and discriminator out of a user tag (`name#discrim`).
+///
+/// If the user tag is invalid, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::utils::parse_user_tag;
+///
+/// assert_eq!(parse_user_tag("kangalioo#9108"), Some(("kangalioo", 9108)));
+/// assert_eq!(parse_user_tag("kangalioo#10108"), None);
+/// ```
+pub fn parse_user_tag(s: &str) -> Option<(&str, u16)> {
+    let pound_sign = s.find('#')?;
+    let name = &s[..pound_sign];
+    let discrim = s[(pound_sign + 1)..].parse::<u16>().ok()?;
+    if discrim > 9999 {
+        return None;
+    }
+    Some((name, discrim))
+}
+
+/// Retrieves IDs from "{channel ID}-{message ID}" (retrieved by shift-clicking on "Copy ID").
+///
+/// If the string is invalid, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::model::prelude::*;
+/// use serenity::utils::parse_message_id_pair;
+///
+/// assert_eq!(
+///     parse_message_id_pair("673965002805477386-842482646604972082"),
+///     Some(ChannelId(673965002805477386), GuildId(842482646604972082)),
+/// );
+/// assert_eq!(
+///     parse_message_id_pair("673965002805477386-842482646604972082-472029906943868929"),
+///     None,
+/// );
+/// ```
+pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
+    let mut parts = s.splitn(2, '-');
+    let channel_id = ChannelId(parts.next()?.parse().ok()?);
+    let message_id = MessageId(parts.next()?.parse().ok()?);
+    Some((channel_id, message_id))
+}
+
+/// Retrieves guild, channel, and message ID from a message URL.
+///
+/// If the URL is malformed, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::model::prelude::*;
+/// use serenity::utils::parse_message_url;
+///
+/// assert_eq!(
+///     parse_message_url(
+///         "https://discord.com/channels/381880193251409931/381880193700069377/806164913558781963"
+///     ),
+///     Some(
+///         GuildId(381880193251409931),
+///         ChannelId(381880193700069377),
+///         MessageId(806164913558781963),
+///     ),
+/// );
+/// assert_eq!(parse_message_url("https://google.com"), None);
+/// ```
+pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
+    let mut parts = s.strip_prefix("https://discord.com/channels/")?.splitn(3, '/');
+    let guild_id = GuildId(parts.next()?.parse().ok()?);
+    let channel_id = ChannelId(parts.next()?.parse().ok()?);
+    let message_id = MessageId(parts.next()?.parse().ok()?);
+    Some((guild_id, channel_id, message_id))
+}
+
+/// Error that can be returned from [`Member::convert`].
 #[non_exhaustive]
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub enum MemberParseError {
+    /// Parser was invoked outside a guild.
+    OutsideGuild,
     /// The guild in which the parser was invoked is not in cache.
     GuildNotInCache,
     /// The provided member string failed to parse, or the parsed result cannot be found in the
@@ -44,9 +134,10 @@ impl std::error::Error for MemberParseError {}
 impl std::fmt::Display for MemberParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-			Self::GuildNotInCache => write!(f, "Guild is not in cache"),
-			Self::NotFoundOrMalformed => write!(f, "Provided member was not found or provided string did not adhere to any known guild member format"),
-		}
+            Self::OutsideGuild => write!(f, "Tried to find member outside a guild"),
+            Self::GuildNotInCache => write!(f, "Guild is not in cache"),
+            Self::NotFoundOrMalformed => write!(f, "Member not found or unknown format"),
+        }
     }
 }
 
@@ -56,30 +147,33 @@ impl std::fmt::Display for MemberParseError {
 ///
 /// The lookup strategy is as follows (in order):
 /// 1. Lookup by ID.
-/// 2. Lookup by mention.
-/// 3. Lookup by name#discrim
+/// 2. [Lookup by mention](`super::parse_username`).
+/// 3. [Lookup by name#discrim](`parse_user_tag`).
 /// 4. Lookup by name
 /// 5. Lookup by nickname
 #[cfg(feature = "cache")]
 #[async_trait::async_trait]
-impl Parse for Member {
+impl ArgumentConvert for Member {
     type Err = MemberParseError;
 
-    async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
-        let guild = msg.guild(&ctx.cache).await.ok_or(MemberParseError::GuildNotInCache)?;
+    async fn convert(
+        ctx: &Context,
+        guild_id: Option<GuildId>,
+        _channel_id: Option<ChannelId>,
+        s: &str,
+    ) -> Result<Self, Self::Err> {
+        let guild = guild_id
+            .ok_or(MemberParseError::OutsideGuild)?
+            .to_guild_cached(ctx)
+            .await
+            .ok_or(MemberParseError::GuildNotInCache)?;
 
         let lookup_by_id = || guild.members.get(&UserId(s.parse().ok()?));
 
-        let lookup_by_mention = || {
-            guild.members.get(&UserId(
-                s.strip_prefix("<@")?.trim_start_matches('!').strip_suffix('>')?.parse().ok()?,
-            ))
-        };
+        let lookup_by_mention = || guild.members.get(&UserId(super::parse_username(s)?));
 
         let lookup_by_name_and_discrim = || {
-            let pound_sign = s.find('#')?;
-            let name = &s[..pound_sign];
-            let discrim = s[(pound_sign + 1)..].parse::<u16>().ok()?;
+            let (name, discrim) = parse_user_tag(s)?;
             guild.members.values().find(|member| {
                 member.user.discriminator == discrim && member.user.name.eq_ignore_ascii_case(name)
             })
@@ -104,7 +198,7 @@ impl Parse for Member {
     }
 }
 
-/// Error that can be returned from [`Message::parse`].
+/// Error that can be returned from [`Message::convert`].
 #[non_exhaustive]
 #[derive(Debug)]
 pub enum MessageParseError {
@@ -144,32 +238,27 @@ impl std::fmt::Display for MessageParseError {
 /// Look up a message by a string.
 ///
 /// The lookup strategy is as follows (in order):
-/// 1. Lookup by "{channel ID}-{message ID}" (retrieved by shift-clicking on "Copy ID")
+/// 1. [Lookup by "{channel ID}-{message ID}"](`parse_message_id_pair`) (retrieved by shift-clicking on "Copy ID")
 /// 2. Lookup by message ID (the message must be in the context channel)
-/// 3. Lookup by message URL
+/// 3. [Lookup by message URL](`parse_message_url`)
 #[async_trait::async_trait]
-impl Parse for Message {
+impl ArgumentConvert for Message {
     type Err = MessageParseError;
 
-    async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
-        let extract_from_id_pair = || {
-            let mut parts = s.splitn(2, '-');
-            let channel_id = ChannelId(parts.next()?.parse().ok()?);
-            let message_id = MessageId(parts.next()?.parse().ok()?);
-            Some((channel_id, message_id))
-        };
-
-        let extract_from_message_id = || Some((msg.channel_id, MessageId(s.parse().ok()?)));
+    async fn convert(
+        ctx: &Context,
+        _guild_id: Option<GuildId>,
+        channel_id: Option<ChannelId>,
+        s: &str,
+    ) -> Result<Self, Self::Err> {
+        let extract_from_message_id = || Some((channel_id?, MessageId(s.parse().ok()?)));
 
         let extract_from_message_url = || {
-            let mut parts = s.strip_prefix("https://discord.com/channels/")?.splitn(3, '/');
-            let _guild_id = GuildId(parts.next()?.parse().ok()?);
-            let channel_id = ChannelId(parts.next()?.parse().ok()?);
-            let message_id = MessageId(parts.next()?.parse().ok()?);
+            let (_guild_id, channel_id, message_id) = parse_message_url(s)?;
             Some((channel_id, message_id))
         };
 
-        let (channel_id, message_id) = extract_from_id_pair()
+        let (channel_id, message_id) = parse_message_id_pair(s)
             .or_else(extract_from_message_id)
             .or_else(extract_from_message_url)
             .ok_or(MessageParseError::Malformed)?;
