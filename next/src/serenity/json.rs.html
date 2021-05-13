@@ -148,6 +148,7 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
+<span id="148">148</span>
 </pre><pre class="rust">
 <span class="doccomment">//! This module exports different types for JSON interactions.</span>
 <span class="doccomment">//! It encapsulates the differences between serde_json and simd-json to allow</span>
@@ -280,8 +281,9 @@
 <span class="kw">where</span>
     <span class="ident">serde_json::Number</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 {
-    <span class="ident">Value::from</span>(<span class="ident">Number::from</span>(<span class="ident">n</span>))
+    <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">n</span>))
 }
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_number</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span>
 <span class="kw">where</span>
