@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -526,13 +526,7 @@
 <span id="523">523</span>
 <span id="524">524</span>
 <span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -541,6 +535,7 @@
 <span class="kw">mod</span> <span class="ident">embed</span>;
 <span class="kw">mod</span> <span class="ident">guild_channel</span>;
 <span class="kw">mod</span> <span class="ident">message</span>;
+<span class="kw">mod</span> <span class="ident">partial_channel</span>;
 <span class="kw">mod</span> <span class="ident">private_channel</span>;
 <span class="kw">mod</span> <span class="ident">reaction</span>;
 <span class="kw">mod</span> <span class="ident">sticker</span>;
@@ -559,6 +554,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::embed</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::guild_channel</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::message</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::partial_channel</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::private_channel</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::reaction</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::sticker</span>::<span class="kw-2">*</span>;
@@ -594,11 +590,11 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Channel</span> {
-    <span class="doccomment">/// Converts from `Channel` to `Option&lt;GuildChannel&gt;`.</span>
+    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;GuildChannel&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Converts `self` into an `Option&lt;GuildChannel&gt;`, consuming</span>
-    <span class="doccomment">/// `self`, and discarding a `PrivateChannel`, or</span>
-    <span class="doccomment">/// `ChannelCategory`, if any.</span>
+    <span class="doccomment">/// `self`, and discarding a [`PrivateChannel`], or</span>
+    <span class="doccomment">/// [`ChannelCategory`], if any.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -629,10 +625,10 @@
         }
     }
 
-    <span class="doccomment">/// Converts from `Channel` to `Option&lt;PrivateChannel&gt;`.</span>
+    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;PrivateChannel&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Converts `self` into an `Option&lt;PrivateChannel&gt;`, consuming</span>
-    <span class="doccomment">/// `self`, and discarding a `GuildChannel`, or `ChannelCategory`,</span>
+    <span class="doccomment">/// `self`, and discarding a [`GuildChannel`], or [`ChannelCategory`],</span>
     <span class="doccomment">/// if any.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -664,11 +660,11 @@
         }
     }
 
-    <span class="doccomment">/// Converts from `Channel` to `Option&lt;ChannelCategory&gt;`.</span>
+    <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;ChannelCategory&gt;`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Converts `self` into an `Option&lt;ChannelCategory&gt;`,</span>
-    <span class="doccomment">/// consuming `self`, and discarding a `GuildChannel`, or</span>
-    <span class="doccomment">/// `PrivateChannel`, if any.</span>
+    <span class="doccomment">/// consuming `self`, and discarding a [`GuildChannel`], or</span>
+    <span class="doccomment">/// [`PrivateChannel`], if any.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -838,12 +834,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: `NewsChannel` is serialized into a [`GuildChannel`]</span>
     <span class="ident">News</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// An indicator that the channel is a `StoreChannel`</span>
+    <span class="doccomment">/// An indicator that the channel is a `StoreChannel]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: `StoreChannel` is serialized into a [`GuildChannel`]</span>
     <span class="ident">Store</span> <span class="op">=</span> <span class="number">6</span>,
     <span class="doccomment">/// An indicator that the channel is a stage [`GuildChannel`].</span>
     <span class="ident">Stage</span> <span class="op">=</span> <span class="number">13</span>,
+    <span class="doccomment">/// An indicator that the channel is of unknown type.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">ChannelType</span> {
@@ -867,19 +865,7 @@
             <span class="ident">ChannelType::News</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;news&quot;</span>,
             <span class="ident">ChannelType::Store</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;store&quot;</span>,
             <span class="ident">ChannelType::Stage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;stage&quot;</span>,
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ChannelType::Text</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
-            <span class="ident">ChannelType::Private</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">ChannelType::Voice</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">2</span>,
-            <span class="ident">ChannelType::Category</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">4</span>,
-            <span class="ident">ChannelType::News</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
-            <span class="ident">ChannelType::Store</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">6</span>,
-            <span class="ident">ChannelType::Stage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">13</span>,
+            <span class="ident">ChannelType::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;unknown&quot;</span>,
         }
     }
 }
@@ -963,6 +949,8 @@
     <span class="ident">Auto</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="doccomment">/// An indicator that the video quality is 720p.</span>
     <span class="ident">Full</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// An indicator that video quality is of unknown type.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">VideoQualityMode</span> {
@@ -1065,5 +1053,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-search-js="../../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
     <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script></body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Error",""]],"struct":[["DiscordJsonError",""],["ErrorResponse",""]]});
+initSidebarItems({"enum":[["Error",""]],"struct":[["DiscordJsonError",""],["DiscordJsonSingleError",""],["ErrorResponse",""]]});

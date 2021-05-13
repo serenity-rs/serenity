@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/user.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>user.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1130,19 +1130,7 @@
 <span id="1127">1127</span>
 <span id="1128">1128</span>
 <span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1276,10 +1264,10 @@
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditProfile</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditProfile</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::String</span>(<span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::from</span>(<span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">email</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">email</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;email&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">email</span>.<span class="ident">clone</span>()));
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;email&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">email</span>.<span class="ident">clone</span>()));
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_profile</span> <span class="op">=</span> <span class="ident">EditProfile</span>(<span class="ident">map</span>);
@@ -1294,11 +1282,8 @@
     <span class="doccomment">/// Retrieves the URL to the current user&#39;s avatar, falling back to the</span>
     <span class="doccomment">/// default avatar if needed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will call [`avatar_url`] first, and if that returns `None`, it</span>
-    <span class="doccomment">/// then falls back to [`default_avatar_url`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`avatar_url`]: Self::avatar_url</span>
-    <span class="doccomment">/// [`default_avatar_url`]: Self::default_avatar_url</span>
+    <span class="doccomment">/// This will call [`Self::avatar_url`] first, and if that returns [`None`], it</span>
+    <span class="doccomment">/// then falls back to [`Self::default_avatar_url`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">face</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">avatar_url</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">default_avatar_url</span>())
@@ -1495,9 +1480,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The default avatar is calculated via the result of `discriminator % 5`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The has of the avatar can be retrieved via calling [`name`] on the enum.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`name`]: Self::name</span>
+<span class="doccomment">/// The has of the avatar can be retrieved via calling [`Self::name`] on the enum.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DefaultAvatar</span> {
@@ -1586,9 +1569,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">bot</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with</span>
-    <span class="doccomment">/// the same [`name`]. The name+discriminator pair is always unique.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`name`]: Self::name</span>
+    <span class="doccomment">/// the same [`Self::name`]. The name+discriminator pair is always unique.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_u16&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">discriminator</span>: <span class="ident">u16</span>,
     <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator</span>
@@ -1608,31 +1589,31 @@
 <span class="macro">__impl_bitflags!</span> {
     <span class="ident">UserPublicFlags</span>: <span class="ident">u32</span> {
         <span class="doccomment">/// User&#39;s flag as discord employee</span>
-        <span class="ident">DISCORD_EMPLOYEE</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000000_00000001</span>;
+        <span class="ident">DISCORD_EMPLOYEE</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0001</span>;
         <span class="doccomment">/// User&#39;s flag as partnered server owner</span>
-        <span class="ident">PARTNERED_SERVER_OWNER</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000000_00000010</span>;
+        <span class="ident">PARTNERED_SERVER_OWNER</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0010</span>;
         <span class="doccomment">/// User&#39;s flag as hypesquad events</span>
-        <span class="ident">HYPESQUAD_EVENTS</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000000_00000100</span>;
+        <span class="ident">HYPESQUAD_EVENTS</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0100</span>;
         <span class="doccomment">/// User&#39;s flag as bug hunter level 1</span>
-        <span class="ident">BUG_HUNTER_LEVEL_1</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000000_00001000</span>;
+        <span class="ident">BUG_HUNTER_LEVEL_1</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_1000</span>;
         <span class="doccomment">/// User&#39;s flag as house bravery</span>
-        <span class="ident">HOUSE_BRAVERY</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000000_01000000</span>;
+        <span class="ident">HOUSE_BRAVERY</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0100_0000</span>;
         <span class="doccomment">/// User&#39;s flag as house brilliance</span>
-        <span class="ident">HOUSE_BRILLIANCE</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000000_10000000</span>;
+        <span class="ident">HOUSE_BRILLIANCE</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_1000_0000</span>;
         <span class="doccomment">/// User&#39;s flag as house balance</span>
-        <span class="ident">HOUSE_BALANCE</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000001_00000000</span>;
+        <span class="ident">HOUSE_BALANCE</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0001_0000_0000</span>;
         <span class="doccomment">/// User&#39;s flag as early supporter</span>
-        <span class="ident">EARLY_SUPPORTER</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000010_00000000</span>;
+        <span class="ident">EARLY_SUPPORTER</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0010_0000_0000</span>;
         <span class="doccomment">/// User&#39;s flag as team user</span>
-        <span class="ident">TEAM_USER</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00000100_00000000</span>;
+        <span class="ident">TEAM_USER</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0100_0000_0000</span>;
         <span class="doccomment">/// User&#39;s flag as system</span>
-        <span class="ident">SYSTEM</span> <span class="op">=</span> <span class="number">0b00000000_00000000_00010000_00000000</span>;
+        <span class="ident">SYSTEM</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0001_0000_0000_0000</span>;
         <span class="doccomment">/// User&#39;s flag as bug hunter level 2</span>
-        <span class="ident">BUG_HUNTER_LEVEL_2</span> <span class="op">=</span> <span class="number">0b00000000_00000000_01000000_00000000</span>;
+        <span class="ident">BUG_HUNTER_LEVEL_2</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0100_0000_0000_0000</span>;
         <span class="doccomment">/// User&#39;s flag as verified bot</span>
-        <span class="ident">VERIFIED_BOT</span> <span class="op">=</span> <span class="number">0b00000000_00000001_00000000_00000000</span>;
+        <span class="ident">VERIFIED_BOT</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0001_0000_0000_0000_0000</span>;
         <span class="doccomment">/// User&#39;s flag as early verified bot developer</span>
-        <span class="ident">EARLY_VERIFIED_BOT_DEVELOPER</span> <span class="op">=</span> <span class="number">0b00000000_00000010_00000000_00000000</span>;
+        <span class="ident">EARLY_VERIFIED_BOT_DEVELOPER</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0010_0000_0000_0000_0000</span>;
     }
 }
 
@@ -1655,13 +1636,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">User</span> {
-    <span class="doccomment">/// Initializes a `User` with default values. Setting the following:</span>
+    <span class="doccomment">/// Initializes a [`User`] with default values. Setting the following:</span>
     <span class="doccomment">/// - **id** to `UserId(210)`</span>
     <span class="doccomment">/// - **avatar** to `Some(&quot;abc&quot;)`</span>
     <span class="doccomment">/// - **bot** to `true`.</span>
     <span class="doccomment">/// - **discriminator** to `1432`.</span>
     <span class="doccomment">/// - **name** to `&quot;test&quot;`.</span>
-    <span class="doccomment">/// - **public_flags** to `None`.</span>
+    <span class="doccomment">/// - **public_flags** to [`None`].</span>
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">User</span> {
             <span class="ident">id</span>: <span class="ident">UserId</span>(<span class="number">210</span>),
@@ -1818,9 +1799,7 @@
         <span class="self">self</span>.<span class="ident">create_dm_channel</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">f</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// This is an alias of [direct_message].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [direct_message]: Self::direct_message</span>
+    <span class="doccomment">/// This is an alias of [`Self::direct_message`].</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
@@ -1833,11 +1812,8 @@
     <span class="doccomment">/// Retrieves the URL to the user&#39;s avatar, falling back to the default</span>
     <span class="doccomment">/// avatar if needed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will call [`avatar_url`] first, and if that returns `None`, it</span>
-    <span class="doccomment">/// then falls back to [`default_avatar_url`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`avatar_url`]: Self::avatar_url</span>
-    <span class="doccomment">/// [`default_avatar_url`]: Self::default_avatar_url</span>
+    <span class="doccomment">/// This will call [`Self::avatar_url`] first, and if that returns [`None`], it</span>
+    <span class="doccomment">/// then falls back to [`Self::default_avatar_url`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">face</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">avatar_url</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">default_avatar_url</span>())
     }
@@ -1862,9 +1838,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an [`Error::Http`] if the given `Guild` is unavailable,</span>
-    <span class="doccomment">/// if that `Role` does not exist in the given `Guild`, or if the</span>
-    <span class="doccomment">/// given `User` is not in that `Guild`.</span>
+    <span class="doccomment">/// Returns an [`Error::Http`] if the given [`Guild`] is unavailable,</span>
+    <span class="doccomment">/// if that [`Role`] does not exist in the given [`Guild`], or if the</span>
+    <span class="doccomment">/// given [`User`] is not in that [`Guild`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in</span>
     <span class="doccomment">/// deserializing the API response.</span>
@@ -1990,7 +1966,7 @@
 
     <span class="doccomment">/// Returns the user&#39;s nickname in the given `guild_id`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If none is used, it returns `None`.</span>
+    <span class="doccomment">/// If none is used, it returns [`None`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">nick_in</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2071,7 +2047,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`Error::Http`] if a `User` with that `UserId` does not exist,</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,</span>
     <span class="doccomment">/// or is otherwise unavailable.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in deserializing</span>
@@ -2113,7 +2089,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// May return an [`Error::Http`] if a `User` with that `UserId` does not exist,</span>
+    <span class="doccomment">/// May return an [`Error::Http`] if a [`User`] with that [`UserId`] does not exist,</span>
     <span class="doccomment">/// or otherwise cannot be fetched.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May also return an [`Error::Json`] if there is an error in</span>
@@ -2157,48 +2133,48 @@
             <span class="ident">discriminator</span>: <span class="ident">user</span>.<span class="ident">discriminator</span>,
             <span class="ident">id</span>: <span class="ident">user</span>.<span class="ident">id</span>,
             <span class="ident">name</span>: <span class="ident">user</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">public_flags</span>: <span class="ident">user</span>.<span class="ident">public_flags</span>.<span class="ident">clone</span>(),
+            <span class="ident">public_flags</span>: <span class="ident">user</span>.<span class="ident">public_flags</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CurrentUser</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `CurrentUser` struct.</span>
+    <span class="doccomment">/// Gets the Id of a [`CurrentUser`] struct.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">current_user</span>: <span class="ident">CurrentUser</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">current_user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CurrentUser</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `CurrentUser` struct.</span>
+    <span class="doccomment">/// Gets the Id of a [`CurrentUser`] struct.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">current_user</span>: <span class="kw-2">&amp;</span><span class="ident">CurrentUser</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">current_user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `Member`.</span>
+    <span class="doccomment">/// Gets the Id of a [`Member`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">member</span>: <span class="ident">Member</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Member</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `Member`.</span>
+    <span class="doccomment">/// Gets the Id of a [`Member`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">member</span>: <span class="kw-2">&amp;</span><span class="ident">Member</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `User`.</span>
+    <span class="doccomment">/// Gets the Id of a [`User`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">user</span>: <span class="ident">User</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">user</span>.<span class="ident">id</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">User</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserId</span> {
-    <span class="doccomment">/// Gets the Id of a `User`.</span>
+    <span class="doccomment">/// Gets the Id of a [`User`].</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="ident">user</span>.<span class="ident">id</span>
     }
@@ -2285,5 +2261,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-js="../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

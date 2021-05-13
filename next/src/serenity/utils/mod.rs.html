@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/utils/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1023,7 +1023,21 @@
 <span id="1020">1020</span>
 <span id="1021">1021</span>
 <span id="1022">1022</span>
-</pre><div class="example-wrap"><pre class="rust ">
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+</pre><pre class="rust">
 <span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -1063,7 +1077,7 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">id::EmojiId</span>, <span class="ident">misc::EmojiIdentifier</span>};
 
-<span class="doccomment">/// Converts a HashMap into a final `serde_json::Map` representation.</span>
+<span class="doccomment">/// Converts a HashMap into a final [`serde_json::Map`] representation.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hashmap_to_json_map</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Value</span>, <span class="ident">H</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">JsonMap</span>
 <span class="kw">where</span>
     <span class="ident">H</span>: <span class="ident">BuildHasher</span>,
@@ -1120,7 +1134,7 @@
 
 <span class="doccomment">/// Retrieves an Id from a user mention.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the mention is invalid, then `None` is returned.</span>
+<span class="doccomment">/// If the mention is invalid, then [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1136,7 +1150,7 @@
 <span class="doccomment">/// assert_eq!(parse_username(&quot;&lt;@!114941315417899012&gt;&quot;), Some(114941315417899012));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid username or nickname mention returns `None`:</span>
+<span class="doccomment">/// Asserting that an invalid username or nickname mention returns [`None`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use serenity::utils::parse_username;</span>
@@ -1166,7 +1180,7 @@
 
 <span class="doccomment">/// Retrieves an Id from a role mention.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the mention is invalid, then `None` is returned.</span>
+<span class="doccomment">/// If the mention is invalid, then [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1178,7 +1192,7 @@
 <span class="doccomment">/// assert_eq!(parse_role(&quot;&lt;@&amp;136107769680887808&gt;&quot;), Some(136107769680887808));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid role mention returns `None`:</span>
+<span class="doccomment">/// Asserting that an invalid role mention returns [`None`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use serenity::utils::parse_role;</span>
@@ -1204,7 +1218,7 @@
 
 <span class="doccomment">/// Retrieves an Id from a channel mention.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the channel mention is invalid, then `None` is returned.</span>
+<span class="doccomment">/// If the channel mention is invalid, then [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1216,7 +1230,7 @@
 <span class="doccomment">/// assert_eq!(parse_channel(&quot;&lt;#81384788765712384&gt;&quot;), Some(81384788765712384));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid channel mention returns `None`:</span>
+<span class="doccomment">/// Asserting that an invalid channel mention returns [`None`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use serenity::utils::parse_channel;</span>
@@ -1243,7 +1257,7 @@
 
 <span class="doccomment">/// Retrieve the ID number out of a channel, role, or user mention.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the mention is invalid, `None` is returned.</span>
+<span class="doccomment">/// If the mention is invalid, [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1269,9 +1283,9 @@
 }
 
 <span class="doccomment">/// Retrieves the animated state, name and Id from an emoji mention, in the form of an</span>
-<span class="doccomment">/// `EmojiIdentifier`.</span>
+<span class="doccomment">/// [`EmojiIdentifier`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// If the emoji usage is invalid, then `None` is returned.</span>
+<span class="doccomment">/// If the emoji usage is invalid, then [`None`] is returned.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -1291,7 +1305,7 @@
 <span class="doccomment">/// assert_eq!(parse_emoji(&quot;&lt;:smugAnimeFace:302516740095606785&gt;&quot;).unwrap(), expected);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Asserting that an invalid emoji usage returns `None`:</span>
+<span class="doccomment">/// Asserting that an invalid emoji usage returns [`None`]:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use serenity::utils::parse_emoji;</span>
@@ -1874,7 +1888,11 @@
             <span class="ident">region</span>: <span class="string">&quot;Ferris Island&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">roles</span>: <span class="ident">HashMap::new</span>(),
             <span class="ident">splash</span>: <span class="prelude-val">None</span>,
+            <span class="ident">discovery_splash</span>: <span class="prelude-val">None</span>,
             <span class="ident">system_channel_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">system_channel_flags</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">rules_channel_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">public_updates_channel_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">verification_level</span>: <span class="ident">VerificationLevel::None</span>,
             <span class="ident">voice_states</span>: <span class="ident">HashMap::new</span>(),
             <span class="ident">description</span>: <span class="prelude-val">None</span>,
@@ -1883,6 +1901,15 @@
             <span class="ident">banner</span>: <span class="prelude-val">None</span>,
             <span class="ident">vanity_url_code</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;bruhmoment1&quot;</span>.<span class="ident">to_string</span>()),
             <span class="ident">preferred_locale</span>: <span class="string">&quot;en-US&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">welcome_screen</span>: <span class="prelude-val">None</span>,
+            <span class="ident">approximate_member_count</span>: <span class="prelude-val">None</span>,
+            <span class="ident">approximate_presence_count</span>: <span class="prelude-val">None</span>,
+            <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
+            <span class="ident">max_video_channel_users</span>: <span class="prelude-val">None</span>,
+            <span class="ident">max_presences</span>: <span class="prelude-val">None</span>,
+            <span class="ident">max_members</span>: <span class="prelude-val">None</span>,
+            <span class="ident">widget_enabled</span>: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+            <span class="ident">widget_channel_id</span>: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">Member</span> {
@@ -1909,6 +1936,7 @@
             <span class="ident">name</span>: <span class="string">&quot;ferris-club-member&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">permissions</span>: <span class="ident">Permissions::all</span>(),
             <span class="ident">position</span>: <span class="number">0</span>,
+            <span class="ident">tags</span>: <span class="ident">RoleTags::default</span>(),
         };
 
         <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">GuildChannel</span> {
@@ -1938,7 +1966,7 @@
         <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">guild</span>.<span class="ident">id</span>, <span class="ident">guild</span>.<span class="ident">clone</span>());
         <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">channel</span>.<span class="ident">id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>());
 
-        <span class="kw">let</span> <span class="ident">with_user_metions</span> <span class="op">=</span> <span class="string">&quot;&lt;@!100000000000000000&gt; &lt;@!000000000000000000&gt; &lt;@123&gt; &lt;@!123&gt; \
+        <span class="kw">let</span> <span class="ident">with_user_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;@!100000000000000000&gt; &lt;@!000000000000000000&gt; &lt;@123&gt; &lt;@!123&gt; \
         &lt;@!123123123123123123123&gt; &lt;@123&gt; &lt;@123123123123123123&gt; &lt;@!invalid&gt; \
         &lt;@invalid&gt; &lt;@日本語 한국어$§)[/__#\\(/&amp;2032$§#&gt; \
         &lt;@!i)/==(&lt;&lt;&gt;z/9080)&gt; &lt;@!1231invalid&gt; &lt;@invalid123&gt; \
@@ -1952,7 +1980,7 @@
 
         <span class="comment">// User mentions</span>
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ContentSafeOptions::default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">without_user_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_user_metions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">without_user_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_user_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ContentSafeOptions::default</span>();
         <span class="macro">assert_eq!</span>(
@@ -1985,7 +2013,7 @@
         );
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">clean_user</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">with_user_metions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_user_metions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">with_user_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_user_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
 
         <span class="comment">// Channel mentions</span>
         <span class="kw">let</span> <span class="ident">with_channel_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;#&gt; &lt;#deleted-channel&gt; #deleted-channel &lt;#0&gt; \
@@ -2047,5 +2075,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-js="../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>
