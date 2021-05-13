@@ -955,7 +955,6 @@
 <span id="952">952</span>
 <span id="953">953</span>
 <span id="954">954</span>
-<span id="955">955</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -972,7 +971,7 @@
 };
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::Http</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
 
 <span class="doccomment">/// Information about an interaction.</span>
@@ -1072,12 +1071,11 @@
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;data&quot;</span>) {
-            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;data&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected data&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">ApplicationCommandInteractionData</span><span class="op">&gt;</span>)
+            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;data&quot;</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">ApplicationCommandInteractionData</span><span class="op">&gt;</span>(<span class="ident">data</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            ),
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;expected data&quot;</span>)),
+            }),
             <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
 

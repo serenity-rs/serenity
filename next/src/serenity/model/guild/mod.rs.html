@@ -5761,13 +5761,13 @@
         <span class="kw">let</span> <span class="ident">emoji_name</span> <span class="op">=</span>
             <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;emoji_name&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected emoji_name&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">emoji_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Value::Null</span> {
+        <span class="kw">if</span> <span class="ident">emoji_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NULL</span> {
             <span class="ident">emoji</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">GuildWelcomeScreenEmoji::Custom</span>(
                 <span class="ident">EmojiId::deserialize</span>(<span class="ident">emoji_id</span>).<span class="ident">expect</span>(<span class="string">&quot;expected emoji_id&quot;</span>),
             ));
         }
 
-        <span class="kw">if</span> <span class="ident">emoji_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Value::Null</span> {
+        <span class="kw">if</span> <span class="ident">emoji_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NULL</span> {
             <span class="ident">emoji</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">GuildWelcomeScreenEmoji::Unicode</span>(
                 <span class="ident">String::deserialize</span>(<span class="ident">emoji_name</span>).<span class="ident">expect</span>(<span class="string">&quot;expected emoji_name&quot;</span>),
             ));
