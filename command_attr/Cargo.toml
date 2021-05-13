@@ -1,6 +1,6 @@
 [package]
 name = "command_attr"
-version = "0.3.5"
+version = "0.3.6"
 authors = ["acdenisSK <acdenissk69@gmail.com>"]
 edition = "2018"
 description = "Procedural macros for command creation for the Serenity library."
