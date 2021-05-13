@@ -2177,6 +2177,19 @@ impl Http {
         .await
     }
 
+    /// Gets a guild embed information.
+    #[deprecated(note = "get_guild_embed was renamed to get_guild_widget")]
+    pub async fn get_guild_embed(&self, guild_id: u64) -> Result<GuildEmbed> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildEmbed {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Gets a guild widget information.
     pub async fn get_guild_widget(&self, guild_id: u64) -> Result<GuildWidget> {
         self.fire(Request {
