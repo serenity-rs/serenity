@@ -212,6 +212,28 @@ impl PartialGuild {
         self.id.bans(&http).await
     }
 
+    /// Gets a list of the guild's audit log entries
+    ///
+    /// **Note**: Requires the [View Audit Log] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid value is given.
+    ///
+    /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
+    #[inline]
+    pub async fn audit_logs(
+        self,
+        http: impl AsRef<Http>,
+        action_type: Option<u8>,
+        user_id: Option<UserId>,
+        before: Option<AuditLogEntryId>,
+        limit: Option<u8>,
+    ) -> Result<AuditLogs> {
+        self.id.audit_logs(http, action_type, user_id, before, limit).await
+    }
+
     /// Gets all of the guild's channels over the REST API.
     ///
     /// # Errors
