@@ -739,6 +739,34 @@ impl PartialGuild {
         self.id.edit_role(http, role_id, f).await
     }
 
+    /// Edits the order of [`Role`]s
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Change the order of a role:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::id::RoleId;
+    /// partial_guild.edit_role_position(&context, RoleId(8), 2);
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn edit_role_position(
+        &self,
+        http: impl AsRef<Http>,
+        role_id: impl Into<RoleId>,
+        position: u64,
+    ) -> Result<Vec<Role>> {
+        self.id.edit_role_position(&http, role_id, position).await
+    }
+
     /// Edits the [`GuildWelcomeScreen`].
     ///
     /// # Errors
