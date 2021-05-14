@@ -2179,6 +2179,7 @@ impl Http {
 
     /// Gets a guild embed information.
     #[deprecated(note = "get_guild_embed was renamed to get_guild_widget")]
+    #[allow(deprecated)]
     pub async fn get_guild_embed(&self, guild_id: u64) -> Result<GuildEmbed> {
         self.fire(Request {
             body: None,

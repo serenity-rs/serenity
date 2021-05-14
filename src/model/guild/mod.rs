@@ -1,5 +1,8 @@
 //! Models relating to guilds and types that it owns.
 
+// FIXME: Remove after `GuildEmbed` is removed.
+#![allow(deprecated)]
+
 mod audit_log;
 mod emoji;
 mod guild_id;
