@@ -2183,7 +2183,7 @@ impl Http {
         self.fire(Request {
             body: None,
             headers: None,
-            route: RouteInfo::GetGuildEmbed {
+            route: RouteInfo::GetGuildWidget {
                 guild_id,
             },
         })

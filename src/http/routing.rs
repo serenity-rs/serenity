@@ -145,12 +145,6 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdChannels(u64),
-    /// Route for the `/guilds/:guild_id/embed` path.
-    ///
-    /// The data is the relevant [`GuildId`].
-    ///
-    /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdEmbed(u64),
     /// Route for the `/guilds/:guild_id/widget` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -542,10 +536,6 @@ impl Route {
 
     pub fn guild_channels(guild_id: u64) -> String {
         format!(api!("/guilds/{}/channels"), guild_id)
-    }
-
-    pub fn guild_embed(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/embed"), guild_id)
     }
 
     pub fn guild_widget(guild_id: u64) -> String {
@@ -1186,9 +1176,6 @@ pub enum RouteInfo<'a> {
         application_id: u64,
         guild_id: u64,
         command_id: u64,
-    },
-    GetGuildEmbed {
-        guild_id: u64,
     },
     GetGuildWidget {
         guild_id: u64,
@@ -1992,13 +1979,6 @@ impl<'a> RouteInfo<'a> {
                     guild_id,
                     command_id,
                 )),
-            ),
-            RouteInfo::GetGuildEmbed {
-                guild_id,
-            } => (
-                LightMethod::Get,
-                Route::GuildsIdEmbed(guild_id),
-                Cow::from(Route::guild_embed(guild_id)),
             ),
             RouteInfo::GetGuildWidget {
                 guild_id,
