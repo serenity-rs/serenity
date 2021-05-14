@@ -2711,6 +2711,17 @@ pub enum GuildWelcomeScreenEmoji {
     Unicode(String),
 }
 
+/// A [`Guild`] embed.
+#[deprecated(note = "GuildEmbed was renamed to GuildWidget")]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct GuildEmbed {
+    /// Whether the embed is enabled.
+    pub enabled: bool,
+    /// The widget channel id.
+    pub channel_id: Option<ChannelId>,
+}
+
 /// A [`Guild`] widget.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
