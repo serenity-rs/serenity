@@ -37,6 +37,7 @@ use std::{
     task::{Context as FutContext, Poll},
 };
 
+use chrono::Datelike;
 use futures::future::BoxFuture;
 use tokio::sync::{Mutex, RwLock};
 use tracing::{debug, error, info, instrument};
@@ -68,6 +69,7 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::id::ApplicationId;
+use crate::model::id::UserId;
 pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
@@ -941,16 +943,8 @@ impl Client {
 /// // ensure a valid token is in fact valid:
 /// assert!(validate_token("Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_ok());
 ///
-/// // "cat" isn't a valid token:
-/// assert!(validate_token("cat").is_err());
-///
-/// // tokens must have three parts, separated by periods (this is still
-/// // actually an invalid token):
-/// assert!(validate_token("aaa.abcdefgh.bbb").is_ok());
-///
-/// // the second part must be _at least_ 6 characters long:
-/// assert!(validate_token("a.abcdef.b").is_ok());
-/// assert!(validate_token("a.abcde.b").is_err());
+/// // helpful to prevent typos
+/// assert!(validate_token("Njg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_err());
 /// ```
 ///
 /// # Errors
@@ -958,28 +952,50 @@ impl Client {
 /// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.
 /// The type of failure is not specified.
 pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
-    let token = token.as_ref();
+    let (user_id, generation_time) =
+        parse_token(token.as_ref()).ok_or(Error::Client(ClientError::InvalidToken))?;
 
-    if token.is_empty() {
-        return Err(Error::Client(ClientError::InvalidToken));
-    }
+    dbg!(user_id, generation_time);
 
-    let parts: Vec<&str> = token.split('.').collect();
-
-    // Check that the token has a total of 3 parts.
-    if parts.len() != 3 {
-        return Err(Error::Client(ClientError::InvalidToken));
-    }
-
-    // Check that the second part is at least 6 characters long.
-    if parts[1].len() < 6 {
-        return Err(Error::Client(ClientError::InvalidToken));
-    }
-
-    // Check that there is no whitespace before/after the token.
-    if token.trim() != token {
+    // Check if timestamps are in a sensible range
+    if user_id.created_at().year() >= 2100 || generation_time.year() >= 2100 {
         return Err(Error::Client(ClientError::InvalidToken));
     }
 
     Ok(())
+}
+
+/// Verifies that the token adheres to the Discord token format and extracts the bot user ID and the
+/// token generation timestamp
+fn parse_token(token: &str) -> Option<(UserId, chrono::NaiveDateTime)> {
+    // The token consists of three base64-encoded parts
+    let parts: Vec<&str> = token.split('.').collect();
+    let base64_config = base64::Config::new(base64::CharacterSet::UrlSafe, true);
+
+    // First part must be a base64-encoded stringified user ID
+    let user_id = base64::decode_config(parts.get(0)?, base64_config).ok()?;
+    let user_id = UserId(std::str::from_utf8(&user_id).ok()?.parse().ok()?);
+
+    // Second part must be a base64-encoded token generation timestamp
+    let timestamp_base64 = parts.get(1)?;
+    // The base64-encoded timestamp must be at least 6 characters
+    if timestamp_base64.len() < 6 {
+        return None;
+    }
+    let timestamp_bytes = base64::decode_config(timestamp_base64, base64_config).ok()?;
+    let mut timestamp = 0;
+    for byte in timestamp_bytes {
+        timestamp *= 256;
+        timestamp += byte as u64;
+    }
+    // Some timestamps are based on the Discord epoch. Convert to Unix epoch
+    if timestamp < 1293840000 {
+        timestamp += 1293840000;
+    }
+    let timestamp = chrono::NaiveDateTime::from_timestamp_opt(timestamp as i64, 0)?;
+
+    // Third part is a base64-encoded HMAC that's not interesting on its own
+    let _ = base64::decode(parts.get(2)?).ok()?;
+
+    Some((user_id, timestamp))
 }
