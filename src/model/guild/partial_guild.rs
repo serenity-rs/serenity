@@ -813,6 +813,95 @@ impl PartialGuild {
         guild_id.into().to_partial_guild(&http).await
     }
 
+    /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
+    ///
+    /// Hierarchy is essentially who has the [`Role`] with the highest
+    /// [`position`].
+    ///
+    /// Returns [`None`] if at least one of the given users' member instances
+    /// is not present. Returns [`None`] if the users have the same hierarchy, as
+    /// neither are greater than the other.
+    ///
+    /// If both user IDs are the same, [`None`] is returned. If one of the users
+    /// is the guild owner, their ID is returned.
+    ///
+    /// [`position`]: Role::position
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub async fn greater_member_hierarchy(
+        &self,
+        cache: impl AsRef<Cache>,
+        lhs_id: impl Into<UserId>,
+        rhs_id: impl Into<UserId>,
+    ) -> Option<UserId> {
+        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into()).await
+    }
+
+    #[cfg(feature = "cache")]
+    async fn _greater_member_hierarchy(
+        &self,
+        cache: impl AsRef<Cache>,
+        lhs_id: UserId,
+        rhs_id: UserId,
+    ) -> Option<UserId> {
+        // Check that the IDs are the same. If they are, neither is greater.
+        if lhs_id == rhs_id {
+            return None;
+        }
+
+        // Check if either user is the guild owner.
+        if lhs_id == self.owner_id {
+            return Some(lhs_id);
+        } else if rhs_id == self.owner_id {
+            return Some(rhs_id);
+        }
+
+        let lhs = cache
+            .as_ref()
+            .guild(self.id)
+            .await?
+            .members
+            .get(&lhs_id)?
+            .highest_role_info(&cache)
+            .await
+            .unwrap_or((RoleId(0), 0));
+        let rhs = cache
+            .as_ref()
+            .guild(self.id)
+            .await?
+            .members
+            .get(&rhs_id)?
+            .highest_role_info(&cache)
+            .await
+            .unwrap_or((RoleId(0), 0));
+
+        // If LHS and RHS both have no top position or have the same role ID,
+        // then no one wins.
+        if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
+            return None;
+        }
+
+        // If LHS's top position is higher than RHS, then LHS wins.
+        if lhs.1 > rhs.1 {
+            return Some(lhs_id);
+        }
+
+        // If RHS's top position is higher than LHS, then RHS wins.
+        if rhs.1 > lhs.1 {
+            return Some(rhs_id);
+        }
+
+        // If LHS and RHS both have the same position, but LHS has the lower
+        // role ID, then LHS wins.
+        //
+        // If RHS has the higher role ID, then RHS wins.
+        if lhs.1 == rhs.1 && lhs.0 < rhs.0 {
+            Some(lhs_id)
+        } else {
+            Some(rhs_id)
+        }
+    }
+
     /// Kicks a [`Member`] from the guild.
     ///
     /// Requires the [Kick Members] permission.
