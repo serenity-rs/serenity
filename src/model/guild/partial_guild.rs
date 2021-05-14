@@ -709,6 +709,36 @@ impl PartialGuild {
         self.id.edit_nickname(&http, new_nickname).await
     }
 
+    /// Edits a role, optionally setting its fields.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Make a role hoisted:
+    ///
+    /// ```rust,ignore
+    /// partial_guild.edit_role(&context, RoleId(7), |r| r.hoist(true));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    #[inline]
+    pub async fn edit_role<F>(
+        self,
+        http: impl AsRef<Http>,
+        role_id: impl Into<RoleId>,
+        f: F,
+    ) -> Result<Role>
+    where
+        F: FnOnce(&mut EditRole) -> &mut EditRole,
+    {
+        self.id.edit_role(http, role_id, f).await
+    }
+
     /// Edits the [`GuildWelcomeScreen`].
     ///
     /// # Errors
