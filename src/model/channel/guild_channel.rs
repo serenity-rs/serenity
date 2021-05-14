@@ -1163,7 +1163,7 @@ impl GuildChannel {
             return Err(Error::Model(ModelError::NameTooShort));
         } else if name.len() > 100 {
             return Err(Error::Model(ModelError::NameTooLong));
-        } else if self.kind.num() != 0 {
+        } else if !self.is_text_based() {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
