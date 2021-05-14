@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.10.7] - 2021-05-14
+
+Thanks to the following for their contributions:
+
+- [@HarmoGlace]
+
+### Fixed
+
+- [model/http] Fix GuildEmbed removal to avoid breaking change ([@HarmoGlace]) [c:822406e]
+
 ## [0.10.6] - 2021-05-13
 
 Thanks to the following for their contributions:
@@ -4169,6 +4179,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.10.7]: https://github.com/serenity-rs/serenity/compare/v0.10.6...v0.10.7
 [0.10.6]: https://github.com/serenity-rs/serenity/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/serenity-rs/serenity/compare/v0.10.4...v0.10.5
 [0.10.4]: https://github.com/serenity-rs/serenity/compare/v0.10.3...v0.10.4
@@ -4408,6 +4419,8 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:822406e]: https://github.com/serenity-rs/serenity/commit/822406ef13cdeffd2b199e72b42ffcbda73a0202
 
 [c:aa9748e]: https://github.com/serenity-rs/serenity/commit/aa9748ed44f020a84199e3c71882d76af885ad19
 [c:07f15ad]: https://github.com/serenity-rs/serenity/commit/07f15ad8e0c09790f98c04f1b3e978f08f61f467
