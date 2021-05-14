@@ -952,22 +952,28 @@ impl Client {
 /// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.
 /// The type of failure is not specified.
 pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
-    let (user_id, generation_time) =
-        parse_token(token.as_ref()).ok_or(Error::Client(ClientError::InvalidToken))?;
+    let token = parse_token(token.as_ref()).ok_or(Error::Client(ClientError::InvalidToken))?;
 
     // Check if timestamps are in a sensible range
-    if user_id.created_at().year() >= 2100 || generation_time.year() >= 2100 {
+    if token.bot_user_id.created_at().year() >= 2100 || token.creation_time.year() >= 2100 {
         return Err(Error::Client(ClientError::InvalidToken));
     }
 
     Ok(())
 }
 
+/// Part of the data contained within a Discord bot token. Returned by [`parse_token`].
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TokenComponents {
+    pub bot_user_id: UserId,
+    pub creation_time: chrono::NaiveDateTime,
+}
+
 /// Verifies that the token adheres to the Discord token format and extracts the bot user ID and the
 /// token generation timestamp
-fn parse_token(token: &str) -> Option<(UserId, chrono::NaiveDateTime)> {
+pub fn parse_token(token: impl AsRef<str>) -> Option<TokenComponents> {
     // The token consists of three base64-encoded parts
-    let parts: Vec<&str> = token.split('.').collect();
+    let parts: Vec<&str> = token.as_ref().split('.').collect();
     let base64_config = base64::Config::new(base64::CharacterSet::UrlSafe, true);
 
     // First part must be a base64-encoded stringified user ID
@@ -995,5 +1001,8 @@ fn parse_token(token: &str) -> Option<(UserId, chrono::NaiveDateTime)> {
     // Third part is a base64-encoded HMAC that's not interesting on its own
     let _ = base64::decode(parts.get(2)?).ok()?;
 
-    Some((user_id, timestamp))
+    Some(TokenComponents {
+        bot_user_id: user_id,
+        creation_time: timestamp,
+    })
 }
