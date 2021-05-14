@@ -3101,8 +3101,25 @@
 <span id="3098">3098</span>
 <span id="3099">3099</span>
 <span id="3100">3100</span>
+<span id="3101">3101</span>
+<span id="3102">3102</span>
+<span id="3103">3103</span>
+<span id="3104">3104</span>
+<span id="3105">3105</span>
+<span id="3106">3106</span>
+<span id="3107">3107</span>
+<span id="3108">3108</span>
+<span id="3109">3109</span>
+<span id="3110">3110</span>
+<span id="3111">3111</span>
+<span id="3112">3112</span>
+<span id="3113">3113</span>
+<span id="3114">3114</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
+
+<span class="comment">// FIXME: Remove after `GuildEmbed` is removed.</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">audit_log</span>;
 <span class="kw">mod</span> <span class="ident">emoji</span>;
@@ -5817,6 +5834,17 @@
     <span class="ident">Custom</span>(<span class="ident">EmojiId</span>),
     <span class="doccomment">/// A unicode emoji.</span>
     <span class="ident">Unicode</span>(<span class="ident">String</span>),
+}
+
+<span class="doccomment">/// A [`Guild`] embed.</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;GuildEmbed was renamed to GuildWidget&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildEmbed</span> {
+    <span class="doccomment">/// Whether the embed is enabled.</span>
+    <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The widget channel id.</span>
+    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// A [`Guild`] widget.</span>
