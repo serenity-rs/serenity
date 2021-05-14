@@ -749,6 +749,11 @@ impl PartialGuild {
         self.icon.as_ref().map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
+    /// Returns a formatted URL of the guild's banner, if the guild has a banner.
+    pub fn banner_url(&self) -> Option<String> {
+        self.banner.as_ref().map(|banner| format!(cdn!("/banners/{}/{}.webp"), self.id, banner))
+    }
+
     /// Gets all [`Emoji`]s of this guild via HTTP.
     ///
     /// # Errors
