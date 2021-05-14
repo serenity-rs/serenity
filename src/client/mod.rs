@@ -955,8 +955,6 @@ pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
     let (user_id, generation_time) =
         parse_token(token.as_ref()).ok_or(Error::Client(ClientError::InvalidToken))?;
 
-    dbg!(user_id, generation_time);
-
     // Check if timestamps are in a sensible range
     if user_id.created_at().year() >= 2100 || generation_time.year() >= 2100 {
         return Err(Error::Client(ClientError::InvalidToken));
