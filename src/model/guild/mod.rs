@@ -1507,10 +1507,9 @@ impl Guild {
 
         if sorted {
             members.sort_by(|a, b| closest_to_origin(prefix, &a.1[..], &b.1[..]));
-            members
-        } else {
-            members
         }
+
+        members
     }
 
     /// Retrieves all [`Member`] containing a given [`String`] as
@@ -1576,10 +1575,9 @@ impl Guild {
 
         if sorted {
             members.sort_by(|a, b| closest_to_origin(substring, &a.1[..], &b.1[..]));
-            members
-        } else {
-            members
         }
+
+        members
     }
 
     /// Retrieves a tuple of [`Member`]s containing a given [`String`] in
@@ -1613,22 +1611,18 @@ impl Guild {
     ) -> Vec<(&Member, String)> {
         let mut members = futures::stream::iter(self.members.values())
             .filter_map(|member| async move {
-                if case_sensitive {
-                    let name = &member.user.name;
+                let name = &member.user.name;
 
+                if case_sensitive {
                     if name.contains(substring) {
                         Some((member, name.to_string()))
                     } else {
                         None
                     }
+                } else if contains_case_insensitive(name, substring) {
+                    Some((member, name.to_string()))
                 } else {
-                    let name = &member.user.name;
-
-                    if contains_case_insensitive(name, substring) {
-                        Some((member, name.to_string()))
-                    } else {
-                        None
-                    }
+                    None
                 }
             })
             .collect::<Vec<(&Member, String)>>()
@@ -1636,10 +1630,9 @@ impl Guild {
 
         if sorted {
             members.sort_by(|a, b| closest_to_origin(substring, &a.1[..], &b.1[..]));
-            members
-        } else {
-            members
         }
+
+        members
     }
 
     /// Retrieves all [`Member`] containing a given [`String`] in
@@ -1694,10 +1687,9 @@ impl Guild {
 
         if sorted {
             members.sort_by(|a, b| closest_to_origin(substring, &a.1[..], &b.1[..]));
-            members
-        } else {
-            members
         }
+
+        members
     }
 
     /// Calculate a [`Member`]'s permissions in the guild.
