@@ -248,6 +248,24 @@ impl PartialGuild {
         self.id.channels(&http).await
     }
 
+    #[cfg(feature = "cache")]
+    pub async fn channel_id_from_name(
+        &self,
+        cache: impl AsRef<Cache>,
+        name: impl AsRef<str>,
+    ) -> Option<ChannelId> {
+        let name = name.as_ref();
+        let guild_channels = cache.as_ref().guild_channels(&self.id).await?;
+
+        for (id, channel) in guild_channels.iter() {
+            if channel.name == name {
+                return Some(*id);
+            }
+        }
+
+        None
+    }
+
     /// Creates a [`GuildChannel`] in the guild.
     ///
     /// Refer to [`Http::create_channel`] for more information.
