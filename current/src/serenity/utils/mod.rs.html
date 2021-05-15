@@ -1037,6 +1037,7 @@
 <span id="1034">1034</span>
 <span id="1035">1035</span>
 <span id="1036">1036</span>
+<span id="1037">1037</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
@@ -1861,6 +1862,7 @@
             <span class="ident">public_flags</span>: <span class="prelude-val">None</span>,
         };
 
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">Guild</span> {
             <span class="ident">afk_channel_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">afk_timeout</span>: <span class="number">0</span>,
