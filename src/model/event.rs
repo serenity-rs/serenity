@@ -1004,7 +1004,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                 // Create a partial member instance out of the presence update
                 // data.
                 if let Some(user) = self.presence.user.as_ref() {
-                    guild.members.entry(self.presence.user_id).or_insert(Member {
+                    guild.members.entry(self.presence.user_id).or_insert_with(|| Member {
                         deaf: false,
                         guild_id,
                         joined_at: None,
