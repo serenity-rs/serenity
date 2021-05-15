@@ -2346,7 +2346,7 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::NameTooShort</span>));
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">100</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::NameTooLong</span>));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">num</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_text_based</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>));
         }
 
