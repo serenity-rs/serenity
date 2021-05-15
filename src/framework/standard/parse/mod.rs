@@ -246,17 +246,17 @@ async fn check_discrepancy(
     msg: &Message,
     config: &Configuration,
     options: &impl CommonOptions,
-) -> Result<(), DispatchError> {
+) -> Result<(), DispatchErrorKind> {
     if options.owners_only() && !config.owners.contains(&msg.author.id) {
-        return Err(DispatchError::OnlyForOwners);
+        return Err(DispatchErrorKind::OnlyForOwners);
     }
 
     if options.only_in() == OnlyIn::Dm && !msg.is_private() {
-        return Err(DispatchError::OnlyForDM);
+        return Err(DispatchErrorKind::OnlyForDM);
     }
 
     if (!config.allow_dm || options.only_in() == OnlyIn::Guild) && msg.is_private() {
-        return Err(DispatchError::OnlyForGuilds);
+        return Err(DispatchErrorKind::OnlyForGuilds);
     }
 
     #[cfg(feature = "cache")]
@@ -283,11 +283,11 @@ async fn check_discrepancy(
             if !(perms.contains(*options.required_permissions())
                 || options.owner_privilege() && config.owners.contains(&msg.author.id))
             {
-                return Err(DispatchError::LackingPermissions(*options.required_permissions()));
+                return Err(DispatchErrorKind::LackingPermissions(*options.required_permissions()));
             }
 
             if !perms.administrator() && !has_correct_roles(options, &roles, &member) {
-                return Err(DispatchError::LackingRole);
+                return Err(DispatchErrorKind::LackingRole);
             }
         }
     }
@@ -337,7 +337,10 @@ fn parse_cmd<'a>(
             try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).into_owned());
 
         if config.disabled_commands.contains(&n) {
-            return Err(ParseError::Dispatch(DispatchError::CommandDisabled(n)));
+            return Err(ParseError::Dispatch(DispatchError::new(
+                DispatchErrorKind::CommandDisabled(n.clone()),
+                n,
+            )));
         }
 
         if let Some((cmd, map)) = r {
@@ -347,7 +350,9 @@ fn parse_cmd<'a>(
                 stream.take_while_char(|c| c.is_whitespace());
             }
 
-            check_discrepancy(ctx, msg, config, &cmd.options).await?;
+            check_discrepancy(ctx, msg, config, &cmd.options)
+                .await
+                .map_err(|e| DispatchError::new(e, n))?;
 
             if map.is_empty() {
                 return Ok(cmd);
@@ -381,7 +386,9 @@ fn parse_group<'a>(
                 stream.take_while_char(|c| c.is_whitespace());
             }
 
-            check_discrepancy(ctx, msg, config, &group.options).await?;
+            check_discrepancy(ctx, msg, config, &group.options)
+                .await
+                .map_err(|e| DispatchError::new(e, n))?;
 
             if map.is_empty() {
                 return Ok((group, commands));
@@ -505,17 +512,32 @@ pub async fn command(
             Map::Prefixless(subgroups, commands) => {
                 is_prefixless = true;
 
+                fn command_name_if_recognised(res: &Result<Invoke, ParseError>) -> Option<&str> {
+                    match res {
+                        Ok(Invoke::Command {
+                            command, ..
+                        }) => Some(command.options.names.get(0).copied().unwrap_or("<unknown>")),
+                        Ok(Invoke::Help(name)) => Some(name), // is this correct?
+                        Err(ParseError::UnrecognisedCommand(_)) => None,
+                        Err(ParseError::Dispatch(error)) => Some(error.command_name()),
+                    }
+                }
+
                 let res = handle_group(stream, ctx, msg, config, subgroups).await;
 
-                if !is_unrecognised(&res) {
-                    check_discrepancy(ctx, msg, config, &group.options).await?;
+                if let Some(command_name) = command_name_if_recognised(&res) {
+                    check_discrepancy(ctx, msg, config, &group.options)
+                        .await
+                        .map_err(|e| DispatchError::new(e, command_name.to_owned()))?;
                     return res;
                 }
 
                 let res = handle_command(stream, ctx, msg, config, commands, group).await;
 
-                if !is_unrecognised(&res) {
-                    check_discrepancy(ctx, msg, config, &group.options).await?;
+                if let Some(command_name) = command_name_if_recognised(&res) {
+                    check_discrepancy(ctx, msg, config, &group.options)
+                        .await
+                        .map_err(|e| DispatchError::new(e, command_name.to_owned()))?;
                     return res;
                 }
 

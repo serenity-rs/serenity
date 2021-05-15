@@ -41,16 +41,41 @@ use crate::model::{channel::Message, permissions::Permissions};
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
 
-/// An enum representing all possible fail conditions under which a command won't
-/// be executed.
+/// Represents a fail condition under which a command won't be executed.
+#[derive(Debug)]
+pub struct DispatchError {
+    kind: DispatchErrorKind,
+    command_name: String,
+}
+
+impl DispatchError {
+    /// Create a new [`DispatchError`] of certain type with the command name it got triggered on.
+    pub fn new(kind: DispatchErrorKind, command_name: String) -> Self {
+        Self {
+            kind,
+            command_name,
+        }
+    }
+
+    pub fn kind(&self) -> &DispatchErrorKind {
+        &self.kind
+    }
+
+    pub fn command_name(&self) -> &str {
+        &self.command_name
+    }
+}
+
+/// An enum representing all possible fail conditions of a [`DispatchError`].
 #[derive(Debug)]
 #[non_exhaustive]
-pub enum DispatchError {
+pub enum DispatchErrorKind {
     /// When a custom function check has failed.
     CheckFailed(&'static str, Reason),
     /// When the command caller has exceeded a ratelimit bucket.
     Ratelimited(RateLimitInfo),
     /// When the requested command is disabled in bot configuration.
+    // TODO: is the String field on this redundant, now that DispatchError stores the command name?
     CommandDisabled(String),
     /// When the user is blocked in bot configuration.
     BlockedUser,
@@ -222,10 +247,10 @@ impl StandardFramework {
         args: &'a mut Args,
         command: &'static CommandOptions,
         group: &'static GroupOptions,
-    ) -> Option<DispatchError> {
+    ) -> Option<DispatchErrorKind> {
         if let Some(min) = command.min_args {
             if args.len() < min as usize {
-                return Some(DispatchError::NotEnoughArguments {
+                return Some(DispatchErrorKind::NotEnoughArguments {
                     min,
                     given: args.len(),
                 });
@@ -234,7 +259,7 @@ impl StandardFramework {
 
         if let Some(max) = command.max_args {
             if args.len() > max as usize {
-                return Some(DispatchError::TooManyArguments {
+                return Some(DispatchErrorKind::TooManyArguments {
                     max,
                     given: args.len(),
                 });
@@ -248,7 +273,7 @@ impl StandardFramework {
         }
 
         if self.config.blocked_users.contains(&msg.author.id) {
-            return Some(DispatchError::BlockedUser);
+            return Some(DispatchErrorKind::BlockedUser);
         }
 
         #[cfg(feature = "cache")]
@@ -257,12 +282,12 @@ impl StandardFramework {
                 let guild_id = channel.guild_id;
 
                 if self.config.blocked_guilds.contains(&guild_id) {
-                    return Some(DispatchError::BlockedGuild);
+                    return Some(DispatchErrorKind::BlockedGuild);
                 }
 
                 if let Some(guild) = guild_id.to_guild_cached(&ctx.cache).await {
                     if self.config.blocked_users.contains(&guild.owner_id) {
-                        return Some(DispatchError::BlockedGuild);
+                        return Some(DispatchErrorKind::BlockedGuild);
                     }
                 }
             }
@@ -271,7 +296,7 @@ impl StandardFramework {
         if !self.config.allowed_channels.is_empty()
             && !self.config.allowed_channels.contains(&msg.channel_id)
         {
-            return Some(DispatchError::BlockedChannel);
+            return Some(DispatchErrorKind::BlockedChannel);
         }
 
         // Try passing the command's bucket.
@@ -290,7 +315,7 @@ impl StandardFramework {
                     if let Some(rate_limit_info) = bucket.take(ctx, msg).await {
                         duration = match rate_limit_info.action {
                             RateLimitAction::Cancelled | RateLimitAction::FailedDelay => {
-                                return Some(DispatchError::Ratelimited(rate_limit_info))
+                                return Some(DispatchErrorKind::Ratelimited(rate_limit_info))
                             },
                             RateLimitAction::Delayed => Some(rate_limit_info.rate_limit),
                         };
@@ -308,7 +333,7 @@ impl StandardFramework {
             let res = (check.function)(ctx, msg, args, command).await;
 
             if let Result::Err(reason) = res {
-                return Some(DispatchError::CheckFailed(check.name, reason));
+                return Some(DispatchErrorKind::CheckFailed(check.name, reason));
             }
         }
 
@@ -722,6 +747,9 @@ impl Framework for StandardFramework {
                     self.should_fail(&ctx, &msg, &mut args, &command.options, &group.options).await
                 {
                     if let Some(dispatch) = &self.dispatch {
+                        let command_name =
+                            command.options.names.get(0).copied().unwrap_or("<unnamed>");
+                        let error = DispatchError::new(error, command_name.to_owned());
                         dispatch(&mut ctx, &msg, error).await;
                     }
 
