@@ -952,14 +952,11 @@ impl Client {
 /// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.
 /// The type of failure is not specified.
 pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
-    let token = parse_token(token.as_ref()).ok_or(Error::Client(ClientError::InvalidToken))?;
-
-    // Check if timestamps are in a sensible range
-    if token.bot_user_id.created_at().year() >= 2100 || token.creation_time.year() >= 2100 {
-        return Err(Error::Client(ClientError::InvalidToken));
+    if parse_token(token.as_ref()).is_some() {
+        Ok(())
+    } else {
+        Err(Error::Client(ClientError::InvalidToken))
     }
-
-    Ok(())
 }
 
 /// Part of the data contained within a Discord bot token. Returned by [`parse_token`].
