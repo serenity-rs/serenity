@@ -752,7 +752,7 @@ impl Http {
         .await
     }
 
-    /// Deletes a stage instance..
+    /// Deletes a stage instance.
     pub async fn delete_stage_instance(&self, channel_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
