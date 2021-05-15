@@ -973,11 +973,17 @@ impl ChannelId {
     }
 
     /// Gets a stage instance.
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel,
+    /// or if there is no stage instance currently.
     pub async fn get_stage_instance(&self, http: impl AsRef<Http>) -> Result<StageInstance> {
         http.as_ref().get_stage_instance(self.0).await
     }
 
     /// Creates a stage instance.
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel,
+    /// or if there is already a stage instance currently.
     pub async fn create_stage_instance<F>(
         &self,
         http: impl AsRef<Http>,
@@ -995,6 +1001,9 @@ impl ChannelId {
     }
 
     /// Edits a stage instance.
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel,
+    /// or if there is not stage instance currently.
     pub async fn edit_stage_instance<F>(
         &self,
         http: impl AsRef<Http>,
@@ -1012,6 +1021,11 @@ impl ChannelId {
     }
 
     /// Deletes a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel,
+    /// or if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_stage_instance(self.0).await
     }
