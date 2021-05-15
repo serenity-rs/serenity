@@ -27,6 +27,7 @@ mod create_interaction_response;
 mod create_interaction_response_followup;
 mod create_invite;
 mod create_message;
+mod create_stage_instance;
 mod edit_channel;
 mod edit_guild;
 mod edit_guild_welcome_screen;
@@ -38,6 +39,7 @@ mod edit_member;
 mod edit_message;
 mod edit_profile;
 mod edit_role;
+mod edit_stage_instance;
 mod edit_voice_state;
 mod edit_webhook_message;
 mod execute_webhook;
@@ -50,6 +52,7 @@ pub use self::{
     create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, Timestamp},
     create_invite::CreateInvite,
     create_message::CreateMessage,
+    create_stage_instance::CreateStageInstance,
     edit_channel::EditChannel,
     edit_guild::EditGuild,
     edit_guild_welcome_screen::EditGuildWelcomeScreen,
@@ -58,6 +61,7 @@ pub use self::{
     edit_message::EditMessage,
     edit_profile::EditProfile,
     edit_role::EditRole,
+    edit_stage_instance::EditStageInstance,
     edit_voice_state::EditVoiceState,
     edit_webhook_message::EditWebhookMessage,
     execute_webhook::ExecuteWebhook,

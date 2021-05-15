@@ -15,6 +15,7 @@ use tokio::{fs::File, io::AsyncReadExt};
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateInvite, CreateMessage, EditChannel, EditMessage, GetMessages};
+use crate::builder::{CreateStageInstance, EditStageInstance};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -969,6 +970,50 @@ impl ChannelId {
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).channel_id(self.0)
+    }
+
+    /// Gets a stage instance.
+    pub async fn get_stage_instance(&self, http: impl AsRef<Http>) -> Result<StageInstance> {
+        http.as_ref().get_stage_instance(self.0).await
+    }
+
+    /// Creates a stage instance.
+    pub async fn create_stage_instance<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<StageInstance>
+    where
+        F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
+    {
+        let mut instance = CreateStageInstance::default();
+        f(&mut instance);
+
+        let map = utils::hashmap_to_json_map(instance.0);
+
+        http.as_ref().create_stage_instance(&Value::Object(map)).await
+    }
+
+    /// Edits a stage instance.
+    pub async fn edit_stage_instance<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<StageInstance>
+    where
+        F: FnOnce(&mut EditStageInstance) -> &mut EditStageInstance,
+    {
+        let mut instance = EditStageInstance::default();
+        f(&mut instance);
+
+        let map = utils::hashmap_to_json_map(instance.0);
+
+        http.as_ref().edit_stage_instance(self.0, &Value::Object(map)).await
+    }
+
+    /// Deletes a stage instance.
+    pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().delete_stage_instance(self.0).await
     }
 }
 

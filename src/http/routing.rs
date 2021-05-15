@@ -372,6 +372,18 @@ pub enum Route {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationsIdGuildsIdCommandsId(u64),
+    /// Route for the `/stage-instances` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    StageInstances,
+    /// Route for the `/stage-instances/:channel_id` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    StageInstancesChannelId(u64),
     /// Route where no ratelimit headers are in place (i.e. user account-only
     /// routes).
     ///
@@ -849,6 +861,14 @@ impl Route {
     pub fn application_guild_commands_permissions(application_id: u64, guild_id: u64) -> String {
         format!(api!("/applications/{}/guilds/{}/commands/permissions"), application_id, guild_id)
     }
+
+    pub fn stage_instances() -> String {
+        format!(api!("/stage-instances"))
+    }
+
+    pub fn stage_instance(channel_id: u64) -> String {
+        format!(api!("/stage-instances/{}"), channel_id)
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -871,6 +891,7 @@ pub enum RouteInfo<'a> {
     CreateChannel {
         guild_id: u64,
     },
+    CreateStageInstance,
     CreateEmoji {
         guild_id: u64,
     },
@@ -936,6 +957,9 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
     },
     DeleteChannel {
+        channel_id: u64,
+    },
+    DeleteStageInstance {
         channel_id: u64,
     },
     DeleteEmoji {
@@ -1021,6 +1045,9 @@ pub enum RouteInfo<'a> {
         message_id: u64,
     },
     EditChannel {
+        channel_id: u64,
+    },
+    EditStageInstance {
         channel_id: u64,
     },
     EditEmoji {
@@ -1157,6 +1184,9 @@ pub enum RouteInfo<'a> {
     },
     GetChannels {
         guild_id: u64,
+    },
+    GetStageInstance {
+        channel_id: u64,
     },
     GetCurrentApplicationInfo,
     GetCurrentUser,
@@ -1381,6 +1411,9 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdChannels(guild_id),
                 Cow::from(Route::guild_channels(guild_id)),
             ),
+            RouteInfo::CreateStageInstance => {
+                (LightMethod::Post, Route::StageInstances, Cow::from(Route::stage_instances()))
+            },
             RouteInfo::CreateEmoji {
                 guild_id,
             } => (
@@ -1515,6 +1548,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::ChannelsId(channel_id),
                 Cow::from(Route::channel(channel_id)),
+            ),
+            RouteInfo::DeleteStageInstance {
+                channel_id,
+            } => (
+                LightMethod::Delete,
+                Route::StageInstancesChannelId(channel_id),
+                Cow::from(Route::stage_instance(channel_id)),
             ),
             RouteInfo::DeleteEmoji {
                 emoji_id,
@@ -1673,6 +1713,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::ChannelsId(channel_id),
                 Cow::from(Route::channel(channel_id)),
+            ),
+            RouteInfo::EditStageInstance {
+                channel_id,
+            } => (
+                LightMethod::Patch,
+                Route::StageInstancesChannelId(channel_id),
+                Cow::from(Route::stage_instance(channel_id)),
             ),
             RouteInfo::EditEmoji {
                 emoji_id,
@@ -1912,6 +1959,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::ChannelsId(channel_id),
                 Cow::from(Route::channel(channel_id)),
+            ),
+            RouteInfo::GetStageInstance {
+                channel_id,
+            } => (
+                LightMethod::Get,
+                Route::StageInstancesChannelId(channel_id),
+                Cow::from(Route::stage_instance(channel_id)),
             ),
             RouteInfo::GetChannelInvites {
                 channel_id,
