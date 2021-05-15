@@ -41,42 +41,17 @@ use crate::model::{channel::Message, permissions::Permissions};
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
 
-/// Represents a fail condition under which a command won't be executed.
-#[derive(Debug)]
-pub struct DispatchError {
-    kind: DispatchErrorKind,
-    command_name: String,
-}
-
-impl DispatchError {
-    /// Create a new [`DispatchError`] of certain type with the command name it got triggered on.
-    pub fn new(kind: DispatchErrorKind, command_name: String) -> Self {
-        Self {
-            kind,
-            command_name,
-        }
-    }
-
-    pub fn kind(&self) -> &DispatchErrorKind {
-        &self.kind
-    }
-
-    pub fn command_name(&self) -> &str {
-        &self.command_name
-    }
-}
-
-/// An enum representing all possible fail conditions of a [`DispatchError`].
+/// An enum representing all possible fail conditions under which a command won't
+/// be executed.
 #[derive(Debug)]
 #[non_exhaustive]
-pub enum DispatchErrorKind {
+pub enum DispatchError {
     /// When a custom function check has failed.
     CheckFailed(&'static str, Reason),
     /// When the command caller has exceeded a ratelimit bucket.
     Ratelimited(RateLimitInfo),
     /// When the requested command is disabled in bot configuration.
-    // TODO: is the String field on this redundant, now that DispatchError stores the command name?
-    CommandDisabled(String),
+    CommandDisabled,
     /// When the user is blocked in bot configuration.
     BlockedUser,
     /// When the guild or its owner is blocked in bot configuration.
@@ -102,7 +77,7 @@ pub enum DispatchErrorKind {
 }
 
 type DispatchHook =
-    for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut, ()>;
+    for<'fut> fn(&'fut Context, &'fut Message, DispatchError, &'fut str) -> BoxFuture<'fut, ()>;
 type BeforeHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, bool>;
 type AfterHook = for<'fut> fn(
     &'fut Context,
@@ -247,10 +222,10 @@ impl StandardFramework {
         args: &'a mut Args,
         command: &'static CommandOptions,
         group: &'static GroupOptions,
-    ) -> Option<DispatchErrorKind> {
+    ) -> Option<DispatchError> {
         if let Some(min) = command.min_args {
             if args.len() < min as usize {
-                return Some(DispatchErrorKind::NotEnoughArguments {
+                return Some(DispatchError::NotEnoughArguments {
                     min,
                     given: args.len(),
                 });
@@ -259,7 +234,7 @@ impl StandardFramework {
 
         if let Some(max) = command.max_args {
             if args.len() > max as usize {
-                return Some(DispatchErrorKind::TooManyArguments {
+                return Some(DispatchError::TooManyArguments {
                     max,
                     given: args.len(),
                 });
@@ -273,7 +248,7 @@ impl StandardFramework {
         }
 
         if self.config.blocked_users.contains(&msg.author.id) {
-            return Some(DispatchErrorKind::BlockedUser);
+            return Some(DispatchError::BlockedUser);
         }
 
         #[cfg(feature = "cache")]
@@ -282,12 +257,12 @@ impl StandardFramework {
                 let guild_id = channel.guild_id;
 
                 if self.config.blocked_guilds.contains(&guild_id) {
-                    return Some(DispatchErrorKind::BlockedGuild);
+                    return Some(DispatchError::BlockedGuild);
                 }
 
                 if let Some(guild) = guild_id.to_guild_cached(&ctx.cache).await {
                     if self.config.blocked_users.contains(&guild.owner_id) {
-                        return Some(DispatchErrorKind::BlockedGuild);
+                        return Some(DispatchError::BlockedGuild);
                     }
                 }
             }
@@ -296,7 +271,7 @@ impl StandardFramework {
         if !self.config.allowed_channels.is_empty()
             && !self.config.allowed_channels.contains(&msg.channel_id)
         {
-            return Some(DispatchErrorKind::BlockedChannel);
+            return Some(DispatchError::BlockedChannel);
         }
 
         // Try passing the command's bucket.
@@ -315,7 +290,7 @@ impl StandardFramework {
                     if let Some(rate_limit_info) = bucket.take(ctx, msg).await {
                         duration = match rate_limit_info.action {
                             RateLimitAction::Cancelled | RateLimitAction::FailedDelay => {
-                                return Some(DispatchErrorKind::Ratelimited(rate_limit_info))
+                                return Some(DispatchError::Ratelimited(rate_limit_info))
                             },
                             RateLimitAction::Delayed => Some(rate_limit_info.rate_limit),
                         };
@@ -333,7 +308,7 @@ impl StandardFramework {
             let res = (check.function)(ctx, msg, args, command).await;
 
             if let Result::Err(reason) = res {
-                return Some(DispatchErrorKind::CheckFailed(check.name, reason));
+                return Some(DispatchError::CheckFailed(check.name, reason));
             }
         }
 
@@ -441,7 +416,12 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     ///
     /// #[hook]
-    /// async fn dispatch_error_hook(context: &Context, msg: &Message, error: DispatchError) {
+    /// async fn dispatch_error_hook(
+    ///     context: &Context,
+    ///     msg: &Message,
+    ///     error: DispatchError,
+    ///     command_name: &str,
+    /// ) {
     ///     match error {
     ///         DispatchError::NotEnoughArguments { min, given } => {
     ///             let s = format!("Need {} arguments, but only got {}.", min, given);
@@ -453,7 +433,7 @@ impl StandardFramework {
     ///
     ///             let _ = msg.channel_id.say(&context, &s).await;
     ///         },
-    ///         _ => println!("Unhandled dispatch error."),
+    ///         _ => println!("Unhandled dispatch error in {}.", command_name),
     ///     }
     /// }
     ///
@@ -676,9 +656,12 @@ impl Framework for StandardFramework {
 
                 return;
             },
-            Err(ParseError::Dispatch(error)) => {
+            Err(ParseError::Dispatch {
+                error,
+                command_name,
+            }) => {
                 if let Some(dispatch) = &self.dispatch {
-                    dispatch(&mut ctx, &msg, error).await;
+                    dispatch(&mut ctx, &msg, error, &command_name).await;
                 }
 
                 return;
@@ -749,8 +732,7 @@ impl Framework for StandardFramework {
                     if let Some(dispatch) = &self.dispatch {
                         let command_name =
                             command.options.names.get(0).copied().unwrap_or("<unnamed>");
-                        let error = DispatchError::new(error, command_name.to_owned());
-                        dispatch(&mut ctx, &msg, error).await;
+                        dispatch(&mut ctx, &msg, error, command_name).await;
                     }
 
                     return;
