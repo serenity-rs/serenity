@@ -974,6 +974,8 @@ impl ChannelId {
 
     /// Gets a stage instance.
     ///
+    /// # Errors
+    ///
     /// Returns [`Error::Http`] if the channel is not a stage channel,
     /// or if there is no stage instance currently.
     pub async fn get_stage_instance(&self, http: impl AsRef<Http>) -> Result<StageInstance> {
@@ -981,6 +983,8 @@ impl ChannelId {
     }
 
     /// Creates a stage instance.
+    ///
+    /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel,
     /// or if there is already a stage instance currently.
@@ -1001,6 +1005,8 @@ impl ChannelId {
     }
 
     /// Edits a stage instance.
+    ///
+    /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel is not a stage channel,
     /// or if there is not stage instance currently.

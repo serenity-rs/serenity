@@ -863,7 +863,7 @@ impl Route {
     }
 
     pub fn stage_instances() -> String {
-        format!(api!("/stage-instances"))
+        api!("/stage-instances").to_string()
     }
 
     pub fn stage_instance(channel_id: u64) -> String {
