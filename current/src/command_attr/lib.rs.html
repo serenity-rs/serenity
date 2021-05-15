@@ -967,6 +967,10 @@
 <span id="964">964</span>
 <span id="965">965</span>
 <span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
@@ -1197,8 +1201,9 @@
             <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
             <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
-                <span class="ident">output</span>
+                <span class="kw">let</span> <span class="ident">_output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
+                <span class="ident">_output</span>
             }.<span class="ident">boxed</span>()
         }
     })
@@ -1492,8 +1497,9 @@
             <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
             <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
-                <span class="ident">output</span>
+                <span class="kw">let</span> <span class="ident">_output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
+                <span class="ident">_output</span>
             }.<span class="ident">boxed</span>()
         }
     })
@@ -1771,8 +1777,9 @@
             <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
             <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
-                <span class="ident">output</span>
+                <span class="kw">let</span> <span class="ident">_output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
+                <span class="ident">_output</span>
             }.<span class="ident">boxed</span>()
         }
     })
@@ -1909,8 +1916,9 @@
                     <span class="kw">use</span> <span class="ident">::serenity::futures::future::FutureExt</span>;
 
                     <span class="kw">async</span> <span class="kw">move</span> {
-                        <span class="kw">let</span> <span class="ident">output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
-                        <span class="ident">output</span>
+                        <span class="kw">let</span> <span class="ident">_output</span>: #<span class="ident">ret</span> <span class="op">=</span> { #(#<span class="ident">body</span>)<span class="op">*</span> };
+                        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
+                        <span class="ident">_output</span>
                     }.<span class="ident">boxed</span>()
                 }
             })
