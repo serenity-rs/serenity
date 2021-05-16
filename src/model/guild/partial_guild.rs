@@ -1,4 +1,6 @@
 use serde::de::Error as DeError;
+#[cfg(feature = "cache")]
+use tracing::{error, warn};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -899,6 +901,138 @@ impl PartialGuild {
             Some(lhs_id)
         } else {
             Some(rhs_id)
+        }
+    }
+
+    /// Calculate a [`Member`]'s permissions in the guild.
+    ///
+    /// If member caching is enabled the cache will be checked
+    /// first. If not found it will resort to an http request.
+    ///
+    /// Cache is still required to look up roles.
+    ///
+    /// # Errors
+    ///
+    /// See [`Guild::member`].
+    #[inline]
+    #[cfg(feature = "cache")]
+    pub async fn member_permissions(
+        &self,
+        cache_http: impl CacheHttp,
+        user_id: impl Into<UserId>,
+    ) -> Result<Permissions> {
+        self._member_permissions(cache_http, user_id.into()).await
+    }
+
+    #[cfg(feature = "cache")]
+    async fn _member_permissions(
+        &self,
+        cache_http: impl CacheHttp,
+        user_id: UserId,
+    ) -> Result<Permissions> {
+        if user_id == self.owner_id {
+            return Ok(Permissions::all());
+        }
+
+        let everyone = match self.roles.get(&RoleId(self.id.0)) {
+            Some(everyone) => everyone,
+            None => {
+                error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
+
+                return Ok(Permissions::empty());
+            },
+        };
+
+        let member = self.member(cache_http, &user_id).await?;
+
+        let mut permissions = everyone.permissions;
+
+        for role in &member.roles {
+            if let Some(role) = self.roles.get(role) {
+                if role.permissions.contains(Permissions::ADMINISTRATOR) {
+                    return Ok(Permissions::all());
+                }
+
+                permissions |= role.permissions;
+            } else {
+                warn!("{} on {} has non-existent role {:?}", member.user.id, self.id, role,);
+            }
+        }
+
+        Ok(permissions)
+    }
+
+    /// Re-orders the channels of the guild.
+    ///
+    /// Although not required, you should specify all channels' positions,
+    /// regardless of whether they were updated. Otherwise, positioning can
+    /// sometimes get weird.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is lacking permission.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn reorder_channels<It>(&self, http: impl AsRef<Http>, channels: It) -> Result<()>
+    where
+        It: IntoIterator<Item = (ChannelId, u64)>,
+    {
+        self.id.reorder_channels(&http, channels).await
+    }
+
+    /// Starts a prune of [`Member`]s.
+    ///
+    /// See the documentation on [`GuildPrune`] for more information.
+    ///
+    /// **Note**: Requires the [Kick Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
+    /// if the current user does not have permission to kick members.
+    ///
+    /// Otherwise will return [`Error::Http`] if the current user does not have
+    /// permission.
+    ///
+    /// Can also return an [`Error::Json`] if there is an error deserializing
+    /// the API response.
+    ///
+    /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
+        #[cfg(feature = "cache")]
+        {
+            if cache_http.cache().is_some() {
+                let req = Permissions::KICK_MEMBERS;
+
+                if !self.has_perms(&cache_http, req).await {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+            }
+        }
+
+        self.id.start_prune(cache_http.http(), days).await
+    }
+
+    #[cfg(feature = "cache")]
+    async fn has_perms(&self, cache_http: impl CacheHttp, mut permissions: Permissions) -> bool {
+        if let Some(cache) = cache_http.cache() {
+            let user_id = cache.current_user().await.id;
+
+            if let Ok(perms) = self.member_permissions(&cache_http, user_id).await {
+                permissions.remove(perms);
+
+                permissions.is_empty()
+            } else {
+                false
+            }
+        } else {
+            false
         }
     }
 
