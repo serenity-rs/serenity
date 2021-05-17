@@ -730,8 +730,7 @@ impl Framework for StandardFramework {
                     self.should_fail(&ctx, &msg, &mut args, &command.options, &group.options).await
                 {
                     if let Some(dispatch) = &self.dispatch {
-                        let command_name =
-                            command.options.names.get(0).copied().unwrap_or("<unnamed>");
+                        let command_name = command.options.names[0];
                         dispatch(&mut ctx, &msg, error, command_name).await;
                     }
 

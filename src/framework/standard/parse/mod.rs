@@ -515,7 +515,7 @@ pub async fn command(
                     match res {
                         Ok(Invoke::Command {
                             command, ..
-                        }) => Some(command.options.names.get(0).copied().unwrap_or("<unknown>")),
+                        }) => Some(command.options.names[0]),
                         Ok(Invoke::Help(name)) => Some(name), // is this correct?
                         Err(ParseError::UnrecognisedCommand(_)) => None,
                         Err(ParseError::Dispatch {
