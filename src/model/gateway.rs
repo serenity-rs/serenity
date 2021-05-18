@@ -141,10 +141,12 @@ impl Activity {
     /// # #[cfg(feature = "client")]
     /// use serenity::client::Context;
     ///
+    /// use url::Url;
+    ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
     /// async fn stream(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
-    ///     const STREAM_URL: &str = "...";
+    ///     let STREAM_URL= Url::parse("https://www.youtube.com/watch?v=dQw4w9WgXcQ").unwrap();
     ///
     ///     let name = args.message();
     ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL)).await;
