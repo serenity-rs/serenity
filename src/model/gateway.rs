@@ -7,6 +7,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 use super::prelude::*;
 use super::utils::*;
 use crate::json::from_value;
+use url::Url;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -151,10 +152,9 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming<N, U>(name: N, url: U) -> Activity
+    pub fn streaming<N>(name: N, url: Url) -> Activity
     where
         N: ToString,
-        U: ToString,
     {
         Activity {
             application_id: None,
