@@ -3,11 +3,11 @@
 use bitflags::bitflags;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
+use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
 use crate::json::from_value;
-use url::Url;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
