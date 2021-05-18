@@ -272,12 +272,28 @@ impl<'a> ClientBuilder<'a> {
     }
 
     /// Sets all intents directly, replacing already set intents.
-    ///
-    /// To enable privileged intents, [`GatewayIntents::all`] to
-    ///
-    /// *Info*:
     /// Intents are a bitflag, you can combine them by performing the
     /// `|`-operator.
+    ///
+    /// # What are Intents
+    /// A [gateway intent] sets the types of gateway events
+    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
+    /// bot shall receive. Carefully picking the needed intents greatly helps
+    /// the bot to scale, as less intents will result in less events to be
+    /// received hence less processed by the bot.
+    ///
+    /// # Privileged Intents
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]
+    /// are *privileged*.
+    /// [Privileged intents] need to be enabled in the *developer portal*.
+    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
+    /// order to use privileged intents.
+    ///
+    /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    /// [`GatewayIntents::GUILD_PRESENCES`]: crate::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES
+    /// [`GatewayIntents::GUILD_MEMBERS`]: crate::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
         self.intents = intents;
 

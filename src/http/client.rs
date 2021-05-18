@@ -430,8 +430,9 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for field information.
     ///
-    /// **note:** Creating a command with the same name as an existing command for your application
-    /// will overwrite the old command.
+    /// **Note:**
+    /// Creating a command with the same name as an existing command for your
+    /// application will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     #[cfg(feature = "unstable_discord_api")]
