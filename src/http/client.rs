@@ -430,7 +430,7 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for field information.
     ///
-    /// **Note:**
+    /// **Note**:
     /// Creating a command with the same name as an existing command for your
     /// application will overwrite the old command.
     ///

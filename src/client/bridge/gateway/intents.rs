@@ -8,6 +8,7 @@ use serde::{
 /// By default, all intents except [Privileged Intents] are selected.
 ///
 /// # What are Intents
+///
 /// A [gateway intent] sets the types of gateway events
 /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
 /// bot shall receive. Carefully picking the needed intents greatly helps
@@ -16,6 +17,7 @@ use serde::{
 /// handling the data.
 ///
 /// # Privileged Intents
+///
 /// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]
 /// are [Privileged Intents]. They need to be enabled in the
 /// *developer portal*.

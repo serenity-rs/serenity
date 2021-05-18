@@ -276,6 +276,7 @@ impl<'a> ClientBuilder<'a> {
     /// `|`-operator.
     ///
     /// # What are Intents
+    ///
     /// A [gateway intent] sets the types of gateway events
     /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
     /// bot shall receive. Carefully picking the needed intents greatly helps
@@ -283,6 +284,7 @@ impl<'a> ClientBuilder<'a> {
     /// received hence less processed by the bot.
     ///
     /// # Privileged Intents
+    ///
     /// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]
     /// are *privileged*.
     /// [Privileged intents] need to be enabled in the *developer portal*.
