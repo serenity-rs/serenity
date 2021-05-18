@@ -1,4 +1,6 @@
 use serde::de::Error as DeError;
+#[cfg(feature = "cache")]
+use tracing::{error, warn};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -212,6 +214,28 @@ impl PartialGuild {
         self.id.bans(&http).await
     }
 
+    /// Gets a list of the guild's audit log entries
+    ///
+    /// **Note**: Requires the [View Audit Log] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid value is given.
+    ///
+    /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
+    #[inline]
+    pub async fn audit_logs(
+        self,
+        http: impl AsRef<Http>,
+        action_type: Option<u8>,
+        user_id: Option<UserId>,
+        before: Option<AuditLogEntryId>,
+        limit: Option<u8>,
+    ) -> Result<AuditLogs> {
+        self.id.audit_logs(http, action_type, user_id, before, limit).await
+    }
+
     /// Gets all of the guild's channels over the REST API.
     ///
     /// # Errors
@@ -224,6 +248,24 @@ impl PartialGuild {
         http: impl AsRef<Http>,
     ) -> Result<HashMap<ChannelId, GuildChannel>> {
         self.id.channels(&http).await
+    }
+
+    #[cfg(feature = "cache")]
+    pub async fn channel_id_from_name(
+        &self,
+        cache: impl AsRef<Cache>,
+        name: impl AsRef<str>,
+    ) -> Option<ChannelId> {
+        let name = name.as_ref();
+        let guild_channels = cache.as_ref().guild_channels(&self.id).await?;
+
+        for (id, channel) in guild_channels.iter() {
+            if channel.name == name {
+                return Some(*id);
+            }
+        }
+
+        None
     }
 
     /// Creates a [`GuildChannel`] in the guild.
@@ -669,6 +711,64 @@ impl PartialGuild {
         self.id.edit_nickname(&http, new_nickname).await
     }
 
+    /// Edits a role, optionally setting its fields.
+    ///
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Make a role hoisted:
+    ///
+    /// ```rust,ignore
+    /// partial_guild.edit_role(&context, RoleId(7), |r| r.hoist(true));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    #[inline]
+    pub async fn edit_role<F>(
+        self,
+        http: impl AsRef<Http>,
+        role_id: impl Into<RoleId>,
+        f: F,
+    ) -> Result<Role>
+    where
+        F: FnOnce(&mut EditRole) -> &mut EditRole,
+    {
+        self.id.edit_role(http, role_id, f).await
+    }
+
+    /// Edits the order of [`Role`]s
+    /// Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Change the order of a role:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::id::RoleId;
+    /// partial_guild.edit_role_position(&context, RoleId(8), 2);
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn edit_role_position(
+        &self,
+        http: impl AsRef<Http>,
+        role_id: impl Into<RoleId>,
+        position: u64,
+    ) -> Result<Vec<Role>> {
+        self.id.edit_role_position(&http, role_id, position).await
+    }
+
     /// Edits the [`GuildWelcomeScreen`].
     ///
     /// # Errors
@@ -715,6 +815,227 @@ impl PartialGuild {
         guild_id.into().to_partial_guild(&http).await
     }
 
+    /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
+    ///
+    /// Hierarchy is essentially who has the [`Role`] with the highest
+    /// [`position`].
+    ///
+    /// Returns [`None`] if at least one of the given users' member instances
+    /// is not present. Returns [`None`] if the users have the same hierarchy, as
+    /// neither are greater than the other.
+    ///
+    /// If both user IDs are the same, [`None`] is returned. If one of the users
+    /// is the guild owner, their ID is returned.
+    ///
+    /// [`position`]: Role::position
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub async fn greater_member_hierarchy(
+        &self,
+        cache: impl AsRef<Cache>,
+        lhs_id: impl Into<UserId>,
+        rhs_id: impl Into<UserId>,
+    ) -> Option<UserId> {
+        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into()).await
+    }
+
+    #[cfg(feature = "cache")]
+    async fn _greater_member_hierarchy(
+        &self,
+        cache: impl AsRef<Cache>,
+        lhs_id: UserId,
+        rhs_id: UserId,
+    ) -> Option<UserId> {
+        // Check that the IDs are the same. If they are, neither is greater.
+        if lhs_id == rhs_id {
+            return None;
+        }
+
+        // Check if either user is the guild owner.
+        if lhs_id == self.owner_id {
+            return Some(lhs_id);
+        } else if rhs_id == self.owner_id {
+            return Some(rhs_id);
+        }
+
+        let lhs = cache
+            .as_ref()
+            .guild(self.id)
+            .await?
+            .members
+            .get(&lhs_id)?
+            .highest_role_info(&cache)
+            .await
+            .unwrap_or((RoleId(0), 0));
+        let rhs = cache
+            .as_ref()
+            .guild(self.id)
+            .await?
+            .members
+            .get(&rhs_id)?
+            .highest_role_info(&cache)
+            .await
+            .unwrap_or((RoleId(0), 0));
+
+        // If LHS and RHS both have no top position or have the same role ID,
+        // then no one wins.
+        if (lhs.1 == 0 && rhs.1 == 0) || (lhs.0 == rhs.0) {
+            return None;
+        }
+
+        // If LHS's top position is higher than RHS, then LHS wins.
+        if lhs.1 > rhs.1 {
+            return Some(lhs_id);
+        }
+
+        // If RHS's top position is higher than LHS, then RHS wins.
+        if rhs.1 > lhs.1 {
+            return Some(rhs_id);
+        }
+
+        // If LHS and RHS both have the same position, but LHS has the lower
+        // role ID, then LHS wins.
+        //
+        // If RHS has the higher role ID, then RHS wins.
+        if lhs.1 == rhs.1 && lhs.0 < rhs.0 {
+            Some(lhs_id)
+        } else {
+            Some(rhs_id)
+        }
+    }
+
+    /// Calculate a [`Member`]'s permissions in the guild.
+    ///
+    /// If member caching is enabled the cache will be checked
+    /// first. If not found it will resort to an http request.
+    ///
+    /// Cache is still required to look up roles.
+    ///
+    /// # Errors
+    ///
+    /// See [`Guild::member`].
+    #[inline]
+    #[cfg(feature = "cache")]
+    pub async fn member_permissions(
+        &self,
+        cache_http: impl CacheHttp,
+        user_id: impl Into<UserId>,
+    ) -> Result<Permissions> {
+        self._member_permissions(cache_http, user_id.into()).await
+    }
+
+    #[cfg(feature = "cache")]
+    async fn _member_permissions(
+        &self,
+        cache_http: impl CacheHttp,
+        user_id: UserId,
+    ) -> Result<Permissions> {
+        if user_id == self.owner_id {
+            return Ok(Permissions::all());
+        }
+
+        let everyone = match self.roles.get(&RoleId(self.id.0)) {
+            Some(everyone) => everyone,
+            None => {
+                error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
+
+                return Ok(Permissions::empty());
+            },
+        };
+
+        let member = self.member(cache_http, &user_id).await?;
+
+        let mut permissions = everyone.permissions;
+
+        for role in &member.roles {
+            if let Some(role) = self.roles.get(role) {
+                if role.permissions.contains(Permissions::ADMINISTRATOR) {
+                    return Ok(Permissions::all());
+                }
+
+                permissions |= role.permissions;
+            } else {
+                warn!("{} on {} has non-existent role {:?}", member.user.id, self.id, role,);
+            }
+        }
+
+        Ok(permissions)
+    }
+
+    /// Re-orders the channels of the guild.
+    ///
+    /// Although not required, you should specify all channels' positions,
+    /// regardless of whether they were updated. Otherwise, positioning can
+    /// sometimes get weird.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is lacking permission.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn reorder_channels<It>(&self, http: impl AsRef<Http>, channels: It) -> Result<()>
+    where
+        It: IntoIterator<Item = (ChannelId, u64)>,
+    {
+        self.id.reorder_channels(&http, channels).await
+    }
+
+    /// Starts a prune of [`Member`]s.
+    ///
+    /// See the documentation on [`GuildPrune`] for more information.
+    ///
+    /// **Note**: Requires the [Kick Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
+    /// if the current user does not have permission to kick members.
+    ///
+    /// Otherwise will return [`Error::Http`] if the current user does not have
+    /// permission.
+    ///
+    /// Can also return an [`Error::Json`] if there is an error deserializing
+    /// the API response.
+    ///
+    /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
+        #[cfg(feature = "cache")]
+        {
+            if cache_http.cache().is_some() {
+                let req = Permissions::KICK_MEMBERS;
+
+                if !self.has_perms(&cache_http, req).await {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+            }
+        }
+
+        self.id.start_prune(cache_http.http(), days).await
+    }
+
+    #[cfg(feature = "cache")]
+    async fn has_perms(&self, cache_http: impl CacheHttp, mut permissions: Permissions) -> bool {
+        if let Some(cache) = cache_http.cache() {
+            let user_id = cache.current_user().await.id;
+
+            if let Ok(perms) = self.member_permissions(&cache_http, user_id).await {
+                permissions.remove(perms);
+
+                permissions.is_empty()
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
     /// Kicks a [`Member`] from the guild.
     ///
     /// Requires the [Kick Members] permission.
@@ -747,6 +1068,11 @@ impl PartialGuild {
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon.as_ref().map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+    }
+
+    /// Returns a formatted URL of the guild's banner, if the guild has a banner.
+    pub fn banner_url(&self) -> Option<String> {
+        self.banner.as_ref().map(|banner| format!(cdn!("/banners/{}/{}.webp"), self.id, banner))
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
