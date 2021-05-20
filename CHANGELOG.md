@@ -25,7 +25,7 @@ Thanks to the following for their contributions:
 - [@legendofmiracles]
 - [@mTvare6]
 - [@nickelc]
-- [@nitsuga5124]
+- [@vicky5124]
 - [@Sei4or]
 - [@sudomann]
 - [@zacck]
@@ -43,10 +43,10 @@ Thanks to the following for their contributions:
 - [model] Support all interactions features ([@HarmoGlace]) [c:d6e86df]
 - [model] Add role tags support ([@HarmoGlace]) [c:7b25308]
 - [http] Add Discord API proxy support ([@drklee3]) [c:badb448]
-- [model] Handle voice status (deaf, mute) in the `MemberUpdate` event ([@nitsuga5124]) [c:3a6eb58]
-- [model] Add the `content_type` field to `Attachment` ([@nitsuga5124]) [c:1b17732]
-- [model] Add the invite reminder system message and flag ([@nitsuga5124]) [c:f238a46]
-- [model] Add watching activity ([@nitsuga5124]) [c:47d9d1c]
+- [model] Handle voice status (deaf, mute) in the `MemberUpdate` event ([@vicky5124]) [c:3a6eb58]
+- [model] Add the `content_type` field to `Attachment` ([@vicky5124]) [c:1b17732]
+- [model] Add the invite reminder system message and flag ([@vicky5124]) [c:f238a46]
+- [model] Add watching activity ([@vicky5124]) [c:47d9d1c]
 - [model] Adds support to message crossposting ([@HarmoGlace]) [c:25ecaa6]
 - [builder] Add a space in the example for `CreateEmbed::timestamp` ([@legendofmiracles]) [c:d0b404d]
 
@@ -417,12 +417,12 @@ Thanks to the following for their contributions:
 
 - [@james7132]
 - [@JellyWX]
-- [@nitsuga5124]
+- [@vicky5124]
 - [@Qeenon]
 
 ### Added
 
-- [client] Mention the required intents for certain events ([@nitsuga5124]) [c:c9971b6]
+- [client] Mention the required intents for certain events ([@vicky5124]) [c:c9971b6]
 - [gateway] Add support for filtering by user ids when requesting guild chunks ([@james7132]) [c:0d9b821]
 
 ### Changed
@@ -454,7 +454,7 @@ Thanks to the following for their contributions:
 - [@leumasme]
 - [@MonliH]
 - [@nickelc]
-- [@nitsuga5124]
+- [@vicky5124]
 - [@Prof-Bloodstone]
 - [@peppizza]
 - [@Qeenon]
@@ -468,9 +468,9 @@ Thanks to the following for their contributions:
 - [model] Add missing fields to `GuildMembersChunkEvent` and add nonce to `ShardMessenger::chunk_guilds` ([@TheElec]) [c:8c30b40]
 - [model] Implement `create_invite` on `ChannelId` ([@acdenisSK]) [c:c0c2137]
 - [client] Derive `Clone` for `CacheAndHttp` ([@acdenisSK]) [c:2b66828]
-- [examples] Update example 07 to use tracing and dotenv ([@nitsuga5124]) [c:2386690]
-- [examples] Add Parallel Loops example. ([@nitsuga5124]) [c:b38cdf5]
-- [examples] Add an example for client data. ([@nitsuga5124]) [c:3fe8056]
+- [examples] Update example 07 to use tracing and dotenv ([@vicky5124]) [c:2386690]
+- [examples] Add Parallel Loops example. ([@vicky5124]) [c:b38cdf5]
+- [examples] Add an example for client data. ([@vicky5124]) [c:3fe8056]
 - [http] Add methods to the http error type to query the presence of variants and to return the status code  ([@Baev1]) [c:7ef12ee]
 - [http] Add methods to start and stop typing ([@AriusX7]) [c:bcf8249]
 
@@ -505,7 +505,7 @@ Thanks to the following for their contributions:
 
 ### Removed
 
-- [model] Remove unnecessary `Option` from `Message::channel_mentions` ([@nitsuga5124]) [c:626bdfd]
+- [model] Remove unnecessary `Option` from `Message::channel_mentions` ([@vicky5124]) [c:626bdfd]
 
 ## [0.9.0-rc.2] - 2020-09-27
 
@@ -517,14 +517,14 @@ Thanks to the following for their contributions:
 - [@FelixMcFelix]
 - [@ikkerens]
 - [@LikeLakers2]
-- [@nitsuga5124]
+- [@vicky5124]
 
 ### Added
 
-- [model] Add the new 'competing in' activity type ([@nitsuga5124]) [c:ebc2cc7]
-- [model] Add `create_webhook` methods to `GuildChannel`. ([@nitsuga5124]) [c:fb44a15]
-- [meta] Add cargo-make support for building the examples. ([@nitsuga5124]) [c:b137f51]
-- [model] Add new guild features to the documentation ([@nitsuga5124]) [c:f2191d5]
+- [model] Add the new 'competing in' activity type ([@vicky5124]) [c:ebc2cc7]
+- [model] Add `create_webhook` methods to `GuildChannel`. ([@vicky5124]) [c:fb44a15]
+- [meta] Add cargo-make support for building the examples. ([@vicky5124]) [c:b137f51]
+- [model] Add new guild features to the documentation ([@vicky5124]) [c:f2191d5]
 - [model/client] Add support for invite events ([@acdenisSK]) [c:7146fd7]
 
 ### Changed
@@ -533,7 +533,7 @@ Thanks to the following for their contributions:
 - [framework] Call the `should_fail_common` check earlier ([@acdenisSK]) [c:bab4b24]
 - [meta] Update the MSRV to 1.40 ([@acdenisSK]) [c:3f5882c]
 - [model] Use `#[non_exhaustive]` where applicable ([@LikeLakers2]) [c:9ee42f1]
-- [meta] Switch from log to tracing. ([@nitsuga5124]) [c:78dd862]
+- [meta] Switch from log to tracing. ([@vicky5124]) [c:78dd862]
 - [utils] Make `parse_emoji` accept animated emojis ([@bdashore3]) [c:66e05ea]
 - [meta] Insert the shard manager in example 7 ([@acdenisSK]) [c:7c2d4f7]
 
@@ -544,7 +544,7 @@ Thanks to the following for their contributions:
 - [framework] Temporarily fix the permissions check in the framework ([@acdenisSK]) [c:88af7cf]
 - [model] Fix ReactionType not remembering animated status. ([@ikkerens]) [c:2eac499]
 - [framework] Fix parsing of commands that have requirements ([@acdenisSK]) [c:323875f]
-- [meta] Fix example 5's retrieval of owners when the bot belongs to a team ([@nitsuga5124]) [c:5c0c045]
+- [meta] Fix example 5's retrieval of owners when the bot belongs to a team ([@vicky5124]) [c:5c0c045]
 - [framework] Fix bucket duration order ([@acdenisSK]) [c:5805539]
 - [voice] Update Voice WS Sender on reconnect. ([@FelixMcFelix]) [c:659448b]
 - [gateway] Fix shutdown regression ([@ikkerens]) [c:fa03b75]
@@ -563,7 +563,7 @@ Thanks to the following for their contributions:
 - [@bdashore3]
 - [@qm3ster]
 - [@nickelc]
-- [@nitsuga5124]
+- [@vicky5124]
 - [@Qeenon]
 
 ### Added
@@ -573,7 +573,7 @@ Thanks to the following for their contributions:
 - [model] Implement `Display` for `Permissions` (#939) ([@AriusX7]) [c:1eb2714]
 - [model/http] Implement endpoints for getting emojis of a guild (#937) ([@acdenisSK]) [c:2a1c385]
 - [client] Implement AsRef<ShardMessenger> for ShardMessenger (#936) ([@ThatsNoMoon]) [c:a9c9caa]
-- [builder] Implement a builder for allowed mentions (#931) ([@nitsuga5124]) [c:59fb7b9]
+- [builder] Implement a builder for allowed mentions (#931) ([@vicky5124]) [c:59fb7b9]
 
 ### Changed
 
@@ -614,18 +614,18 @@ Thanks to the following for their contributions:
 - [@mysteriouspants]
 - [@NieDzejkob]
 - [@NilsIrl]
-- [@nitsuga5124]
+- [@vicky5124]
 - [@Th3-M4jor]
 - [@tverghis]
 
 ### Added
 
 - [model] Add `nick` field to `PartialMember` ([@asherkin]) [c:28f9f8a]
-- [model] Add teams support ([@nitsuga5124]) [c:5a6979a]
+- [model] Add teams support ([@vicky5124]) [c:5a6979a]
 - [model] Add `mentions_current_user` helper ([@mysteriouspants]) [c:e049bc1]
 - [model/client] Add the `nonce` field to `GuildMembersChunk` and the event handler ([@mjsir911]) [c:614f99a]
 - [voice] Add `self_stream` field to `VoiceState` ([@DimiDimit]) [c:c60f397]
-- [model] Add a method to retrieve a webhook's URL ([@nitsuga5124]) [c:5931d1c]
+- [model] Add a method to retrieve a webhook's URL ([@vicky5124]) [c:5931d1c]
 - [model] Add a method to retrieve a link to a message ([@acdenisSK]) [c:a92ca08]
 - [command_attr] Add the delimiters option to the documentation ([@acdenisSK]) [c:1594a3e]
 - [model] Add pagination for CurrentUser::guilds ([@NilsIrl]) [c:9eadffa]
@@ -639,7 +639,7 @@ Thanks to the following for their contributions:
 - [misc] Address the renaming of the lavalink project ([@acdenisSK]) [c:802df92]
 - [utils] Replace the in-house typemap implementation with `typemap_rev` ([@bdashore3]) [c:c1c7300]
 - [misc] Apply copyright to all people who have contributed to Serenity ([@acdenisSK]) [c:287245a]
-- [model] Make `Message::reply` take a content implementing `std::fmt::Display` ([@nitsuga5124]) [c:00683ef]
+- [model] Make `Message::reply` take a content implementing `std::fmt::Display` ([@vicky5124]) [c:00683ef]
 - [framework] Expose CustomisedHelpData fields, improve help strikethrough message attributes. ([@jmgao]) [c:0d72b6e]
 - [framework] Return `Option<Message>` in help command functions ([@MaxOhn]) [c:4472dec]
 - [model] Make `Message::react` return its `Reaction` ([@NieDzejkob]) [c:e7eb52d]
@@ -653,12 +653,12 @@ Thanks to the following for their contributions:
 ### Fixed
 
 - [model] Restrict mention parsing to be specific to the type of id ([@acdenisSK]) [c:dd580fb]
-- [framework] Fix `unrecognised_command()` not working if the last added group has prefixes ([@nitsuga5124]) [c:8040fa5] [c:760ed71] [c:21a5d8e]
+- [framework] Fix `unrecognised_command()` not working if the last added group has prefixes ([@vicky5124]) [c:8040fa5] [c:760ed71] [c:21a5d8e]
 - [misc] Remove unnecessary feature gates and fix incorrect ones ([@acdenisSK]) [c:ed61459]
 
 ### Removed
 
-- [model] Remove `U: Into<UserId>` type parameter for `partial_guild::edit_member()` ([@nitsuga5124]) [c:4227a52]
+- [model] Remove `U: Into<UserId>` type parameter for `partial_guild::edit_member()` ([@vicky5124]) [c:4227a52]
 - [misc] Remove Zeyla Hellyer as an author of Serenity ([@acdenisSK]) [c:9cfc410]
 - [misc] Remove the matches developmental dependency ([@acdenisSK]) [c:2418edd]
 - [misc] Remove usages of mem::replace where its return value is unused ([@acdenisSK]) [c:3135e0f]
@@ -810,7 +810,7 @@ Thanks to the following for their contributions:
 - [@Lakelezz]
 - [@MaxOhn]
 - [@natsukagami]
-- [@nitsuga5124]
+- [@vicky5124]
 - [@Noituri]
 - [@NovusTheory]
 - [@TitusEntertainment]
@@ -828,7 +828,7 @@ Thanks to the following for their contributions:
 
 - [builder] Reexport `Timestamp` from the builder's module. ([@acdenisSK]) [c:3a313c8]
 
-- [model] Implement various `kick_with_reason()` methods ([@nitsuga5124]) [c:5b0e9f3]
+- [model] Implement various `kick_with_reason()` methods ([@vicky5124]) [c:5b0e9f3]
 
 ### Changed
 
@@ -4369,7 +4369,6 @@ Initial commit.
 [@nabijaczleweli]: https://github.com/nabijaczleweli
 [@natsukagami]: https://github.com/natsukagami
 [@nickelc]: https://github.com/nickelc
-[@nitsuga5124]: https://github.com/nitsuga5124
 [@nycex]: https://github.com/nycex
 [@Proximyst]: https://github.com/Proximyst
 [@Prof-Bloodstone]: https://github.com/Prof-Bloodstone
@@ -4406,6 +4405,7 @@ Initial commit.
 [@tverghis]: https://github.com/tverghis
 [@tweirtx]: https://github.com/tweirtx
 [@u5surf]: https://github.com/u5surf
+[@vicky5124]: https://github.com/vicky5124
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
 [@Wolvereness]: https://github.com/Wolvereness
