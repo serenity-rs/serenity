@@ -25,9 +25,9 @@ Thanks to the following for their contributions:
 - [@legendofmiracles]
 - [@mTvare6]
 - [@nickelc]
-- [@vicky5124]
 - [@Sei4or]
 - [@sudomann]
+- [@vicky5124]
 - [@zacck]
 
 ### Added
@@ -417,8 +417,8 @@ Thanks to the following for their contributions:
 
 - [@james7132]
 - [@JellyWX]
-- [@vicky5124]
 - [@Qeenon]
+- [@vicky5124]
 
 ### Added
 
@@ -454,13 +454,13 @@ Thanks to the following for their contributions:
 - [@leumasme]
 - [@MonliH]
 - [@nickelc]
-- [@vicky5124]
 - [@Prof-Bloodstone]
 - [@peppizza]
 - [@Qeenon]
 - [@TheElec]
 - [@tmcarr]
 - [@u5surf]
+- [@vicky5124]
 
 ### Added
 
@@ -563,8 +563,8 @@ Thanks to the following for their contributions:
 - [@bdashore3]
 - [@qm3ster]
 - [@nickelc]
-- [@vicky5124]
 - [@Qeenon]
+- [@vicky5124]
 
 ### Added
 
