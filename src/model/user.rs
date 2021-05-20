@@ -13,7 +13,7 @@ use serde_json::json;
 use super::prelude::*;
 use super::utils::deserialize_u16;
 #[cfg(feature = "model")]
-use crate::builder::{CreateMessage, EditProfile};
+use crate::builder::{CreateMessage, EditProfile, CreateBotAuthParameters};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -325,23 +325,13 @@ impl CurrentUser {
         permissions: Permissions,
         scopes: &[Oauth2Scope],
     ) -> Result<String> {
-        let bits = permissions.bits();
-        let client_id = http.as_ref().get_current_application_info().await.map(|v| v.id)?;
+        let mut builder = CreateBotAuthParameters::default();
 
-        let mut url = format!("https://discord.com/api/oauth2/authorize?client_id={}", client_id);
+        builder.permissions(permissions);
+        builder.auto_client_id(http).await?;
+        builder.scopes(scopes);
 
-        // Replace with `Iterator::intersperse_with` after stable.
-        write!(
-            url,
-            "&scope={}",
-            scopes.iter().map(|i| i.to_string()).collect::<Vec<_>>().join("%20")
-        )?;
-
-        if bits != 0 {
-            write!(url, "&permissions={}", bits)?;
-        }
-
-        Ok(url)
+        Ok(builder.build())
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
