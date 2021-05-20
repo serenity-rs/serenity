@@ -480,6 +480,8 @@ __impl_bitflags! {
         VERIFIED_BOT = 0b0000_0000_0000_0001_0000_0000_0000_0000;
         /// User's flag as early verified bot developer
         EARLY_VERIFIED_BOT_DEVELOPER = 0b0000_0000_0000_0010_0000_0000_0000_0000;
+        /// User's flag as discord certified moderator
+        DISCORD_CERTIFIED_MODERATOR = 0b0000_0000_0000_0000_0010 0000 0000_0000;
     }
 }
 
