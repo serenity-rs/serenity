@@ -51,7 +51,7 @@ pub enum DispatchError {
     /// When the command caller has exceeded a ratelimit bucket.
     Ratelimited(RateLimitInfo),
     /// When the requested command is disabled in bot configuration.
-    CommandDisabled(String),
+    CommandDisabled,
     /// When the user is blocked in bot configuration.
     BlockedUser,
     /// When the guild or its owner is blocked in bot configuration.
@@ -77,7 +77,7 @@ pub enum DispatchError {
 }
 
 type DispatchHook =
-    for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut, ()>;
+    for<'fut> fn(&'fut Context, &'fut Message, DispatchError, &'fut str) -> BoxFuture<'fut, ()>;
 type BeforeHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, bool>;
 type AfterHook = for<'fut> fn(
     &'fut Context,
@@ -418,7 +418,12 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     ///
     /// #[hook]
-    /// async fn dispatch_error_hook(context: &Context, msg: &Message, error: DispatchError) {
+    /// async fn dispatch_error_hook(
+    ///     context: &Context,
+    ///     msg: &Message,
+    ///     error: DispatchError,
+    ///     command_name: &str,
+    /// ) {
     ///     match error {
     ///         DispatchError::NotEnoughArguments { min, given } => {
     ///             let s = format!("Need {} arguments, but only got {}.", min, given);
@@ -430,7 +435,7 @@ impl StandardFramework {
     ///
     ///             let _ = msg.channel_id.say(&context, &s).await;
     ///         },
-    ///         _ => println!("Unhandled dispatch error."),
+    ///         _ => println!("Unhandled dispatch error in {}.", command_name),
     ///     }
     /// }
     ///
@@ -653,9 +658,12 @@ impl Framework for StandardFramework {
 
                 return;
             },
-            Err(ParseError::Dispatch(error)) => {
+            Err(ParseError::Dispatch {
+                error,
+                command_name,
+            }) => {
                 if let Some(dispatch) = &self.dispatch {
-                    dispatch(&mut ctx, &msg, error).await;
+                    dispatch(&mut ctx, &msg, error, &command_name).await;
                 }
 
                 return;
@@ -724,7 +732,8 @@ impl Framework for StandardFramework {
                     self.should_fail(&ctx, &msg, &mut args, command.options, group.options).await
                 {
                     if let Some(dispatch) = &self.dispatch {
-                        dispatch(&mut ctx, &msg, error).await;
+                        let command_name = command.options.names[0];
+                        dispatch(&mut ctx, &msg, error, command_name).await;
                     }
 
                     return;
