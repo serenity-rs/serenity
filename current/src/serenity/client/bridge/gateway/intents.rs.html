@@ -282,6 +282,29 @@
 <span id="279">279</span>
 <span id="280">280</span>
 <span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">bitflags::__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{
@@ -290,9 +313,32 @@
 };
 
 <span class="doccomment">/// [Gateway Intents] will limit the events your bot will receive via the gateway.</span>
-<span class="doccomment">/// By default, no intents are specified by Serenity.</span>
+<span class="doccomment">/// By default, all intents except [Privileged Intents] are selected.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [Gateway Intents]: https://discordapp.com/developers/docs/topics/gateway#gateway-intents</span>
+<span class="doccomment">/// # What are Intents</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// A [gateway intent] sets the types of gateway events</span>
+<span class="doccomment">/// (e.g. member joins, guild integrations, guild emoji updates, ...) the</span>
+<span class="doccomment">/// bot shall receive. Carefully picking the needed intents greatly helps</span>
+<span class="doccomment">/// the bot to scale, as less intents will result in less events to be</span>
+<span class="doccomment">/// received via the network from Discord and less processing needed for</span>
+<span class="doccomment">/// handling the data.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Privileged Intents</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]</span>
+<span class="doccomment">/// are [Privileged Intents]. They need to be enabled in the</span>
+<span class="doccomment">/// *developer portal*.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **Note**:</span>
+<span class="doccomment">/// Once the bot is in 100 guilds or more, [the bot must be verified] in</span>
+<span class="doccomment">/// order to use privileged intents.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
+<span class="doccomment">/// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
+<span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
+<span class="doccomment">/// [`GatewayIntents::GuildPresences`]: serenity::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES</span>
+<span class="doccomment">/// [`GatewayIntents::GuildMembers`]: serenity::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GatewayIntents</span> {
     <span class="doccomment">/// The flags composing gateway intents.</span>
@@ -328,7 +374,7 @@
         <span class="doccomment">/// In order to use it, you must head to your application in the</span>
         <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// This intent is also necessary to even recieve the events in contains.</span>
+        <span class="doccomment">/// This intent is also necessary to even receive the events in contains.</span>
         <span class="ident">GUILD_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
@@ -365,7 +411,7 @@
         <span class="doccomment">/// In order to use it, you must head to your application in the</span>
         <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// This intent is also necessary to even recieve the events in contains.</span>
+        <span class="doccomment">/// This intent is also necessary to even receive the events in contains.</span>
         <span class="ident">GUILD_PRESENCES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>

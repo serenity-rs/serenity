@@ -31,8 +31,8 @@ concerned about the <a href="struct.ShardManager.html" title="ShardManager"><cod
 <table><tr class="module-item"><td><a class="mod" href="event/index.html" title="serenity::client::bridge::gateway::event mod">event</a></td><td class="docblock-short"><p>A collection of events created by the client, not a part of the Discord API
 itself.</p>
 </td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<table><tr class="module-item"><td><a class="struct" href="struct.GatewayIntents.html" title="serenity::client::bridge::gateway::GatewayIntents struct">GatewayIntents</a></td><td class="docblock-short"><p><a href="https://discordapp.com/developers/docs/topics/gateway#gateway-intents">Gateway Intents</a> will limit the events your bot will receive via the gateway.
-By default, no intents are specified by Serenity.</p>
+<table><tr class="module-item"><td><a class="struct" href="struct.GatewayIntents.html" title="serenity::client::bridge::gateway::GatewayIntents struct">GatewayIntents</a></td><td class="docblock-short"><p>[Gateway Intents] will limit the events your bot will receive via the gateway.
+By default, all intents except <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents">Privileged Intents</a> are selected.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.ShardId.html" title="serenity::client::bridge::gateway::ShardId struct">ShardId</a></td><td class="docblock-short"><p>A light tuplestruct wrapper around a u64 to verify type correctness when
 working with the IDs of shards.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.ShardManager.html" title="serenity::client::bridge::gateway::ShardManager struct">ShardManager</a></td><td class="docblock-short"><p>A manager for handling the status of shards by starting them, restarting
