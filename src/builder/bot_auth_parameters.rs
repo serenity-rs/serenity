@@ -1,6 +1,6 @@
+use crate::http::client::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-use crate::http::client::Http;
 
 #[derive(Debug, Clone, Default)]
 pub struct CreateBotAuthParameters {
@@ -22,7 +22,10 @@ impl CreateBotAuthParameters {
         }
 
         if !self._scopes.is_empty() {
-            valid_data.push(("scope", self._scopes.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(" ")));
+            valid_data.push((
+                "scope",
+                self._scopes.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(" "),
+            ));
         }
 
         if bits != 0 {
@@ -40,7 +43,8 @@ impl CreateBotAuthParameters {
         let url = reqwest::Url::parse_with_params(
             "https://discord.com/api/oauth2/authorize",
             &valid_data,
-        ).expect("Wait what");
+        )
+        .expect("Wait what");
 
         url.to_string()
     }
