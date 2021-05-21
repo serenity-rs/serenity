@@ -337,7 +337,10 @@ fn parse_cmd<'a>(
             try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).into_owned());
 
         if config.disabled_commands.contains(&n) {
-            return Err(ParseError::Dispatch(DispatchError::CommandDisabled(n)));
+            return Err(ParseError::Dispatch {
+                error: DispatchError::CommandDisabled,
+                command_name: n,
+            });
         }
 
         if let Some((cmd, map)) = r {
@@ -347,7 +350,12 @@ fn parse_cmd<'a>(
                 stream.take_while_char(|c| c.is_whitespace());
             }
 
-            check_discrepancy(ctx, msg, config, &cmd.options).await?;
+            check_discrepancy(ctx, msg, config, &cmd.options).await.map_err(|e| {
+                ParseError::Dispatch {
+                    error: e,
+                    command_name: n,
+                }
+            })?;
 
             if map.is_empty() {
                 return Ok(cmd);
@@ -381,7 +389,12 @@ fn parse_group<'a>(
                 stream.take_while_char(|c| c.is_whitespace());
             }
 
-            check_discrepancy(ctx, msg, config, &group.options).await?;
+            check_discrepancy(ctx, msg, config, &group.options).await.map_err(|e| {
+                ParseError::Dispatch {
+                    error: e,
+                    command_name: n,
+                }
+            })?;
 
             if map.is_empty() {
                 return Ok((group, commands));
@@ -443,14 +456,7 @@ async fn handle_group<'a>(
 #[derive(Debug)]
 pub enum ParseError {
     UnrecognisedCommand(Option<String>),
-    Dispatch(DispatchError),
-}
-
-impl From<DispatchError> for ParseError {
-    #[inline]
-    fn from(err: DispatchError) -> Self {
-        ParseError::Dispatch(err)
-    }
+    Dispatch { error: DispatchError, command_name: String },
 }
 
 fn is_unrecognised<T>(res: &Result<T, ParseError>) -> bool {
@@ -509,17 +515,40 @@ pub async fn command(
             Map::Prefixless(subgroups, commands) => {
                 is_prefixless = true;
 
+                fn command_name_if_recognised(res: &Result<Invoke, ParseError>) -> Option<&str> {
+                    match res {
+                        Ok(Invoke::Command {
+                            command, ..
+                        }) => Some(command.options.names[0]),
+                        Ok(Invoke::Help(name)) => Some(name), /* unreachable, but fallback just in case */
+                        Err(ParseError::UnrecognisedCommand(_)) => None,
+                        Err(ParseError::Dispatch {
+                            command_name, ..
+                        }) => Some(command_name),
+                    }
+                }
+
                 let res = handle_group(stream, ctx, msg, config, subgroups).await;
 
-                if !is_unrecognised(&res) {
-                    check_discrepancy(ctx, msg, config, &group.options).await?;
+                if let Some(command_name) = command_name_if_recognised(&res) {
+                    check_discrepancy(ctx, msg, config, &group.options).await.map_err(|e| {
+                        ParseError::Dispatch {
+                            error: e,
+                            command_name: command_name.to_owned(),
+                        }
+                    })?;
                     return res;
                 }
 
                 let res = handle_command(stream, ctx, msg, config, commands, group).await;
 
-                if !is_unrecognised(&res) {
-                    check_discrepancy(ctx, msg, config, &group.options).await?;
+                if let Some(command_name) = command_name_if_recognised(&res) {
+                    check_discrepancy(ctx, msg, config, &group.options).await.map_err(|e| {
+                        ParseError::Dispatch {
+                            error: e,
+                            command_name: command_name.to_owned(),
+                        }
+                    })?;
                     return res;
                 }
 
