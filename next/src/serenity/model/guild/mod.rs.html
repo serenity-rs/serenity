@@ -3107,14 +3107,6 @@
 <span id="3104">3104</span>
 <span id="3105">3105</span>
 <span id="3106">3106</span>
-<span id="3107">3107</span>
-<span id="3108">3108</span>
-<span id="3109">3109</span>
-<span id="3110">3110</span>
-<span id="3111">3111</span>
-<span id="3112">3112</span>
-<span id="3113">3113</span>
-<span id="3114">3114</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -4630,10 +4622,9 @@
 
         <span class="kw">if</span> <span class="ident">sorted</span> {
             <span class="ident">members</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">closest_to_origin</span>(<span class="ident">prefix</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="number">1</span>[..], <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">1</span>[..]));
-            <span class="ident">members</span>
-        } <span class="kw">else</span> {
-            <span class="ident">members</span>
         }
+
+        <span class="ident">members</span>
     }
 
     <span class="doccomment">/// Retrieves all [`Member`] containing a given [`String`] as</span>
@@ -4699,10 +4690,9 @@
 
         <span class="kw">if</span> <span class="ident">sorted</span> {
             <span class="ident">members</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">closest_to_origin</span>(<span class="ident">substring</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="number">1</span>[..], <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">1</span>[..]));
-            <span class="ident">members</span>
-        } <span class="kw">else</span> {
-            <span class="ident">members</span>
         }
+
+        <span class="ident">members</span>
     }
 
     <span class="doccomment">/// Retrieves a tuple of [`Member`]s containing a given [`String`] in</span>
@@ -4736,22 +4726,18 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">Member</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">futures::stream::iter</span>(<span class="self">self</span>.<span class="ident">members</span>.<span class="ident">values</span>())
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">if</span> <span class="ident">case_sensitive</span> {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">name</span>;
+                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">name</span>;
 
+                <span class="kw">if</span> <span class="ident">case_sensitive</span> {
                     <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">contains</span>(<span class="ident">substring</span>) {
                         <span class="prelude-val">Some</span>((<span class="ident">member</span>, <span class="ident">name</span>.<span class="ident">to_string</span>()))
                     } <span class="kw">else</span> {
                         <span class="prelude-val">None</span>
                     }
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">contains_case_insensitive</span>(<span class="ident">name</span>, <span class="ident">substring</span>) {
+                    <span class="prelude-val">Some</span>((<span class="ident">member</span>, <span class="ident">name</span>.<span class="ident">to_string</span>()))
                 } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">name</span>;
-
-                    <span class="kw">if</span> <span class="ident">contains_case_insensitive</span>(<span class="ident">name</span>, <span class="ident">substring</span>) {
-                        <span class="prelude-val">Some</span>((<span class="ident">member</span>, <span class="ident">name</span>.<span class="ident">to_string</span>()))
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    }
+                    <span class="prelude-val">None</span>
                 }
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">Member</span>, <span class="ident">String</span>)<span class="op">&gt;</span><span class="op">&gt;</span>()
@@ -4759,10 +4745,9 @@
 
         <span class="kw">if</span> <span class="ident">sorted</span> {
             <span class="ident">members</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">closest_to_origin</span>(<span class="ident">substring</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="number">1</span>[..], <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">1</span>[..]));
-            <span class="ident">members</span>
-        } <span class="kw">else</span> {
-            <span class="ident">members</span>
         }
+
+        <span class="ident">members</span>
     }
 
     <span class="doccomment">/// Retrieves all [`Member`] containing a given [`String`] in</span>
@@ -4817,10 +4802,9 @@
 
         <span class="kw">if</span> <span class="ident">sorted</span> {
             <span class="ident">members</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">closest_to_origin</span>(<span class="ident">substring</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="number">1</span>[..], <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">1</span>[..]));
-            <span class="ident">members</span>
-        } <span class="kw">else</span> {
-            <span class="ident">members</span>
         }
+
+        <span class="ident">members</span>
     }
 
     <span class="doccomment">/// Calculate a [`Member`]&#39;s permissions in the guild.</span>

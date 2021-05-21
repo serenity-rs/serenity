@@ -883,6 +883,15 @@
 <span id="880">880</span>
 <span id="881">881</span>
 <span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
 </pre><pre class="rust">
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
@@ -937,7 +946,7 @@
     <span class="doccomment">/// When the command caller has exceeded a ratelimit bucket.</span>
     <span class="ident">Ratelimited</span>(<span class="ident">RateLimitInfo</span>),
     <span class="doccomment">/// When the requested command is disabled in bot configuration.</span>
-    <span class="ident">CommandDisabled</span>(<span class="ident">String</span>),
+    <span class="ident">CommandDisabled</span>,
     <span class="doccomment">/// When the user is blocked in bot configuration.</span>
     <span class="ident">BlockedUser</span>,
     <span class="doccomment">/// When the guild or its owner is blocked in bot configuration.</span>
@@ -963,7 +972,7 @@
 }
 
 <span class="kw">type</span> <span class="ident">DispatchHook</span> <span class="op">=</span>
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">DispatchError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">DispatchError</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">BeforeHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">bool</span><span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">AfterHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>,
@@ -1302,7 +1311,12 @@
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// #[hook]</span>
-    <span class="doccomment">/// async fn dispatch_error_hook(context: &amp;Context, msg: &amp;Message, error: DispatchError) {</span>
+    <span class="doccomment">/// async fn dispatch_error_hook(</span>
+    <span class="doccomment">///     context: &amp;Context,</span>
+    <span class="doccomment">///     msg: &amp;Message,</span>
+    <span class="doccomment">///     error: DispatchError,</span>
+    <span class="doccomment">///     command_name: &amp;str,</span>
+    <span class="doccomment">/// ) {</span>
     <span class="doccomment">///     match error {</span>
     <span class="doccomment">///         DispatchError::NotEnoughArguments { min, given } =&gt; {</span>
     <span class="doccomment">///             let s = format!(&quot;Need {} arguments, but only got {}.&quot;, min, given);</span>
@@ -1314,7 +1328,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">///             let _ = msg.channel_id.say(&amp;context, &amp;s).await;</span>
     <span class="doccomment">///         },</span>
-    <span class="doccomment">///         _ =&gt; println!(&quot;Unhandled dispatch error.&quot;),</span>
+    <span class="doccomment">///         _ =&gt; println!(&quot;Unhandled dispatch error in {}.&quot;, command_name),</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
@@ -1537,9 +1551,12 @@
 
                 <span class="kw">return</span>;
             },
-            <span class="prelude-val">Err</span>(<span class="ident">ParseError::Dispatch</span>(<span class="ident">error</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">ParseError::Dispatch</span> {
+                <span class="ident">error</span>,
+                <span class="ident">command_name</span>,
+            }) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dispatch</span> {
-                    <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>).<span class="kw">await</span>;
+                    <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>, <span class="kw-2">&amp;</span><span class="ident">command_name</span>).<span class="kw">await</span>;
                 }
 
                 <span class="kw">return</span>;
@@ -1608,7 +1625,8 @@
                     <span class="self">self</span>.<span class="ident">should_fail</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">command</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>).<span class="kw">await</span>
                 {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dispatch</span> {
-                        <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>).<span class="kw">await</span>;
+                        <span class="kw">let</span> <span class="ident">command_name</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>];
+                        <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>, <span class="ident">command_name</span>).<span class="kw">await</span>;
                     }
 
                     <span class="kw">return</span>;
