@@ -187,7 +187,7 @@ async fn delay_action(ctx: &Context, msg: &Message) {
 }
 
 #[hook]
-async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
+async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError, _command_name: &str) {
     if let DispatchError::Ratelimited(info) = error {
         // We notify them only once.
         if info.is_first_try {
@@ -206,6 +206,7 @@ fn _dispatch_error_no_macro<'fut>(
     ctx: &'fut mut Context,
     msg: &'fut Message,
     error: DispatchError,
+    _command_name: &str,
 ) -> BoxFuture<'fut, ()> {
     async move {
         if let DispatchError::Ratelimited(info) = error {
