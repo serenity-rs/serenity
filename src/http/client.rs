@@ -334,11 +334,13 @@ impl Http {
         user_id: u64,
         delete_message_days: u8,
         reason: &str,
-        audit_log_reason: Option<&str>,
     ) -> Result<()> {
+        // Audit log reason and normal ban reason are mutually exclusive so we don't need the audit
+        // log reason parameter here
+
         self.wind(204, Request {
             body: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::GuildBanUser {
                 delete_message_days: Some(delete_message_days),
                 reason: Some(&utf8_percent_encode(reason, NON_ALPHANUMERIC).to_string()),
@@ -775,14 +777,10 @@ impl Http {
     }
 
     /// Deletes a private channel or a channel in a guild.
-    pub async fn delete_channel(
-        &self,
-        channel_id: u64,
-        audit_log_reason: Option<&str>,
-    ) -> Result<Channel> {
+    pub async fn delete_channel(&self, channel_id: u64) -> Result<Channel> {
         self.fire(Request {
             body: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::DeleteChannel {
                 channel_id,
             },
@@ -791,15 +789,10 @@ impl Http {
     }
 
     /// Deletes an emoji from a server.
-    pub async fn delete_emoji(
-        &self,
-        guild_id: u64,
-        emoji_id: u64,
-        audit_log_reason: Option<&str>,
-    ) -> Result<()> {
+    pub async fn delete_emoji(&self, guild_id: u64, emoji_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::DeleteEmoji {
                 guild_id,
                 emoji_id,
@@ -876,15 +869,10 @@ impl Http {
     }
 
     /// Removes an integration from a guild.
-    pub async fn delete_guild_integration(
-        &self,
-        guild_id: u64,
-        integration_id: u64,
-        audit_log_reason: Option<&str>,
-    ) -> Result<()> {
+    pub async fn delete_guild_integration(&self, guild_id: u64, integration_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::DeleteGuildIntegration {
                 guild_id,
                 integration_id,
@@ -894,14 +882,10 @@ impl Http {
     }
 
     /// Deletes an invite by code.
-    pub async fn delete_invite(
-        &self,
-        code: &str,
-        audit_log_reason: Option<&str>,
-    ) -> Result<Invite> {
+    pub async fn delete_invite(&self, code: &str) -> Result<Invite> {
         self.fire(Request {
             body: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::DeleteInvite {
                 code,
             },
@@ -911,15 +895,10 @@ impl Http {
 
     /// Deletes a message if created by us or we have
     /// specific permissions.
-    pub async fn delete_message(
-        &self,
-        channel_id: u64,
-        message_id: u64,
-        audit_log_reason: Option<&str>,
-    ) -> Result<()> {
+    pub async fn delete_message(&self, channel_id: u64, message_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::DeleteMessage {
                 channel_id,
                 message_id,
@@ -929,15 +908,10 @@ impl Http {
     }
 
     /// Deletes a bunch of messages, only works for bots.
-    pub async fn delete_messages(
-        &self,
-        channel_id: u64,
-        map: &Value,
-        audit_log_reason: Option<&str>,
-    ) -> Result<()> {
+    pub async fn delete_messages(&self, channel_id: u64, map: &Value) -> Result<()> {
         self.wind(204, Request {
             body: Some(map.to_string().as_bytes()),
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::DeleteMessages {
                 channel_id,
             },
@@ -1051,15 +1025,10 @@ impl Http {
     }
 
     /// Deletes a role from a server. Can't remove the default everyone role.
-    pub async fn delete_role(
-        &self,
-        guild_id: u64,
-        role_id: u64,
-        audit_log_reason: Option<&str>,
-    ) -> Result<()> {
+    pub async fn delete_role(&self, guild_id: u64, role_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::DeleteRole {
                 guild_id,
                 role_id,
@@ -1089,14 +1058,10 @@ impl Http {
     ///       Ok(())
     /// # }
     /// ```
-    pub async fn delete_webhook(
-        &self,
-        webhook_id: u64,
-        audit_log_reason: Option<&str>,
-    ) -> Result<()> {
+    pub async fn delete_webhook(&self, webhook_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             route: RouteInfo::DeleteWebhook {
                 webhook_id,
             },

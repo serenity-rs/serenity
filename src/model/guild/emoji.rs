@@ -102,7 +102,7 @@ impl Emoji {
     pub async fn delete<T: AsRef<Cache> + AsRef<Http>>(&self, cache_http: T) -> Result<()> {
         match self.find_guild_id(&cache_http).await {
             Some(guild_id) => {
-                AsRef::<Http>::as_ref(&cache_http).delete_emoji(guild_id.0, self.id.0, None).await
+                AsRef::<Http>::as_ref(&cache_http).delete_emoji(guild_id.0, self.id.0).await
             },
             None => Err(Error::Model(ModelError::ItemMissing)),
         }

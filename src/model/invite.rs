@@ -123,7 +123,7 @@ impl Invite {
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code, None).await
+        cache_http.http().as_ref().delete_invite(&self.code).await
     }
 
     /// Gets the information about an invite.
@@ -323,7 +323,7 @@ impl RichInvite {
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code, None).await
+        cache_http.http().as_ref().delete_invite(&self.code).await
     }
 
     /// Returns a URL to use for the invite.

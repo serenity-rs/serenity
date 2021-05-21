@@ -159,7 +159,7 @@ impl ChannelId {
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn delete(self, http: impl AsRef<Http>) -> Result<Channel> {
-        http.as_ref().delete_channel(self.0, None).await
+        http.as_ref().delete_channel(self.0).await
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -181,7 +181,7 @@ impl ChannelId {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        http.as_ref().delete_message(self.0, message_id.into().0, None).await
+        http.as_ref().delete_message(self.0, message_id.into().0).await
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -221,7 +221,7 @@ impl ChannelId {
         } else {
             let map = json!({ "messages": ids });
 
-            http.as_ref().delete_messages(self.0, &map, None).await
+            http.as_ref().delete_messages(self.0, &map).await
         }
     }
 

@@ -107,7 +107,7 @@ impl GuildId {
             return Err(Error::ExceededLimit(reason.to_string(), 512));
         }
 
-        http.as_ref().ban_user(self.0, user.0, dmd, reason, None).await
+        http.as_ref().ban_user(self.0, user.0, dmd, reason).await
     }
 
     /// Gets a list of the guild's bans.
@@ -334,7 +334,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         emoji_id: impl Into<EmojiId>,
     ) -> Result<()> {
-        http.as_ref().delete_emoji(self.0, emoji_id.into().0, None).await
+        http.as_ref().delete_emoji(self.0, emoji_id.into().0).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -353,7 +353,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
     ) -> Result<()> {
-        http.as_ref().delete_guild_integration(self.0, integration_id.into().0, None).await
+        http.as_ref().delete_guild_integration(self.0, integration_id.into().0).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -375,7 +375,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
-        http.as_ref().delete_role(self.0, role_id.into().0, None).await
+        http.as_ref().delete_role(self.0, role_id.into().0).await
     }
 
     /// Edits the current guild with new data where specified.
