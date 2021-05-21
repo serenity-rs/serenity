@@ -132,12 +132,10 @@ impl Shard {
     /// ```
     ///
     /// # Errors
-    /// On Error, will return either [`Error::Gateway`] or [`Error::Rustls`]
-    /// / [`Error::Tungstenite`] depending on if rustls or native_tls is used.
+    /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`]
+    /// or a Rustls/native TLS error.
     ///
-    /// [`Error::Gateway`]: crate::error::Error::Gateway
-    /// [`Error::Rustls`]: crate::error::Error::Rustls
-    /// [`Error::Tungstenite`]: crate::error::Error::Tungstenite
+    /// [`Error::Gateway`]: crate::Error::Gateway
     pub async fn new(
         ws_url: Arc<Mutex<String>>,
         token: &str,
