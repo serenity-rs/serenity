@@ -176,7 +176,7 @@ async fn delay_action(ctx: &Context, msg: &Message) {
 }
 
 #[hook]
-async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
+async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError, _command_name: &str) {
     if let DispatchError::Ratelimited(info) = error {
 
         // We notify them only once.
@@ -192,7 +192,7 @@ async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
 // You can construct a hook without the use of a macro, too.
 // This requires some boilerplate though and the following additional import.
 use serenity::{futures::future::BoxFuture, FutureExt};
-fn _dispatch_error_no_macro<'fut>(ctx: &'fut mut Context, msg: &'fut Message, error: DispatchError) -> BoxFuture<'fut, ()> {
+fn _dispatch_error_no_macro<'fut>(ctx: &'fut mut Context, msg: &'fut Message, error: DispatchError, _command_name: &str) -> BoxFuture<'fut, ()> {
     async move {
         if let DispatchError::Ratelimited(info) = error {
 
