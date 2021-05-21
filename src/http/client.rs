@@ -1054,7 +1054,7 @@ impl Http {
     /// // must have set the token first.
     /// let http = Http::default();
     ///
-    /// http.delete_webhook(245037420704169985, None).await?;
+    /// http.delete_webhook(245037420704169985).await?;
     ///       Ok(())
     /// # }
     /// ```
