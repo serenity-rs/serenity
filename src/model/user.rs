@@ -13,7 +13,7 @@ use serde_json::json;
 use super::prelude::*;
 use super::utils::deserialize_u16;
 #[cfg(feature = "model")]
-use crate::builder::{CreateMessage, EditProfile, CreateBotAuthParameters};
+use crate::builder::{CreateBotAuthParameters, CreateMessage, EditProfile};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
