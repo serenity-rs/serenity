@@ -67,7 +67,6 @@ pub trait Mentionable {
     fn mention(&self) -> Mention;
 }
 
-#[derive(Debug, Clone, Copy)]
 /// A struct that represents some way to insert a notification, link, or emoji
 /// into a message.
 ///
@@ -89,6 +88,7 @@ pub trait Mentionable {
 ///     format!("{} {} {}", Mention::from(user), Mention::from(channel), Mention::from(role),),
 /// )
 /// ```
+#[derive(Debug, Clone, Copy)]
 pub struct Mention(MentionableImpl);
 
 #[derive(Debug, Clone, Copy)]
