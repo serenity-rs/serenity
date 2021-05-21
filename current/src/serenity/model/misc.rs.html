@@ -544,7 +544,6 @@
     <span class="kw">fn</span> <span class="ident">mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Mention</span>;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// A struct that represents some way to insert a notification, link, or emoji</span>
 <span class="doccomment">/// into a message.</span>
 <span class="doccomment">///</span>
@@ -566,6 +565,7 @@
 <span class="doccomment">///     format!(&quot;{} {} {}&quot;, Mention::from(user), Mention::from(channel), Mention::from(role),),</span>
 <span class="doccomment">/// )</span>
 <span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Mention</span>(<span class="ident">MentionableImpl</span>);
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
