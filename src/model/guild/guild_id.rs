@@ -597,6 +597,26 @@ impl GuildId {
             .await
     }
 
+    /// Gets all of the guild's roles over the REST API.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is not in
+    /// the guild.
+    pub async fn roles(
+        self,
+        http: impl AsRef<Http>,
+    ) -> Result<HashMap<RoleId, Role>> {
+        let mut roles = HashMap::new();
+
+        #[allow(clippy::useless_conversion)]
+        for role in http.as_ref().get_guild_roles(self.0).await? {
+            roles.insert(role.id, role);
+        }
+
+        Ok(roles)
+    }
+
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
