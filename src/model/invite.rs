@@ -90,7 +90,7 @@ impl Invite {
 
         let map = utils::hashmap_to_json_map(f(CreateInvite::default()).0);
 
-        cache_http.http().create_invite(channel_id.0, &map).await
+        cache_http.http().create_invite(channel_id.0, &map, None).await
     }
 
     /// Deletes the invite.
@@ -123,7 +123,7 @@ impl Invite {
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code).await
+        cache_http.http().as_ref().delete_invite(&self.code, None).await
     }
 
     /// Gets the information about an invite.
@@ -323,7 +323,7 @@ impl RichInvite {
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code).await
+        cache_http.http().as_ref().delete_invite(&self.code, None).await
     }
 
     /// Returns a URL to use for the invite.

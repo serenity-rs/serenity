@@ -92,7 +92,7 @@ impl Role {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn delete(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_role(self.guild_id.0, self.id.0).await
+        http.as_ref().delete_role(self.guild_id.0, self.id.0, None).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
