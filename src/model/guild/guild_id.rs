@@ -603,10 +603,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user is not in
     /// the guild.
-    pub async fn roles(
-        self,
-        http: impl AsRef<Http>,
-    ) -> Result<HashMap<RoleId, Role>> {
+    pub async fn roles(self, http: impl AsRef<Http>) -> Result<HashMap<RoleId, Role>> {
         let mut roles = HashMap::new();
 
         #[allow(clippy::useless_conversion)]
