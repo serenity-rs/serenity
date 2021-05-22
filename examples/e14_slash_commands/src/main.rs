@@ -12,13 +12,42 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        interaction
-            .create_interaction_response(&ctx.http, |response| {
-                response
-                    .kind(InteractionResponseType::ChannelMessageWithSource)
-                    .interaction_response_data(|message| message.content("Received event!"))
-            })
-            .await;
+        if interaction.kind == InteractionType::ApplicationCommand {
+            if let Some(data) = interaction.data.as_ref() {
+                let content = match data.name.as_str() {
+                    "ping" => "Hey, I'm alive!".to_string(),
+                    "id" => {
+                        let options = data
+                            .options
+                            .get(0)
+                            .expect("Expected user option")
+                            .resolved
+                            .as_ref()
+                            .expect("Expected user object");
+
+                        if let ApplicationCommandInteractionDataOptionValue::User(user, _member) =
+                        options
+                        {
+                            format!("{}'s id is {}", user.tag(), user.id)
+                        } else {
+                            "Please provide a valid user".to_string()
+                        }
+                    },
+                    _ => "not implemented :(".to_string()
+                };
+
+                if let Err(why) = interaction
+                    .create_interaction_response(&ctx.http, |response| {
+                        response
+                            .kind(InteractionResponseType::ChannelMessageWithSource)
+                            .interaction_response_data(|message| message.content(content))
+                    })
+                    .await
+                {
+                    println!("Cannot respond to slash command: {}", why);
+                }
+            }
+        }
     }
 
     async fn ready(&self, ctx: Context, ready: Ready) {
@@ -38,7 +67,7 @@ impl EventHandler for Handler {
                                 .name("id")
                                 .description("The user to lookup")
                                 .kind(ApplicationCommandOptionType::User)
-                                .required(false)
+                                .required(true)
                         })
                 })
                 .create_application_command(|command| {
