@@ -415,8 +415,9 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for field information.
     ///
-    /// **note:** Creating a command with the same name as an existing command for your application
-    /// will overwrite the old command.
+    /// **Note**:
+    /// Creating a command with the same name as an existing command for your
+    /// application will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     #[cfg(feature = "unstable_discord_api")]
@@ -2172,6 +2173,20 @@ impl Http {
                 application_id: self.application_id,
                 guild_id,
                 command_id,
+            },
+        })
+        .await
+    }
+
+    /// Gets a guild embed information.
+    #[deprecated(note = "get_guild_embed was renamed to get_guild_widget")]
+    #[allow(deprecated)]
+    pub async fn get_guild_embed(&self, guild_id: u64) -> Result<GuildEmbed> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildWidget {
+                guild_id,
             },
         })
         .await

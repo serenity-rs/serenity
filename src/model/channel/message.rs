@@ -856,13 +856,16 @@ impl Message {
     /// The link will be valid for messages in either private channels or guilds.
     #[inline]
     pub fn link(&self) -> String {
-        match self.guild_id {
-            Some(guild_id) => format!(
-                "https://discord.com/channels/{}/{}/{}",
-                guild_id.0, self.channel_id.0, self.id.0
-            ),
-            None => format!("https://discord.com/channels/@me/{}/{}", self.channel_id.0, self.id.0),
-        }
+        self.id.link(self.channel_id, self.guild_id)
+    }
+
+    /// Same as [`Self::link`] but tries to find the [`GuildId`]
+    /// if Discord does not provide it.
+    ///
+    /// [`guild_id`]: Self::guild_id
+    #[inline]
+    pub async fn link_ensured(&self, cache_http: impl CacheHttp) -> String {
+        self.id.link_ensured(cache_http, self.channel_id, self.guild_id).await
     }
 
     /// Await a single reaction on this message.
@@ -1193,5 +1196,40 @@ impl Serialize for MessageFlags {
         S: Serializer,
     {
         serializer.serialize_u64(self.bits())
+    }
+}
+
+#[cfg(feature = "model")]
+impl MessageId {
+    /// Returns a link referencing this message. When clicked, users will jump to the message.
+    /// The link will be valid for messages in either private channels or guilds.
+    pub fn link(&self, channel_id: ChannelId, guild_id: Option<GuildId>) -> String {
+        match guild_id {
+            Some(guild_id) => {
+                format!("https://discord.com/channels/{}/{}/{}", guild_id.0, channel_id.0, self.0)
+            },
+            None => format!("https://discord.com/channels/@me/{}/{}", channel_id.0, self.0),
+        }
+    }
+
+    /// Same as [`Self::link`] but tries to find the [`GuildId`]
+    /// if it is not provided.
+    pub async fn link_ensured(
+        &self,
+        cache_http: impl CacheHttp,
+        channel_id: ChannelId,
+        mut guild_id: Option<GuildId>,
+    ) -> String {
+        if guild_id.is_none() {
+            let found_channel = channel_id.to_channel(cache_http).await;
+
+            if let Ok(channel) = found_channel {
+                if let Some(c) = channel.guild() {
+                    guild_id = Some(c.guild_id);
+                }
+            }
+        }
+
+        self.link(channel_id, guild_id)
     }
 }

@@ -5,9 +5,32 @@ use serde::{
 };
 
 /// [Gateway Intents] will limit the events your bot will receive via the gateway.
-/// By default, no intents are specified by Serenity.
+/// By default, all intents except [Privileged Intents] are selected.
 ///
-/// [Gateway Intents]: https://discordapp.com/developers/docs/topics/gateway#gateway-intents
+/// # What are Intents
+///
+/// A [gateway intent] sets the types of gateway events
+/// (e.g. member joins, guild integrations, guild emoji updates, ...) the
+/// bot shall receive. Carefully picking the needed intents greatly helps
+/// the bot to scale, as less intents will result in less events to be
+/// received via the network from Discord and less processing needed for
+/// handling the data.
+///
+/// # Privileged Intents
+///
+/// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]
+/// are [Privileged Intents]. They need to be enabled in the
+/// *developer portal*.
+///
+/// **Note**:
+/// Once the bot is in 100 guilds or more, [the bot must be verified] in
+/// order to use privileged intents.
+///
+/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+/// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+/// [`GatewayIntents::GuildPresences`]: serenity::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES
+/// [`GatewayIntents::GuildMembers`]: serenity::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS
 #[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct GatewayIntents {
     /// The flags composing gateway intents.
@@ -43,7 +66,7 @@ __impl_bitflags! {
         /// In order to use it, you must head to your application in the
         /// Developer Portal and enable the toggle for *Privileged Intents*.
         ///
-        /// This intent is also necessary to even recieve the events in contains.
+        /// This intent is also necessary to even receive the events in contains.
         GUILD_MEMBERS = 1 << 1;
         /// Enables following gateway events:
         ///
@@ -80,7 +103,7 @@ __impl_bitflags! {
         /// In order to use it, you must head to your application in the
         /// Developer Portal and enable the toggle for *Privileged Intents*.
         ///
-        /// This intent is also necessary to even recieve the events in contains.
+        /// This intent is also necessary to even receive the events in contains.
         GUILD_PRESENCES = 1 << 8;
         /// Enables following gateway events:
         ///

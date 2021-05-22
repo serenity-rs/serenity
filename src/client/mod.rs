@@ -68,6 +68,7 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::id::ApplicationId;
+use crate::model::id::UserId;
 pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
@@ -272,12 +273,30 @@ impl<'a> ClientBuilder<'a> {
     }
 
     /// Sets all intents directly, replacing already set intents.
-    ///
-    /// To enable privileged intents, [`GatewayIntents::all`] to
-    ///
-    /// *Info*:
     /// Intents are a bitflag, you can combine them by performing the
     /// `|`-operator.
+    ///
+    /// # What are Intents
+    ///
+    /// A [gateway intent] sets the types of gateway events
+    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
+    /// bot shall receive. Carefully picking the needed intents greatly helps
+    /// the bot to scale, as less intents will result in less events to be
+    /// received hence less processed by the bot.
+    ///
+    /// # Privileged Intents
+    ///
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]
+    /// are *privileged*.
+    /// [Privileged intents] need to be enabled in the *developer portal*.
+    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
+    /// order to use privileged intents.
+    ///
+    /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    /// [`GatewayIntents::GUILD_PRESENCES`]: crate::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES
+    /// [`GatewayIntents::GUILD_MEMBERS`]: crate::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
         self.intents = intents;
 
@@ -941,16 +960,8 @@ impl Client {
 /// // ensure a valid token is in fact valid:
 /// assert!(validate_token("Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_ok());
 ///
-/// // "cat" isn't a valid token:
-/// assert!(validate_token("cat").is_err());
-///
-/// // tokens must have three parts, separated by periods (this is still
-/// // actually an invalid token):
-/// assert!(validate_token("aaa.abcdefgh.bbb").is_ok());
-///
-/// // the second part must be _at least_ 6 characters long:
-/// assert!(validate_token("a.abcdef.b").is_ok());
-/// assert!(validate_token("a.abcde.b").is_err());
+/// // helpful to prevent typos
+/// assert!(validate_token("Njg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_err());
 /// ```
 ///
 /// # Errors
@@ -958,28 +969,54 @@ impl Client {
 /// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.
 /// The type of failure is not specified.
 pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
-    let token = token.as_ref();
-
-    if token.is_empty() {
-        return Err(Error::Client(ClientError::InvalidToken));
+    if parse_token(token.as_ref()).is_some() {
+        Ok(())
+    } else {
+        Err(Error::Client(ClientError::InvalidToken))
     }
+}
 
-    let parts: Vec<&str> = token.split('.').collect();
+/// Part of the data contained within a Discord bot token. Returned by [`parse_token`].
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TokenComponents {
+    pub bot_user_id: UserId,
+    pub creation_time: chrono::NaiveDateTime,
+}
 
-    // Check that the token has a total of 3 parts.
-    if parts.len() != 3 {
-        return Err(Error::Client(ClientError::InvalidToken));
+/// Verifies that the token adheres to the Discord token format and extracts the bot user ID and the
+/// token generation timestamp
+pub fn parse_token(token: impl AsRef<str>) -> Option<TokenComponents> {
+    // The token consists of three base64-encoded parts
+    let parts: Vec<&str> = token.as_ref().split('.').collect();
+    let base64_config = base64::Config::new(base64::CharacterSet::UrlSafe, true);
+
+    // First part must be a base64-encoded stringified user ID
+    let user_id = base64::decode_config(parts.get(0)?, base64_config).ok()?;
+    let user_id = UserId(std::str::from_utf8(&user_id).ok()?.parse().ok()?);
+
+    // Second part must be a base64-encoded token generation timestamp
+    let timestamp_base64 = parts.get(1)?;
+    // The base64-encoded timestamp must be at least 6 characters
+    if timestamp_base64.len() < 6 {
+        return None;
     }
-
-    // Check that the second part is at least 6 characters long.
-    if parts[1].len() < 6 {
-        return Err(Error::Client(ClientError::InvalidToken));
+    let timestamp_bytes = base64::decode_config(timestamp_base64, base64_config).ok()?;
+    let mut timestamp = 0;
+    for byte in timestamp_bytes {
+        timestamp *= 256;
+        timestamp += byte as u64;
     }
-
-    // Check that there is no whitespace before/after the token.
-    if token.trim() != token {
-        return Err(Error::Client(ClientError::InvalidToken));
+    // Some timestamps are based on the Discord epoch. Convert to Unix epoch
+    if timestamp < 1293840000 {
+        timestamp += 1293840000;
     }
+    let timestamp = chrono::NaiveDateTime::from_timestamp_opt(timestamp as i64, 0)?;
 
-    Ok(())
+    // Third part is a base64-encoded HMAC that's not interesting on its own
+    let _ = base64::decode(parts.get(2)?).ok()?;
+
+    Some(TokenComponents {
+        bot_user_id: user_id,
+        creation_time: timestamp,
+    })
 }
