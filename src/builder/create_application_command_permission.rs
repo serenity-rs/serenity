@@ -83,7 +83,7 @@ impl CreateApplicationCommandPermissions {
         let mut data = CreateApplicationCommandPermissionData::default();
         f(&mut data);
 
-        self.add_permission(data);
+        self.add_permissions(data);
 
         self
     }
