@@ -108,6 +108,20 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
 
         self
     }
+    
+    /// Sets a list of embeds to include in the message.
+    ///
+    /// Calling this multiple times will overwrite the embed list.
+    /// To append embeds, call [`Self::add_embed`] instead.
+    pub fn embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
+        let embeds = embeds
+            .into_iter()
+            .map(|embed| utils::hashmap_to_json_map(embed.0).into())
+            .collect();
+        
+        self.0.insert("embeds", Value::Array(embeds));
+        self
+    }
 
     /// Set the allowed mentions for the message.
     pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
