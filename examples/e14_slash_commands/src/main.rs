@@ -3,7 +3,7 @@ use std::env;
 use serenity::{
     async_trait,
     client::bridge::gateway::GatewayIntents,
-    model::{gateway::Ready, interactions::{Interaction, InteractionResponseType, ApplicationCommand}},
+    model::{gateway::Ready, interactions::{Interaction, InteractionResponseType, ApplicationCommand, ApplicationCommandOptionType}},
     prelude::*,
 };
 
@@ -24,9 +24,59 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
-        let interactions = ApplicationCommand::get_global_application_commands(&ctx.http).await;
+        let commands = ApplicationCommand::set_global_application_commands(&ctx.http, |commands| {
+            commands
+                .create_application_command(|command| {
+                    command.name("ping").description("A ping command")
+                })
+                .create_application_command(|command| {
+                    command
+                        .name("id")
+                        .description("Get a user id")
+                        .create_option(|option| {
+                            option
+                                .name("id")
+                                .description("The user to lookup")
+                                .kind(ApplicationCommandOptionType::User)
+                                .required(false)
+                        })
+                })
+                .create_application_command(|command| {
+                    command
+                        .name("welcome")
+                        .description("Welcome a user")
+                        .create_option(|option| {
+                            option
+                                .name("user")
+                                .description("The user to welcome")
+                                .kind(ApplicationCommandOptionType::User)
+                                .required(true)
+                        })
+                        .create_option(|option| {
+                            option
+                                .name("message")
+                                .description("The message to send")
+                                .kind(ApplicationCommandOptionType::String)
+                                .required(true)
+                                .add_string_choice(
+                                    "Welcome to our cool server! Ask me if you need help",
+                                    "pizza"
+                                )
+                                .add_string_choice("Hey, do you want a coffee?", "coffee")
+                                .add_string_choice(
+                                    "Welcome to the club, you're now a good person. Well, I hope.",
+                                    "club"
+                                )
+                                .add_string_choice(
+                                    "I hope that you brought a controller to play together!",
+                                    "game"
+                                )
+                        })
+                })
+        })
+            .await;
 
-        println!("I have the following global slash command(s): {:?}", interactions);
+        println!("I have now the following global slash commands: {:#?}", commands);
     }
 }
 

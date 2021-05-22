@@ -634,13 +634,12 @@ impl Guild {
         self.id.create_application_command(http, f).await
     }
 
-    /// Same as [`create_application_command`], but allows to create more
-    /// than one command per call.
+    /// Overrides all guild application commands.
     ///
     /// [`create_application_command`]: Self::create_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn create_application_commands<F>(
+    pub async fn set_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
@@ -648,7 +647,7 @@ impl Guild {
     where
         F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
     {
-        self.id.create_application_commands(http, f).await
+        self.id.set_application_commands(http, f).await
     }
 
     /// Creates a guild specific [`ApplicationCommandPermission`].
@@ -672,13 +671,10 @@ impl Guild {
         self.id.create_application_command_permission(http, command_id, f).await
     }
 
-    /// Same as [`create_application_command_permission`] but allows to create
-    /// more than one permission per call.
-    ///
-    /// [`create_application_command_permission`]: Self::create_application_command_permission
+    /// Overrides all application commands permissions.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn create_application_commands_permissions<F>(
+    pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
@@ -688,7 +684,7 @@ impl Guild {
             &mut CreateApplicationCommandsPermissions,
         ) -> &mut CreateApplicationCommandsPermissions,
     {
-        self.id.create_application_commands_permissions(http, f).await
+        self.id.set_application_commands_permissions(http, f).await
     }
 
     /// Get all guild application commands.
