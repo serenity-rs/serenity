@@ -276,7 +276,7 @@ impl CurrentUser {
     /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
     /// If the user is not authorized for this end point.
     ///
-    /// May return [`Error::Format`] while writing url to the buffer.
+    /// Should never return [`Error::Url`] as all the data is controlled over.
     ///
     /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
     pub async fn invite_url(
@@ -284,7 +284,7 @@ impl CurrentUser {
         http: impl AsRef<Http>,
         permissions: Permissions,
     ) -> Result<String> {
-        self.invite_url_with_oauth2_scopes(http, permissions, &vec![Oauth2Scope::Bot]).await
+        self.invite_url_with_oauth2_scopes(http, permissions, &[Oauth2Scope::Bot]).await
     }
 
     /// Generate an invite url, but with custom scopes.
@@ -319,6 +319,15 @@ impl CurrentUser {
     ///                  client_id=249608697955745802&scope=bot%20applications.commands");
     /// # }
     /// ```
+    /// # Errors
+    ///
+    /// Returns an
+    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
+    /// If the user is not authorized for this end point.
+    ///
+    /// Should never return [`Error::Url`] as all the data is controlled over.
+    ///
+    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
     pub async fn invite_url_with_oauth2_scopes(
         &self,
         http: impl AsRef<Http>,

@@ -1003,9 +1003,12 @@ impl CacheUpdate for PresenceUpdateEvent {
 
                 // Create a partial member instance out of the presence update
                 // data.
-                if !guild.members.contains_key(&self.presence.user_id) {
+                // https://rust-lang.github.io/rust-clippy/master/index.html#map_entry
+                if let std::collections::hash_map::Entry::Vacant(e) =
+                    guild.members.entry(self.presence.user_id)
+                {
                     if let Some(user) = self.presence.user.as_ref() {
-                        guild.members.insert(self.presence.user_id, Member {
+                        e.insert(Member {
                             deaf: false,
                             guild_id,
                             joined_at: None,
