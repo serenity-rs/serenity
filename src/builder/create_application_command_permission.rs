@@ -73,8 +73,8 @@ impl CreateApplicationCommandPermissions {
         self
     }
 
-    /// Creates permissions(s) for the application command.
-    pub fn create_permission<F>(&mut self, f: F) -> &mut Self
+    /// Creates permissions for the application command.
+    pub fn create_permissions<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(
             &mut CreateApplicationCommandPermissionData,
@@ -88,8 +88,8 @@ impl CreateApplicationCommandPermissions {
         self
     }
 
-    /// Adds permission(s) for the application command.
-    pub fn add_permission(
+    /// Adds permission for the application command.
+    pub fn add_permissions(
         &mut self,
         permission: CreateApplicationCommandPermissionData,
     ) -> &mut Self {
@@ -103,7 +103,7 @@ impl CreateApplicationCommandPermissions {
         self
     }
 
-    /// Sets permission(s) for the application command.
+    /// Sets permissions for the application command.
     pub fn set_permissions(
         &mut self,
         permissions: Vec<CreateApplicationCommandPermissionData>,
@@ -157,7 +157,7 @@ impl CreateApplicationCommandPermissionsData {
         self
     }
 
-    /// Sets a permission for the application command.
+    /// Sets permissions for the application command.
     pub fn set_permissions(
         &mut self,
         permissions: Vec<CreateApplicationCommandPermissionData>,
