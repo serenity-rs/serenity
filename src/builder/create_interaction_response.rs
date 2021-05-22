@@ -81,7 +81,7 @@ impl CreateInteractionResponseData {
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.set_embed(embed)
+        self.add_embed(embed)
     }
 
     /// Adds an embed to the message.
