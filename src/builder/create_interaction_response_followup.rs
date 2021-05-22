@@ -91,15 +91,21 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.set_embed(embed)
+        self.add_embed(embed)
     }
 
-    /// Set an embed for the message.
-    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+    /// Adds an embed to the message.
+    pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
-        self.0.insert("embed", embed);
+        self.0
+            .entry("embeds")
+            .or_insert_with(|| Value::Array(Vec::new()))
+            .as_array_mut()
+            .unwrap()
+            .push(embed);
+
         self
     }
 
