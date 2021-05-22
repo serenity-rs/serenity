@@ -1088,6 +1088,7 @@ mod test {
             let mut channels = HashMap::new();
             channels.insert(ChannelId(2), guild_channel.clone());
 
+            #[allow(deprecated)]
             GuildCreateEvent {
                 guild: Guild {
                     id: GuildId(1),

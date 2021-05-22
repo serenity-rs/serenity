@@ -33,7 +33,7 @@ To run an example, you have various options:
  8 => Shard Manager: How to get started with using the shard manager.
  9 => Create Message Builder: How to send embeds and files.
 10 => Collectors: How to use the collectors feature to wait for messages and reactions.
-11 => Gateway Intents: How to use intents to limit the events the bot will recieve.
+11 => Gateway Intents: How to use intents to limit the events the bot will receive.
 12 => Global Data: How to use the client data to share data between commands and events safely.
 13 => Parallel Loops: How to run tasks in a loop with context access.
       Additionally, show how to send a message to a specific channel.

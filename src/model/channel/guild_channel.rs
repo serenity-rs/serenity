@@ -3,12 +3,9 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
-use bytes::buf::Buf;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "cache")]
 use futures::stream::StreamExt;
-use reqwest::Url;
-use tokio::{fs::File, io::AsyncReadExt};
 
 #[cfg(feature = "model")]
 use crate::builder::EditChannel;
@@ -111,6 +108,12 @@ pub struct GuildChannel {
 
 #[cfg(feature = "model")]
 impl GuildChannel {
+    /// Whether or not this channel is text-based, meaning that
+    /// it is possible to send messages.
+    pub fn is_text_based(&self) -> bool {
+        matches!(self.kind, ChannelType::Text | ChannelType::News)
+    }
+
     /// Broadcasts to the channel that the current user is typing.
     ///
     /// For bots, this is a good indicator for long-running commands.
@@ -1114,7 +1117,7 @@ impl GuildChannel {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
     }
 
-    /// Sends a message with just the given message content in the channel.
+    /// Creates a webhook with only a name.
     ///
     /// # Errors
     ///
@@ -1134,18 +1137,14 @@ impl GuildChannel {
             return Err(Error::Model(ModelError::NameTooShort));
         } else if name.len() > 100 {
             return Err(Error::Model(ModelError::NameTooLong));
-        } else if self.kind.num() != 0 {
+        } else if !self.is_text_based() {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        let map = serde_json::json!({
-            "name": name,
-        });
-
-        http.as_ref().create_webhook(self.id.0, &map).await
+        self.id.create_webhook(&http, name).await
     }
 
-    /// Avatar must be a 128x128 image.
+    /// Creates a webhook with a name and an avatar.
     ///
     /// # Errors
     ///
@@ -1164,48 +1163,11 @@ impl GuildChannel {
             return Err(Error::Model(ModelError::NameTooShort));
         } else if name.len() > 100 {
             return Err(Error::Model(ModelError::NameTooLong));
-        } else if self.kind.num() != 0 {
+        } else if !self.is_text_based() {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        let avatar = match avatar {
-            AttachmentType::Bytes {
-                data,
-                filename: _,
-            } => "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned()),
-            AttachmentType::File {
-                file,
-                filename: _,
-            } => {
-                let mut buf = Vec::new();
-                file.try_clone().await?.read_to_end(&mut buf).await?;
-
-                "data:image/png;base64,".to_string() + &base64::encode(&buf)
-            },
-            AttachmentType::Path(path) => {
-                let mut file = File::open(path).await?;
-                let mut buf = vec![];
-                file.read_to_end(&mut buf).await?;
-
-                "data:image/png;base64,".to_string() + &base64::encode(&buf)
-            },
-            AttachmentType::Image(url) => {
-                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
-                let response = http.as_ref().client.get(url).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = vec![0; bytes.len()];
-                bytes.copy_to_slice(&mut picture[..]);
-
-                "data:image/png;base64,".to_string() + &base64::encode(&picture)
-            },
-        };
-
-        let map = serde_json::json!({
-            "name": name,
-            "avatar": avatar
-        });
-
-        http.as_ref().create_webhook(self.id.0, &map).await
+        self.id.create_webhook_with_avatar(&http, name, avatar).await
     }
 }
 

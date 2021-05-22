@@ -1,5 +1,8 @@
 //! Models relating to guilds and types that it owns.
 
+// FIXME: Remove after `GuildEmbed` is removed.
+#![allow(deprecated)]
+
 mod audit_log;
 mod emoji;
 mod guild_id;
@@ -44,6 +47,15 @@ use crate::builder::{
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
+#[cfg(feature = "collector")]
+use crate::client::bridge::gateway::ShardMessenger;
+#[cfg(feature = "collector")]
+use crate::collector::{
+    CollectReaction,
+    CollectReply,
+    MessageCollectorBuilder,
+    ReactionCollectorBuilder,
+};
 #[cfg(feature = "model")]
 use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
@@ -2222,6 +2234,46 @@ impl Guild {
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
     }
+
+    /// Returns a future that will await one message sent in this guild.
+    #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
+    pub fn await_reply<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReply<'a> {
+        CollectReply::new(shard_messenger).guild_id(self.id.0)
+    }
+
+    /// Returns a stream builder which can be awaited to obtain a stream of messages in this guild.
+    #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
+    pub fn await_replies<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> MessageCollectorBuilder<'a> {
+        MessageCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+    }
+
+    /// Await a single reaction in this guild.
+    #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
+    pub fn await_reaction<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReaction<'a> {
+        CollectReaction::new(shard_messenger).guild_id(self.id.0)
+    }
+
+    /// Returns a stream builder which can be awaited to obtain a stream of reactions sent in this guild.
+    #[cfg(feature = "collector")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
+    pub fn await_reactions<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> ReactionCollectorBuilder<'a> {
+        ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+    }
 }
 
 impl<'de> Deserialize<'de> for Guild {
@@ -2697,6 +2749,17 @@ pub enum GuildWelcomeScreenEmoji {
     Custom(EmojiId),
     /// A unicode emoji.
     Unicode(String),
+}
+
+/// A [`Guild`] embed.
+#[deprecated(note = "GuildEmbed was renamed to GuildWidget")]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct GuildEmbed {
+    /// Whether the embed is enabled.
+    pub enabled: bool,
+    /// The widget channel id.
+    pub channel_id: Option<ChannelId>,
 }
 
 /// A [`Guild`] widget.

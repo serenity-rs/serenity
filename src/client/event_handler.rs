@@ -431,29 +431,17 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a guild integration is created.
     ///
-    /// Provides the created integration and the id of the guild this integration belongs to.
+    /// Provides the created integration.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    async fn integration_create(
-        &self,
-        _ctx: Context,
-        _integration: Integration,
-        _guild_id: GuildId,
-    ) {
-    }
+    async fn integration_create(&self, _ctx: Context, _integration: Integration) {}
 
     /// Dispatched when a guild integration is updated.
     ///
-    /// Provides the updated integration and the id of the guild this integration belongs to.
+    /// Provides the updated integration.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    async fn integration_update(
-        &self,
-        _ctx: Context,
-        _integration: Integration,
-        _guild_id: GuildId,
-    ) {
-    }
+    async fn integration_update(&self, _ctx: Context, _integration: Integration) {}
 
     /// Dispatched when a guild integration is deleted.
     ///
@@ -466,6 +454,42 @@ pub trait EventHandler: Send + Sync {
         _integration_id: IntegrationId,
         _guild_id: GuildId,
         _application_id: Option<ApplicationId>,
+    ) {
+    }
+
+    /// Dispatched when an application command is created.
+    ///
+    /// Provides the created application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_create(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
+    ) {
+    }
+
+    /// Dispatched when an application command is updated.
+    ///
+    /// Provides the updated application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_update(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
+    ) {
+    }
+
+    /// Dispatched when an application command is deleted.
+    ///
+    /// Provides the deleted application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_delete(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
     ) {
     }
 }

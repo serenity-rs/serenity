@@ -227,8 +227,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             use ::serenity::futures::future::FutureExt;
 
             async move {
-                let output: #ret = { #(#body)* };
-                output
+                let _output: #ret = { #(#body)* };
+                #[allow(unreachable_code)]
+                _output
             }.boxed()
         }
     })
@@ -522,8 +523,9 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             use ::serenity::futures::future::FutureExt;
 
             async move {
-                let output: #ret = { #(#body)* };
-                output
+                let _output: #ret = { #(#body)* };
+                #[allow(unreachable_code)]
+                _output
             }.boxed()
         }
     })
@@ -801,8 +803,9 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
             use ::serenity::futures::future::FutureExt;
 
             async move {
-                let output: #ret = { #(#body)* };
-                output
+                let _output: #ret = { #(#body)* };
+                #[allow(unreachable_code)]
+                _output
             }.boxed()
         }
     })
@@ -939,8 +942,9 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
                     use ::serenity::futures::future::FutureExt;
 
                     async move {
-                        let output: #ret = { #(#body)* };
-                        output
+                        let _output: #ret = { #(#body)* };
+                        #[allow(unreachable_code)]
+                        _output
                     }.boxed()
                 }
             })

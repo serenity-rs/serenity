@@ -821,6 +821,7 @@ mod test {
             public_flags: None,
         };
 
+        #[allow(deprecated)]
         let mut guild = Guild {
             afk_channel_id: None,
             afk_timeout: 0,
