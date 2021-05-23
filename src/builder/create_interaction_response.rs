@@ -75,7 +75,7 @@ impl CreateInteractionResponseData {
     }
 
     /// Create an embed for the message.
-    pub fn embed<F>(&mut self, f: F) -> &mut Self
+    pub fn create_embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
