@@ -2,7 +2,6 @@
 
 use bitflags::bitflags;
 use serde::de::Error as DeError;
-use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use super::prelude::*;
 use super::utils::*;
@@ -614,62 +613,19 @@ impl PresenceUser {
 }
 
 /// Information detailing the current online status of a [`User`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Presence {
     /// [`User`]'s current activities.
+    #[serde(default)]
     pub activities: Vec<Activity>,
     /// The devices a user are currently active on, if available.
+    #[serde(default)]
     pub client_status: Option<ClientStatus>,
     /// The user's online status.
     pub status: OnlineStatus,
     /// Data about the associated user.
     pub user: PresenceUser,
-}
-
-impl<'de> Deserialize<'de> for Presence {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Presence, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let user = map.remove("user").ok_or_else(|| DeError::custom("expected presence user"))?;
-        let user = from_value::<PresenceUser>(user).map_err(DeError::custom)?;
-
-        let activities = match map.remove("activities") {
-            Some(v) => from_value::<Vec<Activity>>(v).map_err(DeError::custom)?,
-            None => Vec::new(),
-        };
-
-        let client_status = match map.remove("client_status") {
-            Some(v) => from_value::<Option<ClientStatus>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let status = map
-            .remove("status")
-            .ok_or_else(|| DeError::custom("expected presence status"))
-            .and_then(OnlineStatus::deserialize)
-            .map_err(DeError::custom)?;
-
-        Ok(Presence {
-            activities,
-            client_status,
-            status,
-            user,
-        })
-    }
-}
-
-impl Serialize for Presence {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut state = serializer.serialize_struct("Presence", 3)?;
-        state.serialize_field("client_status", &self.client_status)?;
-        state.serialize_field("status", &self.status)?;
-        state.serialize_field("user", &self.user)?;
-        state.end()
-    }
 }
 
 /// An initial set of information given after IDENTIFYing to the gateway.
