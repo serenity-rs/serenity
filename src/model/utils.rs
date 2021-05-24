@@ -213,7 +213,7 @@ pub fn deserialize_presences<'de, D: Deserializer<'de>>(
     let mut presences = HashMap::new();
 
     for presence in vec {
-        presences.insert(presence.user_id, presence);
+        presences.insert(presence.user.id, presence);
     }
 
     Ok(presences)
