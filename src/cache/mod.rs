@@ -1026,7 +1026,7 @@ mod test {
                 #[cfg(feature = "unstable_discord_api")]
                 interaction: None,
                 #[cfg(feature = "unstable_discord_api")]
-                components: vec![]
+                components: vec![],
             },
         };
 

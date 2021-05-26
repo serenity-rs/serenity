@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use super::CreateAllowedMentions;
 use super::CreateEmbed;
+#[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
@@ -164,6 +165,7 @@ impl<'a> CreateMessage<'a> {
         self
     }
 
+    /// Sets the components of this message.
     #[cfg(feature = "unstable_discord_api")]
     pub fn components<F>(&mut self, f: F) -> &mut Self
     where
