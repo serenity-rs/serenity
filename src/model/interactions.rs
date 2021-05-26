@@ -16,6 +16,8 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::utils;
 
+use serde::ser::{Serialize, SerializeStruct, Serializer};
+
 /// Information about an interaction.
 ///
 /// An interaction is sent when a user invokes a slash command and is the same
@@ -953,3 +955,109 @@ impl From<CommandPermissionId> for UserId {
         Self(id.0)
     }
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub enum Component {
+    ActionRow(ActionRow),
+    Button(Button)
+}
+
+impl<'de> Deserialize<'de> for Channel {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let map = JsonMap::deserialize(deserializer)?;
+
+        let kind = map
+            .get("type")
+            .ok_or_else(|| DeError::custom("expected type"))
+            .and_then(ComponentType::deserialize)
+            .map_err(DeError::custom)?;
+
+        match kind {
+            ComponentType::ActionRow => serde_json::from_value::<ActionRow>(Value::Object(map))
+                .map(ActionRow)
+                .map_err(DeError::custom),
+            ComponentType::Button => serde_json::from_value::<Button>(Value::Object(map))
+                .map(Button)
+                .map_err(DeError::custom),
+            ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
+        }
+    }
+}
+
+impl Serialize for Component {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        match self {
+            Component::ActionRow(c) => ActionRow::serialize(c, serializer),
+            Component::Button(c) => Button::serialize(c, serializer),
+        }
+    }
+}
+
+/// The type of a component
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ComponentType {
+    ActionRow = 1,
+    Button = 2,
+    Unknown = !0,
+}
+
+enum_number!(ComponentType {
+    ActionRow,
+    Button
+});
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActionRow {
+    /// The type of component this ActionRow is.
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The components of this ActionRow.
+    pub components: Vec<ComponentType>
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Button {
+    /// The component type.
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The button style.
+    pub style: ButtonStyle,
+    /// The text which appears on the button.
+    pub label: Option<String>,
+    /// The emoji of this button, if there is one.
+    pub emoji: Option<ReactionType>,
+    /// An identifier defined by the developer for the button.
+    pub custom_id: Option<String>,
+    /// The url of the button, if there is one.
+    pub url: Option<String>,
+    /// Whether the button is disabled.
+    #[serde(default)]
+    pub disabled: bool
+}
+
+/// The style of a button.
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ButtonStyle {
+    Primary = 1,
+    Secondary = 2,
+    Success = 3,
+    Danger = 4,
+    Link = 5,
+    Unknown = !0,
+}
+
+enum_number!(InteractionType {
+    Primary,
+    Secondary,
+    Success,
+    Danger,
+    Link
+});
