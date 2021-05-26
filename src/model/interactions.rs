@@ -31,12 +31,12 @@ pub struct Interaction {
     /// The type of interaction.
     #[serde(rename = "type")]
     pub kind: InteractionType,
-    /// The data of the command which was triggered, if there is one.
+    /// The data of the interaction which was triggered.
     ///
-    /// **Note**: It is always present if the interaction [`kind`] is
-    /// [`ApplicationCommand`].
+    /// **Note**: It is always present if the interaction [`kind`] is not
+    /// [`Ping`].
     ///
-    /// [`ApplicationCommand`]: self::InteractionType::ApplicationCommand
+    /// [`Ping`]: self::InteractionType::Ping
     /// [`kind`]: Interaction::kind
     pub data: Option<InteractionData>,
     /// The message this interaction was triggered by, if
@@ -255,6 +255,7 @@ enum_number!(InteractionType {
     ApplicationCommand
 });
 
+/// The [`Interaction::data`] field.
 #[derive(Clone, Debug, Deserialize)]
 pub enum InteractionData {
     ApplicationCommand(ApplicationCommandInteractionData),
@@ -275,6 +276,7 @@ impl Serialize for InteractionData {
     }
 }
 
+/// A message component data, provided by [`Interaction::data`]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageComponent {
@@ -1036,6 +1038,7 @@ impl From<CommandPermissionId> for UserId {
     }
 }
 
+/// A component.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Component {
@@ -1092,6 +1095,7 @@ enum_number!(ComponentType {
     Button
 });
 
+/// An action row.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ActionRow {
     /// The type of component this ActionRow is.
@@ -1101,9 +1105,10 @@ pub struct ActionRow {
     pub components: Vec<Component>,
 }
 
+/// A button component.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Button {
-    /// The component type.
+    /// The component type, it will always be [`ComponentType::Button`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// The button style.
