@@ -146,17 +146,18 @@ impl Activity {
     /// # #[cfg(feature = "framework")]
     /// #[command]
     /// async fn stream(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
-    ///     let STREAM_URL= Url::parse("https://www.youtube.com/watch?v=dQw4w9WgXcQ").unwrap();
-    ///
+    ///     let STREAM_URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
     ///     let name = args.message();
+    ///
     ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL)).await;
     ///
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming<N>(name: N, url: Url) -> Activity
+    pub fn streaming<'a, N, U>(name: N, url: U) -> Activity
     where
         N: ToString,
+        U: ToString,
     {
         Activity {
             application_id: None,
@@ -175,7 +176,7 @@ impl Activity {
             sync_id: None,
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
-            url: Some(url.to_string()),
+            url: Some(Url::parse(&url.to_string()).expect("Failed to parse url").into()),
         }
     }
 
