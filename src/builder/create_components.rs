@@ -1,10 +1,7 @@
 use std::collections::HashMap;
 
-use super::CreateAllowedMentions;
-use super::CreateEmbed;
-use crate::http::AttachmentType;
 use crate::internal::prelude::*;
-use crate::model::channel::{MessageReference, ReactionType};
+use crate::model::channel::ReactionType;
 use crate::model::prelude::ButtonStyle;
 use crate::utils;
 

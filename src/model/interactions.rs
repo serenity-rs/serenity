@@ -2,7 +2,7 @@
 
 use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
-use serde::ser::{Serialize, SerializeStruct, Serializer};
+use serde::ser::{Serialize, Serializer};
 use serde_json::{Map, Number, Value};
 
 use super::prelude::*;
@@ -788,6 +788,8 @@ pub enum InteractionResponseType {
     Pong = 1,
     ChannelMessageWithSource = 4,
     DeferredChannelMessageWithSource = 5,
+    DeferredUpdateMessage = 6,
+    UpdateMessage = 7
 }
 
 /// The flags for an interaction response.
