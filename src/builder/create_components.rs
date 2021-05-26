@@ -5,12 +5,14 @@ use crate::model::channel::ReactionType;
 use crate::model::prelude::ButtonStyle;
 use crate::utils;
 
-/// Creates a component
+/// A builder for creating several [`ActionRow`]s.
+///
+/// [`ActionRow`]: crate::model::interactions::ActionRow
 #[derive(Clone, Debug, Default)]
 pub struct CreateComponents(pub Vec<Value>);
 
 impl CreateComponents {
-    /// Creates a new application command.
+    /// Creates an action row.
     pub fn create_action_row<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateActionRow) -> &mut CreateActionRow,
@@ -23,7 +25,7 @@ impl CreateComponents {
         self
     }
 
-    /// Adds a new interaction.
+    /// Adds an action row.
     pub fn add_action_row(&mut self, mut row: CreateActionRow) -> &mut Self {
         self.0.push(row.build());
 
@@ -107,8 +109,7 @@ impl CreateButton {
         self
     }
 
-    /// Sets the custom id of the button, it is a developer-defined
-    /// identifier.
+    /// Sets the custom id of the button, a developer-defined identifier.
     pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
         self.0.insert("custom_id", Value::String(id.to_string()));
         self
@@ -120,7 +121,7 @@ impl CreateButton {
         self
     }
 
-    /// Sets the disabled state for the button
+    /// Sets emoji of the button.
     pub fn emoji(&mut self, emoji: ReactionType) -> &mut Self {
         let mut map = JsonMap::new();
 
