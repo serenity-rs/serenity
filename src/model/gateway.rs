@@ -1,8 +1,12 @@
 //! Models pertaining to the gateway.
 
+use std::convert::TryFrom;
+use std::fmt::Debug;
+
 use bitflags::bitflags;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
+use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
@@ -150,10 +154,12 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming<N, U>(name: N, url: U) -> Activity
+    pub fn streaming<'a, N, U>(name: N, url: U) -> Activity
     where
         N: ToString,
-        U: ToString,
+        Url: TryFrom<U>,
+        <Url as TryFrom<U>>::Error: Debug,
+        U: 'a,
     {
         Activity {
             application_id: None,
@@ -172,7 +178,7 @@ impl Activity {
             sync_id: None,
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
-            url: Some(url.to_string()),
+            url: Some(Url::try_from(url).expect("Failed to parse url").into())
         }
     }
 
