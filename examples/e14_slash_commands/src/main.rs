@@ -3,7 +3,17 @@ use std::env;
 use serenity::{
     async_trait,
     client::bridge::gateway::GatewayIntents,
-    model::{gateway::Ready, interactions::{Interaction, InteractionResponseType, ApplicationCommand, ApplicationCommandOptionType}},
+    model::{
+        gateway::Ready,
+        interactions::{
+            ApplicationCommand,
+            ApplicationCommandInteractionDataOptionValue,
+            ApplicationCommandOptionType,
+            Interaction,
+            InteractionResponseType,
+            InteractionType,
+        },
+    },
     prelude::*,
 };
 
@@ -26,14 +36,14 @@ impl EventHandler for Handler {
                             .expect("Expected user object");
 
                         if let ApplicationCommandInteractionDataOptionValue::User(user, _member) =
-                        options
+                            options
                         {
                             format!("{}'s id is {}", user.tag(), user.id)
                         } else {
                             "Please provide a valid user".to_string()
                         }
                     },
-                    _ => "not implemented :(".to_string()
+                    _ => "not implemented :(".to_string(),
                 };
 
                 if let Err(why) = interaction
@@ -59,16 +69,13 @@ impl EventHandler for Handler {
                     command.name("ping").description("A ping command")
                 })
                 .create_application_command(|command| {
-                    command
-                        .name("id")
-                        .description("Get a user id")
-                        .create_option(|option| {
-                            option
-                                .name("id")
-                                .description("The user to lookup")
-                                .kind(ApplicationCommandOptionType::User)
-                                .required(true)
-                        })
+                    command.name("id").description("Get a user id").create_option(|option| {
+                        option
+                            .name("id")
+                            .description("The user to lookup")
+                            .kind(ApplicationCommandOptionType::User)
+                            .required(true)
+                    })
                 })
                 .create_application_command(|command| {
                     command
@@ -89,21 +96,21 @@ impl EventHandler for Handler {
                                 .required(true)
                                 .add_string_choice(
                                     "Welcome to our cool server! Ask me if you need help",
-                                    "pizza"
+                                    "pizza",
                                 )
                                 .add_string_choice("Hey, do you want a coffee?", "coffee")
                                 .add_string_choice(
                                     "Welcome to the club, you're now a good person. Well, I hope.",
-                                    "club"
+                                    "club",
                                 )
                                 .add_string_choice(
                                     "I hope that you brought a controller to play together!",
-                                    "game"
+                                    "game",
                                 )
                         })
                 })
         })
-            .await;
+        .await;
 
         println!("I have now the following global slash commands: {:#?}", commands);
     }
@@ -115,8 +122,10 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     // The Application Id is usually the Bot User Id.
-    let application_id: u64 =
-        env::var("APPLICATION_ID").expect("Expected an application id in the environment").parse().expect("application id is not a valid id");
+    let application_id: u64 = env::var("APPLICATION_ID")
+        .expect("Expected an application id in the environment")
+        .parse()
+        .expect("application id is not a valid id");
 
     // Build our client.
     let mut client = Client::builder(token)
