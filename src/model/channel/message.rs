@@ -126,6 +126,11 @@ pub struct Message {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub interaction: Option<MessageInteraction>,
+    /// The components of this message
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    #[serde(default)]
+    pub components: Vec<Component>,
 }
 
 #[cfg(feature = "model")]

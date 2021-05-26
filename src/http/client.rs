@@ -2824,6 +2824,8 @@ impl Http {
     pub async fn send_message(&self, channel_id: u64, map: &Value) -> Result<Message> {
         let body = serde_json::to_vec(map)?;
 
+        dbg!(&map);
+
         self.fire(Request {
             body: Some(&body),
             headers: None,

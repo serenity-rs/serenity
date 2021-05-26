@@ -2,6 +2,7 @@
 
 use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json::{Map, Number, Value};
 
 use super::prelude::*;
@@ -15,8 +16,6 @@ use crate::builder::{
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::utils;
-
-use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 /// Information about an interaction.
 ///
@@ -39,7 +38,10 @@ pub struct Interaction {
     ///
     /// [`ApplicationCommand`]: self::InteractionType::ApplicationCommand
     /// [`kind`]: Interaction::kind
-    pub data: Option<ApplicationCommandInteractionData>,
+    pub data: Option<InteractionData>,
+    /// The message this interaction was triggered by, if
+    /// it is a component.
+    pub message: Option<Message>,
     /// The guild Id this interaction was sent from, if there is one.
     pub guild_id: Option<GuildId>,
     /// The channel Id this interaction was sent from, if there is one.
@@ -114,15 +116,49 @@ impl<'de> Deserialize<'de> for Interaction {
             .and_then(InteractionType::deserialize)
             .map_err(DeError::custom)?;
 
-        let data = match map.contains_key("data") {
-            true => Some(
-                map.remove("data")
-                    .ok_or_else(|| DeError::custom("expected data"))
-                    .and_then(ApplicationCommandInteractionData::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
+        let data = {
+            if map.contains_key("data") {
+                match kind {
+                    InteractionType::ApplicationCommand => {
+                        Some(InteractionData::ApplicationCommand(
+                            map.remove("data")
+                                .ok_or_else(|| DeError::custom("expected data"))
+                                .and_then(ApplicationCommandInteractionData::deserialize)
+                                .map_err(DeError::custom)?,
+                        ))
+                    },
+                    InteractionType::MessageComponent => Some(InteractionData::MessageComponent(
+                        map.remove("data")
+                            .ok_or_else(|| DeError::custom("expected data"))
+                            .and_then(MessageComponent::deserialize)
+                            .map_err(DeError::custom)?,
+                    )),
+                    _ => None,
+                }
+            } else {
+                None
+            }
         };
+
+        // if map.contains_key("data") {
+        //     match kind {
+        //         InteractionType::ApplicationCommand => {
+        //             data = InteractionData::ApplicationCommand(map
+        //                 .remove("data")
+        //                 .ok_or_else(|| DeError::custom("expected data"))
+        //                 .and_then(ApplicationCommandInteractionData::deserialize)
+        //                 .map_err(DeError::custom)?);
+        //         }
+        //         InteractionType::MessageComponent => {
+        //             data = InteractionData::MessageComponent(map
+        //                 .remove("data")
+        //                 .ok_or_else(|| DeError::custom("expected data"))
+        //                 .and_then(MessageComponent::deserialize)
+        //                 .map_err(DeError::custom)?);
+        //         }
+        //         _ => {}
+        //     }
+        // }
 
         let guild_id = match map.contains_key("guild_id") {
             true => Some(
@@ -164,6 +200,16 @@ impl<'de> Deserialize<'de> for Interaction {
             false => None,
         };
 
+        let message = match map.contains_key("message") {
+            true => Some(
+                map.remove("message")
+                    .ok_or_else(|| DeError::custom("expected message"))
+                    .and_then(Message::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
         let token = map
             .remove("token")
             .ok_or_else(|| DeError::custom("expected token"))
@@ -181,6 +227,7 @@ impl<'de> Deserialize<'de> for Interaction {
             application_id,
             kind,
             data,
+            message,
             guild_id,
             channel_id,
             member,
@@ -198,13 +245,44 @@ impl<'de> Deserialize<'de> for Interaction {
 pub enum InteractionType {
     Ping = 1,
     ApplicationCommand = 2,
+    MessageComponent = 3,
     Unknown = !0,
 }
 
 enum_number!(InteractionType {
     Ping,
+    MessageComponent,
     ApplicationCommand
 });
+
+#[derive(Clone, Debug, Deserialize)]
+pub enum InteractionData {
+    ApplicationCommand(ApplicationCommandInteractionData),
+    MessageComponent(MessageComponent),
+}
+
+impl Serialize for InteractionData {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            InteractionData::ApplicationCommand(c) => {
+                ApplicationCommandInteractionData::serialize(c, serializer)
+            },
+            InteractionData::MessageComponent(c) => MessageComponent::serialize(c, serializer),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MessageComponent {
+    /// The custom id of the component.
+    pub custom_id: String,
+    /// The type of the component.
+    pub component_type: ComponentType,
+}
 
 /// The command data payload.
 #[derive(Clone, Debug, Serialize)]
@@ -956,14 +1034,14 @@ impl From<CommandPermissionId> for UserId {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Component {
     ActionRow(ActionRow),
-    Button(Button)
+    Button(Button),
 }
 
-impl<'de> Deserialize<'de> for Channel {
+impl<'de> Deserialize<'de> for Component {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
 
@@ -975,10 +1053,10 @@ impl<'de> Deserialize<'de> for Channel {
 
         match kind {
             ComponentType::ActionRow => serde_json::from_value::<ActionRow>(Value::Object(map))
-                .map(ActionRow)
+                .map(Component::ActionRow)
                 .map_err(DeError::custom),
             ComponentType::Button => serde_json::from_value::<Button>(Value::Object(map))
-                .map(Button)
+                .map(Component::Button)
                 .map_err(DeError::custom),
             ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
         }
@@ -987,8 +1065,8 @@ impl<'de> Deserialize<'de> for Channel {
 
 impl Serialize for Component {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         match self {
             Component::ActionRow(c) => ActionRow::serialize(c, serializer),
@@ -1018,7 +1096,7 @@ pub struct ActionRow {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// The components of this ActionRow.
-    pub components: Vec<ComponentType>
+    pub components: Vec<Component>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -1038,7 +1116,7 @@ pub struct Button {
     pub url: Option<String>,
     /// Whether the button is disabled.
     #[serde(default)]
-    pub disabled: bool
+    pub disabled: bool,
 }
 
 /// The style of a button.
@@ -1054,7 +1132,7 @@ pub enum ButtonStyle {
     Unknown = !0,
 }
 
-enum_number!(InteractionType {
+enum_number!(ButtonStyle {
     Primary,
     Secondary,
     Success,
