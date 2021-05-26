@@ -1,5 +1,8 @@
 //! Models pertaining to the gateway.
 
+use std::convert::TryFrom;
+use std::fmt::Debug;
+
 use bitflags::bitflags;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
@@ -154,10 +157,12 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming<N, U>(name: N, url: U) -> Activity
+    pub fn streaming<'a, N, U>(name: N, url: U) -> Activity
     where
         N: ToString,
-        U: ToString,
+        Url: TryFrom<U>,
+        <Url as TryFrom<U>>::Error: Debug,
+        U: 'a,
     {
         Activity {
             application_id: None,
