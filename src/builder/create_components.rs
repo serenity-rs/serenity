@@ -149,7 +149,7 @@ impl CreateButton {
 
     /// Sets the disabled state for the button
     pub fn disabled(&mut self, disabled: bool) -> &mut Self {
-        self.0.insert("url", Value::Bool(disabled));
+        self.0.insert("disabled", Value::Bool(disabled));
         self
     }
 
