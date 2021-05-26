@@ -154,7 +154,7 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming<'a, N, U>(name: N, url: U) -> Activity
+    pub fn streaming<N, U>(name: N, url: U) -> Activity
     where
         N: ToString,
         U: ToString,
