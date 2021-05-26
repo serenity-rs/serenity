@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::builder::CreateComponents;
 use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 use crate::{http::AttachmentType, utils};
 
@@ -120,6 +121,19 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Sets the flags for the response.
     pub fn flags(&mut self, flags: InteractionApplicationCommandCallbackDataFlags) -> &mut Self {
         self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits())));
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn components<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
+    {
+        let mut components = CreateComponents::default();
+        f(&mut components);
+
+        self.0.insert("components", Value::Array(components.0));
         self
     }
 }
