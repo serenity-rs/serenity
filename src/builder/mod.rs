@@ -76,7 +76,7 @@ pub use self::{
         CreateApplicationCommandPermissionsData,
         CreateApplicationCommandsPermissions,
     },
-    create_components::CreateComponents,
+    create_components::{CreateActionRow, CreateButton, CreateComponents},
     create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
     create_interaction_response_followup::CreateInteractionResponseFollowup,
     edit_interaction_response::EditInteractionResponse,
