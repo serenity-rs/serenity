@@ -339,7 +339,7 @@ impl<'a> Future for ClientBuilder<'a> {
 
             #[cfg(feature = "unstable_discord_api")]
             if http.application_id == 0 {
-                panic!("Please provide an Application Id in order to use slash commands features.");
+                panic!("Please provide an Application Id in order to use interactions features.");
             }
 
             #[cfg(feature = "voice")]
