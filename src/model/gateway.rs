@@ -1,6 +1,7 @@
 //! Models pertaining to the gateway.
 
 use bitflags::bitflags;
+use reqwest::Url;
 use serde::de::Error as DeError;
 
 use super::prelude::*;
@@ -67,7 +68,7 @@ pub struct Activity {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub session_id: Option<String>,
     /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
-    pub url: Option<String>,
+    pub url: Option<Url>,
 }
 
 #[cfg(feature = "model")]
@@ -150,10 +151,9 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming<N, U>(name: N, url: U) -> Activity
+    pub fn streaming<N>(name: N, url: Url) -> Activity
     where
         N: ToString,
-        U: ToString,
     {
         Activity {
             application_id: None,
@@ -172,7 +172,7 @@ impl Activity {
             sync_id: None,
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
-            url: Some(url.to_string()),
+            url: Some(url),
         }
     }
 
@@ -405,7 +405,7 @@ impl<'de> Deserialize<'de> for Activity {
             None => None,
         };
 
-        let url = map.remove("url").and_then(|v| from_value::<String>(v).ok());
+        let url = map.remove("url").and_then(|v| from_value::<Url>(v).ok());
 
         Ok(Activity {
             application_id,
@@ -515,14 +515,7 @@ pub enum ActivityType {
     Unknown = !0,
 }
 
-enum_number!(ActivityType {
-    Playing,
-    Streaming,
-    Listening,
-    Watching,
-    Custom,
-    Competing
-});
+enum_number!(ActivityType { Playing, Streaming, Listening, Watching, Custom, Competing });
 
 impl Default for ActivityType {
     fn default() -> Self {
