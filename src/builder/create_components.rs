@@ -90,9 +90,9 @@ impl CreateActionRow {
     }
 }
 
-/// A builder for creating an [`Button`].
+/// A builder for creating a [`Button`].
 ///
-/// [`ApplicationCommandPermissionData`]: crate::model::interactions::Button
+/// [`Button`]: crate::model::interactions::Button
 #[derive(Clone, Debug, Default)]
 pub struct CreateButton(pub HashMap<&'static str, Value>);
 
