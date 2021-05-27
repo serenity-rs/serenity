@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use super::{CreateAllowedMentions, CreateEmbed};
-use crate::utils;
 use crate::builder::CreateComponents;
+use crate::utils;
 
 #[derive(Clone, Debug, Default)]
 pub struct EditInteractionResponse(pub HashMap<&'static str, Value>);
@@ -81,8 +81,8 @@ impl EditInteractionResponse {
     /// Sets the components of this message.
     #[cfg(feature = "unstable_discord_api")]
     pub fn components<F>(&mut self, f: F) -> &mut Self
-        where
-            F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
+    where
+        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
     {
         let mut components = CreateComponents::default();
         f(&mut components);

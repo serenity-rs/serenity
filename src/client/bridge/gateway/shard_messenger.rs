@@ -2,6 +2,8 @@ use async_tungstenite::tungstenite::Message;
 use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
 
 use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
+#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+use crate::collector::ComponentInteractionFilter;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionFilter};
 use crate::gateway::InterMessage;
@@ -258,6 +260,14 @@ impl ShardMessenger {
     pub fn set_reaction_filter(&self, collector: ReactionFilter) {
         #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector));
+    }
+
+    /// Sets a new filter for a component interaction collector.
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg_attr(docsrs, doc(cfg(all(feature = "unstable_discord_api", feature = "collector"))))]
+    pub fn set_component_interaction_filter(&self, collector: ComponentInteractionFilter) {
+        #[allow(clippy::let_underscore_must_use)]
+        let _ = self.send_to_shard(ShardRunnerMessage::SetComponentInteractionFilter(collector));
     }
 }
 

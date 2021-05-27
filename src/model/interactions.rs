@@ -60,7 +60,6 @@ pub struct Interaction {
     pub version: u8,
 }
 
-
 impl Interaction {
     /// Gets the interaction response.
     ///
@@ -90,8 +89,8 @@ impl Interaction {
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
-        where
-            F: FnOnce(&mut CreateInteractionResponse) -> &mut CreateInteractionResponse,
+    where
+        F: FnOnce(&mut CreateInteractionResponse) -> &mut CreateInteractionResponse,
     {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
@@ -128,8 +127,8 @@ impl Interaction {
         http: impl AsRef<Http>,
         f: F,
     ) -> Result<Message>
-        where
-            F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
+    where
+        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
     {
         let mut interaction_response = EditInteractionResponse::default();
         f(&mut interaction_response);
@@ -170,8 +169,8 @@ impl Interaction {
         http: impl AsRef<Http>,
         f: F,
     ) -> Result<Message>
-        where
-                for<'b> F: FnOnce(
+    where
+        for<'b> F: FnOnce(
             &'b mut CreateInteractionResponseFollowup<'a>,
         ) -> &'b mut CreateInteractionResponseFollowup<'a>,
     {
@@ -205,8 +204,8 @@ impl Interaction {
         message_id: M,
         f: F,
     ) -> Result<Message>
-        where
-                for<'b> F: FnOnce(
+    where
+        for<'b> F: FnOnce(
             &'b mut CreateInteractionResponseFollowup<'a>,
         ) -> &'b mut CreateInteractionResponseFollowup<'a>,
     {

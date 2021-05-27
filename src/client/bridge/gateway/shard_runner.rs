@@ -18,6 +18,8 @@ use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::{dispatch, DispatchEvent};
 use crate::client::{EventHandler, RawEventHandler};
+#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+use crate::collector::ComponentInteractionFilter;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 #[cfg(feature = "framework")]
@@ -26,6 +28,8 @@ use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardActi
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
+#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+use crate::model::prelude::InteractionType;
 use crate::CacheAndHttp;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
@@ -48,6 +52,8 @@ pub struct ShardRunner {
     message_filters: Vec<MessageFilter>,
     #[cfg(feature = "collector")]
     reaction_filters: Vec<ReactionFilter>,
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    component_interaction_filters: Vec<ComponentInteractionFilter>,
 }
 
 impl ShardRunner {
@@ -72,6 +78,8 @@ impl ShardRunner {
             message_filters: Vec::new(),
             #[cfg(feature = "collector")]
             reaction_filters: Vec::new(),
+            #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+            component_interaction_filters: vec![],
         }
     }
 
@@ -228,6 +236,23 @@ impl ShardRunner {
             });
 
             retain(&mut self.reaction_filters, |f| f.send_reaction(&reaction));
+        }
+
+        // Avoid the clone if there is no interaction filter.
+        #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+        if !self.component_interaction_filters.is_empty() {
+            let interaction = Arc::new(match &event {
+                Event::InteractionCreate(ref interaction_event) => {
+                    if interaction_event.interaction.kind == InteractionType::MessageComponent {
+                        Arc::new(interaction_event.interaction.clone())
+                    } else {
+                        return;
+                    }
+                },
+                _ => return,
+            });
+
+            retain(&mut self.component_interaction_filters, |f| f.send_interaction(&interaction));
         }
     }
 
@@ -431,6 +456,14 @@ impl ShardRunner {
                 #[cfg(feature = "collector")]
                 ShardClientMessage::Runner(ShardRunnerMessage::SetReactionFilter(collector)) => {
                     self.reaction_filters.push(collector);
+
+                    true
+                },
+                #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+                ShardClientMessage::Runner(ShardRunnerMessage::SetComponentInteractionFilter(
+                    collector,
+                )) => {
+                    self.component_interaction_filters.push(collector);
 
                     true
                 },
