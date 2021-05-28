@@ -317,26 +317,6 @@ impl<'de> Deserialize<'de> for Interaction {
             }
         };
 
-        // if map.contains_key("data") {
-        //     match kind {
-        //         InteractionType::ApplicationCommand => {
-        //             data = InteractionData::ApplicationCommand(map
-        //                 .remove("data")
-        //                 .ok_or_else(|| DeError::custom("expected data"))
-        //                 .and_then(ApplicationCommandInteractionData::deserialize)
-        //                 .map_err(DeError::custom)?);
-        //         }
-        //         InteractionType::MessageComponent => {
-        //             data = InteractionData::MessageComponent(map
-        //                 .remove("data")
-        //                 .ok_or_else(|| DeError::custom("expected data"))
-        //                 .and_then(MessageComponent::deserialize)
-        //                 .map_err(DeError::custom)?);
-        //         }
-        //         _ => {}
-        //     }
-        // }
-
         let guild_id = match map.contains_key("guild_id") {
             true => Some(
                 map.remove("guild_id")
@@ -461,6 +441,9 @@ pub struct MessageComponent {
     pub custom_id: String,
     /// The type of the component.
     pub component_type: ComponentType,
+    /// The given values of the [`SelectMenu`]s
+    #[serde(default)]
+    pub values: Vec<String>
 }
 
 /// The command data payload.
@@ -1056,7 +1039,7 @@ impl From<CommandPermissionId> for UserId {
 pub enum Component {
     ActionRow(ActionRow),
     Button(Button),
-    SelectMenu(SelectMenu)
+    SelectMenu(SelectMenu),
 }
 
 impl<'de> Deserialize<'de> for Component {
@@ -1180,6 +1163,9 @@ pub struct SelectMenu {
     pub min_values: Option<u64>,
     /// The maximum number of selections allowed.
     pub max_values: Option<u64>,
+    /// The options of this select menu.
+    #[serde(default)]
+    pub options: Vec<SelectMenuOption>
 }
 
 /// A select menu component options.

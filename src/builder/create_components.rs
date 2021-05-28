@@ -231,7 +231,7 @@ impl CreateSelectMenu {
 pub struct CreateSelectMenuOptions(pub Vec<Value>);
 
 impl CreateSelectMenuOptions {
-    /// Creates an action row.
+    /// Creates an option.
     pub fn create_option<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateSelectMenuOption) -> &mut CreateSelectMenuOption,
@@ -244,7 +244,7 @@ impl CreateSelectMenuOptions {
         self
     }
 
-    /// Adds an action row.
+    /// Adds an option.
     pub fn add_option(&mut self, option: CreateSelectMenuOption) -> &mut Self {
         let data = utils::hashmap_to_json_map(option.0);
 
@@ -253,9 +253,12 @@ impl CreateSelectMenuOptions {
         self
     }
 
-    /// Sets all the action rows.
+    /// Sets all the options.
     pub fn set_options(&mut self, options: Vec<CreateSelectMenuOption>) -> &mut Self {
-        let new_options = options.into_iter().map(|option| utils::hashmap_to_json_map(option.0).into()).collect::<Vec<Value>>();
+        let new_options = options
+            .into_iter()
+            .map(|option| utils::hashmap_to_json_map(option.0).into())
+            .collect::<Vec<Value>>();
 
         for option in new_options {
             self.0.push(option);
