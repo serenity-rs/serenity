@@ -74,15 +74,6 @@ impl CreateActionRow {
         self
     }
 
-    /// Sets all the buttons.
-    pub fn set_buttons(&mut self, buttons: Vec<CreateButton>) -> &mut Self {
-        let new_components = buttons.into_iter().map(|f| f.build()).collect::<Vec<Value>>();
-
-        self.0.insert("components", Value::Array(new_components));
-
-        self
-    }
-
     pub fn build(&mut self) -> Value {
         self.0.insert("type", Value::Number(serde_json::Number::from(1 as u8)));
 
