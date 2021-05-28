@@ -1056,6 +1056,7 @@ impl From<CommandPermissionId> for UserId {
 pub enum Component {
     ActionRow(ActionRow),
     Button(Button),
+    SelectMenu(SelectMenu)
 }
 
 impl<'de> Deserialize<'de> for Component {
@@ -1075,6 +1076,9 @@ impl<'de> Deserialize<'de> for Component {
             ComponentType::Button => serde_json::from_value::<Button>(Value::Object(map))
                 .map(Component::Button)
                 .map_err(DeError::custom),
+            ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
+                .map(Component::SelectMenu)
+                .map_err(DeError::custom),
             ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
         }
     }
@@ -1088,6 +1092,7 @@ impl Serialize for Component {
         match self {
             Component::ActionRow(c) => ActionRow::serialize(c, serializer),
             Component::Button(c) => Button::serialize(c, serializer),
+            Component::SelectMenu(c) => SelectMenu::serialize(c, serializer),
         }
     }
 }
@@ -1099,12 +1104,14 @@ impl Serialize for Component {
 pub enum ComponentType {
     ActionRow = 1,
     Button = 2,
+    SelectMenu = 3,
     Unknown = !0,
 }
 
 enum_number!(ComponentType {
     ActionRow,
-    Button
+    Button,
+    SelectMenu
 });
 
 /// An action row.
@@ -1158,3 +1165,34 @@ enum_number!(ButtonStyle {
     Danger,
     Link
 });
+
+/// A select menu component.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct SelectMenu {
+    /// The component type, it will always be [`ComponentType::SelectMenu`].
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The placeholder shown when nothing is selected.
+    pub placeholder: Option<String>,
+    /// An identifier defined by the developer for the select menu.
+    pub custom_id: Option<String>,
+    /// The minimum number of selections allowed.
+    pub min_values: Option<u64>,
+    /// The maximum number of selections allowed.
+    pub max_values: Option<u64>,
+}
+
+/// A select menu component options.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct SelectMenuOption {
+    /// The text displayed on this option.
+    pub label: String,
+    /// The value to be sent for this option.
+    pub value: String,
+    /// The description shown for this option.
+    pub description: Option<String>,
+    /// The emoji displayed on this option.
+    pub emoji: Option<ReactionType>,
+    /// Render this option as the default selection.
+    pub default: bool,
+}
