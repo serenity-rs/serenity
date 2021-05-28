@@ -128,7 +128,9 @@ impl CreateApplicationCommandPermissionsData {
     /// Creates a permission for the interaction.
     pub fn create_permission<F>(&mut self, f: F) -> &mut Self
     where
-        F: FnOnce(&mut CreateApplicationCommandPermissionData) -> &mut Self,
+        F: FnOnce(
+            &mut CreateApplicationCommandPermissionData,
+        ) -> &mut CreateApplicationCommandPermissionData,
     {
         let mut data = CreateApplicationCommandPermissionData::default();
         f(&mut data);
