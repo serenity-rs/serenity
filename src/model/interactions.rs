@@ -365,7 +365,7 @@ impl<'de> Deserialize<'de> for Interaction {
                 let value: Value = message.into();
 
                 if partial {
-                    Some(InteractionMessageType::InteractionMessage(InteractionMessage::deserialize(value).map_err(DeError::custom)?))
+                    Some(InteractionMessageType::EphemeralMessage(EphemeralMessage::deserialize(value).map_err(DeError::custom)?))
                 } else {
                     Some(InteractionMessageType::Message(Message::deserialize(value).map_err(DeError::custom)?))
                 }
@@ -515,7 +515,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
 #[derive(Clone, Debug, Deserialize)]
 pub enum InteractionMessageType {
     Message(Message),
-    InteractionMessage(InteractionMessage),
+    EphemeralMessage(EphemeralMessage),
 }
 
 impl Serialize for InteractionMessageType {
@@ -527,14 +527,14 @@ impl Serialize for InteractionMessageType {
             InteractionMessageType::Message(c) => {
                 Message::serialize(c, serializer)
             },
-            InteractionMessageType::InteractionMessage(c) => InteractionMessage::serialize(c, serializer),
+            InteractionMessageType::EphemeralMessage(c) => EphemeralMessage::serialize(c, serializer),
         }
     }
 }
 
-/// A message given in an interaction.
+/// An ephemeral message given in an interaction.
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct InteractionMessage {
+pub struct EphemeralMessage {
     /// The message flags.
     pub flags: MessageFlags,
     /// The message Id.

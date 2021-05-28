@@ -150,7 +150,7 @@ impl ComponentInteractionFilter {
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
             && self.options.message_id.map_or(true, |id| {
                 match interaction.message.as_ref().expect("expected message id") {
-                    InteractionMessageType::InteractionMessage(m) => id == m.id.0,
+                    InteractionMessageType::EphemeralMessage(m) => id == m.id.0,
                     InteractionMessageType::Message(m) => id == m.id.0,
                 }
             })
