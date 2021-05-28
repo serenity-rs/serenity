@@ -359,15 +359,23 @@ impl<'de> Deserialize<'de> for Interaction {
 
         let message = match map.contains_key("message") {
             true => {
-                let message = map.remove("message").ok_or_else(|| DeError::custom("expected message")).and_then(JsonMap::deserialize).map_err(DeError::custom)?;
+                let message = map
+                    .remove("message")
+                    .ok_or_else(|| DeError::custom("expected message"))
+                    .and_then(JsonMap::deserialize)
+                    .map_err(DeError::custom)?;
                 let partial = !message.contains_key("author");
 
                 let value: Value = message.into();
 
                 if partial {
-                    Some(InteractionMessageType::EphemeralMessage(EphemeralMessage::deserialize(value).map_err(DeError::custom)?))
+                    Some(InteractionMessageType::EphemeralMessage(
+                        EphemeralMessage::deserialize(value).map_err(DeError::custom)?,
+                    ))
                 } else {
-                    Some(InteractionMessageType::Message(Message::deserialize(value).map_err(DeError::custom)?))
+                    Some(InteractionMessageType::Message(
+                        Message::deserialize(value).map_err(DeError::custom)?,
+                    ))
                 }
             },
             false => None,
@@ -449,7 +457,7 @@ pub struct MessageComponent {
     pub component_type: ComponentType,
     /// The given values of the [`SelectMenu`]s
     #[serde(default)]
-    pub values: Vec<String>
+    pub values: Vec<String>,
 }
 
 /// The command data payload.
@@ -520,14 +528,14 @@ pub enum InteractionMessageType {
 
 impl Serialize for InteractionMessageType {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         match self {
-            InteractionMessageType::Message(c) => {
-                Message::serialize(c, serializer)
+            InteractionMessageType::Message(c) => Message::serialize(c, serializer),
+            InteractionMessageType::EphemeralMessage(c) => {
+                EphemeralMessage::serialize(c, serializer)
             },
-            InteractionMessageType::EphemeralMessage(c) => EphemeralMessage::serialize(c, serializer),
         }
     }
 }
@@ -538,7 +546,7 @@ pub struct EphemeralMessage {
     /// The message flags.
     pub flags: MessageFlags,
     /// The message Id.
-    pub id: MessageId
+    pub id: MessageId,
 }
 
 /// The resolved data of a command data interaction payload.
@@ -1201,7 +1209,7 @@ pub struct SelectMenu {
     pub max_values: Option<u64>,
     /// The options of this select menu.
     #[serde(default)]
-    pub options: Vec<SelectMenuOption>
+    pub options: Vec<SelectMenuOption>,
 }
 
 /// A select menu component options.
