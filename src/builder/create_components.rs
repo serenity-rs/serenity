@@ -193,39 +193,13 @@ impl CreateSelectMenu {
         self
     }
 
-    /// Sets emoji of the button.
-    pub fn emoji(&mut self, emoji: ReactionType) -> &mut Self {
-        let mut map = JsonMap::new();
-
-        match emoji {
-            ReactionType::Unicode(u) => {
-                map.insert("name".to_string(), Value::String(u));
-            },
-            ReactionType::Custom {
-                animated,
-                id,
-                name,
-            } => {
-                map.insert("animated".to_string(), Value::Bool(animated));
-                map.insert("id".to_string(), Value::String(id.to_string()));
-
-                if let Some(name) = name {
-                    map.insert("name".to_string(), Value::String(name));
-                }
-            },
-        };
-
-        self.0.insert("emoji", Value::Object(map));
-        self
-    }
-
-    /// Sets the minimum values to be selected.
+    /// Sets the minimum values for the user to select.
     pub fn min_values(&mut self, min: u64) -> &mut Self {
         self.0.insert("min_values", Value::Number(Number::from(min)));
         self
     }
 
-    /// Sets the minimum values to be selected.
+    /// Sets the maximum values for the user to select.
     pub fn max_values(&mut self, max: u64) -> &mut Self {
         self.0.insert("max_values", Value::Number(Number::from(max)));
         self
