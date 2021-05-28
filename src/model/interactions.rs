@@ -41,7 +41,7 @@ pub struct Interaction {
     pub data: Option<InteractionData>,
     /// The message this interaction was triggered by, if
     /// it is a component.
-    pub message: Option<Message>,
+    pub message: Option<InteractionMessageType>,
     /// The guild Id this interaction was sent from, if there is one.
     pub guild_id: Option<GuildId>,
     /// The channel Id this interaction was sent from, if there is one.
@@ -358,12 +358,18 @@ impl<'de> Deserialize<'de> for Interaction {
         };
 
         let message = match map.contains_key("message") {
-            true => Some(
-                map.remove("message")
-                    .ok_or_else(|| DeError::custom("expected message"))
-                    .and_then(Message::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
+            true => {
+                let message = map.remove("message").ok_or_else(|| DeError::custom("expected message")).and_then(JsonMap::deserialize).map_err(DeError::custom)?;
+                let partial = !message.contains_key("author");
+
+                let value: Value = message.into();
+
+                if partial {
+                    Some(InteractionMessageType::InteractionMessage(InteractionMessage::deserialize(value).map_err(DeError::custom)?))
+                } else {
+                    Some(InteractionMessageType::Message(Message::deserialize(value).map_err(DeError::custom)?))
+                }
+            },
             false => None,
         };
 
@@ -503,6 +509,36 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             resolved,
         })
     }
+}
+
+/// The [`Interaction::message`] field.
+#[derive(Clone, Debug, Deserialize)]
+pub enum InteractionMessageType {
+    Message(Message),
+    InteractionMessage(InteractionMessage),
+}
+
+impl Serialize for InteractionMessageType {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        match self {
+            InteractionMessageType::Message(c) => {
+                Message::serialize(c, serializer)
+            },
+            InteractionMessageType::InteractionMessage(c) => InteractionMessage::serialize(c, serializer),
+        }
+    }
+}
+
+/// A message given in an interaction.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct InteractionMessage {
+    /// The message flags.
+    pub flags: MessageFlags,
+    /// The message Id.
+    pub id: MessageId
 }
 
 /// The resolved data of a command data interaction payload.
@@ -955,7 +991,7 @@ pub enum InteractionResponseType {
 }
 
 /// The flags for an interaction response.
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct InteractionApplicationCommandCallbackDataFlags {
     bits: u64,

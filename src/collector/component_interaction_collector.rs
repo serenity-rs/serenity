@@ -22,7 +22,7 @@ use tokio::time::{delay_for as sleep, Delay as Sleep};
 use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
-use crate::model::interactions::Interaction;
+use crate::model::interactions::{Interaction, InteractionMessageType};
 
 macro_rules! impl_component_interaction_collector {
     ($($name:ident;)*) => {
@@ -149,7 +149,10 @@ impl ComponentInteractionFilter {
     fn is_passing_constraints(&self, interaction: &Arc<Interaction>) -> bool {
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
             && self.options.message_id.map_or(true, |id| {
-                id == interaction.message.as_ref().expect("expected message id").id.0
+                match interaction.message.as_ref().expect("expected message id") {
+                    InteractionMessageType::InteractionMessage(m) => id == m.id.0,
+                    InteractionMessageType::Message(m) => id == m.id.0,
+                }
             })
             && self.options.channel_id.map_or(true, |id| {
                 id == interaction.channel_id.as_ref().expect("expected channel id").0
