@@ -138,7 +138,7 @@ impl CreateButton {
         self
     }
 
-    /// Sets the disabled state for the button
+    /// Sets the disabled state for the button.
     pub fn disabled(&mut self, disabled: bool) -> &mut Self {
         self.0.insert("disabled", Value::Bool(disabled));
         self

@@ -317,26 +317,6 @@ impl<'de> Deserialize<'de> for Interaction {
             }
         };
 
-        // if map.contains_key("data") {
-        //     match kind {
-        //         InteractionType::ApplicationCommand => {
-        //             data = InteractionData::ApplicationCommand(map
-        //                 .remove("data")
-        //                 .ok_or_else(|| DeError::custom("expected data"))
-        //                 .and_then(ApplicationCommandInteractionData::deserialize)
-        //                 .map_err(DeError::custom)?);
-        //         }
-        //         InteractionType::MessageComponent => {
-        //             data = InteractionData::MessageComponent(map
-        //                 .remove("data")
-        //                 .ok_or_else(|| DeError::custom("expected data"))
-        //                 .and_then(MessageComponent::deserialize)
-        //                 .map_err(DeError::custom)?);
-        //         }
-        //         _ => {}
-        //     }
-        // }
-
         let guild_id = match map.contains_key("guild_id") {
             true => Some(
                 map.remove("guild_id")
