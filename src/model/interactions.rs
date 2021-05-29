@@ -41,7 +41,7 @@ pub struct Interaction {
     pub data: Option<InteractionData>,
     /// The message this interaction was triggered by, if
     /// it is a component.
-    pub message: Option<InteractionMessageType>,
+    pub message: Option<InteractionMessage>,
     /// The guild Id this interaction was sent from, if there is one.
     pub guild_id: Option<GuildId>,
     /// The channel Id this interaction was sent from, if there is one.
@@ -369,11 +369,11 @@ impl<'de> Deserialize<'de> for Interaction {
                 let value: Value = message.into();
 
                 if partial {
-                    Some(InteractionMessageType::EphemeralMessage(
+                    Some(InteractionMessage::Ephemeral(
                         EphemeralMessage::deserialize(value).map_err(DeError::custom)?,
                     ))
                 } else {
-                    Some(InteractionMessageType::Message(
+                    Some(InteractionMessage::Regular(
                         Message::deserialize(value).map_err(DeError::custom)?,
                     ))
                 }
@@ -521,21 +521,52 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
 
 /// The [`Interaction::message`] field.
 #[derive(Clone, Debug, Deserialize)]
-pub enum InteractionMessageType {
-    Message(Message),
-    EphemeralMessage(EphemeralMessage),
+pub enum InteractionMessage {
+    Regular(Message),
+    Ephemeral(EphemeralMessage),
 }
 
-impl Serialize for InteractionMessageType {
+impl InteractionMessage {
+    /// Whether the message is ephemeral.
+    pub fn is_ephemeral(&self) -> bool {
+        matches!(self, InteractionMessage::Ephemeral(_))
+    }
+
+    /// Gets the message Id.
+    pub fn id(&self) -> MessageId {
+        match self {
+            InteractionMessage::Regular(m) => m.id,
+            InteractionMessage::Ephemeral(m) => m.id,
+        }
+    }
+
+    /// Converts this to a regular message,
+    /// if it is one.
+    pub fn regular(self) -> Option<Message> {
+        match self {
+            InteractionMessage::Regular(m) => Some(m),
+            InteractionMessage::Ephemeral(_) => None,
+        }
+    }
+
+    /// Converts this to an ephemeral message,
+    /// if it is one.
+    pub fn ephemeral(self) -> Option<EphemeralMessage> {
+        match self {
+            InteractionMessage::Regular(_) => None,
+            InteractionMessage::Ephemeral(m) => Some(m),
+        }
+    }
+}
+
+impl Serialize for InteractionMessage {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
     where
         S: Serializer,
     {
         match self {
-            InteractionMessageType::Message(c) => Message::serialize(c, serializer),
-            InteractionMessageType::EphemeralMessage(c) => {
-                EphemeralMessage::serialize(c, serializer)
-            },
+            InteractionMessage::Regular(c) => Message::serialize(c, serializer),
+            InteractionMessage::Ephemeral(c) => EphemeralMessage::serialize(c, serializer),
         }
     }
 }
