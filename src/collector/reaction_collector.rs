@@ -140,11 +140,7 @@ impl ReactionAction {
     }
 
     pub fn is_removed(&self) -> bool {
-        if let Self::Removed(_) = &self {
-            true
-        } else {
-            false
-        }
+        matches!(self, Self::Removed(_))
     }
 }
 
