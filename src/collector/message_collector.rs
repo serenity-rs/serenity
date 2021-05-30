@@ -116,7 +116,7 @@ impl MessageFilter {
             if self.options.filter.as_ref().map_or(true, |f| f(&message)) {
                 self.collected += 1;
 
-                if let Err(_) = self.sender.send(Arc::clone(message)) {
+                if self.sender.send(Arc::clone(message)).is_err() {
                     return false;
                 }
             }
