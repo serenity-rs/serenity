@@ -22,7 +22,7 @@ use tokio::time::{delay_for as sleep, Delay as Sleep};
 use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
-use crate::model::interactions::{Interaction, InteractionMessage};
+use crate::model::interactions::Interaction;
 
 macro_rules! impl_component_interaction_collector {
     ($($name:ident;)*) => {
