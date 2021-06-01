@@ -158,7 +158,7 @@ fn set_resolved(
                 Some(ApplicationCommandInteractionDataOptionValue::Role(role))
             },
             ApplicationCommandOptionType::Channel => {
-                let id = &ChannelIdstring.unwrap().parse().unwrap());
+                let id = &ChannelIdstring.unwrap().parse().unwrap();
 
                 let channel = resolved.channels.get(id).unwrap().to_owned();
 
