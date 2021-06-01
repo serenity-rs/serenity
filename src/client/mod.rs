@@ -294,7 +294,7 @@ impl<'a> ClientBuilder<'a> {
     }
 
     /// Sets how long the http client should wait for the entire response from the Discord API.
-    /// By default, an http request will never timeout, it could create a deadlock sometimes.
+    /// By default, a http request will never timeout, it could create a deadlock sometimes.
     ///
     /// *Info*:
     /// Setting http request timeout will override any custom http instance configured on the client.
