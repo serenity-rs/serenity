@@ -338,9 +338,9 @@ impl<'a> Future for ClientBuilder<'a> {
             let http = Arc::new(self.http.take().unwrap());
 
             #[cfg(feature = "unstable_discord_api")]
-            self.application_id.expect(
-                "Please provide an Application Id in order to use slash commands features.",
-            );
+            if http.application_id == 0 {
+                panic!("Please provide an Application Id in order to use interactions features.");
+            }
 
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();
