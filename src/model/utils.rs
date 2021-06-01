@@ -143,7 +143,7 @@ fn set_resolved(
 
         options.resolved = match options.kind {
             ApplicationCommandOptionType::User => {
-                let id = &UserIdstring.unwrap().parse().unwrap());
+                let id = &UserIdstring.unwrap().parse().unwrap();
 
                 let user = resolved.users.get(id).unwrap().to_owned();
                 let member = resolved.members.get(id).map(|m| m.to_owned());
@@ -151,7 +151,7 @@ fn set_resolved(
                 Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
             },
             ApplicationCommandOptionType::Role => {
-                let id = &RoleIdstring.unwrap().parse().unwrap());
+                let id = &RoleIdstring.unwrap().parse().unwrap();
 
                 let role = resolved.roles.get(id).unwrap().to_owned();
 
