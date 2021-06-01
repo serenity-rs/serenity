@@ -96,9 +96,6 @@ jobs:
     steps:
       - name: Setup | Checkout
         uses: actions/checkout@v2
-      - name: Setup | libdbus (ubuntu)
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get install libdbus-1-dev
 
       - name: Setup | Rust
         uses: actions-rs/toolchain@v1

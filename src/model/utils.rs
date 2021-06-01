@@ -143,7 +143,7 @@ fn set_resolved(
 
         options.resolved = match options.kind {
             ApplicationCommandOptionType::User => {
-                let id = &UserIdstring.unwrap().parse().unwrap();
+                let id = &UserId().unwrap().parse().unwrap();
 
                 let user = resolved.users.get(id).unwrap().to_owned();
                 let member = resolved.members.get(id).map(|m| m.to_owned());
@@ -158,7 +158,7 @@ fn set_resolved(
                 Some(ApplicationCommandInteractionDataOptionValue::Role(role))
             },
             ApplicationCommandOptionType::Channel => {
-                let id = &ChannelId(*&string.unwrap().parse().unwrap());
+                let id = &ChannelId(string.unwrap().parse().unwrap());
 
                 let channel = resolved.channels.get(id).unwrap().to_owned();
 
