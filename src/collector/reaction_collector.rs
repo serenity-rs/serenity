@@ -136,7 +136,7 @@ impl ReactionAction {
     }
 
     pub fn is_added(&self) -> bool {
-        matches!(self, self::Added(_))
+        matches!(self, Self::Added(_))
     }
 
     pub fn is_removed(&self) -> bool {
