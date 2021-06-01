@@ -143,7 +143,7 @@ fn set_resolved(
 
         options.resolved = match options.kind {
             ApplicationCommandOptionType::User => {
-                let id = &UserId().parse().unwrap();
+                let id = &UserId(string.unwrap().parse().unwrap());
 
                 let user = resolved.users.get(id).unwrap().to_owned();
                 let member = resolved.members.get(id).map(|m| m.to_owned());
