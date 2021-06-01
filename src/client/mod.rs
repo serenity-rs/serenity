@@ -300,22 +300,16 @@ impl<'a> ClientBuilder<'a> {
     /// Setting http request timeout will override any custom http instance configured on the client.
     pub fn http_request_timeout(mut self, timeout: Duration) -> Self {
         self.http_request_timeout = Some(timeout);
-        match self.http {
-            Some(old_http) => {
-                self.http = Some(Http::new_with_timeouts(
-                    self.http_request_timeout,
-                    self.http_connect_timeout,
-                    &old_http.token,
-                ));
-            },
-            None => {
-                self.http = Some(Http::new_with_timeouts(
-                    self.http_request_timeout,
-                    self.http_connect_timeout,
-                    "",
-                ));
-            },
+        let old_token = match self.http {
+            Some(old_http) => &old_http.token,
+            None => "",
         };
+
+        self.http = Some(Http::new_with_timeouts(
+            self.http_request_timeout,
+            self.http_connect_timeout,
+            old_token,
+        ));
         self
     }
 
