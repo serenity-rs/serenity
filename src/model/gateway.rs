@@ -1,5 +1,7 @@
 //! Models pertaining to the gateway.
 
+use std::convert::TryFrom;
+
 use bitflags::bitflags;
 use reqwest::Url;
 use serde::de::Error as DeError;
@@ -151,9 +153,10 @@ impl Activity {
     ///     Ok(())
     /// }
     /// ```
-    pub fn streaming<N>(name: N, url: Url) -> Activity
+    pub fn streaming<N, U>(name: N, url: U) -> Activity
     where
         N: ToString,
+        U: AsRef<str>,
     {
         Activity {
             application_id: None,
@@ -172,7 +175,7 @@ impl Activity {
             sync_id: None,
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
-            url: Some(url),
+            url: Some(Url::try_from(url.as_ref()).expect("Failed to parse url")),
         }
     }
 
