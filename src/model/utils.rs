@@ -151,7 +151,7 @@ fn set_resolved(
                 Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
             },
             ApplicationCommandOptionType::Role => {
-                let id = &RoleId(*&string.unwrap().parse().unwrap());
+                let id = &RoleId(string.unwrap().parse().unwrap());
 
                 let role = resolved.roles.get(id).unwrap().to_owned();
 
