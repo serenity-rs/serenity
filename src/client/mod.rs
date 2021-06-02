@@ -342,10 +342,10 @@ impl<'a> ClientBuilder<'a> {
         #[cfg(feature = "unstable_discord_api")]
         {
             self.http = Some(Http::new_with_token_application_id(
+                &old_token,
                 self.application_id,
                 self.http_request_timeout,
                 self.http_connect_timeout,
-                &old_token,
             ));
         }
 
@@ -375,10 +375,10 @@ impl<'a> ClientBuilder<'a> {
         #[cfg(feature = "unstable_discord_api")]
         {
             self.http = Some(Http::new_with_token_application_id(
+                &old_token,
                 self.application_id,
                 self.http_request_timeout,
                 self.http_connect_timeout,
-                &old_token,
             ));
         }
 
