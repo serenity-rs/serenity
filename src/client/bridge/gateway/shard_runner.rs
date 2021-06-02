@@ -241,18 +241,15 @@ impl ShardRunner {
         // Avoid the clone if there is no interaction filter.
         #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
         if !self.component_interaction_filters.is_empty() {
-            let interaction = Arc::new(match &event {
-                Event::InteractionCreate(ref interaction_event) => {
-                    if interaction_event.interaction.kind == InteractionType::MessageComponent {
-                        Arc::new(interaction_event.interaction.clone())
-                    } else {
-                        return;
-                    }
-                },
-                _ => return,
-            });
+            if let Event::InteractionCreate(ref interaction_event) = &event {
+                if interaction_event.interaction.kind == InteractionType::MessageComponent {
+                    let interaction = Arc::new(interaction_event.interaction.clone());
 
-            retain(&mut self.component_interaction_filters, |f| f.send_interaction(&interaction));
+                    retain(&mut self.component_interaction_filters, |f| {
+                        f.send_interaction(&interaction)
+                    });
+                }
+            }
         }
     }
 
