@@ -150,7 +150,7 @@ impl<'a> ClientBuilder<'a> {
 
         let token =
             if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
-
+        
         self.http = Some(Http::new_with_timeouts(
             self.http_request_timeout,
             self.http_connect_timeout,
@@ -339,12 +339,24 @@ impl<'a> ClientBuilder<'a> {
             Some(old_http) => old_http.token.to_owned(),
             None => String::new(),
         };
+        #[cfg(feature = "unstable_discord_api")]
+        {
+            self.http = Some(Http::new_with_application_id(
+                self.application_id,
+                self.http_request_timeout,
+                self.http_connect_timeout,
+                &old_token,
+            ));
+        }
 
-        self.http = Some(Http::new_with_timeouts(
-            self.http_request_timeout,
-            self.http_connect_timeout,
-            &old_token,
-        ));
+        #[cfg(not(feature = "unstable_discord_api"))]
+        {
+            self.http = Some(Http::new_with_timeouts(
+                self.http_request_timeout,
+                self.http_connect_timeout,
+                &old_token,
+            ));
+        }
         self
     }
 
@@ -360,11 +372,25 @@ impl<'a> ClientBuilder<'a> {
             None => String::new(),
         };
 
-        self.http = Some(Http::new_with_timeouts(
-            self.http_request_timeout,
-            self.http_connect_timeout,
-            &old_token,
-        ));
+        #[cfg(feature = "unstable_discord_api")]
+        {
+            self.http = Some(Http::new_with_application_id(
+                self.application_id,
+                self.http_request_timeout,
+                self.http_connect_timeout,
+                &old_token,
+            ));
+        }
+
+        #[cfg(not(feature = "unstable_discord_api"))]
+        {
+            self.http = Some(Http::new_with_timeouts(
+                self.http_request_timeout,
+                self.http_connect_timeout,
+                &old_token,
+            ));
+        }
+        
         self
     }
 }
