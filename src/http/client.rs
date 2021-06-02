@@ -254,7 +254,7 @@ impl Http {
         timeout: Option<std::time::Duration>,
         connect_timeout: Option<std::time::Duration>,
     ) -> Self {
-        let builder = configure_client_backend(Client::builder());
+        let mut builder = configure_client_backend(Client::builder());
       
         if let Some(t) = timeout {
             builder = builder.timeout(t);
