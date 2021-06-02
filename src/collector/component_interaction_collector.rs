@@ -187,7 +187,7 @@ struct FilterOptions {
 
 impl std::fmt::Debug for FilterOptions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("ReactionFilter")
+        f.debug_struct("ComponentInteractionFilter")
             .field("collect_limit", &self.collect_limit)
             .field("filter", &"Option<Arc<dyn Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>>")
             .field("channel_id", &self.channel_id)

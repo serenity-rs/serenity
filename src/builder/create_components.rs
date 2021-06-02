@@ -74,7 +74,7 @@ impl CreateActionRow {
         self
     }
 
-    /// Creates a button.
+    /// Creates a select menu.
     pub fn create_select_menu<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateSelectMenu) -> &mut CreateSelectMenu,
@@ -87,7 +87,7 @@ impl CreateActionRow {
         self
     }
 
-    /// Adds a button.
+    /// Adds a select menu.
     pub fn add_select_menu(&mut self, menu: CreateSelectMenu) -> &mut Self {
         let components = self.0.entry("components").or_insert_with(|| Value::Array(Vec::new()));
         let components_array = components.as_array_mut().expect("Must be an array");
