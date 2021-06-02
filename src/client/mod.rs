@@ -168,7 +168,12 @@ impl<'a> ClientBuilder<'a> {
         self.application_id = Some(ApplicationId(application_id));
 
         self.http =
-            Some(Http::new_with_token_application_id(&self.token.clone().unwrap(), application_id));
+            Some(Http::new_with_token_application_id(
+                &self.token.clone().unwrap(), 
+                application_id, 
+                self.http_request_timeout, 
+                self.http_connect_timeout,
+            ));
 
         self
     }
@@ -331,14 +336,14 @@ impl<'a> ClientBuilder<'a> {
     pub fn http_request_timeout(mut self, timeout: Duration) -> Self {
         self.http_request_timeout = Some(timeout);
         let old_token = match self.http {
-            Some(old_http) => &old_http.token,
-            None => "",
+            Some(old_http) => old_http.token.to_owned(),
+            None => String::new(),
         };
 
         self.http = Some(Http::new_with_timeouts(
             self.http_request_timeout,
             self.http_connect_timeout,
-            old_token,
+            &old_token,
         ));
         self
     }
@@ -351,14 +356,14 @@ impl<'a> ClientBuilder<'a> {
     pub fn http_connect_timeout(mut self, timeout: Duration) -> Self {
         self.http_connect_timeout = Some(timeout);
         let old_token = match self.http {
-            Some(old_http) => &old_http.token,
-            None => "",
+            Some(old_http) => old_http.token.to_owned(),
+            None => String::new(),
         };
 
         self.http = Some(Http::new_with_timeouts(
             self.http_request_timeout,
             self.http_connect_timeout,
-            old_token,
+            &old_token,
         ));
         self
     }
