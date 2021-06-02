@@ -200,10 +200,16 @@ pub(crate) fn dispatch<'rec>(
                         &cache_and_http.cache,
                     );
 
-                    dispatch_message(context.clone(), event.message.clone(), h).await;
+                    #[cfg(not(feature = "framework"))]
+                    {
+                        // Avoid cloning if there will be no framework dispatch.
+                        dispatch_message(context, event.message, h).await;
+                    }
 
                     #[cfg(feature = "framework")]
                     {
+                        dispatch_message(context.clone(), event.message.clone(), h).await;
+
                         let framework = Arc::clone(&framework);
 
                         tokio::spawn(async move {
@@ -233,8 +239,10 @@ pub(crate) fn dispatch<'rec>(
                     );
 
                     #[cfg(not(feature = "framework"))]
-                    // No clone needed, as there will be no framework disaptch.
-                    event_handler.raw_event(context, event).await;
+                    {
+                        // No clone needed, as there will be no framework dispatch.
+                        event_handler.raw_event(context, event).await;
+                    }
 
                     #[cfg(feature = "framework")]
                     {
@@ -249,7 +257,7 @@ pub(crate) fn dispatch<'rec>(
                                 framework.dispatch(context, message).await;
                             });
                         } else {
-                            // Avoid cloning, if there is no framework-dispatch.
+                            // Avoid cloning if there will be no framework dispatch.
                             event_handler.raw_event(context, event).await;
                         }
                     }
@@ -270,10 +278,16 @@ pub(crate) fn dispatch<'rec>(
 
                 match event {
                     DispatchEvent::Model(Event::MessageCreate(event)) => {
-                        dispatch_message(context.clone(), event.message.clone(), handler).await;
+                        #[cfg(not(feature = "framework"))]
+                        {
+                            // Avoid cloning if there will be no framework dispatch.
+                            dispatch_message(context, event.message, handler).await;
+                        }
 
                         #[cfg(feature = "framework")]
                         {
+                            dispatch_message(context.clone(), event.message.clone(), handler).await;
+
                             let framework = Arc::clone(&framework);
                             let message = event.message;
                             tokio::spawn(async move {
@@ -744,6 +758,56 @@ async fn handle_event(
 
             tokio::spawn(async move {
                 event_handler.interaction_create(context, event.interaction).await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::IntegrationCreate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.integration_create(context, event.integration).await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::IntegrationUpdate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.integration_update(context, event.integration).await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::IntegrationDelete(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler
+                    .integration_delete(context, event.id, event.guild_id, event.application_id)
+                    .await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::ApplicationCommandCreate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.application_command_create(context, event.application_command).await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::ApplicationCommandUpdate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.application_command_update(context, event.application_command).await;
+            });
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        DispatchEvent::Model(Event::ApplicationCommandDelete(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.application_command_delete(context, event.application_command).await;
             });
         },
     }

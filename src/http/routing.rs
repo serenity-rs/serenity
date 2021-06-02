@@ -145,12 +145,18 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdChannels(u64),
-    /// Route for the `/guilds/:guild_id/embed` path.
+    /// Route for the `/guilds/:guild_id/widget` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
     /// [`GuildId`]: crate::model::id::GuildId
-    GuildsIdEmbed(u64),
+    GuildsIdWidget(u64),
+    /// Route for the `/guilds/:guild_id/preview` path.
+    ///
+    /// The data is the relevant [`GuildPreview`].
+    ///
+    /// [`GuildPreview`]: crate::model::guild::GuildPreview
+    GuildsIdPreview(u64),
     /// Route for the `/guilds/:guild_id/emojis` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -260,6 +266,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdWebhooks(u64),
+    /// Route for the `/guilds/:guild_id/welcome-screen` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdWelcomeScreen(u64),
     /// Route for the `/invites/:code` path.
     InvitesCode,
     /// Route for the `/users/:user_id` path.
@@ -322,6 +334,22 @@ pub enum Route {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationsIdGuildsIdCommands(u64),
+    /// Route for the `/applications/:application_id/guilds/:guild_id/commands/permissions` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationsIdGuildsIdCommandsPermissions(u64),
+    /// Route for the `/applications/:application_id/guilds/:guild_id/commands/:command_id/permissions` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationsIdGuildsIdCommandIdPermissions(u64),
     /// Route for the `/applications/:application_id/guilds/:guild_id` path.
     ///
     /// The data is the relevant [`ApplicationId`].
@@ -333,7 +361,7 @@ pub enum Route {
     /// Route where no ratelimit headers are in place (i.e. user account-only
     /// routes).
     ///
-    /// This is a special case, in that if the route is `None` then pre- and
+    /// This is a special case, in that if the route is [`None`] then pre- and
     /// post-hooks are not executed.
     None,
 }
@@ -449,6 +477,10 @@ impl Route {
         format!(api!("/guilds/{}"), guild_id)
     }
 
+    pub fn guild_with_counts(guild_id: u64) -> String {
+        format!(api!("/guilds/{}?with_counts=true"), guild_id)
+    }
+
     #[allow(clippy::let_underscore_must_use)]
     pub fn guild_audit_logs(
         guild_id: u64,
@@ -506,8 +538,12 @@ impl Route {
         format!(api!("/guilds/{}/channels"), guild_id)
     }
 
-    pub fn guild_embed(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/embed"), guild_id)
+    pub fn guild_widget(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/widget"), guild_id)
+    }
+
+    pub fn guild_preview(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/preview"), guild_id)
     }
 
     pub fn guild_emojis(guild_id: u64) -> String {
@@ -596,6 +632,10 @@ impl Route {
 
     pub fn guild_webhooks(guild_id: u64) -> String {
         format!(api!("/guilds/{}/webhooks"), guild_id)
+    }
+
+    pub fn guild_welcome_screen(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/welcome-screen"), guild_id)
     }
 
     pub fn guilds() -> &'static str {
@@ -719,12 +759,8 @@ impl Route {
 
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub fn webhook_followup_messages<D: Display>(
-        application_id: u64,
-        token: D,
-        wait: bool,
-    ) -> String {
-        format!(api!("/webhooks/{}/{}?wait={}"), application_id, token, wait)
+    pub fn webhook_followup_messages<D: Display>(application_id: u64, token: D) -> String {
+        format!(api!("/webhooks/{}/{}"), application_id, token)
     }
 
     #[cfg(feature = "unstable_discord_api")]
@@ -760,8 +796,27 @@ impl Route {
 
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub fn application_guild_command_permissions(
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    ) -> String {
+        format!(
+            api!("/applications/{}/guilds/{}/commands/{}/permissions"),
+            application_id, guild_id, command_id
+        )
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub fn application_guild_commands(application_id: u64, guild_id: u64) -> String {
         format!(api!("/applications/{}/guilds/{}/commands"), application_id, guild_id)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub fn application_guild_commands_permissions(application_id: u64, guild_id: u64) -> String {
+        format!(api!("/applications/{}/guilds/{}/commands/permissions"), application_id, guild_id)
     }
 }
 
@@ -793,17 +848,27 @@ pub enum RouteInfo<'a> {
     CreateFollowupMessage {
         application_id: u64,
         interaction_token: &'a str,
-        wait: bool,
     },
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     CreateGlobalApplicationCommand {
         application_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    CreateGlobalApplicationCommands {
+        application_id: u64,
+    },
     CreateGuild,
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     CreateGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    CreateGuildApplicationCommands {
         application_id: u64,
         guild_id: u64,
     },
@@ -954,10 +1019,26 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         command_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    EditGuildApplicationCommandPermission {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    EditGuildApplicationCommandsPermissions {
+        application_id: u64,
+        guild_id: u64,
+    },
     EditGuildChannels {
         guild_id: u64,
     },
-    EditGuildEmbed {
+    EditGuildWidget {
+        guild_id: u64,
+    },
+    EditGuildWelcomeScreen {
         guild_id: u64,
     },
     EditMember {
@@ -974,6 +1055,12 @@ pub enum RouteInfo<'a> {
     },
     EditNickname {
         guild_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    GetOriginalInteractionResponse {
+        application_id: u64,
+        interaction_token: &'a str,
     },
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
@@ -1052,7 +1139,16 @@ pub enum RouteInfo<'a> {
     GetGlobalApplicationCommands {
         application_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    GetGlobalApplicationCommand {
+        application_id: u64,
+        command_id: u64,
+    },
     GetGuild {
+        guild_id: u64,
+    },
+    GetGuildWithCounts {
         guild_id: u64,
     },
     #[cfg(feature = "unstable_discord_api")]
@@ -1061,7 +1157,33 @@ pub enum RouteInfo<'a> {
         application_id: u64,
         guild_id: u64,
     },
-    GetGuildEmbed {
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    GetGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    GetGuildApplicationCommandsPermissions {
+        application_id: u64,
+        guild_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    GetGuildApplicationCommandPermissions {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    },
+    GetGuildWidget {
+        guild_id: u64,
+    },
+    GetGuildPreview {
+        guild_id: u64,
+    },
+    GetGuildWelcomeScreen {
         guild_id: u64,
     },
     GetGuildIntegrations {
@@ -1230,21 +1352,24 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::CreateFollowupMessage {
                 application_id,
                 interaction_token,
-                wait,
             } => (
                 LightMethod::Post,
                 Route::WebhooksId(application_id),
-                Cow::from(Route::webhook_followup_messages(
-                    application_id,
-                    interaction_token,
-                    wait,
-                )),
+                Cow::from(Route::webhook_followup_messages(application_id, interaction_token)),
             ),
             #[cfg(feature = "unstable_discord_api")]
             RouteInfo::CreateGlobalApplicationCommand {
                 application_id,
             } => (
                 LightMethod::Post,
+                Route::ApplicationsIdCommands(application_id),
+                Cow::from(Route::application_commands(application_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::CreateGlobalApplicationCommands {
+                application_id,
+            } => (
+                LightMethod::Put,
                 Route::ApplicationsIdCommands(application_id),
                 Cow::from(Route::application_commands(application_id)),
             ),
@@ -1257,6 +1382,15 @@ impl<'a> RouteInfo<'a> {
                 guild_id,
             } => (
                 LightMethod::Post,
+                Route::ApplicationsIdGuildsIdCommands(application_id),
+                Cow::from(Route::application_guild_commands(application_id, guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::CreateGuildApplicationCommands {
+                application_id,
+                guild_id,
+            } => (
+                LightMethod::Put,
                 Route::ApplicationsIdGuildsIdCommands(application_id),
                 Cow::from(Route::application_guild_commands(application_id, guild_id)),
             ),
@@ -1544,6 +1678,29 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommandsId(application_id),
                 Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::EditGuildApplicationCommandPermission {
+                application_id,
+                guild_id,
+                command_id,
+            } => (
+                LightMethod::Put,
+                Route::ApplicationsIdGuildsIdCommandIdPermissions(application_id),
+                Cow::from(Route::application_guild_command_permissions(
+                    application_id,
+                    guild_id,
+                    command_id,
+                )),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::EditGuildApplicationCommandsPermissions {
+                application_id,
+                guild_id,
+            } => (
+                LightMethod::Put,
+                Route::ApplicationsIdGuildsIdCommandsPermissions(application_id),
+                Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
+            ),
             RouteInfo::EditGuildChannels {
                 guild_id,
             } => (
@@ -1551,12 +1708,19 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdChannels(guild_id),
                 Cow::from(Route::guild_channels(guild_id)),
             ),
-            RouteInfo::EditGuildEmbed {
+            RouteInfo::EditGuildWidget {
                 guild_id,
             } => (
                 LightMethod::Patch,
-                Route::GuildsIdEmbed(guild_id),
-                Cow::from(Route::guild_embed(guild_id)),
+                Route::GuildsIdWidget(guild_id),
+                Cow::from(Route::guild_widget(guild_id)),
+            ),
+            RouteInfo::EditGuildWelcomeScreen {
+                guild_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdWelcomeScreen(guild_id),
+                Cow::from(Route::guild_welcome_screen(guild_id)),
             ),
             RouteInfo::EditMember {
                 guild_id,
@@ -1580,6 +1744,18 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::GuildsIdMembersMeNick(guild_id),
                 Cow::from(Route::guild_nickname(guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetOriginalInteractionResponse {
+                application_id,
+                interaction_token,
+            } => (
+                LightMethod::Get,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_original_interaction_response(
+                    application_id,
+                    interaction_token,
+                )),
             ),
             #[cfg(feature = "unstable_discord_api")]
             RouteInfo::EditOriginalInteractionResponse {
@@ -1743,9 +1919,25 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdCommands(application_id),
                 Cow::from(Route::application_commands(application_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetGlobalApplicationCommand {
+                application_id,
+                command_id,
+            } => (
+                LightMethod::Get,
+                Route::ApplicationsIdCommandsId(application_id),
+                Cow::from(Route::application_command(application_id, command_id)),
+            ),
             RouteInfo::GetGuild {
                 guild_id,
             } => (LightMethod::Get, Route::GuildsId(guild_id), Cow::from(Route::guild(guild_id))),
+            RouteInfo::GetGuildWithCounts {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsId(guild_id),
+                Cow::from(Route::guild_with_counts(guild_id)),
+            ),
             #[cfg(feature = "unstable_discord_api")]
             RouteInfo::GetGuildApplicationCommands {
                 application_id,
@@ -1755,12 +1947,59 @@ impl<'a> RouteInfo<'a> {
                 Route::ApplicationsIdGuildsIdCommands(application_id),
                 Cow::from(Route::application_guild_commands(application_id, guild_id)),
             ),
-            RouteInfo::GetGuildEmbed {
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id,
+            } => (
+                LightMethod::Get,
+                Route::ApplicationsIdGuildsIdCommandsId(application_id),
+                Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetGuildApplicationCommandsPermissions {
+                application_id,
                 guild_id,
             } => (
                 LightMethod::Get,
-                Route::GuildsIdEmbed(guild_id),
-                Cow::from(Route::guild_embed(guild_id)),
+                Route::ApplicationsIdGuildsIdCommandsPermissions(application_id),
+                Cow::from(Route::application_guild_commands_permissions(application_id, guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetGuildApplicationCommandPermissions {
+                application_id,
+                guild_id,
+                command_id,
+            } => (
+                LightMethod::Get,
+                Route::ApplicationsIdGuildsIdCommandIdPermissions(application_id),
+                Cow::from(Route::application_guild_command_permissions(
+                    application_id,
+                    guild_id,
+                    command_id,
+                )),
+            ),
+            RouteInfo::GetGuildWidget {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdWidget(guild_id),
+                Cow::from(Route::guild_widget(guild_id)),
+            ),
+            RouteInfo::GetGuildPreview {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdPreview(guild_id),
+                Cow::from(Route::guild_preview(guild_id)),
+            ),
+            RouteInfo::GetGuildWelcomeScreen {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdWelcomeScreen(guild_id),
+                Cow::from(Route::guild_welcome_screen(guild_id)),
             ),
             RouteInfo::GetGuildIntegrations {
                 guild_id,

@@ -92,7 +92,7 @@ impl ChannelCategory {
 
     /// Modifies the category's settings, such as its position or name.
     ///
-    /// Refer to `EditChannel`s documentation for a full list of methods.
+    /// Refer to [`EditChannel`]s documentation for a full list of methods.
     ///
     /// **Note**: Requires the [Manage Channels] permission,
     /// also requires the [Manage Roles] permission if modifying
@@ -137,11 +137,11 @@ impl ChannelCategory {
                 id,
                 guild_id,
                 category_id,
-                permission_overwrites,
-                nsfw,
-                name,
                 position,
                 kind,
+                name,
+                nsfw,
+                permission_overwrites,
                 ..
             } = channel;
 
@@ -149,11 +149,11 @@ impl ChannelCategory {
                 id,
                 guild_id,
                 category_id,
-                permission_overwrites,
-                nsfw,
-                name,
                 position,
                 kind,
+                name,
+                nsfw,
+                permission_overwrites,
             };
         })
     }

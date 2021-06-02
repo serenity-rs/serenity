@@ -4,20 +4,65 @@ use std::{
 };
 
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url};
+use serde::de::{Deserialize, Deserializer, Error as DeError};
 use url::ParseError as UrlError;
 
-#[derive(Clone, Serialize, Deserialize, PartialEq)]
+use crate::http::utils::deserialize_errors;
+use crate::internal::prelude::{JsonMap, StdResult};
+
+#[derive(Clone, Serialize, PartialEq, Debug)]
+#[non_exhaustive]
 pub struct DiscordJsonError {
+    /// The error code.
     pub code: isize,
+    /// The error message.
     pub message: String,
-    #[serde(skip)]
-    non_exhaustive: (),
+    /// The full explained errors with their path in the request
+    /// body.
+    pub errors: Vec<DiscordJsonSingleError>,
 }
 
-impl std::fmt::Debug for DiscordJsonError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "\"{}\"", self.message)
+impl<'de> Deserialize<'de> for DiscordJsonError {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let code = map
+            .remove("code")
+            .ok_or_else(|| DeError::custom("expected code"))
+            .and_then(isize::deserialize)
+            .map_err(DeError::custom)?;
+
+        let message = map
+            .remove("message")
+            .ok_or_else(|| DeError::custom("expected message"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
+        let errors = match map.contains_key("errors") {
+            true => map
+                .remove("errors")
+                .ok_or_else(|| DeError::custom("expected errors"))
+                .and_then(deserialize_errors)
+                .map_err(DeError::custom)?,
+            false => vec![],
+        };
+
+        Ok(Self {
+            code,
+            message,
+            errors,
+        })
     }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+pub struct DiscordJsonSingleError {
+    /// The error code.
+    pub code: String,
+    /// The error message.
+    pub message: String,
+    /// The path to the error in the request body itself, dot separated.
+    pub path: String,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -39,7 +84,7 @@ impl ErrorResponse {
                 message:
                     "[Serenity] Could not decode json when receiving error response from discord!"
                         .to_string(),
-                non_exhaustive: (),
+                errors: vec![],
             }),
         }
     }
@@ -161,7 +206,7 @@ mod test {
         let error = DiscordJsonError {
             code: 43121215,
             message: String::from("This is a Ferris error"),
-            non_exhaustive: (),
+            errors: vec![],
         };
 
         let mut builder = Builder::new();

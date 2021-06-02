@@ -65,15 +65,24 @@ pub use crate::cache::Cache;
 use crate::framework::Framework;
 use crate::http::Http;
 use crate::internal::prelude::*;
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::id::ApplicationId;
+use crate::model::id::UserId;
 pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
 pub struct ClientBuilder<'a> {
+    // FIXME: Remove this allow attribute once `application_id` is no longer feature-gated
+    // under `unstable_discord_api`.
+    #[allow(dead_code)]
+    token: Option<String>,
     data: Option<TypeMap>,
     http: Option<Http>,
     fut: Option<BoxFuture<'a, Result<Client>>>,
     intents: GatewayIntents,
+    #[cfg(feature = "unstable_discord_api")]
+    application_id: Option<ApplicationId>,
     timeout: Option<Duration>,
     http_request_timeout: Option<Duration>,
     http_connect_timeout: Option<Duration>,
@@ -89,10 +98,13 @@ pub struct ClientBuilder<'a> {
 impl<'a> ClientBuilder<'a> {
     fn _new() -> Self {
         Self {
+            token: None,
             data: Some(TypeMap::new()),
             http: None,
             fut: None,
             intents: GatewayIntents::non_privileged(),
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: None,
             timeout: None,
             http_request_timeout: None,
             http_connect_timeout: None,
@@ -110,11 +122,8 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// **Panic**:
     /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`framework`] or [`framework_arc`] method,
+    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
-    ///
-    /// [`framework`]: Self::framework
-    /// [`framework_arc`]: Self::framework_arc
     pub fn new(token: impl AsRef<str>) -> Self {
         Self::_new().token(token)
     }
@@ -124,12 +133,10 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// **Panic**:
     /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`framework`] or [`framework_arc`] method,
+    /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
     ///
     /// [`Http`]: crate::http::Http
-    /// [`framework`]: Self::framework
-    /// [`framework_arc`]: Self::framework_arc
     pub fn new_with_http(http: Http) -> Self {
         let mut c = Self::_new();
         c.http = Some(http);
@@ -150,14 +157,25 @@ impl<'a> ClientBuilder<'a> {
             &token,
         ));
 
+        self.token = Some(token.clone());
+
+        self
+    }
+
+    /// Sets the application id.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn application_id(mut self, application_id: u64) -> Self {
+        self.application_id = Some(ApplicationId(application_id));
+
+        self.http =
+            Some(Http::new_with_token_application_id(&self.token.clone().unwrap(), application_id));
+
         self
     }
 
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
-    /// A `TypeMap` must not be constructed manually: [`type_map_insert`]
+    /// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]
     /// can be used to insert one type at a time.
-    ///
-    /// [`type_map_insert`]: Self::type_map_insert
     pub fn type_map(mut self, type_map: TypeMap) -> Self {
         self.data = Some(type_map);
 
@@ -201,9 +219,7 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// *Info*:
     /// If a reference to the framework is required for manual dispatch,
-    /// use the [`framework_arc`]-method instead.
-    ///
-    /// [`framework_arc`]: Self::framework_arc
+    /// use the [`Self::framework_arc`]-method instead.
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
     where
@@ -214,12 +230,10 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// This method allows to pass an `Arc`'ed `framework` - this step is
-    /// done for you in the [`framework`]-method, if you don't need the
+    /// This method allows to pass an [`Arc`]'ed `framework` - this step is
+    /// done for you in the [`Self::framework`]-method, if you don't need the
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
-    ///
-    /// [`framework`]: Self::framework
     #[cfg(feature = "framework")]
     pub fn framework_arc(
         mut self,
@@ -236,9 +250,7 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// *Info*:
     /// If a reference to the voice_manager is required for manual dispatch,
-    /// use the [`voice_manager_arc`]-method instead.
-    ///
-    /// [`voice_manager_arc`]: Self::voice_manager_arc
+    /// use the [`Self::voice_manager_arc`]-method instead.
     #[cfg(feature = "voice")]
     pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
     where
@@ -249,7 +261,7 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// This method allows to pass an `Arc`'ed `voice_manager` - this step is
+    /// This method allows to pass an [`Arc`]'ed `voice_manager` - this step is
     /// done for you in the [`voice_manager`]-method, if you don't need the
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
@@ -266,12 +278,30 @@ impl<'a> ClientBuilder<'a> {
     }
 
     /// Sets all intents directly, replacing already set intents.
-    ///
-    /// To enable privileged intents, `GatewayIntents::all` to
-    ///
-    /// *Info*:
     /// Intents are a bitflag, you can combine them by performing the
     /// `|`-operator.
+    ///
+    /// # What are Intents
+    ///
+    /// A [gateway intent] sets the types of gateway events
+    /// (e.g. member joins, guild integrations, guild emoji updates, ...) the
+    /// bot shall receive. Carefully picking the needed intents greatly helps
+    /// the bot to scale, as less intents will result in less events to be
+    /// received hence less processed by the bot.
+    ///
+    /// # Privileged Intents
+    ///
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]
+    /// are *privileged*.
+    /// [Privileged intents] need to be enabled in the *developer portal*.
+    /// Once the bot is in 100 guilds or more, [the bot must be verified] in
+    /// order to use privileged intents.
+    ///
+    /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
+    /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    /// [`GatewayIntents::GUILD_PRESENCES`]: crate::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES
+    /// [`GatewayIntents::GUILD_MEMBERS`]: crate::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
         self.intents = intents;
 
@@ -351,6 +381,12 @@ impl<'a> Future for ClientBuilder<'a> {
             let raw_event_handler = self.raw_event_handler.take();
             let intents = self.intents;
             let http = Arc::new(self.http.take().unwrap());
+
+            #[cfg(feature = "unstable_discord_api")]
+            if http.application_id == 0 {
+                panic!("Please provide an Application Id in order to use interactions features.");
+            }
+
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();
 
@@ -526,7 +562,7 @@ pub struct Client {
     /// # }
     /// ```
     ///
-    /// Refer to [example 05] for an example on using the `data` field.
+    /// Refer to [example 05] for an example on using the [`Self::data`] field.
     ///
     /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
     /// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete
@@ -766,8 +802,8 @@ impl Client {
     /// # }
     /// ```
     ///
-    /// Start shard 0 of 1 (you may also be interested in [`start`] or
-    /// [`start_autosharded`]):
+    /// Start shard 0 of 1 (you may also be interested in [`Self::start`] or
+    /// [`Self::start_autosharded`]):
     ///
     /// ```rust,no_run
     /// # use std::error::Error;
@@ -794,8 +830,6 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`start`]: Self::start
-    /// [`start_autosharded`]: Self::start_autosharded
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
@@ -809,7 +843,7 @@ impl Client {
     ///
     /// This will create and handle all shards within this single process. If
     /// you only need to start a single shard within the process, or a range of
-    /// shards, use [`start_shard`] or [`start_shard_range`], respectively.
+    /// shards, use [`Self::start_shard`] or [`Self::start_shard_range`], respectively.
     ///
     /// Refer to the [Gateway documentation][gateway docs] for more information
     /// on effectively using sharding.
@@ -843,8 +877,6 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`start_shard`]: Self::start_shard
-    /// [`start_shard_range`]: Self::start_shard_range
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start_shards(&mut self, total_shards: u64) -> Result<()> {
@@ -858,8 +890,8 @@ impl Client {
     ///
     /// This will create and handle all shards within a given range within this
     /// single process. If you only need to start a single shard within the
-    /// process, or all shards within the process, use [`start_shard`] or
-    /// [`start_shards`], respectively.
+    /// process, or all shards within the process, use [`Self::start_shard`] or
+    /// [`Self::start_shards`], respectively.
     ///
     /// Refer to the [Gateway documentation][gateway docs] for more
     /// information on effectively using sharding.
@@ -893,8 +925,6 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`start_shard`]: Self::start_shard
-    /// [`start_shards`]: Self::start_shards
     /// [Gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
@@ -975,16 +1005,8 @@ impl Client {
 /// // ensure a valid token is in fact valid:
 /// assert!(validate_token("Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_ok());
 ///
-/// // "cat" isn't a valid token:
-/// assert!(validate_token("cat").is_err());
-///
-/// // tokens must have three parts, separated by periods (this is still
-/// // actually an invalid token):
-/// assert!(validate_token("aaa.abcdefgh.bbb").is_ok());
-///
-/// // the second part must be _at least_ 6 characters long:
-/// assert!(validate_token("a.abcdef.b").is_ok());
-/// assert!(validate_token("a.abcde.b").is_err());
+/// // helpful to prevent typos
+/// assert!(validate_token("Njg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_err());
 /// ```
 ///
 /// # Errors
@@ -992,28 +1014,54 @@ impl Client {
 /// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.
 /// The type of failure is not specified.
 pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
-    let token = token.as_ref();
-
-    if token.is_empty() {
-        return Err(Error::Client(ClientError::InvalidToken));
+    if parse_token(token.as_ref()).is_some() {
+        Ok(())
+    } else {
+        Err(Error::Client(ClientError::InvalidToken))
     }
+}
 
-    let parts: Vec<&str> = token.split('.').collect();
+/// Part of the data contained within a Discord bot token. Returned by [`parse_token`].
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TokenComponents {
+    pub bot_user_id: UserId,
+    pub creation_time: chrono::NaiveDateTime,
+}
 
-    // Check that the token has a total of 3 parts.
-    if parts.len() != 3 {
-        return Err(Error::Client(ClientError::InvalidToken));
+/// Verifies that the token adheres to the Discord token format and extracts the bot user ID and the
+/// token generation timestamp
+pub fn parse_token(token: impl AsRef<str>) -> Option<TokenComponents> {
+    // The token consists of three base64-encoded parts
+    let parts: Vec<&str> = token.as_ref().split('.').collect();
+    let base64_config = base64::Config::new(base64::CharacterSet::UrlSafe, true);
+
+    // First part must be a base64-encoded stringified user ID
+    let user_id = base64::decode_config(parts.get(0)?, base64_config).ok()?;
+    let user_id = UserId(std::str::from_utf8(&user_id).ok()?.parse().ok()?);
+
+    // Second part must be a base64-encoded token generation timestamp
+    let timestamp_base64 = parts.get(1)?;
+    // The base64-encoded timestamp must be at least 6 characters
+    if timestamp_base64.len() < 6 {
+        return None;
     }
-
-    // Check that the second part is at least 6 characters long.
-    if parts[1].len() < 6 {
-        return Err(Error::Client(ClientError::InvalidToken));
+    let timestamp_bytes = base64::decode_config(timestamp_base64, base64_config).ok()?;
+    let mut timestamp = 0;
+    for byte in timestamp_bytes {
+        timestamp *= 256;
+        timestamp += byte as u64;
     }
-
-    // Check that there is no whitespace before/after the token.
-    if token.trim() != token {
-        return Err(Error::Client(ClientError::InvalidToken));
+    // Some timestamps are based on the Discord epoch. Convert to Unix epoch
+    if timestamp < 1293840000 {
+        timestamp += 1293840000;
     }
+    let timestamp = chrono::NaiveDateTime::from_timestamp_opt(timestamp as i64, 0)?;
 
-    Ok(())
+    // Third part is a base64-encoded HMAC that's not interesting on its own
+    let _ = base64::decode(parts.get(2)?).ok()?;
+
+    Some(TokenComponents {
+        bot_user_id: user_id,
+        creation_time: timestamp,
+    })
 }

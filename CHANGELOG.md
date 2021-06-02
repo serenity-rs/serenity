@@ -3,6 +3,81 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.10.7] - 2021-05-14
+
+Thanks to the following for their contributions:
+
+- [@HarmoGlace]
+
+### Fixed
+
+- [model/http] Fix GuildEmbed removal to avoid breaking change ([@HarmoGlace]) [c:822406e]
+
+## [0.10.6] - 2021-05-13
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@drklee3]
+- [@HarmoGlace]
+- [@kangalioo]
+- [@Lakelezz]
+- [@legendofmiracles]
+- [@mTvare6]
+- [@nickelc]
+- [@Sei4or]
+- [@sudomann]
+- [@vicky5124]
+- [@zacck]
+
+### Added
+
+- [model/gateway/client] Support command create, update, and delete events ([@HarmoGlace]) [c:aa9748e]
+- [model] Support the `Team::name` field ([@HarmoGlace]) [c:07f15ad]
+- [model] Support getting interaction response, editing/deleting followup and flags ([@HarmoGlace]) [c:59bc14c]
+- [model] Support mentionable application command option type ([@HarmoGlace]) [c:a710113]
+- [builder] Support editing voice channel region and video quality mode ([@HarmoGlace]) [c:7983a8e]
+- [model] Add support for all guild fields (welcome screen, rules channel, nsfw, etc.) ([@HarmoGlace]) [c:9b8a31a]
+- [http] Support more detailed HTTP errors from Discord ([@HarmoGlace]) [c:f88355b]
+- [model] Support member field on message reaction add event ([@HarmoGlace]) [c:879f193]
+- [model] Support all interactions features ([@HarmoGlace]) [c:d6e86df]
+- [model] Add role tags support ([@HarmoGlace]) [c:7b25308]
+- [http] Add Discord API proxy support ([@drklee3]) [c:badb448]
+- [model] Handle voice status (deaf, mute) in the `MemberUpdate` event ([@vicky5124]) [c:3a6eb58]
+- [model] Add the `content_type` field to `Attachment` ([@vicky5124]) [c:1b17732]
+- [model] Add the invite reminder system message and flag ([@vicky5124]) [c:f238a46]
+- [model] Add watching activity ([@vicky5124]) [c:47d9d1c]
+- [model] Adds support to message crossposting ([@HarmoGlace]) [c:25ecaa6]
+- [builder] Add a space in the example for `CreateEmbed::timestamp` ([@legendofmiracles]) [c:d0b404d]
+
+### Changed
+
+- [model] Use `Permissions` instead of `String` for the `PartialMember::permissions` field ([@HarmoGlace]) [c:3b662e0]
+- [misc] Update link to Lavalink to account for the author's name change ([@mTvare6]) [c:7315d78]
+- [model] Default to the `Unknown` variant for new model types ([@acdenisSK]) [c:cdbd14b]
+- [misc] Introduce intradoc-links in a lot of places ([@kangalioo]) [c:b2565da]
+- [misc] Update Discord guild badge ([@Lakelezz]) [c:5e5feea]
+- [framework] Type check the return type of the body of async functions ([@acdenisSK]) [c:fa0bdd8]
+- [examples] Rephrase documentation of `before` for accuracy in the framework example ([@sudomann]) [c:392a534]
+- [model] Update the documentation for `Message::mention_channels` with constraints ([@zacck]) [c:8ab0800]
+
+### Fixed
+
+- [model] Fix message link when Discord does not provide `guild_id` ([@HarmoGlace]) [c:01f70db]
+- [model] Fix webhook creation on news channel ([@HarmoGlace]) [c:f34c7bb]
+- [misc] Fix clippy warnings ([@nickelc]) [c:6f30b0e]
+- [http] Only deserialise the `DiscordJsonError::errors` field if present ([@HarmoGlace]) [c:bab4d78]
+- [framework] Consider group restrictions when displaying command availability ([@acdenisSK]) [c:d508c35]
+- [model] Silence warnings related to the deprecation of `(Partial)Guild::region` ([@acdenisSK]) [c:b995482]
+- [framework/client] Avoid cloning messages if the framework feature is disabled ([@acdenisSK]) [c:c7caedd]
+- [client] Silence `dead_code` lint for `ClientBuilder::token` ([@acdenisSK]) [c:8e13e74]
+- [misc] Remove debug tool ([@HarmoGlace]) [c:cfe5f01]
+- [model] Fix misspelling of custom in `ActivityType`'s documentation ([@Sei4or]) [c:dca5c45]
+
+### Removed
+
+- [builder] Remove useless `mut` modifiers in builder code ([@acdenisSK]) [c:9334af5]
+
 ## [0.10.5] - 2021-04-04
 
 Thanks to the following for their contributions:
@@ -342,12 +417,12 @@ Thanks to the following for their contributions:
 
 - [@james7132]
 - [@JellyWX]
-- [@nitsuga5124]
 - [@Qeenon]
+- [@vicky5124]
 
 ### Added
 
-- [client] Mention the required intents for certain events ([@nitsuga5124]) [c:c9971b6]
+- [client] Mention the required intents for certain events ([@vicky5124]) [c:c9971b6]
 - [gateway] Add support for filtering by user ids when requesting guild chunks ([@james7132]) [c:0d9b821]
 
 ### Changed
@@ -379,13 +454,13 @@ Thanks to the following for their contributions:
 - [@leumasme]
 - [@MonliH]
 - [@nickelc]
-- [@nitsuga5124]
 - [@Prof-Bloodstone]
 - [@peppizza]
 - [@Qeenon]
 - [@TheElec]
 - [@tmcarr]
 - [@u5surf]
+- [@vicky5124]
 
 ### Added
 
@@ -393,9 +468,9 @@ Thanks to the following for their contributions:
 - [model] Add missing fields to `GuildMembersChunkEvent` and add nonce to `ShardMessenger::chunk_guilds` ([@TheElec]) [c:8c30b40]
 - [model] Implement `create_invite` on `ChannelId` ([@acdenisSK]) [c:c0c2137]
 - [client] Derive `Clone` for `CacheAndHttp` ([@acdenisSK]) [c:2b66828]
-- [examples] Update example 07 to use tracing and dotenv ([@nitsuga5124]) [c:2386690]
-- [examples] Add Parallel Loops example. ([@nitsuga5124]) [c:b38cdf5]
-- [examples] Add an example for client data. ([@nitsuga5124]) [c:3fe8056]
+- [examples] Update example 07 to use tracing and dotenv ([@vicky5124]) [c:2386690]
+- [examples] Add Parallel Loops example. ([@vicky5124]) [c:b38cdf5]
+- [examples] Add an example for client data. ([@vicky5124]) [c:3fe8056]
 - [http] Add methods to the http error type to query the presence of variants and to return the status code  ([@Baev1]) [c:7ef12ee]
 - [http] Add methods to start and stop typing ([@AriusX7]) [c:bcf8249]
 
@@ -430,7 +505,7 @@ Thanks to the following for their contributions:
 
 ### Removed
 
-- [model] Remove unnecessary `Option` from `Message::channel_mentions` ([@nitsuga5124]) [c:626bdfd]
+- [model] Remove unnecessary `Option` from `Message::channel_mentions` ([@vicky5124]) [c:626bdfd]
 
 ## [0.9.0-rc.2] - 2020-09-27
 
@@ -442,14 +517,14 @@ Thanks to the following for their contributions:
 - [@FelixMcFelix]
 - [@ikkerens]
 - [@LikeLakers2]
-- [@nitsuga5124]
+- [@vicky5124]
 
 ### Added
 
-- [model] Add the new 'competing in' activity type ([@nitsuga5124]) [c:ebc2cc7]
-- [model] Add `create_webhook` methods to `GuildChannel`. ([@nitsuga5124]) [c:fb44a15]
-- [meta] Add cargo-make support for building the examples. ([@nitsuga5124]) [c:b137f51]
-- [model] Add new guild features to the documentation ([@nitsuga5124]) [c:f2191d5]
+- [model] Add the new 'competing in' activity type ([@vicky5124]) [c:ebc2cc7]
+- [model] Add `create_webhook` methods to `GuildChannel`. ([@vicky5124]) [c:fb44a15]
+- [meta] Add cargo-make support for building the examples. ([@vicky5124]) [c:b137f51]
+- [model] Add new guild features to the documentation ([@vicky5124]) [c:f2191d5]
 - [model/client] Add support for invite events ([@acdenisSK]) [c:7146fd7]
 
 ### Changed
@@ -458,7 +533,7 @@ Thanks to the following for their contributions:
 - [framework] Call the `should_fail_common` check earlier ([@acdenisSK]) [c:bab4b24]
 - [meta] Update the MSRV to 1.40 ([@acdenisSK]) [c:3f5882c]
 - [model] Use `#[non_exhaustive]` where applicable ([@LikeLakers2]) [c:9ee42f1]
-- [meta] Switch from log to tracing. ([@nitsuga5124]) [c:78dd862]
+- [meta] Switch from log to tracing. ([@vicky5124]) [c:78dd862]
 - [utils] Make `parse_emoji` accept animated emojis ([@bdashore3]) [c:66e05ea]
 - [meta] Insert the shard manager in example 7 ([@acdenisSK]) [c:7c2d4f7]
 
@@ -469,7 +544,7 @@ Thanks to the following for their contributions:
 - [framework] Temporarily fix the permissions check in the framework ([@acdenisSK]) [c:88af7cf]
 - [model] Fix ReactionType not remembering animated status. ([@ikkerens]) [c:2eac499]
 - [framework] Fix parsing of commands that have requirements ([@acdenisSK]) [c:323875f]
-- [meta] Fix example 5's retrieval of owners when the bot belongs to a team ([@nitsuga5124]) [c:5c0c045]
+- [meta] Fix example 5's retrieval of owners when the bot belongs to a team ([@vicky5124]) [c:5c0c045]
 - [framework] Fix bucket duration order ([@acdenisSK]) [c:5805539]
 - [voice] Update Voice WS Sender on reconnect. ([@FelixMcFelix]) [c:659448b]
 - [gateway] Fix shutdown regression ([@ikkerens]) [c:fa03b75]
@@ -488,8 +563,8 @@ Thanks to the following for their contributions:
 - [@bdashore3]
 - [@qm3ster]
 - [@nickelc]
-- [@nitsuga5124]
 - [@Qeenon]
+- [@vicky5124]
 
 ### Added
 
@@ -498,7 +573,7 @@ Thanks to the following for their contributions:
 - [model] Implement `Display` for `Permissions` (#939) ([@AriusX7]) [c:1eb2714]
 - [model/http] Implement endpoints for getting emojis of a guild (#937) ([@acdenisSK]) [c:2a1c385]
 - [client] Implement AsRef<ShardMessenger> for ShardMessenger (#936) ([@ThatsNoMoon]) [c:a9c9caa]
-- [builder] Implement a builder for allowed mentions (#931) ([@nitsuga5124]) [c:59fb7b9]
+- [builder] Implement a builder for allowed mentions (#931) ([@vicky5124]) [c:59fb7b9]
 
 ### Changed
 
@@ -539,18 +614,18 @@ Thanks to the following for their contributions:
 - [@mysteriouspants]
 - [@NieDzejkob]
 - [@NilsIrl]
-- [@nitsuga5124]
+- [@vicky5124]
 - [@Th3-M4jor]
 - [@tverghis]
 
 ### Added
 
 - [model] Add `nick` field to `PartialMember` ([@asherkin]) [c:28f9f8a]
-- [model] Add teams support ([@nitsuga5124]) [c:5a6979a]
+- [model] Add teams support ([@vicky5124]) [c:5a6979a]
 - [model] Add `mentions_current_user` helper ([@mysteriouspants]) [c:e049bc1]
 - [model/client] Add the `nonce` field to `GuildMembersChunk` and the event handler ([@mjsir911]) [c:614f99a]
 - [voice] Add `self_stream` field to `VoiceState` ([@DimiDimit]) [c:c60f397]
-- [model] Add a method to retrieve a webhook's URL ([@nitsuga5124]) [c:5931d1c]
+- [model] Add a method to retrieve a webhook's URL ([@vicky5124]) [c:5931d1c]
 - [model] Add a method to retrieve a link to a message ([@acdenisSK]) [c:a92ca08]
 - [command_attr] Add the delimiters option to the documentation ([@acdenisSK]) [c:1594a3e]
 - [model] Add pagination for CurrentUser::guilds ([@NilsIrl]) [c:9eadffa]
@@ -564,7 +639,7 @@ Thanks to the following for their contributions:
 - [misc] Address the renaming of the lavalink project ([@acdenisSK]) [c:802df92]
 - [utils] Replace the in-house typemap implementation with `typemap_rev` ([@bdashore3]) [c:c1c7300]
 - [misc] Apply copyright to all people who have contributed to Serenity ([@acdenisSK]) [c:287245a]
-- [model] Make `Message::reply` take a content implementing `std::fmt::Display` ([@nitsuga5124]) [c:00683ef]
+- [model] Make `Message::reply` take a content implementing `std::fmt::Display` ([@vicky5124]) [c:00683ef]
 - [framework] Expose CustomisedHelpData fields, improve help strikethrough message attributes. ([@jmgao]) [c:0d72b6e]
 - [framework] Return `Option<Message>` in help command functions ([@MaxOhn]) [c:4472dec]
 - [model] Make `Message::react` return its `Reaction` ([@NieDzejkob]) [c:e7eb52d]
@@ -578,12 +653,12 @@ Thanks to the following for their contributions:
 ### Fixed
 
 - [model] Restrict mention parsing to be specific to the type of id ([@acdenisSK]) [c:dd580fb]
-- [framework] Fix `unrecognised_command()` not working if the last added group has prefixes ([@nitsuga5124]) [c:8040fa5] [c:760ed71] [c:21a5d8e]
+- [framework] Fix `unrecognised_command()` not working if the last added group has prefixes ([@vicky5124]) [c:8040fa5] [c:760ed71] [c:21a5d8e]
 - [misc] Remove unnecessary feature gates and fix incorrect ones ([@acdenisSK]) [c:ed61459]
 
 ### Removed
 
-- [model] Remove `U: Into<UserId>` type parameter for `partial_guild::edit_member()` ([@nitsuga5124]) [c:4227a52]
+- [model] Remove `U: Into<UserId>` type parameter for `partial_guild::edit_member()` ([@vicky5124]) [c:4227a52]
 - [misc] Remove Zeyla Hellyer as an author of Serenity ([@acdenisSK]) [c:9cfc410]
 - [misc] Remove the matches developmental dependency ([@acdenisSK]) [c:2418edd]
 - [misc] Remove usages of mem::replace where its return value is unused ([@acdenisSK]) [c:3135e0f]
@@ -735,7 +810,7 @@ Thanks to the following for their contributions:
 - [@Lakelezz]
 - [@MaxOhn]
 - [@natsukagami]
-- [@nitsuga5124]
+- [@vicky5124]
 - [@Noituri]
 - [@NovusTheory]
 - [@TitusEntertainment]
@@ -753,7 +828,7 @@ Thanks to the following for their contributions:
 
 - [builder] Reexport `Timestamp` from the builder's module. ([@acdenisSK]) [c:3a313c8]
 
-- [model] Implement various `kick_with_reason()` methods ([@nitsuga5124]) [c:5b0e9f3]
+- [model] Implement various `kick_with_reason()` methods ([@vicky5124]) [c:5b0e9f3]
 
 ### Changed
 
@@ -4104,6 +4179,8 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.10.7]: https://github.com/serenity-rs/serenity/compare/v0.10.6...v0.10.7
+[0.10.6]: https://github.com/serenity-rs/serenity/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/serenity-rs/serenity/compare/v0.10.4...v0.10.5
 [0.10.4]: https://github.com/serenity-rs/serenity/compare/v0.10.3...v0.10.4
 [0.10.3]: https://github.com/serenity-rs/serenity/compare/v0.10.2...v0.10.3
@@ -4237,6 +4314,7 @@ Initial commit.
 [@ftriquet]: https://github.com/ftriquet
 [@fwrs]: https://github.com/fwrs
 [@GetRektByMe]: https://github.com/GetRektByMe
+[@HarmoGlace]: https://github.com/HarmoGlace
 [@hsiW]: https://github.com/hsiW
 [@hyarsan]: https://github.com/hyarsan
 [@icewind1991]: https://github.com/icewind1991
@@ -4265,6 +4343,7 @@ Initial commit.
 [@LikeLakers2]: https://github.com/LikeLakers2
 [@Lymia]: https://github.com/Lymia
 [@lapin-b]: https://github.com/lapin-b
+[@legendofmiracles]: https://github.com/legendofmiracles
 [@leo-lb]: https://github.com/leo-lb
 [@leumasme]: https://github.com/leumasme
 [@lolzballs]: https://github.com/lolzballs
@@ -4272,6 +4351,7 @@ Initial commit.
 [@Mendess2526]: https://github.com/Mendess2526
 [@Mishio595]: https://github.com/Mishio595
 [@MonliH]: https://github.com/MonliH
+[@mTvare6]: https://github.com/mTvare6
 [@mattico]: https://github.com/mattico
 [@megumisonoda]: https://github.com/megumisonoda
 [@mendess]: https://github.com/mendess
@@ -4289,7 +4369,6 @@ Initial commit.
 [@nabijaczleweli]: https://github.com/nabijaczleweli
 [@natsukagami]: https://github.com/natsukagami
 [@nickelc]: https://github.com/nickelc
-[@nitsuga5124]: https://github.com/nitsuga5124
 [@nycex]: https://github.com/nycex
 [@Proximyst]: https://github.com/Proximyst
 [@Prof-Bloodstone]: https://github.com/Prof-Bloodstone
@@ -4301,15 +4380,17 @@ Initial commit.
 [@Qeenon]: https://github.com/Qeenon
 [@qm3ster]: https://github.com/qm3ster
 [@SOF3]: https://github.com/SOF3
+[@Sei4or]: https://github.com/Sei4or
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@Scetch]: https://github.com/Scetch
 [@SinsofSloth]: https://github.com/SinsofSloth
 [@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
 [@SunDwarf]: https://github.com/SunDwarf
-[@sam-kirby]: https://github.com/sam-kirby
 [@s0lst1ce]: https://github.com/s0lst1ce
+[@sam-kirby]: https://github.com/sam-kirby
 [@shnarazk]: https://github.com/shnarazk
 [@sschroe]: https://github.com/sschroe
+[@sudomann]: https://github.com/sudomann
 [@tahahawa]: https://github.com/tahahawa
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
 [@Th3-M4jor]: https://github.com/Th3-M4jor
@@ -4324,6 +4405,7 @@ Initial commit.
 [@tverghis]: https://github.com/tverghis
 [@tweirtx]: https://github.com/tweirtx
 [@u5surf]: https://github.com/u5surf
+[@vicky5124]: https://github.com/vicky5124
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
 [@Wolvereness]: https://github.com/Wolvereness
@@ -4331,11 +4413,51 @@ Initial commit.
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
+[@zacck]: https://github.com/zacck
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
 
 <!-- COMMITS -->
+
+[c:822406e]: https://github.com/serenity-rs/serenity/commit/822406ef13cdeffd2b199e72b42ffcbda73a0202
+
+[c:aa9748e]: https://github.com/serenity-rs/serenity/commit/aa9748ed44f020a84199e3c71882d76af885ad19
+[c:07f15ad]: https://github.com/serenity-rs/serenity/commit/07f15ad8e0c09790f98c04f1b3e978f08f61f467
+[c:59bc14c]: https://github.com/serenity-rs/serenity/commit/59bc14cbb35e23f48024ba3eb42525d52e6f44af
+[c:a710113]: https://github.com/serenity-rs/serenity/commit/a710113f588864cb7304b251c9aa25904529a6b4
+[c:7983a8e]: https://github.com/serenity-rs/serenity/commit/7983a8e3a064990ee3d08bd673f6e25122dddb77
+[c:9b8a31a]: https://github.com/serenity-rs/serenity/commit/9b8a31a86b4cf08877d1a7c767de74afd8a11dc0
+[c:f88355b]: https://github.com/serenity-rs/serenity/commit/f88355bd2d4d9532cb36d95f55ffb39bcd8416c8
+[c:879f193]: https://github.com/serenity-rs/serenity/commit/879f1938c4654a83301a0a77dea1e201df5ab6b7
+[c:d6e86df]: https://github.com/serenity-rs/serenity/commit/d6e86df11b1741e075cf2215db7c1143a20e0e78
+[c:7b25308]: https://github.com/serenity-rs/serenity/commit/7b253086fe1995222ca05b0a7338c95f1026baf1
+[c:badb448]: https://github.com/serenity-rs/serenity/commit/badb44891a73bc27df8b3e39d4baf92675e868a4
+[c:3a6eb58]: https://github.com/serenity-rs/serenity/commit/3a6eb585ae625d5e0ca3591b0ec432ce79ca4ee3
+[c:1b17732]: https://github.com/serenity-rs/serenity/commit/1b177327b887a00e009493ed0e366238253028b4
+[c:f238a46]: https://github.com/serenity-rs/serenity/commit/f238a46b0f8027a8ce67e916d7ecf7f3ef3884da
+[c:47d9d1c]: https://github.com/serenity-rs/serenity/commit/47d9d1cbda6951977c503ae439cad21597d77b9b
+[c:25ecaa6]: https://github.com/serenity-rs/serenity/commit/25ecaa6f17b9aa4b211a8307272b83a2229203df
+[c:d0b404d]: https://github.com/serenity-rs/serenity/commit/d0b404d0481ca537c55dcb3010bec103df46a58b
+[c:3b662e0]: https://github.com/serenity-rs/serenity/commit/3b662e023716461ef5b1e073dfe3ee78480b0c6e
+[c:7315d78]: https://github.com/serenity-rs/serenity/commit/7315d78943f728336c64d07178e3fb9229088716
+[c:cdbd14b]: https://github.com/serenity-rs/serenity/commit/cdbd14ba5e562ce8733571f0ac86adb07357af1d
+[c:b2565da]: https://github.com/serenity-rs/serenity/commit/b2565da364dc7c50b10d9991968cb286d17a4f6d
+[c:5e5feea]: https://github.com/serenity-rs/serenity/commit/5e5feeafbb12b8d4fb77d94f85ac70095967efc9
+[c:fa0bdd8]: https://github.com/serenity-rs/serenity/commit/fa0bdd8a2978af2e757a55077f55f1b8c6df938b
+[c:392a534]: https://github.com/serenity-rs/serenity/commit/392a534980dda1706dcd519550fc58306101d8e8
+[c:8ab0800]: https://github.com/serenity-rs/serenity/commit/8ab08007680f9612bbab3109b8efe0912c923371
+[c:01f70db]: https://github.com/serenity-rs/serenity/commit/01f70dbcad7c31edb5825c70d0e3c049f874abd1
+[c:f34c7bb]: https://github.com/serenity-rs/serenity/commit/f34c7bba5b5e0236881e31a96fa1756f63c6129f
+[c:6f30b0e]: https://github.com/serenity-rs/serenity/commit/6f30b0e4385663660a95010f00d4f2be4592d928
+[c:bab4d78]: https://github.com/serenity-rs/serenity/commit/bab4d78e2d238df7ed830d98942234dc443c5860
+[c:d508c35]: https://github.com/serenity-rs/serenity/commit/d508c3583ac57b8ce3d906004925cfbaf9931c07
+[c:b995482]: https://github.com/serenity-rs/serenity/commit/b995482142a541cb4294a49fdb6f1687693532ef
+[c:c7caedd]: https://github.com/serenity-rs/serenity/commit/c7caedd225acdf3c8ddc60e03c8cc031523a1fc7
+[c:8e13e74]: https://github.com/serenity-rs/serenity/commit/8e13e745884035ca56c953d2cbeb7fb16f292e01
+[c:cfe5f01]: https://github.com/serenity-rs/serenity/commit/cfe5f01622b7ef49db44eef165e7123be31a953e
+[c:dca5c45]: https://github.com/serenity-rs/serenity/commit/dca5c452ef73c94c565d8a5995eb9f7c9a8081d0
+[c:9334af5]: https://github.com/serenity-rs/serenity/commit/9334af5bdfa10db20c41258986bbf8acb6c6538e
 
 [c:4018632]: https://github.com/serenity-rs/serenity/commit/40186329f474df0100a9c1ea1ee3422e485d1f10
 [c:8d0b307]: https://github.com/serenity-rs/serenity/commit/8d0b307a52f1f2d7ea81a9eef9b283434dcc5827

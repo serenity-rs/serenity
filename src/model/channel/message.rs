@@ -74,14 +74,14 @@ pub struct Message {
     /// Channels specifically mentioned in this message.
     ///
     /// **Note**:
-    /// Not all channel mentions in a message will appear in `mention_channels`. Only textual
+    /// Not all channel mentions in a message will appear in [`Self::mention_channels`]. Only textual
     /// channels that are visible to everyone in a lurkable guild will ever be included.
     ///
     /// A lurkable guild is one that allows users to read public channels in a server without
     /// actually joining the server. It also allows users to look at these channels without being
     /// logged in to Discord.
     ///
-    /// Only crossposted messages (via Channel Following) currently include `mention_channels` at
+    /// Only crossposted messages (via Channel Following) currently include [`Self::mention_channels`] at
     /// all. If no mentions in the message meet these requirements, this field will not be sent.
     /// [Refer to Discord's documentation for more information][discord-docs].
     ///
@@ -178,7 +178,7 @@ impl Message {
 
     /// Retrieves the related channel located in the cache.
     ///
-    /// Returns `None` if the channel is not in the cache.
+    /// Returns [`None`] if the channel is not in the cache.
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn channel(&self, cache: impl AsRef<Cache>) -> Option<Channel> {
@@ -450,28 +450,24 @@ impl Message {
         self.channel_id.reaction_users(&http, self.id, reaction_type, limit, after).await
     }
 
-    /// Returns the associated `Guild` for the message if one is in the cache.
+    /// Returns the associated [`Guild`] for the message if one is in the cache.
     ///
-    /// Returns `None` if the guild's Id could not be found via [`guild_id`] or
+    /// Returns [`None`] if the guild's Id could not be found via [`Self::guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
-    ///
-    /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
         cache.as_ref().guild(self.guild_id?).await
     }
 
-    /// Returns a field to the `Guild` for the message if one is in the cache.
+    /// Returns a field to the [`Guild`] for the message if one is in the cache.
     /// The field can be selected via the `field_accessor`.
     ///
-    /// Returns `None` if the guild's ID could not be found via [`guild_id`] or
+    /// Returns [`None`] if the guild's ID could not be found via [`Self::guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
-    ///
-    /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild_field<Ret, Fun>(
         &self,
@@ -499,9 +495,7 @@ impl Message {
     ///
     /// # Errors
     ///
-    /// [`ModelError::ItemMissing`] is returned if [`guild_id`] is `None`.
-    ///
-    /// [`guild_id`]: Self::guild_id
+    /// [`ModelError::ItemMissing`] is returned if [`Self::guild_id`] is [`None`].
     pub async fn member(&self, cache_http: impl CacheHttp) -> Result<Member> {
         let guild_id = match self.guild_id {
             Some(guild_id) => guild_id,
@@ -523,8 +517,8 @@ impl Message {
     /// Checks the length of a string to ensure that it is within Discord's
     /// maximum message length limit.
     ///
-    /// Returns `None` if the message is within the limit, otherwise returns
-    /// `Some` with an inner value of how many unicode code points the message
+    /// Returns [`None`] if the message is within the limit, otherwise returns
+    /// [`Some`] with an inner value of how many unicode code points the message
     /// is over.
     pub fn overflow_length(content: &str) -> Option<usize> {
         // Check if the content is over the maximum number of unicode code
@@ -622,6 +616,7 @@ impl Message {
             message_id: self.id,
             user_id,
             guild_id: self.guild_id,
+            member: self.member.clone(),
         })
     }
 
@@ -708,7 +703,7 @@ impl Message {
         self._reply(cache_http, format!("{} {}", self.author.mention(), content), None).await
     }
 
-    /// `inlined` decides whether this reply is inlinded and whether it pings.
+    /// `inlined` decides whether this reply is inlined and whether it pings.
     async fn _reply(
         &self,
         cache_http: impl CacheHttp,
@@ -731,11 +726,16 @@ impl Message {
         }
 
         self.channel_id
-            .send_message(cache_http.http(), |mut builder| {
+            .send_message(cache_http.http(), |builder| {
                 if let Some(ping_user) = inlined {
-                    builder = builder
-                        .reference_message(self)
-                        .allowed_mentions(|f| f.replied_user(ping_user));
+                    builder.reference_message(self).allowed_mentions(|f| {
+                        f.replied_user(ping_user)
+                            // By providing allowed_mentions, Discord disabled _all_ pings by
+                            // default so we need to re-enable them
+                            .parse(crate::builder::ParseValue::Everyone)
+                            .parse(crate::builder::ParseValue::Users)
+                            .parse(crate::builder::ParseValue::Roles)
+                    });
                 }
 
                 builder.content(content)
@@ -851,7 +851,7 @@ impl Message {
 
     /// Tries to return author's nickname in the current channel's guild.
     ///
-    /// Refer to [`User::nick_in()`] inside and `None` outside of a guild.
+    /// Refer to [`User::nick_in()`] inside and [`None`] outside of a guild.
     #[inline]
     pub async fn author_nick(&self, cache_http: impl CacheHttp) -> Option<String> {
         self.author.nick_in(cache_http, self.guild_id?).await
@@ -861,13 +861,16 @@ impl Message {
     /// The link will be valid for messages in either private channels or guilds.
     #[inline]
     pub fn link(&self) -> String {
-        match self.guild_id {
-            Some(guild_id) => format!(
-                "https://discord.com/channels/{}/{}/{}",
-                guild_id.0, self.channel_id.0, self.id.0
-            ),
-            None => format!("https://discord.com/channels/@me/{}/{}", self.channel_id.0, self.id.0),
-        }
+        self.id.link(self.channel_id, self.guild_id)
+    }
+
+    /// Same as [`Self::link`] but tries to find the [`GuildId`]
+    /// if Discord does not provide it.
+    ///
+    /// [`guild_id`]: Self::guild_id
+    #[inline]
+    pub async fn link_ensured(&self, cache_http: impl CacheHttp) -> String {
+        self.id.link_ensured(cache_http, self.channel_id, self.guild_id).await
     }
 
     /// Await a single reaction on this message.
@@ -897,11 +900,9 @@ impl Message {
     }
 
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
-        if let Some(content) = map.get("content") {
-            if let Value::String(ref content) = *content {
-                if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-                }
+        if let Some(Value::String(ref content)) = map.get("content") {
+            if let Some(length_over) = Message::overflow_length(content) {
+                return Err(Error::Model(ModelError::MessageTooLong(length_over)));
             }
         }
 
@@ -966,14 +967,14 @@ impl AsRef<MessageId> for Message {
 }
 
 impl From<Message> for MessageId {
-    /// Gets the Id of a `Message`.
+    /// Gets the Id of a [`Message`].
     fn from(message: Message) -> MessageId {
         message.id
     }
 }
 
 impl<'a> From<&'a Message> for MessageId {
-    /// Gets the Id of a `Message`.
+    /// Gets the Id of a [`Message`].
     fn from(message: &Message) -> MessageId {
         message.id
     }
@@ -981,10 +982,9 @@ impl<'a> From<&'a Message> for MessageId {
 
 /// A representation of a reaction to a message.
 ///
-/// Multiple of the same [reaction type] are sent into one `MessageReaction`,
-/// with an associated [`count`].
+/// Multiple of the same [reaction type] are sent into one [`MessageReaction`],
+/// with an associated [`Self::count`].
 ///
-/// [`count`]: Self::count
 /// [reaction type]: ReactionType
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -1039,6 +1039,8 @@ pub enum MessageType {
     ApplicationCommand = 20,
     /// Server setup tips.
     GuildInviteReminder = 22,
+    /// An indicator that the message is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(MessageType {
@@ -1061,41 +1063,18 @@ enum_number!(MessageType {
     ApplicationCommand,
 });
 
-impl MessageType {
-    pub fn num(self) -> u64 {
-        use self::MessageType::*;
-
-        match self {
-            Regular => 0,
-            GroupRecipientAddition => 1,
-            GroupRecipientRemoval => 2,
-            GroupCallCreation => 3,
-            GroupNameUpdate => 4,
-            GroupIconUpdate => 5,
-            PinsAdd => 6,
-            MemberJoin => 7,
-            NitroBoost => 8,
-            NitroTier1 => 9,
-            NitroTier2 => 10,
-            NitroTier3 => 11,
-            ChannelFollowAdd => 12,
-            GuildDiscoveryDisqualified => 14,
-            GuildDiscoveryRequalified => 15,
-            InlineReply => 19,
-            ApplicationCommand => 20,
-            GuildInviteReminder => 22,
-        }
-    }
-}
-
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum MessageActivityKind {
+    #[allow(clippy::upper_case_acronyms)]
     JOIN = 1,
+    #[allow(clippy::upper_case_acronyms)]
     SPECTATE = 2,
+    #[allow(clippy::upper_case_acronyms)]
     LISTEN = 3,
     #[allow(non_camel_case_types)]
     JOIN_REQUEST = 5,
+    Unknown = !0,
 }
 
 enum_number!(MessageActivityKind {
@@ -1104,19 +1083,6 @@ enum_number!(MessageActivityKind {
     LISTEN,
     JOIN_REQUEST
 });
-
-impl MessageActivityKind {
-    pub fn num(self) -> u64 {
-        use self::MessageActivityKind::*;
-
-        match self {
-            JOIN => 1,
-            SPECTATE => 2,
-            LISTEN => 3,
-            JOIN_REQUEST => 5,
-        }
-    }
-}
 
 /// Rich Presence application information.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -1207,6 +1173,14 @@ __impl_bitflags! {
         IS_CROSSPOST = 0b0000_0000_0000_0000_0000_0000_0000_0010;
         /// Do not include any embeds when serializing this message.
         SUPPRESS_EMBEDS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
+        /// The source message for this crosspost has been deleted (via Channel Following).
+        SOURCE_MESSAGE_DELETED = 0b0000_0000_0000_0000_0000_0000_0000_1000;
+        /// This message came from the urgent message system.
+        URGENT = 0b0000_0000_0000_0000_0000_0000_0001_0000;
+        /// This message is only visible to the user who invoked the Interaction.
+        EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
+        /// This message is an Interaction Response and the bot is "thinking".
+        LOADING = 0b0000_0000_0000_0000_0000_0000_1000_0000;
     }
 }
 
@@ -1227,5 +1201,40 @@ impl Serialize for MessageFlags {
         S: Serializer,
     {
         serializer.serialize_u64(self.bits())
+    }
+}
+
+#[cfg(feature = "model")]
+impl MessageId {
+    /// Returns a link referencing this message. When clicked, users will jump to the message.
+    /// The link will be valid for messages in either private channels or guilds.
+    pub fn link(&self, channel_id: ChannelId, guild_id: Option<GuildId>) -> String {
+        match guild_id {
+            Some(guild_id) => {
+                format!("https://discord.com/channels/{}/{}/{}", guild_id.0, channel_id.0, self.0)
+            },
+            None => format!("https://discord.com/channels/@me/{}/{}", channel_id.0, self.0),
+        }
+    }
+
+    /// Same as [`Self::link`] but tries to find the [`GuildId`]
+    /// if it is not provided.
+    pub async fn link_ensured(
+        &self,
+        cache_http: impl CacheHttp,
+        channel_id: ChannelId,
+        mut guild_id: Option<GuildId>,
+    ) -> String {
+        if guild_id.is_none() {
+            let found_channel = channel_id.to_channel(cache_http).await;
+
+            if let Ok(channel) = found_channel {
+                if let Some(c) = channel.guild() {
+                    guild_id = Some(c.guild_id);
+                }
+            }
+        }
+
+        self.link(channel_id, guild_id)
     }
 }

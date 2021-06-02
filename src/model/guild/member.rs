@@ -13,6 +13,8 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::utils;
@@ -46,12 +48,12 @@ pub struct Member {
     pub premium_since: Option<DateTime<Utc>>,
     /// The total permissions of the member in a channel, including overrides.
     ///
-    /// This is only `Some` when returned in an [`Interaction`] object.
+    /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
     /// [`Interaction`]: crate::model::interactions::Interaction
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub permissions: Option<String>,
+    pub permissions: Option<Permissions>,
 }
 
 #[cfg(feature = "model")]
@@ -140,14 +142,12 @@ impl Member {
         self.ban_with_reason(&http, dmd, "").await
     }
 
-    /// Ban the member from the guild with a reason. Refer to [`ban`] to further documentation.
+    /// Ban the member from the guild with a reason. Refer to [`Self::ban`] to further documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the errors `ban` may return, can also return [`Error::ExceededLimit`]
+    /// In addition to the errors [`Self::ban`] may return, can also return [`Error::ExceededLimit`]
     /// if the length of the reason is greater than 512.
-    ///
-    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(
         &self,
@@ -178,7 +178,7 @@ impl Member {
 
     /// Returns the "default channel" of the guild for the member.
     /// (This returns the first channel that can be read by the member, if there isn't
-    /// one returns `None`)
+    /// one returns [`None`])
     #[cfg(feature = "cache")]
     pub async fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
         let guild = self.guild_id.to_guild_cached(cache).await?;
@@ -233,7 +233,7 @@ impl Member {
     /// Retrieves the ID and position of the member's highest role in the
     /// hierarchy, if they have one.
     ///
-    /// This _may_ return `None` if:
+    /// This _may_ return [`None`] if:
     ///
     /// - the user has roles, but they are not present in the cache for cache
     /// inconsistency reasons
@@ -328,7 +328,7 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`Self::kick`] may return an error,
     /// can also return an error if the given reason is too long.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
@@ -481,7 +481,7 @@ impl Member {
     ///
     /// This is shorthand for manually searching through the Cache.
     ///
-    /// If role data can not be found for the member, then `None` is returned.
+    /// If role data can not be found for the member, then [`None`] is returned.
     #[cfg(feature = "cache")]
     pub async fn roles(&self, cache: impl AsRef<Cache>) -> Option<Vec<Role>> {
         Some(
@@ -535,10 +535,12 @@ impl Display for Member {
 #[non_exhaustive]
 pub struct PartialMember {
     /// Indicator of whether the member can hear in voice channels.
+    #[serde(default)]
     pub deaf: bool,
     /// Timestamp representing the date when the member joined.
     pub joined_at: Option<DateTime<Utc>>,
-    /// Indicator of whether the member can speak in voice channels.
+    /// Indicator of whether the member can speak in voice channels
+    #[serde(default)]
     pub mute: bool,
     /// The member's nickname, if present.
     ///
@@ -551,4 +553,16 @@ pub struct PartialMember {
     pub pending: bool,
     /// Timestamp representing the date since the member is boosting the guild.
     pub premium_since: Option<DateTime<Utc>>,
+    /// The unique Id of the guild that the member is a part of.
+    pub guild_id: Option<GuildId>,
+    /// Attached User struct.
+    pub user: Option<User>,
+    /// The total permissions of the member in a channel, including overrides.
+    ///
+    /// This is only [`Some`] when returned in an [`Interaction`] object.
+    ///
+    /// [`Interaction`]: crate::model::interactions::Interaction
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub permissions: Option<Permissions>,
 }

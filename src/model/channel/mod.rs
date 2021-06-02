@@ -6,6 +6,7 @@ mod channel_id;
 mod embed;
 mod guild_channel;
 mod message;
+mod partial_channel;
 mod private_channel;
 mod reaction;
 mod sticker;
@@ -24,6 +25,7 @@ pub use self::channel_id::*;
 pub use self::embed::*;
 pub use self::guild_channel::*;
 pub use self::message::*;
+pub use self::partial_channel::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::sticker::*;
@@ -59,11 +61,11 @@ pub enum Channel {
 
 #[cfg(feature = "model")]
 impl Channel {
-    /// Converts from `Channel` to `Option<GuildChannel>`.
+    /// Converts from [`Channel`] to `Option<GuildChannel>`.
     ///
     /// Converts `self` into an `Option<GuildChannel>`, consuming
-    /// `self`, and discarding a `PrivateChannel`, or
-    /// `ChannelCategory`, if any.
+    /// `self`, and discarding a [`PrivateChannel`], or
+    /// [`ChannelCategory`], if any.
     ///
     /// # Examples
     ///
@@ -94,10 +96,10 @@ impl Channel {
         }
     }
 
-    /// Converts from `Channel` to `Option<PrivateChannel>`.
+    /// Converts from [`Channel`] to `Option<PrivateChannel>`.
     ///
     /// Converts `self` into an `Option<PrivateChannel>`, consuming
-    /// `self`, and discarding a `GuildChannel`, or `ChannelCategory`,
+    /// `self`, and discarding a [`GuildChannel`], or [`ChannelCategory`],
     /// if any.
     ///
     /// # Examples
@@ -129,11 +131,11 @@ impl Channel {
         }
     }
 
-    /// Converts from `Channel` to `Option<ChannelCategory>`.
+    /// Converts from [`Channel`] to `Option<ChannelCategory>`.
     ///
     /// Converts `self` into an `Option<ChannelCategory>`,
-    /// consuming `self`, and discarding a `GuildChannel`, or
-    /// `PrivateChannel`, if any.
+    /// consuming `self`, and discarding a [`GuildChannel`], or
+    /// [`PrivateChannel`], if any.
     ///
     /// # Examples
     ///
@@ -303,12 +305,14 @@ pub enum ChannelType {
     ///
     /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
     News = 5,
-    /// An indicator that the channel is a `StoreChannel`
+    /// An indicator that the channel is a `StoreChannel]
     ///
     /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
     Store = 6,
     /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
+    /// An indicator that the channel is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(ChannelType {
@@ -332,19 +336,7 @@ impl ChannelType {
             ChannelType::News => "news",
             ChannelType::Store => "store",
             ChannelType::Stage => "stage",
-        }
-    }
-
-    #[inline]
-    pub fn num(self) -> u64 {
-        match self {
-            ChannelType::Text => 0,
-            ChannelType::Private => 1,
-            ChannelType::Voice => 2,
-            ChannelType::Category => 4,
-            ChannelType::News => 5,
-            ChannelType::Store => 6,
-            ChannelType::Stage => 13,
+            ChannelType::Unknown => "unknown",
         }
     }
 }
@@ -428,6 +420,8 @@ pub enum VideoQualityMode {
     Auto = 1,
     /// An indicator that the video quality is 720p.
     Full = 2,
+    /// An indicator that video quality is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(VideoQualityMode {

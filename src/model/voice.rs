@@ -10,6 +10,8 @@ use super::{
     id::{ChannelId, GuildId, RoleId, UserId},
     user::User,
 };
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::permissions::Permissions;
 
 /// Information about an available voice region.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -47,8 +49,8 @@ pub struct VoiceState {
     pub token: Option<String>,
     pub user_id: UserId,
     /// When unsuppressed, non-bot users will have this set to the current time.
-    /// Bot users will be set to `None`. When suppressed, the user will have
-    /// their `request_to_speak_timestamp` removed.
+    /// Bot users will be set to [`None`]. When suppressed, the user will have
+    /// their [`Self::request_to_speak_timestamp`] removed.
     pub request_to_speak_timestamp: Option<DateTime<Utc>>,
 }
 
@@ -106,7 +108,7 @@ impl<'de> Deserialize<'de> for VoiceState {
             pending: bool,
             premium_since: Option<DateTime<Utc>>,
             #[cfg(feature = "unstable_discord_api")]
-            permissions: Option<String>,
+            permissions: Option<Permissions>,
         }
 
         struct VoiceStateVisitor;

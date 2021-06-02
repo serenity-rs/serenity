@@ -3,12 +3,9 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
-use bytes::buf::Buf;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "cache")]
 use futures::stream::StreamExt;
-use reqwest::Url;
-use tokio::{fs::File, io::AsyncReadExt};
 
 #[cfg(feature = "model")]
 use crate::builder::EditChannel;
@@ -38,7 +35,7 @@ use crate::utils as serenity_utils;
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
 /// News channels are a subset of text channels and lack slow mode hence
-/// `slow_mode_rate` will be `None`.
+/// [`Self::slow_mode_rate`] will be [`None`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildChannel {
@@ -89,9 +86,7 @@ pub struct GuildChannel {
     /// **Note**: This is only available for voice channels.
     pub user_limit: Option<u64>,
     /// Used to tell if the channel is not safe for work.
-    /// Note however, it's recommended to use [`is_nsfw`] as it's gonna be more accurate.
-    ///
-    /// [`is_nsfw`]: Self::is_nsfw
+    /// Note however, it's recommended to use [`Self::is_nsfw`] as it's gonna be more accurate.
     // This field can or can not be present sometimes, but if it isn't
     // default to `false`.
     #[serde(default)]
@@ -104,7 +99,7 @@ pub struct GuildChannel {
     pub slow_mode_rate: Option<u64>,
     /// The region override.
     ///
-    /// **Note**: This is only available for voice and stage channels. `None`
+    /// **Note**: This is only available for voice and stage channels. [`None`]
     /// for voice and stage channels means automatic region selection.
     pub rtc_region: Option<String>,
     /// The video quality mode for a voice channel.
@@ -113,6 +108,12 @@ pub struct GuildChannel {
 
 #[cfg(feature = "model")]
 impl GuildChannel {
+    /// Whether or not this channel is text-based, meaning that
+    /// it is possible to send messages.
+    pub fn is_text_based(&self) -> bool {
+        matches!(self.kind, ChannelType::Text | ChannelType::News)
+    }
+
     /// Broadcasts to the channel that the current user is typing.
     ///
     /// For bots, this is a good indicator for long-running commands.
@@ -377,7 +378,7 @@ impl GuildChannel {
 
     /// Modifies a channel's settings, such as its position or name.
     ///
-    /// Refer to `EditChannel`s documentation for a full list of methods.
+    /// Refer to [`EditChannel`]s documentation for a full list of methods.
     ///
     /// # Examples
     ///
@@ -454,7 +455,7 @@ impl GuildChannel {
         self.id.edit_message(&http, message_id, f).await
     }
 
-    /// Edits a voice state in a stage channel. Pass `None` for `user_id` to
+    /// Edits a voice state in a stage channel. Pass [`None`] for `user_id` to
     /// edit the current user's voice state.
     ///
     /// Requires the [Mute Members] permission to suppress another user or
@@ -636,7 +637,7 @@ impl GuildChannel {
     /// Refer to the [`GetMessages`]-builder for more information on how to
     /// use `builder`.
     ///
-    /// **Note**: Returns an empty `Vec` if the current user does not have the
+    /// **Note**: Returns an empty [`Vec`] if the current user does not have the
     /// [Read Message History] permission.
     ///
     /// # Errors
@@ -816,7 +817,7 @@ impl GuildChannel {
     /// Gets all channel's pins.
     ///
     /// **Note**: If the current user lacks the [Read Message History] permission
-    /// an empty `Vec` will be returned.
+    /// an empty [`Vec`] will be returned.
     ///
     /// # Errors
     ///
@@ -946,11 +947,11 @@ impl GuildChannel {
     ///
     /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
     /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after `stop` is called.
+    /// for a few seconds after [`Typing::stop`] is called.
     /// Typing is also stopped when the struct is dropped.
     ///
     /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.
@@ -1116,7 +1117,7 @@ impl GuildChannel {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
     }
 
-    /// Sends a message with just the given message content in the channel.
+    /// Creates a webhook with only a name.
     ///
     /// # Errors
     ///
@@ -1136,22 +1137,18 @@ impl GuildChannel {
             return Err(Error::Model(ModelError::NameTooShort));
         } else if name.len() > 100 {
             return Err(Error::Model(ModelError::NameTooLong));
-        } else if self.kind.num() != 0 {
+        } else if !self.is_text_based() {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        let map = serde_json::json!({
-            "name": name,
-        });
-
-        http.as_ref().create_webhook(self.id.0, &map).await
+        self.id.create_webhook(&http, name).await
     }
 
-    /// Avatar must be a 128x128 image.
+    /// Creates a webhook with a name and an avatar.
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `create_webhook` may return an [`Error::Http`],
+    /// In addition to the reasons [`Self::create_webhook`] may return an [`Error::Http`],
     /// if the image is too large.
     pub async fn create_webhook_with_avatar<'a>(
         &self,
@@ -1166,48 +1163,11 @@ impl GuildChannel {
             return Err(Error::Model(ModelError::NameTooShort));
         } else if name.len() > 100 {
             return Err(Error::Model(ModelError::NameTooLong));
-        } else if self.kind.num() != 0 {
+        } else if !self.is_text_based() {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        let avatar = match avatar {
-            AttachmentType::Bytes {
-                data,
-                filename: _,
-            } => "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned()),
-            AttachmentType::File {
-                file,
-                filename: _,
-            } => {
-                let mut buf = Vec::new();
-                file.try_clone().await?.read_to_end(&mut buf).await?;
-
-                "data:image/png;base64,".to_string() + &base64::encode(&buf)
-            },
-            AttachmentType::Path(path) => {
-                let mut file = File::open(path).await?;
-                let mut buf = vec![];
-                file.read_to_end(&mut buf).await?;
-
-                "data:image/png;base64,".to_string() + &base64::encode(&buf)
-            },
-            AttachmentType::Image(url) => {
-                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
-                let response = http.as_ref().client.get(url).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = vec![0; bytes.len()];
-                bytes.copy_to_slice(&mut picture[..]);
-
-                "data:image/png;base64,".to_string() + &base64::encode(&picture)
-            },
-        };
-
-        let map = serde_json::json!({
-            "name": name,
-            "avatar": avatar
-        });
-
-        http.as_ref().create_webhook(self.id.0, &map).await
+        self.id.create_webhook_with_avatar(&http, name, avatar).await
     }
 }
 

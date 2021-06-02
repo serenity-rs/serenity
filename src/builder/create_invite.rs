@@ -213,7 +213,7 @@ impl Default for CreateInvite {
     ///
     /// # Examples
     ///
-    /// Create a default `CreateInvite` builder:
+    /// Create a default [`CreateInvite`] builder:
     ///
     /// ```rust
     /// use serenity::builder::CreateInvite;

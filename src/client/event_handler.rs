@@ -87,9 +87,11 @@ pub trait EventHandler: Send + Sync {
     /// Provides the partial data of the guild sent by discord,
     /// and the full data from the cache, if available.
     ///
-    /// The `unavailable` flag in the partial data determines the status of the guild.
+    /// The [`unavailable`] flag in the partial data determines the status of the guild.
     /// If the flag is false, the bot was removed from the guild, either by being
     /// kicked or banned. If the flag is true, the guild went offline.
+    ///
+    /// [`unavailable`]: GuildUnavailable::unavailable
     #[cfg(feature = "cache")]
     async fn guild_delete(
         &self,
@@ -103,9 +105,11 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the partial data of the guild sent by discord.
     ///
-    /// The `unavailable` flag in the partial data determines the status of the guild.
+    /// The [`unavailable`] flag in the partial data determines the status of the guild.
     /// If the flag is false, the bot was removed from the guild, either by being
     /// kicked or banned. If the flag is true, the guild went offline.
+    ///
+    /// [`unavailable`]: GuildUnavailable::unavailable
     #[cfg(not(feature = "cache"))]
     async fn guild_delete(&self, _ctx: Context, _incomplete: GuildUnavailable) {}
 
@@ -424,6 +428,70 @@ pub trait EventHandler: Send + Sync {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn interaction_create(&self, _ctx: Context, _interaction: Interaction) {}
+
+    /// Dispatched when a guild integration is created.
+    ///
+    /// Provides the created integration.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_create(&self, _ctx: Context, _integration: Integration) {}
+
+    /// Dispatched when a guild integration is updated.
+    ///
+    /// Provides the updated integration.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_update(&self, _ctx: Context, _integration: Integration) {}
+
+    /// Dispatched when a guild integration is deleted.
+    ///
+    /// Provides the integration's id, the id of the guild it belongs to, and its associated application id
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn integration_delete(
+        &self,
+        _ctx: Context,
+        _integration_id: IntegrationId,
+        _guild_id: GuildId,
+        _application_id: Option<ApplicationId>,
+    ) {
+    }
+
+    /// Dispatched when an application command is created.
+    ///
+    /// Provides the created application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_create(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
+    ) {
+    }
+
+    /// Dispatched when an application command is updated.
+    ///
+    /// Provides the updated application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_update(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
+    ) {
+    }
+
+    /// Dispatched when an application command is deleted.
+    ///
+    /// Provides the deleted application command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    async fn application_command_delete(
+        &self,
+        _ctx: Context,
+        _application_command: ApplicationCommand,
+    ) {
+    }
 }
 
 /// This core trait for handling raw events

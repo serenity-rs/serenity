@@ -37,7 +37,7 @@ use crate::model::channel::Channel;
 use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
 use crate::model::{id::EmojiId, misc::EmojiIdentifier};
 
-/// Converts a HashMap into a final `serde_json::Map` representation.
+/// Converts a HashMap into a final [`serde_json::Map`] representation.
 pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>) -> Map<String, Value>
 where
     H: BuildHasher,
@@ -94,7 +94,7 @@ pub fn parse_invite(code: &str) -> &str {
 
 /// Retrieves an Id from a user mention.
 ///
-/// If the mention is invalid, then `None` is returned.
+/// If the mention is invalid, then [`None`] is returned.
 ///
 /// # Examples
 ///
@@ -110,7 +110,7 @@ pub fn parse_invite(code: &str) -> &str {
 /// assert_eq!(parse_username("<@!114941315417899012>"), Some(114941315417899012));
 /// ```
 ///
-/// Asserting that an invalid username or nickname mention returns `None`:
+/// Asserting that an invalid username or nickname mention returns [`None`]:
 ///
 /// ```rust
 /// use serenity::utils::parse_username;
@@ -140,7 +140,7 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
 
 /// Retrieves an Id from a role mention.
 ///
-/// If the mention is invalid, then `None` is returned.
+/// If the mention is invalid, then [`None`] is returned.
 ///
 /// # Examples
 ///
@@ -152,7 +152,7 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
 /// assert_eq!(parse_role("<@&136107769680887808>"), Some(136107769680887808));
 /// ```
 ///
-/// Asserting that an invalid role mention returns `None`:
+/// Asserting that an invalid role mention returns [`None`]:
 ///
 /// ```rust
 /// use serenity::utils::parse_role;
@@ -178,7 +178,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
 
 /// Retrieves an Id from a channel mention.
 ///
-/// If the channel mention is invalid, then `None` is returned.
+/// If the channel mention is invalid, then [`None`] is returned.
 ///
 /// # Examples
 ///
@@ -190,7 +190,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
 /// assert_eq!(parse_channel("<#81384788765712384>"), Some(81384788765712384));
 /// ```
 ///
-/// Asserting that an invalid channel mention returns `None`:
+/// Asserting that an invalid channel mention returns [`None`]:
 ///
 /// ```rust
 /// use serenity::utils::parse_channel;
@@ -217,7 +217,7 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<u64> {
 
 /// Retrieve the ID number out of a channel, role, or user mention.
 ///
-/// If the mention is invalid, `None` is returned.
+/// If the mention is invalid, [`None`] is returned.
 ///
 /// # Examples
 ///
@@ -243,9 +243,9 @@ pub fn parse_mention(mention: impl AsRef<str>) -> Option<u64> {
 }
 
 /// Retrieves the animated state, name and Id from an emoji mention, in the form of an
-/// `EmojiIdentifier`.
+/// [`EmojiIdentifier`].
 ///
-/// If the emoji usage is invalid, then `None` is returned.
+/// If the emoji usage is invalid, then [`None`] is returned.
 ///
 /// # Examples
 ///
@@ -265,7 +265,7 @@ pub fn parse_mention(mention: impl AsRef<str>) -> Option<u64> {
 /// assert_eq!(parse_emoji("<:smugAnimeFace:302516740095606785>").unwrap(), expected);
 /// ```
 ///
-/// Asserting that an invalid emoji usage returns `None`:
+/// Asserting that an invalid emoji usage returns [`None`]:
 ///
 /// ```rust
 /// use serenity::utils::parse_emoji;
@@ -821,6 +821,7 @@ mod test {
             public_flags: None,
         };
 
+        #[allow(deprecated)]
         let mut guild = Guild {
             afk_channel_id: None,
             afk_timeout: 0,
@@ -848,7 +849,11 @@ mod test {
             region: "Ferris Island".to_string(),
             roles: HashMap::new(),
             splash: None,
+            discovery_splash: None,
             system_channel_id: None,
+            system_channel_flags: Default::default(),
+            rules_channel_id: None,
+            public_updates_channel_id: None,
             verification_level: VerificationLevel::None,
             voice_states: HashMap::new(),
             description: None,
@@ -857,6 +862,15 @@ mod test {
             banner: None,
             vanity_url_code: Some("bruhmoment1".to_string()),
             preferred_locale: "en-US".to_string(),
+            welcome_screen: None,
+            approximate_member_count: None,
+            approximate_presence_count: None,
+            nsfw: false,
+            max_video_channel_users: None,
+            max_presences: None,
+            max_members: None,
+            widget_enabled: Some(false),
+            widget_channel_id: None,
         };
 
         let member = Member {
@@ -883,6 +897,7 @@ mod test {
             name: "ferris-club-member".to_string(),
             permissions: Permissions::all(),
             position: 0,
+            tags: RoleTags::default(),
         };
 
         let channel = GuildChannel {
@@ -912,7 +927,7 @@ mod test {
         cache.guilds.write().await.insert(guild.id, guild.clone());
         cache.channels.write().await.insert(channel.id, channel.clone());
 
-        let with_user_metions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
+        let with_user_mentions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
         <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
         <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
@@ -926,7 +941,7 @@ mod test {
 
         // User mentions
         let options = ContentSafeOptions::default();
-        assert_eq!(without_user_mentions, content_safe(&cache, with_user_metions, &options).await);
+        assert_eq!(without_user_mentions, content_safe(&cache, with_user_mentions, &options).await);
 
         let options = ContentSafeOptions::default();
         assert_eq!(
@@ -959,7 +974,7 @@ mod test {
         );
 
         let options = options.clean_user(false);
-        assert_eq!(with_user_metions, content_safe(&cache, with_user_metions, &options).await);
+        assert_eq!(with_user_mentions, content_safe(&cache, with_user_mentions, &options).await);
 
         // Channel mentions
         let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#0> \

@@ -17,7 +17,7 @@ pub struct CreateInteractionResponse(pub HashMap<&'static str, Value>);
 impl CreateInteractionResponse {
     /// Sets the InteractionResponseType of the message.
     ///
-    /// Defaults to `Acknowledge`.
+    /// Defaults to `ChannelMessageWithSource`.
     pub fn kind(&mut self, kind: InteractionResponseType) -> &mut Self {
         self.0.insert("type", Value::Number(serde_json::Number::from(kind as u8)));
         self
@@ -75,17 +75,17 @@ impl CreateInteractionResponseData {
     }
 
     /// Create an embed for the message.
-    pub fn embed<F>(&mut self, f: F) -> &mut Self
+    pub fn create_embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.set_embed(embed)
+        self.add_embed(embed)
     }
 
-    /// Set an embed for the message.
-    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+    /// Adds an embed to the message.
+    pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
@@ -95,6 +95,18 @@ impl CreateInteractionResponseData {
             embeds.push(embed);
         }
 
+        self
+    }
+
+    /// Sets a list of embeds to include in the message.
+    ///
+    /// Calling this multiple times will overwrite the embed list.
+    /// To append embeds, call [`Self::add_embed`] instead.
+    pub fn embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
+        let embeds =
+            embeds.into_iter().map(|embed| utils::hashmap_to_json_map(embed.0).into()).collect();
+
+        self.0.insert("embeds", Value::Array(embeds));
         self
     }
 
@@ -112,6 +124,7 @@ impl CreateInteractionResponseData {
         self
     }
 
+    /// Sets the flags for the message.
     pub fn flags(&mut self, flags: InteractionApplicationCommandCallbackDataFlags) -> &mut Self {
         self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits())));
         self

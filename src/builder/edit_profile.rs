@@ -10,7 +10,7 @@ use crate::internal::prelude::*;
 pub struct EditProfile(pub HashMap<&'static str, Value>);
 
 impl EditProfile {
-    /// Sets the avatar of the current user. `None` can be passed to remove an
+    /// Sets the avatar of the current user. [`None`] can be passed to remove an
     /// avatar.
     ///
     /// A base64-encoded string is accepted as the avatar content.

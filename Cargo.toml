@@ -8,7 +8,7 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.10.5"
+version = "0.10.7"
 edition = "2018"
 include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
 
@@ -23,7 +23,7 @@ features = ["log"]
 
 [dependencies.command_attr]
 path = "./command_attr"
-version = "0.3.5"
+version = "0.3.6"
 optional = true
 
 [dependencies.serde]

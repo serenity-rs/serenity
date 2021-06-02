@@ -66,6 +66,8 @@ pub struct HttpBuilder<'a> {
     token: Option<String>,
     proxy: Option<Url>,
     fut: Option<BoxFuture<'a, Result<Http>>>,
+    #[cfg(feature = "unstable_discord_api")]
+    application_id: Option<u64>,
 }
 
 impl<'a> HttpBuilder<'a> {
@@ -77,6 +79,8 @@ impl<'a> HttpBuilder<'a> {
             token: None,
             proxy: None,
             fut: None,
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: None,
         }
     }
 
@@ -84,6 +88,14 @@ impl<'a> HttpBuilder<'a> {
     /// The `token` will automatically be prefixed "Bot " if not already.
     pub fn new(token: impl AsRef<str>) -> Self {
         Self::_new().token(token)
+    }
+
+    /// Sets the application_id to use slash commands.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn application_id(mut self, application_id: u64) -> Self {
+        self.application_id = Some(application_id);
+
+        self
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
@@ -146,7 +158,7 @@ impl<'a> HttpBuilder<'a> {
     /// [`twilight-http-proxy`]: https://github.com/twilight-rs/http-proxy
     /// [`HTTP CONNECT`]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/CONNECT
     pub fn proxy(mut self, proxy: impl Into<String>) -> Result<Self> {
-        let proxy = Url::from_str(&proxy.into()).map_err(|e| HttpError::Url(e))?;
+        let proxy = Url::from_str(&proxy.into()).map_err(HttpError::Url)?;
         self.proxy = Some(proxy);
 
         Ok(self)
@@ -161,6 +173,11 @@ impl<'a> Future for HttpBuilder<'a> {
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let token = self.token.take().unwrap();
+
+            #[cfg(feature = "unstable_discord_api")]
+            let application_id = self
+                .application_id
+                .expect("Expected application Id in order to use slash commands");
 
             let client = self.client.take().unwrap_or_else(|| {
                 let builder = configure_client_backend(Client::builder());
@@ -182,6 +199,8 @@ impl<'a> Future for HttpBuilder<'a> {
                     ratelimiter_disabled,
                     proxy,
                     token,
+                    #[cfg(feature = "unstable_discord_api")]
+                    application_id,
                 })
             }))
         }
@@ -190,7 +209,7 @@ impl<'a> Future for HttpBuilder<'a> {
     }
 }
 
-/// **Note**: For all member functions that return a `Result`, the
+/// **Note**: For all member functions that return a [`Result`], the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
 ///
 /// [`Error::Http`]: crate::error::Error::Http
@@ -201,6 +220,8 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
+    #[cfg(feature = "unstable_discord_api")]
+    pub application_id: u64,
 }
 
 impl fmt::Debug for Http {
@@ -224,7 +245,34 @@ impl Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: token.to_string(),
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: 0,
         }
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn new_with_application_id(
+        application_id: u64,
+        timeout: Option<std::time::Duration>,
+        connect_timeout: Option<std::time::Duration>,
+    ) -> Self {
+        let builder = configure_client_backend(Client::builder());
+      
+        if let Some(t) = timeout {
+            builder = builder.timeout(t);
+        }
+
+        if let Some(t) = connect_timeout {
+            builder = builder.connect_timeout(t);
+        }
+
+        let built = builder.build().expect("Cannot build reqwest::Client");
+
+        let mut data = Self::new(Arc::new(built), "");
+
+        data.application_id = application_id;
+
+        data
     }
 
     pub fn new_with_token(token: &str) -> Self {
@@ -265,6 +313,21 @@ impl Http {
         };
 
         Self::new(Arc::new(built), &token)
+    }
+  
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn new_with_token_application_id(
+        token: &str,
+        application_id: u64,
+        timeout: Option<std::time::Duration>,
+        connect_timeout: Option<std::time::Duration>,
+    ) -> Self {
+        let mut base = Self::new_with_timeouts(timeout, connect_timeout, token);
+
+        base.application_id = application_id;
+
+        base
+
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -356,12 +419,11 @@ impl Http {
 
     /// Creates an emoji in the given [`Guild`] with the given data.
     ///
-    /// View the source code for [`Guild`]'s [`create_emoji`] method to see what
+    /// View the source code for [`Guild::create_emoji`] method to see what
     /// fields this requires.
     ///
     /// **Note**: Requires the [Manage Emojis] permission.
     ///
-    /// [`create_emoji`]: Guild::create_emoji
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     pub async fn create_emoji(&self, guild_id: u64, map: &Value) -> Result<Emoji> {
         self.fire(Request {
@@ -376,40 +438,23 @@ impl Http {
 
     /// Create a follow-up message for an Interaction.
     ///
-    /// Functions the same as [`execute_webhook`]
-    ///
-    /// [`execute_webhook`]: Self::execute_webhook
+    /// Functions the same as [`Self::execute_webhook`]
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
-        wait: bool,
-        map: &JsonMap,
-    ) -> Result<Option<Message>> {
-        let body = serde_json::to_vec(map)?;
-
-        let mut headers = Headers::new();
-        headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
-
-        let response = self
-            .request(Request {
-                body: Some(&body),
-                headers: Some(headers),
-                route: RouteInfo::CreateFollowupMessage {
-                    application_id,
-                    interaction_token,
-                    wait,
-                },
-            })
-            .await?;
-
-        if response.status() == StatusCode::NO_CONTENT {
-            return Ok(None);
-        }
-
-        response.json::<Message>().await.map(Some).map_err(From::from)
+        map: &Value,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateFollowupMessage {
+                application_id: self.application_id,
+                interaction_token,
+            },
+        })
+        .await
     }
 
     /// Creates a new global command.
@@ -418,22 +463,58 @@ impl Http {
     ///
     /// Refer to Discord's [docs] for field information.
     ///
-    /// **note:** Creating a command with the same name as an existing command for your application
-    /// will overwrite the old command.
+    /// **Note**:
+    /// Creating a command with the same name as an existing command for your
+    /// application will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_global_application_command(
         &self,
-        application_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
+            },
+        })
+        .await
+    }
+
+    /// Creates new global application commands.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_global_application_commands(
+        &self,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateGlobalApplicationCommands {
+                application_id: self.application_id,
+            },
+        })
+        .await
+    }
+
+    /// Creates new guild application commands.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_guild_application_commands(
+        &self,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateGuildApplicationCommands {
+                application_id: self.application_id,
+                guild_id,
             },
         })
         .await
@@ -494,7 +575,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
@@ -502,7 +582,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
             },
         })
@@ -727,7 +807,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
         message_id: u64,
     ) -> Result<()> {
@@ -735,7 +814,7 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::DeleteFollowupMessage {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
                 message_id,
             },
@@ -746,16 +825,12 @@ impl Http {
     /// Deletes a global command.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn delete_global_application_command(
-        &self,
-        application_id: u64,
-        command_id: u64,
-    ) -> Result<()> {
+    pub async fn delete_global_application_command(&self, command_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
             route: RouteInfo::DeleteGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 command_id,
             },
         })
@@ -779,7 +854,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
     ) -> Result<()> {
@@ -787,7 +861,7 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::DeleteGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
             },
@@ -900,14 +974,13 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_original_interaction_response(
         &self,
-        application_id: u64,
         interaction_token: &str,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
             route: RouteInfo::DeleteOriginalInteractionResponse {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
             },
         })
@@ -967,7 +1040,7 @@ impl Http {
 
     /// Deletes a [`Webhook`] given its Id.
     ///
-    /// This method requires authentication, whereas [`delete_webhook_with_token`]
+    /// This method requires authentication, whereas [`Self::delete_webhook_with_token`]
     /// does not.
     ///
     /// # Examples
@@ -986,8 +1059,6 @@ impl Http {
     ///       Ok(())
     /// # }
     /// ```
-    ///
-    /// [`delete_webhook_with_token`]: Self::delete_webhook_with_token
     pub async fn delete_webhook(&self, webhook_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1069,7 +1140,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_followup_message(
         &self,
-        application_id: u64,
         interaction_token: &str,
         message_id: u64,
         map: &Value,
@@ -1078,7 +1148,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
                 message_id,
             },
@@ -1097,7 +1167,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_global_application_command(
         &self,
-        application_id: u64,
         command_id: u64,
         map: &Value,
     ) -> Result<ApplicationCommand> {
@@ -1105,7 +1174,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditGlobalApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 command_id,
             },
         })
@@ -1137,7 +1206,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_command(
         &self,
-        application_id: u64,
         guild_id: u64,
         command_id: u64,
         map: &Value,
@@ -1146,9 +1214,61 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditGuildApplicationCommand {
-                application_id,
+                application_id: self.application_id,
                 guild_id,
                 command_id,
+            },
+        })
+        .await
+    }
+
+    /// Edits a guild command permissions.
+    ///
+    /// Updates for guild commands will be available immediately.
+    ///
+    /// Refer to Discord's [documentation] for field information.
+    ///
+    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_guild_application_command_permissions(
+        &self,
+        guild_id: u64,
+        command_id: u64,
+        map: &Value,
+    ) -> Result<ApplicationCommandPermission> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditGuildApplicationCommandPermission {
+                application_id: self.application_id,
+                guild_id,
+                command_id,
+            },
+        })
+        .await
+    }
+
+    /// Edits a guild commands permissions.
+    ///
+    /// Updates for guild commands will be available immediately.
+    ///
+    /// Refer to Discord's [documentation] for field information.
+    ///
+    /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_guild_application_commands_permissions(
+        &self,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditGuildApplicationCommandsPermissions {
+                application_id: self.application_id,
+                guild_id,
             },
         })
         .await
@@ -1168,14 +1288,32 @@ impl Http {
         .await
     }
 
-    /// Edits a [`Guild`]'s embed setting.
-    pub async fn edit_guild_embed(&self, guild_id: u64, map: &Value) -> Result<GuildEmbed> {
+    /// Edits a [`Guild`]'s widget.
+    pub async fn edit_guild_widget(&self, guild_id: u64, map: &Value) -> Result<GuildWidget> {
         let body = serde_json::to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
             headers: None,
-            route: RouteInfo::EditGuildEmbed {
+            route: RouteInfo::EditGuildWidget {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Edits a guild welcome screen.
+    pub async fn edit_guild_welcome_screen(
+        &self,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<GuildWelcomeScreen> {
+        let body = serde_json::to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::EditGuildWelcomeScreen {
                 guild_id,
             },
         })
@@ -1245,7 +1383,7 @@ impl Http {
 
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     pub async fn edit_nickname(&self, guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
         let map = json!({ "nick": new_nickname });
         let body = serde_json::to_vec(&map)?;
@@ -1260,6 +1398,24 @@ impl Http {
         .await
     }
 
+    /// Gets the initial interaction response.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_original_interaction_response(
+        &self,
+        interaction_token: &str,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetOriginalInteractionResponse {
+                application_id: self.application_id,
+                interaction_token,
+            },
+        })
+        .await
+    }
+
     /// Edits the initial interaction response.
     ///
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
@@ -1269,7 +1425,6 @@ impl Http {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_original_interaction_response(
         &self,
-        application_id: u64,
         interaction_token: &str,
         map: &Value,
     ) -> Result<Message> {
@@ -1277,7 +1432,7 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
-                application_id,
+                application_id: self.application_id,
                 interaction_token,
             },
         })
@@ -1461,9 +1616,9 @@ impl Http {
     /// - **name**: the name of the webhook, limited to between 2 and 100 characters
     ///   long.
     ///
-    /// Note that, unlike with [`create_webhook`], _all_ values are optional.
+    /// Note that, unlike with [`Self::create_webhook`], _all_ values are optional.
     ///
-    /// This method requires authentication, whereas [`edit_webhook_with_token`]
+    /// This method requires authentication, whereas [`Self::edit_webhook_with_token`]
     /// does not.
     ///
     /// # Examples
@@ -1486,9 +1641,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`create_webhook`]: Self::create_webhook
-    /// [`edit_webhook_with_token`]: Self::edit_webhook_with_token
     pub async fn edit_webhook(&self, webhook_id: u64, map: &Value) -> Result<Webhook> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
@@ -1502,7 +1654,7 @@ impl Http {
 
     /// Edits the webhook with the given data.
     ///
-    /// Refer to the documentation for [`edit_webhook`] for more information.
+    /// Refer to the documentation for [`Self::edit_webhook`] for more information.
     ///
     /// This method does _not_ require authentication.
     ///
@@ -1525,8 +1677,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`edit_webhook`]: Self::edit_webhook
     pub async fn edit_webhook_with_token(
         &self,
         webhook_id: u64,
@@ -1947,15 +2097,30 @@ impl Http {
     /// Fetches all of the global commands for your application.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn get_global_application_commands(
-        &self,
-        application_id: u64,
-    ) -> Result<Vec<ApplicationCommand>> {
+    pub async fn get_global_application_commands(&self) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommands {
-                application_id,
+                application_id: self.application_id,
+            },
+        })
+        .await
+    }
+
+    /// Fetches a global commands for your application by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_global_application_command(
+        &self,
+        command_id: u64,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGlobalApplicationCommand {
+                application_id: self.application_id,
+                command_id,
             },
         })
         .await
@@ -1973,31 +2138,138 @@ impl Http {
         .await
     }
 
-    /// Fetches all of the guild commands for your application for a specific guild.
-    #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn get_guild_application_commands(
-        &self,
-        application_id: u64,
-        guild_id: u64,
-    ) -> Result<Vec<ApplicationCommand>> {
+    /// Gets guild information with counts.
+    pub async fn get_guild_with_counts(&self, guild_id: u64) -> Result<PartialGuild> {
         self.fire(Request {
             body: None,
             headers: None,
-            route: RouteInfo::GetGuildApplicationCommands {
-                application_id,
+            route: RouteInfo::GetGuildWithCounts {
                 guild_id,
             },
         })
         .await
     }
 
+    /// Fetches all of the guild commands for your application for a specific guild.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_commands(
+        &self,
+        guild_id: u64,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommands {
+                application_id: self.application_id,
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Fetches a guild command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_command(
+        &self,
+        guild_id: u64,
+        command_id: u64,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommand {
+                application_id: self.application_id,
+                guild_id,
+                command_id,
+            },
+        })
+        .await
+    }
+
+    /// Fetches all of the guild commands permissions for your application for a specific guild.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_commands_permissions(
+        &self,
+        guild_id: u64,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommandsPermissions {
+                application_id: self.application_id,
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Gives the guild command permission for your application for a specific guild.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_guild_application_command_permissions(
+        &self,
+        guild_id: u64,
+        command_id: u64,
+    ) -> Result<ApplicationCommandPermission> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommandPermissions {
+                application_id: self.application_id,
+                guild_id,
+                command_id,
+            },
+        })
+        .await
+    }
+
     /// Gets a guild embed information.
+    #[deprecated(note = "get_guild_embed was renamed to get_guild_widget")]
+    #[allow(deprecated)]
     pub async fn get_guild_embed(&self, guild_id: u64) -> Result<GuildEmbed> {
         self.fire(Request {
             body: None,
             headers: None,
-            route: RouteInfo::GetGuildEmbed {
+            route: RouteInfo::GetGuildWidget {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Gets a guild widget information.
+    pub async fn get_guild_widget(&self, guild_id: u64) -> Result<GuildWidget> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildWidget {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Gets a guild preview.
+    pub async fn get_guild_preview(&self, guild_id: u64) -> Result<GuildPreview> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildPreview {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    /// Gets a guild welcome screen information.
+    pub async fn get_guild_welcome_screen(&self, guild_id: u64) -> Result<GuildWelcomeScreen> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildWelcomeScreen {
                 guild_id,
             },
         })
@@ -2399,7 +2671,7 @@ impl Http {
 
     /// Retrieves a webhook given its Id.
     ///
-    /// This method requires authentication, whereas [`get_webhook_with_token`] does
+    /// This method requires authentication, whereas [`Self::get_webhook_with_token`] does
     /// not.
     ///
     /// # Examples
@@ -2416,8 +2688,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`get_webhook_with_token`]: Self::get_webhook_with_token
     pub async fn get_webhook(&self, webhook_id: u64) -> Result<Webhook> {
         self.fire(Request {
             body: None,
@@ -2520,7 +2790,7 @@ impl Http {
         };
 
         if let Some(proxy) = &self.proxy {
-            url.set_host(proxy.host_str()).map_err(|e| HttpError::Url(e))?;
+            url.set_host(proxy.host_str()).map_err(HttpError::Url)?;
             url.set_scheme(proxy.scheme()).map_err(|_| HttpError::InvalidScheme)?;
             url.set_port(proxy.port()).map_err(|_| HttpError::InvalidPort)?;
         }
@@ -2700,11 +2970,11 @@ impl Http {
     ///
     /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
     /// on the returned struct to stop typing. Note that on some clients, typing may persist
-    /// for a few seconds after `stop` is called.
+    /// for a few seconds after [`Typing::stop`] is called.
     /// Typing is also stopped when the struct is dropped.
     ///
     /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    /// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.
@@ -2751,7 +3021,7 @@ impl Http {
     /// bound.
     ///
     /// If you don't need to deserialize the response and want the response instance
-    /// itself, use [`request`].
+    /// itself, use [`Self::request`].
     ///
     /// # Examples
     ///
@@ -2792,7 +3062,6 @@ impl Http {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     ///
-    /// [`request`]: Self::request
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
@@ -2803,7 +3072,7 @@ impl Http {
 
     /// Performs a request, ratelimiting it if necessary.
     ///
-    /// Returns the raw reqwest Response. Use [`fire`] to deserialize the response
+    /// Returns the raw reqwest Response. Use [`Self::fire`] to deserialize the response
     /// into some type.
     ///
     /// # Examples
@@ -2836,8 +3105,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`fire`]: Self::fire
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
@@ -2902,37 +3169,8 @@ impl Default for Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
+            #[cfg(feature = "unstable_discord_api")]
+            application_id: 0,
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::HttpBuilder;
-
-    #[tokio::test]
-    async fn test_http_builder_defaults() {
-        let http = HttpBuilder::new("is this dubu?").await.expect("Create Http");
-
-        assert!(!http.ratelimiter_disabled);
-        assert!(http.proxy.is_none());
-    }
-
-    #[tokio::test]
-    async fn test_http_builder_with_proxy() {
-        let http = HttpBuilder::new("no it is token")
-            .ratelimiter_disabled(true)
-            .proxy("http://127.0.0.1:3000")
-            .expect("Set proxy")
-            .await
-            .expect("Create Http");
-
-        assert!(http.ratelimiter_disabled);
-
-        let proxy = http.proxy.expect("Http proxy missing");
-
-        assert_eq!(proxy.scheme(), "http");
-        assert_eq!(proxy.host_str(), Some("127.0.0.1"));
-        assert_eq!(proxy.port(), Some(3000));
     }
 }

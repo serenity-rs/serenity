@@ -52,7 +52,7 @@ use crate::model::{
 /// you need to. For most use cases, you will not need to do this, and you can
 /// leave the client to do it.
 ///
-/// This can be done by passing in the required parameters to [`new`]. You can
+/// This can be done by passing in the required parameters to [`Self::new`]. You can
 /// then manually handle the shard yourself and receive events via
 /// [`receive`].
 ///
@@ -61,10 +61,9 @@ use crate::model::{
 ///
 /// # Examples
 ///
-/// See the documentation for [`new`] on how to use this.
+/// See the documentation for [`Self::new`] on how to use this.
 ///
 /// [`Client`]: crate::Client
-/// [`new`]: Self::new
 /// [`receive`]: #method.receive
 /// [docs]: https://discord.com/developers/docs/topics/gateway#sharding
 /// [module docs]: crate::gateway#sharding
@@ -133,12 +132,10 @@ impl Shard {
     /// ```
     ///
     /// # Errors
-    /// On Error, will return either [`Error::Gateway`] or [`Error::Rustls`]
-    /// / [`Error::Tungstenite`] depending on if rustls or native_tls is used.
+    /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`]
+    /// or a Rustls/native TLS error.
     ///
-    /// [`Error::Gateway`]: crate::error::Error::Gateway
-    /// [`Error::Rustls`]: crate::error::Error::Rustls
-    /// [`Error::Tungstenite`]: crate::error::Error::Tungstenite
+    /// [`Error::Gateway`]: crate::Error::Gateway
     pub async fn new(
         ws_url: Arc<Mutex<String>>,
         token: &str,
@@ -216,7 +213,7 @@ impl Shard {
     /// Sends a heartbeat to the gateway with the current sequence.
     ///
     /// This sets the last heartbeat time to now, and
-    /// `last_heartbeat_acknowledged` to `false`.
+    /// [`Self::last_heartbeat_acknowledged`] to `false`.
     ///
     /// # Errors
     ///
@@ -494,16 +491,16 @@ impl Shard {
     ///
     /// # Errors
     ///
-    /// Returns a `GatewayError::InvalidAuthentication` if invalid
+    /// Returns a [`GatewayError::InvalidAuthentication`] if invalid
     /// authentication was sent in the IDENTIFY.
     ///
-    /// Returns a `GatewayError::InvalidShardData` if invalid shard data was
+    /// Returns a [`GatewayError::InvalidShardData`] if invalid shard data was
     /// sent in the IDENTIFY.
     ///
-    /// Returns a `GatewayError::NoAuthentication` if no authentication was sent
+    /// Returns a [`GatewayError::NoAuthentication`] if no authentication was sent
     /// in the IDENTIFY.
     ///
-    /// Returns a `GatewayError::OverloadedShard` if the shard would have too
+    /// Returns a [`GatewayError::OverloadedShard`] if the shard would have too
     /// many guilds assigned to it.
     #[instrument(skip(self))]
     pub(crate) fn handle_event(
@@ -639,15 +636,13 @@ impl Shard {
 
     /// Performs a deterministic reconnect.
     ///
-    /// The type of reconnect is deterministic on whether a [`session_id`].
+    /// The type of reconnect is deterministic on whether a [`Self::session_id`].
     ///
     /// If the `session_id` still exists, then a RESUME is sent. If not, then
     /// an IDENTIFY is sent.
     ///
     /// Note that, if the shard is already in a stage of
     /// [`ConnectionStage::Connecting`], then no action will be performed.
-    ///
-    /// [`session_id`]: Self::session_id
     pub fn should_reconnect(&mut self) -> Option<ReconnectType> {
         if self.stage == ConnectionStage::Connecting {
             return None;
@@ -742,7 +737,7 @@ impl Shard {
     /// Sets the shard as going into identifying stage, which sets:
     ///
     /// - the time that the last heartbeat sent as being now
-    /// - the `stage` to `Identifying`
+    /// - the `stage` to [`ConnectionStage::Identifying`]
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client.send_identify(&self.shard_info, &self.token, self.intents).await?;

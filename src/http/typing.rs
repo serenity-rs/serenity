@@ -17,11 +17,11 @@ use crate::{error::Result, http::Http};
 ///
 /// Typing is started by using the [`Typing::start`] method
 /// and stopped by using the [`Typing::stop`] method.
-/// Note that on some clients, typing may persist for a few seconds after `stop` is called.
+/// Note that on some clients, typing may persist for a few seconds after [`Typing::stop`] is called.
 /// Typing is also stopped when the struct is dropped.
 ///
 /// If a message is sent while typing is triggered, the user will stop typing for a brief period
-/// of time and then resume again until either `stop` is called or the struct is dropped.
+/// of time and then resume again until either [`Typing::stop`] is called or the struct is dropped.
 ///
 /// This should rarely be used for bots, although it is a good indicator that a
 /// long-running command is still being processed.
@@ -56,7 +56,7 @@ impl Typing {
     /// Starts typing in the specified [`Channel`] for an indefinite period of time.
     ///
     /// Returns [`Typing`]. To stop typing, you must call the [`Typing::stop`] method on
-    /// the returned `Typing` object or wait for it to be dropped. Note that on some
+    /// the returned [`Typing`] object or wait for it to be dropped. Note that on some
     /// clients, typing may persist for a few seconds after stopped.
     ///
     /// # Errors

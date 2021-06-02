@@ -90,7 +90,7 @@ use crate::{
     Error,
 };
 
-/// Macro to format a command according to a `HelpBehaviour` or
+/// Macro to format a command according to a [`HelpBehaviour`] or
 /// continue to the next command-name upon hiding.
 #[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! format_command_name {
@@ -103,7 +103,7 @@ macro_rules! format_command_name {
     };
 }
 
-/// Wraps around `warn`-macro in order to keep
+/// Wraps around [`warn`]-macro in order to keep
 /// the literal same for all formats of help.
 #[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! warn_about_failed_send {
@@ -154,7 +154,7 @@ pub struct Suggestions(pub Vec<SuggestedCommandName>);
 
 #[cfg(all(feature = "cache", feature = "http"))]
 impl Suggestions {
-    /// Immutably borrow inner `Vec`.
+    /// Immutably borrow inner [`Vec`].
     #[inline]
     pub fn as_vec(&self) -> &Vec<SuggestedCommandName> {
         &self.0
@@ -579,9 +579,11 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                     });
                 }
 
-                let available_text = if options.only_in == OnlyIn::Dm {
+                let is_only = |only| group.options.only_in == only || options.only_in == only;
+
+                let available_text = if is_only(OnlyIn::Dm) {
                     &help_options.dm_only_text
-                } else if options.only_in == OnlyIn::Guild {
+                } else if is_only(OnlyIn::Guild) {
                     &help_options.guild_only_text
                 } else {
                     &help_options.dm_and_guild_text
@@ -928,8 +930,8 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
     .boxed()
 }
 
-/// Iterates over all commands and forges them into a `CustomisedHelpData`,
-/// taking `HelpOptions` into consideration when deciding on whether a command
+/// Iterates over all commands and forges them into a [`CustomisedHelpData`],
+/// taking [`HelpOptions`] into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
 #[allow(clippy::implicit_hasher)]
@@ -1271,7 +1273,7 @@ async fn send_error_embed(
 ///
 /// # Examples
 ///
-/// Use the command with `exec_help`:
+/// Use the command with [`StandardFramework::help`]:
 ///
 /// ```rust,no_run
 /// # use serenity::prelude::*;
@@ -1297,6 +1299,8 @@ async fn send_error_embed(
 /// let framwork = StandardFramework::new()
 ///     .help(&MY_HELP);
 /// ```
+///
+/// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub async fn with_embeds(
@@ -1372,7 +1376,7 @@ pub async fn with_embeds(
     }
 }
 
-/// Turns grouped commands into a `String` taking plain help format into account.
+/// Turns grouped commands into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::let_underscore_must_use)]
 fn grouped_commands_to_plain_string(
@@ -1393,7 +1397,7 @@ fn grouped_commands_to_plain_string(
     result
 }
 
-/// Turns a single command into a `String` taking plain help format into account.
+/// Turns a single command into a [`String`] taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::let_underscore_must_use)]
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {

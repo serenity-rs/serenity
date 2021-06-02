@@ -102,7 +102,7 @@ impl fmt::Debug for Ratelimiter {
 }
 
 impl Ratelimiter {
-    /// Creates a new ratelimiter, with a shared `reqwest` client and the
+    /// Creates a new ratelimiter, with a shared [`reqwest`] client and the
     /// bot's token.
     ///
     /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not
@@ -376,7 +376,7 @@ impl Default for Ratelimit {
 /// This only contains the basic information needed by the ratelimiter to
 /// perform a full cycle of making the request and returning the response.
 ///
-/// Use the `From` implementations for making one of these.
+/// Use the [`From`] implementations for making one of these.
 #[derive(Debug)]
 pub struct RatelimitedRequest<'a> {
     req: Request<'a>,

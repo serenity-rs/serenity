@@ -798,7 +798,12 @@ impl CacheUpdate for GuildUpdateEvent {
             guild.icon.clone_from(&self.guild.icon);
             guild.name.clone_from(&self.guild.name);
             guild.owner_id.clone_from(&self.guild.owner_id);
-            guild.region.clone_from(&self.guild.region);
+
+            #[allow(deprecated)]
+            {
+                guild.region.clone_from(&self.guild.region);
+            }
+
             guild.roles.clone_from(&self.guild.roles);
             guild.verification_level = self.guild.verification_level;
         }
@@ -998,22 +1003,20 @@ impl CacheUpdate for PresenceUpdateEvent {
 
                 // Create a partial member instance out of the presence update
                 // data.
-                if !guild.members.contains_key(&self.presence.user_id) {
-                    if let Some(user) = self.presence.user.as_ref() {
-                        guild.members.insert(self.presence.user_id, Member {
-                            deaf: false,
-                            guild_id,
-                            joined_at: None,
-                            mute: false,
-                            nick: None,
-                            user: user.clone(),
-                            roles: vec![],
-                            pending: false,
-                            premium_since: None,
-                            #[cfg(feature = "unstable_discord_api")]
-                            permissions: None,
-                        });
-                    }
+                if let Some(user) = self.presence.user.as_ref() {
+                    guild.members.entry(self.presence.user_id).or_insert_with(|| Member {
+                        deaf: false,
+                        guild_id,
+                        joined_at: None,
+                        mute: false,
+                        nick: None,
+                        user: user.clone(),
+                        roles: vec![],
+                        pending: false,
+                        premium_since: None,
+                        #[cfg(feature = "unstable_discord_api")]
+                        permissions: None,
+                    });
                 }
             }
         } else if self.presence.status == OnlineStatus::Offline {
@@ -1185,10 +1188,7 @@ impl CacheUpdate for ReadyEvent {
                 cache.update_user_entry(user).await;
             }
 
-            presence.user = match cache.user(user_id).await {
-                Some(user) => Some(user),
-                None => None,
-            };
+            presence.user = cache.user(user_id).await;
         }
 
         cache.presences.write().await.extend(ready.presences);
@@ -1375,6 +1375,116 @@ impl Serialize for InteractionCreateEvent {
         S: Serializer,
     {
         Interaction::serialize(&self.interaction, serializer)
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct IntegrationCreateEvent {
+    pub integration: Integration,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+impl<'de> Deserialize<'de> for IntegrationCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let integration = Integration::deserialize(deserializer)?;
+
+        Ok(Self {
+            integration,
+        })
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct IntegrationUpdateEvent {
+    pub integration: Integration,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+impl<'de> Deserialize<'de> for IntegrationUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let integration = Integration::deserialize(deserializer)?;
+
+        Ok(Self {
+            integration,
+        })
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct IntegrationDeleteEvent {
+    pub id: IntegrationId,
+    pub guild_id: GuildId,
+    pub application_id: Option<ApplicationId>,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandCreateEvent {
+    pub application_command: ApplicationCommand,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+impl<'de> Deserialize<'de> for ApplicationCommandCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let application_command = ApplicationCommand::deserialize(deserializer)?;
+
+        Ok(Self {
+            application_command,
+        })
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandUpdateEvent {
+    pub application_command: ApplicationCommand,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+impl<'de> Deserialize<'de> for ApplicationCommandUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let application_command = ApplicationCommand::deserialize(deserializer)?;
+
+        Ok(Self {
+            application_command,
+        })
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ApplicationCommandDeleteEvent {
+    pub application_command: ApplicationCommand,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+impl<'de> Deserialize<'de> for ApplicationCommandDeleteEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let application_command = ApplicationCommand::deserialize(deserializer)?;
+
+        Ok(Self {
+            application_command,
+        })
     }
 }
 
@@ -1568,6 +1678,30 @@ pub enum Event {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     InteractionCreate(InteractionCreateEvent),
+    /// A guild integration was created
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    IntegrationCreate(IntegrationCreateEvent),
+    /// A guild integration was updated
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    IntegrationUpdate(IntegrationUpdateEvent),
+    /// A guild integration was deleted
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    IntegrationDelete(IntegrationDeleteEvent),
+    /// An application command was created
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandCreate(ApplicationCommandCreateEvent),
+    /// An application command was updated
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandUpdate(ApplicationCommandUpdateEvent),
+    /// An application command was deleted
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandDelete(ApplicationCommandDeleteEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
 }
@@ -1615,14 +1749,26 @@ impl Event {
             Self::WebhookUpdate(_) => EventType::WebhookUpdate,
             #[cfg(feature = "unstable_discord_api")]
             Self::InteractionCreate(_) => EventType::InteractionCreate,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationCreate(_) => EventType::IntegrationCreate,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationUpdate(_) => EventType::IntegrationUpdate,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationDelete(_) => EventType::IntegrationDelete,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandCreate(_) => EventType::ApplicationCommandCreate,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandUpdate(_) => EventType::ApplicationCommandUpdate,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandDelete(_) => EventType::ApplicationCommandDelete,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
     }
 }
 
-/// Deserializes a `serde_json::Value` into an `Event`.
+/// Deserializes a [`serde_json::Value`] into an [`Event`].
 ///
-/// The given `EventType` is used to determine what event to deserialize into.
+/// The given [`EventType`] is used to determine what event to deserialize into.
 /// For example, an [`EventType::ChannelCreate`] will cause the given value to
 /// attempt to be deserialized into a [`ChannelCreateEvent`].
 ///
@@ -1700,6 +1846,24 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::WebhookUpdate => Event::WebhookUpdate(serde_json::from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
         EventType::InteractionCreate => Event::InteractionCreate(serde_json::from_value(v)?),
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::IntegrationCreate => Event::IntegrationCreate(serde_json::from_value(v)?),
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::IntegrationUpdate => Event::IntegrationUpdate(serde_json::from_value(v)?),
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::IntegrationDelete => Event::IntegrationDelete(serde_json::from_value(v)?),
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::ApplicationCommandCreate => {
+            Event::ApplicationCommandCreate(serde_json::from_value(v)?)
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::ApplicationCommandUpdate => {
+            Event::ApplicationCommandUpdate(serde_json::from_value(v)?)
+        },
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::ApplicationCommandDelete => {
+            Event::ApplicationCommandDelete(serde_json::from_value(v)?)
+        },
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
             value: v,
@@ -1871,6 +2035,36 @@ pub enum EventType {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     InteractionCreate,
+    /// Indicator that an integration was created.
+    /// This maps to [`IntegrationCreateEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    IntegrationCreate,
+    /// Indicator that an integration was created.
+    /// This maps to [`IntegrationUpdateEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    IntegrationUpdate,
+    /// Indicator that an integration was created.
+    /// This maps to [`IntegrationDeleteEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    IntegrationDelete,
+    /// Indicator that an application command was created.
+    /// This maps to [`ApplicationCommandCreateEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandCreate,
+    /// Indicator that an application command was updated.
+    /// This maps to [`ApplicationCommandUpdateEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandUpdate,
+    /// Indicator that an application command was deleted.
+    /// This maps to [`ApplicationCommandDeleteEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    ApplicationCommandDelete,
     /// An unknown event was received over the gateway.
     ///
     /// This should be logged so that support for it can be added in the
@@ -1924,10 +2118,28 @@ impl EventType {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     const INTERACTION_CREATE: &'static str = "INTERACTION_CREATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const INTEGRATION_CREATE: &'static str = "INTEGRATION_CREATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const INTEGRATION_UPDATE: &'static str = "INTEGRATION_UPDATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const INTEGRATION_DELETE: &'static str = "INTEGRATION_DELETE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const APPLICATION_COMMAND_CREATE: &'static str = "APPLICATION_COMMAND_CREATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const APPLICATION_COMMAND_UPDATE: &'static str = "APPLICATION_COMMAND_UPDATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    const APPLICATION_COMMAND_DELETE: &'static str = "APPLICATION_COMMAND_DELETE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
-    /// case this method returns `None`.
+    /// case this method returns [`None`].
     pub fn name(&self) -> Option<&str> {
         match self {
             Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
@@ -1968,6 +2180,18 @@ impl EventType {
             Self::WebhookUpdate => Some(Self::WEBHOOKS_UPDATE),
             #[cfg(feature = "unstable_discord_api")]
             Self::InteractionCreate => Some(Self::INTERACTION_CREATE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationCreate => Some(Self::INTEGRATION_CREATE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationUpdate => Some(Self::INTEGRATION_UPDATE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationDelete => Some(Self::INTEGRATION_DELETE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandCreate => Some(Self::APPLICATION_COMMAND_CREATE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandUpdate => Some(Self::APPLICATION_COMMAND_UPDATE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandDelete => Some(Self::APPLICATION_COMMAND_DELETE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
             // to recover the name here, so we return `None` instead.
@@ -2034,6 +2258,18 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::WEBHOOKS_UPDATE => EventType::WebhookUpdate,
                     #[cfg(feature = "unstable_discord_api")]
                     EventType::INTERACTION_CREATE => EventType::InteractionCreate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::INTEGRATION_CREATE => EventType::IntegrationCreate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::INTEGRATION_UPDATE => EventType::IntegrationUpdate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::INTEGRATION_DELETE => EventType::IntegrationDelete,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::APPLICATION_COMMAND_CREATE => EventType::ApplicationCommandCreate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::APPLICATION_COMMAND_UPDATE => EventType::ApplicationCommandUpdate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::APPLICATION_COMMAND_DELETE => EventType::ApplicationCommandDelete,
                     other => EventType::Other(other.to_owned()),
                 })
             }

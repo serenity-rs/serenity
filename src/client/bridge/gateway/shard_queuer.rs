@@ -51,12 +51,12 @@ pub struct ShardQueuer {
     ///
     /// [`Client::data`]: crate::Client::data
     pub data: Arc<RwLock<TypeMap>>,
-    /// A reference to an `EventHandler`, such as the one given to the
+    /// A reference to an [`EventHandler`], such as the one given to the
     /// [`Client`].
     ///
     /// [`Client`]: crate::Client
     pub event_handler: Option<Arc<dyn EventHandler>>,
-    /// A reference to an `RawEventHandler`, such as the one given to the
+    /// A reference to an [`RawEventHandler`], such as the one given to the
     /// [`Client`].
     ///
     /// [`Client`]: crate::Client
@@ -93,7 +93,7 @@ pub struct ShardQueuer {
 impl ShardQueuer {
     /// Begins the shard queuer loop.
     ///
-    /// This will loop over the internal [`rx`] for [`ShardQueuerMessage`]s,
+    /// This will loop over the internal [`Self::rx`] for [`ShardQueuerMessage`]s,
     /// blocking for messages on what to do.
     ///
     /// If a [`ShardQueuerMessage::Start`] is received, this will:
@@ -108,8 +108,6 @@ impl ShardQueuer {
     ///
     /// **Note**: This should be run in its own thread due to the blocking
     /// nature of the loop.
-    ///
-    /// [`rx`]: Self::rx
     #[instrument(skip(self))]
     pub async fn run(&mut self) {
         // The duration to timeout from reads over the Rx channel. This can be

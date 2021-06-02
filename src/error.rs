@@ -39,11 +39,8 @@ pub type Result<T> = StdResult<T, Error>;
 /// custom [`Result`].
 ///
 /// The most common error types, the [`ClientError`] and [`GatewayError`]
-/// enums, are both wrapped around this in the form of the [`Client`] and
-/// [`Gateway`] variants.
-///
-/// [`Client`]: Error::Client
-/// [`Gateway`]: Error::Gateway
+/// enums, are both wrapped around this in the form of the [`Self::Client`] and
+/// [`Self::Gateway`] variants.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
@@ -51,9 +48,9 @@ pub enum Error {
     Decode(&'static str, Value),
     /// There was an error with a format.
     Format(FormatError),
-    /// An `std::io` error.
+    /// An [`std::io`] error.
     Io(IoError),
-    /// An error from the `serde_json` crate.
+    /// An error from the [`serde_json`] crate.
     Json(JsonError),
     /// An error from the [`model`] module.
     ///
@@ -64,26 +61,35 @@ pub enum Error {
     /// Input exceeded a limit.
     /// Providing the input and the limit that's not supposed to be exceeded.
     ///
-    /// *This only exists for the `GuildId::ban` and `Member::ban` functions. For their cases,
+    /// *This only exists for the [`GuildId::ban`] and [`Member::ban`] functions. For their cases,
     /// it's the "reason".*
+    ///
+    /// [`GuildId::ban`]: crate::model::id::GuildId::ban
+    /// [`Member::ban`]: crate::model::guild::Member::ban
     ExceededLimit(String, u32),
     /// The input is not in the specified range.
-    /// Returned by `GuildId::members`, `Guild::members` and `PartialGuild::members`
+    /// Returned by [`GuildId::members`], [`Guild::members`] and [`PartialGuild::members`]
     ///
     /// (param_name, value, range_min, range_max)
+    ///
+    /// [`GuildId::members`]: crate::model::id::GuildId::members
+    /// [`Guild::members`]: crate::model::guild::Guild::members
+    /// [`PartialGuild::members`]: crate::model::guild::PartialGuild::members
     NotInRange(&'static str, u64, u64, u64),
     /// Some other error. This is only used for "Expected value <TYPE>" errors,
     /// when a more detailed error can not be easily provided via the
     /// [`Error::Decode`] variant.
     Other(&'static str),
-    /// An error from the `url` crate.
+    /// An error from the [`url`] crate.
     Url(String),
     /// A [client] error.
     ///
     /// [client]: crate::client
     #[cfg(feature = "client")]
     Client(ClientError),
-    /// An error from the `gateway` module.
+    /// An error from the [`gateway`] module.
+    ///
+    /// [`gateway`]: crate::gateway
     #[cfg(feature = "gateway")]
     Gateway(GatewayError),
     /// An error from the [`http`] module.

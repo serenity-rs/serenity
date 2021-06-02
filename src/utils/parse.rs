@@ -72,7 +72,7 @@ impl Parse for Member {
 
         let lookup_by_mention = || {
             guild.members.get(&UserId(
-                s.strip_prefix("<@")?.trim_start_matches('!').strip_suffix(">")?.parse().ok()?,
+                s.strip_prefix("<@")?.trim_start_matches('!').strip_suffix('>')?.parse().ok()?,
             ))
         };
 

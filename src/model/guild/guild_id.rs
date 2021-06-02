@@ -5,7 +5,7 @@ use serde_json::json;
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{EditGuild, EditGuildWelcomeScreen, EditGuildWidget, EditMember, EditRole};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -26,8 +26,13 @@ use crate::model::prelude::*;
 use crate::utils;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
-    builder::CreateInteraction,
-    model::interactions::{ApplicationCommand, Interaction},
+    builder::{
+        CreateApplicationCommand,
+        CreateApplicationCommandPermissionsData,
+        CreateApplicationCommands,
+        CreateApplicationCommandsPermissions,
+    },
+    model::interactions::ApplicationCommand,
 };
 
 #[cfg(feature = "model")]
@@ -70,14 +75,12 @@ impl GuildId {
         self._ban_with_reason(http, user.into(), dmd, "").await
     }
 
-    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    /// Ban a [`User`] from the guild with a reason. Refer to [`Self::ban`] to further documentation.
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `ban` may return an error, may
+    /// In addition to the reasons [`Self::ban`] may return an error, may
     /// also return [`Error::ExceededLimit`] if `reason` is too long.
-    ///
-    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(
         self,
@@ -268,33 +271,6 @@ impl GuildId {
         });
 
         http.as_ref().create_guild_integration(self.0, integration_id.0, &map).await
-    }
-
-    /// Creates a new [`ApplicationCommand`] for the guild.
-    ///
-    /// See the documentation for [`Interaction::create_global_application_command`] on how to use this.
-    ///
-    /// **Note**: `application_id` is usually the bot's id, unless it's a very old bot.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if invalid data is given, may also return [`Error::Json`]
-    /// if there is an error in deserializing the API response.
-    ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    #[inline]
-    pub async fn create_application_command<F>(
-        self,
-        http: impl AsRef<Http>,
-        application_id: u64,
-        f: F,
-    ) -> Result<ApplicationCommand>
-    where
-        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
-    {
-        Interaction::create_guild_application_command(http, self, application_id, f).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -492,7 +468,7 @@ impl GuildId {
 
     /// Edits the current user's nickname for the guild.
     ///
-    /// Pass `None` to reset the nickname.
+    /// Pass [`None`] to reset the nickname.
     ///
     /// Requires the [Change Nickname] permission.
     ///
@@ -576,6 +552,68 @@ impl GuildId {
         http.as_ref().edit_role_position(self.0, role_id.into().0, position).await
     }
 
+    /// Edits the [`GuildWelcomeScreen`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if some mandatory fields are not provided.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_welcome_screen<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildWelcomeScreen>
+    where
+        F: FnOnce(&mut EditGuildWelcomeScreen) -> &mut EditGuildWelcomeScreen,
+    {
+        let mut map = EditGuildWelcomeScreen::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_welcome_screen(self.0, &Value::Object(utils::hashmap_to_json_map(map.0)))
+            .await
+    }
+
+    /// Edits the [`GuildWidget`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the bot does not have the `MANAGE_GUILD`
+    /// permission.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
+    pub async fn edit_widget<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildWidget>
+    where
+        F: FnOnce(&mut EditGuildWidget) -> &mut EditGuildWidget,
+    {
+        let mut map = EditGuildWidget::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_widget(self.0, &Value::Object(utils::hashmap_to_json_map(map.0)))
+            .await
+    }
+
+    /// Gets all of the guild's roles over the REST API.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is not in
+    /// the guild.
+    pub async fn roles(self, http: impl AsRef<Http>) -> Result<HashMap<RoleId, Role>> {
+        let mut roles = HashMap::new();
+
+        #[allow(clippy::useless_conversion)]
+        for role in http.as_ref().get_guild_roles(self.0).await? {
+            roles.insert(role.id, role);
+        }
+
+        Ok(roles)
+    }
+
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
@@ -596,6 +634,24 @@ impl GuildId {
     #[inline]
     pub async fn to_partial_guild(self, http: impl AsRef<Http>) -> Result<PartialGuild> {
         http.as_ref().get_guild(self.0).await
+    }
+
+    /// Requests [`PartialGuild`] over REST API with counts.
+    ///
+    /// **Note**: This will not be a [`Guild`], as the REST API does not send
+    /// all data with a guild retrieval.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn to_partial_guild_with_counts(
+        self,
+        http: impl AsRef<Http>,
+    ) -> Result<PartialGuild> {
+        http.as_ref().get_guild_with_counts(self.0).await
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
@@ -677,7 +733,7 @@ impl GuildId {
     #[inline]
     /// # Errors
     ///
-    /// In addition to the reasons `kick` may return an error,
+    /// In addition to the reasons [`Self::kick`] may return an error,
     /// may also return an error if the reason is too long.
     pub async fn kick_with_reason(
         self,
@@ -759,7 +815,7 @@ impl GuildId {
 
     /// Streams over all the members in a guild.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`members`].
+    /// This is accomplished and equivalent to repeated calls to [`Self::members`].
     /// A buffer of at most 1,000 members is used to reduce the number of calls
     /// necessary.
     ///
@@ -787,8 +843,6 @@ impl GuildId {
     /// }
     /// # }
     /// ```
-    ///
-    /// [`members`]: Self::members
     pub fn members_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Member>> {
         MembersIter::<H>::stream(http, self)
     }
@@ -801,7 +855,7 @@ impl GuildId {
     ///
     /// Returns an [`Error::Http`] if the current user
     /// lacks permission, or if the member is not currently
-    /// in a voice channel for this `Guild`.
+    /// in a voice channel for this [`Guild`].
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     /// [`Error::Http`]: crate::error::Error::Http
@@ -949,7 +1003,7 @@ impl GuildId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
-    /// or if an `Integration` with that Id does not exist.
+    /// or if an [`Integration`] with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -1069,6 +1123,211 @@ impl GuildId {
     ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.0)
     }
+
+    /// Creates a guild specific [`ApplicationCommand`]
+    ///
+    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    ///
+    /// # Errors
+    ///
+    /// Returns the same possible errors as [`create_global_application_command`].
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`create_global_application_command`]: crate::model::interactions::ApplicationCommand::create_global_application_command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_command<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    {
+        let map = ApplicationCommand::build_application_command(f);
+        http.as_ref().create_guild_application_command(self.0, &Value::Object(map)).await
+    }
+
+    /// Same as [`create_application_command`], but allows to create more
+    /// than one command per call.
+    ///
+    /// [`create_application_command`]: Self::create_application_command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_commands<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Vec<ApplicationCommand>>
+    where
+        F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
+    {
+        let mut array = CreateApplicationCommands::default();
+
+        f(&mut array);
+
+        http.as_ref().create_guild_application_commands(self.0, &Value::Array(array.0)).await
+    }
+
+    /// Creates a guild specific [`ApplicationCommandPermission`].
+    ///
+    /// **Note**: It will update instantly.
+    ///
+    /// [`ApplicationCommandPermission`]: crate::model::interactions::ApplicationCommandPermission
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_command_permission<F>(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+        f: F,
+    ) -> Result<ApplicationCommandPermission>
+    where
+        F: FnOnce(
+            &mut CreateApplicationCommandPermissionsData,
+        ) -> &mut CreateApplicationCommandPermissionsData,
+    {
+        let mut map = CreateApplicationCommandPermissionsData::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_application_command_permissions(
+                self.0,
+                command_id.into(),
+                &Value::Object(utils::hashmap_to_json_map(map.0)),
+            )
+            .await
+    }
+
+    /// Same as [`create_application_command_permission`] but allows to create
+    /// more than one permission per call.
+    ///
+    /// [`create_application_command_permission`]: Self::create_application_command_permission
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_application_commands_permissions<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Vec<ApplicationCommandPermission>>
+    where
+        F: FnOnce(
+            &mut CreateApplicationCommandsPermissions,
+        ) -> &mut CreateApplicationCommandsPermissions,
+    {
+        let mut map = CreateApplicationCommandsPermissions::default();
+        f(&mut map);
+
+        http.as_ref()
+            .edit_guild_application_commands_permissions(self.0, &Value::Array(map.0))
+            .await
+    }
+
+    /// Get all guild application commands.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_commands(
+        &self,
+        http: impl AsRef<Http>,
+    ) -> Result<Vec<ApplicationCommand>> {
+        http.as_ref().get_guild_application_commands(self.0).await
+    }
+
+    /// Get a specific guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_command(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+    ) -> Result<ApplicationCommand> {
+        http.as_ref().get_guild_application_command(self.0, command_id.into()).await
+    }
+
+    /// Edit guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_application_command<F>(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    {
+        let map = ApplicationCommand::build_application_command(f);
+        http.as_ref()
+            .edit_guild_application_command(self.0, command_id.into(), &Value::Object(map))
+            .await
+    }
+
+    /// Delete guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn delete_application_command(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+    ) -> Result<()> {
+        http.as_ref().delete_guild_application_command(self.0, command_id.into()).await
+    }
+
+    /// Get all guild application commands permissions only.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_commands_permissions(
+        &self,
+        http: impl AsRef<Http>,
+    ) -> Result<Vec<ApplicationCommandPermission>> {
+        http.as_ref().get_guild_application_commands_permissions(self.0).await
+    }
+
+    /// Get permissions for specific guild application command by its Id.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn get_application_command_permissions(
+        &self,
+        http: impl AsRef<Http>,
+        command_id: CommandId,
+    ) -> Result<ApplicationCommandPermission> {
+        http.as_ref().get_guild_application_command_permissions(self.0, command_id.into()).await
+    }
+
+    /// Get the guild welcome screen.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the guild does not have a welcome screen.
+    pub async fn get_welcome_screen(&self, http: impl AsRef<Http>) -> Result<GuildWelcomeScreen> {
+        http.as_ref().get_guild_welcome_screen(self.0).await
+    }
+
+    /// Get the guild preview.
+    ///
+    /// **Note**: The bot need either to be part of the guild
+    /// or the guild needs to have the `DISCOVERABLE` feature.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the bot cannot see the guild preview, see the note.
+    pub async fn get_preview(&self, http: impl AsRef<Http>) -> Result<GuildPreview> {
+        http.as_ref().get_guild_preview(self.0).await
+    }
+
+    /// Get the guild widget.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the bot does not have `MANAGE_MESSAGES` permission.
+    pub async fn get_widget(&self, http: impl AsRef<Http>) -> Result<GuildWidget> {
+        http.as_ref().get_guild_widget(self.0).await
+    }
+
+    /// Get the widget image URL.
+    pub fn widget_image_url(&self, style: GuildWidgetStyle) -> String {
+        format!(api!("/guilds/{}/widget.png?style={}"), self.0.to_string(), style.to_string())
+    }
 }
 
 impl From<PartialGuild> for GuildId {
@@ -1177,7 +1436,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
     /// Streams over all the members in a guild.
     ///
-    /// This is accomplished and equivalent to repeated calls to [`members`].
+    /// This is accomplished and equivalent to repeated calls to [`GuildId::members`].
     /// A buffer of at most 1,000 members is used to reduce the number of calls
     /// necessary.
     ///
@@ -1206,8 +1465,6 @@ impl<H: AsRef<Http>> MembersIter<H> {
     /// }
     /// # }
     /// ```
-    ///
-    /// [`members`]: GuildId::members
     pub fn stream(http: impl AsRef<Http>, guild_id: GuildId) -> impl Stream<Item = Result<Member>> {
         let init_state = MembersIter::new(guild_id, http);
 
@@ -1220,5 +1477,27 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
             state.buffer.pop().map(|entry| (Ok(entry), state))
         })
+    }
+}
+
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
+#[non_exhaustive]
+pub enum GuildWidgetStyle {
+    Shield,
+    Banner1,
+    Banner2,
+    Banner3,
+    Banner4,
+}
+
+impl Display for GuildWidgetStyle {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            GuildWidgetStyle::Shield => write!(f, "shield"),
+            GuildWidgetStyle::Banner1 => write!(f, "banner1"),
+            GuildWidgetStyle::Banner2 => write!(f, "banner2"),
+            GuildWidgetStyle::Banner3 => write!(f, "banner3"),
+            GuildWidgetStyle::Banner4 => write!(f, "banner4"),
+        }
     }
 }

@@ -140,6 +140,8 @@ pub struct Team {
     /// The snowflake ID of the team.
     #[serde(deserialize_with = "deserialize_u64")]
     pub id: u64,
+    /// The name of the team.
+    pub name: String,
     /// The members of the team
     pub members: Vec<TeamMember>,
     /// The user id of the team owner.
@@ -166,6 +168,7 @@ pub struct TeamMember {
 pub enum MembershipState {
     Invited = 1,
     Accepted = 2,
+    Unknown = !0,
 }
 
 enum_number!(MembershipState {

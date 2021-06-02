@@ -43,7 +43,7 @@ pub struct Invite {
     /// A representation of the minimal amount of information needed about the
     /// [`User`] that created the invite.
     ///
-    /// This can be `None` for invites created by Discord such as invite-widgets
+    /// This can be [`None`] for invites created by Discord such as invite-widgets
     /// or vanity invite links.
     pub inviter: Option<InviteUser>,
 }
@@ -305,14 +305,11 @@ pub struct RichInvite {
     pub max_age: u64,
     /// The maximum number of times that an invite may be used before it expires.
 
-    /// Note that this does not supersede the [`max_age`] value, if the value of
-    /// [`temporary`] is `true`. If the value of `temporary` is `false`, then the
+    /// Note that this does not supersede the [`Self::max_age`] value, if the value of
+    /// [`Self::temporary`] is `true`. If the value of `temporary` is `false`, then the
     /// invite _will_ self-expire after the given number of max uses.
 
     /// If the value is `0`, then the invite is permanent.
-    ///
-    /// [`max_age`]: Self::max_age
-    /// [`temporary`]: Self::temporary
     pub max_uses: u64,
     /// Indicator of whether the invite self-expires after a certain amount of
     /// time or uses.

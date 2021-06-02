@@ -66,15 +66,13 @@ pub struct Activity {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub session_id: Option<String>,
-    /// The Stream URL if [`kind`] is [`ActivityType::Streaming`].
-    ///
-    /// [`kind`]: Self::kind
+    /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     pub url: Option<String>,
 }
 
 #[cfg(feature = "model")]
 impl Activity {
-    /// Creates a `Activity` struct that appears as a `Playing <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -124,7 +122,7 @@ impl Activity {
         }
     }
 
-    /// Creates an `Activity` struct that appears as a `Streaming <name>`
+    /// Creates an [`Activity`] struct that appears as a `Streaming <name>`
     /// status.
     ///
     /// **Note**: Maximum `name` length is 128.
@@ -178,7 +176,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Listening to <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Listening to <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -228,7 +226,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Watching <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Watching <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -278,7 +276,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Competing in <name>` status.
+    /// Creates a [`Activity`] struct that appears as a `Competing in <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -509,10 +507,12 @@ pub enum ActivityType {
     Listening = 2,
     /// An indicator that the user is watching something.
     Watching = 3,
-    /// An indicator that the user uses custum statuses
+    /// An indicator that the user uses custom statuses
     Custom = 4,
     /// An indicator that the user is competing somewhere.
     Competing = 5,
+    /// An indicator that the activity is of unknown type.
+    Unknown = !0,
 }
 
 enum_number!(ActivityType {
@@ -523,21 +523,6 @@ enum_number!(ActivityType {
     Custom,
     Competing
 });
-
-impl ActivityType {
-    pub fn num(self) -> u64 {
-        use self::ActivityType::*;
-
-        match self {
-            Playing => 0,
-            Streaming => 1,
-            Listening => 2,
-            Watching => 3,
-            Custom => 4,
-            Competing => 5,
-        }
-    }
-}
 
 impl Default for ActivityType {
     fn default() -> Self {
@@ -633,8 +618,8 @@ impl<'de> Deserialize<'de> for Presence {
             client_status,
             last_modified,
             status,
-            user,
             user_id,
+            user,
         })
     }
 }

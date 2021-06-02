@@ -4,19 +4,19 @@ use serde_json::{json, Value};
 
 use crate::{model::interactions::ApplicationCommandOptionType, utils};
 
-/// A builder for creating a new [`ApplicationCommandInteractionDataOption`].
+/// A builder for creating a new [`ApplicationCommandOption`].
 ///
-/// [`kind`], [`name`], and [`description`] are required fields.
+/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
-/// [`ApplicationCommandInteractionDataOption`]: crate::model::interactions::ApplicationCommandInteractionDataOption
+/// [`ApplicationCommandOption`]: crate::model::interactions::ApplicationCommandOption
 /// [`kind`]: Self::kind
 /// [`name`]: Self::name
 /// [`description`]: Self::description
 #[derive(Clone, Debug, Default)]
-pub struct CreateInteractionOption(pub HashMap<&'static str, Value>);
+pub struct CreateApplicationCommandOption(pub HashMap<&'static str, Value>);
 
-impl CreateInteractionOption {
-    /// Set the ApplicationCommandOptionType for the InteractionOption.
+impl CreateApplicationCommandOption {
+    /// Sets the ApplicationCommandOptionType.
     pub fn kind(&mut self, kind: ApplicationCommandOptionType) -> &mut Self {
         self.0.insert("type", Value::Number(serde_json::Number::from(kind as u8)));
         self
@@ -38,7 +38,7 @@ impl CreateInteractionOption {
         self
     }
 
-    /// The first required option for the user to complete
+    /// The first required option for the user to complete.
     ///
     /// **Note**: Only one option can be `default`.
     pub fn default_option(&mut self, default: bool) -> &mut Self {
@@ -88,14 +88,14 @@ impl CreateInteractionOption {
     /// [`SubCommandGroup`]: crate::model::interactions::ApplicationCommandOptionType::SubCommandGroup
     pub fn create_sub_option<F>(&mut self, f: F) -> &mut Self
     where
-        F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption,
+        F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
     {
-        let mut data = CreateInteractionOption::default();
+        let mut data = CreateApplicationCommandOption::default();
         f(&mut data);
         self.add_sub_option(data)
     }
 
-    pub fn add_sub_option(&mut self, sub_option: CreateInteractionOption) -> &mut Self {
+    pub fn add_sub_option(&mut self, sub_option: CreateApplicationCommandOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(sub_option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
         let opt_arr = options.as_array_mut().expect("Must be an array");
@@ -107,21 +107,29 @@ impl CreateInteractionOption {
 
 /// A builder for creating a new [`ApplicationCommand`].
 ///
-/// [`name`] and [`description`] are required fields.
+/// [`Self::name`] and [`Self::description`] are required fields.
 ///
 /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-/// [`name`]: Self::name
-/// [`description`]: Self::description
 #[derive(Clone, Debug, Default)]
-pub struct CreateInteraction(pub HashMap<&'static str, Value>);
+pub struct CreateApplicationCommand(pub HashMap<&'static str, Value>);
 
-impl CreateInteraction {
+impl CreateApplicationCommand {
     /// Specify the name of the Interaction.
     ///
     /// **Note**: Must be between 1 and 32 characters long,
     /// and cannot start with a space.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
+        self
+    }
+
+    /// Specify if the command should not be usable by default
+    ///
+    /// **Note**: Setting it to false will disable it for anyone,
+    /// including administrators and guild owners.
+    pub fn default_permission(&mut self, default_permission: bool) -> &mut Self {
+        self.0.insert("default_permission", Value::Bool(default_permission));
+
         self
     }
 
@@ -136,19 +144,19 @@ impl CreateInteraction {
     /// Create an interaction option for the interaction.
     ///
     /// **Note**: Interactions can only have up to 10 options.
-    pub fn create_interaction_option<F>(&mut self, f: F) -> &mut Self
+    pub fn create_option<F>(&mut self, f: F) -> &mut Self
     where
-        F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption,
+        F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
     {
-        let mut data = CreateInteractionOption::default();
+        let mut data = CreateApplicationCommandOption::default();
         f(&mut data);
-        self.add_interaction_option(data)
+        self.add_option(data)
     }
 
     /// Add an interaction option for the interaction.
     ///
     /// **Note**: Interactions can only have up to 10 options.
-    pub fn add_interaction_option(&mut self, option: CreateInteractionOption) -> &mut Self {
+    pub fn add_option(&mut self, option: CreateApplicationCommandOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
         let opt_arr = options.as_array_mut().expect("Must be an array");
@@ -160,12 +168,56 @@ impl CreateInteraction {
     /// Sets all the interaction options for the interaction.
     ///
     /// **Note**: Interactions can only have up to 10 options.
-    pub fn set_interaction_options(&mut self, options: Vec<CreateInteractionOption>) -> &mut Self {
+    pub fn set_options(&mut self, options: Vec<CreateApplicationCommandOption>) -> &mut Self {
         let new_options = options
             .into_iter()
             .map(|f| Value::Object(utils::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();
         self.0.insert("options", Value::Array(new_options));
+        self
+    }
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct CreateApplicationCommands(pub Vec<Value>);
+
+impl CreateApplicationCommands {
+    /// Creates a new application command.
+    pub fn create_application_command<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateApplicationCommand) -> &mut CreateApplicationCommand,
+    {
+        let mut data = CreateApplicationCommand::default();
+        f(&mut data);
+
+        self.add_application_command(data);
+
+        self
+    }
+
+    /// Adds a new application command.
+    pub fn add_application_command(&mut self, interaction: CreateApplicationCommand) -> &mut Self {
+        let new_data = Value::Object(utils::hashmap_to_json_map(interaction.0));
+
+        self.0.push(new_data);
+
+        self
+    }
+
+    /// Sets all the application commands.
+    pub fn set_application_commands(
+        &mut self,
+        interactions: Vec<CreateApplicationCommand>,
+    ) -> &mut Self {
+        let new_application_command = interactions
+            .into_iter()
+            .map(|f| Value::Object(utils::hashmap_to_json_map(f.0)))
+            .collect::<Vec<Value>>();
+
+        for application_command in new_application_command {
+            self.0.push(application_command);
+        }
+
         self
     }
 }

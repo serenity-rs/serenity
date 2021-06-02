@@ -34,12 +34,6 @@ impl UnitRatelimit {
     }
 }
 
-#[derive(Default)]
-pub(crate) struct UnitRatelimitTimes {
-    pub last_time: Option<Instant>,
-    pub set_time: Option<Instant>,
-}
-
 /// A bucket offers fine-grained control over the execution of commands.
 pub(crate) enum Bucket {
     /// The bucket will collect tickets for every invocation of a command.
@@ -450,9 +444,7 @@ impl BucketBuilder {
         self
     }
 
-    /// Number of invocations allowed per [`time_span`].
-    ///
-    /// [`time_span`]: Self::time_span
+    /// Number of invocations allowed per [`Self::time_span`].
     #[inline]
     pub fn limit(&mut self, n: u32) -> &mut Self {
         self.limit = n;

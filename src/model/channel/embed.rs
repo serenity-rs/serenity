@@ -49,10 +49,8 @@ pub struct Embed {
     pub kind: String,
     /// Provider information for the embed.
     ///
-    /// For example, if the embed [`kind`] is `"video"`, the provider might
+    /// For example, if the embed [`Self::kind`] is `"video"`, the provider might
     /// contain information about YouTube.
-    ///
-    /// [`kind`]: Self::kind
     pub provider: Option<EmbedProvider>,
     /// Thumbnail information of the embed.
     pub thumbnail: Option<EmbedThumbnail>,
@@ -64,15 +62,13 @@ pub struct Embed {
     pub url: Option<String>,
     /// The embed's video information.
     ///
-    /// This is present if the [`kind`] is `"video"`.
-    ///
-    /// [`kind`]: Self::kind
+    /// This is present if the [`Self::kind`] is `"video"`.
     pub video: Option<EmbedVideo>,
 }
 
 #[cfg(feature = "model")]
 impl Embed {
-    /// Creates a fake Embed, giving back a `serde_json` map.
+    /// Creates a fake Embed, giving back a [`serde_json`] map.
     ///
     /// This should only be useful in conjunction with [`Webhook::execute`].
     ///
@@ -139,11 +135,8 @@ pub struct EmbedField {
 impl EmbedField {
     /// Creates a new embed field.
     ///
-    /// **Note**: Refer to the [`name`] and [`value`] documentation for maximum
+    /// **Note**: Refer to the [`Self::name`] and [`Self::value`] documentation for maximum
     /// lengths.
-    ///
-    /// [`name`]: Self::name
-    /// [`value`]: Self::value
     pub fn new<T, U>(name: T, value: U, inline: bool) -> Self
     where
         T: Into<String>,
@@ -154,9 +147,9 @@ impl EmbedField {
 
     fn _new(name: String, value: String, inline: bool) -> Self {
         Self {
+            inline,
             name,
             value,
-            inline,
         }
     }
 }
