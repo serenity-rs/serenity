@@ -3129,6 +3129,11 @@
 <span id="3126">3126</span>
 <span id="3127">3127</span>
 <span id="3128">3128</span>
+<span id="3129">3129</span>
+<span id="3130">3130</span>
+<span id="3131">3131</span>
+<span id="3132">3132</span>
+<span id="3133">3133</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -5813,6 +5818,11 @@
             },
         })
         .<span class="kw">await</span>
+        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">w</span>: <span class="ident">Webhook</span><span class="op">|</span> {
+            <span class="ident">w</span>.<span class="ident">token</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>.<span class="ident">to_string</span>());
+
+            <span class="ident">w</span>
+        })
     }
 
     <span class="doccomment">/// Kicks a member from a guild.</span>
