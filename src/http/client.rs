@@ -237,11 +237,9 @@ impl fmt::Debug for Http {
 
 impl Http {
     pub fn new(client: Arc<Client>, token: &str) -> Self {
-        let client2 = Arc::clone(&client);
-
         Http {
-            client,
-            ratelimiter: Ratelimiter::new(client2, token.to_string()),
+            client: client.clone(),
+            ratelimiter: Ratelimiter::new(client, token.to_string()),
             ratelimiter_disabled: false,
             proxy: None,
             token: token.to_string(),
@@ -3161,11 +3159,10 @@ impl Default for Http {
     fn default() -> Self {
         let built = Client::builder().build().expect("Cannot build Reqwest::Client.");
         let client = Arc::new(built);
-        let client2 = Arc::clone(&client);
 
         Self {
-            client,
-            ratelimiter: Ratelimiter::new(client2, ""),
+            client: client.clone(),
+            ratelimiter: Ratelimiter::new(client, ""),
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
