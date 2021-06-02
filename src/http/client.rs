@@ -2681,6 +2681,11 @@ impl Http {
             },
         })
         .await
+        .map(|mut w: Webhook| {
+            w.token = Some(token.to_string());
+
+            w
+        })
     }
 
     /// Kicks a member from a guild.
