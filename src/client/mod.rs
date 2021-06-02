@@ -150,7 +150,7 @@ impl<'a> ClientBuilder<'a> {
 
         let token =
             if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
-        
+
         self.http = Some(Http::new_with_timeouts(
             self.http_request_timeout,
             self.http_connect_timeout,
@@ -167,13 +167,12 @@ impl<'a> ClientBuilder<'a> {
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(ApplicationId(application_id));
 
-        self.http =
-            Some(Http::new_with_token_application_id(
-                &self.token.clone().unwrap(), 
-                application_id, 
-                self.http_request_timeout, 
-                self.http_connect_timeout,
-            ));
+        self.http = Some(Http::new_with_token_application_id(
+            &self.token.clone().unwrap(),
+            application_id,
+            self.http_request_timeout,
+            self.http_connect_timeout,
+        ));
 
         self
     }

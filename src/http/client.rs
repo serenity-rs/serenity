@@ -255,7 +255,7 @@ impl Http {
         connect_timeout: Option<std::time::Duration>,
     ) -> Self {
         let mut builder = configure_client_backend(Client::builder());
-      
+
         if let Some(t) = timeout {
             builder = builder.timeout(t);
         }
@@ -312,7 +312,7 @@ impl Http {
 
         Self::new(Arc::new(built), &token)
     }
-  
+
     #[cfg(feature = "unstable_discord_api")]
     pub fn new_with_token_application_id(
         token: &str,
@@ -325,7 +325,6 @@ impl Http {
         base.application_id = application_id;
 
         base
-
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
