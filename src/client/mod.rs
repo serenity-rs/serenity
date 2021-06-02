@@ -343,7 +343,7 @@ impl<'a> ClientBuilder<'a> {
         {
             self.http = Some(Http::new_with_token_application_id(
                 &old_token,
-                self.application_id,
+                self.application_id.unwrap_or_default().as_u64(),
                 self.http_request_timeout,
                 self.http_connect_timeout,
             ));
@@ -376,7 +376,7 @@ impl<'a> ClientBuilder<'a> {
         {
             self.http = Some(Http::new_with_token_application_id(
                 &old_token,
-                self.application_id,
+                self.application_id.unwrap_or_default().as_u64(),
                 self.http_request_timeout,
                 self.http_connect_timeout,
             ));
