@@ -217,17 +217,22 @@ impl ShardRunner {
 
         // Avoid the clone if there is no reacton filter.
         if !self.reaction_filters.is_empty() {
-            let reaction = Arc::new(match &event {
+            match &event {
                 Event::ReactionAdd(ref reaction_event) => {
-                    ReactionAction::Added(Arc::new(reaction_event.reaction.clone()))
+                    let reaction =
+                        Arc::new(ReactionAction::Added(Arc::new(reaction_event.reaction.clone())));
+
+                    retain(&mut self.reaction_filters, |f| f.send_reaction(&reaction));
                 },
                 Event::ReactionRemove(ref reaction_event) => {
-                    ReactionAction::Removed(Arc::new(reaction_event.reaction.clone()))
-                },
-                _ => return,
-            });
+                    let reaction = Arc::new(ReactionAction::Removed(Arc::new(
+                        reaction_event.reaction.clone(),
+                    )));
 
-            retain(&mut self.reaction_filters, |f| f.send_reaction(&reaction));
+                    retain(&mut self.reaction_filters, |f| f.send_reaction(&reaction));
+                },
+                _ => {},
+            }
         }
     }
 
