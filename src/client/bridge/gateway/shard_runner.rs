@@ -215,7 +215,7 @@ impl ShardRunner {
             }
         }
 
-        // Avoid the clone if there is no reacton filter.
+        // Avoid the clone if there is no reaction filter.
         if !self.reaction_filters.is_empty() {
             match &event {
                 Event::ReactionAdd(ref reaction_event) => {
