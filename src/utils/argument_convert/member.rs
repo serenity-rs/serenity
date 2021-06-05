@@ -1,4 +1,5 @@
-use super::*;
+use super::ArgumentConvert;
+use crate::{model::prelude::*, prelude::*};
 
 /// Error that can be returned from [`Member::convert`].
 #[non_exhaustive]
@@ -57,7 +58,7 @@ impl ArgumentConvert for Member {
         let lookup_by_mention = || guild.members.get(&UserId(crate::utils::parse_username(s)?));
 
         let lookup_by_name_and_discrim = || {
-            let (name, discrim) = parse_user_tag(s)?;
+            let (name, discrim) = crate::utils::parse_user_tag(s)?;
             guild.members.values().find(|member| {
                 member.user.discriminator == discrim && member.user.name.eq_ignore_ascii_case(name)
             })

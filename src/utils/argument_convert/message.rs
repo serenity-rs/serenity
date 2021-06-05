@@ -1,4 +1,5 @@
-use super::*;
+use super::ArgumentConvert;
+use crate::{model::prelude::*, prelude::*};
 
 /// Error that can be returned from [`Message::convert`].
 #[non_exhaustive]
@@ -56,11 +57,11 @@ impl ArgumentConvert for Message {
         let extract_from_message_id = || Some((channel_id?, MessageId(s.parse().ok()?)));
 
         let extract_from_message_url = || {
-            let (_guild_id, channel_id, message_id) = parse_message_url(s)?;
+            let (_guild_id, channel_id, message_id) = crate::utils::parse_message_url(s)?;
             Some((channel_id, message_id))
         };
 
-        let (channel_id, message_id) = parse_message_id_pair(s)
+        let (channel_id, message_id) = crate::utils::parse_message_id_pair(s)
             .or_else(extract_from_message_id)
             .or_else(extract_from_message_url)
             .ok_or(MessageParseError::Malformed)?;
