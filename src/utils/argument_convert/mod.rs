@@ -4,6 +4,21 @@ pub use member::*;
 mod message;
 pub use message::*;
 
+mod user;
+pub use user::*;
+
+mod channel;
+pub use channel::*;
+
+mod guild;
+pub use guild::*;
+
+mod role;
+pub use role::*;
+
+mod emoji;
+pub use emoji::*;
+
 use crate::model::prelude::*;
 use crate::prelude::*;
 
