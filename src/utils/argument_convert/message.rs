@@ -41,9 +41,9 @@ impl std::fmt::Display for MessageParseError {
 /// Look up a message by a string.
 ///
 /// The lookup strategy is as follows (in order):
-/// 1. [Lookup by "{channel ID}-{message ID}"](`parse_message_id_pair`) (retrieved by shift-clicking on "Copy ID")
+/// 1. [Lookup by "{channel ID}-{message ID}"](`crate::utils::parse_message_id_pair`) (retrieved by shift-clicking on "Copy ID")
 /// 2. Lookup by message ID (the message must be in the context channel)
-/// 3. [Lookup by message URL](`parse_message_url`)
+/// 3. [Lookup by message URL](`crate::utils::parse_message_url`)
 #[async_trait::async_trait]
 impl ArgumentConvert for Message {
     type Err = MessageParseError;

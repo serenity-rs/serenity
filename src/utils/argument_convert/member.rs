@@ -32,8 +32,8 @@ impl std::fmt::Display for MemberParseError {
 ///
 /// The lookup strategy is as follows (in order):
 /// 1. Lookup by ID.
-/// 2. [Lookup by mention](`super::parse_username`).
-/// 3. [Lookup by name#discrim](`parse_user_tag`).
+/// 2. [Lookup by mention](`crate::utils::parse_username`).
+/// 3. [Lookup by name#discrim](`crate::utils::parse_user_tag`).
 /// 4. Lookup by name
 /// 5. Lookup by nickname
 #[cfg(feature = "cache")]

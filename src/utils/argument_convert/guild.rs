@@ -1,7 +1,7 @@
 use super::ArgumentConvert;
 use crate::{model::prelude::*, prelude::*};
 
-/// Error that can be returned from [`CHANGE::convert`].
+/// Error that can be returned from [`Guild::convert`].
 #[non_exhaustive]
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub enum GuildParseError {
