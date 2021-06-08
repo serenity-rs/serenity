@@ -596,8 +596,6 @@ impl PresenceUser {
         })
     }
 
-    // TODO: add `to_current_user` and `into_current_user`? (converts to Option<CurrentUser>)
-
     pub(crate) fn update_with_user(&mut self, user: User) {
         self.id = user.id;
         if let Some(avatar) = user.avatar {
