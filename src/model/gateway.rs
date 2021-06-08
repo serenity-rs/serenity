@@ -2,7 +2,6 @@
 
 use bitflags::bitflags;
 use serde::de::Error as DeError;
-use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use super::prelude::*;
 use super::utils::*;
@@ -549,105 +548,82 @@ pub struct ClientStatus {
     pub web: Option<OnlineStatus>,
 }
 
+/// Information about the user of a [`Presence`] event.
+#[derive(Clone, Default, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+#[serde(default)]
+pub struct PresenceUser {
+    pub id: UserId,
+    pub avatar: Option<String>,
+    pub bot: Option<bool>,
+    pub discriminator: Option<u16>,
+    pub email: Option<String>,
+    pub mfa_enabled: Option<bool>,
+    #[serde(rename = "username")]
+    pub name: Option<String>,
+    pub verified: Option<bool>,
+    pub public_flags: Option<UserPublicFlags>,
+}
+
+impl PresenceUser {
+    /// Attempts to convert this [`PresenceUser`] instance into a [`User`].
+    ///
+    /// If one of [`User`]'s required fields is None in `self`, None is returned.
+    pub fn into_user(self) -> Option<User> {
+        Some(User {
+            avatar: self.avatar,
+            bot: self.bot?,
+            discriminator: self.discriminator?,
+            id: self.id,
+            name: self.name?,
+            public_flags: self.public_flags,
+        })
+    }
+
+    /// Attempts to convert this [`PresenceUser`] instance into a [`User`].
+    ///
+    /// Will clone individual fields if needed.
+    ///
+    /// If one of [`User`]'s required fields is None in `self`, None is returned.
+    pub fn to_user(&self) -> Option<User> {
+        Some(User {
+            avatar: self.avatar.clone(),
+            bot: self.bot?,
+            discriminator: self.discriminator?,
+            id: self.id,
+            name: self.name.clone()?,
+            public_flags: self.public_flags,
+        })
+    }
+
+    pub(crate) fn update_with_user(&mut self, user: User) {
+        self.id = user.id;
+        if let Some(avatar) = user.avatar {
+            self.avatar = Some(avatar);
+        }
+        self.bot = Some(user.bot);
+        self.discriminator = Some(user.discriminator);
+        self.name = Some(user.name);
+        if let Some(public_flags) = user.public_flags {
+            self.public_flags = Some(public_flags);
+        }
+    }
+}
+
 /// Information detailing the current online status of a [`User`].
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Presence {
     /// [`User`]'s current activities.
+    #[serde(default)]
     pub activities: Vec<Activity>,
     /// The devices a user are currently active on, if available.
+    #[serde(default)]
     pub client_status: Option<ClientStatus>,
-    /// The date of the last presence update.
-    pub last_modified: Option<u64>,
     /// The user's online status.
     pub status: OnlineStatus,
-    /// The Id of the [`User`]. Can be used to calculate the user's creation
-    /// date.
-    pub user_id: UserId,
-    /// The associated user instance.
-    pub user: Option<User>,
-}
-
-impl<'de> Deserialize<'de> for Presence {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Presence, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-        let mut user_map = map
-            .remove("user")
-            .ok_or_else(|| DeError::custom("expected presence user"))
-            .and_then(JsonMap::deserialize)
-            .map_err(DeError::custom)?;
-
-        let (user_id, user) = if user_map.len() > 1 {
-            let user = User::deserialize(Value::from(user_map)).map_err(DeError::custom)?;
-
-            (user.id, Some(user))
-        } else {
-            let user_id = user_map
-                .remove("id")
-                .ok_or_else(|| DeError::custom("Missing presence user id"))
-                .and_then(UserId::deserialize)
-                .map_err(DeError::custom)?;
-
-            (user_id, None)
-        };
-
-        let activities = match map.remove("activities") {
-            Some(v) => from_value::<Vec<Activity>>(v).map_err(DeError::custom)?,
-            None => Vec::new(),
-        };
-
-        let client_status = match map.remove("client_status") {
-            Some(v) => from_value::<Option<ClientStatus>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let last_modified = match map.remove("last_modified") {
-            Some(v) => from_value::<Option<u64>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let status = map
-            .remove("status")
-            .ok_or_else(|| DeError::custom("expected presence status"))
-            .and_then(OnlineStatus::deserialize)
-            .map_err(DeError::custom)?;
-
-        Ok(Presence {
-            activities,
-            client_status,
-            last_modified,
-            status,
-            user_id,
-            user,
-        })
-    }
-}
-
-impl Serialize for Presence {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        #[derive(Serialize)]
-        struct UserId {
-            id: u64,
-        }
-
-        let mut state = serializer.serialize_struct("Presence", 3)?;
-        state.serialize_field("client_status", &self.client_status)?;
-        state.serialize_field("last_modified", &self.last_modified)?;
-        state.serialize_field("status", &self.status)?;
-
-        if let Some(user) = &self.user {
-            state.serialize_field("user", &user)?;
-        } else {
-            state.serialize_field("user", &UserId {
-                id: self.user_id.0,
-            })?;
-        }
-
-        state.end()
-    }
+    /// Data about the associated user.
+    pub user: PresenceUser,
 }
 
 /// An initial set of information given after IDENTIFYing to the gateway.

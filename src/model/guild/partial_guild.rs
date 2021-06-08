@@ -1,10 +1,8 @@
 use serde::de::Error as DeError;
-
-#[cfg(feature = "cache")]
-use tracing::{error, warn};
-
 #[cfg(feature = "simd-json")]
 use simd_json::StaticNode;
+#[cfg(feature = "cache")]
+use tracing::{error, warn};
 
 #[cfg(feature = "model")]
 use crate::builder::{
