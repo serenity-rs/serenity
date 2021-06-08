@@ -1014,34 +1014,33 @@ impl CacheUpdate for PresenceUpdateEvent {
     type Output = ();
 
     async fn update(&mut self, cache: &Cache) -> Option<()> {
-        let user_id = self.presence.user_id;
+        if let Some(user) = self.presence.user.to_user() {
+            cache.update_user_entry(&user).await;
+        }
 
-        if let Some(user) = self.presence.user.as_mut() {
-            cache.update_user_entry(user).await;
-            if let Some(u) = cache.user(user_id).await {
-                *user = u;
-            }
+        if let Some(user) = cache.user(self.presence.user.id).await {
+            self.presence.user.update_with_user(user);
         }
 
         if let Some(guild_id) = self.guild_id {
             if let Some(guild) = cache.guilds.write().await.get_mut(&guild_id) {
                 // If the member went offline, remove them from the presence list.
                 if self.presence.status == OnlineStatus::Offline {
-                    guild.presences.remove(&self.presence.user_id);
+                    guild.presences.remove(&self.presence.user.id);
                 } else {
-                    guild.presences.insert(self.presence.user_id, self.presence.clone());
+                    guild.presences.insert(self.presence.user.id, self.presence.clone());
                 }
 
                 // Create a partial member instance out of the presence update
                 // data.
-                if let Some(user) = self.presence.user.as_ref() {
-                    guild.members.entry(self.presence.user_id).or_insert_with(|| Member {
+                if let Some(user) = self.presence.user.to_user() {
+                    guild.members.entry(self.presence.user.id).or_insert_with(|| Member {
                         deaf: false,
                         guild_id,
                         joined_at: None,
                         mute: false,
                         nick: None,
-                        user: user.clone(),
+                        user,
                         roles: vec![],
                         pending: false,
                         premium_since: None,
@@ -1052,9 +1051,9 @@ impl CacheUpdate for PresenceUpdateEvent {
                 }
             }
         } else if self.presence.status == OnlineStatus::Offline {
-            cache.presences.write().await.remove(&self.presence.user_id);
+            cache.presences.write().await.remove(&self.presence.user.id);
         } else {
-            cache.presences.write().await.insert(self.presence.user_id, self.presence.clone());
+            cache.presences.write().await.insert(self.presence.user.id, self.presence.clone());
         }
 
         None
@@ -1094,7 +1093,7 @@ impl CacheUpdate for PresencesReplaceEvent {
             let mut p: HashMap<UserId, Presence> = HashMap::default();
 
             for presence in &self.presences {
-                p.insert(presence.user_id, presence.clone());
+                p.insert(presence.user.id, presence.clone());
             }
 
             p
@@ -1216,11 +1215,12 @@ impl CacheUpdate for ReadyEvent {
         // So don't handle it at all.
 
         for (user_id, presence) in &mut ready.presences {
-            if let Some(ref user) = presence.user {
-                cache.update_user_entry(user).await;
+            if let Some(user) = presence.user.to_user() {
+                cache.update_user_entry(&user).await;
             }
-
-            presence.user = cache.user(user_id).await;
+            if let Some(user) = cache.user(user_id).await {
+                presence.user.update_with_user(user);
+            }
         }
 
         cache.presences.write().await.extend(ready.presences);
@@ -2072,13 +2072,13 @@ macro_rules! with_related_ids_for_event_types {
                 message_id: Some(e.id),
             },
             Self::PresenceUpdate, Self::PresenceUpdate(e) => {
-                user_id: Some(e.presence.user_id),
+                user_id: Some(e.presence.user.id),
                 guild_id: e.guild_id.into(),
                 channel_id: Never,
                 message_id: Never,
             },
             Self::PresencesReplace, Self::PresencesReplace(e) => {
-                user_id: Multiple(e.presences.iter().map(|p| p.user_id).collect()),
+                user_id: Multiple(e.presences.iter().map(|p| p.user.id).collect()),
                 guild_id: Never,
                 channel_id: Never,
                 message_id: Never,
