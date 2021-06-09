@@ -7,7 +7,7 @@ mod colour;
 mod custom_message;
 mod message_builder;
 
-#[cfg(feature = "client")]
+#[cfg(all(feature = "client", feature = "cache"))]
 pub use argument_convert::*;
 
 pub use self::{
