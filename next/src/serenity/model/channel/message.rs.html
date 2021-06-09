@@ -1231,6 +1231,11 @@
 <span id="1229">1229</span>
 <span id="1230">1230</span>
 <span id="1231">1231</span>
+<span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1958,11 +1963,16 @@
         }
 
         <span class="self">self</span>.<span class="ident">channel_id</span>
-            .<span class="ident">send_message</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">builder</span><span class="op">|</span> {
+            .<span class="ident">send_message</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="op">|</span><span class="ident">builder</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ping_user</span>) <span class="op">=</span> <span class="ident">inlined</span> {
-                    <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>
-                        .<span class="ident">reference_message</span>(<span class="self">self</span>)
-                        .<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">replied_user</span>(<span class="ident">ping_user</span>));
+                    <span class="ident">builder</span>.<span class="ident">reference_message</span>(<span class="self">self</span>).<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+                        <span class="ident">f</span>.<span class="ident">replied_user</span>(<span class="ident">ping_user</span>)
+                            <span class="comment">// By providing allowed_mentions, Discord disabled _all_ pings by</span>
+                            <span class="comment">// default so we need to re-enable them</span>
+                            .<span class="ident">parse</span>(<span class="kw">crate</span><span class="ident">::builder::ParseValue::Everyone</span>)
+                            .<span class="ident">parse</span>(<span class="kw">crate</span><span class="ident">::builder::ParseValue::Users</span>)
+                            .<span class="ident">parse</span>(<span class="kw">crate</span><span class="ident">::builder::ParseValue::Roles</span>)
+                    });
                 }
 
                 <span class="ident">builder</span>.<span class="ident">content</span>(<span class="ident">content</span>)
