@@ -518,7 +518,14 @@ pub enum ActivityType {
     Unknown = !0,
 }
 
-enum_number!(ActivityType { Playing, Streaming, Listening, Watching, Custom, Competing });
+enum_number!(ActivityType {
+    Playing,
+    Streaming,
+    Listening,
+    Watching,
+    Custom,
+    Competing
+});
 
 impl Default for ActivityType {
     fn default() -> Self {
