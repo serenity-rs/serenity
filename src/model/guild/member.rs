@@ -54,6 +54,8 @@ pub struct Member {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub permissions: Option<Permissions>,
+    /// The guild avatar hash
+    pub avatar: Option<String>,
 }
 
 #[cfg(feature = "model")]
@@ -510,6 +512,24 @@ impl Member {
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().remove_ban(self.guild_id.0, self.user.id.0).await
     }
+
+    /// Returns the formatted URL of the member's per guild avatar, if one exists.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the member has a GIF avatar.
+    #[inline]
+    pub fn avatar_url(&self) -> Option<String> {
+        avatar_url(self.guild_id, self.user.id, self.avatar.as_ref())
+    }
+
+    /// Retrieves the URL to the current member's avatar, falling back to the
+    /// user's avatar, then default avatar if needed.
+    ///
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
+    /// then falls back to [`Self::user::face()`].
+    #[inline]
+    pub fn face(&self) -> String {
+        self.avatar_url().unwrap_or_else(|| self.user.face())
+    }
 }
 
 impl Display for Member {
@@ -565,4 +585,13 @@ pub struct PartialMember {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub permissions: Option<Permissions>,
+}
+
+#[cfg(feature = "model")]
+fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Option<String> {
+    hash.map(|hash| {
+        let ext = if hash.starts_with("a_") { "gif" } else { "webp" };
+
+        cdn!("/guilds/{}/users/{}/avatars/{}.{}?size=1024", guild_id.0, user_id.0, hash, ext)
+    })
 }

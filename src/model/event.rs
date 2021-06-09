@@ -470,6 +470,7 @@ pub struct GuildMemberUpdateEvent {
     pub deaf: bool,
     #[serde(default)]
     pub mute: bool,
+    pub avatar: Option<String>,
 }
 
 #[cfg(feature = "cache")]
@@ -492,6 +493,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.premium_since.clone_from(&self.premium_since);
                 member.deaf.clone_from(&self.deaf);
                 member.mute.clone_from(&self.mute);
+                member.avatar.clone_from(&self.avatar);
 
                 item
             } else {
@@ -511,6 +513,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     premium_since: self.premium_since,
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
+                    avatar: self.avatar.clone(),
                 });
             }
 
@@ -1036,6 +1039,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                         premium_since: None,
                         #[cfg(feature = "unstable_discord_api")]
                         permissions: None,
+                        avatar: None,
                     });
                 }
             }
