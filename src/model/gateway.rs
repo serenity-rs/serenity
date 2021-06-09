@@ -1,7 +1,5 @@
 //! Models pertaining to the gateway.
 
-use std::convert::TryFrom;
-
 use bitflags::bitflags;
 use reqwest::Url;
 use serde::de::Error as DeError;
@@ -175,7 +173,7 @@ impl Activity {
             sync_id: None,
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
-            url: Some(Url::try_from(url.as_ref()).expect("Failed to parse url")),
+            url: Some(Url::parse(url.as_ref()).expect("Failed to parse url")),
         }
     }
 
