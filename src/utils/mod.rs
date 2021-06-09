@@ -756,7 +756,7 @@ pub async fn content_safe(
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::non_ascii_literal)]
 mod test {
     use super::*;
     #[cfg(feature = "cache")]
@@ -803,7 +803,6 @@ mod test {
     }
 
     #[cfg(feature = "cache")]
-    #[allow(clippy::non_ascii_literal)]
     #[tokio::test]
     async fn test_content_safe() {
         use std::{collections::HashMap, sync::Arc};
