@@ -1,7 +1,7 @@
 //! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
-#[cfg(feature = "client")]
+#[cfg(all(feature = "client", feature = "cache"))]
 mod argument_convert;
 mod colour;
 mod custom_message;
