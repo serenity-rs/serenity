@@ -93,7 +93,7 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
 ///
 /// assert_eq!(
 ///     parse_message_id_pair("673965002805477386-842482646604972082"),
-///     Some(ChannelId(673965002805477386), GuildId(842482646604972082)),
+///     Some((ChannelId(673965002805477386), GuildId(842482646604972082))),
 /// );
 /// assert_eq!(
 ///     parse_message_id_pair("673965002805477386-842482646604972082-472029906943868929"),
@@ -120,11 +120,11 @@ pub fn parse_message_id_pair(s: &str) -> Option<(ChannelId, MessageId)> {
 ///     parse_message_url(
 ///         "https://discord.com/channels/381880193251409931/381880193700069377/806164913558781963"
 ///     ),
-///     Some(
+///     Some((
 ///         GuildId(381880193251409931),
 ///         ChannelId(381880193700069377),
 ///         MessageId(806164913558781963),
-///     ),
+///     )),
 /// );
 /// assert_eq!(parse_message_url("https://google.com"), None);
 /// ```
