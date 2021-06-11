@@ -19,7 +19,7 @@ impl CreateThread {
     ///
     /// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.
     pub fn auto_archive_duration(&mut self, duration: u16) -> &mut Self {
-        self.0.insert("bitrate", Value::Number(Number::from(duration)));
+        self.0.insert("auto_archive_duration", Value::Number(Number::from(duration)));
 
         self
     }
