@@ -22,6 +22,8 @@ use crate::builder::{CreateEmbed, EditMessage};
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
+#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+use crate::collector::{CollectComponentInteraction, ComponentInteractionCollectorBuilder};
 #[cfg(feature = "collector")]
 use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
@@ -126,6 +128,11 @@ pub struct Message {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub interaction: Option<MessageInteraction>,
+    /// The components of this message
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    #[serde(default)]
+    pub components: Vec<Component>,
 }
 
 #[cfg(feature = "model")]
@@ -891,6 +898,26 @@ impl Message {
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+    }
+
+    /// Await a single component interaction on this message.
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg_attr(docsrs, doc(cfg(all(feature = "unstable_discord_api", feature = "collector"))))]
+    pub fn await_component_interaction<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectComponentInteraction<'a> {
+        CollectComponentInteraction::new(shard_messenger).message_id(self.id.0)
+    }
+
+    /// Returns a stream builder which can be awaited to obtain a stream of component interactions on this message.
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg_attr(docsrs, doc(cfg(all(feature = "unstable_discord_api", feature = "collector"))))]
+    pub fn await_component_interactions<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> ComponentInteractionCollectorBuilder<'a> {
+        ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Retrieves the message channel's category ID if the channel has one.

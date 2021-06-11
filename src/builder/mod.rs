@@ -18,6 +18,9 @@ mod create_application_command_permission;
 mod create_allowed_mentions;
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+mod create_components;
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod create_interaction_response;
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
@@ -73,6 +76,7 @@ pub use self::{
         CreateApplicationCommandPermissionsData,
         CreateApplicationCommandsPermissions,
     },
+    create_components::{CreateActionRow, CreateButton, CreateComponents},
     create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
     create_interaction_response_followup::CreateInteractionResponseFollowup,
     edit_interaction_response::EditInteractionResponse,

@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::builder::CreateComponents;
 use crate::utils;
 
 #[derive(Clone, Debug, Default)]
@@ -74,6 +75,19 @@ impl EditInteractionResponse {
         let allowed_mentions = Value::Object(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn components<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
+    {
+        let mut components = CreateComponents::default();
+        f(&mut components);
+
+        self.0.insert("components", Value::Array(components.0));
         self
     }
 }
