@@ -79,6 +79,10 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
@@ -98,6 +102,9 @@
 <span class="kw">mod</span> <span class="ident">create_application_command_permission</span>;
 
 <span class="kw">mod</span> <span class="ident">create_allowed_mentions</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
+<span class="kw">mod</span> <span class="ident">create_components</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">create_interaction_response</span>;
@@ -155,6 +162,7 @@
         <span class="ident">CreateApplicationCommandPermissionsData</span>,
         <span class="ident">CreateApplicationCommandsPermissions</span>,
     },
+    <span class="ident">create_components</span>::{<span class="ident">CreateActionRow</span>, <span class="ident">CreateButton</span>, <span class="ident">CreateComponents</span>},
     <span class="ident">create_interaction_response</span>::{<span class="ident">CreateInteractionResponse</span>, <span class="ident">CreateInteractionResponseData</span>},
     <span class="ident">create_interaction_response_followup::CreateInteractionResponseFollowup</span>,
     <span class="ident">edit_interaction_response::EditInteractionResponse</span>,
