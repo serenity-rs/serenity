@@ -67,6 +67,7 @@ use crate::CacheAndHttp;
 /// [`Context`], you can pass a tuple of `(CacheRwLock, Http)`.
 pub trait CacheHttp: Send + Sync {
     fn http(&self) -> &Http;
+
     #[cfg(feature = "cache")]
     fn cache(&self) -> Option<&Arc<Cache>> {
         None
@@ -126,6 +127,12 @@ impl CacheHttp for (&Arc<Cache>, &Http) {
     }
     fn http(&self) -> &Http {
         &self.1
+    }
+}
+
+impl CacheHttp for Http {
+    fn http(&self) -> &Http {
+        self
     }
 }
 
