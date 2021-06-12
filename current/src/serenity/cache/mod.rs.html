@@ -1232,7 +1232,7 @@
     <span class="kw">where</span>
         <span class="ident">CRL</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
     {
-        <span class="ident">F::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
+        <span class="ident">F::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>).<span class="kw">await</span>
     }
 }
 
