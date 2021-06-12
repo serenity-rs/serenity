@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.10.8] - 2021-06-12
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@drklee3]
+- [@Gabriel-Paulucci]
+- [@HarmoGlace]
+- [@JellyWX]
+- [@kangalioo]
+- [@Lakelezz]
+- [@Max2408]
+- [@NotNorom]
+- [@TehPers]
+- [@Unoqwy]
+- [@vicky5124]
+
+### Added
+
+- [http] Implement `CacheHttp` for `Http` ([@acdenisSK]) [c:5c9c194]
+- [model/builder/collector] Support components (buttons and dropdowns) ([@HarmoGlace]) [c:47a0a14]
+- [model] Add support for `Activity` buttons ([@HarmoGlace]) [c:2635f7b]
+- [builder] Add `set_embed` to `EditMessage` ([@Gabriel-Paulucci]) [c:073c22f]
+- [model] Add a `roles` method on GuildId for retrieving the guild's roles ([@JellyWX]) [c:38a39f5]
+- [model] Add new user flag for Discord Certified Moderator ([@Max2408]) [c:c60d504]
+- [model] Add a few missing methods for (Partial)Guild ([@NotNorom]) [c:7c50e70]
+
+### Changed
+
+- [client/gateway] Improve documentation of gateway intents ([@Lakelezz]) [c:b03d14b]
+- [misc] Update Github/Gitlab username in README and CHANGELOG for vicky5124 ([@vicky5124]) [c:7b95b41]
+- [http] Implement stricter `validate_token` checks ([@kangalioo]) [c:132fd68]
+
+### Fixed
+
+- [misc] Prevent CI clippy errors ([@Unoqwy]) [c:a788fe2]
+- [client] Remove early return when handling collector filters ([@drklee3]) [c:cbfd92b]
+- [model] Fix embeds in interaction follow-up messages ([@TehPers]) [c:f7907ed]
+- [client] Check existing `application_id` of `Http` when creating a `Client` ([@drklee3]) [c:1744883]
+- [model] Fix being unable to mention additional users with `Message::reply(_ping)` ([@kangalioo]) [c:22d2276]
+- [http] Fix paths in `DiscordJsonError` messages ([@HarmoGlace]) [c:97c01ee]
+- [model] Apply the same fix from #1330 for `create_webhook_with_avatar` ([@JellyWX]) [c:d390ca1]
+
 ## [0.10.7] - 2021-05-14
 
 Thanks to the following for their contributions:
@@ -4179,6 +4222,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.10.8]: https://github.com/serenity-rs/serenity/compare/v0.10.7...v0.10.8
 [0.10.7]: https://github.com/serenity-rs/serenity/compare/v0.10.6...v0.10.7
 [0.10.6]: https://github.com/serenity-rs/serenity/compare/v0.10.5...v0.10.6
 [0.10.5]: https://github.com/serenity-rs/serenity/compare/v0.10.4...v0.10.5
@@ -4313,6 +4357,7 @@ Initial commit.
 [@foxbot]: https://github.com/foxbot
 [@ftriquet]: https://github.com/ftriquet
 [@fwrs]: https://github.com/fwrs
+[@Gabriel-Paulucci]: https://github.com/Gabriel-Paulucci
 [@GetRektByMe]: https://github.com/GetRektByMe
 [@HarmoGlace]: https://github.com/HarmoGlace
 [@hsiW]: https://github.com/hsiW
@@ -4347,6 +4392,7 @@ Initial commit.
 [@leo-lb]: https://github.com/leo-lb
 [@leumasme]: https://github.com/leumasme
 [@lolzballs]: https://github.com/lolzballs
+[@Max2408]: https://github.com/Max2408
 [@MaxOhn]: https://github.com/MaxOhn
 [@Mendess2526]: https://github.com/Mendess2526
 [@Mishio595]: https://github.com/Mishio595
@@ -4365,6 +4411,7 @@ Initial commit.
 [@NieDzejkob]: https://github.com/NieDzejkob
 [@NilsIrl]: https://github.com/NilsIrl
 [@Noituri]: https://github.com/Noituri
+[@NotNorom]: https://github.com/NotNorom
 [@NovusTheory]: https://github.com/NovusTheory
 [@nabijaczleweli]: https://github.com/nabijaczleweli
 [@natsukagami]: https://github.com/natsukagami
@@ -4392,6 +4439,7 @@ Initial commit.
 [@sschroe]: https://github.com/sschroe
 [@sudomann]: https://github.com/sudomann
 [@tahahawa]: https://github.com/tahahawa
+[@TehPers]: https://github.com/TehPers
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
 [@Th3-M4jor]: https://github.com/Th3-M4jor
 [@TheElec]: https://github.com/TheElec
@@ -4404,6 +4452,7 @@ Initial commit.
 [@tmcarr]: https://github.com/tmcarr
 [@tverghis]: https://github.com/tverghis
 [@tweirtx]: https://github.com/tweirtx
+[@Unoqwy]: https://github.com/Unoqwy
 [@u5surf]: https://github.com/u5surf
 [@vicky5124]: https://github.com/vicky5124
 [@vityafx]: https://github.com/vityafx
@@ -4419,6 +4468,24 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:5c9c194]: https://github.com/serenity-rs/serenity/commit/5c9c194c82bef5fda93143c12e30173737a12429
+[c:47a0a14]: https://github.com/serenity-rs/serenity/commit/47a0a1420ff7d008985dc206fade40d89f6bf0e6
+[c:2635f7b]: https://github.com/serenity-rs/serenity/commit/2635f7ba306c61a0e1248d71392106cc694243fb
+[c:073c22f]: https://github.com/serenity-rs/serenity/commit/073c22f00d53b78476bddf6bfbd4cd42f1b45aeb
+[c:38a39f5]: https://github.com/serenity-rs/serenity/commit/38a39f59b5ad00f8277f9cba59706b0f7bb824fe
+[c:c60d504]: https://github.com/serenity-rs/serenity/commit/c60d5042c8117038e3ab14fc2ab1fff54c08b77e
+[c:7c50e70]: https://github.com/serenity-rs/serenity/commit/7c50e70fa459c4ef44745f4a498cae4ca1b1db12
+[c:b03d14b]: https://github.com/serenity-rs/serenity/commit/b03d14b9a222ff3878b0615822f41cdca4e05896
+[c:7b95b41]: https://github.com/serenity-rs/serenity/commit/7b95b41a4ffb1b8c5226d5dd56706cfedb62a82f
+[c:132fd68]: https://github.com/serenity-rs/serenity/commit/132fd68aa06a01a2c930270a7193056effe002a0
+[c:a788fe2]: https://github.com/serenity-rs/serenity/commit/a788fe25f06728f98f722912bef16abc4c79d714
+[c:cbfd92b]: https://github.com/serenity-rs/serenity/commit/cbfd92b6da31958a21344ff5fc50e566b39f25a9
+[c:f7907ed]: https://github.com/serenity-rs/serenity/commit/f7907ed75ad105057e5841211a4bf5a963c220fd
+[c:1744883]: https://github.com/serenity-rs/serenity/commit/1744883e5a8fd552a9cfb82f1164df8ac8f2f58e
+[c:22d2276]: https://github.com/serenity-rs/serenity/commit/22d2276dc31e25ef0680668aab7cb52b6692a06f
+[c:97c01ee]: https://github.com/serenity-rs/serenity/commit/97c01ee592b8e0d32986a037c3137a9c241a4af8
+[c:d390ca1]: https://github.com/serenity-rs/serenity/commit/d390ca12276b8c70b61ad5d95191fc4dd7f3444e
 
 [c:822406e]: https://github.com/serenity-rs/serenity/commit/822406ef13cdeffd2b199e72b42ffcbda73a0202
 
