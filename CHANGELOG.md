@@ -34,7 +34,7 @@ Thanks to the following for their contributions:
 
 - [client/gateway] Improve documentation of gateway intents ([@Lakelezz]) [c:b03d14b]
 - [misc] Update Github/Gitlab username in README and CHANGELOG for vicky5124 ([@vicky5124]) [c:7b95b41]
-- [http] Implement stricter `validate_token` checks ([@kangalioo]) [c:132fd68]
+- [client] Implement stricter `validate_token` checks ([@kangalioo]) [c:132fd68]
 
 ### Fixed
 
