@@ -203,6 +203,10 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -222,7 +226,9 @@
     <span class="doccomment">/// Creates a new application command.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandPermissions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandPermissions</span>,
+        ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandPermissions</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateApplicationCommandPermissions::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>);
@@ -334,7 +340,9 @@
     <span class="doccomment">/// Creates a permission for the interaction.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_permission</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandPermissionData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandPermissionData</span>,
+        ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandPermissionData</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateApplicationCommandPermissionData::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>);
