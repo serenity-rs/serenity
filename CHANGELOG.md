@@ -38,6 +38,7 @@ Thanks to the following for their contributions:
 
 ### Fixed
 
+- [builder] Fix application command permission builder closures ([@HarmoGlace]) [c:1c7e98b]
 - [misc] Prevent CI clippy errors ([@Unoqwy]) [c:a788fe2]
 - [client] Remove early return when handling collector filters ([@drklee3]) [c:cbfd92b]
 - [model] Fix embeds in interaction follow-up messages ([@TehPers]) [c:f7907ed]
@@ -4469,6 +4470,7 @@ Initial commit.
 
 <!-- COMMITS -->
 
+[c:1c7e98b]: https://github.com/serenity-rs/serenity/commit/1c7e98b70d8eedc94ce731276ec76d3ef7505588
 [c:5c9c194]: https://github.com/serenity-rs/serenity/commit/5c9c194c82bef5fda93143c12e30173737a12429
 [c:47a0a14]: https://github.com/serenity-rs/serenity/commit/47a0a1420ff7d008985dc206fade40d89f6bf0e6
 [c:2635f7b]: https://github.com/serenity-rs/serenity/commit/2635f7ba306c61a0e1248d71392106cc694243fb
