@@ -16,7 +16,7 @@ impl CreateApplicationCommandsPermissions {
     /// Creates a new application command.
     pub fn create_application_command<F>(&mut self, f: F) -> &mut Self
     where
-        F: FnOnce(&mut CreateApplicationCommandPermissions) -> &mut Self,
+        F: FnOnce(&mut CreateApplicationCommandPermissions) -> &mut CreateApplicationCommandPermissions,
     {
         let mut data = CreateApplicationCommandPermissions::default();
         f(&mut data);
@@ -128,7 +128,7 @@ impl CreateApplicationCommandPermissionsData {
     /// Creates a permission for the interaction.
     pub fn create_permission<F>(&mut self, f: F) -> &mut Self
     where
-        F: FnOnce(&mut CreateApplicationCommandPermissionData) -> &mut Self,
+        F: FnOnce(&mut CreateApplicationCommandPermissionData) -> &mut CreateApplicationCommandPermissionData,
     {
         let mut data = CreateApplicationCommandPermissionData::default();
         f(&mut data);
