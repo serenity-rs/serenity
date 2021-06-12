@@ -70,7 +70,7 @@ impl StrExt for &str {
     where
         CRL: AsRef<Cache> + Send + Sync,
     {
-        F::from_str(&cache, &self).await
+        F::from_str(&cache, self).await
     }
 }
 
