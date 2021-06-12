@@ -455,7 +455,7 @@ impl AsRef<Arc<Cache>> for Context {
 #[cfg(feature = "cache")]
 impl AsRef<Cache> for Cache {
     fn as_ref(&self) -> &Cache {
-        &self
+        self
     }
 }
 
