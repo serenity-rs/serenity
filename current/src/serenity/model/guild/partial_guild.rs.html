@@ -1695,7 +1695,26 @@
 <span id="1693">1693</span>
 <span id="1694">1694</span>
 <span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
 </pre><pre class="rust">
+<span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field.</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">warn</span>};
@@ -1834,7 +1853,13 @@
     <span class="doccomment">/// Whether or not this guild is designated as NSFW. See [`discord support article`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Removed in favor of Guild::nsfw_level.&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">nsfw</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// The guild NSFW state. See [`discord support article`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation</span>
+    <span class="kw">pub</span> <span class="ident">nsfw_level</span>: <span class="ident">NsfwLevel</span>,
     <span class="doccomment">/// The maximum amount of users in a video channel.</span>
     <span class="kw">pub</span> <span class="ident">max_video_channel_users</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The maximum number of presences for the guild. The default value is currently 25000.</span>
@@ -3274,6 +3299,12 @@
             .<span class="ident">and_then</span>(<span class="ident">bool::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
+        <span class="kw">let</span> <span class="ident">nsfw_level</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;nsfw_level&quot;</span>)
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected nsfw_level&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="ident">NsfwLevel::deserialize</span>)
+            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+
         <span class="kw">let</span> <span class="ident">max_video_channel_users</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;max_video_channel_users&quot;</span>) {
             <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(
                 <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;max_video_channel_users&quot;</span>)
@@ -3384,6 +3415,7 @@
             <span class="ident">approximate_member_count</span>,
             <span class="ident">approximate_presence_count</span>,
             <span class="ident">nsfw</span>,
+            <span class="ident">nsfw_level</span>,
             <span class="ident">max_video_channel_users</span>,
             <span class="ident">max_presences</span>,
             <span class="ident">max_members</span>,
