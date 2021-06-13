@@ -865,6 +865,7 @@ mod test {
             approximate_member_count: None,
             approximate_presence_count: None,
             nsfw: false,
+            nsfw_level: NsfwLevel::Default,
             max_video_channel_users: None,
             max_presences: None,
             max_members: None,

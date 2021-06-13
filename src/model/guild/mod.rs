@@ -1,6 +1,6 @@
 //! Models relating to guilds and types that it owns.
 
-// FIXME: Remove after `GuildEmbed` is removed.
+// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.
 #![allow(deprecated)]
 
 mod audit_log;
@@ -224,7 +224,13 @@ pub struct Guild {
     /// Whether or not this guild is designated as NSFW. See [`discord support article`].
     ///
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    #[deprecated(note = "Removed in favor of Guild::nsfw_level.")]
+    #[serde(default)]
     pub nsfw: bool,
+    /// The guild NSFW state. See [`discord support article`].
+    ///
+    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    pub nsfw_level: NsfwLevel,
     /// The maximum amount of users in a video channel.
     pub max_video_channel_users: Option<u64>,
     /// The maximum number of presences for the guild. The default value is currently 25000.
@@ -2524,6 +2530,12 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(bool::deserialize)
             .map_err(DeError::custom)?;
 
+        let nsfw_level = map
+            .remove("nsfw_level")
+            .ok_or_else(|| DeError::custom("expected nsfw_level"))
+            .and_then(NsfwLevel::deserialize)
+            .map_err(DeError::custom)?;
+
         let widget_enabled = match map.remove("widget_enabled") {
             Some(v) => Option::<bool>::deserialize(v).map_err(DeError::custom)?,
             None => None,
@@ -2590,6 +2602,7 @@ impl<'de> Deserialize<'de> for Guild {
             approximate_member_count,
             approximate_presence_count,
             nsfw,
+            nsfw_level,
             max_video_channel_users,
             max_presences,
             max_members,
@@ -3025,6 +3038,29 @@ enum_number!(VerificationLevel {
     Higher
 });
 
+/// The [`Guild`] nsfw level.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+pub enum NsfwLevel {
+    /// The nsfw level is not specified.
+    Default = 0,
+    /// The guild is considered as explicit.
+    Explicit = 1,
+    /// The guild is considered as safe.
+    Safe = 2,
+    /// The guild is age restricted.
+    AgeRestricted = 3,
+    /// Unknown nsfw level.
+    Unknown = !0,
+}
+
+enum_number!(NsfwLevel {
+    Default,
+    Explicit,
+    Safe,
+    AgeRestricted
+});
+
 #[cfg(test)]
 mod test {
     #[cfg(feature = "model")]
@@ -3120,6 +3156,7 @@ mod test {
                 approximate_member_count: None,
                 approximate_presence_count: None,
                 nsfw: false,
+                nsfw_level: NsfwLevel::Default,
                 max_video_channel_users: None,
                 max_presences: None,
                 max_members: None,
