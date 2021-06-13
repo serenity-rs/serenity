@@ -289,7 +289,7 @@ impl CreateSelectMenuOption {
 
     /// Sets the description shown on this option.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("value", Value::String(description.to_string()));
+        self.0.insert("description", Value::String(description.to_string()));
         self
     }
 
