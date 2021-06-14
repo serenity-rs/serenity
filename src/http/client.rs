@@ -1397,6 +1397,53 @@ impl Http {
         .await
     }
 
+    /// Edits a message and its attachments by Id.
+    ///
+    /// **Note**: Only the author of a message can modify it.
+    pub async fn edit_message_and_attachments(
+        &self,
+        channel_id: u64,
+        message_id: u64,
+        map: &Value,
+        new_attachments: impl IntoIterator<Item = AttachmentType<'_>>,
+    ) -> Result<Message> {
+        // Note: if you need to copy this code for a new method, extract this code into a function
+        // instead and call it in here and in send_files(), to avoid duplication (see Rule Of Three)
+
+        let uri = api!("/channels/{}/messages/{}", channel_id, message_id);
+        let mut url = Url::parse(&uri).map_err(|_| Error::Url(uri))?;
+
+        if let Some(proxy) = &self.proxy {
+            url.set_host(proxy.host_str()).map_err(HttpError::Url)?;
+            url.set_scheme(proxy.scheme()).map_err(|_| HttpError::InvalidScheme)?;
+            url.set_port(proxy.port()).map_err(|_| HttpError::InvalidPort)?;
+        }
+
+        let mut multipart = reqwest::multipart::Form::new();
+
+        for (i, attachment) in new_attachments.into_iter().enumerate() {
+            multipart =
+                multipart.part(i.to_string(), attachment.into_http_form_part(&self.client).await?);
+        }
+
+        multipart = multipart.text("payload_json", serde_json::to_string(map)?);
+
+        let response = self
+            .client
+            .patch(url)
+            .header(AUTHORIZATION, HeaderValue::from_str(&self.token)?)
+            .header(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT))
+            .multipart(multipart)
+            .send()
+            .await?;
+
+        if !response.status().is_success() {
+            return Err(HttpError::from_response(response).await.into());
+        }
+
+        response.json::<Message>().await.map_err(From::from)
+    }
+
     /// Crossposts a message by Id.
     ///
     /// **Note**: Only available on announcements channels.
@@ -3033,56 +3080,8 @@ impl Http {
         let mut multipart = reqwest::multipart::Form::new();
 
         for (file_num, file) in files.into_iter().enumerate() {
-            match file.into() {
-                AttachmentType::Bytes {
-                    data,
-                    filename,
-                } => {
-                    multipart = multipart.part(
-                        file_num.to_string(),
-                        Part::bytes(data.into_owned()).file_name(filename),
-                    );
-                },
-                AttachmentType::File {
-                    file,
-                    filename,
-                } => {
-                    let mut buf = Vec::new();
-                    file.try_clone().await?.read_to_end(&mut buf).await?;
-
-                    multipart =
-                        multipart.part(file_num.to_string(), Part::stream(buf).file_name(filename));
-                },
-                AttachmentType::Path(path) => {
-                    let filename =
-                        path.file_name().map(|filename| filename.to_string_lossy().into_owned());
-                    let mut file = File::open(path).await?;
-                    let mut buf = vec![];
-                    file.read_to_end(&mut buf).await?;
-
-                    let part = match filename {
-                        Some(filename) => Part::bytes(buf).file_name(filename),
-                        None => Part::bytes(buf),
-                    };
-
-                    multipart = multipart.part(file_num.to_string(), part);
-                },
-                AttachmentType::Image(url) => {
-                    let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
-                    let filename = url
-                        .path_segments()
-                        .and_then(|segments| segments.last().map(ToString::to_string))
-                        .ok_or_else(|| Error::Url(url.to_string()))?;
-                    let response = self.client.get(url).send().await?;
-                    let mut bytes = response.bytes().await?;
-                    let mut picture: Vec<u8> = vec![0; bytes.len()];
-                    bytes.copy_to_slice(&mut picture[..]);
-                    multipart = multipart.part(
-                        file_num.to_string(),
-                        Part::bytes(picture).file_name(filename.to_string()),
-                    );
-                },
-            }
+            multipart = multipart
+                .part(file_num.to_string(), file.into().into_http_form_part(&self.client).await?);
         }
 
         multipart = multipart.text("payload_json", to_string(&map)?);
