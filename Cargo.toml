@@ -115,6 +115,7 @@ version = "0.1.3"
 [dependencies.url]
 optional = true
 version = "^2.1"
+features = ["serde"]
 
 [dependencies.bytes]
 optional = true
