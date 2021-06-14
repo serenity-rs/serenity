@@ -374,7 +374,7 @@ impl ChannelId {
         f: F,
     ) -> Result<Message>
     where
-        F: FnOnce(&mut EditMessage) -> &mut EditMessage,
+        F: for<'a, 'b> FnOnce(&'a mut EditMessage<'b>) -> &'a mut EditMessage<'b>,
     {
         let mut msg = EditMessage::default();
         f(&mut msg);
@@ -387,7 +387,9 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(msg.0);
 
-        http.as_ref().edit_message(self.0, message_id.into().0, &Value::from(map)).await
+        http.as_ref()
+            .edit_message_and_attachments(self.0, message_id.into().0, &Value::from(map), msg.1)
+            .await
     }
 
     /// Attempts to find a [`Channel`] by its Id in the cache.
