@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use super::CreateEmbed;
 use crate::utils;
-use crate::{internal::prelude::*, json::from_number};
+use crate::{http::AttachmentType, internal::prelude::*, json::from_number};
 
 /// A builder to specify the fields to edit in an existing message.
 ///
@@ -31,9 +31,9 @@ use crate::{internal::prelude::*, json::from_number};
 ///
 /// [`Message`]: crate::model::channel::Message
 #[derive(Clone, Debug, Default)]
-pub struct EditMessage(pub HashMap<&'static str, Value>);
+pub struct EditMessage<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
 
-impl EditMessage {
+impl<'a> EditMessage<'a> {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
@@ -76,6 +76,14 @@ impl EditMessage {
             self.0.remove("flags");
         }
 
+        self
+    }
+
+    /// Add a new attachment for the message.
+    ///
+    /// This can be called multiple times.
+    pub fn attachment(&mut self, attachment: impl Into<AttachmentType<'a>>) -> &mut Self {
+        self.1.push(attachment.into());
         self
     }
 }
