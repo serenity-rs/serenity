@@ -333,7 +333,7 @@ impl Message {
     #[cfg(feature = "utils")]
     pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
     where
-        F: FnOnce(&mut EditMessage) -> &mut EditMessage,
+        F: for<'a, 'b> FnOnce(&'a mut EditMessage<'b>) -> &'a mut EditMessage<'b>,
     {
         #[cfg(feature = "cache")]
         {
@@ -357,8 +357,15 @@ impl Message {
 
         let map = crate::utils::hashmap_to_json_map(builder.0);
 
-        *self =
-            cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::from(map)).await?;
+        *self = cache_http
+            .http()
+            .edit_message_and_attachments(
+                self.channel_id.0,
+                self.id.0,
+                &Value::from(map),
+                builder.1,
+            )
+            .await?;
 
         Ok(())
     }
