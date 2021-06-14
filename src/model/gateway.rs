@@ -1,7 +1,7 @@
 //! Models pertaining to the gateway.
 
 use bitflags::bitflags;
-use reqwest::Url;
+use url::Url;
 use serde::de::Error as DeError;
 
 use super::prelude::*;
