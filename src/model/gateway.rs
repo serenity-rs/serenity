@@ -1,8 +1,8 @@
 //! Models pertaining to the gateway.
 
 use bitflags::bitflags;
-use url::Url;
 use serde::de::Error as DeError;
+use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
