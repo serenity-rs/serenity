@@ -170,7 +170,7 @@ impl PrivateChannel {
         f: F,
     ) -> Result<Message>
     where
-        F: FnOnce(&mut EditMessage) -> &mut EditMessage,
+        F: for<'a, 'b> FnOnce(&'a mut EditMessage<'b>) -> &'a mut EditMessage<'b>,
     {
         self.id.edit_message(&http, message_id, f).await
     }
