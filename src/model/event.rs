@@ -796,8 +796,13 @@ impl CacheUpdate for GuildUpdateEvent {
             guild.afk_timeout = self.guild.afk_timeout;
             guild.afk_channel_id.clone_from(&self.guild.afk_channel_id);
             guild.icon.clone_from(&self.guild.icon);
+            guild.banner.clone_from(&self.guild.banner);
+            guild.splash.clone_from(&self.guild.splash);
+            guild.discovery_splash.clone_from(&self.guild.discovery_splash);
             guild.name.clone_from(&self.guild.name);
             guild.owner_id.clone_from(&self.guild.owner_id);
+            guild.vanity_url_code.clone_from(&self.guild.vanity_url_code);
+            guild.welcome_screen.clone_from(&self.guild.welcome_screen);
 
             #[allow(deprecated)]
             {
@@ -805,7 +810,23 @@ impl CacheUpdate for GuildUpdateEvent {
             }
 
             guild.roles.clone_from(&self.guild.roles);
+            guild.features.clone_from(&self.guild.features);
+
+            guild.max_video_channel_users = self.guild.max_video_channel_users;
+            guild.max_presences = self.guild.max_presences;
+            guild.max_members = self.guild.max_members;
+            guild.nsfw_level = self.guild.nsfw_level;
+            guild.mfa_level = self.guild.mfa_level;
+            guild.widget_enabled = self.guild.widget_enabled;
+            guild.widget_channel_id = self.guild.widget_channel_id;
+            guild.default_message_notifications = self.guild.default_message_notifications;
             guild.verification_level = self.guild.verification_level;
+            guild.system_channel_id = self.guild.system_channel_id;
+            guild.system_channel_flags = self.guild.system_channel_flags;
+            guild.rules_channel_id = self.guild.rules_channel_id;
+            guild.public_updates_channel_id = self.guild.public_updates_channel_id;
+            guild.premium_tier = self.guild.premium_tier;
+            guild.premium_subscription_count = self.guild.premium_subscription_count;
         }
 
         None
