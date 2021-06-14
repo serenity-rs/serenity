@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use super::CreateEmbed;
 #[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
+use crate::http::AttachmentType;
 use crate::internal::prelude::*;
 use crate::json::from_number;
 use crate::utils;
@@ -34,9 +35,9 @@ use crate::utils;
 ///
 /// [`Message`]: crate::model::channel::Message
 #[derive(Clone, Debug, Default)]
-pub struct EditMessage(pub HashMap<&'static str, Value>);
+pub struct EditMessage<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
 
-impl EditMessage {
+impl<'a> EditMessage<'a> {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
@@ -144,6 +145,14 @@ impl EditMessage {
         f(&mut components);
 
         self.0.insert("components", Value::from(components.0));
+        self
+    }
+
+    /// Add a new attachment for the message.
+    ///
+    /// This can be called multiple times.
+    pub fn attachment(&mut self, attachment: impl Into<AttachmentType<'a>>) -> &mut Self {
+        self.1.push(attachment.into());
         self
     }
 }
