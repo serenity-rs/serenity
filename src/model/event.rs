@@ -793,14 +793,16 @@ impl CacheUpdate for GuildUpdateEvent {
 
     async fn update(&mut self, cache: &Cache) -> Option<()> {
         if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild.id) {
-            guild.afk_timeout = self.guild.afk_timeout;
             guild.afk_channel_id.clone_from(&self.guild.afk_channel_id);
-            guild.icon.clone_from(&self.guild.icon);
+            guild.afk_timeout = self.guild.afk_timeout;
             guild.banner.clone_from(&self.guild.banner);
-            guild.splash.clone_from(&self.guild.splash);
             guild.discovery_splash.clone_from(&self.guild.discovery_splash);
+            guild.features.clone_from(&self.guild.features);
+            guild.icon.clone_from(&self.guild.icon);
             guild.name.clone_from(&self.guild.name);
             guild.owner_id.clone_from(&self.guild.owner_id);
+            guild.roles.clone_from(&self.guild.roles);
+            guild.splash.clone_from(&self.guild.splash);
             guild.vanity_url_code.clone_from(&self.guild.vanity_url_code);
             guild.welcome_screen.clone_from(&self.guild.welcome_screen);
 
@@ -809,24 +811,21 @@ impl CacheUpdate for GuildUpdateEvent {
                 guild.region.clone_from(&self.guild.region);
             }
 
-            guild.roles.clone_from(&self.guild.roles);
-            guild.features.clone_from(&self.guild.features);
-
-            guild.max_video_channel_users = self.guild.max_video_channel_users;
-            guild.max_presences = self.guild.max_presences;
-            guild.max_members = self.guild.max_members;
-            guild.nsfw_level = self.guild.nsfw_level;
-            guild.mfa_level = self.guild.mfa_level;
-            guild.widget_enabled = self.guild.widget_enabled;
-            guild.widget_channel_id = self.guild.widget_channel_id;
             guild.default_message_notifications = self.guild.default_message_notifications;
-            guild.verification_level = self.guild.verification_level;
-            guild.system_channel_id = self.guild.system_channel_id;
-            guild.system_channel_flags = self.guild.system_channel_flags;
-            guild.rules_channel_id = self.guild.rules_channel_id;
-            guild.public_updates_channel_id = self.guild.public_updates_channel_id;
-            guild.premium_tier = self.guild.premium_tier;
+            guild.max_members = self.guild.max_members;
+            guild.max_presences = self.guild.max_presences;
+            guild.max_video_channel_users = self.guild.max_video_channel_users;
+            guild.mfa_level = self.guild.mfa_level;
+            guild.nsfw_level = self.guild.nsfw_level;
             guild.premium_subscription_count = self.guild.premium_subscription_count;
+            guild.premium_tier = self.guild.premium_tier;
+            guild.public_updates_channel_id = self.guild.public_updates_channel_id;
+            guild.rules_channel_id = self.guild.rules_channel_id;
+            guild.system_channel_flags = self.guild.system_channel_flags;
+            guild.system_channel_id = self.guild.system_channel_id;
+            guild.verification_level = self.guild.verification_level;
+            guild.widget_channel_id = self.guild.widget_channel_id;
+            guild.widget_enabled = self.guild.widget_enabled;
         }
 
         None
