@@ -1329,7 +1329,8 @@ impl Http {
         map: &Value,
         new_attachments: impl IntoIterator<Item = AttachmentType<'_>>,
     ) -> Result<Message> {
-        // TODO: Avoid duplication with send_files()?
+        // Note: if you need to copy this code for a new method, extract this code into a function
+        // instead and call it in here and in send_files(), to avoid duplication (see Rule Of Three)
 
         let uri = api!("/channels/{}/messages/{}", channel_id, message_id);
         let mut url = Url::parse(&uri).map_err(|_| Error::Url(uri))?;
