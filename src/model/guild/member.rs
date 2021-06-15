@@ -524,8 +524,8 @@ impl Member {
     /// Retrieves the URL to the current member's avatar, falling back to the
     /// user's avatar, then default avatar if needed.
     ///
-    /// This will call [`Self::avatar_url`] first, and if that returns [`None`], it
-    /// then falls back to [`Self::user::face()`].
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`],
+    /// it then falls back to [`User::face()`].
     #[inline]
     pub fn face(&self) -> String {
         self.avatar_url().unwrap_or_else(|| self.user.face())
