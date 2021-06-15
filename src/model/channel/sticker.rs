@@ -1,4 +1,4 @@
-use crate::model::id::{StickerId, StickerPackId};
+use crate::model::{id::{StickerId, StickerPackId, GuildId}, user::User};
 
 /// A sticker sent with a message.
 ///
@@ -9,19 +9,27 @@ pub struct Sticker {
     /// The unique ID given to this sticker.
     pub id: StickerId,
     /// The unique ID of the pack the sticker is from.
-    pub pack_id: StickerPackId,
+    pub pack_id: Option<StickerPackId>,
     /// The name of the sticker.
     pub name: String,
     /// Description of the sticker
     pub description: String,
-    /// A comma-separated list of tags for the sticker.
-    pub tags: Option<String>,
-    /// The sticker asset hash.
+    /// A unicode emoji representing the sticker's expression.
+    pub tags: String,
+    /// Previously the sticker asset hash, now an empty string.
+    #[deprecated]
     pub asset: String,
-    /// The sticker preview asset hash.
-    pub preview_asset: Option<String>,
     /// The type of sticker format.
     pub format_type: StickerFormatType,
+    /// Whether or not the sticker is available.
+    #[serde(default)]
+    pub available: bool,
+    /// Id of the guild that owns this sticker.
+    pub guild_id: Option<GuildId>,
+    /// User that uploaded the sticker.
+    pub user: Option<User>,
+    /// A sticker's sort order within a pack.
+    pub sort_value: Option<u64>,
 }
 
 /// Differentiates between sticker formats.

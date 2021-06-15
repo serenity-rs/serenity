@@ -116,6 +116,7 @@ pub struct Message {
     /// Bit flags describing extra features of the message.
     pub flags: Option<MessageFlags>,
     /// Array of stickers sent with the message.
+    #[deprecated(note = "stickers was replaced with sticker_map")]
     #[serde(default)]
     pub stickers: Vec<Sticker>,
     /// The message that was replied to using this message.
