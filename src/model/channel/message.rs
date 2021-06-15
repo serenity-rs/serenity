@@ -348,13 +348,11 @@ impl Message {
             builder.content(&self.content);
         }
 
-        if let Some(embed) = self.embeds.get(0) {
-            let embed = CreateEmbed::from(embed.clone());
-            builder.embed(|e| {
-                *e = embed;
-                e
-            });
-        }
+        let embeds: Vec<_> = self
+            .embeds
+            .iter()
+            .map(|e| CreateEmbed::from(e.clone())).collect();
+        builder.set_embeds(embeds);
 
         f(&mut builder);
 
