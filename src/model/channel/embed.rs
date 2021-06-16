@@ -24,8 +24,8 @@ pub struct Embed {
     pub author: Option<EmbedAuthor>,
     /// The colour code of the embed.
     #[cfg(feature = "utils")]
-    #[serde(default, rename = "color")]
-    pub colour: Colour,
+    #[serde(rename = "color")]
+    pub colour: Option<Colour>,
     /// The colour code of the embed.
     #[cfg(not(feature = "utils"))]
     #[serde(default, rename = "color")]
