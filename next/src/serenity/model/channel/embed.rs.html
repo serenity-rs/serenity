@@ -250,8 +250,8 @@
     <span class="kw">pub</span> <span class="ident">author</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedAuthor</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The colour code of the embed.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">Colour</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The colour code of the embed.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>

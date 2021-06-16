@@ -598,6 +598,9 @@
 <span id="596">596</span>
 <span id="597">597</span>
 <span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
@@ -960,7 +963,10 @@
     <span class="doccomment">/// Some values - such as Proxy URLs - are not preserved.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">embed</span>: <span class="ident">Embed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>();
-        <span class="ident">b</span>.<span class="ident">colour</span>(<span class="ident">embed</span>.<span class="ident">colour</span>);
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">colour</span>) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">colour</span> {
+            <span class="ident">b</span>.<span class="ident">colour</span>(<span class="ident">colour</span>);
+        }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">author</span>) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">author</span> {
             <span class="ident">b</span>.<span class="ident">author</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
@@ -1120,7 +1126,7 @@
     <span class="kw">fn</span> <span class="ident">test_from_embed</span>() {
         <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Embed</span> {
             <span class="ident">author</span>: <span class="prelude-val">None</span>,
-            <span class="ident">colour</span>: <span class="ident">Colour::new</span>(<span class="number">0xFF0011</span>),
+            <span class="ident">colour</span>: <span class="prelude-val">Some</span>(<span class="ident">Colour::new</span>(<span class="number">0xFF0011</span>)),
             <span class="ident">description</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;This is a test description&quot;</span>.<span class="ident">to_string</span>()),
             <span class="ident">fields</span>: <span class="macro">vec!</span>[
                 <span class="ident">EmbedField</span> {
