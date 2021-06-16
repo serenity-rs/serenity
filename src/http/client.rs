@@ -1655,10 +1655,10 @@ impl Http {
             .await?;
 
         if let Some(map) = value.as_object_mut() {
-            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+            map.insert("guild_id".to_string(), from_number(guild_id));
         }
 
-        serde_json::from_value(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Changes another user's voice state in a stage channel.
@@ -2575,12 +2575,12 @@ impl Http {
         if let Some(array) = value.as_array_mut() {
             for role in array {
                 if let Some(map) = role.as_object_mut() {
-                    map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                    map.insert("guild_id".to_string(), from_number(guild_id));
                 }
             }
         }
 
-        serde_json::from_value(value).map_err(From::from)
+        from_value(value).map_err(From::from)
     }
 
     /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
