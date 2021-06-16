@@ -885,6 +885,7 @@ mod test {
             premium_since: None,
             #[cfg(feature = "unstable_discord_api")]
             permissions: None,
+            avatar: None,
         };
 
         let role = Role {

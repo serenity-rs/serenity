@@ -511,6 +511,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     premium_since: self.premium_since,
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
+                    avatar: None,
                 });
             }
 
@@ -1036,6 +1037,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                         premium_since: None,
                         #[cfg(feature = "unstable_discord_api")]
                         permissions: None,
+                        avatar: None,
                     });
                 }
             }
