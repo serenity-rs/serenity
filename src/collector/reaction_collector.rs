@@ -189,7 +189,7 @@ impl ReactionFilter {
 
         self.filtered += 1;
 
-        self.is_within_limits()
+        self.is_within_limits() && !self.sender.is_closed()
     }
 
     /// Checks if the `reaction` passes set constraints.

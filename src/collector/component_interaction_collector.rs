@@ -140,7 +140,7 @@ impl ComponentInteractionFilter {
 
         self.filtered += 1;
 
-        self.is_within_limits()
+        self.is_within_limits() && !self.sender.is_closed()
     }
 
     /// Checks if the `interaction` passes set constraints.
