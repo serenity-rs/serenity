@@ -348,10 +348,7 @@ impl Message {
             builder.content(&self.content);
         }
 
-        let embeds: Vec<_> = self
-            .embeds
-            .iter()
-            .map(|e| CreateEmbed::from(e.clone())).collect();
+        let embeds: Vec<_> = self.embeds.iter().map(|e| CreateEmbed::from(e.clone())).collect();
         builder.set_embeds(embeds);
 
         f(&mut builder);
