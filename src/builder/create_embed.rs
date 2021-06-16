@@ -355,7 +355,10 @@ impl From<Embed> for CreateEmbed {
     /// Some values - such as Proxy URLs - are not preserved.
     fn from(embed: Embed) -> Self {
         let mut b = CreateEmbed::default();
-        b.colour(embed.colour);
+
+        if let Some(colour) = embed.colour {
+            b.colour(colour);
+        }
 
         if let Some(author) = embed.author {
             b.author(move |a| {
@@ -526,7 +529,7 @@ mod test {
     fn test_from_embed() {
         let embed = Embed {
             author: None,
-            colour: Colour::new(0xFF0011),
+            colour: Some(Colour::new(0xFF0011)),
             description: Some("This is a test description".to_string()),
             fields: vec![
                 EmbedField {
