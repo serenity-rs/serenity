@@ -1267,6 +1267,7 @@
 <span id="1265">1265</span>
 <span id="1266">1266</span>
 <span id="1267">1267</span>
+<span id="1268">1268</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1618,13 +1619,8 @@
             <span class="ident">builder</span>.<span class="ident">content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">embed</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">get</span>(<span class="number">0</span>) {
-            <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::from</span>(<span class="ident">embed</span>.<span class="ident">clone</span>());
-            <span class="ident">builder</span>.<span class="ident">embed</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                <span class="kw-2">*</span><span class="ident">e</span> <span class="op">=</span> <span class="ident">embed</span>;
-                <span class="ident">e</span>
-            });
-        }
+        <span class="kw">let</span> <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CreateEmbed::from</span>(<span class="ident">e</span>.<span class="ident">clone</span>())).<span class="ident">collect</span>();
+        <span class="ident">builder</span>.<span class="ident">set_embeds</span>(<span class="ident">embeds</span>);
 
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder</span>);
 
@@ -2207,53 +2203,59 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_embed_length</span>(<span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;embed&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">value</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>,
+        <span class="kw">let</span> <span class="ident">embeds</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;embeds&quot;</span>) {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Array</span>(<span class="kw-2">ref</span> <span class="ident">value</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">if</span> <span class="ident">embeds</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">10</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedAmount</span>));
+        }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">author</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;author&quot;</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">name</span>)) <span class="op">=</span> <span class="ident">author</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>) {
-                <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">name</span>.<span class="ident">len</span>();
+        <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">author</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;author&quot;</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">name</span>)) <span class="op">=</span> <span class="ident">author</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>) {
+                    <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">name</span>.<span class="ident">len</span>();
+                }
             }
-        }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">description</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;description&quot;</span>) {
-            <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">description</span>.<span class="ident">len</span>();
-        }
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">description</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;description&quot;</span>) {
+                <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">description</span>.<span class="ident">len</span>();
+            }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Array</span>(<span class="kw-2">ref</span> <span class="ident">fields</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;fields&quot;</span>) {
-            <span class="kw">for</span> <span class="ident">field_as_value</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">field</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">field_as_value</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">field_name</span>)) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>) {
-                        <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">field_name</span>.<span class="ident">len</span>();
-                    }
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Array</span>(<span class="kw-2">ref</span> <span class="ident">fields</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;fields&quot;</span>) {
+                <span class="kw">for</span> <span class="ident">field_as_value</span> <span class="kw">in</span> <span class="ident">fields</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">field</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">field_as_value</span> {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">field_name</span>)) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>) {
+                            <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">field_name</span>.<span class="ident">len</span>();
+                        }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">field_value</span>)) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">get</span>(<span class="string">&quot;value&quot;</span>) {
-                        <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">len</span>();
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">field_value</span>)) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">get</span>(<span class="string">&quot;value&quot;</span>) {
+                            <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">len</span>();
+                        }
                     }
                 }
             }
-        }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">footer</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;footer&quot;</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">text</span>)) <span class="op">=</span> <span class="ident">footer</span>.<span class="ident">get</span>(<span class="string">&quot;text&quot;</span>) {
-                <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>();
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="kw-2">ref</span> <span class="ident">footer</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;footer&quot;</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">text</span>)) <span class="op">=</span> <span class="ident">footer</span>.<span class="ident">get</span>(<span class="string">&quot;text&quot;</span>) {
+                    <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>();
+                }
+            }
+
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">title</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;title&quot;</span>) {
+                <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">title</span>.<span class="ident">len</span>();
+            }
+
+            <span class="kw">if</span> <span class="ident">total</span> <span class="op">&gt;</span> <span class="ident">constants::EMBED_MAX_LENGTH</span> {
+                <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">-</span> <span class="ident">constants::EMBED_MAX_LENGTH</span>;
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedTooLarge</span>(<span class="ident">overflow</span>)));
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">Value::String</span>(<span class="kw-2">ref</span> <span class="ident">title</span>)) <span class="op">=</span> <span class="ident">embed</span>.<span class="ident">get</span>(<span class="string">&quot;title&quot;</span>) {
-            <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">title</span>.<span class="ident">len</span>();
-        }
-
-        <span class="kw">if</span> <span class="ident">total</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">constants::EMBED_MAX_LENGTH</span> {
-            <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">-</span> <span class="ident">constants::EMBED_MAX_LENGTH</span>;
-            <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::EmbedTooLarge</span>(<span class="ident">overflow</span>)))
-        }
+        <span class="prelude-val">Ok</span>(())
     }
 }
 

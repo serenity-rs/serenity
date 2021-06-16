@@ -168,11 +168,17 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A set of constants used by the library.</span>
 
 <span class="doccomment">/// The maximum length of the textual size of an embed.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EMBED_MAX_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">6000</span>;
+
+<span class="doccomment">/// The maximum number of embeds in a message.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EMBED_MAX_COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
 
 <span class="doccomment">/// The gateway version used by the library. The gateway URI is retrieved via</span>
 <span class="doccomment">/// the REST API.</span>
