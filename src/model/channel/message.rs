@@ -34,7 +34,10 @@ use crate::model::utils::U64Visitor;
 #[cfg(feature = "model")]
 use crate::{
     constants,
-    model::id::{ApplicationId, ChannelId, GuildId, MessageId},
+    model::{
+        id::{ApplicationId, ChannelId, GuildId, MessageId},
+        sticker::Sticker,
+    },
 };
 
 /// A representation of a message over a guild's text channel, a group, or a

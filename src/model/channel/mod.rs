@@ -9,7 +9,6 @@ mod message;
 mod partial_channel;
 mod private_channel;
 mod reaction;
-mod sticker;
 
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -28,7 +27,6 @@ pub use self::message::*;
 pub use self::partial_channel::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
-pub use self::sticker::*;
 use super::utils::deserialize_u64;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;

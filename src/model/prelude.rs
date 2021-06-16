@@ -22,6 +22,8 @@ pub use super::interactions::*;
 pub use super::invite::*;
 pub use super::misc::*;
 pub use super::permissions::*;
+pub use super::sticker::*;
+pub use super::sticker_pack::*;
 pub use super::user::*;
 pub use super::voice::*;
 pub use super::webhook::*;

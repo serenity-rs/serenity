@@ -704,6 +704,81 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
+    /// Creates a sticker.
+    pub async fn create_sticker<'a, T>(
+        &self,
+        guild_id: u64,
+        map: &JsonMap,
+        file: T,
+    ) -> Result<Sticker>
+    where
+        T: Into<AttachmentType<'a>>,
+    {
+        let mut multipart = reqwest::multipart::Form::new();
+
+        match file.into() {
+            AttachmentType::Bytes {
+                data,
+                filename,
+            } => {
+                multipart =
+                    multipart.part("file", Part::bytes(data.into_owned()).file_name(filename));
+            },
+            AttachmentType::File {
+                file,
+                filename,
+            } => {
+                let mut buf = Vec::new();
+                file.try_clone().await?.read_to_end(&mut buf).await?;
+
+                multipart = multipart.part("file", Part::stream(buf).file_name(filename));
+            },
+            AttachmentType::Path(path) => {
+                let filename =
+                    path.file_name().map(|filename| filename.to_string_lossy().into_owned());
+                let mut file = File::open(path).await?;
+                let mut buf = vec![];
+                file.read_to_end(&mut buf).await?;
+
+                let part = match filename {
+                    Some(filename) => Part::bytes(buf).file_name(filename),
+                    None => Part::bytes(buf),
+                };
+
+                multipart = multipart.part("file", part);
+            },
+            AttachmentType::Image(url) => {
+                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
+                let filename = url
+                    .path_segments()
+                    .and_then(|segments| segments.last().map(ToString::to_string))
+                    .ok_or_else(|| Error::Url(url.to_string()))?;
+                let response = self.client.get(url).send().await?;
+                let mut bytes = response.bytes().await?;
+                let mut picture: Vec<u8> = vec![0; bytes.len()];
+                bytes.copy_to_slice(&mut picture[..]);
+                multipart =
+                    multipart.part("file", Part::bytes(picture).file_name(filename.to_string()));
+            },
+        }
+
+        multipart = multipart.text("payload_json", serde_json::to_string(&map)?);
+
+        let response = self
+            .client
+            .post(&Route::guild_stickers(guild_id))
+            .multipart(multipart)
+            .header(CONTENT_TYPE, HeaderValue::from_static(&"multipart/form-data"))
+            .send()
+            .await?;
+
+        if !response.status().is_success() {
+            return Err(HttpError::from_response(response).await.into());
+        }
+
+        response.json::<Sticker>().await.map_err(From::from)
+    }
+
     /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
     /// the given data.
     ///
@@ -1019,6 +1094,19 @@ impl Http {
             route: RouteInfo::DeleteRole {
                 guild_id,
                 role_id,
+            },
+        })
+        .await
+    }
+
+    /// Deletes a sticker from a server.
+    pub async fn delete_sticker(&self, guild_id: u64, sticker_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::DeleteSticker {
+                guild_id,
+                sticker_id,
             },
         })
         .await
@@ -1543,6 +1631,34 @@ impl Http {
         }
 
         from_value(value).map_err(From::from)
+    }
+
+    /// Changes a sticker in a guild.
+    pub async fn edit_sticker(
+        &self,
+        guild_id: u64,
+        sticker_id: u64,
+        map: &JsonMap,
+    ) -> Result<Sticker> {
+        let body = serde_json::to_vec(&map)?;
+        let mut value = self
+            .request(Request {
+                body: Some(&body),
+                headers: None,
+                route: RouteInfo::EditSticker {
+                    guild_id,
+                    sticker_id,
+                },
+            })
+            .await?
+            .json::<Value>()
+            .await?;
+
+        if let Some(map) = value.as_object_mut() {
+            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+        }
+
+        serde_json::from_value(value).map_err(From::from)
     }
 
     /// Changes another user's voice state in a stage channel.
@@ -2440,6 +2556,31 @@ impl Http {
         }
 
         from_value(value).map_err(From::from)
+    }
+
+    /// Retrieves a list of stickers in a [`Guild`].
+    pub async fn get_guild_stickers(&self, guild_id: u64) -> Result<Vec<Sticker>> {
+        let mut value = self
+            .request(Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::GetGuildStickers {
+                    guild_id,
+                },
+            })
+            .await?
+            .json::<Value>()
+            .await?;
+
+        if let Some(array) = value.as_array_mut() {
+            for role in array {
+                if let Some(map) = role.as_object_mut() {
+                    map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                }
+            }
+        }
+
+        serde_json::from_value(value).map_err(From::from)
     }
 
     /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
