@@ -45,26 +45,59 @@ impl EditMessage {
         self
     }
 
-    /// Set an embed for the message.
+    /// Add an embed for the message.
+    pub fn add_embed<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
+        let mut embed = CreateEmbed::default();
+        f(&mut embed);
+        self._add_embed(embed)
+    }
+
+    fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+        let map = utils::hashmap_to_json_map(embed.0);
+        let embed = Value::Object(map);
+
+        let embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(Vec::new()));
+        let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");
+
+        embeds_array.push(embed);
+
+        self
+    }
+
+    /// Set the embed for the message.
+    ///
+    /// **Note**: This will replace all existing embeds. Use
+    /// [`Self::add_embed()`] to add additional embeds.
     pub fn embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
-        let mut create_embed = CreateEmbed::default();
-        f(&mut create_embed);
-        let map = utils::hashmap_to_json_map(create_embed.0);
-        let embed = Value::Object(map);
-
-        self.0.insert("embed", embed);
-        self
+        let mut embed = CreateEmbed::default();
+        f(&mut embed);
+        self.set_embed(embed)
     }
 
     /// Set an embed for the message.
+    ///
+    /// **Note**: This will replace all existing embeds with the provided embed.
+    /// Use [`Self::set_embeds()`] to set multiple embeds at once.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
-        self.0.insert("embed", embed);
+        self.0.insert("embeds", Value::Array(vec![embed]));
+        self
+    }
+
+    /// Set multiple embeds for the message.
+    pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        for embed in embeds {
+            self._add_embed(embed);
+        }
+
         self
     }
 
