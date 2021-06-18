@@ -212,6 +212,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersIdRolesId(u64),
+    /// Route for the `/guilds/:guild_id/members/@me` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdMembersMe(u64),
     /// Route for the `/guilds/:guild_id/members/@me/nick` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -596,6 +602,10 @@ impl Route {
         // should not error, ignoring
 
         s
+    }
+
+    pub fn guild_member_me(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/members/@me"), guild_id)
     }
 
     pub fn guild_nickname(guild_id: u64) -> String {
@@ -1052,6 +1062,9 @@ pub enum RouteInfo<'a> {
     CrosspostMessage {
         channel_id: u64,
         message_id: u64,
+    },
+    EditMemberMe {
+        guild_id: u64,
     },
     EditNickname {
         guild_id: u64,
@@ -1737,6 +1750,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::ChannelsIdMessagesId(LightMethod::Patch, channel_id),
                 Cow::from(Route::channel_message(channel_id, message_id)),
+            ),
+            RouteInfo::EditMemberMe {
+                guild_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdMembersMe(guild_id),
+                Cow::from(Route::guild_member_me(guild_id)),
             ),
             RouteInfo::EditNickname {
                 guild_id,

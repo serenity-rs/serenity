@@ -70,7 +70,7 @@ impl StrExt for &str {
     where
         CRL: AsRef<Cache> + Send + Sync,
     {
-        F::from_str(&cache, &self).await
+        F::from_str(&cache, self).await
     }
 }
 
@@ -1025,6 +1025,8 @@ mod test {
                 referenced_message: None,
                 #[cfg(feature = "unstable_discord_api")]
                 interaction: None,
+                #[cfg(feature = "unstable_discord_api")]
+                components: vec![],
             },
         };
 
@@ -1129,6 +1131,7 @@ mod test {
                     approximate_member_count: None,
                     approximate_presence_count: None,
                     nsfw: false,
+                    nsfw_level: NsfwLevel::Default,
                     max_video_channel_users: None,
                     max_presences: None,
                     max_members: None,

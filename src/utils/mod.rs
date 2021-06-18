@@ -756,7 +756,7 @@ pub async fn content_safe(
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
+#[allow(clippy::unwrap_used, clippy::non_ascii_literal)]
 mod test {
     use super::*;
     #[cfg(feature = "cache")]
@@ -803,7 +803,6 @@ mod test {
     }
 
     #[cfg(feature = "cache")]
-    #[allow(clippy::non_ascii_literal)]
     #[tokio::test]
     async fn test_content_safe() {
         use std::{collections::HashMap, sync::Arc};
@@ -866,6 +865,7 @@ mod test {
             approximate_member_count: None,
             approximate_presence_count: None,
             nsfw: false,
+            nsfw_level: NsfwLevel::Default,
             max_video_channel_users: None,
             max_presences: None,
             max_members: None,
@@ -885,6 +885,7 @@ mod test {
             premium_since: None,
             #[cfg(feature = "unstable_discord_api")]
             permissions: None,
+            avatar: None,
         };
 
         let role = Role {

@@ -385,6 +385,7 @@ mod test {
         use crate::utils::Colour;
 
         #[tokio::test]
+        #[allow(clippy::unwrap_used)]
         async fn test_mention() {
             let channel = Channel::Guild(GuildChannel {
                 bitrate: None,
@@ -446,6 +447,7 @@ mod test {
                 premium_since: None,
                 #[cfg(feature = "unstable_discord_api")]
                 permissions: None,
+                avatar: None,
             };
 
             assert_eq!(ChannelId(1).mention().to_string(), "<#1>");

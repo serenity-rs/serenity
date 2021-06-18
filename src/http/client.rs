@@ -1334,6 +1334,20 @@ impl Http {
         .await
     }
 
+    /// Edits the current member for the provided [`Guild`] via its Id.
+    pub async fn edit_member_me(&self, guild_id: u64, map: &JsonMap) -> Result<Member> {
+        let body = serde_json::to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::EditMemberMe {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
     ///
     /// Pass [`None`] to reset the nickname.
@@ -1344,7 +1358,7 @@ impl Http {
         self.wind(200, Request {
             body: Some(&body),
             headers: None,
-            route: RouteInfo::EditNickname {
+            route: RouteInfo::EditMemberMe {
                 guild_id,
             },
         })
@@ -2682,11 +2696,6 @@ impl Http {
             },
         })
         .await
-        .map(|mut w: Webhook| {
-            w.token = Some(token.to_string());
-
-            w
-        })
     }
 
     /// Kicks a member from a guild.

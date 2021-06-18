@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use super::CreateAllowedMentions;
 use super::CreateEmbed;
+#[cfg(feature = "unstable_discord_api")]
+use crate::builder::CreateComponents;
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
 use crate::model::channel::{MessageReference, ReactionType};
@@ -72,7 +74,32 @@ impl<'a> CreateMessage<'a> {
         self
     }
 
-    /// Create an embed for the message.
+    /// Add an embed for the message.
+    pub fn add_embed<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
+        let mut embed = CreateEmbed::default();
+        f(&mut embed);
+        self._add_embed(embed)
+    }
+
+    fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+        let map = utils::hashmap_to_json_map(embed.0);
+        let embed = Value::Object(map);
+
+        let embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(Vec::new()));
+        let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");
+
+        embeds_array.push(embed);
+
+        self
+    }
+
+    /// Set the embed for the message.
+    ///
+    /// **Note**: This will replace all existing embeds. Use
+    /// [`Self::add_embed()`] to add additional embeds.
     pub fn embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
@@ -83,11 +110,23 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Set an embed for the message.
+    ///
+    /// **Note**: This will replace all existing embeds with the provided embed.
+    /// Use [`Self::set_embeds()`] to set multiple embeds at once.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
-        self.0.insert("embed", embed);
+        self.0.insert("embeds", Value::Array(vec![embed]));
+        self
+    }
+
+    /// Set multiple embeds for the message.
+    pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        for embed in embeds {
+            self._add_embed(embed);
+        }
+
         self
     }
 
@@ -160,6 +199,19 @@ impl<'a> CreateMessage<'a> {
     #[allow(clippy::unwrap_used)] // allowing unwrap here because serializing MessageReference should never error
     pub fn reference_message(&mut self, reference: impl Into<MessageReference>) -> &mut Self {
         self.0.insert("message_reference", serde_json::to_value(reference.into()).unwrap());
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn components<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
+    {
+        let mut components = CreateComponents::default();
+        f(&mut components);
+
+        self.0.insert("components", Value::Array(components.0));
         self
     }
 }
