@@ -2056,6 +2056,8 @@ impl Guild {
     /// Optionally pass in the `limit` to limit the number of results.
     /// Minimum value is 1, maximum and default value is 1000.
     ///
+    /// **Note**: Queries are case insensitive.
+    ///
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if the API returns an error.
