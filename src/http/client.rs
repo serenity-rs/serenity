@@ -2899,6 +2899,39 @@ impl Http {
         .await
     }
 
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
+    /// starts with a provided string.
+    pub async fn search_guild_members(
+        &self,
+        guild_id: u64,
+        query: &str,
+        limit: Option<u64>,
+    ) -> Result<Vec<Member>> {
+        let mut value = self
+            .request(Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::SearchGuildMembers {
+                    guild_id,
+                    query,
+                    limit,
+                },
+            })
+            .await?
+            .json::<Value>()
+            .await?;
+
+        if let Some(members) = value.as_array_mut() {
+            for member in members {
+                if let Some(map) = member.as_object_mut() {
+                    map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                }
+            }
+        }
+
+        serde_json::from_value(value).map_err(From::from)
+    }
+
     /// Starts removing some members from a guild based on the last time they've been online.
     pub async fn start_guild_prune(&self, guild_id: u64, map: &Value) -> Result<GuildPrune> {
         // Note for 0.6.x: turn this into a function parameter.

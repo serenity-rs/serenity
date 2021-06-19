@@ -953,6 +953,18 @@ impl GuildId {
         http.as_ref().edit_guild_channel_positions(self.0, &Value::Array(items)).await
     }
 
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
+    /// starts with a provided string.
+    #[inline]
+    pub async fn search_members(
+        self,
+        http: impl AsRef<Http>,
+        query: &str,
+        limit: Option<u64>,
+    ) -> Result<Vec<Member>> {
+        http.as_ref().search_guild_members(self.0, query, limit).await
+    }
+
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total

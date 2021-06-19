@@ -2030,6 +2030,18 @@ impl Guild {
         self.id.reorder_channels(&http, channels).await
     }
 
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
+    /// starts with a provided string.
+    #[inline]
+    pub async fn search_members(
+        &self,
+        http: impl AsRef<Http>,
+        query: &str,
+        limit: Option<u64>,
+    ) -> Result<Vec<Member>> {
+        http.as_ref().search_guild_members(self.id.0, query, limit).await
+    }
+
     /// Returns the Id of the shard associated with the guild.
     ///
     /// When the cache is enabled this will automatically retrieve the total

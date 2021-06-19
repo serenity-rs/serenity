@@ -224,6 +224,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersMeNick(u64),
+    /// Route for the `/guilds/:guild_id/members/search` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdMembersSearch(u64),
     /// Route for the `/guilds/:guild_id/prune` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -586,6 +592,17 @@ impl Route {
 
     pub fn guild_members(guild_id: u64) -> String {
         format!(api!("/guilds/{}/members"), guild_id)
+    }
+
+    pub fn guild_members_search(guild_id: u64, query: &str, limit: Option<u64>) -> String {
+        let mut s = format!(api!("/guilds/{}/members/search?"), guild_id);
+
+        let _ = write!(s, "&query={}", query);
+
+        #[allow(clippy::let_underscore_must_use)]
+        let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
+
+        s
     }
 
     pub fn guild_members_optioned(guild_id: u64, after: Option<u64>, limit: Option<u64>) -> String {
@@ -1294,6 +1311,11 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         role_id: u64,
         user_id: u64,
+    },
+    SearchGuildMembers {
+        guild_id: u64,
+        query: &'a str,
+        limit: Option<u64>,
     },
     StartGuildPrune {
         days: u64,
@@ -2220,6 +2242,15 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::GuildsIdMembersIdRolesId(guild_id),
                 Cow::from(Route::guild_member_role(guild_id, user_id, role_id)),
+            ),
+            RouteInfo::SearchGuildMembers {
+                guild_id,
+                query,
+                limit,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdMembersSearch(guild_id),
+                Cow::from(Route::guild_members_search(guild_id, query, limit)),
             ),
             RouteInfo::StartGuildPrune {
                 days,
