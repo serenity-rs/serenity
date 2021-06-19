@@ -597,6 +597,7 @@ impl Route {
     pub fn guild_members_search(guild_id: u64, query: &str, limit: Option<u64>) -> String {
         let mut s = format!(api!("/guilds/{}/members/search?"), guild_id);
 
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(s, "&query={}", query);
 
         #[allow(clippy::let_underscore_must_use)]

@@ -955,6 +955,15 @@ impl GuildId {
 
     /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
     /// starts with a provided string.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results.
+    /// Minimum value is 1, maximum and default value is 1000.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn search_members(
         self,
