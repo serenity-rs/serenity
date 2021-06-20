@@ -1696,7 +1696,7 @@ pub enum Event {
     VoiceServerUpdate(VoiceServerUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     WebhookUpdate(WebhookUpdateEvent),
-    /// A user used a slash command.
+    /// An interaction was created.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     InteractionCreate(InteractionCreateEvent),

@@ -88,7 +88,7 @@ impl<'a> HttpBuilder<'a> {
         Self::_new().token(token)
     }
 
-    /// Sets the application_id to use slash commands.
+    /// Sets the application_id to use interactions.
     #[cfg(feature = "unstable_discord_api")]
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(application_id);
@@ -175,7 +175,7 @@ impl<'a> Future for HttpBuilder<'a> {
             #[cfg(feature = "unstable_discord_api")]
             let application_id = self
                 .application_id
-                .expect("Expected application Id in order to use slash commands");
+                .expect("Expected application Id in order to use interaction features");
 
             let client = self.client.take().unwrap_or_else(|| {
                 let builder = configure_client_backend(Client::builder());
