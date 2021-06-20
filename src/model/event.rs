@@ -2051,7 +2051,7 @@ pub enum EventType {
     ///
     /// This maps to [`WebhookUpdateEvent`].
     WebhookUpdate,
-    /// Indicator that a slash command was received.
+    /// Indicator that an interaction was created.
     ///
     /// This maps to [`InteractionCreateEvent`].
     #[cfg(feature = "unstable_discord_api")]
