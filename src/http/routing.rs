@@ -429,6 +429,7 @@ impl Route {
         api!("/channels/{}/messages/{}/reactions", channel_id, message_id)
     }
 
+    #[allow(clippy::let_underscore_must_use)]
     pub fn channel_message_reactions_list(
         channel_id: u64,
         message_id: u64,
@@ -442,7 +443,6 @@ impl Route {
         );
 
         if let Some(after) = after {
-            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(uri, "&after={}", after);
         }
 
@@ -594,28 +594,26 @@ impl Route {
         format!(api!("/guilds/{}/members"), guild_id)
     }
 
+    #[allow(clippy::let_underscore_must_use)]
     pub fn guild_members_search(guild_id: u64, query: &str, limit: Option<u64>) -> String {
         let mut s = format!(api!("/guilds/{}/members/search?"), guild_id);
 
-        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(s, "&query={}", query);
 
-        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
 
         s
     }
 
+    #[allow(clippy::let_underscore_must_use)]
     pub fn guild_members_optioned(guild_id: u64, after: Option<u64>, limit: Option<u64>) -> String {
         let mut s = format!(api!("/guilds/{}/members?"), guild_id);
 
         if let Some(after) = after {
-            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(s, "&after={}", after);
             // should not error, ignoring
         }
 
-        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
         // should not error, ignoring
 
@@ -714,6 +712,7 @@ impl Route {
         format!(api!("/users/{}/guilds"), target)
     }
 
+    #[allow(clippy::let_underscore_must_use)]
     pub fn user_guilds_optioned<D: Display>(
         target: D,
         after: Option<u64>,
@@ -723,13 +722,11 @@ impl Route {
         let mut s = format!(api!("/users/{}/guilds?limit={}&"), target, limit);
 
         if let Some(after) = after {
-            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(s, "&after={}", after);
             // should not error, ignoring
         }
 
         if let Some(before) = before {
-            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(s, "&before={}", before);
             // should not error, ignoring
         }
