@@ -2437,7 +2437,7 @@ impl Http {
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// let guilds = http.get_guilds(&GuildPagination::After(guild_id), 10).await?;
+    /// let guilds = http.get_guilds(Some(&GuildPagination::After(guild_id)), 10).await?;
     /// #     Ok(())
     /// # }
     /// ```
