@@ -1024,6 +1024,7 @@ impl CacheUpdate for PresenceUpdateEvent {
 
                 // Create a partial member instance out of the presence update
                 // data.
+<<<<<<< HEAD
                 if let Some(user) = self.presence.user.as_ref() {
                     guild.members.entry(self.presence.user_id).or_insert_with(|| Member {
                         deaf: false,
@@ -1039,6 +1040,44 @@ impl CacheUpdate for PresenceUpdateEvent {
                         permissions: None,
                         avatar: None,
                     });
+||||||| parent of 40e24e46 (Fixed clippy lints)
+                if !guild.members.contains_key(&self.presence.user_id) {
+                    if let Some(user) = self.presence.user.as_ref() {
+                        guild.members.insert(self.presence.user_id, Member {
+                            deaf: false,
+                            guild_id,
+                            joined_at: None,
+                            mute: false,
+                            nick: None,
+                            user: user.clone(),
+                            roles: vec![],
+                            pending: false,
+                            premium_since: None,
+                            #[cfg(feature = "unstable_discord_api")]
+                            permissions: None,
+                        });
+                    }
+=======
+                // https://rust-lang.github.io/rust-clippy/master/index.html#map_entry
+                if let std::collections::hash_map::Entry::Vacant(e) =
+                    guild.members.entry(self.presence.user_id)
+                {
+                    if let Some(user) = self.presence.user.as_ref() {
+                        e.insert(Member {
+                            deaf: false,
+                            guild_id,
+                            joined_at: None,
+                            mute: false,
+                            nick: None,
+                            user: user.clone(),
+                            roles: vec![],
+                            pending: false,
+                            premium_since: None,
+                            #[cfg(feature = "unstable_discord_api")]
+                            permissions: None,
+                        });
+                    }
+>>>>>>> 40e24e46 (Fixed clippy lints)
                 }
             }
         } else if self.presence.status == OnlineStatus::Offline {
