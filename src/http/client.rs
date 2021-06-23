@@ -2475,7 +2475,7 @@ impl Http {
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// let guilds = http.get_guilds(Some(&GuildPagination::After(guild_id)), 10).await?;
+    /// let guilds = http.get_guilds(Some(&GuildPagination::After(guild_id)), Some(10)).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -2484,7 +2484,7 @@ impl Http {
     pub async fn get_guilds(
         &self,
         target: Option<&GuildPagination>,
-        limit: u64,
+        limit: Option<u64>,
     ) -> Result<Vec<GuildInfo>> {
         let (after, before) = match target {
             None => (None, None),

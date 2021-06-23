@@ -1216,7 +1216,7 @@ pub enum RouteInfo<'a> {
     GetGuilds {
         after: Option<u64>,
         before: Option<u64>,
-        limit: u64,
+        limit: Option<u64>,
     },
     GetInvite {
         code: &'a str,
