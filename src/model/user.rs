@@ -190,15 +190,7 @@ impl CurrentUser {
     pub async fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
         let mut guilds = Vec::new();
         loop {
-            let mut pagination = http
-                .as_ref()
-                .get_guilds(
-                    Some(&GuildPagination::After(
-                        guilds.last().map_or(GuildId(1), |g: &GuildInfo| g.id),
-                    )),
-                    100,
-                )
-                .await?;
+            let mut pagination = http.as_ref().get_guilds(None, 100).await?;
             let len = pagination.len();
             guilds.append(&mut pagination);
             if len != 100 {
