@@ -346,10 +346,11 @@ impl<'de> Deserialize<'de> for Interaction {
         };
 
         let user = match map.contains_key("user") {
-            true => map.remove("user")
-                    .ok_or_else(|| DeError::custom("expected user"))
-                    .and_then(User::deserialize)
-                    .map_err(DeError::custom)?,
+            true => map
+                .remove("user")
+                .ok_or_else(|| DeError::custom("expected user"))
+                .and_then(User::deserialize)
+                .map_err(DeError::custom)?,
             false => member.as_ref().expect("expected user or member").user.clone(),
         };
 

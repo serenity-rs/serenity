@@ -154,12 +154,7 @@ impl ComponentInteractionFilter {
             && self.options.channel_id.map_or(true, |id| {
                 id == interaction.channel_id.as_ref().expect("expected channel id").0
             })
-            && self.options.author_id.map_or(true, |id| {
-                id == interaction
-                    .user
-                    .id
-                    .0
-            })
+            && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
             && self.options.filter.as_ref().map_or(true, |f| f(&interaction))
     }
 
