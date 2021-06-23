@@ -62,6 +62,7 @@ impl EventHandler for Handler {
                             println!("Cannot respond to slash command: {}", why);
                         }
                     },
+                    _ => {},
                 }
             }
         }
