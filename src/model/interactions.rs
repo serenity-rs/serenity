@@ -350,7 +350,7 @@ impl<'de> Deserialize<'de> for Interaction {
                     .ok_or_else(|| DeError::custom("expected user"))
                     .and_then(User::deserialize)
                     .map_err(DeError::custom)?,
-            false => member.unwrap_or_else(|| DeError::custom("expected user or member")).user,
+            false => member.as_ref().expect("expected user or member").user.clone(),
         };
 
         let message = match map.contains_key("message") {

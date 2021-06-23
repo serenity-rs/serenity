@@ -157,8 +157,6 @@ impl ComponentInteractionFilter {
             && self.options.author_id.map_or(true, |id| {
                 id == interaction
                     .user
-                    .as_ref()
-                    .unwrap_or(&interaction.member.as_ref().expect("expected member").user)
                     .id
                     .0
             })
