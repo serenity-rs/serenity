@@ -56,6 +56,14 @@ impl CreateBotAuthParameters {
     }
 
     /// Will try to fill the client_id automatically from the current application.
+    ///
+    /// # Errors
+    ///
+    /// Returns an
+    /// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]
+    /// If the user is not authorized for this end point.
+    ///
+    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
     pub async fn auto_client_id(&mut self, http: impl AsRef<Http>) -> Result<&mut Self> {
         self._client_id = http.as_ref().get_current_application_info().await.map(|v| v.id)?;
         Ok(self)
