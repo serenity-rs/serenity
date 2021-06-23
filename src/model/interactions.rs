@@ -51,9 +51,7 @@ pub struct Interaction {
     /// **Note**: It is only present if the interaction is triggered in a guild.
     pub member: Option<Member>,
     /// The `user` object for the invoking user.
-    ///
-    /// It is only present if the interaction is triggered in DM.
-    pub user: Option<User>,
+    pub user: User,
     /// A continuation token for responding to the interaction.
     pub token: String,
     /// Always `1`.
@@ -348,13 +346,11 @@ impl<'de> Deserialize<'de> for Interaction {
         };
 
         let user = match map.contains_key("user") {
-            true => Some(
-                map.remove("user")
+            true => map.remove("user")
                     .ok_or_else(|| DeError::custom("expected user"))
                     .and_then(User::deserialize)
                     .map_err(DeError::custom)?,
-            ),
-            false => None,
+            false => member.unwrap_or_else(|| DeError::custom("expected user or member")).user,
         };
 
         let message = match map.contains_key("message") {
