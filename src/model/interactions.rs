@@ -19,8 +19,8 @@ use crate::utils;
 
 /// Information about an interaction.
 ///
-/// An interaction is sent when a user invokes a slash command and is the same
-/// for slash commands and other future interaction types.
+/// An interaction is sent when a user invokes a slash command, clicks a button,
+/// or other future interaction types.
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct Interaction {

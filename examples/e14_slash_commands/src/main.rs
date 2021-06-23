@@ -112,7 +112,7 @@ impl EventHandler for Handler {
         })
         .await;
 
-        println!("I have now the following global slash commands: {:#?}", commands);
+        println!("I now have the following global slash commands: {:#?}", commands);
     }
 }
 

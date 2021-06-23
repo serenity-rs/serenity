@@ -422,7 +422,8 @@ pub trait EventHandler: Send + Sync {
     ) {
     }
 
-    /// Dispatched when a user used a slash command.
+    /// Dispatched when an interaction is created (e.g a slash command was used
+    /// or a button was clicked).
     ///
     /// Provides the created interaction.
     #[cfg(feature = "unstable_discord_api")]
