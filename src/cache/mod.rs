@@ -1086,7 +1086,7 @@ mod test {
             assert!(!channel.contains_key(&MessageId(3)));
         }
 
-        let guild_channel = GuildChannel {
+        let channel = Channel::Guild(GuildChannel {
             id: event.message.channel_id,
             bitrate: None,
             category_id: None,
@@ -1103,12 +1103,12 @@ mod test {
             slow_mode_rate: Some(0),
             rtc_region: None,
             video_quality_mode: None,
-        };
+        });
 
         // Add a channel delete event to the cache, the cached messages for that
         // channel should now be gone.
         let mut delete = ChannelDeleteEvent {
-            channel: Channel::Guild(guild_channel.clone()),
+            channel: channel.clone(),
         };
         assert!(cache.update(&mut delete).await.is_none());
         assert!(!cache.messages.read().await.contains_key(&delete.channel.id()));
@@ -1117,7 +1117,7 @@ mod test {
         // is received.
         let mut guild_create = {
             let mut channels = HashMap::new();
-            channels.insert(ChannelId(2), guild_channel.clone());
+            channels.insert(ChannelId(2), channel.clone());
 
             #[allow(deprecated)]
             GuildCreateEvent {
