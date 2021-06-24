@@ -643,12 +643,44 @@ impl Cache {
     }
 
     async fn _guild_channels(&self, guild_id: GuildId) -> Option<HashMap<ChannelId, GuildChannel>> {
-        self.guilds.read().await.get(&guild_id).map(|g| g.channels.clone())
+        self.guilds.read().await.get(&guild_id).map(|g| {
+            g.channels
+                .iter()
+                .filter_map(|c| match c.1 {
+                    Channel::Guild(channel) => Some((channel.id, channel.clone())),
+                    _ => None,
+                })
+                .collect()
+        })
     }
 
     /// Returns the number of guild channels in the cache.
     pub async fn guild_channel_count(&self) -> usize {
         self.channels.read().await.len()
+    }
+
+    /// This method returns all categories from a guild of with the given `guild_id`.
+    #[inline]
+    pub async fn guild_categories(
+        &self,
+        guild_id: impl Into<GuildId>,
+    ) -> Option<HashMap<ChannelId, ChannelCategory>> {
+        self._guild_categories(guild_id.into()).await
+    }
+
+    async fn _guild_categories(
+        &self,
+        guild_id: GuildId,
+    ) -> Option<HashMap<ChannelId, ChannelCategory>> {
+        self.guilds.read().await.get(&guild_id).map(|g| {
+            g.channels
+                .iter()
+                .filter_map(|c| match c.1 {
+                    Channel::Category(category) => Some((category.id, category.clone())),
+                    _ => None,
+                })
+                .collect()
+        })
     }
 
     /// Returns the number of shards.
