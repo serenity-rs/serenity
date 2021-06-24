@@ -191,7 +191,7 @@ impl Member {
                     if guild.user_permissions_in(channel, member).ok()?.read_messages() {
                         return Some(channel.clone());
                     }
-                }
+                },
                 _ => {},
             }
         }
