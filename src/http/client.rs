@@ -2618,7 +2618,10 @@ impl Http {
 
     /// Gets the current user's third party connections.
     ///
-    /// This method only works for user tokens with the `connections` OAuth2 scope.
+    /// This method only works for user tokens with the
+    /// [`Connections`] OAuth2 scope.
+    ///
+    /// [`Connections`]: crate::model::oauth2::Oauth2Scope::Connections
     pub async fn get_user_connections(&self) -> Result<Vec<Connection>> {
         self.fire(Request {
             body: None,
