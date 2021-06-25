@@ -3141,6 +3141,18 @@
 <span id="3141">3141</span>
 <span id="3142">3142</span>
 <span id="3143">3143</span>
+<span id="3144">3144</span>
+<span id="3145">3145</span>
+<span id="3146">3146</span>
+<span id="3147">3147</span>
+<span id="3148">3148</span>
+<span id="3149">3149</span>
+<span id="3150">3150</span>
+<span id="3151">3151</span>
+<span id="3152">3152</span>
+<span id="3153">3153</span>
+<span id="3154">3154</span>
+<span id="3155">3155</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -5756,6 +5768,18 @@
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetUser</span> {
                 <span class="ident">user_id</span>,
             },
+        })
+        .<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Gets the current user&#39;s third party connections.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method only works for user tokens with the `connections` OAuth2 scope.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_connections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::GetUserConnections</span>,
         })
         .<span class="kw">await</span>
     }

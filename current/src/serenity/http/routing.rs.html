@@ -2257,6 +2257,18 @@
 <span id="2257">2257</span>
 <span id="2258">2258</span>
 <span id="2259">2259</span>
+<span id="2260">2260</span>
+<span id="2261">2261</span>
+<span id="2262">2262</span>
+<span id="2263">2263</span>
+<span id="2264">2264</span>
+<span id="2265">2265</span>
+<span id="2266">2266</span>
+<span id="2267">2267</span>
+<span id="2268">2268</span>
+<span id="2269">2269</span>
+<span id="2270">2270</span>
+<span id="2271">2271</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
@@ -2546,6 +2558,8 @@
     <span class="ident">UsersMe</span>,
     <span class="doccomment">/// Route for the `/users/@me/channels` path.</span>
     <span class="ident">UsersMeChannels</span>,
+    <span class="doccomment">/// Route for the `/users/@me/connections` path.</span>
+    <span class="ident">UsersMeConnections</span>,
     <span class="doccomment">/// Route for the `/users/@me/guilds` path.</span>
     <span class="ident">UsersMeGuilds</span>,
     <span class="doccomment">/// Route for the `/users/@me/guilds/:guild_id` path.</span>
@@ -2942,6 +2956,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">target</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}&quot;</span>), <span class="ident">target</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_me_connections</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/users/@me/connections&quot;</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_dm_channels</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">target</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
@@ -3522,6 +3540,7 @@
     <span class="ident">GetUser</span> {
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">GetUserConnections</span>,
     <span class="ident">GetUserDmChannels</span>,
     <span class="ident">GetVoiceRegions</span>,
     <span class="ident">GetWebhook</span> {
@@ -4410,6 +4429,11 @@
             <span class="ident">RouteInfo::GetUser</span> {
                 <span class="ident">user_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::UsersId</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::user</span>(<span class="ident">user_id</span>))),
+            <span class="ident">RouteInfo::GetUserConnections</span> <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::UsersMeConnections</span>,
+                <span class="ident">Cow::from</span>(<span class="ident">Route::user_me_connections</span>()),
+            ),
             <span class="ident">RouteInfo::GetUserDmChannels</span> <span class="op">=</span><span class="op">&gt;</span> (
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::UsersMeChannels</span>,

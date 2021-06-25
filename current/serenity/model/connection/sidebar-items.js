@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ConnectionVisibility","The visibility of a user connection on a user’s profile."]],"struct":[["Connection","Information about a connection between the current user and a third party service."]]});
