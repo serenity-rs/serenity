@@ -18,7 +18,7 @@ impl CreateBotAuthParameters {
         let bits = self._permissions.bits();
 
         if self._client_id.0 != 0 {
-            valid_data.push(("cliend_id", self._client_id.0.to_string()));
+            valid_data.push(("client_id", self._client_id.0.to_string()));
         }
 
         if !self._scopes.is_empty() {
