@@ -286,6 +286,8 @@ pub enum Route {
     UsersMe,
     /// Route for the `/users/@me/channels` path.
     UsersMeChannels,
+    /// Route for the `/users/@me/connections` path.
+    UsersMeConnections,
     /// Route for the `/users/@me/guilds` path.
     UsersMeGuilds,
     /// Route for the `/users/@me/guilds/:guild_id` path.
@@ -682,6 +684,10 @@ impl Route {
 
     pub fn user<D: Display>(target: D) -> String {
         format!(api!("/users/{}"), target)
+    }
+
+    pub fn user_me_connections() -> &'static str {
+        api!("/users/@me/connections")
     }
 
     pub fn user_dm_channels<D: Display>(target: D) -> String {
@@ -1262,6 +1268,7 @@ pub enum RouteInfo<'a> {
     GetUser {
         user_id: u64,
     },
+    GetUserConnections,
     GetUserDmChannels,
     GetVoiceRegions,
     GetWebhook {
@@ -2150,6 +2157,11 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::GetUser {
                 user_id,
             } => (LightMethod::Get, Route::UsersId, Cow::from(Route::user(user_id))),
+            RouteInfo::GetUserConnections => (
+                LightMethod::Get,
+                Route::UsersMeConnections,
+                Cow::from(Route::user_me_connections()),
+            ),
             RouteInfo::GetUserDmChannels => (
                 LightMethod::Get,
                 Route::UsersMeChannels,
