@@ -408,7 +408,7 @@ mod test {
                 member_count: None,
                 thread_metadata: None,
                 member: None,
-                default_auto_archive_duration: None
+                default_auto_archive_duration: None,
             });
             let emoji = Emoji {
                 animated: false,

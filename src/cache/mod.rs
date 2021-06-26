@@ -1078,7 +1078,7 @@ mod test {
             member_count: None,
             thread_metadata: None,
             member: None,
-            default_auto_archive_duration: None
+            default_auto_archive_duration: None,
         };
 
         // Add a channel delete event to the cache, the cached messages for that
