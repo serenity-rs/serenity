@@ -35,6 +35,7 @@ use crate::cache::Cache;
 use crate::client::Context;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
+use crate::model::guild::Guild;
 #[cfg(feature = "cache")]
 use crate::model::guild::Member;
 use crate::model::{channel::Message, permissions::Permissions};
@@ -260,8 +261,12 @@ impl StandardFramework {
                     return Some(DispatchError::BlockedGuild);
                 }
 
-                if let Some(guild) = guild_id.to_guild_cached(&ctx.cache).await {
-                    if self.config.blocked_users.contains(&guild.owner_id) {
+                let cache = ctx.cache.clone();
+                let guild_selector = |guild: &Guild| guild.owner_id;
+                let owner_id_option = cache.guild_field(guild_id, guild_selector).await;
+
+                if let Some(owner_id) = owner_id_option {
+                    if self.config.blocked_users.contains(&owner_id) {
                         return Some(DispatchError::BlockedGuild);
                     }
                 }
