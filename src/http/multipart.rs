@@ -18,7 +18,7 @@ pub struct Multipart<'a> {
 }
 
 impl<'a> Multipart<'a> {
-    pub async fn to_multipart_form(&mut self, client: &Client) -> Result<Form> {
+    pub(crate) async fn to_multipart_form(&mut self, client: &Client) -> Result<Form> {
         let mut multipart = Form::new();
 
         for (file_num, file) in self.files.iter_mut().enumerate() {
