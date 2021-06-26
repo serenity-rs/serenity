@@ -840,32 +840,39 @@ pub(crate) async fn has_correct_permissions(
 ) -> bool {
     if options.required_permissions().is_empty() {
         true
-    } else if let Some(guild) = message.guild(&cache).await {
-        let channel = match guild.channels.get(&message.channel_id) {
-            Some(channel) => channel,
-            None => return false,
-        };
-        let member = match guild.members.get(&message.author.id) {
-            Some(member) => member,
-            None => return false,
-        };
-
-        let perms = match guild.user_permissions_in(channel, member) {
-            Ok(perms) => perms,
-            Err(e) => {
-                tracing::error!(
-                    "Error getting permissions for user {} in channel {}: {}",
-                    member.user.id,
-                    channel.id,
-                    e
-                );
-                return false;
-            },
-        };
-
-        perms.contains(*options.required_permissions())
     } else {
-        false
+        let has_perms_accessor = |guild: &Guild| {
+            let channel_option = guild.channels.get(&message.channel_id);
+
+            if channel_option.is_none() {
+                return false;
+            }
+
+            let member_option = guild.members.get(&message.author.id);
+
+            if member_option.is_none() {
+                return false;
+            }
+
+            let channel = channel_option.unwrap();
+            let member = member_option.unwrap();
+
+            match guild.user_permissions_in(channel, member) {
+                Ok(perms) => perms.contains(*options.required_permissions()),
+                Err(e) => {
+                    tracing::error!(
+                        "Error getting permissions for user {} in channel {}: {}",
+                        member.user.id,
+                        channel.id,
+                        e
+                    );
+
+                    false
+                },
+            }
+        };
+
+        message.guild_field(cache, has_perms_accessor).await.unwrap_or(false)
     }
 }
 
