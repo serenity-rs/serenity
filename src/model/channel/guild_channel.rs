@@ -113,9 +113,18 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available on thread channels.
     pub member_count: Option<u8>,
+    /// The thread metadata.
+    ///
+    /// **Note**: This is only available on thread channels.
+    pub thread_metadata: Option<ThreadMetadata>,
     /// Thread member object for the current user, if they have joined the thread,
     /// only included on certain API endpoints.
     pub member: Option<ThreadMember>,
+    /// Default duration for newly created threads, in minutes, to automatically
+    /// archive the thread after recent activity.
+    ///
+    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
+    pub default_auto_archive_duration: Option<u64>,
 }
 
 #[cfg(feature = "model")]

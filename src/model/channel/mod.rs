@@ -462,8 +462,6 @@ pub struct StageInstance {
 #[non_exhaustive]pub struct ThreadMetadata {
     /// Whether the thread is archived.
     pub archived: bool,
-    /// Id of the user that last archived or unarchived the thread.
-    pub archiver_id: Option<UserId>,
     /// Duration in minutes to automatically archive the thread after recent activity.
     ///
     /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
@@ -513,7 +511,9 @@ mod test {
                 video_quality_mode: None,
                 message_count: None,
                 member_count: None,
+                thread_metadata: None,
                 member: None,
+                default_auto_archive_duration: None,
             }
         }
 

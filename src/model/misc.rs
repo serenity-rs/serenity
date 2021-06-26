@@ -406,7 +406,9 @@ mod test {
                 video_quality_mode: None,
                 message_count: None,
                 member_count: None,
+                thread_metadata: None,
                 member: None,
+                default_auto_archive_duration: None
             });
             let emoji = Emoji {
                 animated: false,
