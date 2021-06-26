@@ -13,8 +13,8 @@ use crate::internal::prelude::*;
 /// messages with attachments.
 #[derive(Clone, Debug)]
 pub struct Multipart<'a> {
-    pub(super) files: Vec<AttachmentType<'a>>,
-    pub(super) payload_json: Value,
+    pub files: Vec<AttachmentType<'a>>,
+    pub payload_json: Value,
 }
 
 impl<'a> Multipart<'a> {
