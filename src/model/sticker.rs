@@ -5,7 +5,7 @@ use crate::model::{
 
 /// A sticker sent with a message.
 ///
-/// Bots currently can only receive messages with stickers, not send.
+/// Bots cannot send stickers.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Sticker {
@@ -38,6 +38,18 @@ pub struct Sticker {
     pub user: Option<User>,
     /// A sticker's sort order within a pack.
     pub sort_value: Option<u64>,
+}
+
+/// The smallest amount of data required to render a sticker.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct StickerItem {
+    /// The unique ID given to this sticker.
+    pub id: StickerId,
+    /// The name of the sticker.
+    pub name: String,
+    /// The type of sticker format.
+    pub format_type: StickerFormatType,
 }
 
 /// Differentiates between sticker types.
