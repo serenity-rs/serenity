@@ -36,7 +36,7 @@ use crate::{
     constants,
     model::{
         id::{ApplicationId, ChannelId, GuildId, MessageId},
-        sticker::{Sticker, StickerItem},
+        sticker::StickerItem,
     },
 };
 
@@ -118,10 +118,6 @@ pub struct Message {
     pub message_reference: Option<MessageReference>,
     /// Bit flags describing extra features of the message.
     pub flags: Option<MessageFlags>,
-    /// Array of stickers sent with the message.
-    #[deprecated(note = "stickers was replaced with sticker_items")]
-    #[serde(default)]
-    pub stickers: Vec<Sticker>,
     /// Array of message sticker item objects.
     pub sticker_items: Vec<StickerItem>,
     /// The message that was replied to using this message.

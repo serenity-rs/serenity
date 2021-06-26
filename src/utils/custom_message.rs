@@ -237,7 +237,6 @@ impl Default for CustomMessage {
 
 #[inline]
 fn dummy_message() -> Message {
-    #[allow(deprecated)]
     Message {
         id: MessageId::default(),
         attachments: Vec::new(),
@@ -270,7 +269,6 @@ fn dummy_message() -> Message {
         application: None,
         message_reference: None,
         flags: None,
-        stickers: Vec::new(),
         sticker_items: Vec::new(),
         referenced_message: None,
         #[cfg(feature = "unstable_discord_api")]

@@ -1019,7 +1019,6 @@ mod test {
             DateTime::parse_from_str("1983 Apr 13 12:09:14.274 +0000", "%Y %b %d %H:%M:%S%.3f %z")
                 .unwrap()
                 .with_timezone(&Utc);
-        #[allow(deprecated)]
         let mut event = MessageCreateEvent {
             message: Message {
                 id: MessageId(3),
@@ -1053,7 +1052,6 @@ mod test {
                 application: None,
                 message_reference: None,
                 flags: None,
-                stickers: vec![],
                 sticker_items: vec![],
                 referenced_message: None,
                 #[cfg(feature = "unstable_discord_api")]

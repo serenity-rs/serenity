@@ -21,9 +21,6 @@ pub struct Sticker {
     /// expression. For nitro stickers, a comma-separated list of related
     /// expressions.
     pub tags: String,
-    /// Previously the sticker asset hash, now an empty string.
-    #[deprecated(note = "Asset is now an empty string")]
-    pub asset: String,
     /// The type of sticker.
     #[serde(rename = "type")]
     pub kind: StickerType,
