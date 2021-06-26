@@ -94,7 +94,7 @@ impl EditMessage {
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.0.remove("embeds");
+        self.0.insert("embeds", Value::Array(Vec::new()));
         self._add_embed(embed)
     }
 
@@ -105,7 +105,7 @@ impl EditMessage {
     /// **Note**: This will replace all existing embeds.
     /// Use [`Self::add_embed()`] to add an additional embed.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        self.0.remove("embeds");
+        self.0.insert("embeds", Value::Array(Vec::new()));
         self._add_embed(embed)
     }
 
@@ -114,7 +114,7 @@ impl EditMessage {
     /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
     /// embeds.
     pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
-        self.0.remove("embeds");
+        self.0.insert("embeds", Value::Array(Vec::new()));
         for embed in embeds {
             self._add_embed(embed);
         }
