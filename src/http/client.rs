@@ -33,7 +33,7 @@ use super::{
 use crate::constants;
 use crate::internal::prelude::*;
 use crate::json::json;
-use crate::json::{from_number, from_value, to_vec, to_value};
+use crate::json::{from_number, from_value, to_value, to_vec};
 use crate::model::prelude::*;
 
 /// A builder implementing [`Future`] building a [`Http`] client to perform
