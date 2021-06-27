@@ -56,10 +56,7 @@ pub struct Interaction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<Member>,
     /// The `user` object for the invoking user.
-    ///
-    /// It is only present if the interaction is triggered in DM.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub user: Option<User>,
+    pub user: User,
     /// A continuation token for responding to the interaction.
     pub token: String,
     /// Always `1`.
@@ -354,13 +351,12 @@ impl<'de> Deserialize<'de> for Interaction {
         };
 
         let user = match map.contains_key("user") {
-            true => Some(
-                map.remove("user")
-                    .ok_or_else(|| DeError::custom("expected user"))
-                    .and_then(User::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
+            true => map
+                .remove("user")
+                .ok_or_else(|| DeError::custom("expected user"))
+                .and_then(User::deserialize)
+                .map_err(DeError::custom)?,
+            false => member.as_ref().expect("expected user or member").user.clone(),
         };
 
         let message = match map.contains_key("message") {
