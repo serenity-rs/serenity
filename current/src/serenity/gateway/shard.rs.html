@@ -828,13 +828,6 @@
 <span id="828">828</span>
 <span id="829">829</span>
 <span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
-<span id="833">833</span>
-<span id="834">834</span>
-<span id="835">835</span>
-<span id="836">836</span>
-<span id="837">837</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync::Arc</span>,
@@ -891,8 +884,7 @@
 <span class="doccomment">/// leave the client to do it.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This can be done by passing in the required parameters to [`Self::new`]. You can</span>
-<span class="doccomment">/// then manually handle the shard yourself and receive events via</span>
-<span class="doccomment">/// [`receive`].</span>
+<span class="doccomment">/// then manually handle the shard yourself.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// **Note**: You _really_ do not need to do this. Just call one of the</span>
 <span class="doccomment">/// appropriate methods on the [`Client`].</span>
@@ -1016,12 +1008,6 @@
     }
 
     <span class="doccomment">/// Whether the shard has permanently shutdown.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should normally happen due to manual calling of [`shutdown`] or</span>
-    <span class="doccomment">/// [`shutdown_clean`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`shutdown`]: #method.shutdown</span>
-    <span class="doccomment">/// [`shutdown_clean`]: #method.shutdown_clean</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">shutdown</span>

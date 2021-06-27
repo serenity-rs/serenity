@@ -2,7 +2,7 @@
 <p>View the <a href="https://github.com/serenity-rs/serenity/tree/current/examples">examples</a> on how to make and structure a bot.</p>
 <p>Serenity supports bot user authentication via the use of <a href="client/struct.Client.html#method.builder" title="Client::builder"><code>Client::builder</code></a>.</p>
 <p>Once logged in, you may add handlers to your client to dispatch <a href="model/event/enum.Event.html"><code>Event</code></a>s,
-such as <a href="client/struct.Client.html#method.on_message"><code>Client::on_message</code></a>. This will cause your handler to be called
+such as <a href="prelude/trait.EventHandler.html#method.message"><code>EventHandler::message</code></a>. This will cause your handler to be called
 when a <a href="model/event/enum.Event.html#variant.MessageCreate"><code>Event::MessageCreate</code></a> is received. Each handler is given a
 <a href="prelude/struct.Context.html"><code>Context</code></a>, giving information about the event. See the
 <a href="client/index.html">client’s module-level documentation</a>.</p>
