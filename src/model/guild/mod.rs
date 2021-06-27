@@ -1737,23 +1737,29 @@ impl Guild {
             return Ok(Permissions::all());
         }
 
+        let member = self.member(cache_http, &user_id).await?;
+
+        Ok(self._member_permission_from_member(&member))
+    }
+
+    /// Helper function that's used for getting a [`Member`]'s permissions.
+    #[cfg(feature = "cache")]
+    pub(crate) fn _member_permission_from_member(&self, member: &Member) -> Permissions {
         let everyone = match self.roles.get(&RoleId(self.id.0)) {
             Some(everyone) => everyone,
             None => {
                 error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
 
-                return Ok(Permissions::empty());
+                return Permissions::empty();
             },
         };
-
-        let member = self.member(cache_http, &user_id).await?;
 
         let mut permissions = everyone.permissions;
 
         for role in &member.roles {
             if let Some(role) = self.roles.get(role) {
                 if role.permissions.contains(Permissions::ADMINISTRATOR) {
-                    return Ok(Permissions::all());
+                    return Permissions::all();
                 }
 
                 permissions |= role.permissions;
@@ -1762,7 +1768,7 @@ impl Guild {
             }
         }
 
-        Ok(permissions)
+        permissions
     }
 
     /// Moves a member to a specific voice channel.
