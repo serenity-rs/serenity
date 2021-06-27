@@ -2300,6 +2300,8 @@
 <span id="2300">2300</span>
 <span id="2301">2301</span>
 <span id="2302">2302</span>
+<span id="2303">2303</span>
+<span id="2304">2304</span>
 </pre><pre class="rust">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -2773,6 +2775,7 @@
     <span class="kw">pub</span> <span class="ident">deaf</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">mute</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2795,6 +2798,7 @@
                 <span class="ident">member</span>.<span class="ident">premium_since</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">premium_since</span>);
                 <span class="ident">member</span>.<span class="ident">deaf</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">deaf</span>);
                 <span class="ident">member</span>.<span class="ident">mute</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mute</span>);
+                <span class="ident">member</span>.<span class="ident">avatar</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">avatar</span>);
 
                 <span class="ident">item</span>
             } <span class="kw">else</span> {
@@ -2814,7 +2818,7 @@
                     <span class="ident">premium_since</span>: <span class="self">self</span>.<span class="ident">premium_since</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>.<span class="ident">clone</span>(),
                 });
             }
 
