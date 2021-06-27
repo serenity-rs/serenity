@@ -2616,6 +2616,18 @@ impl Http {
         .await
     }
 
+    /// Gets the current user's third party connections.
+    ///
+    /// This method only works for user tokens with the `connections` OAuth2 scope.
+    pub async fn get_user_connections(&self) -> Result<Vec<Connection>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetUserConnections,
+        })
+        .await
+    }
+
     /// Gets our DM channels.
     pub async fn get_user_dm_channels(&self) -> Result<Vec<PrivateChannel>> {
         self.fire(Request {
