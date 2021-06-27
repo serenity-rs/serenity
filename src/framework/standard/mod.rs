@@ -840,21 +840,15 @@ pub(crate) async fn has_correct_permissions(
     } else {
         message
             .guild_field(cache, |guild| {
-                let channel_option = guild.channels.get(&message.channel_id);
+                let channel = match guild.channels.get(&message.channel_id) {
+                    Some(channel) => channel,
+                    None => return false,
+                };
 
-                if channel_option.is_none() {
-                    return false;
-                }
-
-                let member_option = guild.members.get(&message.author.id);
-
-                if member_option.is_none() {
-                    return false;
-                }
-
-                let channel =
-                    channel_option.expect("Expected None for channel to be accounted for.");
-                let member = member_option.expect("Expected None for member to be accounted for.");
+                let member = match guild.members.get(&message.author.id) {
+                    Some(member) => member,
+                    None => return false,
+                };
 
                 match guild.user_permissions_in(channel, member) {
                     Ok(perms) => perms.contains(*options.required_permissions()),
