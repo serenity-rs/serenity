@@ -407,12 +407,15 @@ impl Member {
         &self,
         cache_http: impl CacheHttp + AsRef<Cache>,
     ) -> Result<Permissions> {
-        let guild = match cache_http.as_ref().guild(self.guild_id).await {
-            Some(guild) => guild,
-            None => return Err(From::from(ModelError::GuildNotFound)),
-        };
+        let perms_opt = cache_http
+            .as_ref()
+            .guild_field(self.guild_id, |guild| guild._member_permission_from_member(self))
+            .await;
 
-        guild.member_permissions(cache_http, self.user.id).await
+        match perms_opt {
+            Some(perms) => Ok(perms),
+            None => Err(From::from(ModelError::GuildNotFound)),
+        }
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
