@@ -855,7 +855,7 @@ pub(crate) async fn has_correct_permissions(
             }
 
             let channel = channel_option.expect("Expected None for channel to be accounted for.");
-            let member = member_option.expect("Expected None for channel to be accounted for.");
+            let member = member_option.expect("Expected None for member to be accounted for.");
 
             match guild.user_permissions_in(channel, member) {
                 Ok(perms) => perms.contains(*options.required_permissions()),
