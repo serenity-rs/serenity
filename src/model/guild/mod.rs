@@ -1743,6 +1743,7 @@ impl Guild {
     }
 
     /// Helper function that's used for getting a [`Member`]'s permissions.
+    #[cfg(feature = "cache")]
     pub(crate) fn _member_permission_from_member(&self, member: &Member) -> Permissions {
         let everyone = match self.roles.get(&RoleId(self.id.0)) {
             Some(everyone) => everyone,
