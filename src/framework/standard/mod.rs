@@ -35,7 +35,6 @@ use crate::cache::Cache;
 use crate::client::Context;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
-use crate::model::guild::Guild;
 #[cfg(feature = "cache")]
 use crate::model::guild::Member;
 use crate::model::{channel::Message, permissions::Permissions};
@@ -261,9 +260,7 @@ impl StandardFramework {
                     return Some(DispatchError::BlockedGuild);
                 }
 
-                let cache = ctx.cache.clone();
-                let guild_selector = |guild: &Guild| guild.owner_id;
-                let owner_id_option = cache.guild_field(guild_id, guild_selector).await;
+                let owner_id_option = ctx.cache.guild_field(guild_id, |guild| guild.owner_id).await;
 
                 if let Some(owner_id) = owner_id_option {
                     if self.config.blocked_users.contains(&owner_id) {
@@ -841,38 +838,40 @@ pub(crate) async fn has_correct_permissions(
     if options.required_permissions().is_empty() {
         true
     } else {
-        let has_perms_accessor = |guild: &Guild| {
-            let channel_option = guild.channels.get(&message.channel_id);
+        message
+            .guild_field(cache, |guild| {
+                let channel_option = guild.channels.get(&message.channel_id);
 
-            if channel_option.is_none() {
-                return false;
-            }
+                if channel_option.is_none() {
+                    return false;
+                }
 
-            let member_option = guild.members.get(&message.author.id);
+                let member_option = guild.members.get(&message.author.id);
 
-            if member_option.is_none() {
-                return false;
-            }
+                if member_option.is_none() {
+                    return false;
+                }
 
-            let channel = channel_option.expect("Expected None for channel to be accounted for.");
-            let member = member_option.expect("Expected None for member to be accounted for.");
+                let channel =
+                    channel_option.expect("Expected None for channel to be accounted for.");
+                let member = member_option.expect("Expected None for member to be accounted for.");
 
-            match guild.user_permissions_in(channel, member) {
-                Ok(perms) => perms.contains(*options.required_permissions()),
-                Err(e) => {
-                    tracing::error!(
-                        "Error getting permissions for user {} in channel {}: {}",
-                        member.user.id,
-                        channel.id,
-                        e
-                    );
+                match guild.user_permissions_in(channel, member) {
+                    Ok(perms) => perms.contains(*options.required_permissions()),
+                    Err(e) => {
+                        tracing::error!(
+                            "Error getting permissions for user {} in channel {}: {}",
+                            member.user.id,
+                            channel.id,
+                            e
+                        );
 
-                    false
-                },
-            }
-        };
-
-        message.guild_field(cache, has_perms_accessor).await.unwrap_or(false)
+                        false
+                    },
+                }
+            })
+            .await
+            .unwrap_or(false)
     }
 }
 

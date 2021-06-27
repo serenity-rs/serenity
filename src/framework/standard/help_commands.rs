@@ -317,8 +317,6 @@ async fn check_common_behaviour(
     owners: &HashSet<UserId>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
-    use crate::model::guild::Guild;
-
     if !options.help_available() {
         return HelpBehaviour::Hide;
     }
@@ -341,7 +339,7 @@ async fn check_common_behaviour(
         return help_options.lacking_permissions;
     }
 
-    let behaviour_accessor = |guild: &Guild| {
+    msg.guild_field(&cache_http, |guild| {
         if let Some(member) = guild.members.get(&msg.author.id) {
             if !has_correct_roles(options, &guild.roles, &member) {
                 return help_options.lacking_role;
@@ -349,9 +347,9 @@ async fn check_common_behaviour(
         }
 
         HelpBehaviour::Nothing
-    };
-
-    msg.guild_field(&cache_http, behaviour_accessor).await.unwrap_or(HelpBehaviour::Nothing)
+    })
+    .await
+    .unwrap_or(HelpBehaviour::Nothing)
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
