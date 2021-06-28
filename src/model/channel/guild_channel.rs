@@ -72,11 +72,13 @@ pub struct GuildChannel {
     /// The name of the channel.
     pub name: String,
     /// Permission overwrites for [`Member`]s and for [`Role`]s.
+    #[serde(default)]
     pub permission_overwrites: Vec<PermissionOverwrite>,
     /// The position of the channel.
     ///
     /// The default text channel will _almost always_ have a position of `-1` or
     /// `0`.
+    #[serde(default)]
     pub position: i64,
     /// The topic of the channel.
     ///
