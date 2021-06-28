@@ -193,7 +193,9 @@ impl CurrentUser {
             let mut pagination = http
                 .as_ref()
                 .get_guilds(
-                    Some(&GuildPagination::After(guilds.last().map_or(GuildId(1), |g: &GuildInfo| g.id))),
+                    Some(&GuildPagination::After(
+                        guilds.last().map_or(GuildId(1), |g: &GuildInfo| g.id),
+                    )),
                     Some(100),
                 )
                 .await?;
