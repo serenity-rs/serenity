@@ -1034,6 +1034,109 @@ impl ChannelId {
     /// or if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_stage_instance(self.0).await
+
+    /// Gets the thread members, if this channel is a thread.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the channel is not a thread channel
+    pub async fn get_thread_members(&self, http: impl AsRef<Http>) -> Result<Vec<ThreadMember>> {
+        http.as_ref().get_channel_thread_members(self.0).await
+    }
+
+    /// Joins the thread, if this channel is a thread.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the channel is not a thread channel
+    pub async fn join_thread(&self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().join_thread_channel(self.0).await
+    }
+
+    /// Leaves the thread, if this channel is a thread.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the channel is not a thread channel
+    pub async fn leave_thread(&self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().leave_thread_channel(self.0).await
+    }
+
+    /// Adds a thread member, if this channel is a thread.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the channel is not a thread channel
+    pub async fn add_thread_member(&self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
+        http.as_ref().add_thread_channel_member(self.0, user_id.into()).await
+    }
+
+    /// Removes a thread member, if this channel is a thread.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the channel is not a thread channel
+    pub async fn remove_thread_member(
+        &self,
+        http: impl AsRef<Http>,
+        user_id: UserId,
+    ) -> Result<()> {
+        http.as_ref().remove_thread_channel_member(self.0, user_id.into()).await
+    }
+
+    /// Gets all active threads of a channel.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the bot doesn't have the
+    /// permission to get it.
+    pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
+        http.as_ref().get_channel_active_threads(self.0).await
+    }
+
+    /// Gets private archived threads of a channel.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the bot doesn't have the
+    /// permission to get it.
+    pub async fn get_archived_private_threads(
+        &self,
+        http: impl AsRef<Http>,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        http.as_ref().get_channel_archived_private_threads(self.0, before, limit).await
+    }
+
+    /// Gets public archived threads of a channel.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the bot doesn't have the
+    /// permission to get it.
+    pub async fn get_archived_public_threads(
+        &self,
+        http: impl AsRef<Http>,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        http.as_ref().get_channel_archived_public_threads(self.0, before, limit).await
+    }
+
+    /// Gets private archived threads joined by the current user of a channel.
+    ///
+    /// # Errors
+    ///
+    /// It may return an [`Error::Http`] if the bot doesn't have the
+    /// permission to get it.
+    pub async fn get_joined_archived_private_threads(
+        &self,
+        http: impl AsRef<Http>,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> Result<ThreadsData> {
+        http.as_ref().get_channel_joined_archived_private_threads(self.0, before, limit).await
     }
 }
 

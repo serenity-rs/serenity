@@ -1309,11 +1309,11 @@ pub enum RouteInfo<'a> {
     LeaveThread {
         channel_id: u64,
     },
-    AddThreadUser {
+    AddThreadMember {
         channel_id: u64,
         user_id: u64,
     },
-    RemoveThreadUser {
+    RemoveThreadMember {
         channel_id: u64,
         user_id: u64,
     },
@@ -2235,7 +2235,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsIdThreadMembersMe(channel_id),
                 Cow::from(Route::channel_thread_member_me(channel_id)),
             ),
-            RouteInfo::AddThreadUser {
+            RouteInfo::AddThreadMember {
                 channel_id,
                 user_id,
             } => (
@@ -2243,7 +2243,7 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsIdThreadMembersUserId(channel_id),
                 Cow::from(Route::channel_thread_member(channel_id, user_id)),
             ),
-            RouteInfo::RemoveThreadUser {
+            RouteInfo::RemoveThreadMember {
                 channel_id,
                 user_id,
             } => (

@@ -2129,12 +2129,12 @@ impl Http {
         .await
     }
 
-    /// Adds a user to a thread channel.
-    pub async fn add_thread_channel_user(&self, channel_id: u64, user_id: u64) -> Result<()> {
+    /// Adds a member to a thread channel.
+    pub async fn add_thread_channel_member(&self, channel_id: u64, user_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
-            route: RouteInfo::AddThreadUser {
+            route: RouteInfo::AddThreadMember {
                 channel_id,
                 user_id,
             },
@@ -2142,12 +2142,12 @@ impl Http {
         .await
     }
 
-    /// Removes a user to a thread channel.
-    pub async fn remove_thread_channel_user(&self, channel_id: u64, user_id: u64) -> Result<()> {
+    /// Removes a member from a thread channel.
+    pub async fn remove_thread_channel_member(&self, channel_id: u64, user_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
-            route: RouteInfo::RemoveThreadUser {
+            route: RouteInfo::RemoveThreadMember {
                 channel_id,
                 user_id,
             },
