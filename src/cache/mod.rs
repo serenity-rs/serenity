@@ -696,12 +696,44 @@ impl Cache {
     }
 
     async fn _guild_channels(&self, guild_id: GuildId) -> Option<HashMap<ChannelId, GuildChannel>> {
-        self.guilds.read().await.get(&guild_id).map(|g| g.channels.clone())
+        self.guilds.read().await.get(&guild_id).map(|g| {
+            g.channels
+                .iter()
+                .filter_map(|c| match c.1 {
+                    Channel::Guild(channel) => Some((channel.id, channel.clone())),
+                    _ => None,
+                })
+                .collect()
+        })
     }
 
     /// Returns the number of guild channels in the cache.
     pub async fn guild_channel_count(&self) -> usize {
         self.channels.read().await.len()
+    }
+
+    /// This method returns all categories from a guild of with the given `guild_id`.
+    #[inline]
+    pub async fn guild_categories(
+        &self,
+        guild_id: impl Into<GuildId>,
+    ) -> Option<HashMap<ChannelId, ChannelCategory>> {
+        self._guild_categories(guild_id.into()).await
+    }
+
+    async fn _guild_categories(
+        &self,
+        guild_id: GuildId,
+    ) -> Option<HashMap<ChannelId, ChannelCategory>> {
+        self.guilds.read().await.get(&guild_id).map(|g| {
+            g.channels
+                .iter()
+                .filter_map(|c| match c.1 {
+                    Channel::Category(category) => Some((category.id, category.clone())),
+                    _ => None,
+                })
+                .collect()
+        })
     }
 
     /// Returns the number of shards.
@@ -1117,7 +1149,7 @@ mod test {
             assert!(!channel.contains_key(&MessageId(3)));
         }
 
-        let guild_channel = GuildChannel {
+        let channel = Channel::Guild(GuildChannel {
             id: event.message.channel_id,
             bitrate: None,
             category_id: None,
@@ -1139,12 +1171,12 @@ mod test {
             thread_metadata: None,
             member: None,
             default_auto_archive_duration: None,
-        };
+        });
 
         // Add a channel delete event to the cache, the cached messages for that
         // channel should now be gone.
         let mut delete = ChannelDeleteEvent {
-            channel: Channel::Guild(guild_channel.clone()),
+            channel: channel.clone(),
         };
         assert!(cache.update(&mut delete).await.is_none());
         assert!(!cache.messages.read().await.contains_key(&delete.channel.id()));
@@ -1153,7 +1185,7 @@ mod test {
         // is received.
         let mut guild_create = {
             let mut channels = HashMap::new();
-            channels.insert(ChannelId(2), guild_channel.clone());
+            channels.insert(ChannelId(2), channel.clone());
 
             #[allow(deprecated)]
             GuildCreateEvent {
