@@ -1441,6 +1441,10 @@ impl Guild {
     ///
     /// - **username**: "zey"
     /// - **username and discriminator**: "zey#5479"
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub fn member_named(&self, name: &str) -> Option<&Member> {
         let (name, discrim) = if let Some(pos) = name.rfind('#') {
             let split = name.split_at(pos + 1);
@@ -1487,6 +1491,10 @@ impl Guild {
     /// However, since the read-locks are dropped after borrowing the name,
     /// the names might have been changed by the user, the sorted list cannot
     /// account for this.
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub async fn members_starting_with(
         &self,
         prefix: &str,
@@ -1555,6 +1563,10 @@ impl Guild {
     /// However, since the read-locks are dropped after borrowing the name,
     /// the names might have been changed by the user, the sorted list cannot
     /// account for this.
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub async fn members_containing(
         &self,
         substring: &str,
@@ -1618,6 +1630,10 @@ impl Guild {
     /// However, since the read-locks are dropped after borrowing the name,
     /// the names might have been changed by the user, the sorted list cannot
     /// account for this.
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub async fn members_username_containing(
         &self,
         substring: &str,
@@ -1676,6 +1692,10 @@ impl Guild {
     /// However, since the read-locks are dropped after borrowing the name,
     /// the names might have been changed by the user, the sorted list cannot
     /// account for this.
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub async fn members_nick_containing(
         &self,
         substring: &str,
@@ -2034,6 +2054,29 @@ impl Guild {
         It: IntoIterator<Item = (ChannelId, u64)>,
     {
         self.id.reorder_channels(&http, channels).await
+    }
+
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
+    /// starts with a provided string.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results.
+    /// Minimum value is 1, maximum and default value is 1000.
+    ///
+    /// **Note**: Queries are case insensitive.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn search_members(
+        &self,
+        http: impl AsRef<Http>,
+        query: &str,
+        limit: Option<u64>,
+    ) -> Result<Vec<Member>> {
+        self.id.search_members(http, query, limit).await
     }
 
     /// Returns the Id of the shard associated with the guild.

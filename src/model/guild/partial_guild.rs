@@ -993,6 +993,29 @@ impl PartialGuild {
         self.id.reorder_channels(&http, channels).await
     }
 
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
+    /// starts with a provided string.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results.
+    /// Minimum value is 1, maximum and default value is 1000.
+    ///
+    /// **Note**: Queries are case insensitive.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn search_members(
+        &self,
+        http: impl AsRef<Http>,
+        query: &str,
+        limit: Option<u64>,
+    ) -> Result<Vec<Member>> {
+        self.id.search_members(http, query, limit).await
+    }
+
     /// Starts a prune of [`Member`]s.
     ///
     /// See the documentation on [`GuildPrune`] for more information.
