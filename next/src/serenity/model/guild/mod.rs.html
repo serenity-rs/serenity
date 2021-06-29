@@ -3153,6 +3153,16 @@
 <span id="3153">3153</span>
 <span id="3154">3154</span>
 <span id="3155">3155</span>
+<span id="3156">3156</span>
+<span id="3157">3157</span>
+<span id="3158">3158</span>
+<span id="3159">3159</span>
+<span id="3160">3160</span>
+<span id="3161">3161</span>
+<span id="3162">3162</span>
+<span id="3163">3163</span>
+<span id="3164">3164</span>
+<span id="3165">3165</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -3258,7 +3268,7 @@
     <span class="doccomment">/// This contains all channels regardless of permissions (i.e. the ability</span>
     <span class="doccomment">/// of the bot to read from or connect to them).</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of whether notifications for all messages are enabled by</span>
     <span class="doccomment">/// default in the guild.</span>
     <span class="kw">pub</span> <span class="ident">default_message_notifications</span>: <span class="ident">DefaultMessageNotificationLevel</span>,
@@ -3421,8 +3431,13 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">default_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uid</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">uid</span>)<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">values</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">read_messages</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>);
+            <span class="kw">match</span> <span class="ident">channel</span> {
+                <span class="ident">Channel::Guild</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">read_messages</span>() {
+                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>);
+                    }
+                },
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
             }
         }
 
@@ -3437,10 +3452,15 @@
     <span class="doccomment">/// members, or both.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">default_channel_guaranteed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">values</span>() {
-            <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">values</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">read_messages</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>);
-                }
+            <span class="kw">match</span> <span class="ident">channel</span> {
+                <span class="ident">Channel::Guild</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">values</span>() {
+                        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">read_messages</span>() {
+                            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>);
+                        }
+                    }
+                },
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
             }
         }
 

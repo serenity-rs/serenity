@@ -566,6 +566,11 @@
 <span id="566">566</span>
 <span id="567">567</span>
 <span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
 </pre><pre class="rust">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -755,8 +760,13 @@
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">values</span>() {
-            <span class="kw">if</span> <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">read_messages</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>.<span class="ident">clone</span>());
+            <span class="kw">match</span> <span class="ident">channel</span> {
+                <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">if</span> <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">read_messages</span>() {
+                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>.<span class="ident">clone</span>());
+                    }
+                },
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
             }
         }
 

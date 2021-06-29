@@ -1154,6 +1154,38 @@
 <span id="1154">1154</span>
 <span id="1155">1155</span>
 <span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -1800,12 +1832,44 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">channels</span>.<span class="ident">clone</span>())
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
+            <span class="ident">g</span>.<span class="ident">channels</span>
+                .<span class="ident">iter</span>()
+                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="number">1</span> {
+                    <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">channel</span>.<span class="ident">id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>())),
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                })
+                .<span class="ident">collect</span>()
+        })
     }
 
     <span class="doccomment">/// Returns the number of guild channels in the cache.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_channel_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">len</span>()
+    }
+
+    <span class="doccomment">/// This method returns all categories from a guild of with the given `guild_id`.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_categories</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_guild_categories</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild_categories</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
+            <span class="ident">g</span>.<span class="ident">channels</span>
+                .<span class="ident">iter</span>()
+                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="number">1</span> {
+                    <span class="ident">Channel::Category</span>(<span class="ident">category</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>((<span class="ident">category</span>.<span class="ident">id</span>, <span class="ident">category</span>.<span class="ident">clone</span>())),
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                })
+                .<span class="ident">collect</span>()
+        })
     }
 
     <span class="doccomment">/// Returns the number of shards.</span>
@@ -2211,7 +2275,7 @@
             <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">channel</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">MessageId</span>(<span class="number">3</span>)));
         }
 
-        <span class="kw">let</span> <span class="ident">guild_channel</span> <span class="op">=</span> <span class="ident">GuildChannel</span> {
+        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">Channel::Guild</span>(<span class="ident">GuildChannel</span> {
             <span class="ident">id</span>: <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>,
             <span class="ident">bitrate</span>: <span class="prelude-val">None</span>,
             <span class="ident">category_id</span>: <span class="prelude-val">None</span>,
@@ -2228,12 +2292,12 @@
             <span class="ident">slow_mode_rate</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
             <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
             <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
-        };
+        });
 
         <span class="comment">// Add a channel delete event to the cache, the cached messages for that</span>
         <span class="comment">// channel should now be gone.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delete</span> <span class="op">=</span> <span class="ident">ChannelDeleteEvent</span> {
-            <span class="ident">channel</span>: <span class="ident">Channel::Guild</span>(<span class="ident">guild_channel</span>.<span class="ident">clone</span>()),
+            <span class="ident">channel</span>: <span class="ident">channel</span>.<span class="ident">clone</span>(),
         };
         <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delete</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">delete</span>.<span class="ident">channel</span>.<span class="ident">id</span>()));
@@ -2242,7 +2306,7 @@
         <span class="comment">// is received.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild_create</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">ChannelId</span>(<span class="number">2</span>), <span class="ident">guild_channel</span>.<span class="ident">clone</span>());
+            <span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">ChannelId</span>(<span class="number">2</span>), <span class="ident">channel</span>.<span class="ident">clone</span>());
 
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident">GuildCreateEvent</span> {
