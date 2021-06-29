@@ -93,7 +93,7 @@ impl<T: std::str::FromStr> ArgumentConvert for T {
 ///
 /// assert_eq!(
 ///     parse_message_id_pair("673965002805477386-842482646604972082"),
-///     Some((ChannelId(673965002805477386), GuildId(842482646604972082))),
+///     Some((ChannelId(673965002805477386), MessageId(842482646604972082))),
 /// );
 /// assert_eq!(
 ///     parse_message_id_pair("673965002805477386-842482646604972082-472029906943868929"),
