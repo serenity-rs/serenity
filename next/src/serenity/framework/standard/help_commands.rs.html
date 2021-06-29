@@ -1612,17 +1612,6 @@
 <span id="1612">1612</span>
 <span id="1613">1613</span>
 <span id="1614">1614</span>
-<span id="1615">1615</span>
-<span id="1616">1616</span>
-<span id="1617">1617</span>
-<span id="1618">1618</span>
-<span id="1619">1619</span>
-<span id="1620">1620</span>
-<span id="1621">1621</span>
-<span id="1622">1622</span>
-<span id="1623">1623</span>
-<span id="1624">1624</span>
-<span id="1625">1625</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -1726,15 +1715,6 @@
             <span class="ident">HelpBehaviour::Nothing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command_name</span>),
             <span class="ident">HelpBehaviour::Hide</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
         }
-    };
-}
-
-<span class="doccomment">/// Wraps around [`warn`]-macro in order to keep</span>
-<span class="doccomment">/// the literal same for all formats of help.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">warn_about_failed_send</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">customised_help</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="macro">warn!</span>(<span class="string">&quot;Failed to send {:?} because: {:?}&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">customised_help</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">error</span>);
     };
 }
 
@@ -2918,7 +2898,7 @@
 <span class="doccomment">///     groups: &amp;[&amp;&#39;static CommandGroup],</span>
 <span class="doccomment">///     owners: HashSet&lt;UserId&gt;</span>
 <span class="doccomment">/// ) -&gt; CommandResult {</span>
-<span class="doccomment">///     let _ = with_embeds(context, msg, args, &amp;help_options, groups, owners).await;</span>
+<span class="doccomment">///     let _ = with_embeds(context, msg, args, &amp;help_options, groups, owners).await?;</span>
 <span class="doccomment">///     Ok(())</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
@@ -2926,7 +2906,12 @@
 <span class="doccomment">///     .help(&amp;MY_HELP);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// # Errors</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns the same errors as [`ChannelId::send_message`].</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help</span>
+<span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::implicit_hasher</span>)]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_embeds</span>(
@@ -2936,7 +2921,7 @@
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
     <span class="ident">owners</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">formatted_help</span> <span class="op">=</span>
         <span class="ident">create_customised_help_data</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
@@ -2993,13 +2978,7 @@
         },
     };
 
-    <span class="kw">match</span> <span class="ident">response_result</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">response</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="macro">warn_about_failed_send!</span>(<span class="kw-2">&amp;</span><span class="ident">formatted_help</span>, <span class="ident">why</span>);
-            <span class="prelude-val">None</span>
-        },
-    }
+    <span class="ident">response_result</span>
 }
 
 <span class="doccomment">/// Turns grouped commands into a [`String`] taking plain help format into account.</span>
@@ -3120,13 +3099,18 @@
 <span class="doccomment">///     groups: &amp;[&amp;&#39;static CommandGroup],</span>
 <span class="doccomment">///     owners: HashSet&lt;UserId&gt;</span>
 <span class="doccomment">/// ) -&gt; CommandResult {</span>
-<span class="doccomment">///     let _ = plain(context, msg, args, &amp;help_options, groups, owners).await;</span>
+<span class="doccomment">///     let _ = plain(context, msg, args, &amp;help_options, groups, owners).await?;</span>
 <span class="doccomment">///     Ok(())</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let framework = StandardFramework::new()</span>
 <span class="doccomment">///     .help(&amp;MY_HELP);</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">/// # Errors</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns the same errors as [`ChannelId::send_message`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::implicit_hasher</span>)]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">plain</span>(
@@ -3136,7 +3120,7 @@
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
     <span class="ident">owners</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">formatted_help</span> <span class="op">=</span>
         <span class="ident">create_customised_help_data</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
@@ -3157,13 +3141,7 @@
         } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">single_command_to_plain_string</span>(<span class="kw-2">&amp;</span><span class="ident">help_options</span>, <span class="kw-2">&amp;</span><span class="ident">command</span>),
     };
 
-    <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">result</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">response</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">response</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="macro">warn_about_failed_send!</span>(<span class="kw-2">&amp;</span><span class="ident">formatted_help</span>, <span class="ident">why</span>);
-            <span class="prelude-val">None</span>
-        },
-    }
+    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">result</span>).<span class="kw">await</span>
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
