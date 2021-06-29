@@ -74,16 +74,6 @@ impl<'a> CreateMessage<'a> {
         self
     }
 
-    /// Add an embed for the message.
-    pub fn add_embed<F>(&mut self, f: F) -> &mut Self
-    where
-        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
-    {
-        let mut embed = CreateEmbed::default();
-        f(&mut embed);
-        self._add_embed(embed)
-    }
-
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
@@ -96,33 +86,64 @@ impl<'a> CreateMessage<'a> {
         self
     }
 
-    /// Set the embed for the message.
+    /// Add an embed for the message.
+    ///
+    /// **Note**: This will keep all existing embeds. Use [`Self::set_embed()`] to replace existing
+    /// embeds.
+    pub fn add_embed<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
+        let mut embed = CreateEmbed::default();
+        f(&mut embed);
+        self._add_embed(embed)
+    }
+
+    /// Add multiple embeds for the message.
+    ///
+    /// **Note**: This will keep all existing embeds. Use [`Self::set_embeds()`] to replace existing
+    /// embeds.
+    pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        for embed in embeds {
+            self._add_embed(embed);
+        }
+
+        self
+    }
+
+    /// Set an embed for the message.
+    ///
+    /// Equivalent to [`Self::set_embed()`].
     ///
     /// **Note**: This will replace all existing embeds. Use
-    /// [`Self::add_embed()`] to add additional embeds.
+    /// [`Self::add_embed()`] to add an additional embed.
     pub fn embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.set_embed(embed)
+        self.0.insert("embeds", Value::Array(Vec::new()));
+        self._add_embed(embed)
     }
 
     /// Set an embed for the message.
     ///
-    /// **Note**: This will replace all existing embeds with the provided embed.
-    /// Use [`Self::set_embeds()`] to set multiple embeds at once.
+    /// Equivalent to [`Self::embed()`].
+    ///
+    /// **Note**: This will replace all existing embeds.
+    /// Use [`Self::add_embed()`] to add an additional embed.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = utils::hashmap_to_json_map(embed.0);
-        let embed = Value::Object(map);
-
-        self.0.insert("embeds", Value::Array(vec![embed]));
-        self
+        self.0.insert("embeds", Value::Array(Vec::new()));
+        self._add_embed(embed)
     }
 
     /// Set multiple embeds for the message.
+    ///
+    /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
+    /// embeds.
     pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        self.0.insert("embeds", Value::Array(Vec::new()));
         for embed in embeds {
             self._add_embed(embed);
         }
