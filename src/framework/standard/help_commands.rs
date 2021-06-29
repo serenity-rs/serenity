@@ -103,15 +103,6 @@ macro_rules! format_command_name {
     };
 }
 
-/// Wraps around [`warn`]-macro in order to keep
-/// the literal same for all formats of help.
-#[cfg(all(feature = "cache", feature = "http"))]
-macro_rules! warn_about_failed_send {
-    ($customised_help:expr, $error:expr) => {
-        warn!("Failed to send {:?} because: {:?}", $customised_help, $error);
-    };
-}
-
 /// A single group containing its name and all related commands that are eligible
 /// in relation of help-settings measured to the user.
 #[derive(Clone, Debug, Default)]
@@ -1292,7 +1283,7 @@ async fn send_error_embed(
 ///     groups: &[&'static CommandGroup],
 ///     owners: HashSet<UserId>
 /// ) -> CommandResult {
-///     let _ = with_embeds(context, msg, args, &help_options, groups, owners).await;
+///     let _ = with_embeds(context, msg, args, &help_options, groups, owners).await?;
 ///     Ok(())
 /// }
 ///
@@ -1300,7 +1291,12 @@ async fn send_error_embed(
 ///     .help(&MY_HELP);
 /// ```
 ///
+/// # Errors
+///
+/// Returns the same errors as [`ChannelId::send_message`].
+///
 /// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
+/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub async fn with_embeds(
@@ -1310,7 +1306,7 @@ pub async fn with_embeds(
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>,
-) -> Option<Message> {
+) -> Result<Message, Error> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, &groups, &owners, help_options).await;
 
@@ -1367,13 +1363,7 @@ pub async fn with_embeds(
         },
     };
 
-    match response_result {
-        Ok(response) => Some(response),
-        Err(why) => {
-            warn_about_failed_send!(&formatted_help, why);
-            None
-        },
-    }
+    response_result
 }
 
 /// Turns grouped commands into a [`String`] taking plain help format into account.
@@ -1494,13 +1484,18 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     groups: &[&'static CommandGroup],
 ///     owners: HashSet<UserId>
 /// ) -> CommandResult {
-///     let _ = plain(context, msg, args, &help_options, groups, owners).await;
+///     let _ = plain(context, msg, args, &help_options, groups, owners).await?;
 ///     Ok(())
 /// }
 ///
 /// let framework = StandardFramework::new()
 ///     .help(&MY_HELP);
 /// ```
+/// # Errors
+///
+/// Returns the same errors as [`ChannelId::send_message`].
+///
+/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub async fn plain(
@@ -1510,7 +1505,7 @@ pub async fn plain(
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>,
-) -> Option<Message> {
+) -> Result<Message, Error> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, &groups, &owners, help_options).await;
 
@@ -1531,13 +1526,7 @@ pub async fn plain(
         } => single_command_to_plain_string(&help_options, &command),
     };
 
-    match msg.channel_id.say(&ctx, result).await {
-        Ok(response) => Some(response),
-        Err(why) => {
-            warn_about_failed_send!(&formatted_help, why);
-            None
-        },
-    }
+    msg.channel_id.say(&ctx, result).await
 }
 
 #[cfg(test)]
