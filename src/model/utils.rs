@@ -48,12 +48,12 @@ pub fn serialize_emojis<S: Serializer>(
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     deserializer: D,
-) -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
-    let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
+) -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
+    let vec: Vec<Channel> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
 
     for channel in vec {
-        map.insert(channel.id, channel);
+        map.insert(channel.id(), channel);
     }
 
     Ok(map)
