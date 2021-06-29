@@ -61,7 +61,7 @@ async fn permissions_in(
         return Permissions::all();
     }
 
-    if let Some(Some(channel)) =
+    if let Some(Some(Channel::Guild(channel))) =
         ctx.cache.guild_field(guild_id, |guild| guild.channels.get(&channel_id).cloned()).await
     {
         if channel.kind == ChannelType::Text {
