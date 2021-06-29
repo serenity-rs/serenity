@@ -127,6 +127,27 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -175,16 +196,6 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Add an embed for the message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embed</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbed</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed</span>);
-        <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>)
-    }
-
     <span class="kw">fn</span> <span class="ident">_add_embed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Value::Object</span>(<span class="ident">map</span>);
@@ -197,33 +208,64 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Set the embed for the message.</span>
+    <span class="doccomment">/// Add an embed for the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will keep all existing embeds. Use [`Self::set_embed()`] to replace existing</span>
+    <span class="doccomment">/// embeds.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embed</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbed</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed</span>);
+        <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>)
+    }
+
+    <span class="doccomment">/// Add multiple embeds for the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will keep all existing embeds. Use [`Self::set_embeds()`] to replace existing</span>
+    <span class="doccomment">/// embeds.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_embeds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
+            <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>);
+        }
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set an embed for the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Equivalent to [`Self::set_embed()`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This will replace all existing embeds. Use</span>
-    <span class="doccomment">/// [`Self::add_embed()`] to add additional embeds.</span>
+    <span class="doccomment">/// [`Self::add_embed()`] to add an additional embed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embed</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbed</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed</span>);
-        <span class="self">self</span>.<span class="ident">set_embed</span>(<span class="ident">embed</span>)
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>)
     }
 
     <span class="doccomment">/// Set an embed for the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This will replace all existing embeds with the provided embed.</span>
-    <span class="doccomment">/// Use [`Self::set_embeds()`] to set multiple embeds at once.</span>
+    <span class="doccomment">/// Equivalent to [`Self::embed()`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will replace all existing embeds.</span>
+    <span class="doccomment">/// Use [`Self::add_embed()`] to add an additional embed.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_embed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embed</span>: <span class="ident">CreateEmbed</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">Value::Object</span>(<span class="ident">map</span>);
-
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="macro">vec!</span>[<span class="ident">embed</span>]));
-        <span class="self">self</span>
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
+        <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>)
     }
 
     <span class="doccomment">/// Set multiple embeds for the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing</span>
+    <span class="doccomment">/// embeds.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_embeds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateEmbed</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()));
         <span class="kw">for</span> <span class="ident">embed</span> <span class="kw">in</span> <span class="ident">embeds</span> {
             <span class="self">self</span>.<span class="ident">_add_embed</span>(<span class="ident">embed</span>);
         }
