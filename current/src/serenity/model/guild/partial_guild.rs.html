@@ -1709,6 +1709,29 @@
 <span id="1709">1709</span>
 <span id="1710">1710</span>
 <span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
 </pre><pre class="rust">
 <span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
@@ -2703,6 +2726,29 @@
         <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">ChannelId</span>, <span class="ident">u64</span>)<span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">reorder_channels</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">channels</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname</span>
+    <span class="doccomment">/// starts with a provided string.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Optionally pass in the `limit` to limit the number of results.</span>
+    <span class="doccomment">/// Minimum value is 1, maximum and default value is 1000.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Queries are case insensitive.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an [`Error::Http`] if the API returns an error.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">search_members</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">search_members</span>(<span class="ident">http</span>, <span class="ident">query</span>, <span class="ident">limit</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Starts a prune of [`Member`]s.</span>
