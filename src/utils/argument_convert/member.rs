@@ -53,32 +53,38 @@ impl ArgumentConvert for Member {
             .await
             .ok_or(MemberParseError::GuildNotInCache)?;
 
-        let lookup_by_id = || guild.members.get(&UserId(s.parse().ok()?));
+        // DON'T use guild.members: it's only populated when guild presences intent is enabled!
 
-        let lookup_by_mention = || guild.members.get(&UserId(crate::utils::parse_username(s)?));
+        // If string is a raw user ID or a mention
+        if let Some(user_id) = s.parse().ok().or_else(|| crate::utils::parse_username(s)) {
+            if let Ok(member) = guild.member(ctx, UserId(user_id)).await {
+                return Ok(member);
+            }
+        }
 
-        let lookup_by_name_and_discrim = || {
-            let (name, discrim) = crate::utils::parse_user_tag(s)?;
-            guild.members.values().find(|member| {
-                member.user.discriminator == discrim && member.user.name.eq_ignore_ascii_case(name)
-            })
-        };
+        // Following code is inspired by discord.py's MemberConvert::query_member_named
 
-        let lookup_by_name = || guild.members.values().find(|member| member.user.name == s);
+        // If string is a username+discriminator
+        if let Some((name, discrim)) = crate::utils::parse_user_tag(s) {
+            if let Ok(member_results) = guild.search_members(ctx, name, Some(100)).await {
+                if let Some(member) = member_results.into_iter().find(|m| {
+                    m.user.name.eq_ignore_ascii_case(name) && m.user.discriminator == discrim
+                }) {
+                    return Ok(member);
+                }
+            }
+        }
 
-        let lookup_by_nickname = || {
-            guild.members.values().find(|member| match &member.nick {
-                Some(nick) => nick.eq_ignore_ascii_case(s),
-                None => false,
-            })
-        };
+        // If string is username or nickname
+        if let Ok(member_results) = guild.search_members(ctx, s, Some(100)).await {
+            if let Some(member) = member_results.into_iter().find(|m| {
+                m.user.name.eq_ignore_ascii_case(s)
+                    || m.nick.as_ref().map_or(false, |nick| nick.eq_ignore_ascii_case(s))
+            }) {
+                return Ok(member);
+            }
+        }
 
-        lookup_by_id()
-            .or_else(lookup_by_mention)
-            .or_else(lookup_by_name_and_discrim)
-            .or_else(lookup_by_name)
-            .or_else(lookup_by_nickname)
-            .cloned()
-            .ok_or(MemberParseError::NotFoundOrMalformed)
+        Err(MemberParseError::NotFoundOrMalformed)
     }
 }
