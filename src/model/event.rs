@@ -65,8 +65,7 @@ impl CacheUpdate for ChannelCreateEvent {
                     .write()
                     .await
                     .get_mut(&guild_id)
-                    .and_then(|g| g.channels.insert(channel_id, channel.clone()))
-                    .map(Channel::Guild);
+                    .and_then(|g| g.channels.insert(channel_id, self.channel.clone()));
 
                 cache.channels.write().await.insert(channel_id, channel.clone());
 
@@ -98,12 +97,20 @@ impl CacheUpdate for ChannelCreateEvent {
                     .insert(id, channel.clone())
                     .map(Channel::Private)
             },
-            Channel::Category(ref category) => cache
-                .categories
-                .write()
-                .await
-                .insert(category.id, category.clone())
-                .map(Channel::Category),
+            Channel::Category(ref category) => {
+                let (guild_id, channel_id) = (category.guild_id, category.id);
+
+                let old_channel = cache
+                    .guilds
+                    .write()
+                    .await
+                    .get_mut(&guild_id)
+                    .and_then(|g| g.channels.insert(channel_id, self.channel.clone()));
+
+                cache.categories.write().await.insert(channel_id, category.clone());
+
+                old_channel
+            },
         }
     }
 }
@@ -134,9 +141,16 @@ impl CacheUpdate for ChannelDeleteEvent {
                     .map(|g| g.channels.remove(&channel_id));
             },
             Channel::Category(ref category) => {
-                let channel_id = category.id;
+                let (guild_id, channel_id) = (category.guild_id, category.id);
 
                 cache.categories.write().await.remove(&channel_id);
+
+                cache
+                    .guilds
+                    .write()
+                    .await
+                    .get_mut(&guild_id)
+                    .map(|g| g.channels.remove(&channel_id));
             },
             Channel::Private(ref channel) => {
                 let id = { channel.id };
@@ -222,7 +236,7 @@ impl CacheUpdate for ChannelUpdateEvent {
                     .write()
                     .await
                     .get_mut(&guild_id)
-                    .map(|g| g.channels.insert(channel_id, channel.clone()));
+                    .map(|g| g.channels.insert(channel_id, self.channel.clone()));
             },
             Channel::Private(ref channel) => {
                 if let Some(c) = cache.private_channels.write().await.get_mut(&channel.id) {
@@ -230,9 +244,16 @@ impl CacheUpdate for ChannelUpdateEvent {
                 }
             },
             Channel::Category(ref category) => {
-                if let Some(c) = cache.categories.write().await.get_mut(&category.id) {
-                    c.clone_from(category);
-                }
+                let (guild_id, channel_id) = (category.guild_id, category.id);
+
+                cache.categories.write().await.insert(channel_id, category.clone());
+
+                cache
+                    .guilds
+                    .write()
+                    .await
+                    .get_mut(&guild_id)
+                    .map(|g| g.channels.insert(channel_id, self.channel.clone()));
             },
         }
 
@@ -293,7 +314,20 @@ impl CacheUpdate for GuildCreateEvent {
             }
         }
 
-        cache.channels.write().await.extend(guild.channels.clone().into_iter());
+        cache.channels.write().await.extend(guild.channels.clone().into_iter().filter_map(|c| {
+            match c.1 {
+                Channel::Guild(channel) => Some((c.0, channel)),
+                _ => None,
+            }
+        }));
+
+        cache.categories.write().await.extend(guild.channels.clone().into_iter().filter_map(|c| {
+            match c.1 {
+                Channel::Category(category) => Some((c.0, category)),
+                _ => None,
+            }
+        }));
+
         cache.guilds.write().await.insert(self.guild.id, guild);
 
         None
@@ -331,12 +365,21 @@ impl CacheUpdate for GuildDeleteEvent {
     async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         match cache.guilds.write().await.remove(&self.guild.id) {
             Some(guild) => {
-                for channel_id in guild.channels.keys() {
-                    // Remove the channel from the cache.
-                    cache.channels.write().await.remove(channel_id);
+                for (channel_id, channel) in &guild.channels {
+                    match channel {
+                        Channel::Guild(_) => {
+                            // Remove the channel from the cache.
+                            cache.channels.write().await.remove(channel_id);
 
-                    // Remove the channel's cached messages.
-                    cache.messages.write().await.remove(channel_id);
+                            // Remove the channel's cached messages.
+                            cache.messages.write().await.remove(channel_id);
+                        },
+                        Channel::Category(_) => {
+                            // Remove the category from the cache
+                            cache.categories.write().await.remove(channel_id);
+                        },
+                        _ => {},
+                    }
                 }
 
                 Some(guild)
