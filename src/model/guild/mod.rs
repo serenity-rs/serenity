@@ -102,7 +102,7 @@ pub struct Guild {
     /// This contains all channels regardless of permissions (i.e. the ability
     /// of the bot to read from or connect to them).
     #[serde(serialize_with = "serialize_gen_map")]
-    pub channels: HashMap<ChannelId, GuildChannel>,
+    pub channels: HashMap<ChannelId, Channel>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
@@ -265,8 +265,13 @@ impl Guild {
     pub async fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
-            if self.user_permissions_in(channel, member).ok()?.read_messages() {
-                return Some(channel);
+            match channel {
+                Channel::Guild(ref channel) => {
+                    if self.user_permissions_in(channel, member).ok()?.read_messages() {
+                        return Some(channel);
+                    }
+                },
+                _ => {},
             }
         }
 
@@ -281,10 +286,15 @@ impl Guild {
     /// members, or both.
     pub async fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         for channel in self.channels.values() {
-            for member in self.members.values() {
-                if self.user_permissions_in(channel, member).ok()?.read_messages() {
-                    return Some(channel);
-                }
+            match channel {
+                Channel::Guild(ref channel) => {
+                    for member in self.members.values() {
+                        if self.user_permissions_in(channel, member).ok()?.read_messages() {
+                            return Some(channel);
+                        }
+                    }
+                },
+                _ => {},
             }
         }
 
