@@ -2723,16 +2723,23 @@ impl Http {
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// let guilds = http.get_guilds(&GuildPagination::After(guild_id), 10).await?;
+    /// let guilds = http.get_guilds(Some(&GuildPagination::After(guild_id)), Some(10)).await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
     /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guilds
-    pub async fn get_guilds(&self, target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>> {
-        let (after, before) = match *target {
-            GuildPagination::After(id) => (Some(id.0), None),
-            GuildPagination::Before(id) => (None, Some(id.0)),
+    pub async fn get_guilds(
+        &self,
+        target: Option<&GuildPagination>,
+        limit: Option<u64>,
+    ) -> Result<Vec<GuildInfo>> {
+        let (after, before) = match target {
+            None => (None, None),
+            Some(gp) => match gp {
+                GuildPagination::After(id) => (Some(id.0), None),
+                GuildPagination::Before(id) => (None, Some(id.0)),
+            },
         };
 
         self.fire(Request {
