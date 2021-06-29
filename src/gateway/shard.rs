@@ -87,8 +87,6 @@ pub struct Shard {
     seq: u64,
     session_id: Option<String>,
     shard_info: [u64; 2],
-    /// Whether the shard has permanently shutdown.
-    shutdown: bool,
     stage: ConnectionStage,
     /// Instant of when the shard was started.
     // This acts as a timeout to determine if the shard has - for some reason -
@@ -154,7 +152,6 @@ impl Shard {
         let session_id = None;
 
         Ok(Shard {
-            shutdown: false,
             client,
             current_presence,
             heartbeat_instants,
@@ -175,12 +172,6 @@ impl Shard {
     #[inline]
     pub fn current_presence(&self) -> &CurrentPresence {
         &self.current_presence
-    }
-
-    /// Whether the shard has permanently shutdown.
-    #[inline]
-    pub fn is_shutdown(&self) -> bool {
-        self.shutdown
     }
 
     /// Retrieves the heartbeat instants of the shard.
