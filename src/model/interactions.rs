@@ -2,6 +2,7 @@
 
 use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
+use serde::ser::{Serialize, Serializer};
 use serde_json::{Map, Number, Value};
 
 use super::prelude::*;
@@ -30,30 +31,213 @@ pub struct Interaction {
     /// The type of interaction.
     #[serde(rename = "type")]
     pub kind: InteractionType,
-    /// The data of the command which was triggered, if there is one.
+    /// The data of the interaction which was triggered.
     ///
-    /// **Note**: It is always present if the interaction [`kind`] is
-    /// [`ApplicationCommand`].
+    /// **Note**: It is always present if the interaction [`kind`] is not
+    /// [`Ping`].
     ///
-    /// [`ApplicationCommand`]: self::InteractionType::ApplicationCommand
+    /// [`Ping`]: self::InteractionType::Ping
     /// [`kind`]: Interaction::kind
-    pub data: Option<ApplicationCommandInteractionData>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data: Option<InteractionData>,
+    /// The message this interaction was triggered by, if
+    /// it is a component.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<InteractionMessage>,
     /// The guild Id this interaction was sent from, if there is one.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
     /// The channel Id this interaction was sent from, if there is one.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub channel_id: Option<ChannelId>,
     /// The `member` data for the invoking user.
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<Member>,
     /// The `user` object for the invoking user.
-    ///
-    /// It is only present if the interaction is triggered in DM.
-    pub user: Option<User>,
+    pub user: User,
     /// A continuation token for responding to the interaction.
     pub token: String,
     /// Always `1`.
     pub version: u8,
+}
+
+impl Interaction {
+    /// Gets the interaction response.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if there is no interaction response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    pub async fn get_interaction_response(&self, http: impl AsRef<Http>) -> Result<Message> {
+        http.as_ref().get_original_interaction_response(&self.token).await
+    }
+
+    /// Creates a response to the interaction received.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long.
+    /// May also return an [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error in deserializing the
+    /// API response.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
+    where
+        F: FnOnce(&mut CreateInteractionResponse) -> &mut CreateInteractionResponse,
+    {
+        let mut interaction_response = CreateInteractionResponse::default();
+        f(&mut interaction_response);
+
+        let map = utils::hashmap_to_json_map(interaction_response.0);
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
+        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
+    }
+
+    /// Edits the initial interaction response.
+    ///
+    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
+    ///
+    /// Refer to Discord's docs for Edit Webhook Message for field information.
+    ///
+    /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
+    ///
+    /// [`UserId`]: crate::model::id::UserId
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the edited content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn edit_original_interaction_response<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Message>
+    where
+        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
+    {
+        let mut interaction_response = EditInteractionResponse::default();
+        f(&mut interaction_response);
+
+        let map = utils::hashmap_to_json_map(interaction_response.0);
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
+        http.as_ref().edit_original_interaction_response(&self.token, &Value::Object(map)).await
+    }
+
+    /// Deletes the initial interaction response.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().delete_original_interaction_response(&self.token).await
+    }
+
+    /// Creates a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Will return [`Error::Model`] if the content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or a [`Error::Json`] if there is an error in deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn create_followup_message<'a, F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(
+            &'b mut CreateInteractionResponseFollowup<'a>,
+        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
+    {
+        let mut interaction_response = CreateInteractionResponseFollowup::default();
+        f(&mut interaction_response);
+
+        let map = utils::hashmap_to_json_map(interaction_response.0);
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
+        http.as_ref().create_followup_message(&self.token, &Value::Object(map)).await
+    }
+
+    /// Edits a followup response to the response sent.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Will return [`Error::Model`] if the content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or a [`Error::Json`] if there is an error in deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+        f: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(
+            &'b mut CreateInteractionResponseFollowup<'a>,
+        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
+    {
+        let mut interaction_response = CreateInteractionResponseFollowup::default();
+        f(&mut interaction_response);
+
+        let map = utils::hashmap_to_json_map(interaction_response.0);
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
+        http.as_ref()
+            .edit_followup_message(&self.token, message_id.into().into(), &Value::Object(map))
+            .await
+    }
+
+    /// Deletes a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
+    pub async fn delete_followup_message<M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+    ) -> Result<()> {
+        http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
+    }
 }
 
 impl<'de> Deserialize<'de> for Interaction {
@@ -112,14 +296,28 @@ impl<'de> Deserialize<'de> for Interaction {
             .and_then(InteractionType::deserialize)
             .map_err(DeError::custom)?;
 
-        let data = match map.contains_key("data") {
-            true => Some(
-                map.remove("data")
-                    .ok_or_else(|| DeError::custom("expected data"))
-                    .and_then(ApplicationCommandInteractionData::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
+        let data = {
+            if map.contains_key("data") {
+                match kind {
+                    InteractionType::ApplicationCommand => {
+                        Some(InteractionData::ApplicationCommand(
+                            map.remove("data")
+                                .ok_or_else(|| DeError::custom("expected data"))
+                                .and_then(ApplicationCommandInteractionData::deserialize)
+                                .map_err(DeError::custom)?,
+                        ))
+                    },
+                    InteractionType::MessageComponent => Some(InteractionData::MessageComponent(
+                        map.remove("data")
+                            .ok_or_else(|| DeError::custom("expected data"))
+                            .and_then(MessageComponent::deserialize)
+                            .map_err(DeError::custom)?,
+                    )),
+                    _ => None,
+                }
+            } else {
+                None
+            }
         };
 
         let guild_id = match map.contains_key("guild_id") {
@@ -153,12 +351,35 @@ impl<'de> Deserialize<'de> for Interaction {
         };
 
         let user = match map.contains_key("user") {
-            true => Some(
-                map.remove("user")
-                    .ok_or_else(|| DeError::custom("expected user"))
-                    .and_then(User::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
+            true => map
+                .remove("user")
+                .ok_or_else(|| DeError::custom("expected user"))
+                .and_then(User::deserialize)
+                .map_err(DeError::custom)?,
+            false => member.as_ref().expect("expected user or member").user.clone(),
+        };
+
+        let message = match map.contains_key("message") {
+            true => {
+                let message = map
+                    .remove("message")
+                    .ok_or_else(|| DeError::custom("expected message"))
+                    .and_then(JsonMap::deserialize)
+                    .map_err(DeError::custom)?;
+                let partial = !message.contains_key("author");
+
+                let value: Value = message.into();
+
+                if partial {
+                    Some(InteractionMessage::Ephemeral(
+                        EphemeralMessage::deserialize(value).map_err(DeError::custom)?,
+                    ))
+                } else {
+                    Some(InteractionMessage::Regular(
+                        Message::deserialize(value).map_err(DeError::custom)?,
+                    ))
+                }
+            },
             false => None,
         };
 
@@ -179,6 +400,7 @@ impl<'de> Deserialize<'de> for Interaction {
             application_id,
             kind,
             data,
+            message,
             guild_id,
             channel_id,
             member,
@@ -196,13 +418,49 @@ impl<'de> Deserialize<'de> for Interaction {
 pub enum InteractionType {
     Ping = 1,
     ApplicationCommand = 2,
+    MessageComponent = 3,
     Unknown = !0,
 }
 
 enum_number!(InteractionType {
     Ping,
+    MessageComponent,
     ApplicationCommand
 });
+
+/// The [`Interaction::data`] field.
+#[derive(Clone, Debug, Deserialize)]
+pub enum InteractionData {
+    ApplicationCommand(ApplicationCommandInteractionData),
+    MessageComponent(MessageComponent),
+}
+
+impl Serialize for InteractionData {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            InteractionData::ApplicationCommand(c) => {
+                ApplicationCommandInteractionData::serialize(c, serializer)
+            },
+            InteractionData::MessageComponent(c) => MessageComponent::serialize(c, serializer),
+        }
+    }
+}
+
+/// A message component data, provided by [`Interaction::data`]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MessageComponent {
+    /// The custom id of the component.
+    pub custom_id: String,
+    /// The type of the component.
+    pub component_type: ComponentType,
+    /// The given values of the [`SelectMenu`]s
+    #[serde(default)]
+    pub values: Vec<String>,
+}
 
 /// The command data payload.
 #[derive(Clone, Debug, Serialize)]
@@ -261,6 +519,67 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             resolved,
         })
     }
+}
+
+/// The [`Interaction::message`] field.
+#[derive(Clone, Debug, Deserialize)]
+pub enum InteractionMessage {
+    Regular(Message),
+    Ephemeral(EphemeralMessage),
+}
+
+impl InteractionMessage {
+    /// Whether the message is ephemeral.
+    pub fn is_ephemeral(&self) -> bool {
+        matches!(self, InteractionMessage::Ephemeral(_))
+    }
+
+    /// Gets the message Id.
+    pub fn id(&self) -> MessageId {
+        match self {
+            InteractionMessage::Regular(m) => m.id,
+            InteractionMessage::Ephemeral(m) => m.id,
+        }
+    }
+
+    /// Converts this to a regular message,
+    /// if it is one.
+    pub fn regular(self) -> Option<Message> {
+        match self {
+            InteractionMessage::Regular(m) => Some(m),
+            InteractionMessage::Ephemeral(_) => None,
+        }
+    }
+
+    /// Converts this to an ephemeral message,
+    /// if it is one.
+    pub fn ephemeral(self) -> Option<EphemeralMessage> {
+        match self {
+            InteractionMessage::Regular(_) => None,
+            InteractionMessage::Ephemeral(m) => Some(m),
+        }
+    }
+}
+
+impl Serialize for InteractionMessage {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            InteractionMessage::Regular(c) => Message::serialize(c, serializer),
+            InteractionMessage::Ephemeral(c) => EphemeralMessage::serialize(c, serializer),
+        }
+    }
+}
+
+/// An ephemeral message given in an interaction.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct EphemeralMessage {
+    /// The message flags.
+    pub flags: MessageFlags,
+    /// The message Id.
+    pub id: MessageId,
 }
 
 /// The resolved data of a command data interaction payload.
@@ -708,10 +1027,12 @@ pub enum InteractionResponseType {
     Pong = 1,
     ChannelMessageWithSource = 4,
     DeferredChannelMessageWithSource = 5,
+    DeferredUpdateMessage = 6,
+    UpdateMessage = 7,
 }
 
 /// The flags for an interaction response.
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct InteractionApplicationCommandCallbackDataFlags {
     bits: u64,
@@ -741,183 +1062,6 @@ pub struct MessageInteraction {
     pub user: User,
 }
 
-impl Interaction {
-    /// Gets the interaction response.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Http`] if there is no interaction response.
-    ///
-    /// [`Error::Http`]: crate::error::Error::Http
-    pub async fn get_interaction_response(&self, http: impl AsRef<Http>) -> Result<Message> {
-        http.as_ref().get_original_interaction_response(&self.token).await
-    }
-
-    /// Creates a response to the interaction received.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Returns an [`Error::Model`] if the message content is too long.
-    /// May also return an [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error in deserializing the
-    /// API response.
-    ///
-    /// # Errors
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where
-        F: FnOnce(&mut CreateInteractionResponse) -> &mut CreateInteractionResponse,
-    {
-        let mut interaction_response = CreateInteractionResponse::default();
-        f(&mut interaction_response);
-
-        let map = utils::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
-    }
-
-    /// Edits the initial interaction response.
-    ///
-    /// `application_id` will usually be the bot's [`UserId`], except in cases of bots being very old.
-    ///
-    /// Refer to Discord's docs for Edit Webhook Message for field information.
-    ///
-    /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
-    ///
-    /// [`UserId`]: crate::model::id::UserId
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Model`] if the edited content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or an [`Error::Json`] if there is an error deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn edit_original_interaction_response<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse,
-    {
-        let mut interaction_response = EditInteractionResponse::default();
-        f(&mut interaction_response);
-
-        let map = utils::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref().edit_original_interaction_response(&self.token, &Value::Object(map)).await
-    }
-
-    /// Deletes the initial interaction response.
-    ///
-    /// # Errors
-    ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
-    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().delete_original_interaction_response(&self.token).await
-    }
-
-    /// Creates a followup response to the response sent.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn create_followup_message<'a, F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-
-        let map = utils::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref().create_followup_message(&self.token, &Value::Object(map)).await
-    }
-
-    /// Edits a followup response to the response sent.
-    ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
-    ///
-    /// # Errors
-    ///
-    /// Will return [`Error::Model`] if the content is too long.
-    /// May also return [`Error::Http`] if the API returns an error,
-    /// or a [`Error::Json`] if there is an error in deserializing the response.
-    ///
-    /// [`Error::Model`]: crate::error::Error::Model
-    /// [`Error::Http`]: crate::error::Error::Http
-    /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn edit_followup_message<'a, F, M: Into<MessageId>>(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: M,
-        f: F,
-    ) -> Result<Message>
-    where
-        for<'b> F: FnOnce(
-            &'b mut CreateInteractionResponseFollowup<'a>,
-        ) -> &'b mut CreateInteractionResponseFollowup<'a>,
-    {
-        let mut interaction_response = CreateInteractionResponseFollowup::default();
-        f(&mut interaction_response);
-
-        let map = utils::hashmap_to_json_map(interaction_response.0);
-
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
-
-        http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::Object(map))
-            .await
-    }
-
-    /// Deletes a followup message.
-    ///
-    /// # Errors
-    ///
-    /// May return [`Error::Http`] if the API returns an error.
-    /// Such as if the response was already deleted.
-    pub async fn delete_followup_message<M: Into<MessageId>>(
-        &self,
-        http: impl AsRef<Http>,
-        message_id: M,
-    ) -> Result<()> {
-        http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
-    }
-}
-
 impl CommandPermissionId {
     /// Converts this [`CommandPermissionId`] to [`UserId`].
     pub fn to_user_id(self) -> UserId {
@@ -936,8 +1080,20 @@ impl From<RoleId> for CommandPermissionId {
     }
 }
 
+impl<'a> From<&'a RoleId> for CommandPermissionId {
+    fn from(id: &RoleId) -> Self {
+        Self(id.0)
+    }
+}
+
 impl From<UserId> for CommandPermissionId {
     fn from(id: UserId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl<'a> From<&'a UserId> for CommandPermissionId {
+    fn from(id: &UserId) -> Self {
         Self(id.0)
     }
 }
@@ -952,4 +1108,154 @@ impl From<CommandPermissionId> for UserId {
     fn from(id: CommandPermissionId) -> Self {
         Self(id.0)
     }
+}
+
+/// A component.
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub enum Component {
+    ActionRow(ActionRow),
+    Button(Button),
+    SelectMenu(SelectMenu),
+}
+
+impl<'de> Deserialize<'de> for Component {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let map = JsonMap::deserialize(deserializer)?;
+
+        let kind = map
+            .get("type")
+            .ok_or_else(|| DeError::custom("expected type"))
+            .and_then(ComponentType::deserialize)
+            .map_err(DeError::custom)?;
+
+        match kind {
+            ComponentType::ActionRow => serde_json::from_value::<ActionRow>(Value::Object(map))
+                .map(Component::ActionRow)
+                .map_err(DeError::custom),
+            ComponentType::Button => serde_json::from_value::<Button>(Value::Object(map))
+                .map(Component::Button)
+                .map_err(DeError::custom),
+            ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
+                .map(Component::SelectMenu)
+                .map_err(DeError::custom),
+            ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
+        }
+    }
+}
+
+impl Serialize for Component {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Component::ActionRow(c) => ActionRow::serialize(c, serializer),
+            Component::Button(c) => Button::serialize(c, serializer),
+            Component::SelectMenu(c) => SelectMenu::serialize(c, serializer),
+        }
+    }
+}
+
+/// The type of a component
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ComponentType {
+    ActionRow = 1,
+    Button = 2,
+    SelectMenu = 3,
+    Unknown = !0,
+}
+
+enum_number!(ComponentType {
+    ActionRow,
+    Button,
+    SelectMenu
+});
+
+/// An action row.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActionRow {
+    /// The type of component this ActionRow is.
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The components of this ActionRow.
+    pub components: Vec<Component>,
+}
+
+/// A button component.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Button {
+    /// The component type, it will always be [`ComponentType::Button`].
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The button style.
+    pub style: ButtonStyle,
+    /// The text which appears on the button.
+    pub label: Option<String>,
+    /// The emoji of this button, if there is one.
+    pub emoji: Option<ReactionType>,
+    /// An identifier defined by the developer for the button.
+    pub custom_id: Option<String>,
+    /// The url of the button, if there is one.
+    pub url: Option<String>,
+    /// Whether the button is disabled.
+    #[serde(default)]
+    pub disabled: bool,
+}
+
+/// The style of a button.
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ButtonStyle {
+    Primary = 1,
+    Secondary = 2,
+    Success = 3,
+    Danger = 4,
+    Link = 5,
+    Unknown = !0,
+}
+
+enum_number!(ButtonStyle {
+    Primary,
+    Secondary,
+    Success,
+    Danger,
+    Link
+});
+
+/// A select menu component.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct SelectMenu {
+    /// The component type, it will always be [`ComponentType::SelectMenu`].
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// The placeholder shown when nothing is selected.
+    pub placeholder: Option<String>,
+    /// An identifier defined by the developer for the select menu.
+    pub custom_id: Option<String>,
+    /// The minimum number of selections allowed.
+    pub min_values: Option<u64>,
+    /// The maximum number of selections allowed.
+    pub max_values: Option<u64>,
+    /// The options of this select menu.
+    #[serde(default)]
+    pub options: Vec<SelectMenuOption>,
+}
+
+/// A select menu component options.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct SelectMenuOption {
+    /// The text displayed on this option.
+    pub label: String,
+    /// The value to be sent for this option.
+    pub value: String,
+    /// The description shown for this option.
+    pub description: Option<String>,
+    /// The emoji displayed on this option.
+    pub emoji: Option<ReactionType>,
+    /// Render this option as the default selection.
+    pub default: bool,
 }

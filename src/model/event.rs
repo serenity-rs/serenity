@@ -470,6 +470,7 @@ pub struct GuildMemberUpdateEvent {
     pub deaf: bool,
     #[serde(default)]
     pub mute: bool,
+    pub avatar: Option<String>,
 }
 
 #[cfg(feature = "cache")]
@@ -492,6 +493,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.premium_since.clone_from(&self.premium_since);
                 member.deaf.clone_from(&self.deaf);
                 member.mute.clone_from(&self.mute);
+                member.avatar.clone_from(&self.avatar);
 
                 item
             } else {
@@ -511,6 +513,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     premium_since: self.premium_since,
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
+                    avatar: self.avatar.clone(),
                 });
             }
 
@@ -793,19 +796,39 @@ impl CacheUpdate for GuildUpdateEvent {
 
     async fn update(&mut self, cache: &Cache) -> Option<()> {
         if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild.id) {
-            guild.afk_timeout = self.guild.afk_timeout;
             guild.afk_channel_id.clone_from(&self.guild.afk_channel_id);
+            guild.afk_timeout = self.guild.afk_timeout;
+            guild.banner.clone_from(&self.guild.banner);
+            guild.discovery_splash.clone_from(&self.guild.discovery_splash);
+            guild.features.clone_from(&self.guild.features);
             guild.icon.clone_from(&self.guild.icon);
             guild.name.clone_from(&self.guild.name);
             guild.owner_id.clone_from(&self.guild.owner_id);
+            guild.roles.clone_from(&self.guild.roles);
+            guild.splash.clone_from(&self.guild.splash);
+            guild.vanity_url_code.clone_from(&self.guild.vanity_url_code);
+            guild.welcome_screen.clone_from(&self.guild.welcome_screen);
 
             #[allow(deprecated)]
             {
                 guild.region.clone_from(&self.guild.region);
             }
 
-            guild.roles.clone_from(&self.guild.roles);
+            guild.default_message_notifications = self.guild.default_message_notifications;
+            guild.max_members = self.guild.max_members;
+            guild.max_presences = self.guild.max_presences;
+            guild.max_video_channel_users = self.guild.max_video_channel_users;
+            guild.mfa_level = self.guild.mfa_level;
+            guild.nsfw_level = self.guild.nsfw_level;
+            guild.premium_subscription_count = self.guild.premium_subscription_count;
+            guild.premium_tier = self.guild.premium_tier;
+            guild.public_updates_channel_id = self.guild.public_updates_channel_id;
+            guild.rules_channel_id = self.guild.rules_channel_id;
+            guild.system_channel_flags = self.guild.system_channel_flags;
+            guild.system_channel_id = self.guild.system_channel_id;
             guild.verification_level = self.guild.verification_level;
+            guild.widget_channel_id = self.guild.widget_channel_id;
+            guild.widget_enabled = self.guild.widget_enabled;
         }
 
         None
@@ -1016,6 +1039,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                         premium_since: None,
                         #[cfg(feature = "unstable_discord_api")]
                         permissions: None,
+                        avatar: None,
                     });
                 }
             }

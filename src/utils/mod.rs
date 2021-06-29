@@ -865,6 +865,7 @@ mod test {
             approximate_member_count: None,
             approximate_presence_count: None,
             nsfw: false,
+            nsfw_level: NsfwLevel::Default,
             max_video_channel_users: None,
             max_presences: None,
             max_members: None,
@@ -884,6 +885,7 @@ mod test {
             premium_since: None,
             #[cfg(feature = "unstable_discord_api")]
             permissions: None,
+            avatar: None,
         };
 
         let role = Role {

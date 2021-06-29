@@ -5,7 +5,7 @@
 //! Serenity supports bot user authentication via the use of [`Client::builder`].
 //!
 //! Once logged in, you may add handlers to your client to dispatch [`Event`]s,
-//! such as [`Client::on_message`]. This will cause your handler to be called
+//! such as [`EventHandler::message`]. This will cause your handler to be called
 //! when a [`Event::MessageCreate`] is received. Each handler is given a
 //! [`Context`], giving information about the event. See the
 //! [client's module-level documentation].
@@ -40,7 +40,7 @@
 //! ```
 //!
 //! [`Context`]: crate::client::Context
-//! [`Client::on_message`]: client/struct.Client.html#method.on_message
+//! [`EventHandler::message`]: crate::client::EventHandler::message
 //! [`Event`]: crate::model::event::Event
 //! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
 //! [`Shard`]: crate::gateway::Shard

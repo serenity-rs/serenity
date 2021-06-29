@@ -212,12 +212,24 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersIdRolesId(u64),
+    /// Route for the `/guilds/:guild_id/members/@me` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdMembersMe(u64),
     /// Route for the `/guilds/:guild_id/members/@me/nick` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersMeNick(u64),
+    /// Route for the `/guilds/:guild_id/members/search` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdMembersSearch(u64),
     /// Route for the `/guilds/:guild_id/prune` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -280,6 +292,8 @@ pub enum Route {
     UsersMe,
     /// Route for the `/users/@me/channels` path.
     UsersMeChannels,
+    /// Route for the `/users/@me/connections` path.
+    UsersMeConnections,
     /// Route for the `/users/@me/guilds` path.
     UsersMeGuilds,
     /// Route for the `/users/@me/guilds/:guild_id` path.
@@ -417,6 +431,7 @@ impl Route {
         api!("/channels/{}/messages/{}/reactions", channel_id, message_id)
     }
 
+    #[allow(clippy::let_underscore_must_use)]
     pub fn channel_message_reactions_list(
         channel_id: u64,
         message_id: u64,
@@ -430,7 +445,6 @@ impl Route {
         );
 
         if let Some(after) = after {
-            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(uri, "&after={}", after);
         }
 
@@ -582,20 +596,34 @@ impl Route {
         format!(api!("/guilds/{}/members"), guild_id)
     }
 
+    #[allow(clippy::let_underscore_must_use)]
+    pub fn guild_members_search(guild_id: u64, query: &str, limit: Option<u64>) -> String {
+        let mut s = format!(api!("/guilds/{}/members/search?"), guild_id);
+
+        let _ = write!(s, "&query={}", query);
+
+        let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
+
+        s
+    }
+
+    #[allow(clippy::let_underscore_must_use)]
     pub fn guild_members_optioned(guild_id: u64, after: Option<u64>, limit: Option<u64>) -> String {
         let mut s = format!(api!("/guilds/{}/members?"), guild_id);
 
         if let Some(after) = after {
-            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(s, "&after={}", after);
             // should not error, ignoring
         }
 
-        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
         // should not error, ignoring
 
         s
+    }
+
+    pub fn guild_member_me(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/members/@me"), guild_id)
     }
 
     pub fn guild_nickname(guild_id: u64) -> String {
@@ -674,6 +702,10 @@ impl Route {
         format!(api!("/users/{}"), target)
     }
 
+    pub fn user_me_connections() -> &'static str {
+        api!("/users/@me/connections")
+    }
+
     pub fn user_dm_channels<D: Display>(target: D) -> String {
         format!(api!("/users/{}/channels"), target)
     }
@@ -686,6 +718,7 @@ impl Route {
         format!(api!("/users/{}/guilds"), target)
     }
 
+    #[allow(clippy::let_underscore_must_use)]
     pub fn user_guilds_optioned<D: Display>(
         target: D,
         after: Option<u64>,
@@ -695,13 +728,11 @@ impl Route {
         let mut s = format!(api!("/users/{}/guilds?limit={}&"), target, limit);
 
         if let Some(after) = after {
-            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(s, "&after={}", after);
             // should not error, ignoring
         }
 
         if let Some(before) = before {
-            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(s, "&before={}", before);
             // should not error, ignoring
         }
@@ -1053,6 +1084,9 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
     },
+    EditMemberMe {
+        guild_id: u64,
+    },
     EditNickname {
         guild_id: u64,
     },
@@ -1249,6 +1283,7 @@ pub enum RouteInfo<'a> {
     GetUser {
         user_id: u64,
     },
+    GetUserConnections,
     GetUserDmChannels,
     GetVoiceRegions,
     GetWebhook {
@@ -1281,6 +1316,11 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         role_id: u64,
         user_id: u64,
+    },
+    SearchGuildMembers {
+        guild_id: u64,
+        query: &'a str,
+        limit: Option<u64>,
     },
     StartGuildPrune {
         days: u64,
@@ -1738,6 +1778,13 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsIdMessagesId(LightMethod::Patch, channel_id),
                 Cow::from(Route::channel_message(channel_id, message_id)),
             ),
+            RouteInfo::EditMemberMe {
+                guild_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdMembersMe(guild_id),
+                Cow::from(Route::guild_member_me(guild_id)),
+            ),
             RouteInfo::EditNickname {
                 guild_id,
             } => (
@@ -2130,6 +2177,11 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::GetUser {
                 user_id,
             } => (LightMethod::Get, Route::UsersId, Cow::from(Route::user(user_id))),
+            RouteInfo::GetUserConnections => (
+                LightMethod::Get,
+                Route::UsersMeConnections,
+                Cow::from(Route::user_me_connections()),
+            ),
             RouteInfo::GetUserDmChannels => (
                 LightMethod::Get,
                 Route::UsersMeChannels,
@@ -2200,6 +2252,15 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::GuildsIdMembersIdRolesId(guild_id),
                 Cow::from(Route::guild_member_role(guild_id, user_id, role_id)),
+            ),
+            RouteInfo::SearchGuildMembers {
+                guild_id,
+                query,
+                limit,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdMembersSearch(guild_id),
+                Cow::from(Route::guild_members_search(guild_id, query, limit)),
             ),
             RouteInfo::StartGuildPrune {
                 days,

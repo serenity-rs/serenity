@@ -260,8 +260,10 @@ impl StandardFramework {
                     return Some(DispatchError::BlockedGuild);
                 }
 
-                if let Some(guild) = guild_id.to_guild_cached(&ctx.cache).await {
-                    if self.config.blocked_users.contains(&guild.owner_id) {
+                let owner_id_option = ctx.cache.guild_field(guild_id, |guild| guild.owner_id).await;
+
+                if let Some(owner_id) = owner_id_option {
+                    if self.config.blocked_users.contains(&owner_id) {
                         return Some(DispatchError::BlockedGuild);
                     }
                 }
@@ -835,32 +837,35 @@ pub(crate) async fn has_correct_permissions(
 ) -> bool {
     if options.required_permissions().is_empty() {
         true
-    } else if let Some(guild) = message.guild(&cache).await {
-        let channel = match guild.channels.get(&message.channel_id) {
-            Some(channel) => channel,
-            None => return false,
-        };
-        let member = match guild.members.get(&message.author.id) {
-            Some(member) => member,
-            None => return false,
-        };
-
-        let perms = match guild.user_permissions_in(channel, member) {
-            Ok(perms) => perms,
-            Err(e) => {
-                tracing::error!(
-                    "Error getting permissions for user {} in channel {}: {}",
-                    member.user.id,
-                    channel.id,
-                    e
-                );
-                return false;
-            },
-        };
-
-        perms.contains(*options.required_permissions())
     } else {
-        false
+        message
+            .guild_field(cache, |guild| {
+                let channel = match guild.channels.get(&message.channel_id) {
+                    Some(channel) => channel,
+                    None => return false,
+                };
+
+                let member = match guild.members.get(&message.author.id) {
+                    Some(member) => member,
+                    None => return false,
+                };
+
+                match guild.user_permissions_in(channel, member) {
+                    Ok(perms) => perms.contains(*options.required_permissions()),
+                    Err(e) => {
+                        tracing::error!(
+                            "Error getting permissions for user {} in channel {}: {}",
+                            member.user.id,
+                            channel.id,
+                            e
+                        );
+
+                        false
+                    },
+                }
+            })
+            .await
+            .unwrap_or(false)
     }
 }
 
