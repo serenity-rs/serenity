@@ -242,6 +242,8 @@ pub struct Guild {
     pub widget_enabled: Option<bool>,
     /// The channel id that the widget will generate an invite to, or null if set to no invite
     pub widget_channel_id: Option<ChannelId>,
+    #[serde(serialize_with = "serialize_gen_map")]
+    pub stickers: HashMap<StickerId, Sticker>,
 }
 
 #[cfg(feature = "model")]
@@ -575,7 +577,7 @@ impl Guild {
     /// The name of the emoji must be at least 2 characters long and can only
     /// contain alphanumeric characters and underscores.
     ///
-    /// Requires the [Manage Emojis] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -589,7 +591,7 @@ impl Guild {
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
-    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn create_emoji(
         &self,
@@ -838,13 +840,13 @@ impl Guild {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// Requires the [Manage Emojis] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_emoji(
         &self,
@@ -972,13 +974,13 @@ impl Guild {
     /// Also see [`Emoji::edit`] if you have the `cache` and `model` features
     /// enabled.
     ///
-    /// Requires the [Manage Emojis] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_emoji(
@@ -2564,6 +2566,12 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(SystemChannelFlags::deserialize)
             .map_err(DeError::custom)?;
 
+        let stickers = map
+            .remove("stickers")
+            .ok_or_else(|| DeError::custom("expected guild stickers"))
+            .and_then(deserialize_stickers)
+            .map_err(DeError::custom)?;
+
         #[allow(deprecated)]
         Ok(Self {
             afk_channel_id,
@@ -2609,6 +2617,7 @@ impl<'de> Deserialize<'de> for Guild {
             max_members,
             widget_enabled,
             widget_channel_id,
+            stickers,
         })
     }
 }
@@ -3092,6 +3101,7 @@ mod test {
             let hm4 = HashMap::new();
             let hm5 = HashMap::new();
             let hm6 = HashMap::new();
+            let hm7 = HashMap::new();
 
             hm3.insert(u.id, m);
 
@@ -3141,6 +3151,7 @@ mod test {
                 discovery_splash: None,
                 widget_channel_id: None,
                 public_updates_channel_id: None,
+                stickers: hm7,
             }
         }
 

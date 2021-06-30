@@ -18,7 +18,7 @@ pub struct StickerPack {
     /// The unique ID given to the pack's SKU.
     pub sku_id: SkuId,
     /// ID of a sticker in the pack which is shown as the pack's icon.
-    pub cover_sticker_id: StickerId,
+    pub cover_sticker_id: Option<StickerId>,
     /// Description of the sticker pack.
     pub description: String,
     /// The unique ID given to the sticker pack's banner image.
@@ -29,7 +29,7 @@ pub struct StickerPack {
 impl StickerPack {
     /// Returns the sticker that is shown as the pack's icon
     pub fn cover_sticker(&self) -> Option<&Sticker> {
-        self.stickers.iter().find(|s| s.id == self.cover_sticker_id)
+        self.cover_sticker_id.and_then(|id| self.stickers.iter().find(|s| s.id == id))
     }
 
     pub fn banner_url(&self) -> String {

@@ -377,9 +377,9 @@ impl Http {
     /// View the source code for [`Guild::create_emoji`] method to see what
     /// fields this requires.
     ///
-    /// **Note**: Requires the [Manage Emojis] permission.
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
-    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn create_emoji(&self, guild_id: u64, map: &Value) -> Result<Emoji> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
@@ -705,6 +705,10 @@ impl Http {
     }
 
     /// Creates a sticker.
+    ///
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn create_sticker<'a, T>(
         &self,
         guild_id: u64,
@@ -1100,6 +1104,10 @@ impl Http {
     }
 
     /// Deletes a sticker from a server.
+    ///
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn delete_sticker(&self, guild_id: u64, sticker_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1634,6 +1642,10 @@ impl Http {
     }
 
     /// Changes a sticker in a guild.
+    ///
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn edit_sticker(
         &self,
         guild_id: u64,

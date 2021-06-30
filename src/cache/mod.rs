@@ -1165,6 +1165,7 @@ mod test {
                     max_members: None,
                     widget_enabled: Some(false),
                     widget_channel_id: None,
+                    stickers: HashMap::new(),
                 },
             }
         };

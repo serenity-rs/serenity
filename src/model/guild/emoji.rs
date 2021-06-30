@@ -57,7 +57,7 @@ impl Emoji {
     /// Deletes the emoji.
     /// This method requires the cache to fetch the guild ID.
     ///
-    /// **Note**: The [Manage Emojis] permission is required.
+    /// **Note**: The [Manage Emojis and Stickers] permission is required.
     ///
     ///
     /// # Examples
@@ -96,7 +96,7 @@ impl Emoji {
     /// or may return [`ModelError::ItemMissing`] if the emoji is not
     /// in the cache.
     ///
-    /// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn delete<T: AsRef<Cache> + AsRef<Http>>(&self, cache_http: T) -> Result<()> {
@@ -111,14 +111,14 @@ impl Emoji {
     /// Edits the emoji by updating it with a new name.
     /// This method requires the cache to fetch the guild ID.
     ///
-    /// **Note**: The [Manage Emojis] permission is required.
+    /// **Note**: The [Manage Emojis and Stickers] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if an invalid name is given.
     ///
-    /// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[cfg(feature = "cache")]
     pub async fn edit<T: AsRef<Cache> + AsRef<Http>>(
         &mut self,
