@@ -71,32 +71,22 @@ jobs:
 
       - name: Build all features
         if: matrix.features == ''
-        env:
-            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo build --all-features
 
       - name: Test all features
         if: matrix.features == ''
-        env:
-            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo test --all-features
 
       - name: Build some features
         if: matrix.features
-        env:
-            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo build --no-default-features --features "${{ matrix.features }}"
 
       - name: Test some features
         if: ${{ !matrix.dont-test && matrix.features }}
-        env:
-            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo test --no-default-features --features "${{ matrix.features }}"
 
       - name: Check minimal versions
         if: matrix.toolchain == 'nightly'
-        env:
-            RUSTFLAGS: -C target-feature=+sse4.2
         run: cargo clean; cargo update -Z minimal-versions; cargo check
 
   MSRV:
@@ -118,8 +108,6 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Check
-        env:
-            RUSTFLAGS: -C target-feature=+avx,+avx2,+sse4.2
         run: cargo check --all-features
 
   doc:
