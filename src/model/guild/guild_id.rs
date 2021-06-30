@@ -414,7 +414,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_emoji(
