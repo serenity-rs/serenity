@@ -16,7 +16,7 @@ pub struct Sticker {
     /// The name of the sticker.
     pub name: String,
     /// Description of the sticker
-    pub description: String,
+    pub description: Option<String>,
     /// For guild stickers, a unicode emoji representing the sticker's
     /// expression. For nitro stickers, a comma-separated list of related
     /// expressions.

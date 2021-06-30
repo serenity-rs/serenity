@@ -242,6 +242,7 @@ pub struct Guild {
     pub widget_enabled: Option<bool>,
     /// The channel id that the widget will generate an invite to, or null if set to no invite
     pub widget_channel_id: Option<ChannelId>,
+    /// All of the guild's custom stickers.
     #[serde(serialize_with = "serialize_gen_map")]
     pub stickers: HashMap<StickerId, Sticker>,
 }

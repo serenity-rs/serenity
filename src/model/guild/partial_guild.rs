@@ -152,6 +152,7 @@ pub struct PartialGuild {
     pub max_members: Option<u64>,
     /// The user permissions in the guild.
     pub permissions: Option<String>,
+    /// All of the guild's custom stickers.
     #[serde(serialize_with = "serialize_stickers", deserialize_with = "deserialize_stickers")]
     pub stickers: HashMap<StickerId, Sticker>,
 }
