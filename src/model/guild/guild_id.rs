@@ -218,7 +218,7 @@ impl GuildId {
     /// Refer to the documentation for [`Guild::create_emoji`] for more
     /// information.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -232,7 +232,7 @@ impl GuildId {
     /// if the name is too long, or if the image is too big.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
     pub async fn create_emoji(
         self,
@@ -320,14 +320,14 @@ impl GuildId {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    /// **Note**: Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if an Emoji with that Id does not exist.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
     pub async fn delete_emoji(
         self,
@@ -408,13 +408,13 @@ impl GuildId {
     /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
     /// enabled.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJIS
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_emoji(

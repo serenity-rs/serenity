@@ -577,7 +577,7 @@ impl Guild {
     /// The name of the emoji must be at least 2 characters long and can only
     /// contain alphanumeric characters and underscores.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -591,7 +591,7 @@ impl Guild {
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
     pub async fn create_emoji(
         &self,
@@ -840,13 +840,13 @@ impl Guild {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
     pub async fn delete_emoji(
         &self,
@@ -974,13 +974,13 @@ impl Guild {
     /// Also see [`Emoji::edit`] if you have the `cache` and `model` features
     /// enabled.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_emoji(

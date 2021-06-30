@@ -312,7 +312,7 @@ impl PartialGuild {
     /// Refer to the documentation for [`Guild::create_emoji`] for more
     /// information.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -327,7 +327,7 @@ impl PartialGuild {
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
     pub async fn create_emoji(
         &self,
@@ -542,14 +542,14 @@ impl PartialGuild {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if an emoji with that Id does not exist in the guild.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
     pub async fn delete_emoji(
         &self,
@@ -647,14 +647,14 @@ impl PartialGuild {
     /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
     /// enabled.
     ///
-    /// Requires the [Manage Emojis and Stickers] permission.
+    /// Requires the [Manage Emoji and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if an emoji with that Id does not exist in the guild.
     ///
-    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
+    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
     pub async fn edit_emoji(
         &self,
