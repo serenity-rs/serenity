@@ -1,6 +1,7 @@
 use crate::model::{
     id::{GuildId, StickerId, StickerPackId},
     user::User,
+    utils::{serialize_comma_separated_string, deserialize_comma_separated_string},
 };
 
 /// A sticker sent with a message.
@@ -17,10 +18,14 @@ pub struct Sticker {
     pub name: String,
     /// Description of the sticker
     pub description: Option<String>,
-    /// For guild stickers, a unicode emoji representing the sticker's
-    /// expression. For nitro stickers, a comma-separated list of related
-    /// expressions.
-    pub tags: String,
+    /// For guild stickers, the name of a unicode emoji representing the
+    /// sticker's expression. For standard stickers, a list of
+    /// related expressions.
+    #[serde(
+        serialize_with = "serialize_comma_separated_string",
+        deserialize_with = "deserialize_comma_separated_string"
+    )]
+    pub tags: Vec<String>,
     /// The type of sticker.
     #[serde(rename = "type")]
     pub kind: StickerType,
