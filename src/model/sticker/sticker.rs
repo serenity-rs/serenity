@@ -1,4 +1,6 @@
 #[cfg(feature = "model")]
+use crate::builder::EditSticker;
+#[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
@@ -49,10 +51,50 @@ pub struct Sticker {
 
 #[cfg(feature = "model")]
 impl Sticker {
+    /// Deletes a [`Sticker`] by Id from the guild.
+    ///
+    /// Requires the [Manage Emoji and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission
+    /// to delete the sticker.
+    ///
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
-            self.id.delete(&http, guild_id.0).await
+            guild_id.delete_sticker(&http, self.id).await
+        } else {
+            Err(Error::Model(ModelError::DeleteNitroSticker))
+        }
+    }
+
+    /// Edits a sticker, optionally setting its fields.
+    ///
+    /// Requires the [Manage Emoji and Stickers] permission.
+    ///
+    /// # Examples
+    ///
+    /// Rename a sticker:
+    ///
+    /// ```rust,ignore
+    /// guild.edit_sticker(&context, StickerId(7), |r| r.name("Bun bun meow"));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    #[inline]
+    pub async fn edit_sticker<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
+    where
+        F: FnOnce(&mut EditSticker) -> &mut EditSticker,
+    {
+        if let Some(guild_id) = self.guild_id {
+            guild_id.edit_sticker(&http, self.id, f).await
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
         }

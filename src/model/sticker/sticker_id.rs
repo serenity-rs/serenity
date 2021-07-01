@@ -19,8 +19,8 @@ impl StickerId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
-    pub async fn delete(&self, http: impl AsRef<Http>, guild_id: u64) -> Result<()> {
-        http.as_ref().delete_sticker(guild_id, self.0).await
+    pub async fn delete(&self, http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<()> {
+        guild_id.into().delete_sticker(http, self.0).await
     }
 
     /// Requests the sticker via the REST API to get a [`Sticker`] with all
@@ -44,14 +44,15 @@ impl StickerId {
     /// or if invalid edits are given.
     ///
     /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
-    pub async fn edit<F>(&self, http: impl AsRef<Http>, guild_id: u64, f: F) -> Result<Sticker>
+    pub async fn edit<F>(
+        &self,
+        http: impl AsRef<Http>,
+        guild_id: impl Into<GuildId>,
+        f: F,
+    ) -> Result<Sticker>
     where
         F: FnOnce(&mut EditSticker) -> &mut EditSticker,
     {
-        let mut edit_sticker = EditSticker::default();
-        f(&mut edit_sticker);
-        let map = utils::hashmap_to_json_map(edit_sticker.0);
-
-        http.as_ref().edit_sticker(guild_id, self.0, &map).await
+        guild_id.into().edit_sticker(http, self.0, f).await
     }
 }
