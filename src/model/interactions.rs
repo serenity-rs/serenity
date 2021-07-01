@@ -19,8 +19,8 @@ use crate::utils;
 
 /// Information about an interaction.
 ///
-/// An interaction is sent when a user invokes a slash command and is the same
-/// for slash commands and other future interaction types.
+/// An interaction is sent when a user invokes a slash command, clicks a button,
+/// or other future interaction types.
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct Interaction {
@@ -762,13 +762,15 @@ impl ApplicationCommand {
     ///
     /// When a created [`ApplicationCommand`] is used, the [`InteractionCreate`] event will be emitted.
     ///
-    /// **Note**: Global commands may take up to an hour to become available.
+    /// **Note**: Global commands may take up to an hour to be updated in the user slash commands
+    /// list. If an outdated command data is sent by a user, discord will consider it as an error
+    /// and then will instantly update that command.
     ///
     /// As such, it is recommended that guild application commands be used for testing purposes.
     ///
     /// # Examples
     ///
-    /// Create a simple ping command
+    /// Create a simple ping command:
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
@@ -778,15 +780,15 @@ impl ApplicationCommand {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::{interactions::ApplicationCommand, id::ApplicationId};
     ///
-    /// let _ = ApplicationCommand::create_global_application_command(&http, |a| {
-    ///    a.name("ping")
+    /// let _ = ApplicationCommand::create_global_application_command(&http, |command| {
+    ///    command.name("ping")
     ///     .description("A simple ping command")
     /// })
     /// .await;
     /// # }
     /// ```
     ///
-    /// Create a command that echoes what is inserted
+    /// Create a command that echoes what is inserted:
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
@@ -799,12 +801,12 @@ impl ApplicationCommand {
     ///     id::ApplicationId
     /// };
     ///
-    /// let _ = ApplicationCommand::create_global_application_command(&http, |a| {
-    ///    a.name("echo")
-    ///     .description("What is said is echoed")
-    ///     .create_option(|o| {
-    ///         o.name("to_say")
-    ///          .description("What will be echoed")
+    /// let _ = ApplicationCommand::create_global_application_command(&http, |command| {
+    ///    command.name("echo")
+    ///     .description("Makes the bot send a message")
+    ///     .create_option(|option| {
+    ///         option.name("message")
+    ///          .description("The message to send")
     ///          .kind(ApplicationCommandOptionType::String)
     ///          .required(true)
     ///     })
@@ -838,11 +840,10 @@ impl ApplicationCommand {
         http.as_ref().create_global_application_command(&Value::Object(map)).await
     }
 
-    /// Same as [`create_global_application_command`] but allows
-    /// to create more than one global command per call.
+    /// Overrides all global application commands.
     ///
     /// [`create_global_application_command`]: Self::create_global_application_command
-    pub async fn create_global_application_commands<F>(
+    pub async fn set_global_application_commands<F>(
         http: impl AsRef<Http>,
         f: F,
     ) -> Result<Vec<ApplicationCommand>>

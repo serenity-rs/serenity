@@ -1169,13 +1169,10 @@ impl GuildId {
         http.as_ref().create_guild_application_command(self.0, &Value::Object(map)).await
     }
 
-    /// Same as [`create_application_command`], but allows to create more
-    /// than one command per call.
-    ///
-    /// [`create_application_command`]: Self::create_application_command
+    /// Overrides all guild application commands.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn create_application_commands<F>(
+    pub async fn set_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
@@ -1220,13 +1217,10 @@ impl GuildId {
             .await
     }
 
-    /// Same as [`create_application_command_permission`] but allows to create
-    /// more than one permission per call.
-    ///
-    /// [`create_application_command_permission`]: Self::create_application_command_permission
+    /// Overrides all application commands permissions.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn create_application_commands_permissions<F>(
+    pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
