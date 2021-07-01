@@ -769,7 +769,7 @@ impl GuildId {
         http.as_ref().get_emoji(self.0, emoji_id.0).await
     }
 
-    /// Gets all [`Stickers`]s of this guild via HTTP.
+    /// Gets all [`Sticker`]s of this guild via HTTP.
     ///
     /// # Errors
     ///

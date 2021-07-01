@@ -89,7 +89,7 @@ impl Sticker {
     /// [`Error::Http`]: crate::error::Error::Http
     /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
     #[inline]
-    pub async fn edit_sticker<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
+    pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
     where
         F: FnOnce(&mut EditSticker) -> &mut EditSticker,
     {

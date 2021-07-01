@@ -10,6 +10,11 @@ use crate::internal::prelude::*;
 /// - [`PartialGuild::create_sticker`]
 /// - [`Guild::create_sticker`]
 /// - [`GuildId::create_sticker`]
+///
+/// [`Sticker`]: crate::model::sticker::Sticker
+/// [`PartialGuild::create_sticker`]: crate::model::guild::PartialGuild::create_sticker
+/// [`Guild::create_sticker`]: crate::model::guild::Guild::create_sticker
+/// [`GuildId::create_sticker`]: crate::model::id::GuildId::create_sticker
 #[derive(Clone, Debug, Default)]
 pub struct CreateSticker<'a>(pub HashMap<&'static str, Value>, pub Option<AttachmentType<'a>>);
 

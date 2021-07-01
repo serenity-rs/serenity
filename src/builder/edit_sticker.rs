@@ -7,8 +7,15 @@ use crate::internal::prelude::*;
 /// These are:
 ///
 /// - [`Guild::edit_sticker`]
+/// - [`PartialGuild::edit_sticker`]
 /// - [`GuildId::edit_sticker`]
 /// - [`Sticker::edit`]
+///
+/// [`Sticker`]: crate::model::sticker::Sticker
+/// [`PartialGuild::edit_sticker`]: crate::model::guild::PartialGuild::edit_sticker
+/// [`Guild::edit_sticker`]: crate::model::guild::Guild::edit_sticker
+/// [`GuildId::edit_sticker`]: crate::model::id::GuildId::edit_sticker
+/// [`Sticker::edit`]: crate::model::sticker::Sticker::edit
 #[derive(Clone, Debug, Default)]
 pub struct EditSticker(pub HashMap<&'static str, Value>);
 
