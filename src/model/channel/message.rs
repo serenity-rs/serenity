@@ -119,6 +119,7 @@ pub struct Message {
     /// Bit flags describing extra features of the message.
     pub flags: Option<MessageFlags>,
     /// Array of message sticker item objects.
+    #[serde(default)]
     pub sticker_items: Vec<StickerItem>,
     /// The message that was replied to using this message.
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recusion
