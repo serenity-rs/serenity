@@ -320,7 +320,7 @@ pub fn deserialize_comma_separated_string<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<String>, D::Error> {
     let str_sequence = String::deserialize(deserializer)?;
-    let vec = str_sequence.split(',').map(|item| item.trim().to_owned()).collect();
+    let vec = str_sequence.split(", ").map(str::to_owned).collect();
 
     Ok(vec)
 }
@@ -329,7 +329,7 @@ pub fn serialize_comma_separated_string<S: Serializer>(
     vec: &Vec<String>,
     serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
-    serializer.serialize_str(&vec.join(" "))
+    serializer.serialize_str(&vec.join(", "))
 }
 
 pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
