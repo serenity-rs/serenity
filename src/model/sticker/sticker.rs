@@ -43,7 +43,10 @@ pub struct Sticker {
     pub available: bool,
     /// Id of the guild that owns this sticker.
     pub guild_id: Option<GuildId>,
-    /// User that uploaded the sticker.
+    /// User that uploaded the sticker. This will be `None` if the current user
+    /// does not have the [Manage Emoji and Stickers] permission.
+    ///
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
     pub user: Option<User>,
     /// A sticker's sort order within a pack.
     pub sort_value: Option<u64>,

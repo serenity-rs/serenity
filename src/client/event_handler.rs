@@ -237,6 +237,17 @@ pub trait EventHandler: Send + Sync {
     #[cfg(not(feature = "cache"))]
     async fn guild_role_update(&self, _ctx: Context, _guild_id: GuildId, _new_data: Role) {}
 
+    /// Dispatched when the stickers are updated.
+    ///
+    /// Provides the guild's id and the new state of the stickers in the guild.
+    async fn guild_stickers_update(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _current_state: HashMap<StickerId, Sticker>,
+    ) {
+    }
+
     /// Dispatched when a guild became unavailable.
     ///
     /// Provides the guild's id.
