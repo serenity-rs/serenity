@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::Value;
 
-use crate::model::interactions::ApplicationCommandPermissionType;
+use crate::model::interactions::application_command::ApplicationCommandPermissionType;
 use crate::utils;
 
 /// A builder for creating several [`ApplicationCommandPermission`].

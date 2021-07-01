@@ -29,7 +29,7 @@ use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
 #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-use crate::model::prelude::InteractionType;
+use crate::model::interactions::{InteractionType, Interaction, message_component::MessageComponentInteraction};
 use crate::CacheAndHttp;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
@@ -229,8 +229,8 @@ impl ShardRunner {
             },
             #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
             Event::InteractionCreate(ref interaction_event) => {
-                if interaction_event.interaction.kind == InteractionType::MessageComponent {
-                    let mut interaction = LazyArc::new(&interaction_event.interaction);
+                if interaction_event.interaction.kind() == InteractionType::MessageComponent {
+                    let mut interaction = LazyArc::new(&interaction_event.interaction.message_component.expect("expected message component interaction"));
                     retain(&mut self.component_interaction_filters, |f| {
                         f.send_interaction(&mut interaction)
                     });

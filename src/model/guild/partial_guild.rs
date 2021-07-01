@@ -37,7 +37,7 @@ use crate::{
         CreateApplicationCommands,
         CreateApplicationCommandsPermissions,
     },
-    model::interactions::ApplicationCommand,
+    model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
 };
 
 /// Partial information about a [`Guild`]. This does not include information

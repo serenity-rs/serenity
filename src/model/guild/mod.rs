@@ -69,7 +69,7 @@ use crate::{
         CreateApplicationCommands,
         CreateApplicationCommandsPermissions,
     },
-    model::interactions::ApplicationCommand,
+    model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
 };
 
 /// A representation of a banning of a user.

@@ -36,6 +36,8 @@ use crate::constants;
 use crate::http::routing::Route;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission};
 
 /// A builder implementing [`Future`] building a [`Http`] client to perform
 /// requests to Discord's HTTP API. If you do not need to use a proxy or do not

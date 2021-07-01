@@ -5,6 +5,8 @@ use serde_json::Value;
 
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::interactions::{Interaction, application_command::ApplicationCommand};
 use crate::model::prelude::*;
 
 /// The core trait for handling events by serenity.
@@ -422,13 +424,17 @@ pub trait EventHandler: Send + Sync {
     ) {
     }
 
-    /// Dispatched when an interaction is created (e.g a slash command was used
-    /// or a button was clicked).
+    /// Dispatched when an interaction is created (e.g a slash command was used or a button was clicked).
     ///
     /// Provides the created interaction.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    async fn interaction_create(&self, _ctx: Context, _interaction: Interaction) {}
+    async fn interaction_create(
+        &self,
+        _ctx: Context,
+        _interaction: Interaction,
+    ) {
+    }
 
     /// Dispatched when a guild integration is created.
     ///

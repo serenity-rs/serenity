@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::internal::prelude::*;
 use crate::model::channel::ReactionType;
-use crate::model::prelude::ButtonStyle;
+use crate::model::interactions::message_component::ButtonStyle;
 use crate::utils;
 
 /// A builder for creating several [`ActionRow`]s.

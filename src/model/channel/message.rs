@@ -29,7 +29,7 @@ use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "unstable_discord_api")]
-use crate::model::interactions::MessageInteraction;
+use crate::model::interactions::{MessageInteraction, message_component::Component};
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::U64Visitor;

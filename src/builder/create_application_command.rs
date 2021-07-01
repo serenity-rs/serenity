@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde_json::{json, Value};
 
-use crate::{model::interactions::ApplicationCommandOptionType, utils};
+use crate::{model::interactions::application_command::ApplicationCommandOptionType, utils};
 
 /// A builder for creating a new [`ApplicationCommandOption`].
 ///
