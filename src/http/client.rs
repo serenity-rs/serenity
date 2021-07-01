@@ -2595,7 +2595,7 @@ impl Http {
         from_value(value).map_err(From::from)
     }
 
-    /// Retrieves a list of stickers in a [`Guild`].
+    /// Retrieves a single sticker in a [`Guild`].
     pub async fn get_guild_sticker(&self, guild_id: u64, sticker_id: u64) -> Result<Sticker> {
         let mut value = self
             .request(Request {

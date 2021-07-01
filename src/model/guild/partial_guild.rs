@@ -7,11 +7,13 @@ use tracing::{error, warn};
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateChannel,
+    CreateSticker,
     EditGuild,
     EditGuildWelcomeScreen,
     EditGuildWidget,
     EditMember,
     EditRole,
+    EditSticker,
 };
 #[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
 use crate::cache::Cache;
@@ -524,6 +526,34 @@ impl PartialGuild {
         self.id.create_role(&http, f).await
     }
 
+    /// Creates a new sticker in the guild with the data set, if any.
+    ///
+    /// **Note**: Requires the [Manage Emoji and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
+    /// if the current user does not have permission to manage roles.
+    ///
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    pub async fn create_sticker<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Sticker>
+    where
+        for<'a, 'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
+    {
+        #[cfg(feature = "cache")]
+        {
+            if cache_http.cache().is_some() {
+                let req = Permissions::MANAGE_EMOJI_AND_STICKERS;
+
+                if !self.has_perms(&cache_http, req).await {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+            }
+        }
+
+        self.id.create_sticker(cache_http.http(), f).await
+    }
+
     /// Deletes the current guild if the current user is the owner of the
     /// guild.
     ///
@@ -596,6 +626,25 @@ impl PartialGuild {
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
         self.id.delete_role(&http, role_id).await
+    }
+
+    /// Deletes a [`Sticker`] by Id from the guild.
+    ///
+    /// Requires the [Manage Emoji and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission
+    /// to delete the sticker.
+    ///
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    #[inline]
+    pub async fn delete_sticker(
+        &self,
+        http: impl AsRef<Http>,
+        sticker_id: impl Into<StickerId>,
+    ) -> Result<()> {
+        self.id.delete_sticker(&http, sticker_id).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -772,6 +821,37 @@ impl PartialGuild {
         position: u64,
     ) -> Result<Vec<Role>> {
         self.id.edit_role_position(&http, role_id, position).await
+    }
+
+    /// Edits a sticker, optionally setting its fields.
+    ///
+    /// Requires the [Manage Emoji and Stickers] permission.
+    ///
+    /// # Examples
+    ///
+    /// Rename a sticker:
+    ///
+    /// ```rust,ignore
+    /// guild.edit_sticker(&context, StickerId(7), |r| r.name("Bun bun meow"));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    #[inline]
+    pub async fn edit_sticker<F>(
+        &self,
+        http: impl AsRef<Http>,
+        sticker_id: impl Into<StickerId>,
+        f: F,
+    ) -> Result<Sticker>
+    where
+        F: FnOnce(&mut EditSticker) -> &mut EditSticker,
+    {
+        self.id.edit_sticker(&http, sticker_id, f).await
     }
 
     /// Edits the [`GuildWelcomeScreen`].

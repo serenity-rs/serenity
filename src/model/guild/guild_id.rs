@@ -3,7 +3,15 @@ use futures::stream::Stream;
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditGuildWelcomeScreen, EditGuildWidget, EditMember, EditRole};
+use crate::builder::{
+    CreateSticker,
+    EditGuild,
+    EditGuildWelcomeScreen,
+    EditGuildWidget,
+    EditMember,
+    EditRole,
+    EditSticker,
+};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -303,6 +311,35 @@ impl GuildId {
         Ok(role)
     }
 
+    /// Creates a new sticker in the guild with the data set, if any.
+    ///
+    /// **Note**: Requires the [Manage Emoji and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid data is given.
+    ///
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    #[inline]
+    pub async fn create_sticker<F>(self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
+    where
+        for<'a, 'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
+    {
+        let mut create_sticker = CreateSticker::default();
+        f(&mut create_sticker);
+        let map = utils::hashmap_to_json_map(create_sticker.0);
+
+        let file = match create_sticker.1 {
+            Some(f) => f,
+            None => return Err(Error::Model(ModelError::NoStickerFileSet)),
+        };
+
+        let sticker = http.as_ref().create_sticker(self.0, &map, file).await?;
+
+        Ok(sticker)
+    }
+
     /// Deletes the current guild if the current account is the owner of the
     /// guild.
     ///
@@ -376,6 +413,25 @@ impl GuildId {
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
         http.as_ref().delete_role(self.0, role_id.into().0).await
+    }
+
+    /// Deletes a [`Sticker`] by Id from the guild.
+    ///
+    /// **Note**: Requires the [Manage Emoji and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if a sticker with that Id does not exist.
+    ///
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    #[inline]
+    pub async fn delete_sticker(
+        self,
+        http: impl AsRef<Http>,
+        sticker_id: impl Into<StickerId>,
+    ) -> Result<()> {
+        http.as_ref().delete_sticker(self.0, sticker_id.into().0).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -522,6 +578,41 @@ impl GuildId {
         let map = utils::hashmap_to_json_map(edit_role.0);
 
         http.as_ref().edit_role(self.0, role_id.into().0, &map).await
+    }
+
+    /// Edits a [`Sticker`], optionally setting its fields.
+    ///
+    /// Requires the [Manage Emoji and Stickers] permission.
+    ///
+    /// # Examples
+    ///
+    /// Rename a sticker:
+    ///
+    /// ```rust,ignore
+    /// guild.edit_sticker(&context, StickerId(7), |r| r.name("Bun bun meow"));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    #[inline]
+    pub async fn edit_sticker<F>(
+        &self,
+        http: impl AsRef<Http>,
+        sticker_id: impl Into<StickerId>,
+        f: F,
+    ) -> Result<Sticker>
+    where
+        F: FnOnce(&mut EditSticker) -> &mut EditSticker,
+    {
+        let mut edit_sticker = EditSticker::default();
+        f(&mut edit_sticker);
+        let map = utils::hashmap_to_json_map(edit_sticker.0);
+
+        http.as_ref().edit_sticker(self.0, sticker_id.into().0, &map).await
     }
 
     /// Edits the order of [`Role`]s
@@ -676,6 +767,30 @@ impl GuildId {
     #[inline]
     pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
         http.as_ref().get_emoji(self.0, emoji_id.0).await
+    }
+
+    /// Gets all [`Stickers`]s of this guild via HTTP.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the guild is unavailable.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn stickers(&self, http: impl AsRef<Http>) -> Result<Vec<Sticker>> {
+        http.as_ref().get_guild_stickers(self.0).await
+    }
+
+    /// Gets an [`Sticker`] of this guild by its ID via HTTP.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if an sticker with that Id does not exist.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn sticker(&self, http: impl AsRef<Http>, sticker_id: StickerId) -> Result<Sticker> {
+        http.as_ref().get_guild_sticker(self.0, sticker_id.0).await
     }
 
     /// Gets all integration of the guild.

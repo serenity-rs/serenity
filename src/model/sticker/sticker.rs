@@ -1,8 +1,13 @@
+#[cfg(feature = "model")]
+use crate::http::Http;
+#[cfg(feature = "model")]
+use crate::internal::prelude::*;
 use crate::model::{
     id::{GuildId, StickerId, StickerPackId},
     user::User,
     utils::{deserialize_comma_separated_string, serialize_comma_separated_string},
 };
+use crate::{json::prelude::*, model::prelude::*};
 
 /// A sticker sent with a message.
 ///
@@ -42,16 +47,16 @@ pub struct Sticker {
     pub sort_value: Option<u64>,
 }
 
-/// The smallest amount of data required to render a sticker.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct StickerItem {
-    /// The unique ID given to this sticker.
-    pub id: StickerId,
-    /// The name of the sticker.
-    pub name: String,
-    /// The type of sticker format.
-    pub format_type: StickerFormatType,
+#[cfg(feature = "model")]
+impl Sticker {
+    #[inline]
+    pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
+        if let Some(guild_id) = self.guild_id {
+            self.id.delete(&http, guild_id.0).await
+        } else {
+            Err(Error::Model(ModelError::DeleteNitroSticker))
+        }
+    }
 }
 
 /// Differentiates between sticker types.
