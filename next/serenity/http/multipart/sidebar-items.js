@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Multipart","Holder for multipart body. Contains files and payload_json for creating messages with attachments."]]});

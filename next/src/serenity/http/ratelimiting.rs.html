@@ -633,7 +633,7 @@
     <span class="attribute">#[<span class="ident">instrument</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">perform</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">RatelimitedRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">RatelimitedRequest</span> {
-            <span class="ident">req</span>,
+            <span class="kw-2">mut</span> <span class="ident">req</span>,
         } <span class="op">=</span> <span class="ident">req</span>;
 
         <span class="kw">loop</span> {
@@ -649,7 +649,7 @@
             <span class="comment">// amount.</span>
             <span class="comment">//</span>
             <span class="comment">// This isn&#39;t normally important, but might be for ratelimiting.</span>
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">route</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">route</span>.<span class="ident">deconstruct</span>();
+            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">route</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">route</span>.<span class="ident">clone</span>().<span class="ident">deconstruct</span>();
 
             <span class="comment">// Perform pre-checking here:</span>
             <span class="comment">//</span>
@@ -663,7 +663,7 @@
 
             <span class="ident">bucket</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">pre_hook</span>(<span class="kw-2">&amp;</span><span class="ident">route</span>).<span class="kw">await</span>;
 
-            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">execute</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="comment">// Check if the request got ratelimited by checking for status 429,</span>

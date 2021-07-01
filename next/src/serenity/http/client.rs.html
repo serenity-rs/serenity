@@ -3138,6 +3138,24 @@
 <span id="3138">3138</span>
 <span id="3139">3139</span>
 <span id="3140">3140</span>
+<span id="3141">3141</span>
+<span id="3142">3142</span>
+<span id="3143">3143</span>
+<span id="3144">3144</span>
+<span id="3145">3145</span>
+<span id="3146">3146</span>
+<span id="3147">3147</span>
+<span id="3148">3148</span>
+<span id="3149">3149</span>
+<span id="3150">3150</span>
+<span id="3151">3151</span>
+<span id="3152">3152</span>
+<span id="3153">3153</span>
+<span id="3154">3154</span>
+<span id="3155">3155</span>
+<span id="3156">3156</span>
+<span id="3157">3157</span>
+<span id="3158">3158</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -3150,20 +3168,19 @@
     <span class="ident">task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>},
 };
 
-<span class="kw">use</span> <span class="ident">bytes::buf::Buf</span>;
 <span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
 <span class="kw">use</span> <span class="ident">percent_encoding</span>::{<span class="ident">utf8_percent_encode</span>, <span class="ident">NON_ALPHANUMERIC</span>};
 <span class="kw">use</span> <span class="ident">reqwest</span>::{
-    <span class="ident">header</span>::{<span class="ident">HeaderMap</span> <span class="kw">as</span> <span class="ident">Headers</span>, <span class="ident">HeaderValue</span>, <span class="ident">AUTHORIZATION</span>, <span class="ident">CONTENT_TYPE</span>, <span class="ident">USER_AGENT</span>},
+    <span class="ident">header</span>::{<span class="ident">HeaderMap</span> <span class="kw">as</span> <span class="ident">Headers</span>, <span class="ident">HeaderValue</span>, <span class="ident">CONTENT_TYPE</span>},
     <span class="ident">StatusCode</span>,
     <span class="ident">Url</span>,
 };
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">multipart::Part</span>, <span class="ident">Client</span>, <span class="ident">ClientBuilder</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ReqwestResponse</span>};
+<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">ClientBuilder</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ReqwestResponse</span>};
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">fs::File</span>, <span class="ident">io::AsyncReadExt</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
+    <span class="ident">multipart::Multipart</span>,
     <span class="ident">ratelimiting</span>::{<span class="ident">RatelimitedRequest</span>, <span class="ident">Ratelimiter</span>},
     <span class="ident">request::Request</span>,
     <span class="ident">routing::RouteInfo</span>,
@@ -3173,10 +3190,9 @@
     <span class="ident">HttpError</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::constants</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::routing::Route</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::json</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">to_string</span>, <span class="ident">to_vec</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">to_value</span>, <span class="ident">to_vec</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder implementing [`Future`] building a [`Http`] client to perform</span>
@@ -3433,6 +3449,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">add_member_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>, <span class="ident">role_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::AddMemberRole</span> {
                 <span class="ident">guild_id</span>,
@@ -3461,6 +3478,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GuildBanUser</span> {
                 <span class="ident">delete_message_days</span>: <span class="prelude-val">Some</span>(<span class="ident">delete_message_days</span>),
@@ -3482,6 +3500,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">broadcast_typing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::BroadcastTyping</span> {
                 <span class="ident">channel_id</span>,
@@ -3503,6 +3522,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateChannel</span> {
                 <span class="ident">guild_id</span>,
@@ -3522,6 +3542,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateEmoji</span> {
                 <span class="ident">guild_id</span>,
@@ -3542,6 +3563,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateFollowupMessage</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -3570,6 +3592,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGlobalApplicationCommand</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -3587,6 +3610,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGlobalApplicationCommands</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -3605,6 +3629,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuildApplicationCommands</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -3652,6 +3677,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuild</span>,
         })
@@ -3674,6 +3700,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuildApplicationCommand</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -3699,6 +3726,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuildIntegration</span> {
                 <span class="ident">guild_id</span>,
@@ -3723,6 +3751,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateInteractionResponse</span> {
                 <span class="ident">interaction_id</span>,
@@ -3747,6 +3776,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateInvite</span> {
                 <span class="ident">channel_id</span>,
@@ -3766,6 +3796,7 @@
 
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreatePermission</span> {
                 <span class="ident">channel_id</span>,
@@ -3781,6 +3812,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreatePrivateChannel</span>,
         })
@@ -3796,6 +3828,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateReaction</span> {
                 <span class="comment">// Escape emojis like &#39;#️⃣&#39; that contain a hash</span>
@@ -3813,6 +3846,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::CreateRole</span> {
                     <span class="ident">guild_id</span>,
@@ -3863,6 +3897,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateWebhook</span> {
                 <span class="ident">channel_id</span>,
@@ -3875,6 +3910,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteChannel</span> {
                 <span class="ident">channel_id</span>,
@@ -3887,6 +3923,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">emoji_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteEmoji</span> {
                 <span class="ident">guild_id</span>,
@@ -3906,6 +3943,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteFollowupMessage</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -3922,6 +3960,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_global_application_command</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">command_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteGlobalApplicationCommand</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -3935,6 +3974,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteGuild</span> {
                 <span class="ident">guild_id</span>,
@@ -3953,6 +3993,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteGuildApplicationCommand</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -3967,6 +4008,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_guild_integration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">integration_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteGuildIntegration</span> {
                 <span class="ident">guild_id</span>,
@@ -3980,6 +4022,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_invite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invite</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteInvite</span> {
                 <span class="ident">code</span>,
@@ -3993,6 +4036,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteMessage</span> {
                 <span class="ident">channel_id</span>,
@@ -4006,6 +4050,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteMessages</span> {
                 <span class="ident">channel_id</span>,
@@ -4035,6 +4080,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_message_reactions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteMessageReactions</span> {
                 <span class="ident">channel_id</span>,
@@ -4053,6 +4099,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteMessageReactionEmoji</span> {
                 <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">as_data</span>(),
@@ -4072,6 +4119,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteOriginalInteractionResponse</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -4085,6 +4133,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_permission</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">target_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeletePermission</span> {
                 <span class="ident">channel_id</span>,
@@ -4107,6 +4156,7 @@
 
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteReaction</span> {
                 <span class="comment">// Escape emojis like &#39;#️⃣&#39; that contain a hash</span>
@@ -4123,6 +4173,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">role_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteRole</span> {
                 <span class="ident">guild_id</span>,
@@ -4156,6 +4207,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_webhook</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteWebhook</span> {
                 <span class="ident">webhook_id</span>,
@@ -4187,6 +4239,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_webhook_with_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteWebhookWithToken</span> {
                 <span class="ident">token</span>,
@@ -4202,6 +4255,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditChannel</span> {
                 <span class="ident">channel_id</span>,
@@ -4216,6 +4270,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditEmoji</span> {
                 <span class="ident">guild_id</span>,
@@ -4240,6 +4295,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditFollowupMessage</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -4266,6 +4322,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGlobalApplicationCommand</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -4281,6 +4338,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuild</span> {
                 <span class="ident">guild_id</span>,
@@ -4306,6 +4364,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommand</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -4333,6 +4392,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommandPermission</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommandPermission</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -4359,6 +4419,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommandsPermissions</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -4374,6 +4435,7 @@
 
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildChannels</span> {
                 <span class="ident">guild_id</span>,
@@ -4388,6 +4450,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildWidget</span> {
                 <span class="ident">guild_id</span>,
@@ -4406,6 +4469,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildWelcomeScreen</span> {
                 <span class="ident">guild_id</span>,
@@ -4421,6 +4485,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::EditMember</span> {
                     <span class="ident">guild_id</span>,
@@ -4451,6 +4516,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditMessage</span> {
                 <span class="ident">channel_id</span>,
@@ -4470,41 +4536,19 @@
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
         <span class="ident">new_attachments</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="comment">// Note: if you need to copy this code for a new method, extract this code into a function</span>
-        <span class="comment">// instead and call it in here and in send_files(), to avoid duplication (see Rule Of Three)</span>
-
-        <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">message_id</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">uri</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Url</span>(<span class="ident">uri</span>))<span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">proxy</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">proxy</span> {
-            <span class="ident">url</span>.<span class="ident">set_host</span>(<span class="ident">proxy</span>.<span class="ident">host_str</span>()).<span class="ident">map_err</span>(<span class="ident">HttpError::Url</span>)<span class="question-mark">?</span>;
-            <span class="ident">url</span>.<span class="ident">set_scheme</span>(<span class="ident">proxy</span>.<span class="ident">scheme</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">HttpError::InvalidScheme</span>)<span class="question-mark">?</span>;
-            <span class="ident">url</span>.<span class="ident">set_port</span>(<span class="ident">proxy</span>.<span class="ident">port</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">HttpError::InvalidPort</span>)<span class="question-mark">?</span>;
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">reqwest::multipart::Form::new</span>();
-
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">attachment</span>) <span class="kw">in</span> <span class="ident">new_attachments</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">multipart</span> <span class="op">=</span>
-                <span class="ident">multipart</span>.<span class="ident">part</span>(<span class="ident">i</span>.<span class="ident">to_string</span>(), <span class="ident">attachment</span>.<span class="ident">into_http_form_part</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>).<span class="kw">await</span><span class="question-mark">?</span>);
-        }
-
-        <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">serde_json::to_string</span>(<span class="ident">map</span>)<span class="question-mark">?</span>);
-
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">client</span>
-            .<span class="ident">patch</span>(<span class="ident">url</span>)
-            .<span class="ident">header</span>(<span class="ident">AUTHORIZATION</span>, <span class="ident">HeaderValue::from_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>)<span class="question-mark">?</span>)
-            .<span class="ident">header</span>(<span class="ident">USER_AGENT</span>, <span class="ident">HeaderValue::from_static</span>(<span class="kw-2">&amp;</span><span class="ident">constants::USER_AGENT</span>))
-            .<span class="ident">multipart</span>(<span class="ident">multipart</span>)
-            .<span class="ident">send</span>()
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">status</span>().<span class="ident">is_success</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HttpError::from_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">into</span>());
-        }
-
-        <span class="ident">response</span>.<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">Some</span>(<span class="ident">Multipart</span> {
+                <span class="ident">files</span>: <span class="ident">new_attachments</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="ident">payload_json</span>: <span class="ident">map</span>.<span class="ident">clone</span>(),
+            }),
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::EditMessage</span> {
+                <span class="ident">channel_id</span>,
+                <span class="ident">message_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Crossposts a message by Id.</span>
@@ -4513,6 +4557,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">crosspost_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CrosspostMessage</span> {
                 <span class="ident">channel_id</span>,
@@ -4531,6 +4576,7 @@
 
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">200</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditNickname</span> {
                 <span class="ident">guild_id</span>,
@@ -4548,6 +4594,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetOriginalInteractionResponse</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -4571,6 +4618,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditOriginalInteractionResponse</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -4587,6 +4635,7 @@
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::EditProfile</span>,
             })
@@ -4601,6 +4650,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::EditRole</span> {
                     <span class="ident">guild_id</span>,
@@ -4633,6 +4683,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::EditRolePosition</span> {
                     <span class="ident">guild_id</span>,
@@ -4693,6 +4744,7 @@
 
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditVoiceState</span> {
                 <span class="ident">guild_id</span>,
@@ -4744,6 +4796,7 @@
 
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditVoiceStateMe</span> {
                 <span class="ident">guild_id</span>,
@@ -4789,6 +4842,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_webhook</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditWebhook</span> {
                 <span class="ident">webhook_id</span>,
@@ -4833,6 +4887,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditWebhookWithToken</span> {
                 <span class="ident">token</span>,
@@ -4905,6 +4960,7 @@
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">Some</span>(<span class="ident">headers</span>),
                 <span class="ident">route</span>: <span class="ident">RouteInfo::ExecuteWebhook</span> {
                     <span class="ident">token</span>,
@@ -4939,76 +4995,20 @@
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">reqwest::multipart::Form::new</span>();
-
-        <span class="kw">for</span> (<span class="ident">file_num</span>, <span class="ident">file</span>) <span class="kw">in</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">match</span> <span class="ident">file</span>.<span class="ident">into</span>() {
-                <span class="ident">AttachmentType::Bytes</span> {
-                    <span class="ident">data</span>,
-                    <span class="ident">filename</span>,
-                } <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">part</span>(
-                        <span class="ident">file_num</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">Part::bytes</span>(<span class="ident">data</span>.<span class="ident">into_owned</span>()).<span class="ident">file_name</span>(<span class="ident">filename</span>),
-                    );
-                },
-                <span class="ident">AttachmentType::File</span> {
-                    <span class="ident">file</span>,
-                    <span class="ident">filename</span>,
-                } <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="ident">file</span>.<span class="ident">try_clone</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-                    <span class="ident">multipart</span> <span class="op">=</span>
-                        <span class="ident">multipart</span>.<span class="ident">part</span>(<span class="ident">file_num</span>.<span class="ident">to_string</span>(), <span class="ident">Part::stream</span>(<span class="ident">buf</span>).<span class="ident">file_name</span>(<span class="ident">filename</span>));
-                },
-                <span class="ident">AttachmentType::Path</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span>
-                        <span class="ident">path</span>.<span class="ident">file_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">filename</span><span class="op">|</span> <span class="ident">filename</span>.<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>());
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-                    <span class="ident">file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-                    <span class="kw">let</span> <span class="ident">part</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">filename</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">filename</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Part::bytes</span>(<span class="ident">buf</span>).<span class="ident">file_name</span>(<span class="ident">filename</span>),
-                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Part::bytes</span>(<span class="ident">buf</span>),
-                    };
-
-                    <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">part</span>(<span class="ident">file_num</span>.<span class="ident">to_string</span>(), <span class="ident">part</span>);
-                },
-                <span class="ident">AttachmentType::Image</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">url</span>
-                        .<span class="ident">path_segments</span>()
-                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">segments</span><span class="op">|</span> <span class="ident">segments</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>))
-                        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="ident">url</span>).<span class="ident">send</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">bytes</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">picture</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">bytes</span>.<span class="ident">len</span>()];
-                    <span class="ident">bytes</span>.<span class="ident">copy_to_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">picture</span>[..]);
-                    <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">part</span>(
-                        <span class="ident">file_num</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">Part::bytes</span>(<span class="ident">picture</span>).<span class="ident">file_name</span>(<span class="ident">filename</span>.<span class="ident">to_string</span>()),
-                    );
-                },
-            }
-        }
-
-        <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>);
-
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">client</span>
-            .<span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="ident">Route::webhook_with_token_optioned</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>))
-            .<span class="ident">multipart</span>(<span class="ident">multipart</span>)
-            .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="ident">HeaderValue::from_static</span>(<span class="kw-2">&amp;</span><span class="string">&quot;multipart/form-data&quot;</span>))
-            .<span class="ident">send</span>()
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">status</span>().<span class="ident">is_success</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HttpError::from_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">into</span>());
-        }
-
-        <span class="ident">response</span>.<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>().<span class="kw">await</span>.<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">Some</span>(<span class="ident">Multipart</span> {
+                <span class="ident">files</span>: <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="ident">payload_json</span>: <span class="ident">to_value</span>(<span class="ident">map</span>)<span class="question-mark">?</span>,
+            }),
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::ExecuteWebhook</span> {
+                <span class="ident">token</span>,
+                <span class="ident">wait</span>,
+                <span class="ident">webhook_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits a webhook&#39;s message by Id.</span>
@@ -5023,6 +5023,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditWebhookMessage</span> {
                 <span class="ident">token</span>,
@@ -5042,6 +5043,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteWebhookMessage</span> {
                 <span class="ident">token</span>,
@@ -5059,6 +5061,7 @@
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">None</span>,
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::GetActiveMaintenance</span>,
             })
@@ -5076,6 +5079,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_bans</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ban</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetBans</span> {
                 <span class="ident">guild_id</span>,
@@ -5095,6 +5099,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AuditLogs</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetAuditLogs</span> {
                 <span class="ident">action_type</span>,
@@ -5111,6 +5116,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_bot_gateway</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BotGateway</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetBotGateway</span>,
         })
@@ -5121,6 +5127,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_channel_invites</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetChannelInvites</span> {
                 <span class="ident">channel_id</span>,
@@ -5151,6 +5158,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_channel_webhooks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetChannelWebhooks</span> {
                 <span class="ident">channel_id</span>,
@@ -5163,6 +5171,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetChannel</span> {
                 <span class="ident">channel_id</span>,
@@ -5175,6 +5184,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetChannels</span> {
                 <span class="ident">guild_id</span>,
@@ -5189,6 +5199,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_current_application_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CurrentApplicationInfo</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetCurrentApplicationInfo</span>,
         })
@@ -5199,6 +5210,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_current_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CurrentUser</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetCurrentUser</span>,
         })
@@ -5209,6 +5221,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_emojis</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetEmojis</span> {
                 <span class="ident">guild_id</span>,
@@ -5221,6 +5234,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">emoji_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetEmoji</span> {
                 <span class="ident">guild_id</span>,
@@ -5234,6 +5248,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_gateway</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Gateway</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGateway</span>,
         })
@@ -5246,6 +5261,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_global_application_commands</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGlobalApplicationCommands</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -5263,6 +5279,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGlobalApplicationCommand</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -5276,6 +5293,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuild</span> {
                 <span class="ident">guild_id</span>,
@@ -5288,6 +5306,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_with_counts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildWithCounts</span> {
                 <span class="ident">guild_id</span>,
@@ -5305,6 +5324,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildApplicationCommands</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -5324,6 +5344,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildApplicationCommand</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -5343,6 +5364,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommandPermission</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildApplicationCommandsPermissions</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -5362,6 +5384,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommandPermission</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildApplicationCommandPermissions</span> {
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
@@ -5378,6 +5401,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_embed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildEmbed</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildWidget</span> {
                 <span class="ident">guild_id</span>,
@@ -5390,6 +5414,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_widget</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWidget</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildWidget</span> {
                 <span class="ident">guild_id</span>,
@@ -5402,6 +5427,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_preview</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPreview</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildPreview</span> {
                 <span class="ident">guild_id</span>,
@@ -5414,6 +5440,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_welcome_screen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWelcomeScreen</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildWelcomeScreen</span> {
                 <span class="ident">guild_id</span>,
@@ -5426,6 +5453,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_integrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Integration</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildIntegrations</span> {
                 <span class="ident">guild_id</span>,
@@ -5438,6 +5466,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_invites</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildInvites</span> {
                 <span class="ident">guild_id</span>,
@@ -5455,6 +5484,7 @@
 
         <span class="self">self</span>.<span class="ident">request</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildVanityUrl</span> {
                 <span class="ident">guild_id</span>,
@@ -5484,6 +5514,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">None</span>,
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildMembers</span> {
                     <span class="ident">after</span>,
@@ -5520,6 +5551,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildPruneCount</span> {
                 <span class="ident">days</span>: <span class="ident">req</span>.<span class="ident">days</span>,
@@ -5534,6 +5566,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_regions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VoiceRegion</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildRegions</span> {
                 <span class="ident">guild_id</span>,
@@ -5547,6 +5580,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">None</span>,
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildRoles</span> {
                     <span class="ident">guild_id</span>,
@@ -5589,6 +5623,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_webhooks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildWebhooks</span> {
                 <span class="ident">guild_id</span>,
@@ -5637,6 +5672,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuilds</span> {
                 <span class="ident">after</span>,
@@ -5656,6 +5692,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetInvite</span> {
                 <span class="ident">code</span>,
@@ -5670,6 +5707,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">None</span>,
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::GetMember</span> {
                     <span class="ident">guild_id</span>,
@@ -5691,6 +5729,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetMessage</span> {
                 <span class="ident">channel_id</span>,
@@ -5704,6 +5743,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetMessages</span> {
                 <span class="ident">query</span>: <span class="ident">query</span>.<span class="ident">to_owned</span>(),
@@ -5717,6 +5757,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_pins</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetPins</span> {
                 <span class="ident">channel_id</span>,
@@ -5738,6 +5779,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetReactionUsers</span> {
                 <span class="ident">after</span>,
@@ -5757,6 +5799,7 @@
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">None</span>,
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::GetUnresolvedIncidents</span>,
             })
@@ -5777,6 +5820,7 @@
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">request</span>(<span class="ident">Request</span> {
                 <span class="ident">body</span>: <span class="prelude-val">None</span>,
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
                 <span class="ident">headers</span>: <span class="prelude-val">None</span>,
                 <span class="ident">route</span>: <span class="ident">RouteInfo::GetUpcomingMaintenances</span>,
             })
@@ -5794,6 +5838,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetUser</span> {
                 <span class="ident">user_id</span>,
@@ -5806,6 +5851,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_dm_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetUserDmChannels</span>,
         })
@@ -5816,6 +5862,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_voice_regions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VoiceRegion</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetVoiceRegions</span>,
         })
@@ -5844,6 +5891,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_webhook</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetWebhook</span> {
                 <span class="ident">webhook_id</span>,
@@ -5875,6 +5923,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_webhook_with_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetWebhookWithToken</span> {
                 <span class="ident">token</span>,
@@ -5898,6 +5947,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::KickMember</span> {
                 <span class="ident">guild_id</span>,
@@ -5912,6 +5962,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">leave_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::LeaveGuild</span> {
                 <span class="ident">guild_id</span>,
@@ -5936,41 +5987,18 @@
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages&quot;</span>, <span class="ident">channel_id</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">uri</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">url</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Url</span>(<span class="ident">uri</span>)),
-        };
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">proxy</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">proxy</span> {
-            <span class="ident">url</span>.<span class="ident">set_host</span>(<span class="ident">proxy</span>.<span class="ident">host_str</span>()).<span class="ident">map_err</span>(<span class="ident">HttpError::Url</span>)<span class="question-mark">?</span>;
-            <span class="ident">url</span>.<span class="ident">set_scheme</span>(<span class="ident">proxy</span>.<span class="ident">scheme</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">HttpError::InvalidScheme</span>)<span class="question-mark">?</span>;
-            <span class="ident">url</span>.<span class="ident">set_port</span>(<span class="ident">proxy</span>.<span class="ident">port</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">HttpError::InvalidPort</span>)<span class="question-mark">?</span>;
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">reqwest::multipart::Form::new</span>();
-
-        <span class="kw">for</span> (<span class="ident">file_num</span>, <span class="ident">file</span>) <span class="kw">in</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>
-                .<span class="ident">part</span>(<span class="ident">file_num</span>.<span class="ident">to_string</span>(), <span class="ident">file</span>.<span class="ident">into</span>().<span class="ident">into_http_form_part</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>).<span class="kw">await</span><span class="question-mark">?</span>);
-        }
-
-        <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>);
-
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">client</span>
-            .<span class="ident">post</span>(<span class="ident">url</span>)
-            .<span class="ident">header</span>(<span class="ident">AUTHORIZATION</span>, <span class="ident">HeaderValue::from_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>)<span class="question-mark">?</span>)
-            .<span class="ident">header</span>(<span class="ident">USER_AGENT</span>, <span class="ident">HeaderValue::from_static</span>(<span class="kw-2">&amp;</span><span class="ident">constants::USER_AGENT</span>))
-            .<span class="ident">multipart</span>(<span class="ident">multipart</span>)
-            .<span class="ident">send</span>()
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">status</span>().<span class="ident">is_success</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HttpError::from_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">into</span>());
-        }
-
-        <span class="ident">response</span>.<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">Some</span>(<span class="ident">Multipart</span> {
+                <span class="ident">files</span>: <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                <span class="ident">payload_json</span>: <span class="ident">to_value</span>(<span class="ident">map</span>)<span class="question-mark">?</span>,
+            }),
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::CreateMessage</span> {
+                <span class="ident">channel_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Sends a message to a channel.</span>
@@ -5979,6 +6007,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateMessage</span> {
                 <span class="ident">channel_id</span>,
@@ -5991,6 +6020,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pin_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::PinMessage</span> {
                 <span class="ident">channel_id</span>,
@@ -6004,6 +6034,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_ban</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::RemoveBan</span> {
                 <span class="ident">guild_id</span>,
@@ -6027,6 +6058,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::RemoveMemberRole</span> {
                 <span class="ident">guild_id</span>,
@@ -6049,6 +6081,7 @@
 
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::StartGuildPrune</span> {
                 <span class="ident">days</span>: <span class="ident">req</span>.<span class="ident">days</span>,
@@ -6062,6 +6095,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_integration_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">integration_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::StartIntegrationSync</span> {
                 <span class="ident">guild_id</span>,
@@ -6113,6 +6147,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">unpin_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::UnpinMessage</span> {
                 <span class="ident">channel_id</span>,
@@ -6211,9 +6246,10 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">instrument</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReqwestResponse</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReqwestResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ratelimiter_disabled</span> {
-            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="self">self</span>.<span class="ident">proxy</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
+                <span class="ident">req</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="self">self</span>.<span class="ident">proxy</span>.<span class="ident">as_ref</span>()).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">execute</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">ratelimiting_req</span> <span class="op">=</span> <span class="ident">RatelimitedRequest::from</span>(<span class="ident">req</span>);
