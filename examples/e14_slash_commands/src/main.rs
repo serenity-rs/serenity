@@ -5,6 +5,7 @@ use serenity::{
     client::bridge::gateway::GatewayIntents,
     model::{
         gateway::Ready,
+        id::GuildId,
         interactions::{
             ApplicationCommand,
             ApplicationCommandInteractionDataOptionValue,
