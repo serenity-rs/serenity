@@ -500,6 +500,7 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
+<span id="503">503</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -925,7 +926,8 @@
     ) {
     }
 
-    <span class="doccomment">/// Dispatched when a user used a slash command.</span>
+    <span class="doccomment">/// Dispatched when an interaction is created (e.g a slash command was used</span>
+    <span class="doccomment">/// or a button was clicked).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the created interaction.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>

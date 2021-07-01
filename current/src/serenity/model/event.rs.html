@@ -4003,7 +4003,7 @@
     <span class="ident">VoiceServerUpdate</span>(<span class="ident">VoiceServerUpdateEvent</span>),
     <span class="doccomment">/// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].</span>
     <span class="ident">WebhookUpdate</span>(<span class="ident">WebhookUpdateEvent</span>),
-    <span class="doccomment">/// A user used a slash command.</span>
+    <span class="doccomment">/// An interaction was created.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">InteractionCreate</span>(<span class="ident">InteractionCreateEvent</span>),
@@ -4358,7 +4358,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`WebhookUpdateEvent`].</span>
     <span class="ident">WebhookUpdate</span>,
-    <span class="doccomment">/// Indicator that a slash command was received.</span>
+    <span class="doccomment">/// Indicator that an interaction was created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`InteractionCreateEvent`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>

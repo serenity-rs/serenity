@@ -3232,10 +3232,6 @@
 <span id="3232">3232</span>
 <span id="3233">3233</span>
 <span id="3234">3234</span>
-<span id="3235">3235</span>
-<span id="3236">3236</span>
-<span id="3237">3237</span>
-<span id="3238">3238</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -3873,13 +3869,12 @@
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_application_command</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Same as [`create_application_command`], but allows to create more</span>
-    <span class="doccomment">/// than one command per call.</span>
+    <span class="doccomment">/// Overrides all guild application commands.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`create_application_command`]: Self::create_application_command</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
@@ -3887,7 +3882,7 @@
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommands</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommands</span>,
     {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_application_commands</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">set_application_commands</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a guild specific [`ApplicationCommandPermission`].</span>
@@ -3911,13 +3906,10 @@
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_application_command_permission</span>(<span class="ident">http</span>, <span class="ident">command_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Same as [`create_application_command_permission`] but allows to create</span>
-    <span class="doccomment">/// more than one permission per call.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create_application_command_permission`]: Self::create_application_command_permission</span>
+    <span class="doccomment">/// Overrides all application commands permissions.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
@@ -3927,7 +3919,7 @@
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandsPermissions</span>,
         ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandsPermissions</span>,
     {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_application_commands_permissions</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">set_application_commands_permissions</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get all guild application commands.</span>

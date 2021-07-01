@@ -3277,7 +3277,7 @@
         <span class="self">Self</span><span class="ident">::_new</span>().<span class="ident">token</span>(<span class="ident">token</span>)
     }
 
-    <span class="doccomment">/// Sets the application_id to use slash commands.</span>
+    <span class="doccomment">/// Sets the application_id to use interactions.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">application_id</span>);
@@ -3364,7 +3364,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="kw">let</span> <span class="ident">application_id</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">application_id</span>
-                .<span class="ident">expect</span>(<span class="string">&quot;Expected application Id in order to use slash commands&quot;</span>);
+                .<span class="ident">expect</span>(<span class="string">&quot;Expected application Id in order to use interacions features&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">take</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());

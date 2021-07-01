@@ -1516,12 +1516,6 @@
 <span id="1516">1516</span>
 <span id="1517">1517</span>
 <span id="1518">1518</span>
-<span id="1519">1519</span>
-<span id="1520">1520</span>
-<span id="1521">1521</span>
-<span id="1522">1522</span>
-<span id="1523">1523</span>
-<span id="1524">1524</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2694,13 +2688,10 @@
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_guild_application_command</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value::Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Same as [`create_application_command`], but allows to create more</span>
-    <span class="doccomment">/// than one command per call.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create_application_command`]: Self::create_application_command</span>
+    <span class="doccomment">/// Overrides all guild application commands.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
@@ -2745,13 +2736,10 @@
             .<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Same as [`create_application_command_permission`] but allows to create</span>
-    <span class="doccomment">/// more than one permission per call.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create_application_command_permission`]: Self::create_application_command_permission</span>
+    <span class="doccomment">/// Overrides all application commands permissions.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
