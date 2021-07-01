@@ -672,12 +672,12 @@ impl ApplicationCommand {
     /// Can also return an [`Error::Json`] if there is an error in deserializing
     /// the response.
     ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
     /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    /// [`choices`]: crate::model::interactions::ApplicationCommandOption::choices
+    /// [`choices`]: crate::model::interactions::application_command::ApplicationCommandOption::choices
     pub async fn create_global_application_command<F>(
         http: impl AsRef<Http>,
         f: F,

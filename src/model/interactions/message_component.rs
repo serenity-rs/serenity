@@ -530,7 +530,7 @@ pub struct SelectMenuOption {
     pub default: bool,
 }
 
-/// The [`Interaction::message`] field.
+/// The [`MessageComponentInteraction::message`] field.
 #[derive(Clone, Debug, Deserialize)]
 pub enum InteractionMessage {
     Regular(Message),

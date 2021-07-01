@@ -7,7 +7,7 @@ use crate::utils;
 
 /// A builder for creating several [`ApplicationCommandPermission`].
 ///
-/// [`ApplicationCommandPermission`]: crate::model::interactions::ApplicationCommandPermission
+/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
 /// [`kind`]: Self::kind
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommandsPermissions(pub Vec<Value>);
@@ -59,7 +59,7 @@ impl CreateApplicationCommandsPermissions {
 }
 /// A builder for creating an [`ApplicationCommandPermission`].
 ///
-/// [`ApplicationCommandPermission`]: crate::model::interactions::ApplicationCommandPermission
+/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
 /// [`kind`]: Self::kind
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommandPermissions(pub HashMap<&'static str, Value>);
@@ -121,7 +121,7 @@ impl CreateApplicationCommandPermissions {
 
 /// A builder for creating several [`ApplicationCommandPermissionData`].
 ///
-/// [`ApplicationCommandPermissionData`]: crate::model::interactions::ApplicationCommandPermissionData
+/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData
 /// [`kind`]: Self::kind
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommandPermissionsData(pub HashMap<&'static str, Value>);

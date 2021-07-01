@@ -181,6 +181,8 @@ pub struct MessageInteraction {
     #[serde(rename = "type")]
     pub kind: InteractionType,
     /// The name of the [`ApplicationCommand`].
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
     pub name: String,
     /// The user who invoked the interaction.
     pub user: User,
