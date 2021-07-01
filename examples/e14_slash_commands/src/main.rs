@@ -30,7 +30,8 @@ impl EventHandler for Handler {
             let content = match command.data.name.as_str() {
                 "ping" => "Hey, I'm alive!".to_string(),
                 "id" => {
-                    let options = data
+                    let options = command
+                        .data
                         .options
                         .get(0)
                         .expect("Expected user option")
@@ -49,7 +50,7 @@ impl EventHandler for Handler {
                 _ => "not implemented :(".to_string(),
             };
 
-            if let Err(why) = interaction
+            if let Err(why) = command
                 .create_interaction_response(&ctx.http, |response| {
                     response
                         .kind(InteractionResponseType::ChannelMessageWithSource)
