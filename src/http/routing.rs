@@ -286,6 +286,10 @@ pub enum Route {
     GuildsIdWelcomeScreen(u64),
     /// Route for the `/invites/:code` path.
     InvitesCode,
+    /// Route for the `/sticker-packs` path.
+    StickerPacks,
+    /// Route for the `/stickers/:sticker_id` path.
+    StickersId,
     /// Route for the `/users/:user_id` path.
     UsersId,
     /// Route for the `/users/@me` path.
@@ -688,6 +692,14 @@ impl Route {
 
     pub fn status_maintenances_upcoming() -> &'static str {
         status!("/scheduled-maintenances/upcoming.json")
+    }
+
+    pub fn sticker(sticker_id: u64) -> String {
+        format!(api!("/stickers/{}"), sticker_id)
+    }
+
+    pub fn sticker_packs() -> &'static str {
+        api!("/sticker-packs")
     }
 
     pub fn user<D: Display>(target: D) -> String {
@@ -1284,6 +1296,10 @@ pub enum RouteInfo<'a> {
         reaction: String,
     },
     GetSticker {
+        sticker_id: u64,
+    },
+    GetStickerPacks,
+    GetGuildSticker {
         guild_id: u64,
         sticker_id: u64,
     },
@@ -2112,6 +2128,14 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdRoles(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
             ),
+            RouteInfo::GetGuildSticker {
+                guild_id,
+                sticker_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdStickersId(guild_id),
+                Cow::from(Route::guild_sticker(guild_id, sticker_id)),
+            ),
             RouteInfo::GetGuildStickers {
                 guild_id,
             } => (
@@ -2195,13 +2219,11 @@ impl<'a> RouteInfo<'a> {
                 )),
             ),
             RouteInfo::GetSticker {
-                guild_id,
                 sticker_id,
-            } => (
-                LightMethod::Get,
-                Route::GuildsIdStickers(guild_id),
-                Cow::from(Route::guild_sticker(guild_id, sticker_id)),
-            ),
+            } => (LightMethod::Get, Route::StickersId, Cow::from(Route::sticker(sticker_id))),
+            RouteInfo::GetStickerPacks => {
+                (LightMethod::Get, Route::StickerPacks, Cow::from(Route::sticker_packs()))
+            },
             RouteInfo::GetUnresolvedIncidents => {
                 (LightMethod::Get, Route::None, Cow::from(Route::status_incidents_unresolved()))
             },

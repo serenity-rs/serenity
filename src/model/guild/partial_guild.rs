@@ -26,6 +26,7 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::json::{from_number, prelude::*};
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
     builder::{
@@ -37,10 +38,6 @@ use crate::{
     model::interactions::ApplicationCommand,
 };
 use crate::{json::from_value, model::prelude::*};
-use crate::{
-    json::{from_number, prelude::*},
-    model::utils::{deserialize_emojis, deserialize_roles},
-};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.

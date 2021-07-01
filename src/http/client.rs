@@ -2560,8 +2560,8 @@ impl Http {
             .await?;
 
         if let Some(array) = value.as_array_mut() {
-            for role in array {
-                if let Some(map) = role.as_object_mut() {
+            for sticker in array {
+                if let Some(map) = sticker.as_object_mut() {
                     map.insert("guild_id".to_string(), from_number(guild_id));
                 }
             }
@@ -2590,6 +2590,28 @@ impl Http {
                     map.insert("guild_id".to_string(), from_number(guild_id));
                 }
             }
+        }
+
+        from_value(value).map_err(From::from)
+    }
+
+    /// Retrieves a list of stickers in a [`Guild`].
+    pub async fn get_guild_sticker(&self, guild_id: u64, sticker_id: u64) -> Result<Sticker> {
+        let mut value = self
+            .request(Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::GetGuildSticker {
+                    guild_id,
+                    sticker_id,
+                },
+            })
+            .await?
+            .json::<Value>()
+            .await?;
+
+        if let Some(map) = value.as_object_mut() {
+            map.insert("guild_id".to_string(), from_number(guild_id));
         }
 
         from_value(value).map_err(From::from)
@@ -2747,6 +2769,25 @@ impl Http {
         .await
     }
 
+    /// Retrieves a list of all nitro sticker packs.
+    pub async fn get_nitro_stickers(&self) -> Result<Vec<StickerPack>> {
+        #[derive(Deserialize)]
+        struct StickerPacks {
+            sticker_packs: Vec<StickerPack>,
+        }
+
+        self.request(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetStickerPacks,
+        })
+        .await?
+        .json::<StickerPacks>()
+        .await
+        .map(|s| s.sticker_packs)
+        .map_err(From::from)
+    }
+
     /// Gets all pins of a channel.
     pub async fn get_pins(&self, channel_id: u64) -> Result<Vec<Message>> {
         self.fire(Request {
@@ -2781,6 +2822,18 @@ impl Http {
                 limit,
                 message_id,
                 reaction,
+            },
+        })
+        .await
+    }
+
+    /// Gets a sticker.
+    pub async fn get_sticker(&self, sticker_id: u64) -> Result<Sticker> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetSticker {
+                sticker_id,
             },
         })
         .await

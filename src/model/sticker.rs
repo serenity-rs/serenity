@@ -1,7 +1,7 @@
 use crate::model::{
     id::{GuildId, StickerId, StickerPackId},
     user::User,
-    utils::{serialize_comma_separated_string, deserialize_comma_separated_string},
+    utils::{deserialize_comma_separated_string, serialize_comma_separated_string},
 };
 
 /// A sticker sent with a message.
