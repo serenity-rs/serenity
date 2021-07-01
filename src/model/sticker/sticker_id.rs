@@ -5,8 +5,7 @@ use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl StickerId {

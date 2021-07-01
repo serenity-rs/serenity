@@ -4,12 +4,12 @@ use crate::builder::EditSticker;
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+use crate::model::prelude::*;
 use crate::model::{
     id::{GuildId, StickerId, StickerPackId},
     user::User,
     utils::{deserialize_comma_separated_string, serialize_comma_separated_string},
 };
-use crate::{model::prelude::*};
 
 /// A sticker sent with a message.
 ///
