@@ -11,16 +11,7 @@ use crate::internal::prelude::*;
 ///
 /// - [`PartialGuild::create_sticker`]
 /// - [`Guild::create_sticker`]
-/// - [`Guild::edit_sticker`]
 /// - [`GuildId::create_sticker`]
-/// - [`GuildId::edit_sticker`]
-/// - [`Sticker::edit`]
-///
-/// [`PartialGuild::create_role`]: crate::model::guild::PartialGuild::create_role
-/// [`Guild::create_role`]: crate::model::guild::Guild::create_role
-/// [`Guild::edit_role`]: crate::model::guild::Guild::edit_role
-/// [`GuildId::create_role`]: crate::model::id::GuildId::create_role
-/// [`GuildId::edit_role`]: crate::model::id::GuildId::edit_role
 #[derive(Clone, Debug, Default)]
 pub struct CreateSticker<'a>(pub HashMap<&'static str, Value>, pub Option<AttachmentType<'a>>);
 
