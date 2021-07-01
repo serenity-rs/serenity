@@ -8,20 +8,10 @@ use message_component::MessageComponentInteraction;
 use ping::PingInteraction;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
-use serde_json::{Map, Number, Value};
+use serde_json::{Value};
 
 use super::prelude::*;
-use super::prelude::*;
-use crate::builder::{
-    CreateApplicationCommand,
-    CreateApplicationCommands,
-    CreateInteractionResponse,
-    CreateInteractionResponseFollowup,
-    EditInteractionResponse,
-};
-use crate::http::Http;
 use crate::internal::prelude::*;
-use crate::utils;
 
 #[derive(Clone, Debug)]
 pub enum Interaction {

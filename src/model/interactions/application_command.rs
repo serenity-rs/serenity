@@ -627,7 +627,7 @@ impl ApplicationCommand {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
-    /// use serenity::model::{interactions_old::ApplicationCommand, id::ApplicationId};
+    /// use serenity::model::{interactions::application_command::ApplicationCommand, id::ApplicationId};
     ///
     /// let _ = ApplicationCommand::create_global_application_command(&http, |command| {
     ///    command.name("ping")
@@ -646,7 +646,7 @@ impl ApplicationCommand {
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::{
-    ///     interactions_old::{ApplicationCommand, ApplicationCommandOptionType},
+    ///     interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},
     ///     id::ApplicationId
     /// };
     ///
