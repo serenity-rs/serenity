@@ -29,7 +29,11 @@ use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
 #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-use crate::model::interactions::{InteractionType, Interaction, message_component::MessageComponentInteraction};
+use crate::model::interactions::{
+    message_component::MessageComponentInteraction,
+    Interaction,
+    InteractionType,
+};
 use crate::CacheAndHttp;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.

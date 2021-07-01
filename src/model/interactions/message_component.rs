@@ -1,8 +1,7 @@
-use serde::{Serialize, Serializer};
 use serde::de::Error as DeError;
+use serde::{Serialize, Serializer};
 
 use super::prelude::*;
-use crate::utils;
 use crate::builder::{
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
@@ -10,6 +9,7 @@ use crate::builder::{
 };
 use crate::http::Http;
 use crate::model::interactions::InteractionType;
+use crate::utils;
 
 /// An interaction triggered by a message component.
 #[derive(Clone, Debug, Serialize)]

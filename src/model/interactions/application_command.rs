@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Deserializer};
 use serde::de::Error as DeError;
+use serde::{Deserialize, Deserializer};
 
 use super::prelude::*;
-use crate::utils;
 use crate::builder::{
     CreateApplicationCommand,
     CreateApplicationCommands,
@@ -35,6 +34,7 @@ use crate::model::utils::{
     deserialize_roles_map,
     deserialize_users,
 };
+use crate::utils;
 
 /// An interaction when a user invokes a slash command.
 #[derive(Clone, Debug, Serialize)]

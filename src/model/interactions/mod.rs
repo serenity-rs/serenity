@@ -3,8 +3,8 @@ pub mod message_component;
 pub mod ping;
 
 use application_command::ApplicationCommandInteraction;
-use message_component::MessageComponentInteraction;
 use bitflags::__impl_bitflags;
+use message_component::MessageComponentInteraction;
 use ping::PingInteraction;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
@@ -36,7 +36,7 @@ impl Interaction {
         match self {
             Interaction::Ping(i) => i.id,
             Interaction::ApplicationCommand(i) => i.id,
-            Interaction::MessageComponent(i) => i.id
+            Interaction::MessageComponent(i) => i.id,
         }
     }
 
@@ -45,7 +45,7 @@ impl Interaction {
         match self {
             Interaction::Ping(_) => InteractionType::Ping,
             Interaction::ApplicationCommand(_) => InteractionType::ApplicationCommand,
-            Interaction::MessageComponent(_) => InteractionType::MessageComponent
+            Interaction::MessageComponent(_) => InteractionType::MessageComponent,
         }
     }
 
@@ -54,7 +54,7 @@ impl Interaction {
         match self {
             Interaction::Ping(i) => i.application_id,
             Interaction::ApplicationCommand(i) => i.application_id,
-            Interaction::MessageComponent(i) => i.application_id
+            Interaction::MessageComponent(i) => i.application_id,
         }
     }
 
@@ -63,7 +63,7 @@ impl Interaction {
         match self {
             Interaction::Ping(i) => &i.token,
             Interaction::ApplicationCommand(i) => &i.token,
-            Interaction::MessageComponent(i) => &i.token
+            Interaction::MessageComponent(i) => &i.token,
         }
     }
 
@@ -106,12 +106,16 @@ impl<'de> Deserialize<'de> for Interaction {
             InteractionType::Ping => serde_json::from_value::<PingInteraction>(Value::Object(map))
                 .map(Interaction::Ping)
                 .map_err(DeError::custom),
-            InteractionType::ApplicationCommand => serde_json::from_value::<ApplicationCommandInteraction>(Value::Object(map))
-                .map(Interaction::ApplicationCommand)
-                .map_err(DeError::custom),
-            InteractionType::MessageComponent => serde_json::from_value::<MessageComponentInteraction>(Value::Object(map))
-                .map(Interaction::MessageComponent)
-                .map_err(DeError::custom),
+            InteractionType::ApplicationCommand => {
+                serde_json::from_value::<ApplicationCommandInteraction>(Value::Object(map))
+                    .map(Interaction::ApplicationCommand)
+                    .map_err(DeError::custom)
+            },
+            InteractionType::MessageComponent => {
+                serde_json::from_value::<MessageComponentInteraction>(Value::Object(map))
+                    .map(Interaction::MessageComponent)
+                    .map_err(DeError::custom)
+            },
             InteractionType::Unknown => Err(DeError::custom("Unknown interaction type")),
         }
     }
@@ -124,8 +128,12 @@ impl Serialize for Interaction {
     {
         match self {
             Interaction::Ping(i) => PingInteraction::serialize(i, serializer),
-            Interaction::ApplicationCommand(i) => ApplicationCommandInteraction::serialize(i, serializer),
-            Interaction::MessageComponent(i) => MessageComponentInteraction::serialize(i, serializer),
+            Interaction::ApplicationCommand(i) => {
+                ApplicationCommandInteraction::serialize(i, serializer)
+            },
+            Interaction::MessageComponent(i) => {
+                MessageComponentInteraction::serialize(i, serializer)
+            },
         }
     }
 }
