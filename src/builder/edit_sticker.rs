@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use crate::internal::prelude::*;
-use crate::json::from_number;
-use crate::model::{guild::Role, Permissions};
+
+
 
 /// A builder to create or edit a [`Sticker`] for use via a number of model methods.
 ///

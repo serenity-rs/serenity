@@ -9,7 +9,7 @@ use crate::model::{
     user::User,
     utils::{deserialize_comma_separated_string, serialize_comma_separated_string},
 };
-use crate::{json::prelude::*, model::prelude::*};
+use crate::{model::prelude::*};
 
 /// A sticker sent with a message.
 ///
