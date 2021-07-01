@@ -18,6 +18,13 @@ pub struct StickerItem {
 
 #[cfg(feature = "model")]
 impl StickerItem {
+    /// Requests the sticker via the REST API to get a [`Sticker`] with all
+    /// details.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does
+    /// not exist, or is otherwise unavailable.
     #[inline]
     pub async fn to_sticker(&self, http: impl AsRef<Http>) -> Result<Sticker> {
         self.id.to_sticker(&http).await
