@@ -712,75 +712,24 @@ impl Http {
     pub async fn create_sticker<'a, T>(
         &self,
         guild_id: u64,
-        map: &JsonMap,
+        map: &Value,
         file: T,
     ) -> Result<Sticker>
     where
         T: Into<AttachmentType<'a>>,
     {
-        let mut multipart = reqwest::multipart::Form::new();
-
-        match file.into() {
-            AttachmentType::Bytes {
-                data,
-                filename,
-            } => {
-                multipart =
-                    multipart.part("file", Part::bytes(data.into_owned()).file_name(filename));
+        self.fire(Request {
+            body: None,
+            multipart: Some(Multipart {
+                files: vec![file.into()],
+                payload_json: map.clone(),
+            }),
+            headers: None,
+            route: RouteInfo::CreateSticker {
+                guild_id
             },
-            AttachmentType::File {
-                file,
-                filename,
-            } => {
-                let mut buf = Vec::new();
-                file.try_clone().await?.read_to_end(&mut buf).await?;
-
-                multipart = multipart.part("file", Part::stream(buf).file_name(filename));
-            },
-            AttachmentType::Path(path) => {
-                let filename =
-                    path.file_name().map(|filename| filename.to_string_lossy().into_owned());
-                let mut file = File::open(path).await?;
-                let mut buf = vec![];
-                file.read_to_end(&mut buf).await?;
-
-                let part = match filename {
-                    Some(filename) => Part::bytes(buf).file_name(filename),
-                    None => Part::bytes(buf),
-                };
-
-                multipart = multipart.part("file", part);
-            },
-            AttachmentType::Image(url) => {
-                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
-                let filename = url
-                    .path_segments()
-                    .and_then(|segments| segments.last().map(ToString::to_string))
-                    .ok_or_else(|| Error::Url(url.to_string()))?;
-                let response = self.client.get(url).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = vec![0; bytes.len()];
-                bytes.copy_to_slice(&mut picture[..]);
-                multipart =
-                    multipart.part("file", Part::bytes(picture).file_name(filename.to_string()));
-            },
-        }
-
-        multipart = multipart.text("payload_json", serde_json::to_string(&map)?);
-
-        let response = self
-            .client
-            .post(&Route::guild_stickers(guild_id))
-            .multipart(multipart)
-            .header(CONTENT_TYPE, HeaderValue::from_static(&"multipart/form-data"))
-            .send()
-            .await?;
-
-        if !response.status().is_success() {
-            return Err(HttpError::from_response(response).await.into());
-        }
-
-        response.json::<Sticker>().await.map_err(From::from)
+        })
+        .await
     }
 
     /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
@@ -1111,6 +1060,7 @@ impl Http {
     pub async fn delete_sticker(&self, guild_id: u64, sticker_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
+            multipart: None,
             headers: None,
             route: RouteInfo::DeleteSticker {
                 guild_id,
@@ -1656,6 +1606,7 @@ impl Http {
         let mut value = self
             .request(Request {
                 body: Some(&body),
+                multipart: None,
                 headers: None,
                 route: RouteInfo::EditSticker {
                     guild_id,
@@ -2575,6 +2526,7 @@ impl Http {
         let mut value = self
             .request(Request {
                 body: None,
+                multipart: None,
                 headers: None,
                 route: RouteInfo::GetGuildStickers {
                     guild_id,
@@ -2600,6 +2552,7 @@ impl Http {
         let mut value = self
             .request(Request {
                 body: None,
+                multipart: None,
                 headers: None,
                 route: RouteInfo::GetGuildSticker {
                     guild_id,
@@ -2778,6 +2731,7 @@ impl Http {
 
         self.request(Request {
             body: None,
+            multipart: None,
             headers: None,
             route: RouteInfo::GetStickerPacks,
         })
@@ -2831,6 +2785,7 @@ impl Http {
     pub async fn get_sticker(&self, sticker_id: u64) -> Result<Sticker> {
         self.fire(Request {
             body: None,
+            multipart: None,
             headers: None,
             route: RouteInfo::GetSticker {
                 sticker_id,

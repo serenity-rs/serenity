@@ -335,7 +335,7 @@ impl GuildId {
             None => return Err(Error::Model(ModelError::NoStickerFileSet)),
         };
 
-        let sticker = http.as_ref().create_sticker(self.0, &map, file).await?;
+        let sticker = http.as_ref().create_sticker(self.0, &Value::from(map), file).await?;
 
         Ok(sticker)
     }
