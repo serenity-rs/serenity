@@ -421,7 +421,7 @@ impl GuildChannel {
         f(&mut edit_channel);
         let edited = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        *self = cache_http.http().edit_channel(self.id.0, &edited).await?;
+        *self = cache_http.http().edit_channel(self.id.0, &edited, None).await?;
 
         Ok(())
     }
