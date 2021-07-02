@@ -21,7 +21,7 @@ use tokio::time::{delay_for as sleep, Delay as Sleep};
 #[cfg(feature = "tokio")]
 use tokio::time::{sleep, Sleep};
 
-use crate::{client::bridge::gateway::ShardMessenger, model::channel::Message};
+use crate::{client::bridge::gateway::ShardMessenger, collector::LazyArc, model::channel::Message};
 
 macro_rules! impl_message_collector {
     ($($name:ident;)*) => {
@@ -111,12 +111,13 @@ impl MessageFilter {
 
     /// Sends a `message` to the consuming collector if the `message` conforms
     /// to the constraints and the limits are not reached yet.
-    pub(crate) fn send_message(&mut self, message: &Arc<Message>) -> bool {
-        if self.is_passing_constraints(&message) {
-            if self.options.filter.as_ref().map_or(true, |f| f(&message)) {
+    pub(crate) fn send_message(&mut self, message: &mut LazyArc<'_, Message>) -> bool {
+        if self.is_passing_constraints(message) {
+            // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
+            if self.options.filter.as_ref().map_or(true, |f| f(&message.as_arc())) {
                 self.collected += 1;
 
-                if let Err(_) = self.sender.send(Arc::clone(message)) {
+                if let Err(_) = self.sender.send(message.as_arc()) {
                     return false;
                 }
             }
@@ -130,7 +131,7 @@ impl MessageFilter {
     /// Checks if the `message` passes set constraints.
     /// Constraints are optional, as it is possible to limit messages to
     /// be sent by a specific author or in a specifc guild.
-    fn is_passing_constraints(&self, message: &Arc<Message>) -> bool {
+    fn is_passing_constraints(&self, message: &Message) -> bool {
         self.options.guild_id.map_or(true, |g| Some(g) == message.guild_id.map(|g| g.0))
             && self.options.channel_id.map_or(true, |g| g == message.channel_id.0)
             && self.options.author_id.map_or(true, |g| g == message.author.id.0)

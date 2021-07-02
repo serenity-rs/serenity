@@ -22,6 +22,7 @@ use tokio::time::{delay_for as sleep, Delay as Sleep};
 use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
+use crate::collector::LazyArc;
 use crate::model::interactions::Interaction;
 
 macro_rules! impl_component_interaction_collector {
@@ -129,11 +130,11 @@ impl ComponentInteractionFilter {
 
     /// Sends an `interaction` to the consuming collector if the `interaction` conforms
     /// to the constraints and the limits are not reached yet.
-    pub(crate) fn send_interaction(&mut self, interaction: &Arc<Interaction>) -> bool {
-        if self.is_passing_constraints(&interaction) {
+    pub(crate) fn send_interaction(&mut self, interaction: &mut LazyArc<'_, Interaction>) -> bool {
+        if self.is_passing_constraints(interaction) {
             self.collected += 1;
 
-            if self.sender.send(Arc::clone(interaction)).is_err() {
+            if self.sender.send(interaction.as_arc()).is_err() {
                 return false;
             }
         }
@@ -146,7 +147,8 @@ impl ComponentInteractionFilter {
     /// Checks if the `interaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit interactions to
     /// be sent by a specific author or in a specifc guild.
-    fn is_passing_constraints(&self, interaction: &Arc<Interaction>) -> bool {
+    fn is_passing_constraints(&self, interaction: &mut LazyArc<'_, Interaction>) -> bool {
+        // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
             && self.options.message_id.map_or(true, |id| {
                 interaction.message.as_ref().expect("expected message id").id().0 == id
@@ -155,7 +157,7 @@ impl ComponentInteractionFilter {
                 id == interaction.channel_id.as_ref().expect("expected channel id").0
             })
             && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
-            && self.options.filter.as_ref().map_or(true, |f| f(&interaction))
+            && self.options.filter.as_ref().map_or(true, |f| f(&interaction.as_arc()))
     }
 
     /// Checks if the filter is within set receive and collect limits.
