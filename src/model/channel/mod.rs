@@ -429,6 +429,19 @@ enum_number!(VideoQualityMode {
     Full
 });
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct StageInstance {
+    /// The Id of the stage instance.
+    pub id: StageInstanceId,
+    /// The guild Id of the associated stage channel.
+    pub guild_id: GuildId,
+    /// The Id of the associated stage channel.
+    pub channel_id: ChannelId,
+    /// The topic of the stage instance.
+    pub topic: String,
+}
+
 #[cfg(test)]
 mod test {
     #[cfg(all(feature = "model", feature = "utils"))]

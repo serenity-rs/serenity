@@ -11,6 +11,7 @@ use futures::stream::StreamExt;
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
 use crate::builder::{CreateInvite, CreateMessage, EditMessage, EditVoiceState, GetMessages};
+use crate::builder::{CreateStageInstance, EditStageInstance};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -1168,6 +1169,76 @@ impl GuildChannel {
         }
 
         self.id.create_webhook_with_avatar(&http, name, avatar).await
+    }
+
+    /// Gets a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    /// Returns [`Error::Http`] if there is no stage instance currently.
+    pub async fn get_stage_instance(&self, http: impl AsRef<Http>) -> Result<StageInstance> {
+        if self.kind.num() != 13 {
+            return Err(Error::Model(ModelError::InvalidChannelType));
+        }
+
+        self.id.get_stage_instance(http).await
+    }
+
+    /// Creates a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    /// Returns [`Error::Http`] if there is already a stage instance currently.
+    pub async fn create_stage_instance<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<StageInstance>
+    where
+        F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
+    {
+        if self.kind.num() != 13 {
+            return Err(Error::Model(ModelError::InvalidChannelType));
+        }
+
+        self.id.create_stage_instance(http, f).await
+    }
+
+    /// Edits a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    /// Returns [`Error::Http`] if there is no stage instance currently.
+    pub async fn edit_stage_instance<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<StageInstance>
+    where
+        F: FnOnce(&mut EditStageInstance) -> &mut EditStageInstance,
+    {
+        if self.kind.num() != 13 {
+            return Err(Error::Model(ModelError::InvalidChannelType));
+        }
+
+        self.id.edit_stage_instance(http, f).await
+    }
+
+    /// Deletes a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ModelError::InvalidChannelType`] if the channel is not a stage channel.
+    /// Returns [`Error::Http`] if there is no stage instance currently.
+    pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
+        if self.kind.num() != 13 {
+            return Err(Error::Model(ModelError::InvalidChannelType));
+        }
+
+        self.id.delete_stage_instance(http).await
     }
 }
 
