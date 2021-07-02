@@ -853,7 +853,7 @@ impl Message {
             }
         }
 
-        cache_http.http().unpin_message(self.channel_id.0, self.id.0).await
+        cache_http.http().unpin_message(self.channel_id.0, self.id.0, None).await
     }
 
     /// Tries to return author's nickname in the current channel's guild.
