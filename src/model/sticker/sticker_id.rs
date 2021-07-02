@@ -11,13 +11,13 @@ use crate::model::prelude::*;
 impl StickerId {
     /// Delete a guild sticker.
     ///
-    /// **Note**: The [Manage Emoji and Stickers] permission is required.
+    /// **Note**: The [Manage Emojis and Stickers] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn delete(&self, http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<()> {
         guild_id.into().delete_sticker(http, self.0).await
     }
@@ -35,14 +35,14 @@ impl StickerId {
 
     /// Edits the sticker.
     ///
-    /// **Note**: The [Manage Emoji and Stickers] permission is required.
+    /// **Note**: The [Manage Emojis and Stickers] permission is required.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if invalid edits are given.
     ///
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn edit<F>(
         &self,
         http: impl AsRef<Http>,

@@ -44,9 +44,9 @@ pub struct Sticker {
     /// Id of the guild that owns this sticker.
     pub guild_id: Option<GuildId>,
     /// User that uploaded the sticker. This will be `None` if the current user
-    /// does not have the [Manage Emoji and Stickers] permission.
+    /// does not have the [Manage Emojis and Stickers] permission.
     ///
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub user: Option<User>,
     /// A sticker's sort order within a pack.
     pub sort_value: Option<u64>,
@@ -56,14 +56,14 @@ pub struct Sticker {
 impl Sticker {
     /// Deletes a [`Sticker`] by Id from the guild.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission
     /// to delete the sticker.
     ///
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         if let Some(guild_id) = self.guild_id {
@@ -75,7 +75,7 @@ impl Sticker {
 
     /// Edits a sticker, optionally setting its fields.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -90,7 +90,7 @@ impl Sticker {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
     where

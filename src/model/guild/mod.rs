@@ -580,7 +580,7 @@ impl Guild {
     /// The name of the emoji must be at least 2 characters long and can only
     /// contain alphanumeric characters and underscores.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -594,7 +594,7 @@ impl Guild {
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
-    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn create_emoji(
         &self,
@@ -816,14 +816,14 @@ impl Guild {
 
     /// Creates a new sticker in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Emoji and Stickers] permission.
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to manage roles.
     ///
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     pub async fn create_sticker<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Sticker>
     where
         for<'a, 'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
@@ -831,7 +831,7 @@ impl Guild {
         #[cfg(feature = "cache")]
         {
             if cache_http.cache().is_some() {
-                let req = Permissions::MANAGE_EMOJI_AND_STICKERS;
+                let req = Permissions::MANAGE_EMOJIS_AND_STICKERS;
 
                 if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -871,13 +871,13 @@ impl Guild {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_emoji(
         &self,
@@ -930,14 +930,14 @@ impl Guild {
 
     /// Deletes a [`Sticker`] by Id from the guild.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission
     /// to delete the sticker.
     ///
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_sticker(
         &self,
@@ -1024,13 +1024,13 @@ impl Guild {
     /// Also see [`Emoji::edit`] if you have the `cache` and `model` features
     /// enabled.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_emoji(
@@ -1170,7 +1170,7 @@ impl Guild {
 
     /// Edits a sticker, optionally setting its fields.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -1185,7 +1185,7 @@ impl Guild {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn edit_sticker<F>(
         &self,

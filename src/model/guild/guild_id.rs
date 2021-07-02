@@ -226,7 +226,7 @@ impl GuildId {
     /// Refer to the documentation for [`Guild::create_emoji`] for more
     /// information.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -240,7 +240,7 @@ impl GuildId {
     /// if the name is too long, or if the image is too big.
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
-    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn create_emoji(
         self,
@@ -313,14 +313,14 @@ impl GuildId {
 
     /// Creates a new sticker in the guild with the data set, if any.
     ///
-    /// **Note**: Requires the [Manage Emoji and Stickers] permission.
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if invalid data is given.
     ///
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn create_sticker<F>(self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
     where
@@ -357,14 +357,14 @@ impl GuildId {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// **Note**: Requires the [Manage Emoji and Stickers] permission.
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if an Emoji with that Id does not exist.
     ///
-    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_emoji(
         self,
@@ -417,14 +417,14 @@ impl GuildId {
 
     /// Deletes a [`Sticker`] by Id from the guild.
     ///
-    /// **Note**: Requires the [Manage Emoji and Stickers] permission.
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission,
     /// or if a sticker with that Id does not exist.
     ///
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_sticker(
         self,
@@ -464,13 +464,13 @@ impl GuildId {
     /// Also see [`Emoji::edit`] if you have the `cache` and `methods` features
     /// enabled.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emoji and Stickers]: Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_emoji(
@@ -582,7 +582,7 @@ impl GuildId {
 
     /// Edits a [`Sticker`], optionally setting its fields.
     ///
-    /// Requires the [Manage Emoji and Stickers] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -597,7 +597,7 @@ impl GuildId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
-    /// [Manage Emoji and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJI_AND_STICKERS
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn edit_sticker<F>(
         &self,
