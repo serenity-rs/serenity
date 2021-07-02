@@ -171,14 +171,14 @@ impl CreateApplicationCommandOption {
 
     /// Sets the minimum permitted value for this number option
     pub fn min_number_value(&mut self, value: f64) -> &mut Self {
-        self.0.insert("min_value", from_number(value));
+        self.0.insert("min_value", Value::from(value));
 
         self
     }
 
     /// Sets the maximum permitted value for this number option
     pub fn max_number_value(&mut self, value: f64) -> &mut Self {
-        self.0.insert("max_value", from_number(value));
+        self.0.insert("max_value", Value::from(value));
 
         self
     }
