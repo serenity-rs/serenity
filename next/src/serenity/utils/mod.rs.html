@@ -1034,6 +1034,8 @@
 <span id="1034">1034</span>
 <span id="1035">1035</span>
 <span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
@@ -1902,6 +1904,7 @@
             <span class="ident">approximate_member_count</span>: <span class="prelude-val">None</span>,
             <span class="ident">approximate_presence_count</span>: <span class="prelude-val">None</span>,
             <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
+            <span class="ident">nsfw_level</span>: <span class="ident">NsfwLevel::Default</span>,
             <span class="ident">max_video_channel_users</span>: <span class="prelude-val">None</span>,
             <span class="ident">max_presences</span>: <span class="prelude-val">None</span>,
             <span class="ident">max_members</span>: <span class="prelude-val">None</span>,
@@ -1921,6 +1924,7 @@
             <span class="ident">premium_since</span>: <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
+            <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
         };
 
         <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">Role</span> {

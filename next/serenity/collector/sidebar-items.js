@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["message_collector",""],["reaction_collector",""]]});
+initSidebarItems({"mod":[["component_interaction_collector",""],["message_collector",""],["reaction_collector",""]]});

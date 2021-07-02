@@ -208,6 +208,9 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Error enum definition wrapping potential model implementation errors.</span>
 
@@ -280,6 +283,8 @@
     <span class="doccomment">/// When attempting to delete a number of days&#39; worth of messages that is</span>
     <span class="doccomment">/// not allowed.</span>
     <span class="ident">DeleteMessageDaysAmount</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// When attempting to send a message with over 10 embeds.</span>
+    <span class="ident">EmbedAmount</span>,
     <span class="doccomment">/// Indicates that the textual content of an embed exceeds the maximum</span>
     <span class="doccomment">/// length.</span>
     <span class="ident">EmbedTooLarge</span>(<span class="ident">usize</span>),
@@ -395,6 +400,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Error::BulkDeleteAmount</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too few/many messages to bulk delete.&quot;</span>),
             <span class="ident">Error::DeleteMessageDaysAmount</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid delete message days.&quot;</span>),
+            <span class="ident">Error::EmbedAmount</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too many embeds in a message.&quot;</span>),
             <span class="ident">Error::EmbedTooLarge</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Embed too large.&quot;</span>),
             <span class="ident">Error::GuildNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Guild not found in the cache.&quot;</span>),
             <span class="ident">Error::RoleNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role not found in the cache.&quot;</span>),

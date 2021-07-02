@@ -674,6 +674,38 @@
 <span id="674">674</span>
 <span id="675">675</span>
 <span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models pertaining to the gateway.</span>
 
@@ -746,6 +778,11 @@
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].</span>
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The buttons of this activity.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: There can only be up to 2 buttons.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">buttons</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ActivityButton</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -797,6 +834,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">None</span>,
+            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
         }
     }
 
@@ -851,6 +889,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">Url::parse</span>(<span class="ident">url</span>.<span class="ident">as_ref</span>()).<span class="ident">expect</span>(<span class="string">&quot;Failed to parse url&quot;</span>)),
+            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
         }
     }
 
@@ -901,6 +940,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">None</span>,
+            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
         }
     }
 
@@ -951,6 +991,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">None</span>,
+            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
         }
     }
 
@@ -1001,6 +1042,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">session_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">None</span>,
+            <span class="ident">buttons</span>: <span class="macro">vec!</span>[],
         }
     }
 }
@@ -1085,6 +1127,15 @@
 
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;url&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">ok</span>());
 
+        <span class="kw">let</span> <span class="ident">buttons</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;buttons&quot;</span>) {
+            <span class="bool-val">true</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">map</span>
+                .<span class="ident">remove</span>(<span class="string">&quot;buttons&quot;</span>)
+                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected buttons&quot;</span>))
+                .<span class="ident">and_then</span>(<span class="ident">deserialize_buttons</span>)
+                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
+            <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
+        };
+
         <span class="prelude-val">Ok</span>(<span class="ident">Activity</span> {
             <span class="ident">application_id</span>,
             <span class="ident">assets</span>,
@@ -1103,8 +1154,21 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">session_id</span>,
             <span class="ident">url</span>,
+            <span class="ident">buttons</span>,
         })
     }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityButton</span> {
+    <span class="doccomment">/// The text shown on the button.</span>
+    <span class="kw">pub</span> <span class="ident">label</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The url opened when clicking the button.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Bots cannot access activity button URL.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
 }
 
 <span class="doccomment">/// The assets for an activity.</span>

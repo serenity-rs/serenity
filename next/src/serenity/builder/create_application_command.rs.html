@@ -287,7 +287,7 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Interaction commands can optionally have a limited</span>
+    <span class="doccomment">/// Application commands can optionally have a limited</span>
     <span class="doccomment">/// number of integer or string choices.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: There can be no more than 10 choices set.</span>
@@ -347,7 +347,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommand</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">CreateApplicationCommand</span> {
-    <span class="doccomment">/// Specify the name of the Interaction.</span>
+    <span class="doccomment">/// Specify the name of the application command.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 1 and 32 characters long,</span>
     <span class="doccomment">/// and cannot start with a space.</span>
@@ -366,7 +366,7 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Specify the description of the Interaction.</span>
+    <span class="doccomment">/// Specify the description of the application command.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 1 and 100 characters long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -374,9 +374,9 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Create an interaction option for the interaction.</span>
+    <span class="doccomment">/// Create an application command option for the application command.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Interactions can only have up to 10 options.</span>
+    <span class="doccomment">/// **Note**: Application commands can only have up to 10 options.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandOption</span>,
@@ -386,9 +386,9 @@
         <span class="self">self</span>.<span class="ident">add_option</span>(<span class="ident">data</span>)
     }
 
-    <span class="doccomment">/// Add an interaction option for the interaction.</span>
+    <span class="doccomment">/// Add an application command option for the application command.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Interactions can only have up to 10 options.</span>
+    <span class="doccomment">/// **Note**: Application commands can only have up to 10 options.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_option</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">CreateApplicationCommandOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;options&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
@@ -398,9 +398,9 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets all the interaction options for the interaction.</span>
+    <span class="doccomment">/// Sets all the application command options for the application command.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Interactions can only have up to 10 options.</span>
+    <span class="doccomment">/// **Note**: Application commands can only have up to 10 options.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_options</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandOption</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_options</span> <span class="op">=</span> <span class="ident">options</span>
             .<span class="ident">into_iter</span>()
@@ -430,8 +430,8 @@
     }
 
     <span class="doccomment">/// Adds a new application command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_application_command</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">interaction</span>: <span class="ident">CreateApplicationCommand</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">interaction</span>.<span class="number">0</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_application_command</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">command</span>: <span class="ident">CreateApplicationCommand</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">command</span>.<span class="number">0</span>));
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">new_data</span>);
 
@@ -441,9 +441,9 @@
     <span class="doccomment">/// Sets all the application commands.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">interactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommand</span><span class="op">&gt;</span>,
+        <span class="ident">commands</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommand</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_application_command</span> <span class="op">=</span> <span class="ident">interactions</span>
+        <span class="kw">let</span> <span class="ident">new_application_command</span> <span class="op">=</span> <span class="ident">commands</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();

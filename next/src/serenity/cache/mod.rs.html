@@ -1186,6 +1186,9 @@
 <span id="1186">1186</span>
 <span id="1187">1187</span>
 <span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -1258,7 +1261,7 @@
     <span class="kw">where</span>
         <span class="ident">CRL</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
     {
-        <span class="ident">F::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>
+        <span class="ident">F::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>).<span class="kw">await</span>
     }
 }
 
@@ -1605,7 +1608,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Getting a guild&#39;s channel via the Id of the message received through a</span>
-    <span class="doccomment">/// [`Client::on_message`] event dispatch:</span>
+    <span class="doccomment">/// [`EventHandler::message`] event dispatch:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::model::prelude::*;</span>
@@ -1633,14 +1636,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client::on_message`]: ../client/struct.Client.html#method.on_message</span>
+    <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_guild_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
@@ -1701,7 +1704,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Retrieving the member object of the user that posted a message, in a</span>
-    <span class="doccomment">/// [`Client::on_message`] context:</span>
+    <span class="doccomment">/// [`EventHandler::message`] context:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
@@ -1713,7 +1716,7 @@
     <span class="doccomment">/// # let http = Arc::new(Http::new_with_token(&quot;DISCORD_TOKEN&quot;));</span>
     <span class="doccomment">/// # let message = ChannelId(0).message(&amp;http, MessageId(1)).await.unwrap();</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// #</span>
     <span class="doccomment">/// let member = {</span>
     <span class="doccomment">///     let channel = match cache.guild_channel(message.channel_id).await {</span>
     <span class="doccomment">///         Some(channel) =&gt; channel,</span>
@@ -1744,7 +1747,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client::on_message`]: ../client/struct.Client.html#method.on_message</span>
+    <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
     <span class="doccomment">/// [`members`]: crate::model::guild::Guild::members</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">member</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">G</span>, <span class="ident">user_id</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>
@@ -1902,7 +1905,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// match cache.message(message.channel_id, message.id).await {</span>
     <span class="doccomment">///     Some(m) =&gt; assert_eq!(message.content, m.content),</span>
-    <span class="doccomment">///     None =&gt;println!(&quot;No message found in cache.&quot;),</span>
+    <span class="doccomment">///     None =&gt; println!(&quot;No message found in cache.&quot;),</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
@@ -2245,6 +2248,8 @@
                 <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                 <span class="ident">interaction</span>: <span class="prelude-val">None</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                <span class="ident">components</span>: <span class="macro">vec!</span>[],
             },
         };
 
@@ -2349,6 +2354,7 @@
                     <span class="ident">approximate_member_count</span>: <span class="prelude-val">None</span>,
                     <span class="ident">approximate_presence_count</span>: <span class="prelude-val">None</span>,
                     <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
+                    <span class="ident">nsfw_level</span>: <span class="ident">NsfwLevel::Default</span>,
                     <span class="ident">max_video_channel_users</span>: <span class="prelude-val">None</span>,
                     <span class="ident">max_presences</span>: <span class="prelude-val">None</span>,
                     <span class="ident">max_members</span>: <span class="prelude-val">None</span>,

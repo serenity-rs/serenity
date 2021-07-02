@@ -2313,6 +2313,108 @@
 <span id="2313">2313</span>
 <span id="2314">2314</span>
 <span id="2315">2315</span>
+<span id="2316">2316</span>
+<span id="2317">2317</span>
+<span id="2318">2318</span>
+<span id="2319">2319</span>
+<span id="2320">2320</span>
+<span id="2321">2321</span>
+<span id="2322">2322</span>
+<span id="2323">2323</span>
+<span id="2324">2324</span>
+<span id="2325">2325</span>
+<span id="2326">2326</span>
+<span id="2327">2327</span>
+<span id="2328">2328</span>
+<span id="2329">2329</span>
+<span id="2330">2330</span>
+<span id="2331">2331</span>
+<span id="2332">2332</span>
+<span id="2333">2333</span>
+<span id="2334">2334</span>
+<span id="2335">2335</span>
+<span id="2336">2336</span>
+<span id="2337">2337</span>
+<span id="2338">2338</span>
+<span id="2339">2339</span>
+<span id="2340">2340</span>
+<span id="2341">2341</span>
+<span id="2342">2342</span>
+<span id="2343">2343</span>
+<span id="2344">2344</span>
+<span id="2345">2345</span>
+<span id="2346">2346</span>
+<span id="2347">2347</span>
+<span id="2348">2348</span>
+<span id="2349">2349</span>
+<span id="2350">2350</span>
+<span id="2351">2351</span>
+<span id="2352">2352</span>
+<span id="2353">2353</span>
+<span id="2354">2354</span>
+<span id="2355">2355</span>
+<span id="2356">2356</span>
+<span id="2357">2357</span>
+<span id="2358">2358</span>
+<span id="2359">2359</span>
+<span id="2360">2360</span>
+<span id="2361">2361</span>
+<span id="2362">2362</span>
+<span id="2363">2363</span>
+<span id="2364">2364</span>
+<span id="2365">2365</span>
+<span id="2366">2366</span>
+<span id="2367">2367</span>
+<span id="2368">2368</span>
+<span id="2369">2369</span>
+<span id="2370">2370</span>
+<span id="2371">2371</span>
+<span id="2372">2372</span>
+<span id="2373">2373</span>
+<span id="2374">2374</span>
+<span id="2375">2375</span>
+<span id="2376">2376</span>
+<span id="2377">2377</span>
+<span id="2378">2378</span>
+<span id="2379">2379</span>
+<span id="2380">2380</span>
+<span id="2381">2381</span>
+<span id="2382">2382</span>
+<span id="2383">2383</span>
+<span id="2384">2384</span>
+<span id="2385">2385</span>
+<span id="2386">2386</span>
+<span id="2387">2387</span>
+<span id="2388">2388</span>
+<span id="2389">2389</span>
+<span id="2390">2390</span>
+<span id="2391">2391</span>
+<span id="2392">2392</span>
+<span id="2393">2393</span>
+<span id="2394">2394</span>
+<span id="2395">2395</span>
+<span id="2396">2396</span>
+<span id="2397">2397</span>
+<span id="2398">2398</span>
+<span id="2399">2399</span>
+<span id="2400">2400</span>
+<span id="2401">2401</span>
+<span id="2402">2402</span>
+<span id="2403">2403</span>
+<span id="2404">2404</span>
+<span id="2405">2405</span>
+<span id="2406">2406</span>
+<span id="2407">2407</span>
+<span id="2408">2408</span>
+<span id="2409">2409</span>
+<span id="2410">2410</span>
+<span id="2411">2411</span>
+<span id="2412">2412</span>
+<span id="2413">2413</span>
+<span id="2414">2414</span>
+<span id="2415">2415</span>
+<span id="2416">2416</span>
+<span id="2417">2417</span>
 </pre><pre class="rust">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -2830,6 +2932,7 @@
     <span class="kw">pub</span> <span class="ident">deaf</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">mute</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2852,6 +2955,7 @@
                 <span class="ident">member</span>.<span class="ident">premium_since</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">premium_since</span>);
                 <span class="ident">member</span>.<span class="ident">deaf</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">deaf</span>);
                 <span class="ident">member</span>.<span class="ident">mute</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mute</span>);
+                <span class="ident">member</span>.<span class="ident">avatar</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">avatar</span>);
 
                 <span class="ident">item</span>
             } <span class="kw">else</span> {
@@ -2871,6 +2975,7 @@
                     <span class="ident">premium_since</span>: <span class="self">self</span>.<span class="ident">premium_since</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">avatar</span>: <span class="self">self</span>.<span class="ident">avatar</span>.<span class="ident">clone</span>(),
                 });
             }
 
@@ -3153,19 +3258,39 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>) {
-            <span class="ident">guild</span>.<span class="ident">afk_timeout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">afk_timeout</span>;
             <span class="ident">guild</span>.<span class="ident">afk_channel_id</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">afk_channel_id</span>);
+            <span class="ident">guild</span>.<span class="ident">afk_timeout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">afk_timeout</span>;
+            <span class="ident">guild</span>.<span class="ident">banner</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">banner</span>);
+            <span class="ident">guild</span>.<span class="ident">discovery_splash</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">discovery_splash</span>);
+            <span class="ident">guild</span>.<span class="ident">features</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">features</span>);
             <span class="ident">guild</span>.<span class="ident">icon</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">icon</span>);
             <span class="ident">guild</span>.<span class="ident">name</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">name</span>);
             <span class="ident">guild</span>.<span class="ident">owner_id</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">owner_id</span>);
+            <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">roles</span>);
+            <span class="ident">guild</span>.<span class="ident">splash</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">splash</span>);
+            <span class="ident">guild</span>.<span class="ident">vanity_url_code</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">vanity_url_code</span>);
+            <span class="ident">guild</span>.<span class="ident">welcome_screen</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">welcome_screen</span>);
 
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             {
                 <span class="ident">guild</span>.<span class="ident">region</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">region</span>);
             }
 
-            <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">roles</span>);
+            <span class="ident">guild</span>.<span class="ident">default_message_notifications</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">default_message_notifications</span>;
+            <span class="ident">guild</span>.<span class="ident">max_members</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">max_members</span>;
+            <span class="ident">guild</span>.<span class="ident">max_presences</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">max_presences</span>;
+            <span class="ident">guild</span>.<span class="ident">max_video_channel_users</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">max_video_channel_users</span>;
+            <span class="ident">guild</span>.<span class="ident">mfa_level</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">mfa_level</span>;
+            <span class="ident">guild</span>.<span class="ident">nsfw_level</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">nsfw_level</span>;
+            <span class="ident">guild</span>.<span class="ident">premium_subscription_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">premium_subscription_count</span>;
+            <span class="ident">guild</span>.<span class="ident">premium_tier</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">premium_tier</span>;
+            <span class="ident">guild</span>.<span class="ident">public_updates_channel_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">public_updates_channel_id</span>;
+            <span class="ident">guild</span>.<span class="ident">rules_channel_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">rules_channel_id</span>;
+            <span class="ident">guild</span>.<span class="ident">system_channel_flags</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">system_channel_flags</span>;
+            <span class="ident">guild</span>.<span class="ident">system_channel_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">system_channel_id</span>;
             <span class="ident">guild</span>.<span class="ident">verification_level</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">verification_level</span>;
+            <span class="ident">guild</span>.<span class="ident">widget_channel_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">widget_channel_id</span>;
+            <span class="ident">guild</span>.<span class="ident">widget_enabled</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">widget_enabled</span>;
         }
 
         <span class="prelude-val">None</span>
@@ -3374,6 +3499,7 @@
                         <span class="ident">premium_since</span>: <span class="prelude-val">None</span>,
                         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                         <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
+                        <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
                     });
                 }
             }
@@ -3847,6 +3973,54 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StageInstanceCreateEvent</span> {
+    <span class="kw">pub</span> <span class="ident">stage_instance</span>: <span class="ident">StageInstance</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StageInstanceCreateEvent</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stage_instance</span> <span class="op">=</span> <span class="ident">StageInstance::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">stage_instance</span>,
+        })
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StageInstanceUpdateEvent</span> {
+    <span class="kw">pub</span> <span class="ident">stage_instance</span>: <span class="ident">StageInstance</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StageInstanceUpdateEvent</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stage_instance</span> <span class="op">=</span> <span class="ident">StageInstance::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">stage_instance</span>,
+        })
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StageInstanceDeleteEvent</span> {
+    <span class="kw">pub</span> <span class="ident">stage_instance</span>: <span class="ident">StageInstance</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StageInstanceDeleteEvent</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stage_instance</span> <span class="op">=</span> <span class="ident">StageInstance::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+            <span class="ident">stage_instance</span>,
+        })
+    }
+}
+
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -4033,7 +4207,7 @@
     <span class="ident">VoiceServerUpdate</span>(<span class="ident">VoiceServerUpdateEvent</span>),
     <span class="doccomment">/// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].</span>
     <span class="ident">WebhookUpdate</span>(<span class="ident">WebhookUpdateEvent</span>),
-    <span class="doccomment">/// A user used a slash command.</span>
+    <span class="doccomment">/// An interaction was created.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">InteractionCreate</span>(<span class="ident">InteractionCreateEvent</span>),
@@ -4061,6 +4235,12 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationCommandDelete</span>(<span class="ident">ApplicationCommandDeleteEvent</span>),
+    <span class="doccomment">/// A stage instance was created.</span>
+    <span class="ident">StageInstanceCreate</span>(<span class="ident">StageInstanceCreateEvent</span>),
+    <span class="doccomment">/// A stage instance was updated.</span>
+    <span class="ident">StageInstanceUpdate</span>(<span class="ident">StageInstanceUpdateEvent</span>),
+    <span class="doccomment">/// A stage instance was deleted.</span>
+    <span class="ident">StageInstanceDelete</span>(<span class="ident">StageInstanceDeleteEvent</span>),
     <span class="doccomment">/// An event type not covered by the above</span>
     <span class="ident">Unknown</span>(<span class="ident">UnknownEvent</span>),
 }
@@ -4120,6 +4300,9 @@
             <span class="self">Self</span><span class="ident">::ApplicationCommandUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandUpdate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="self">Self</span><span class="ident">::ApplicationCommandDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandDelete</span>,
+            <span class="self">Self</span><span class="ident">::StageInstanceCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceCreate</span>,
+            <span class="self">Self</span><span class="ident">::StageInstanceUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceUpdate</span>,
+            <span class="self">Self</span><span class="ident">::StageInstanceDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceDelete</span>,
             <span class="self">Self</span><span class="ident">::Unknown</span>(<span class="ident">unknown</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Other</span>(<span class="ident">unknown</span>.<span class="ident">kind</span>.<span class="ident">clone</span>()),
         }
     }
@@ -4215,6 +4398,9 @@
         <span class="ident">EventType::ApplicationCommandUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ApplicationCommandUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">EventType::ApplicationCommandDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::ApplicationCommandDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::StageInstanceCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::StageInstanceCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::StageInstanceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::StageInstanceUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType::StageInstanceDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::StageInstanceDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::Other</span>(<span class="ident">kind</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event::Unknown</span>(<span class="ident">UnknownEvent</span> {
             <span class="ident">kind</span>,
             <span class="ident">value</span>: <span class="ident">v</span>,
@@ -4380,7 +4566,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`WebhookUpdateEvent`].</span>
     <span class="ident">WebhookUpdate</span>,
-    <span class="doccomment">/// Indicator that a slash command was received.</span>
+    <span class="doccomment">/// Indicator that an interaction was created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`InteractionCreateEvent`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -4416,6 +4602,15 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationCommandDelete</span>,
+    <span class="doccomment">/// Indicator that a stage instance was created.</span>
+    <span class="doccomment">/// This maps to [`StageInstanceCreateEvent`].</span>
+    <span class="ident">StageInstanceCreate</span>,
+    <span class="doccomment">/// Indicator that a stage instance was updated.</span>
+    <span class="doccomment">/// This maps to [`StageInstanceUpdateEvent`].</span>
+    <span class="ident">StageInstanceUpdate</span>,
+    <span class="doccomment">/// Indicator that a stage instance was deleted.</span>
+    <span class="doccomment">/// This maps to [`StageInstanceDeleteEvent`].</span>
+    <span class="ident">StageInstanceDelete</span>,
     <span class="doccomment">/// An unknown event was received over the gateway.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should be logged so that support for it can be added in the</span>
@@ -4487,6 +4682,9 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">const</span> <span class="ident">APPLICATION_COMMAND_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;APPLICATION_COMMAND_DELETE&quot;</span>;
+    <span class="kw">const</span> <span class="ident">STAGE_INSTANCE_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;STAGE_INSTANCE_CREATE&quot;</span>;
+    <span class="kw">const</span> <span class="ident">STAGE_INSTANCE_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;STAGE_INSTANCE_UPDATE&quot;</span>;
+    <span class="kw">const</span> <span class="ident">STAGE_INSTANCE_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;STAGE_INSTANCE_DELETE&quot;</span>;
 
     <span class="doccomment">/// Return the event name of this event. Some events are synthetic, and we lack</span>
     <span class="doccomment">/// the information to recover the original event name for these events, in which</span>
@@ -4543,6 +4741,9 @@
             <span class="self">Self</span><span class="ident">::ApplicationCommandUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::APPLICATION_COMMAND_UPDATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="self">Self</span><span class="ident">::ApplicationCommandDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::APPLICATION_COMMAND_DELETE</span>),
+            <span class="self">Self</span><span class="ident">::StageInstanceCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::STAGE_INSTANCE_CREATE</span>),
+            <span class="self">Self</span><span class="ident">::StageInstanceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::STAGE_INSTANCE_UPDATE</span>),
+            <span class="self">Self</span><span class="ident">::StageInstanceDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::STAGE_INSTANCE_DELETE</span>),
             <span class="comment">// GuildUnavailable is a synthetic event type, corresponding to either</span>
             <span class="comment">// `GUILD_CREATE` or `GUILD_DELETE`, but we don&#39;t have enough information</span>
             <span class="comment">// to recover the name here, so we return `None` instead.</span>
@@ -4621,6 +4822,9 @@
                     <span class="ident">EventType::APPLICATION_COMMAND_UPDATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandUpdate</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">EventType::APPLICATION_COMMAND_DELETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandDelete</span>,
+                    <span class="ident">EventType::STAGE_INSTANCE_CREATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceCreate</span>,
+                    <span class="ident">EventType::STAGE_INSTANCE_UPDATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceUpdate</span>,
+                    <span class="ident">EventType::STAGE_INSTANCE_DELETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceDelete</span>,
                     <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Other</span>(<span class="ident">other</span>.<span class="ident">to_owned</span>()),
                 })
             }

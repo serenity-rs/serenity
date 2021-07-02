@@ -3250,6 +3250,119 @@
 <span id="3250">3250</span>
 <span id="3251">3251</span>
 <span id="3252">3252</span>
+<span id="3253">3253</span>
+<span id="3254">3254</span>
+<span id="3255">3255</span>
+<span id="3256">3256</span>
+<span id="3257">3257</span>
+<span id="3258">3258</span>
+<span id="3259">3259</span>
+<span id="3260">3260</span>
+<span id="3261">3261</span>
+<span id="3262">3262</span>
+<span id="3263">3263</span>
+<span id="3264">3264</span>
+<span id="3265">3265</span>
+<span id="3266">3266</span>
+<span id="3267">3267</span>
+<span id="3268">3268</span>
+<span id="3269">3269</span>
+<span id="3270">3270</span>
+<span id="3271">3271</span>
+<span id="3272">3272</span>
+<span id="3273">3273</span>
+<span id="3274">3274</span>
+<span id="3275">3275</span>
+<span id="3276">3276</span>
+<span id="3277">3277</span>
+<span id="3278">3278</span>
+<span id="3279">3279</span>
+<span id="3280">3280</span>
+<span id="3281">3281</span>
+<span id="3282">3282</span>
+<span id="3283">3283</span>
+<span id="3284">3284</span>
+<span id="3285">3285</span>
+<span id="3286">3286</span>
+<span id="3287">3287</span>
+<span id="3288">3288</span>
+<span id="3289">3289</span>
+<span id="3290">3290</span>
+<span id="3291">3291</span>
+<span id="3292">3292</span>
+<span id="3293">3293</span>
+<span id="3294">3294</span>
+<span id="3295">3295</span>
+<span id="3296">3296</span>
+<span id="3297">3297</span>
+<span id="3298">3298</span>
+<span id="3299">3299</span>
+<span id="3300">3300</span>
+<span id="3301">3301</span>
+<span id="3302">3302</span>
+<span id="3303">3303</span>
+<span id="3304">3304</span>
+<span id="3305">3305</span>
+<span id="3306">3306</span>
+<span id="3307">3307</span>
+<span id="3308">3308</span>
+<span id="3309">3309</span>
+<span id="3310">3310</span>
+<span id="3311">3311</span>
+<span id="3312">3312</span>
+<span id="3313">3313</span>
+<span id="3314">3314</span>
+<span id="3315">3315</span>
+<span id="3316">3316</span>
+<span id="3317">3317</span>
+<span id="3318">3318</span>
+<span id="3319">3319</span>
+<span id="3320">3320</span>
+<span id="3321">3321</span>
+<span id="3322">3322</span>
+<span id="3323">3323</span>
+<span id="3324">3324</span>
+<span id="3325">3325</span>
+<span id="3326">3326</span>
+<span id="3327">3327</span>
+<span id="3328">3328</span>
+<span id="3329">3329</span>
+<span id="3330">3330</span>
+<span id="3331">3331</span>
+<span id="3332">3332</span>
+<span id="3333">3333</span>
+<span id="3334">3334</span>
+<span id="3335">3335</span>
+<span id="3336">3336</span>
+<span id="3337">3337</span>
+<span id="3338">3338</span>
+<span id="3339">3339</span>
+<span id="3340">3340</span>
+<span id="3341">3341</span>
+<span id="3342">3342</span>
+<span id="3343">3343</span>
+<span id="3344">3344</span>
+<span id="3345">3345</span>
+<span id="3346">3346</span>
+<span id="3347">3347</span>
+<span id="3348">3348</span>
+<span id="3349">3349</span>
+<span id="3350">3350</span>
+<span id="3351">3351</span>
+<span id="3352">3352</span>
+<span id="3353">3353</span>
+<span id="3354">3354</span>
+<span id="3355">3355</span>
+<span id="3356">3356</span>
+<span id="3357">3357</span>
+<span id="3358">3358</span>
+<span id="3359">3359</span>
+<span id="3360">3360</span>
+<span id="3361">3361</span>
+<span id="3362">3362</span>
+<span id="3363">3363</span>
+<span id="3364">3364</span>
+<span id="3365">3365</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -3341,7 +3454,7 @@
         <span class="self">Self</span><span class="ident">::_new</span>().<span class="ident">token</span>(<span class="ident">token</span>)
     }
 
-    <span class="doccomment">/// Sets the application_id to use slash commands.</span>
+    <span class="doccomment">/// Sets the application_id to use interactions.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">application_id</span>);
@@ -3428,7 +3541,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="kw">let</span> <span class="ident">application_id</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">application_id</span>
-                .<span class="ident">expect</span>(<span class="string">&quot;Expected application Id in order to use slash commands&quot;</span>);
+                .<span class="ident">expect</span>(<span class="string">&quot;Expected application Id in order to use interacions features&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">take</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
@@ -3527,7 +3640,8 @@
         <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
         <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">trim</span>().<span class="ident">starts_with</span>(<span class="string">&quot;Bot &quot;</span>) {
+        <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">trim</span>();
+        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">trimmed</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Bot &quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">trimmed</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Bearer &quot;</span>) {
             <span class="ident">token</span>.<span class="ident">to_string</span>()
         } <span class="kw">else</span> {
             <span class="macro">format!</span>(<span class="string">&quot;Bot {}&quot;</span>, <span class="ident">token</span>)
@@ -3646,6 +3760,17 @@
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateChannel</span> {
                 <span class="ident">guild_id</span>,
             },
+        })
+        .<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Creates a stage instance.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::CreateStageInstance</span>,
         })
         .<span class="kw">await</span>
     }
@@ -4059,6 +4184,19 @@
         .<span class="kw">await</span>
     }
 
+    <span class="doccomment">/// Deletes a stage instance.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteStageInstance</span> {
+                <span class="ident">channel_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Deletes an emoji from a server.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">emoji_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
@@ -4409,6 +4547,19 @@
         .<span class="kw">await</span>
     }
 
+    <span class="doccomment">/// Edits a stage instance.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::EditStageInstance</span> {
+                <span class="ident">channel_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Changes emoji information.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_emoji</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -4729,6 +4880,21 @@
         .<span class="kw">await</span>
     }
 
+    <span class="doccomment">/// Edits the current member for the provided [`Guild`] via its Id.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_member_me</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
+
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::EditMemberMe</span> {
+                <span class="ident">guild_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Edits the current user&#39;s nickname for the provided [`Guild`] via its Id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Pass [`None`] to reset the nickname.</span>
@@ -4740,7 +4906,7 @@
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
-            <span class="ident">route</span>: <span class="ident">RouteInfo::EditNickname</span> {
+            <span class="ident">route</span>: <span class="ident">RouteInfo::EditMemberMe</span> {
                 <span class="ident">guild_id</span>,
             },
         })
@@ -5362,6 +5528,19 @@
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetChannels</span> {
                 <span class="ident">guild_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Gets a stage instance.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_stage_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::GetStageInstance</span> {
+                <span class="ident">channel_id</span>,
             },
         })
         .<span class="kw">await</span>
@@ -6021,6 +6200,19 @@
         .<span class="kw">await</span>
     }
 
+    <span class="doccomment">/// Gets the current user&#39;s third party connections.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method only works for user tokens with the `connections` OAuth2 scope.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_connections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::GetUserConnections</span>,
+        })
+        .<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Gets our DM channels.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_dm_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
@@ -6253,6 +6445,40 @@
             },
         })
         .<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname</span>
+    <span class="doccomment">/// starts with a provided string.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">search_guild_members</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">request</span>(<span class="ident">Request</span> {
+                <span class="ident">body</span>: <span class="prelude-val">None</span>,
+                <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+                <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+                <span class="ident">route</span>: <span class="ident">RouteInfo::SearchGuildMembers</span> {
+                    <span class="ident">guild_id</span>,
+                    <span class="ident">query</span>,
+                    <span class="ident">limit</span>,
+                },
+            })
+            .<span class="kw">await</span><span class="question-mark">?</span>
+            .<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>()
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">members</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_array_mut</span>() {
+            <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="ident">members</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>) <span class="op">=</span> <span class="ident">member</span>.<span class="ident">as_object_mut</span>() {
+                    <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">from_number</span>(<span class="ident">guild_id</span>));
+                }
+            }
+        }
+
+        <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
     }
 
     <span class="doccomment">/// Starts removing some members from a guild based on the last time they&#39;ve been online.</span>

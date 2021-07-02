@@ -500,6 +500,22 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -925,7 +941,8 @@
     ) {
     }
 
-    <span class="doccomment">/// Dispatched when a user used a slash command.</span>
+    <span class="doccomment">/// Dispatched when an interaction is created (e.g a slash command was used</span>
+    <span class="doccomment">/// or a button was clicked).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the created interaction.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -995,6 +1012,21 @@
         <span class="ident">_application_command</span>: <span class="ident">ApplicationCommand</span>,
     ) {
     }
+
+    <span class="doccomment">/// Dispatched when a stage instance is created.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides the created stage instance.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stage_instance_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_stage_instance</span>: <span class="ident">StageInstance</span>) {}
+
+    <span class="doccomment">/// Dispatched when a stage instance is updated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides the created stage instance.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stage_instance_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_stage_instance</span>: <span class="ident">StageInstance</span>) {}
+
+    <span class="doccomment">/// Dispatched when a stage instance is deleted.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides the created stage instance.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stage_instance_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_stage_instance</span>: <span class="ident">StageInstance</span>) {}
 }
 
 <span class="doccomment">/// This core trait for handling raw events</span>

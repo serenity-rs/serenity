@@ -595,7 +595,7 @@
 
         <span class="self">self</span>.<span class="ident">filtered</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
-        <span class="self">self</span>.<span class="ident">is_within_limits</span>()
+        <span class="self">self</span>.<span class="ident">is_within_limits</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">is_closed</span>()
     }
 
     <span class="doccomment">/// Checks if the `reaction` passes set constraints.</span>

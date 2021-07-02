@@ -2242,6 +2242,121 @@
 <span id="2242">2242</span>
 <span id="2243">2243</span>
 <span id="2244">2244</span>
+<span id="2245">2245</span>
+<span id="2246">2246</span>
+<span id="2247">2247</span>
+<span id="2248">2248</span>
+<span id="2249">2249</span>
+<span id="2250">2250</span>
+<span id="2251">2251</span>
+<span id="2252">2252</span>
+<span id="2253">2253</span>
+<span id="2254">2254</span>
+<span id="2255">2255</span>
+<span id="2256">2256</span>
+<span id="2257">2257</span>
+<span id="2258">2258</span>
+<span id="2259">2259</span>
+<span id="2260">2260</span>
+<span id="2261">2261</span>
+<span id="2262">2262</span>
+<span id="2263">2263</span>
+<span id="2264">2264</span>
+<span id="2265">2265</span>
+<span id="2266">2266</span>
+<span id="2267">2267</span>
+<span id="2268">2268</span>
+<span id="2269">2269</span>
+<span id="2270">2270</span>
+<span id="2271">2271</span>
+<span id="2272">2272</span>
+<span id="2273">2273</span>
+<span id="2274">2274</span>
+<span id="2275">2275</span>
+<span id="2276">2276</span>
+<span id="2277">2277</span>
+<span id="2278">2278</span>
+<span id="2279">2279</span>
+<span id="2280">2280</span>
+<span id="2281">2281</span>
+<span id="2282">2282</span>
+<span id="2283">2283</span>
+<span id="2284">2284</span>
+<span id="2285">2285</span>
+<span id="2286">2286</span>
+<span id="2287">2287</span>
+<span id="2288">2288</span>
+<span id="2289">2289</span>
+<span id="2290">2290</span>
+<span id="2291">2291</span>
+<span id="2292">2292</span>
+<span id="2293">2293</span>
+<span id="2294">2294</span>
+<span id="2295">2295</span>
+<span id="2296">2296</span>
+<span id="2297">2297</span>
+<span id="2298">2298</span>
+<span id="2299">2299</span>
+<span id="2300">2300</span>
+<span id="2301">2301</span>
+<span id="2302">2302</span>
+<span id="2303">2303</span>
+<span id="2304">2304</span>
+<span id="2305">2305</span>
+<span id="2306">2306</span>
+<span id="2307">2307</span>
+<span id="2308">2308</span>
+<span id="2309">2309</span>
+<span id="2310">2310</span>
+<span id="2311">2311</span>
+<span id="2312">2312</span>
+<span id="2313">2313</span>
+<span id="2314">2314</span>
+<span id="2315">2315</span>
+<span id="2316">2316</span>
+<span id="2317">2317</span>
+<span id="2318">2318</span>
+<span id="2319">2319</span>
+<span id="2320">2320</span>
+<span id="2321">2321</span>
+<span id="2322">2322</span>
+<span id="2323">2323</span>
+<span id="2324">2324</span>
+<span id="2325">2325</span>
+<span id="2326">2326</span>
+<span id="2327">2327</span>
+<span id="2328">2328</span>
+<span id="2329">2329</span>
+<span id="2330">2330</span>
+<span id="2331">2331</span>
+<span id="2332">2332</span>
+<span id="2333">2333</span>
+<span id="2334">2334</span>
+<span id="2335">2335</span>
+<span id="2336">2336</span>
+<span id="2337">2337</span>
+<span id="2338">2338</span>
+<span id="2339">2339</span>
+<span id="2340">2340</span>
+<span id="2341">2341</span>
+<span id="2342">2342</span>
+<span id="2343">2343</span>
+<span id="2344">2344</span>
+<span id="2345">2345</span>
+<span id="2346">2346</span>
+<span id="2347">2347</span>
+<span id="2348">2348</span>
+<span id="2349">2349</span>
+<span id="2350">2350</span>
+<span id="2351">2351</span>
+<span id="2352">2352</span>
+<span id="2353">2353</span>
+<span id="2354">2354</span>
+<span id="2355">2355</span>
+<span id="2356">2356</span>
+<span id="2357">2357</span>
+<span id="2358">2358</span>
+<span id="2359">2359</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
@@ -2457,12 +2572,24 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdMembersIdRolesId</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/members/@me` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdMembersMe</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/members/@me/nick` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdMembersMeNick</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/members/search` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdMembersSearch</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/prune` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
@@ -2525,6 +2652,8 @@
     <span class="ident">UsersMe</span>,
     <span class="doccomment">/// Route for the `/users/@me/channels` path.</span>
     <span class="ident">UsersMeChannels</span>,
+    <span class="doccomment">/// Route for the `/users/@me/connections` path.</span>
+    <span class="ident">UsersMeConnections</span>,
     <span class="doccomment">/// Route for the `/users/@me/guilds` path.</span>
     <span class="ident">UsersMeGuilds</span>,
     <span class="doccomment">/// Route for the `/users/@me/guilds/:guild_id` path.</span>
@@ -2603,6 +2732,18 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationsIdGuildsIdCommandsId</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/stage-instances` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
+    <span class="ident">StageInstances</span>,
+    <span class="doccomment">/// Route for the `/stage-instances/:channel_id` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
+    <span class="ident">StageInstancesChannelId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route where no ratelimit headers are in place (i.e. user account-only</span>
     <span class="doccomment">/// routes).</span>
     <span class="doccomment">///</span>
@@ -2662,6 +2803,7 @@
         <span class="macro">api!</span>(<span class="string">&quot;/channels/{}/messages/{}/reactions&quot;</span>, <span class="ident">channel_id</span>, <span class="ident">message_id</span>)
     }
 
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_message_reactions_list</span>(
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
@@ -2675,7 +2817,6 @@
         );
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">uri</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>);
         }
 
@@ -2827,20 +2968,34 @@
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members&quot;</span>), <span class="ident">guild_id</span>)
     }
 
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members_search</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/search?&quot;</span>), <span class="ident">guild_id</span>);
+
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;query={}&quot;</span>, <span class="ident">query</span>);
+
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="ident">constants::MEMBER_FETCH_LIMIT</span>));
+
+        <span class="ident">s</span>
+    }
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members_optioned</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members?&quot;</span>), <span class="ident">guild_id</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>);
             <span class="comment">// should not error, ignoring</span>
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="ident">constants::MEMBER_FETCH_LIMIT</span>));
         <span class="comment">// should not error, ignoring</span>
 
         <span class="ident">s</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_member_me</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/members/@me&quot;</span>), <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_nickname</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
@@ -2919,6 +3074,10 @@
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}&quot;</span>), <span class="ident">target</span>)
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_me_connections</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/users/@me/connections&quot;</span>)
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_dm_channels</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">target</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}/channels&quot;</span>), <span class="ident">target</span>)
     }
@@ -2931,6 +3090,7 @@
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/users/{}/guilds&quot;</span>), <span class="ident">target</span>)
     }
 
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_guilds_optioned</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(
         <span class="ident">target</span>: <span class="ident">D</span>,
         <span class="ident">after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
@@ -2945,13 +3105,11 @@
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">after</span> {
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>);
             <span class="comment">// should not error, ignoring</span>
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="ident">before</span> {
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;before={}&quot;</span>, <span class="ident">before</span>);
             <span class="comment">// should not error, ignoring</span>
         }
@@ -3068,6 +3226,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_commands_permissions</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/permissions&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
     }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instances</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/stage-instances&quot;</span>).<span class="ident">to_string</span>()
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instance</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/stage-instances/{}&quot;</span>), <span class="ident">channel_id</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -3090,6 +3256,7 @@
     <span class="ident">CreateChannel</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">CreateStageInstance</span>,
     <span class="ident">CreateEmoji</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
@@ -3155,6 +3322,9 @@
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">DeleteChannel</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">DeleteStageInstance</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">DeleteEmoji</span> {
@@ -3242,6 +3412,9 @@
     <span class="ident">EditChannel</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">EditStageInstance</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">EditEmoji</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">emoji_id</span>: <span class="ident">u64</span>,
@@ -3302,6 +3475,9 @@
     <span class="ident">CrosspostMessage</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditMemberMe</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditNickname</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3373,6 +3549,9 @@
     },
     <span class="ident">GetChannels</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetStageInstance</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetCurrentApplicationInfo</span>,
     <span class="ident">GetCurrentUser</span>,
@@ -3499,6 +3678,7 @@
     <span class="ident">GetUser</span> {
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">GetUserConnections</span>,
     <span class="ident">GetUserDmChannels</span>,
     <span class="ident">GetVoiceRegions</span>,
     <span class="ident">GetWebhook</span> {
@@ -3531,6 +3711,11 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">role_id</span>: <span class="ident">u64</span>,
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">SearchGuildMembers</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     },
     <span class="ident">StartGuildPrune</span> {
         <span class="ident">days</span>: <span class="ident">u64</span>,
@@ -3591,6 +3776,9 @@
                 <span class="ident">Route::GuildsIdChannels</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_channels</span>(<span class="ident">guild_id</span>)),
             ),
+            <span class="ident">RouteInfo::CreateStageInstance</span> <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="ident">LightMethod::Post</span>, <span class="ident">Route::StageInstances</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::stage_instances</span>()))
+            },
             <span class="ident">RouteInfo::CreateEmoji</span> {
                 <span class="ident">guild_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (
@@ -3725,6 +3913,13 @@
                 <span class="ident">LightMethod::Delete</span>,
                 <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
+            ),
+            <span class="ident">RouteInfo::DeleteStageInstance</span> {
+                <span class="ident">channel_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Delete</span>,
+                <span class="ident">Route::StageInstancesChannelId</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::stage_instance</span>(<span class="ident">channel_id</span>)),
             ),
             <span class="ident">RouteInfo::DeleteEmoji</span> {
                 <span class="ident">emoji_id</span>,
@@ -3884,6 +4079,13 @@
                 <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
             ),
+            <span class="ident">RouteInfo::EditStageInstance</span> {
+                <span class="ident">channel_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::StageInstancesChannelId</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::stage_instance</span>(<span class="ident">channel_id</span>)),
+            ),
             <span class="ident">RouteInfo::EditEmoji</span> {
                 <span class="ident">emoji_id</span>,
                 <span class="ident">guild_id</span>,
@@ -3987,6 +4189,13 @@
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::ChannelsIdMessagesId</span>(<span class="ident">LightMethod::Patch</span>, <span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_message</span>(<span class="ident">channel_id</span>, <span class="ident">message_id</span>)),
+            ),
+            <span class="ident">RouteInfo::EditMemberMe</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::GuildsIdMembersMe</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_member_me</span>(<span class="ident">guild_id</span>)),
             ),
             <span class="ident">RouteInfo::EditNickname</span> {
                 <span class="ident">guild_id</span>,
@@ -4115,6 +4324,13 @@
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
+            ),
+            <span class="ident">RouteInfo::GetStageInstance</span> {
+                <span class="ident">channel_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::StageInstancesChannelId</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::stage_instance</span>(<span class="ident">channel_id</span>)),
             ),
             <span class="ident">RouteInfo::GetChannelInvites</span> {
                 <span class="ident">channel_id</span>,
@@ -4380,6 +4596,11 @@
             <span class="ident">RouteInfo::GetUser</span> {
                 <span class="ident">user_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::UsersId</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::user</span>(<span class="ident">user_id</span>))),
+            <span class="ident">RouteInfo::GetUserConnections</span> <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::UsersMeConnections</span>,
+                <span class="ident">Cow::from</span>(<span class="ident">Route::user_me_connections</span>()),
+            ),
             <span class="ident">RouteInfo::GetUserDmChannels</span> <span class="op">=</span><span class="op">&gt;</span> (
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::UsersMeChannels</span>,
@@ -4450,6 +4671,15 @@
                 <span class="ident">LightMethod::Delete</span>,
                 <span class="ident">Route::GuildsIdMembersIdRolesId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_member_role</span>(<span class="ident">guild_id</span>, <span class="ident">user_id</span>, <span class="ident">role_id</span>)),
+            ),
+            <span class="ident">RouteInfo::SearchGuildMembers</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">query</span>,
+                <span class="ident">limit</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdMembersSearch</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_members_search</span>(<span class="ident">guild_id</span>, <span class="ident">query</span>, <span class="ident">limit</span>)),
             ),
             <span class="ident">RouteInfo::StartGuildPrune</span> {
                 <span class="ident">days</span>,

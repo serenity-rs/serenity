@@ -307,6 +307,8 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Representations of voice information.</span>
 
@@ -419,6 +421,7 @@
             <span class="ident">premium_since</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span>,
+            <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         }
 
         <span class="kw">struct</span> <span class="ident">VoiceStateVisitor</span>;
@@ -494,6 +497,7 @@
                                     <span class="ident">premium_since</span>: <span class="ident">partial_member</span>.<span class="ident">premium_since</span>,
                                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                                     <span class="ident">permissions</span>: <span class="ident">partial_member</span>.<span class="ident">permissions</span>,
+                                    <span class="ident">avatar</span>: <span class="ident">partial_member</span>.<span class="ident">avatar</span>,
                                 });
                             }
                         },

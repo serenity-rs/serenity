@@ -143,6 +143,22 @@
 <span id="143">143</span>
 <span id="144">144</span>
 <span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -150,6 +166,7 @@
 <span class="kw">use</span> <span class="ident">simd_json::Mutable</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateEmbed</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder::CreateComponents</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions::InteractionApplicationCommandCallbackDataFlags</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">http::AttachmentType</span>, <span class="ident">utils</span>};
@@ -249,7 +266,7 @@
 
         <span class="self">self</span>.<span class="number">0</span>
             .<span class="ident">entry</span>(<span class="string">&quot;embeds&quot;</span>)
-            .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()))
+            .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()))
             .<span class="ident">as_array_mut</span>()
             .<span class="ident">unwrap</span>()
             .<span class="ident">push</span>(<span class="ident">embed</span>);
@@ -262,10 +279,12 @@
     <span class="doccomment">/// Calling this multiple times will overwrite the embed list.</span>
     <span class="doccomment">/// To append embeds, call [`Self::add_embed`] instead.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CreateEmbed</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">embeds</span> <span class="op">=</span>
-            <span class="ident">embeds</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">embed</span><span class="op">|</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>).<span class="ident">into</span>()).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">embeds</span> <span class="op">=</span> <span class="ident">embeds</span>
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">embed</span><span class="op">|</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">embed</span>.<span class="number">0</span>).<span class="ident">into</span>())
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">embeds</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">embeds</span>));
         <span class="self">self</span>
     }
 
@@ -286,6 +305,19 @@
     <span class="doccomment">/// Sets the flags for the response.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">from_number</span>(<span class="ident">flags</span>.<span class="ident">bits</span>()));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the components of this message.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateComponents</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateComponents</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">components</span> <span class="op">=</span> <span class="ident">CreateComponents::default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">components</span>);
+
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
         <span class="self">self</span>
     }
 }

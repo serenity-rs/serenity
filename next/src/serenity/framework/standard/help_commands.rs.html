@@ -1612,6 +1612,8 @@
 <span id="1612">1612</span>
 <span id="1613">1613</span>
 <span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -1945,15 +1947,17 @@
         <span class="kw">return</span> <span class="ident">help_options</span>.<span class="ident">lacking_permissions</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>).<span class="kw">await</span> {
+    <span class="ident">msg</span>.<span class="ident">guild_field</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="op">|</span><span class="ident">guild</span><span class="op">|</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">has_correct_roles</span>(<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">guild</span>.<span class="ident">roles</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>) {
                 <span class="kw">return</span> <span class="ident">help_options</span>.<span class="ident">lacking_role</span>;
             }
         }
-    }
 
-    <span class="ident">HelpBehaviour::Nothing</span>
+        <span class="ident">HelpBehaviour::Nothing</span>
+    })
+    .<span class="kw">await</span>
+    .<span class="ident">unwrap_or</span>(<span class="ident">HelpBehaviour::Nothing</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
