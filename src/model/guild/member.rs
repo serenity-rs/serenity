@@ -88,7 +88,8 @@ impl Member {
             return Ok(());
         }
 
-        match http.as_ref().add_member_role(self.guild_id.0, self.user.id.0, role_id.0).await {
+        match http.as_ref().add_member_role(self.guild_id.0, self.user.id.0, role_id.0, None).await
+        {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -120,7 +121,7 @@ impl Member {
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await {
             Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -237,7 +238,7 @@ impl Member {
         f(&mut edit_member);
         let map = utils::hashmap_to_json_map(edit_member.0);
 
-        http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await
+        http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await
     }
 
     /// Retrieves the ID and position of the member's highest role in the
@@ -448,7 +449,11 @@ impl Member {
             return Ok(());
         }
 
-        match http.as_ref().remove_member_role(self.guild_id.0, self.user.id.0, role_id.0).await {
+        match http
+            .as_ref()
+            .remove_member_role(self.guild_id.0, self.user.id.0, role_id.0, None)
+            .await
+        {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -480,7 +485,7 @@ impl Member {
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await {
             Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -521,7 +526,7 @@ impl Member {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id.0, self.user.id.0).await
+        http.as_ref().remove_ban(self.guild_id.0, self.user.id.0, None).await
     }
 
     /// Returns the formatted URL of the member's per guild avatar, if one exists.
