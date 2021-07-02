@@ -15,7 +15,7 @@ use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
 };
-#[cfg(feature = "simdjson")]
+#[cfg(feature = "simd-json")]
 use simd_json::ValueAccess;
 
 #[cfg(all(feature = "model", feature = "utils"))]
