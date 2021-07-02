@@ -2,6 +2,7 @@
 
 use bitflags::bitflags;
 use serde::de::Error as DeError;
+use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
@@ -67,7 +68,7 @@ pub struct Activity {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub session_id: Option<String>,
     /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
-    pub url: Option<String>,
+    pub url: Option<Url>,
 }
 
 #[cfg(feature = "model")]
@@ -153,7 +154,7 @@ impl Activity {
     pub fn streaming<N, U>(name: N, url: U) -> Activity
     where
         N: ToString,
-        U: ToString,
+        U: AsRef<str>,
     {
         Activity {
             application_id: None,
@@ -172,7 +173,7 @@ impl Activity {
             sync_id: None,
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
-            url: Some(url.to_string()),
+            url: Some(Url::parse(url.as_ref()).expect("Failed to parse url")),
         }
     }
 
@@ -405,7 +406,7 @@ impl<'de> Deserialize<'de> for Activity {
             None => None,
         };
 
-        let url = map.remove("url").and_then(|v| from_value::<String>(v).ok());
+        let url = map.remove("url").and_then(|v| from_value::<Url>(v).ok());
 
         Ok(Activity {
             application_id,

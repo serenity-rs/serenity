@@ -159,7 +159,7 @@ impl Ratelimiter {
     #[instrument]
     pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
         let RatelimitedRequest {
-            req,
+            mut req,
         } = req;
 
         loop {
@@ -175,7 +175,7 @@ impl Ratelimiter {
             // amount.
             //
             // This isn't normally important, but might be for ratelimiting.
-            let (_, route, _) = req.route.deconstruct();
+            let (_, route, _) = req.route.clone().deconstruct();
 
             // Perform pre-checking here:
             //
@@ -189,7 +189,7 @@ impl Ratelimiter {
 
             bucket.lock().await.pre_hook(&route).await;
 
-            let request = req.build(&self.client, &self.token, None)?.build()?;
+            let request = req.build(&self.client, &self.token, None).await?.build()?;
             let response = self.client.execute(request).await?;
 
             // Check if the request got ratelimited by checking for status 429,

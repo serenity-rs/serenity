@@ -846,8 +846,8 @@ pub(crate) async fn has_correct_permissions(
         true
     } else if let Some(guild) = message.guild(&cache).await {
         let channel = match guild.channels.get(&message.channel_id) {
-            Some(channel) => channel,
-            None => return false,
+            Some(Channel::Guild(channel)) => channel,
+            _ => return false,
         };
         let member = match guild.members.get(&message.author.id) {
             Some(member) => member,

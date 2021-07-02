@@ -690,9 +690,14 @@ impl Route {
         target: D,
         after: Option<u64>,
         before: Option<u64>,
-        limit: u64,
+        limit: Option<u64>,
     ) -> String {
-        let mut s = format!(api!("/users/{}/guilds?limit={}&"), target, limit);
+        let mut s = format!(api!("/users/{}/guilds?"), target);
+
+        if let Some(limit) = limit {
+            #[allow(clippy::let_underscore_must_use)]
+            let _ = write!(s, "&limit={}", limit);
+        }
 
         if let Some(after) = after {
             #[allow(clippy::let_underscore_must_use)]
@@ -1216,7 +1221,7 @@ pub enum RouteInfo<'a> {
     GetGuilds {
         after: Option<u64>,
         before: Option<u64>,
-        limit: u64,
+        limit: Option<u64>,
     },
     GetInvite {
         code: &'a str,
