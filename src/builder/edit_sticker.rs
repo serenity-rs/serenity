@@ -20,19 +20,25 @@ use crate::internal::prelude::*;
 pub struct EditSticker(pub HashMap<&'static str, Value>);
 
 impl EditSticker {
-    /// The name of the role to set.
+    /// The name of the sticker to set.
+    ///
+    /// **Note**: Must be between 2 and 30 characters long.
     pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
         self.0.insert("name", Value::from(name.to_string()));
         self
     }
 
-    /// The set of permissions to assign the role.
+    /// The description of the sticker.
+    ///
+    /// **Note**: If not empty, must be between 2 and 100 characters long.
     pub fn description<S: ToString>(&mut self, description: S) -> &mut Self {
         self.0.insert("description", Value::from(description.to_string()));
         self
     }
 
-    /// The name of a unicode emoji representing the sticker's expression
+    /// The Discord name of a unicode emoji representing the sticker's expression. 
+    ///
+    /// **Note**: Must be between 2 and 200 characters long.
     pub fn tags<S: ToString>(&mut self, tags: S) -> &mut Self {
         self.0.insert("tags", Value::from(tags.to_string()));
         self

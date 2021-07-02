@@ -25,7 +25,7 @@ pub struct Sticker {
     pub name: String,
     /// Description of the sticker
     pub description: Option<String>,
-    /// For guild stickers, the name of a unicode emoji representing the
+    /// For guild stickers, the Discord name of a unicode emoji representing the
     /// sticker's expression. For standard stickers, a list of
     /// related expressions.
     #[serde(
@@ -38,7 +38,8 @@ pub struct Sticker {
     pub kind: StickerType,
     /// The type of sticker format.
     pub format_type: StickerFormatType,
-    /// Whether or not the sticker is available.
+    /// Whether or not this sticker can be used, may be false due to loss of
+    /// Server Boosts.
     #[serde(default)]
     pub available: bool,
     /// Id of the guild that owns this sticker.
