@@ -2410,6 +2410,19 @@ pub enum RelatedId<T> {
     Multiple(Vec<T>),
 }
 
+impl<T> RelatedId<T> {
+    pub fn contains(&self, value: &T) -> bool
+    where
+        T: std::cmp::PartialEq,
+    {
+        match self {
+            RelatedId::Never | RelatedId::None => false,
+            RelatedId::Some(id) => id == value,
+            RelatedId::Multiple(ids) => ids.contains(value),
+        }
+    }
+}
+
 impl<T> From<Option<T>> for RelatedId<T> {
     fn from(value: Option<T>) -> Self {
         match value {
