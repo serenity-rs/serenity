@@ -1182,6 +1182,7 @@ pub struct ActionRow {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// The components of this ActionRow.
+    #[serde(default)]
     pub components: Vec<Component>,
 }
 
@@ -1258,5 +1259,6 @@ pub struct SelectMenuOption {
     /// The emoji displayed on this option.
     pub emoji: Option<ReactionType>,
     /// Render this option as the default selection.
+    #[serde(default)]
     pub default: bool,
 }
