@@ -3219,6 +3219,7 @@ mod test {
                 discovery_splash: None,
                 widget_channel_id: None,
                 public_updates_channel_id: None,
+                stage_instances: vec![],
             }
         }
 
