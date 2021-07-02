@@ -104,6 +104,7 @@ impl Interaction {
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
+        Message::check_sticker_ids_length(&map)?;
 
         http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
     }
@@ -142,6 +143,7 @@ impl Interaction {
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
+        Message::check_sticker_ids_length(&map)?;
 
         http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
     }
@@ -186,6 +188,7 @@ impl Interaction {
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
+        Message::check_sticker_ids_length(&map)?;
 
         http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
     }
@@ -221,6 +224,7 @@ impl Interaction {
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
+        Message::check_sticker_ids_length(&map)?;
 
         http.as_ref()
             .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))

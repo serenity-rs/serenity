@@ -735,6 +735,7 @@ impl ChannelId {
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
+        Message::check_sticker_ids_length(&map)?;
 
         http.as_ref().send_files(self.0, files, map).await
     }
@@ -771,6 +772,7 @@ impl ChannelId {
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
+        Message::check_sticker_ids_length(&map)?;
 
         let message = if msg.2.is_empty() {
             http.as_ref().send_message(self.0, &Value::from(map)).await?

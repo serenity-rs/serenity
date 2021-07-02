@@ -169,6 +169,8 @@ pub enum Error {
     DeleteNitroSticker,
     /// Indicates that the sticker file is missing.
     NoStickerFileSet,
+    /// When attempting to send a message with over 3 stickers.
+    StickerAmount,
 }
 
 impl Error {
@@ -213,6 +215,7 @@ impl Display for Error {
             Error::NoTokenSet => f.write_str("Token is not set."),
             Error::DeleteNitroSticker => f.write_str("Cannot delete an official sticker."),
             Error::NoStickerFileSet => f.write_str("Sticker file is not set."),
+            Error::StickerAmount => f.write_str("Too many stickers in a message."),
         }
     }
 }

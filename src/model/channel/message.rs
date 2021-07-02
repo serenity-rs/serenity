@@ -994,6 +994,16 @@ impl Message {
 
         Ok(())
     }
+
+    pub(crate) fn check_sticker_ids_length(map: &JsonMap) -> Result<()> {
+        if let Some(Value::Array(sticker_ids)) = map.get("sticker_ids") {
+            if sticker_ids.len() > constants::STICKER_MAX_COUNT {
+                return Err(Error::Model(ModelError::StickerAmount));
+            }
+        }
+
+        Ok(())
+    }
 }
 
 impl AsRef<MessageId> for Message {
