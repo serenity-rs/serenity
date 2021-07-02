@@ -35,7 +35,7 @@ impl<'a> CreateSticker<'a> {
         self
     }
 
-    /// The Discord name of a unicode emoji representing the sticker's expression. 
+    /// The Discord name of a unicode emoji representing the sticker's expression.
     ///
     /// **Note**: Must be between 2 and 200 characters long.
     pub fn tags<S: ToString>(&mut self, tags: S) -> &mut Self {

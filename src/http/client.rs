@@ -726,7 +726,7 @@ impl Http {
             }),
             headers: None,
             route: RouteInfo::CreateSticker {
-                guild_id
+                guild_id,
             },
         })
         .await
