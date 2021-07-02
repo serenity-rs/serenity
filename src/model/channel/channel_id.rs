@@ -97,7 +97,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(invite.0);
 
-        http.as_ref().create_invite(self.0, &map).await
+        http.as_ref().create_invite(self.0, &map, None).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -345,7 +345,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(channel.0);
 
-        http.as_ref().edit_channel(self.0, &map).await
+        http.as_ref().edit_channel(self.0, &map, None).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -558,7 +558,7 @@ impl ChannelId {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn pin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
-        http.as_ref().pin_message(self.0, message_id.into().0).await
+        http.as_ref().pin_message(self.0, message_id.into().0, None).await
     }
 
     /// Crossposts a [`Message`].
@@ -854,7 +854,7 @@ impl ChannelId {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        http.as_ref().unpin_message(self.0, message_id.into().0).await
+        http.as_ref().unpin_message(self.0, message_id.into().0, None).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -885,7 +885,7 @@ impl ChannelId {
             "name": name.to_string(),
         });
 
-        http.as_ref().create_webhook(self.0, &map).await
+        http.as_ref().create_webhook(self.0, &map, None).await
     }
 
     /// Creates a webhook with a name and an avatar.
@@ -940,7 +940,7 @@ impl ChannelId {
             "avatar": avatar
         });
 
-        http.as_ref().create_webhook(self.0, &map).await
+        http.as_ref().create_webhook(self.0, &map, None).await
     }
 
     /// Returns a future that will await one message sent in this channel.

@@ -132,7 +132,7 @@ impl Emoji {
                 });
 
                 *self = AsRef::<Http>::as_ref(&cache_http)
-                    .edit_emoji(guild_id.0, self.id.0, &map)
+                    .edit_emoji(guild_id.0, self.id.0, &map, None)
                     .await?;
 
                 Ok(())
