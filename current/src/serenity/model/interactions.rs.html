@@ -1260,6 +1260,8 @@
 <span id="1260">1260</span>
 <span id="1261">1261</span>
 <span id="1262">1262</span>
+<span id="1263">1263</span>
+<span id="1264">1264</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -2445,6 +2447,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ComponentType</span>,
     <span class="doccomment">/// The components of this ActionRow.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">components</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Component</span><span class="op">&gt;</span>,
 }
 
@@ -2521,6 +2524,7 @@
     <span class="doccomment">/// The emoji displayed on this option.</span>
     <span class="kw">pub</span> <span class="ident">emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Render this option as the default selection.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">default</span>: <span class="ident">bool</span>,
 }
 </pre></div>
