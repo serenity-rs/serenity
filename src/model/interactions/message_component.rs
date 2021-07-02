@@ -1,3 +1,5 @@
+use std::convert::TryFrom;
+
 use serde::de::Error as DeError;
 use serde::{Serialize, Serializer};
 
@@ -10,7 +12,6 @@ use crate::builder::{
 use crate::http::Http;
 use crate::model::interactions::InteractionType;
 use crate::utils;
-use std::convert::TryFrom;
 
 /// An interaction triggered by a message component.
 #[derive(Clone, Debug, Serialize)]
@@ -506,8 +507,8 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
 
 impl Serialize for ActionRowComponent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         match self {
             ActionRowComponent::Button(c) => Button::serialize(c, serializer),
@@ -520,7 +521,7 @@ impl From<ActionRowComponent> for Component {
     fn from(component: ActionRowComponent) -> Self {
         match component {
             ActionRowComponent::Button(b) => Component::Button(b),
-            ActionRowComponent::SelectMenu(s) => Component::SelectMenu(s)
+            ActionRowComponent::SelectMenu(s) => Component::SelectMenu(s),
         }
     }
 }

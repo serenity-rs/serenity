@@ -165,7 +165,7 @@ pub enum Error {
     /// Indicates that the webhook token is missing.
     NoTokenSet,
     /// Indicates that the component type cannot be used in this context.
-    InvalidComponentType
+    InvalidComponentType,
 }
 
 impl Error {
