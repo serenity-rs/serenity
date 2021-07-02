@@ -467,7 +467,7 @@
 
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>(<span class="ident">CreateInvite::default</span>()).<span class="number">0</span>);
 
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">create_invite</span>(<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">create_invite</span>(<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes the invite.</span>

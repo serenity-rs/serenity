@@ -1223,7 +1223,7 @@
 
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">invite</span>.<span class="number">0</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_invite</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_invite</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a [permission overwrite][`PermissionOverwrite`] for either a</span>
@@ -1471,7 +1471,7 @@
 
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">channel</span>.<span class="number">0</span>);
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits a [`Message`] in the channel given its Id.</span>
@@ -1684,7 +1684,7 @@
     <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pin</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">pin_message</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">pin_message</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Crossposts a [`Message`].</span>
@@ -1979,7 +1979,7 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">message_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">unpin_message</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">unpin_message</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">message_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Retrieves the channel&#39;s webhooks.</span>
@@ -2010,7 +2010,7 @@
             <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
         });
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_webhook</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_webhook</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a webhook with a name and an avatar.</span>
@@ -2065,7 +2065,7 @@
             <span class="string">&quot;avatar&quot;</span>: <span class="ident">avatar</span>
         });
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_webhook</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_webhook</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Returns a future that will await one message sent in this channel.</span>
