@@ -242,7 +242,7 @@ impl GuildId {
 
         let map = utils::hashmap_to_json_map(builder.0);
 
-        http.as_ref().create_channel(self.0, &map).await
+        http.as_ref().create_channel(self.0, &map, None).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -277,7 +277,7 @@ impl GuildId {
             "image": image,
         });
 
-        http.as_ref().create_emoji(self.0, &map).await
+        http.as_ref().create_emoji(self.0, &map, None).await
     }
 
     /// Creates an integration for the guild.
@@ -302,7 +302,7 @@ impl GuildId {
             "type": kind,
         });
 
-        http.as_ref().create_guild_integration(self.0, integration_id.0, &map).await
+        http.as_ref().create_guild_integration(self.0, integration_id.0, &map, None).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -326,7 +326,7 @@ impl GuildId {
         f(&mut edit_role);
         let map = utils::hashmap_to_json_map(edit_role.0);
 
-        let role = http.as_ref().create_role(self.0, &map).await?;
+        let role = http.as_ref().create_role(self.0, &map, None).await?;
 
         if let Some(position) = map.get("position").and_then(Value::as_u64) {
             self.edit_role_position(&http, role.id, position).await?;
@@ -432,7 +432,7 @@ impl GuildId {
         f(&mut edit_guild);
         let map = utils::hashmap_to_json_map(edit_guild.0);
 
-        http.as_ref().edit_guild(self.0, &map).await
+        http.as_ref().edit_guild(self.0, &map, None).await
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -459,7 +459,7 @@ impl GuildId {
             "name": name,
         });
 
-        http.as_ref().edit_emoji(self.0, emoji_id.into().0, &map).await
+        http.as_ref().edit_emoji(self.0, emoji_id.into().0, &map, None).await
     }
 
     /// Edits the properties of member of the guild, such as muting or
@@ -495,7 +495,7 @@ impl GuildId {
         f(&mut edit_member);
         let map = utils::hashmap_to_json_map(edit_member.0);
 
-        http.as_ref().edit_member(self.0, user_id.into().0, &map).await
+        http.as_ref().edit_member(self.0, user_id.into().0, &map, None).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -553,7 +553,7 @@ impl GuildId {
         f(&mut edit_role);
         let map = utils::hashmap_to_json_map(edit_role.0);
 
-        http.as_ref().edit_role(self.0, role_id.into().0, &map).await
+        http.as_ref().edit_role(self.0, role_id.into().0, &map, None).await
     }
 
     /// Edits the order of [`Role`]s
@@ -581,7 +581,7 @@ impl GuildId {
         role_id: impl Into<RoleId>,
         position: u64,
     ) -> Result<Vec<Role>> {
-        http.as_ref().edit_role_position(self.0, role_id.into().0, position).await
+        http.as_ref().edit_role_position(self.0, role_id.into().0, position, None).await
     }
 
     /// Edits the [`GuildWelcomeScreen`].
@@ -773,7 +773,7 @@ impl GuildId {
         user_id: impl Into<UserId>,
         reason: &str,
     ) -> Result<()> {
-        http.as_ref().kick_member_with_reason(self.0, user_id.into().0, reason).await
+        http.as_ref().kick_member_with_reason(self.0, user_id.into().0, reason, None).await
     }
 
     /// Leaves the guild.
@@ -897,7 +897,7 @@ impl GuildId {
         let mut map = JsonMap::new();
         map.insert("channel_id".to_string(), from_number(channel_id.into().0));
 
-        http.as_ref().edit_member(self.0, user_id.into().0, &map).await
+        http.as_ref().edit_member(self.0, user_id.into().0, &map, None).await
     }
 
     /// Returns the name of whatever guild this id holds.
@@ -925,7 +925,7 @@ impl GuildId {
     ) -> Result<Member> {
         let mut map = JsonMap::new();
         map.insert("channel_id".to_string(), NULL);
-        http.as_ref().edit_member(self.0, user_id.into().0, &map).await
+        http.as_ref().edit_member(self.0, user_id.into().0, &map, None).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
@@ -1077,11 +1077,7 @@ impl GuildId {
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn start_prune(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
-        let map = json!({
-            "days": days,
-        });
-
-        http.as_ref().start_guild_prune(self.0, &map).await
+        http.as_ref().start_guild_prune(self.0, days as u64, None).await
     }
 
     /// Unbans a [`User`] from the guild.
@@ -1095,7 +1091,7 @@ impl GuildId {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn unban(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().remove_ban(self.0, user_id.into().0).await
+        http.as_ref().remove_ban(self.0, user_id.into().0, None).await
     }
 
     /// Retrieve's the guild's vanity URL.
