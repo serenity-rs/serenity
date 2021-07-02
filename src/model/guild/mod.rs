@@ -1,6 +1,6 @@
 //! Models relating to guilds and types that it owns.
 
-// FIXME: Remove after `GuildEmbed` is removed.
+// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.
 #![allow(deprecated)]
 
 mod audit_log;
@@ -231,7 +231,13 @@ pub struct Guild {
     /// Whether or not this guild is designated as NSFW. See [`discord support article`].
     ///
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    #[deprecated(note = "Removed in favor of Guild::nsfw_level.")]
+    #[serde(default)]
     pub nsfw: bool,
+    /// The guild NSFW state. See [`discord support article`].
+    ///
+    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    pub nsfw_level: NsfwLevel,
     /// The maximum amount of users in a video channel.
     pub max_video_channel_users: Option<u64>,
     /// The maximum number of presences for the guild. The default value is currently 25000.
@@ -648,13 +654,12 @@ impl Guild {
         self.id.create_application_command(http, f).await
     }
 
-    /// Same as [`create_application_command`], but allows to create more
-    /// than one command per call.
+    /// Overrides all guild application commands.
     ///
     /// [`create_application_command`]: Self::create_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn create_application_commands<F>(
+    pub async fn set_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
@@ -662,7 +667,7 @@ impl Guild {
     where
         F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
     {
-        self.id.create_application_commands(http, f).await
+        self.id.set_application_commands(http, f).await
     }
 
     /// Creates a guild specific [`ApplicationCommandPermission`].
@@ -686,13 +691,10 @@ impl Guild {
         self.id.create_application_command_permission(http, command_id, f).await
     }
 
-    /// Same as [`create_application_command_permission`] but allows to create
-    /// more than one permission per call.
-    ///
-    /// [`create_application_command_permission`]: Self::create_application_command_permission
+    /// Overrides all application commands permissions.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn create_application_commands_permissions<F>(
+    pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
@@ -702,7 +704,7 @@ impl Guild {
             &mut CreateApplicationCommandsPermissions,
         ) -> &mut CreateApplicationCommandsPermissions,
     {
-        self.id.create_application_commands_permissions(http, f).await
+        self.id.set_application_commands_permissions(http, f).await
     }
 
     /// Get all guild application commands.
@@ -1533,6 +1535,10 @@ impl Guild {
     ///
     /// - **username**: "zey"
     /// - **username and discriminator**: "zey#5479"
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub fn member_named(&self, name: &str) -> Option<&Member> {
         let (name, discrim) = if let Some(pos) = name.rfind('#') {
             let split = name.split_at(pos + 1);
@@ -1579,6 +1585,10 @@ impl Guild {
     /// However, since the read-locks are dropped after borrowing the name,
     /// the names might have been changed by the user, the sorted list cannot
     /// account for this.
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub async fn members_starting_with(
         &self,
         prefix: &str,
@@ -1647,6 +1657,10 @@ impl Guild {
     /// However, since the read-locks are dropped after borrowing the name,
     /// the names might have been changed by the user, the sorted list cannot
     /// account for this.
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub async fn members_containing(
         &self,
         substring: &str,
@@ -1710,6 +1724,10 @@ impl Guild {
     /// However, since the read-locks are dropped after borrowing the name,
     /// the names might have been changed by the user, the sorted list cannot
     /// account for this.
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub async fn members_username_containing(
         &self,
         substring: &str,
@@ -1768,6 +1786,10 @@ impl Guild {
     /// However, since the read-locks are dropped after borrowing the name,
     /// the names might have been changed by the user, the sorted list cannot
     /// account for this.
+    ///
+    /// **Note**: This will only search members that are cached. If you want to
+    /// search all members in the guild via the Http API, use
+    /// [`Self::search_members`].
     pub async fn members_nick_containing(
         &self,
         substring: &str,
@@ -1829,23 +1851,29 @@ impl Guild {
             return Ok(Permissions::all());
         }
 
+        let member = self.member(cache_http, &user_id).await?;
+
+        Ok(self._member_permission_from_member(&member))
+    }
+
+    /// Helper function that's used for getting a [`Member`]'s permissions.
+    #[cfg(feature = "cache")]
+    pub(crate) fn _member_permission_from_member(&self, member: &Member) -> Permissions {
         let everyone = match self.roles.get(&RoleId(self.id.0)) {
             Some(everyone) => everyone,
             None => {
                 error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
 
-                return Ok(Permissions::empty());
+                return Permissions::empty();
             },
         };
-
-        let member = self.member(cache_http, &user_id).await?;
 
         let mut permissions = everyone.permissions;
 
         for role in &member.roles {
             if let Some(role) = self.roles.get(role) {
                 if role.permissions.contains(Permissions::ADMINISTRATOR) {
-                    return Ok(Permissions::all());
+                    return Permissions::all();
                 }
 
                 permissions |= role.permissions;
@@ -1854,7 +1882,7 @@ impl Guild {
             }
         }
 
-        Ok(permissions)
+        permissions
     }
 
     /// Moves a member to a specific voice channel.
@@ -2120,6 +2148,29 @@ impl Guild {
         It: IntoIterator<Item = (ChannelId, u64)>,
     {
         self.id.reorder_channels(&http, channels).await
+    }
+
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
+    /// starts with a provided string.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results.
+    /// Minimum value is 1, maximum and default value is 1000.
+    ///
+    /// **Note**: Queries are case insensitive.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn search_members(
+        &self,
+        http: impl AsRef<Http>,
+        query: &str,
+        limit: Option<u64>,
+    ) -> Result<Vec<Member>> {
+        self.id.search_members(http, query, limit).await
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -2621,6 +2672,12 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(bool::deserialize)
             .map_err(DeError::custom)?;
 
+        let nsfw_level = map
+            .remove("nsfw_level")
+            .ok_or_else(|| DeError::custom("expected nsfw_level"))
+            .and_then(NsfwLevel::deserialize)
+            .map_err(DeError::custom)?;
+
         let widget_enabled = match map.remove("widget_enabled") {
             Some(v) => Option::<bool>::deserialize(v).map_err(DeError::custom)?,
             None => None,
@@ -2693,6 +2750,7 @@ impl<'de> Deserialize<'de> for Guild {
             approximate_member_count,
             approximate_presence_count,
             nsfw,
+            nsfw_level,
             max_video_channel_users,
             max_presences,
             max_members,
@@ -3129,6 +3187,29 @@ enum_number!(VerificationLevel {
     Higher
 });
 
+/// The [`Guild`] nsfw level.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+pub enum NsfwLevel {
+    /// The nsfw level is not specified.
+    Default = 0,
+    /// The guild is considered as explicit.
+    Explicit = 1,
+    /// The guild is considered as safe.
+    Safe = 2,
+    /// The guild is age restricted.
+    AgeRestricted = 3,
+    /// Unknown nsfw level.
+    Unknown = !0,
+}
+
+enum_number!(NsfwLevel {
+    Default,
+    Explicit,
+    Safe,
+    AgeRestricted
+});
+
 #[cfg(test)]
 mod test {
     #[cfg(feature = "model")]
@@ -3163,6 +3244,7 @@ mod test {
                 premium_since: None,
                 #[cfg(feature = "unstable_discord_api")]
                 permissions: None,
+                avatar: None,
             }
         }
 
@@ -3225,6 +3307,7 @@ mod test {
                 approximate_member_count: None,
                 approximate_presence_count: None,
                 nsfw: false,
+                nsfw_level: NsfwLevel::Default,
                 max_video_channel_users: None,
                 max_presences: None,
                 max_members: None,

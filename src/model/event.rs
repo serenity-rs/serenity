@@ -514,6 +514,7 @@ pub struct GuildMemberUpdateEvent {
     pub deaf: bool,
     #[serde(default)]
     pub mute: bool,
+    pub avatar: Option<String>,
 }
 
 #[cfg(feature = "cache")]
@@ -536,6 +537,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.premium_since.clone_from(&self.premium_since);
                 member.deaf.clone_from(&self.deaf);
                 member.mute.clone_from(&self.mute);
+                member.avatar.clone_from(&self.avatar);
 
                 item
             } else {
@@ -555,6 +557,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     premium_since: self.premium_since,
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
+                    avatar: self.avatar.clone(),
                 });
             }
 
@@ -859,19 +862,39 @@ impl CacheUpdate for GuildUpdateEvent {
 
     async fn update(&mut self, cache: &Cache) -> Option<()> {
         if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild.id) {
-            guild.afk_timeout = self.guild.afk_timeout;
             guild.afk_channel_id.clone_from(&self.guild.afk_channel_id);
+            guild.afk_timeout = self.guild.afk_timeout;
+            guild.banner.clone_from(&self.guild.banner);
+            guild.discovery_splash.clone_from(&self.guild.discovery_splash);
+            guild.features.clone_from(&self.guild.features);
             guild.icon.clone_from(&self.guild.icon);
             guild.name.clone_from(&self.guild.name);
             guild.owner_id.clone_from(&self.guild.owner_id);
+            guild.roles.clone_from(&self.guild.roles);
+            guild.splash.clone_from(&self.guild.splash);
+            guild.vanity_url_code.clone_from(&self.guild.vanity_url_code);
+            guild.welcome_screen.clone_from(&self.guild.welcome_screen);
 
             #[allow(deprecated)]
             {
                 guild.region.clone_from(&self.guild.region);
             }
 
-            guild.roles.clone_from(&self.guild.roles);
+            guild.default_message_notifications = self.guild.default_message_notifications;
+            guild.max_members = self.guild.max_members;
+            guild.max_presences = self.guild.max_presences;
+            guild.max_video_channel_users = self.guild.max_video_channel_users;
+            guild.mfa_level = self.guild.mfa_level;
+            guild.nsfw_level = self.guild.nsfw_level;
+            guild.premium_subscription_count = self.guild.premium_subscription_count;
+            guild.premium_tier = self.guild.premium_tier;
+            guild.public_updates_channel_id = self.guild.public_updates_channel_id;
+            guild.rules_channel_id = self.guild.rules_channel_id;
+            guild.system_channel_flags = self.guild.system_channel_flags;
+            guild.system_channel_id = self.guild.system_channel_id;
             guild.verification_level = self.guild.verification_level;
+            guild.widget_channel_id = self.guild.widget_channel_id;
+            guild.widget_enabled = self.guild.widget_enabled;
         }
 
         None
@@ -1080,6 +1103,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                         premium_since: None,
                         #[cfg(feature = "unstable_discord_api")]
                         permissions: None,
+                        avatar: None,
                     });
                 }
             }
@@ -1553,6 +1577,54 @@ impl<'de> Deserialize<'de> for ApplicationCommandDeleteEvent {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct StageInstanceCreateEvent {
+    pub stage_instance: StageInstance,
+}
+
+impl<'de> Deserialize<'de> for StageInstanceCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let stage_instance = StageInstance::deserialize(deserializer)?;
+
+        Ok(Self {
+            stage_instance,
+        })
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct StageInstanceUpdateEvent {
+    pub stage_instance: StageInstance,
+}
+
+impl<'de> Deserialize<'de> for StageInstanceUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let stage_instance = StageInstance::deserialize(deserializer)?;
+
+        Ok(Self {
+            stage_instance,
+        })
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct StageInstanceDeleteEvent {
+    pub stage_instance: StageInstance,
+}
+
+impl<'de> Deserialize<'de> for StageInstanceDeleteEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let stage_instance = StageInstance::deserialize(deserializer)?;
+
+        Ok(Self {
+            stage_instance,
+        })
+    }
+}
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -1741,7 +1813,7 @@ pub enum Event {
     VoiceServerUpdate(VoiceServerUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     WebhookUpdate(WebhookUpdateEvent),
-    /// A user used a slash command.
+    /// An interaction was created.
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     InteractionCreate(InteractionCreateEvent),
@@ -1769,6 +1841,12 @@ pub enum Event {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationCommandDelete(ApplicationCommandDeleteEvent),
+    /// A stage instance was created.
+    StageInstanceCreate(StageInstanceCreateEvent),
+    /// A stage instance was updated.
+    StageInstanceUpdate(StageInstanceUpdateEvent),
+    /// A stage instance was deleted.
+    StageInstanceDelete(StageInstanceDeleteEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
 }
@@ -1829,6 +1907,9 @@ impl Event {
             Self::ApplicationCommandUpdate(_) => EventType::ApplicationCommandUpdate,
             #[cfg(feature = "unstable_discord_api")]
             Self::ApplicationCommandDelete(_) => EventType::ApplicationCommandDelete,
+            Self::StageInstanceCreate(_) => EventType::StageInstanceCreate,
+            Self::StageInstanceUpdate(_) => EventType::StageInstanceUpdate,
+            Self::StageInstanceDelete(_) => EventType::StageInstanceDelete,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
     }
@@ -1925,6 +2006,9 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::ApplicationCommandUpdate => Event::ApplicationCommandUpdate(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
         EventType::ApplicationCommandDelete => Event::ApplicationCommandDelete(from_value(v)?),
+        EventType::StageInstanceCreate => Event::StageInstanceCreate(from_value(v)?),
+        EventType::StageInstanceUpdate => Event::StageInstanceUpdate(from_value(v)?),
+        EventType::StageInstanceDelete => Event::StageInstanceDelete(from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
             value: v,
@@ -2094,7 +2178,7 @@ pub enum EventType {
     ///
     /// This maps to [`WebhookUpdateEvent`].
     WebhookUpdate,
-    /// Indicator that a slash command was received.
+    /// Indicator that an interaction was created.
     ///
     /// This maps to [`InteractionCreateEvent`].
     #[cfg(feature = "unstable_discord_api")]
@@ -2130,6 +2214,15 @@ pub enum EventType {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationCommandDelete,
+    /// Indicator that a stage instance was created.
+    /// This maps to [`StageInstanceCreateEvent`].
+    StageInstanceCreate,
+    /// Indicator that a stage instance was updated.
+    /// This maps to [`StageInstanceUpdateEvent`].
+    StageInstanceUpdate,
+    /// Indicator that a stage instance was deleted.
+    /// This maps to [`StageInstanceDeleteEvent`].
+    StageInstanceDelete,
     /// An unknown event was received over the gateway.
     ///
     /// This should be logged so that support for it can be added in the
@@ -2202,6 +2295,9 @@ impl EventType {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     const APPLICATION_COMMAND_DELETE: &'static str = "APPLICATION_COMMAND_DELETE";
+    const STAGE_INSTANCE_CREATE: &'static str = "STAGE_INSTANCE_CREATE";
+    const STAGE_INSTANCE_UPDATE: &'static str = "STAGE_INSTANCE_UPDATE";
+    const STAGE_INSTANCE_DELETE: &'static str = "STAGE_INSTANCE_DELETE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
@@ -2259,6 +2355,9 @@ impl EventType {
             Self::ApplicationCommandUpdate => Some(Self::APPLICATION_COMMAND_UPDATE),
             #[cfg(feature = "unstable_discord_api")]
             Self::ApplicationCommandDelete => Some(Self::APPLICATION_COMMAND_DELETE),
+            Self::StageInstanceCreate => Some(Self::STAGE_INSTANCE_CREATE),
+            Self::StageInstanceUpdate => Some(Self::STAGE_INSTANCE_UPDATE),
+            Self::StageInstanceDelete => Some(Self::STAGE_INSTANCE_DELETE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
             // to recover the name here, so we return `None` instead.
@@ -2338,6 +2437,9 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::APPLICATION_COMMAND_UPDATE => EventType::ApplicationCommandUpdate,
                     #[cfg(feature = "unstable_discord_api")]
                     EventType::APPLICATION_COMMAND_DELETE => EventType::ApplicationCommandDelete,
+                    EventType::STAGE_INSTANCE_CREATE => EventType::StageInstanceCreate,
+                    EventType::STAGE_INSTANCE_UPDATE => EventType::StageInstanceUpdate,
+                    EventType::STAGE_INSTANCE_DELETE => EventType::StageInstanceDelete,
                     other => EventType::Other(other.to_owned()),
                 })
             }

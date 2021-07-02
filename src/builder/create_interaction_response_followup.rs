@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use simd_json::Mutable;
 
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::builder::CreateComponents;
 use crate::json::{from_number, Value};
 use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 use crate::{http::AttachmentType, utils};
@@ -103,7 +104,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
 
         self.0
             .entry("embeds")
-            .or_insert_with(|| Value::Array(Vec::new()))
+            .or_insert_with(|| Value::from(Vec::<Value>::new()))
             .as_array_mut()
             .unwrap()
             .push(embed);
@@ -116,10 +117,12 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Calling this multiple times will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
     pub fn embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
-        let embeds =
-            embeds.into_iter().map(|embed| utils::hashmap_to_json_map(embed.0).into()).collect();
+        let embeds = embeds
+            .into_iter()
+            .map(|embed| utils::hashmap_to_json_map(embed.0).into())
+            .collect::<Vec<Value>>();
 
-        self.0.insert("embeds", Value::Array(embeds));
+        self.0.insert("embeds", Value::from(embeds));
         self
     }
 
@@ -140,6 +143,19 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Sets the flags for the response.
     pub fn flags(&mut self, flags: InteractionApplicationCommandCallbackDataFlags) -> &mut Self {
         self.0.insert("flags", from_number(flags.bits()));
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn components<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
+    {
+        let mut components = CreateComponents::default();
+        f(&mut components);
+
+        self.0.insert("components", Value::from(components.0));
         self
     }
 }

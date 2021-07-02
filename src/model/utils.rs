@@ -232,6 +232,22 @@ pub fn serialize_presences<S: Serializer>(
     seq.end()
 }
 
+pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Vec<ActivityButton>, D::Error> {
+    let labels: Vec<String> = Deserialize::deserialize(deserializer)?;
+    let mut buttons = vec![];
+
+    for label in labels {
+        buttons.push(ActivityButton {
+            label,
+            url: "".to_owned(),
+        });
+    }
+
+    Ok(buttons)
+}
+
 pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<ChannelId, Channel>, D::Error> {

@@ -53,8 +53,7 @@ use crate::model::{
 /// leave the client to do it.
 ///
 /// This can be done by passing in the required parameters to [`Self::new`]. You can
-/// then manually handle the shard yourself and receive events via
-/// [`receive`].
+/// then manually handle the shard yourself.
 ///
 /// **Note**: You _really_ do not need to do this. Just call one of the
 /// appropriate methods on the [`Client`].

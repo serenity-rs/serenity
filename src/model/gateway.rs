@@ -69,6 +69,11 @@ pub struct Activity {
     pub session_id: Option<String>,
     /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     pub url: Option<Url>,
+    /// The buttons of this activity.
+    ///
+    /// **Note**: There can only be up to 2 buttons.
+    #[serde(default)]
+    pub buttons: Vec<ActivityButton>,
 }
 
 #[cfg(feature = "model")]
@@ -120,6 +125,7 @@ impl Activity {
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: None,
+            buttons: vec![],
         }
     }
 
@@ -174,6 +180,7 @@ impl Activity {
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: Some(Url::parse(url.as_ref()).expect("Failed to parse url")),
+            buttons: vec![],
         }
     }
 
@@ -224,6 +231,7 @@ impl Activity {
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: None,
+            buttons: vec![],
         }
     }
 
@@ -274,6 +282,7 @@ impl Activity {
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: None,
+            buttons: vec![],
         }
     }
 
@@ -324,6 +333,7 @@ impl Activity {
             #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: None,
+            buttons: vec![],
         }
     }
 }
@@ -408,6 +418,15 @@ impl<'de> Deserialize<'de> for Activity {
 
         let url = map.remove("url").and_then(|v| from_value::<Url>(v).ok());
 
+        let buttons = match map.contains_key("buttons") {
+            true => map
+                .remove("buttons")
+                .ok_or_else(|| DeError::custom("expected buttons"))
+                .and_then(deserialize_buttons)
+                .map_err(DeError::custom)?,
+            false => vec![],
+        };
+
         Ok(Activity {
             application_id,
             assets,
@@ -426,8 +445,21 @@ impl<'de> Deserialize<'de> for Activity {
             #[cfg(feature = "unstable_discord_api")]
             session_id,
             url,
+            buttons,
         })
     }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct ActivityButton {
+    /// The text shown on the button.
+    pub label: String,
+    /// The url opened when clicking the button.
+    ///
+    /// **Note**: Bots cannot access activity button URL.
+    #[serde(default)]
+    pub url: String,
 }
 
 /// The assets for an activity.

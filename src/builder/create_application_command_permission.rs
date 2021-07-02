@@ -18,7 +18,9 @@ impl CreateApplicationCommandsPermissions {
     /// Creates a new application command.
     pub fn create_application_command<F>(&mut self, f: F) -> &mut Self
     where
-        F: FnOnce(&mut CreateApplicationCommandPermissions) -> &mut Self,
+        F: FnOnce(
+            &mut CreateApplicationCommandPermissions,
+        ) -> &mut CreateApplicationCommandPermissions,
     {
         let mut data = CreateApplicationCommandPermissions::default();
         f(&mut data);
@@ -28,7 +30,7 @@ impl CreateApplicationCommandsPermissions {
         self
     }
 
-    /// Adds a new interaction.
+    /// Adds a new application command.
     pub fn add_application_command(
         &mut self,
         application_command: CreateApplicationCommandPermissions,
@@ -40,7 +42,7 @@ impl CreateApplicationCommandsPermissions {
         self
     }
 
-    /// Sets all the interactions.
+    /// Sets all the application commands.
     pub fn set_application_commands(
         &mut self,
         application_commands: Vec<CreateApplicationCommandPermissions>,
@@ -73,8 +75,8 @@ impl CreateApplicationCommandPermissions {
         self
     }
 
-    /// Creates a new permission for the interaction.
-    pub fn create_permission<F>(&mut self, f: F) -> &mut Self
+    /// Creates permissions for the application command.
+    pub fn create_permissions<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(
             &mut CreateApplicationCommandPermissionData,
@@ -83,13 +85,13 @@ impl CreateApplicationCommandPermissions {
         let mut data = CreateApplicationCommandPermissionData::default();
         f(&mut data);
 
-        self.add_permission(data);
+        self.add_permissions(data);
 
         self
     }
 
-    /// Adds a permission for the interaction.
-    pub fn add_permission(
+    /// Adds permission for the application command.
+    pub fn add_permissions(
         &mut self,
         permission: CreateApplicationCommandPermissionData,
     ) -> &mut Self {
@@ -104,7 +106,7 @@ impl CreateApplicationCommandPermissions {
         self
     }
 
-    /// Sets all the permissions for the interaction.
+    /// Sets permissions for the application command.
     pub fn set_permissions(
         &mut self,
         permissions: Vec<CreateApplicationCommandPermissionData>,
@@ -128,10 +130,12 @@ impl CreateApplicationCommandPermissions {
 pub struct CreateApplicationCommandPermissionsData(pub HashMap<&'static str, Value>);
 
 impl CreateApplicationCommandPermissionsData {
-    /// Creates a permission for the interaction.
+    /// Creates a permission for the application command.
     pub fn create_permission<F>(&mut self, f: F) -> &mut Self
     where
-        F: FnOnce(&mut CreateApplicationCommandPermissionData) -> &mut Self,
+        F: FnOnce(
+            &mut CreateApplicationCommandPermissionData,
+        ) -> &mut CreateApplicationCommandPermissionData,
     {
         let mut data = CreateApplicationCommandPermissionData::default();
         f(&mut data);
@@ -141,7 +145,7 @@ impl CreateApplicationCommandPermissionsData {
         self
     }
 
-    /// Adds a permission.
+    /// Adds a permission for the application command.
     pub fn add_permission(
         &mut self,
         permission: CreateApplicationCommandPermissionData,
@@ -157,7 +161,7 @@ impl CreateApplicationCommandPermissionsData {
         self
     }
 
-    /// Sets all the permissions for the interaction.
+    /// Sets permissions for the application command.
     pub fn set_permissions(
         &mut self,
         permissions: Vec<CreateApplicationCommandPermissionData>,
@@ -199,7 +203,12 @@ impl CreateApplicationCommandPermissionData {
         self
     }
 
-    /// Sets the permission.
+    /// Sets the permission for the [`ApplicationCommandPermissionData`].
+    ///
+    /// **Note**: Setting it to `false` will only grey the application command in the
+    /// list, it will not fully hide it to the user.
+    ///
+    /// [`ApplicationCommandPermissionData`]: crate::model::interaction::ApplicationCommandPermissionData
     pub fn permission(&mut self, permission: bool) -> &mut Self {
         self.0.insert("permission", Value::from(permission));
         self

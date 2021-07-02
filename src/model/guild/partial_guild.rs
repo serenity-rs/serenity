@@ -1,3 +1,6 @@
+// FIXME: Remove after the removal of the `̀nsfw` field.
+#![allow(deprecated)]
+
 use serde::de::Error as DeError;
 #[cfg(feature = "simd-json")]
 use simd_json::StaticNode;
@@ -28,7 +31,6 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::json::{from_number, prelude::*};
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
     builder::{
@@ -40,6 +42,10 @@ use crate::{
     model::interactions::ApplicationCommand,
 };
 use crate::{json::from_value, model::prelude::*};
+use crate::{
+    json::{from_number, prelude::*},
+    model::utils::{deserialize_emojis, deserialize_roles},
+};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
@@ -140,7 +146,13 @@ pub struct PartialGuild {
     /// Whether or not this guild is designated as NSFW. See [`discord support article`].
     ///
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    #[deprecated(note = "Removed in favor of Guild::nsfw_level.")]
+    #[serde(default)]
     pub nsfw: bool,
+    /// The guild NSFW state. See [`discord support article`].
+    ///
+    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
+    pub nsfw_level: NsfwLevel,
     /// The maximum amount of users in a video channel.
     pub max_video_channel_users: Option<u64>,
     /// The maximum number of presences for the guild. The default value is currently 25000.
@@ -381,13 +393,12 @@ impl PartialGuild {
         self.id.create_application_command(http, f).await
     }
 
-    /// Same as [`create_application_command`], but allows to create more
-    /// than one command per call.
+    /// Overrides all guild application commands.
     ///
     /// [`create_application_command`]: Self::create_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn create_application_commands<F>(
+    pub async fn set_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
@@ -395,7 +406,7 @@ impl PartialGuild {
     where
         F: FnOnce(&mut CreateApplicationCommands) -> &mut CreateApplicationCommands,
     {
-        self.id.create_application_commands(http, f).await
+        self.id.set_application_commands(http, f).await
     }
 
     /// Creates a guild specific [`ApplicationCommandPermission`].
@@ -425,7 +436,7 @@ impl PartialGuild {
     /// [`create_application_command_permission`]: Self::create_application_command_permission
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-    pub async fn create_application_commands_permissions<F>(
+    pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
         f: F,
@@ -435,7 +446,7 @@ impl PartialGuild {
             &mut CreateApplicationCommandsPermissions,
         ) -> &mut CreateApplicationCommandsPermissions,
     {
-        self.id.create_application_commands_permissions(http, f).await
+        self.id.set_application_commands_permissions(http, f).await
     }
 
     /// Get all guild application commands.
@@ -1069,6 +1080,29 @@ impl PartialGuild {
         self.id.reorder_channels(&http, channels).await
     }
 
+    /// Returns a list of [`Member`]s in a [`Guild`] whose username or nickname
+    /// starts with a provided string.
+    ///
+    /// Optionally pass in the `limit` to limit the number of results.
+    /// Minimum value is 1, maximum and default value is 1000.
+    ///
+    /// **Note**: Queries are case insensitive.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    #[inline]
+    pub async fn search_members(
+        &self,
+        http: impl AsRef<Http>,
+        query: &str,
+        limit: Option<u64>,
+    ) -> Result<Vec<Member>> {
+        self.id.search_members(http, query, limit).await
+    }
+
     /// Starts a prune of [`Member`]s.
     ///
     /// See the documentation on [`GuildPrune`] for more information.
@@ -1664,6 +1698,12 @@ impl<'de> Deserialize<'de> for PartialGuild {
             .and_then(bool::deserialize)
             .map_err(DeError::custom)?;
 
+        let nsfw_level = map
+            .remove("nsfw_level")
+            .ok_or_else(|| DeError::custom("expected nsfw_level"))
+            .and_then(NsfwLevel::deserialize)
+            .map_err(DeError::custom)?;
+
         let max_video_channel_users = match map.contains_key("max_video_channel_users") {
             true => Some(
                 map.remove("max_video_channel_users")
@@ -1780,6 +1820,7 @@ impl<'de> Deserialize<'de> for PartialGuild {
             approximate_member_count,
             approximate_presence_count,
             nsfw,
+            nsfw_level,
             max_video_channel_users,
             max_presences,
             max_members,

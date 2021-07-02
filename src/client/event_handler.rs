@@ -433,7 +433,8 @@ pub trait EventHandler: Send + Sync {
     ) {
     }
 
-    /// Dispatched when a user used a slash command.
+    /// Dispatched when an interaction is created (e.g a slash command was used
+    /// or a button was clicked).
     ///
     /// Provides the created interaction.
     #[cfg(feature = "unstable_discord_api")]
@@ -503,6 +504,21 @@ pub trait EventHandler: Send + Sync {
         _application_command: ApplicationCommand,
     ) {
     }
+
+    /// Dispatched when a stage instance is created.
+    ///
+    /// Provides the created stage instance.
+    async fn stage_instance_create(&self, _ctx: Context, _stage_instance: StageInstance) {}
+
+    /// Dispatched when a stage instance is updated.
+    ///
+    /// Provides the created stage instance.
+    async fn stage_instance_update(&self, _ctx: Context, _stage_instance: StageInstance) {}
+
+    /// Dispatched when a stage instance is deleted.
+    ///
+    /// Provides the created stage instance.
+    async fn stage_instance_delete(&self, _ctx: Context, _stage_instance: StageInstance) {}
 }
 
 /// This core trait for handling raw events

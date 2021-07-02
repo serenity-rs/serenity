@@ -14,6 +14,8 @@ use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
 };
+#[cfg(feature = "simd-json")]
+use simd_json::ValueAccess;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
@@ -21,6 +23,8 @@ use crate::builder::{CreateEmbed, EditMessage};
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
+#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+use crate::collector::{CollectComponentInteraction, ComponentInteractionCollectorBuilder};
 #[cfg(feature = "collector")]
 use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
@@ -129,6 +133,11 @@ pub struct Message {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub interaction: Option<MessageInteraction>,
+    /// The components of this message
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    #[serde(default)]
+    pub components: Vec<Component>,
 }
 
 #[cfg(feature = "model")]
@@ -344,13 +353,8 @@ impl Message {
             builder.content(&self.content);
         }
 
-        if let Some(embed) = self.embeds.get(0) {
-            let embed = CreateEmbed::from(embed.clone());
-            builder.embed(|e| {
-                *e = embed;
-                e
-            });
-        }
+        let embeds: Vec<_> = self.embeds.iter().map(|e| CreateEmbed::from(e.clone())).collect();
+        builder.set_embeds(embeds);
 
         f(&mut builder);
 
@@ -852,7 +856,7 @@ impl Message {
             }
         }
 
-        cache_http.http().unpin_message(self.channel_id.0, self.id.0).await
+        cache_http.http().unpin_message(self.channel_id.0, self.id.0, None).await
     }
 
     /// Tries to return author's nickname in the current channel's guild.
@@ -899,6 +903,26 @@ impl Message {
         ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
+    /// Await a single component interaction on this message.
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg_attr(docsrs, doc(cfg(all(feature = "unstable_discord_api", feature = "collector"))))]
+    pub fn await_component_interaction<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectComponentInteraction<'a> {
+        CollectComponentInteraction::new(shard_messenger).message_id(self.id.0)
+    }
+
+    /// Returns a stream builder which can be awaited to obtain a stream of component interactions on this message.
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg_attr(docsrs, doc(cfg(all(feature = "unstable_discord_api", feature = "collector"))))]
+    pub fn await_component_interactions<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> ComponentInteractionCollectorBuilder<'a> {
+        ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+    }
+
     /// Retrieves the message channel's category ID if the channel has one.
     #[cfg(feature = "cache")]
     pub async fn category_id(&self, cache: impl AsRef<Cache>) -> Option<ChannelId> {
@@ -916,53 +940,59 @@ impl Message {
     }
 
     pub(crate) fn check_embed_length(map: &JsonMap) -> Result<()> {
-        let embed = match map.get("embed") {
-            Some(&Value::Object(ref value)) => value,
+        let embeds = match map.get("embeds") {
+            Some(&Value::Array(ref value)) => value,
             _ => return Ok(()),
         };
 
-        let mut total: usize = 0;
+        if embeds.len() > 10 {
+            return Err(Error::Model(ModelError::EmbedAmount));
+        }
 
-        if let Some(&Value::Object(ref author)) = embed.get("author") {
-            if let Some(&Value::String(ref name)) = author.get("name") {
-                total += name.len();
+        for embed in embeds {
+            let mut total: usize = 0;
+
+            if let Some(&Value::Object(ref author)) = embed.get("author") {
+                if let Some(&Value::Object(ref name)) = author.get("name") {
+                    total += name.len();
+                }
             }
-        }
 
-        if let Some(&Value::String(ref description)) = embed.get("description") {
-            total += description.len();
-        }
+            if let Some(&Value::String(ref description)) = embed.get("description") {
+                total += description.len();
+            }
 
-        if let Some(&Value::Array(ref fields)) = embed.get("fields") {
-            for field_as_value in fields {
-                if let Value::Object(ref field) = *field_as_value {
-                    if let Some(&Value::String(ref field_name)) = field.get("name") {
-                        total += field_name.len();
-                    }
+            if let Some(&Value::Array(ref fields)) = embed.get("fields") {
+                for field_as_value in fields {
+                    if let Value::Object(ref field) = *field_as_value {
+                        if let Some(&Value::String(ref field_name)) = field.get("name") {
+                            total += field_name.len();
+                        }
 
-                    if let Some(&Value::String(ref field_value)) = field.get("value") {
-                        total += field_value.len();
+                        if let Some(&Value::String(ref field_value)) = field.get("value") {
+                            total += field_value.len();
+                        }
                     }
                 }
             }
-        }
 
-        if let Some(&Value::Object(ref footer)) = embed.get("footer") {
-            if let Some(&Value::String(ref text)) = footer.get("text") {
-                total += text.len();
+            if let Some(&Value::Object(ref footer)) = embed.get("footer") {
+                if let Some(&Value::String(ref text)) = footer.get("text") {
+                    total += text.len();
+                }
+            }
+
+            if let Some(&Value::String(ref title)) = embed.get("title") {
+                total += title.len();
+            }
+
+            if total > constants::EMBED_MAX_LENGTH {
+                let overflow = total - constants::EMBED_MAX_LENGTH;
+                return Err(Error::Model(ModelError::EmbedTooLarge(overflow)));
             }
         }
 
-        if let Some(&Value::String(ref title)) = embed.get("title") {
-            total += title.len();
-        }
-
-        if total <= constants::EMBED_MAX_LENGTH {
-            Ok(())
-        } else {
-            let overflow = total - constants::EMBED_MAX_LENGTH;
-            Err(Error::Model(ModelError::EmbedTooLarge(overflow)))
-        }
+        Ok(())
     }
 }
 

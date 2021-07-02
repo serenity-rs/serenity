@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use super::CreateAllowedMentions;
 use super::CreateEmbed;
+#[cfg(feature = "unstable_discord_api")]
+use crate::builder::CreateComponents;
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
 use crate::json::to_value;
@@ -75,22 +77,80 @@ impl<'a> CreateMessage<'a> {
         self
     }
 
-    /// Create an embed for the message.
+    fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+        let map = utils::hashmap_to_json_map(embed.0);
+        let embed = Value::from(map);
+
+        let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let embeds_array = embeds.as_array_mut().expect("Embeds must be an array");
+
+        embeds_array.push(embed);
+
+        self
+    }
+
+    /// Add an embed for the message.
+    ///
+    /// **Note**: This will keep all existing embeds. Use [`Self::set_embed()`] to replace existing
+    /// embeds.
+    pub fn add_embed<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
+        let mut embed = CreateEmbed::default();
+        f(&mut embed);
+        self._add_embed(embed)
+    }
+
+    /// Add multiple embeds for the message.
+    ///
+    /// **Note**: This will keep all existing embeds. Use [`Self::set_embeds()`] to replace existing
+    /// embeds.
+    pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        for embed in embeds {
+            self._add_embed(embed);
+        }
+
+        self
+    }
+
+    /// Set an embed for the message.
+    ///
+    /// Equivalent to [`Self::set_embed()`].
+    ///
+    /// **Note**: This will replace all existing embeds. Use
+    /// [`Self::add_embed()`] to add an additional embed.
     pub fn embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        self.set_embed(embed)
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
+        self._add_embed(embed)
     }
 
     /// Set an embed for the message.
+    ///
+    /// Equivalent to [`Self::embed()`].
+    ///
+    /// **Note**: This will replace all existing embeds.
+    /// Use [`Self::add_embed()`] to add an additional embed.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = utils::hashmap_to_json_map(embed.0);
-        let embed = Value::from(map);
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
+        self._add_embed(embed)
+    }
 
-        self.0.insert("embed", embed);
+    /// Set multiple embeds for the message.
+    ///
+    /// **Note**: This will replace all existing embeds. Use [`Self::add_embeds()`] to keep existing
+    /// embeds.
+    pub fn set_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        self.0.insert("embeds", Value::from(Vec::<Value>::new()));
+        for embed in embeds {
+            self._add_embed(embed);
+        }
+
         self
     }
 
@@ -213,6 +273,19 @@ impl<'a> CreateMessage<'a> {
             self._add_sticker_id(sticker_id);
         }
 
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn components<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
+    {
+        let mut components = CreateComponents::default();
+        f(&mut components);
+
+        self.0.insert("components", Value::from(components.0));
         self
     }
 }

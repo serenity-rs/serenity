@@ -13,6 +13,7 @@ use tokio::{fs::File, io::AsyncReadExt};
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateInvite, CreateMessage, EditChannel, EditMessage, GetMessages};
+use crate::builder::{CreateStageInstance, EditStageInstance};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -88,7 +89,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(invite.0);
 
-        http.as_ref().create_invite(self.0, &map).await
+        http.as_ref().create_invite(self.0, &map, None).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -336,7 +337,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(channel.0);
 
-        http.as_ref().edit_channel(self.0, &map).await
+        http.as_ref().edit_channel(self.0, &map, None).await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -549,7 +550,7 @@ impl ChannelId {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn pin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
-        http.as_ref().pin_message(self.0, message_id.into().0).await
+        http.as_ref().pin_message(self.0, message_id.into().0, None).await
     }
 
     /// Crossposts a [`Message`].
@@ -844,7 +845,7 @@ impl ChannelId {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
     ) -> Result<()> {
-        http.as_ref().unpin_message(self.0, message_id.into().0).await
+        http.as_ref().unpin_message(self.0, message_id.into().0, None).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -875,7 +876,7 @@ impl ChannelId {
             "name": name.to_string(),
         });
 
-        http.as_ref().create_webhook(self.0, &map).await
+        http.as_ref().create_webhook(self.0, &map, None).await
     }
 
     /// Creates a webhook with a name and an avatar.
@@ -930,7 +931,7 @@ impl ChannelId {
             "avatar": avatar
         });
 
-        http.as_ref().create_webhook(self.0, &map).await
+        http.as_ref().create_webhook(self.0, &map, None).await
     }
 
     /// Returns a future that will await one message sent in this channel.
@@ -971,6 +972,70 @@ impl ChannelId {
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).channel_id(self.0)
+    }
+
+    /// Gets a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel,
+    /// or if there is no stage instance currently.
+    pub async fn get_stage_instance(&self, http: impl AsRef<Http>) -> Result<StageInstance> {
+        http.as_ref().get_stage_instance(self.0).await
+    }
+
+    /// Creates a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel,
+    /// or if there is already a stage instance currently.
+    pub async fn create_stage_instance<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<StageInstance>
+    where
+        F: FnOnce(&mut CreateStageInstance) -> &mut CreateStageInstance,
+    {
+        let mut instance = CreateStageInstance::default();
+        f(&mut instance);
+
+        let map = utils::hashmap_to_json_map(instance.0);
+
+        http.as_ref().create_stage_instance(&Value::from(map)).await
+    }
+
+    /// Edits a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel,
+    /// or if there is not stage instance currently.
+    pub async fn edit_stage_instance<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<StageInstance>
+    where
+        F: FnOnce(&mut EditStageInstance) -> &mut EditStageInstance,
+    {
+        let mut instance = EditStageInstance::default();
+        f(&mut instance);
+
+        let map = utils::hashmap_to_json_map(instance.0);
+
+        http.as_ref().edit_stage_instance(self.0, &Value::from(map)).await
+    }
+
+    /// Deletes a stage instance.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the channel is not a stage channel,
+    /// or if there is no stage instance currently.
+    pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().delete_stage_instance(self.0).await
     }
 }
 

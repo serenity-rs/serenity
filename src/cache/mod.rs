@@ -69,7 +69,7 @@ impl StrExt for &str {
     where
         CRL: AsRef<Cache> + Send + Sync,
     {
-        F::from_str(&cache, &self).await
+        F::from_str(&cache, self).await
     }
 }
 
@@ -416,7 +416,7 @@ impl Cache {
     /// # Examples
     ///
     /// Getting a guild's channel via the Id of the message received through a
-    /// [`Client::on_message`] event dispatch:
+    /// [`EventHandler::message`] event dispatch:
     ///
     /// ```rust,no_run
     /// # use serenity::model::prelude::*;
@@ -444,14 +444,14 @@ impl Cache {
     ///
     /// # #[cfg(feature = "client")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
-    /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
+    /// [`EventHandler::message`]: crate::client::EventHandler::message
     #[inline]
     pub async fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannel> {
         self._guild_channel(id.into()).await
@@ -512,7 +512,7 @@ impl Cache {
     /// # Examples
     ///
     /// Retrieving the member object of the user that posted a message, in a
-    /// [`Client::on_message`] context:
+    /// [`EventHandler::message`] context:
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
@@ -524,7 +524,7 @@ impl Cache {
     /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
     /// # let message = ChannelId(0).message(&http, MessageId(1)).await.unwrap();
     /// # let cache = Cache::default();
-    ///
+    /// #
     /// let member = {
     ///     let channel = match cache.guild_channel(message.channel_id).await {
     ///         Some(channel) => channel,
@@ -555,7 +555,7 @@ impl Cache {
     /// # }
     /// ```
     ///
-    /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
+    /// [`EventHandler::message`]: crate::client::EventHandler::message
     /// [`members`]: crate::model::guild::Guild::members
     #[inline]
     pub async fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
@@ -713,7 +713,7 @@ impl Cache {
     /// #
     /// match cache.message(message.channel_id, message.id).await {
     ///     Some(m) => assert_eq!(message.content, m.content),
-    ///     None =>println!("No message found in cache."),
+    ///     None => println!("No message found in cache."),
     /// };
     /// #     Ok(())
     /// # }
@@ -1056,6 +1056,8 @@ mod test {
                 referenced_message: None,
                 #[cfg(feature = "unstable_discord_api")]
                 interaction: None,
+                #[cfg(feature = "unstable_discord_api")]
+                components: vec![],
             },
         };
 
@@ -1160,6 +1162,7 @@ mod test {
                     approximate_member_count: None,
                     approximate_presence_count: None,
                     nsfw: false,
+                    nsfw_level: NsfwLevel::Default,
                     max_video_channel_users: None,
                     max_presences: None,
                     max_members: None,

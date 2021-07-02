@@ -69,6 +69,8 @@ pub enum Error {
     /// When attempting to delete a number of days' worth of messages that is
     /// not allowed.
     DeleteMessageDaysAmount(u8),
+    /// When attempting to send a message with over 10 embeds.
+    EmbedAmount,
     /// Indicates that the textual content of an embed exceeds the maximum
     /// length.
     EmbedTooLarge(usize),
@@ -189,6 +191,7 @@ impl Display for Error {
         match self {
             Error::BulkDeleteAmount => f.write_str("Too few/many messages to bulk delete."),
             Error::DeleteMessageDaysAmount(_) => f.write_str("Invalid delete message days."),
+            Error::EmbedAmount => f.write_str("Too many embeds in a message."),
             Error::EmbedTooLarge(_) => f.write_str("Embed too large."),
             Error::GuildNotFound => f.write_str("Guild not found in the cache."),
             Error::RoleNotFound => f.write_str("Role not found in the cache."),

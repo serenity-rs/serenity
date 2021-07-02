@@ -58,7 +58,7 @@ impl CreateApplicationCommandOption {
         self
     }
 
-    /// Interaction commands can optionally have a limited
+    /// Application commands can optionally have a limited
     /// number of integer or string choices.
     ///
     /// **Note**: There can be no more than 10 choices set.
@@ -118,7 +118,7 @@ impl CreateApplicationCommandOption {
 pub struct CreateApplicationCommand(pub HashMap<&'static str, Value>);
 
 impl CreateApplicationCommand {
-    /// Specify the name of the Interaction.
+    /// Specify the name of the application command.
     ///
     /// **Note**: Must be between 1 and 32 characters long,
     /// and cannot start with a space.
@@ -137,7 +137,7 @@ impl CreateApplicationCommand {
         self
     }
 
-    /// Specify the description of the Interaction.
+    /// Specify the description of the application command.
     ///
     /// **Note**: Must be between 1 and 100 characters long.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
@@ -145,9 +145,9 @@ impl CreateApplicationCommand {
         self
     }
 
-    /// Create an interaction option for the interaction.
+    /// Create an application command option for the application command.
     ///
-    /// **Note**: Interactions can only have up to 10 options.
+    /// **Note**: Application commands can only have up to 10 options.
     pub fn create_option<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
@@ -157,9 +157,9 @@ impl CreateApplicationCommand {
         self.add_option(data)
     }
 
-    /// Add an interaction option for the interaction.
+    /// Add an application command option for the application command.
     ///
-    /// **Note**: Interactions can only have up to 10 options.
+    /// **Note**: Application commands can only have up to 10 options.
     pub fn add_option(&mut self, option: CreateApplicationCommandOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::from(Vec::<Value>::new()));
@@ -169,9 +169,9 @@ impl CreateApplicationCommand {
         self
     }
 
-    /// Sets all the interaction options for the interaction.
+    /// Sets all the application command options for the application command.
     ///
-    /// **Note**: Interactions can only have up to 10 options.
+    /// **Note**: Application commands can only have up to 10 options.
     pub fn set_options(&mut self, options: Vec<CreateApplicationCommandOption>) -> &mut Self {
         let new_options = options
             .into_iter()
@@ -201,8 +201,8 @@ impl CreateApplicationCommands {
     }
 
     /// Adds a new application command.
-    pub fn add_application_command(&mut self, interaction: CreateApplicationCommand) -> &mut Self {
-        let new_data = Value::from(utils::hashmap_to_json_map(interaction.0));
+    pub fn add_application_command(&mut self, command: CreateApplicationCommand) -> &mut Self {
+        let new_data = Value::from(utils::hashmap_to_json_map(command.0));
 
         self.0.push(new_data);
 
@@ -212,9 +212,9 @@ impl CreateApplicationCommands {
     /// Sets all the application commands.
     pub fn set_application_commands(
         &mut self,
-        interactions: Vec<CreateApplicationCommand>,
+        commands: Vec<CreateApplicationCommand>,
     ) -> &mut Self {
-        let new_application_command = interactions
+        let new_application_command = commands
             .into_iter()
             .map(|f| Value::from(utils::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();

@@ -1013,7 +1013,7 @@ pub fn parse_token(token: impl AsRef<str>) -> Option<TokenComponents> {
     let timestamp = chrono::NaiveDateTime::from_timestamp_opt(timestamp as i64, 0)?;
 
     // Third part is a base64-encoded HMAC that's not interesting on its own
-    let _ = base64::decode(parts.get(2)?).ok()?;
+    let _ = base64::decode_config(parts.get(2)?, base64_config).ok()?;
 
     Some(TokenComponents {
         bot_user_id: user_id,

@@ -18,6 +18,9 @@ mod create_application_command_permission;
 mod create_allowed_mentions;
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+mod create_components;
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod create_interaction_response;
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
@@ -25,6 +28,7 @@ mod create_interaction_response_followup;
 mod create_invite;
 mod create_message;
 mod create_sticker;
+mod create_stage_instance;
 mod edit_channel;
 mod edit_guild;
 mod edit_guild_welcome_screen;
@@ -37,6 +41,7 @@ mod edit_message;
 mod edit_profile;
 mod edit_role;
 mod edit_sticker;
+mod edit_stage_instance;
 mod edit_voice_state;
 mod edit_webhook_message;
 mod execute_webhook;
@@ -50,6 +55,7 @@ pub use self::{
     create_invite::CreateInvite,
     create_message::CreateMessage,
     create_sticker::CreateSticker,
+    create_stage_instance::CreateStageInstance,
     edit_channel::EditChannel,
     edit_guild::EditGuild,
     edit_guild_welcome_screen::EditGuildWelcomeScreen,
@@ -59,6 +65,7 @@ pub use self::{
     edit_profile::EditProfile,
     edit_role::EditRole,
     edit_sticker::EditSticker,
+    edit_stage_instance::EditStageInstance,
     edit_voice_state::EditVoiceState,
     edit_webhook_message::EditWebhookMessage,
     execute_webhook::ExecuteWebhook,
@@ -76,6 +83,14 @@ pub use self::{
         CreateApplicationCommandPermissions,
         CreateApplicationCommandPermissionsData,
         CreateApplicationCommandsPermissions,
+    },
+    create_components::{
+        CreateActionRow,
+        CreateButton,
+        CreateComponents,
+        CreateSelectMenu,
+        CreateSelectMenuOption,
+        CreateSelectMenuOptions,
     },
     create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
     create_interaction_response_followup::CreateInteractionResponseFollowup,

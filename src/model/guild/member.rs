@@ -54,6 +54,8 @@ pub struct Member {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub permissions: Option<Permissions>,
+    /// The guild avatar hash
+    pub avatar: Option<String>,
 }
 
 #[cfg(feature = "model")]
@@ -83,7 +85,8 @@ impl Member {
             return Ok(());
         }
 
-        match http.as_ref().add_member_role(self.guild_id.0, self.user.id.0, role_id.0).await {
+        match http.as_ref().add_member_role(self.guild_id.0, self.user.id.0, role_id.0, None).await
+        {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -115,7 +118,7 @@ impl Member {
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await {
             Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -232,7 +235,7 @@ impl Member {
         f(&mut edit_member);
         let map = utils::hashmap_to_json_map(edit_member.0);
 
-        http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await
+        http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await
     }
 
     /// Retrieves the ID and position of the member's highest role in the
@@ -410,12 +413,15 @@ impl Member {
         &self,
         cache_http: impl CacheHttp + AsRef<Cache>,
     ) -> Result<Permissions> {
-        let guild = match cache_http.as_ref().guild(self.guild_id).await {
-            Some(guild) => guild,
-            None => return Err(From::from(ModelError::GuildNotFound)),
-        };
+        let perms_opt = cache_http
+            .as_ref()
+            .guild_field(self.guild_id, |guild| guild._member_permission_from_member(self))
+            .await;
 
-        guild.member_permissions(cache_http, self.user.id).await
+        match perms_opt {
+            Some(perms) => Ok(perms),
+            None => Err(From::from(ModelError::GuildNotFound)),
+        }
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
@@ -440,7 +446,11 @@ impl Member {
             return Ok(());
         }
 
-        match http.as_ref().remove_member_role(self.guild_id.0, self.user.id.0, role_id.0).await {
+        match http
+            .as_ref()
+            .remove_member_role(self.guild_id.0, self.user.id.0, role_id.0, None)
+            .await
+        {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -472,7 +482,7 @@ impl Member {
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await {
             Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -513,7 +523,25 @@ impl Member {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id.0, self.user.id.0).await
+        http.as_ref().remove_ban(self.guild_id.0, self.user.id.0, None).await
+    }
+
+    /// Returns the formatted URL of the member's per guild avatar, if one exists.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the member has a GIF avatar.
+    #[inline]
+    pub fn avatar_url(&self) -> Option<String> {
+        avatar_url(self.guild_id, self.user.id, self.avatar.as_ref())
+    }
+
+    /// Retrieves the URL to the current member's avatar, falling back to the
+    /// user's avatar, then default avatar if needed.
+    ///
+    /// This will call [`Self::avatar_url`] first, and if that returns [`None`],
+    /// it then falls back to [`User::face()`].
+    #[inline]
+    pub fn face(&self) -> String {
+        self.avatar_url().unwrap_or_else(|| self.user.face())
     }
 }
 
@@ -570,4 +598,13 @@ pub struct PartialMember {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub permissions: Option<Permissions>,
+}
+
+#[cfg(feature = "model")]
+fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Option<String> {
+    hash.map(|hash| {
+        let ext = if hash.starts_with("a_") { "gif" } else { "webp" };
+
+        cdn!("/guilds/{}/users/{}/avatars/{}.{}?size=1024", guild_id.0, user_id.0, hash, ext)
+    })
 }
