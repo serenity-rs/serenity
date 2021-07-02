@@ -30,7 +30,6 @@ use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
 #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
 use crate::model::interactions::{
-    message_component::MessageComponentInteraction,
     Interaction,
     InteractionType,
 };

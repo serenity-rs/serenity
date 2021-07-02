@@ -10,6 +10,7 @@ use crate::builder::{
 use crate::http::Http;
 use crate::model::interactions::InteractionType;
 use crate::utils;
+use std::convert::TryFrom;
 
 /// An interaction triggered by a message component.
 #[derive(Clone, Debug, Serialize)]
@@ -427,6 +428,24 @@ impl Serialize for Component {
     }
 }
 
+impl From<ActionRow> for Component {
+    fn from(component: ActionRow) -> Self {
+        Component::ActionRow(component)
+    }
+}
+
+impl From<Button> for Component {
+    fn from(component: Button) -> Self {
+        Component::Button(component)
+    }
+}
+
+impl From<SelectMenu> for Component {
+    fn from(component: SelectMenu) -> Self {
+        Component::SelectMenu(component)
+    }
+}
+
 /// The type of a component
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
@@ -451,7 +470,83 @@ pub struct ActionRow {
     #[serde(rename = "type")]
     pub kind: ComponentType,
     /// The components of this ActionRow.
-    pub components: Vec<Component>,
+    #[serde(default)]
+    pub components: Vec<ActionRowComponent>,
+}
+
+// A component which can be inside of an [`ActionRow`].
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub enum ActionRowComponent {
+    Button(Button),
+    SelectMenu(SelectMenu),
+}
+
+impl<'de> Deserialize<'de> for ActionRowComponent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let map = JsonMap::deserialize(deserializer)?;
+
+        let kind = map
+            .get("type")
+            .ok_or_else(|| DeError::custom("expected type"))
+            .and_then(ComponentType::deserialize)
+            .map_err(DeError::custom)?;
+
+        match kind {
+            ComponentType::Button => serde_json::from_value::<Button>(Value::Object(map))
+                .map(ActionRowComponent::Button)
+                .map_err(DeError::custom),
+            ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
+                .map(ActionRowComponent::SelectMenu)
+                .map_err(DeError::custom),
+            _ => Err(DeError::custom("Unknown component type")),
+        }
+    }
+}
+
+impl Serialize for ActionRowComponent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where
+            S: Serializer,
+    {
+        match self {
+            ActionRowComponent::Button(c) => Button::serialize(c, serializer),
+            ActionRowComponent::SelectMenu(c) => SelectMenu::serialize(c, serializer),
+        }
+    }
+}
+
+impl From<ActionRowComponent> for Component {
+    fn from(component: ActionRowComponent) -> Self {
+        match component {
+            ActionRowComponent::Button(b) => Component::Button(b),
+            ActionRowComponent::SelectMenu(s) => Component::SelectMenu(s)
+        }
+    }
+}
+
+impl TryFrom<Component> for ActionRowComponent {
+    type Error = Error;
+
+    fn try_from(value: Component) -> Result<Self> {
+        match value {
+            Component::ActionRow(_) => Err(Error::Model(ModelError::InvalidComponentType)),
+            Component::Button(b) => Ok(ActionRowComponent::Button(b)),
+            Component::SelectMenu(s) => Ok(ActionRowComponent::SelectMenu(s)),
+        }
+    }
+}
+
+impl From<Button> for ActionRowComponent {
+    fn from(component: Button) -> Self {
+        ActionRowComponent::Button(component)
+    }
+}
+
+impl From<SelectMenu> for ActionRowComponent {
+    fn from(component: SelectMenu) -> Self {
+        ActionRowComponent::SelectMenu(component)
+    }
 }
 
 /// A button component.
@@ -527,6 +622,7 @@ pub struct SelectMenuOption {
     /// The emoji displayed on this option.
     pub emoji: Option<ReactionType>,
     /// Render this option as the default selection.
+    #[serde(default)]
     pub default: bool,
 }
 
