@@ -3,6 +3,7 @@
 //! are not reached yet.
 #[cfg(feature = "unstable_discord_api")]
 pub mod component_interaction_collector;
+pub mod event_collector;
 pub mod message_collector;
 pub mod reaction_collector;
 
@@ -10,6 +11,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "unstable_discord_api")]
 pub use component_interaction_collector::*;
+pub use event_collector::*;
 pub use message_collector::*;
 pub use reaction_collector::*;
 
