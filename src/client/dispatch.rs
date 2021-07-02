@@ -810,5 +810,26 @@ async fn handle_event(
                 event_handler.application_command_delete(context, event.application_command).await;
             });
         },
+        DispatchEvent::Model(Event::StageInstanceCreate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.stage_instance_create(context, event.stage_instance).await;
+            });
+        },
+        DispatchEvent::Model(Event::StageInstanceUpdate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.stage_instance_update(context, event.stage_instance).await;
+            });
+        },
+        DispatchEvent::Model(Event::StageInstanceDelete(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.stage_instance_delete(context, event.stage_instance).await;
+            });
+        },
     }
 }

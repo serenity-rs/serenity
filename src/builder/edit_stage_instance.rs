@@ -2,8 +2,6 @@ use std::collections::HashMap;
 
 use serde_json::Value;
 
-use crate::internal::prelude::*;
-
 /// Edits a [`StageInstance`].
 ///
 /// [`StageInstance`]: crate::model::channel::StageInstance

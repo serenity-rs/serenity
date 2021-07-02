@@ -1512,6 +1512,54 @@ impl<'de> Deserialize<'de> for ApplicationCommandDeleteEvent {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct StageInstanceCreateEvent {
+    pub stage_instance: StageInstance,
+}
+
+impl<'de> Deserialize<'de> for StageInstanceCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let stage_instance = StageInstance::deserialize(deserializer)?;
+
+        Ok(Self {
+            stage_instance,
+        })
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct StageInstanceUpdateEvent {
+    pub stage_instance: StageInstance,
+}
+
+impl<'de> Deserialize<'de> for StageInstanceUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let stage_instance = StageInstance::deserialize(deserializer)?;
+
+        Ok(Self {
+            stage_instance,
+        })
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct StageInstanceDeleteEvent {
+    pub stage_instance: StageInstance,
+}
+
+impl<'de> Deserialize<'de> for StageInstanceDeleteEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let stage_instance = StageInstance::deserialize(deserializer)?;
+
+        Ok(Self {
+            stage_instance,
+        })
+    }
+}
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -1726,6 +1774,12 @@ pub enum Event {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationCommandDelete(ApplicationCommandDeleteEvent),
+    /// A stage instance was created.
+    StageInstanceCreate(StageInstanceCreateEvent),
+    /// A stage instance was updated.
+    StageInstanceUpdate(StageInstanceUpdateEvent),
+    /// A stage instance was deleted.
+    StageInstanceDelete(StageInstanceDeleteEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
 }
@@ -1785,6 +1839,9 @@ impl Event {
             Self::ApplicationCommandUpdate(_) => EventType::ApplicationCommandUpdate,
             #[cfg(feature = "unstable_discord_api")]
             Self::ApplicationCommandDelete(_) => EventType::ApplicationCommandDelete,
+            Self::StageInstanceCreate(_) => EventType::StageInstanceCreate,
+            Self::StageInstanceUpdate(_) => EventType::StageInstanceUpdate,
+            Self::StageInstanceDelete(_) => EventType::StageInstanceDelete,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
     }
@@ -1888,6 +1945,9 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::ApplicationCommandDelete => {
             Event::ApplicationCommandDelete(serde_json::from_value(v)?)
         },
+        EventType::StageInstanceCreate => Event::StageInstanceCreate(serde_json::from_value(v)?),
+        EventType::StageInstanceUpdate => Event::StageInstanceUpdate(serde_json::from_value(v)?),
+        EventType::StageInstanceDelete => Event::StageInstanceDelete(serde_json::from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
             value: v,
@@ -2089,6 +2149,15 @@ pub enum EventType {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationCommandDelete,
+    /// Indicator that a stage instance was created.
+    /// This maps to [`StageInstanceCreateEvent`].
+    StageInstanceCreate,
+    /// Indicator that a stage instance was updated.
+    /// This maps to [`StageInstanceUpdateEvent`].
+    StageInstanceUpdate,
+    /// Indicator that a stage instance was deleted.
+    /// This maps to [`StageInstanceDeleteEvent`].
+    StageInstanceDelete,
     /// An unknown event was received over the gateway.
     ///
     /// This should be logged so that support for it can be added in the
@@ -2160,6 +2229,9 @@ impl EventType {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     const APPLICATION_COMMAND_DELETE: &'static str = "APPLICATION_COMMAND_DELETE";
+    const STAGE_INSTANCE_CREATE: &'static str = "STAGE_INSTANCE_CREATE";
+    const STAGE_INSTANCE_UPDATE: &'static str = "STAGE_INSTANCE_UPDATE";
+    const STAGE_INSTANCE_DELETE: &'static str = "STAGE_INSTANCE_DELETE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
@@ -2216,6 +2288,9 @@ impl EventType {
             Self::ApplicationCommandUpdate => Some(Self::APPLICATION_COMMAND_UPDATE),
             #[cfg(feature = "unstable_discord_api")]
             Self::ApplicationCommandDelete => Some(Self::APPLICATION_COMMAND_DELETE),
+            Self::StageInstanceCreate => Some(Self::STAGE_INSTANCE_CREATE),
+            Self::StageInstanceUpdate => Some(Self::STAGE_INSTANCE_UPDATE),
+            Self::StageInstanceDelete => Some(Self::STAGE_INSTANCE_DELETE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
             // to recover the name here, so we return `None` instead.
@@ -2294,6 +2369,9 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::APPLICATION_COMMAND_UPDATE => EventType::ApplicationCommandUpdate,
                     #[cfg(feature = "unstable_discord_api")]
                     EventType::APPLICATION_COMMAND_DELETE => EventType::ApplicationCommandDelete,
+                    EventType::STAGE_INSTANCE_CREATE => EventType::StageInstanceCreate,
+                    EventType::STAGE_INSTANCE_UPDATE => EventType::StageInstanceUpdate,
+                    EventType::STAGE_INSTANCE_DELETE => EventType::StageInstanceDelete,
                     other => EventType::Other(other.to_owned()),
                 })
             }
