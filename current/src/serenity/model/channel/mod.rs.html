@@ -523,6 +523,19 @@
 <span id="523">523</span>
 <span id="524">524</span>
 <span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to channels and types within channels.</span>
 
@@ -954,6 +967,19 @@
     <span class="ident">Auto</span>,
     <span class="ident">Full</span>
 });
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StageInstance</span> {
+    <span class="doccomment">/// The Id of the stage instance.</span>
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">StageInstanceId</span>,
+    <span class="doccomment">/// The guild Id of the associated stage channel.</span>
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    <span class="doccomment">/// The Id of the associated stage channel.</span>
+    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
+    <span class="doccomment">/// The topic of the stage instance.</span>
+    <span class="kw">pub</span> <span class="ident">topic</span>: <span class="ident">String</span>,
+}
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {

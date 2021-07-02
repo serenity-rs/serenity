@@ -2298,6 +2298,60 @@
 <span id="2298">2298</span>
 <span id="2299">2299</span>
 <span id="2300">2300</span>
+<span id="2301">2301</span>
+<span id="2302">2302</span>
+<span id="2303">2303</span>
+<span id="2304">2304</span>
+<span id="2305">2305</span>
+<span id="2306">2306</span>
+<span id="2307">2307</span>
+<span id="2308">2308</span>
+<span id="2309">2309</span>
+<span id="2310">2310</span>
+<span id="2311">2311</span>
+<span id="2312">2312</span>
+<span id="2313">2313</span>
+<span id="2314">2314</span>
+<span id="2315">2315</span>
+<span id="2316">2316</span>
+<span id="2317">2317</span>
+<span id="2318">2318</span>
+<span id="2319">2319</span>
+<span id="2320">2320</span>
+<span id="2321">2321</span>
+<span id="2322">2322</span>
+<span id="2323">2323</span>
+<span id="2324">2324</span>
+<span id="2325">2325</span>
+<span id="2326">2326</span>
+<span id="2327">2327</span>
+<span id="2328">2328</span>
+<span id="2329">2329</span>
+<span id="2330">2330</span>
+<span id="2331">2331</span>
+<span id="2332">2332</span>
+<span id="2333">2333</span>
+<span id="2334">2334</span>
+<span id="2335">2335</span>
+<span id="2336">2336</span>
+<span id="2337">2337</span>
+<span id="2338">2338</span>
+<span id="2339">2339</span>
+<span id="2340">2340</span>
+<span id="2341">2341</span>
+<span id="2342">2342</span>
+<span id="2343">2343</span>
+<span id="2344">2344</span>
+<span id="2345">2345</span>
+<span id="2346">2346</span>
+<span id="2347">2347</span>
+<span id="2348">2348</span>
+<span id="2349">2349</span>
+<span id="2350">2350</span>
+<span id="2351">2351</span>
+<span id="2352">2352</span>
+<span id="2353">2353</span>
+<span id="2354">2354</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
@@ -2673,6 +2727,18 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationsIdGuildsIdCommandsId</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/stage-instances` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
+    <span class="ident">StageInstances</span>,
+    <span class="doccomment">/// Route for the `/stage-instances/:channel_id` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
+    <span class="ident">StageInstancesChannelId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route where no ratelimit headers are in place (i.e. user account-only</span>
     <span class="doccomment">/// routes).</span>
     <span class="doccomment">///</span>
@@ -3150,6 +3216,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_commands_permissions</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/permissions&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
     }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instances</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/stage-instances&quot;</span>).<span class="ident">to_string</span>()
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instance</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/stage-instances/{}&quot;</span>), <span class="ident">channel_id</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -3172,6 +3246,7 @@
     <span class="ident">CreateChannel</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">CreateStageInstance</span>,
     <span class="ident">CreateEmoji</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
@@ -3237,6 +3312,9 @@
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">DeleteChannel</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">DeleteStageInstance</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">DeleteEmoji</span> {
@@ -3322,6 +3400,9 @@
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditChannel</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditStageInstance</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditEmoji</span> {
@@ -3458,6 +3539,9 @@
     },
     <span class="ident">GetChannels</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetStageInstance</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetCurrentApplicationInfo</span>,
     <span class="ident">GetCurrentUser</span>,
@@ -3682,6 +3766,9 @@
                 <span class="ident">Route::GuildsIdChannels</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_channels</span>(<span class="ident">guild_id</span>)),
             ),
+            <span class="ident">RouteInfo::CreateStageInstance</span> <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="ident">LightMethod::Post</span>, <span class="ident">Route::StageInstances</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::stage_instances</span>()))
+            },
             <span class="ident">RouteInfo::CreateEmoji</span> {
                 <span class="ident">guild_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (
@@ -3816,6 +3903,13 @@
                 <span class="ident">LightMethod::Delete</span>,
                 <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
+            ),
+            <span class="ident">RouteInfo::DeleteStageInstance</span> {
+                <span class="ident">channel_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Delete</span>,
+                <span class="ident">Route::StageInstancesChannelId</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::stage_instance</span>(<span class="ident">channel_id</span>)),
             ),
             <span class="ident">RouteInfo::DeleteEmoji</span> {
                 <span class="ident">emoji_id</span>,
@@ -3974,6 +4068,13 @@
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
+            ),
+            <span class="ident">RouteInfo::EditStageInstance</span> {
+                <span class="ident">channel_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::StageInstancesChannelId</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::stage_instance</span>(<span class="ident">channel_id</span>)),
             ),
             <span class="ident">RouteInfo::EditEmoji</span> {
                 <span class="ident">emoji_id</span>,
@@ -4213,6 +4314,13 @@
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
+            ),
+            <span class="ident">RouteInfo::GetStageInstance</span> {
+                <span class="ident">channel_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::StageInstancesChannelId</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::stage_instance</span>(<span class="ident">channel_id</span>)),
             ),
             <span class="ident">RouteInfo::GetChannelInvites</span> {
                 <span class="ident">channel_id</span>,
