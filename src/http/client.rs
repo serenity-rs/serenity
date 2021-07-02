@@ -370,7 +370,6 @@ impl Http {
         .await
     }
 
-
     /// Creates a stage instance.
     pub async fn create_stage_instance(&self, map: &Value) -> Result<StageInstance> {
         self.fire(Request {

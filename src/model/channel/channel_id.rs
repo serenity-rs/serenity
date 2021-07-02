@@ -1034,6 +1034,7 @@ impl ChannelId {
     /// or if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_stage_instance(self.0).await
+    }
 
     /// Gets the thread members, if this channel is a thread.
     ///

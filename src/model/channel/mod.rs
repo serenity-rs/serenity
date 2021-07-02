@@ -459,7 +459,8 @@ pub struct StageInstance {
 
 /// A thread data.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[non_exhaustive]pub struct ThreadMetadata {
+#[non_exhaustive]
+pub struct ThreadMetadata {
     /// Whether the thread is archived.
     pub archived: bool,
     /// Duration in minutes to automatically archive the thread after recent activity.
