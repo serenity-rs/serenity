@@ -929,6 +929,14 @@ impl Message {
         cache.as_ref().channel_category_id(self.channel_id).await
     }
 
+    pub(crate) fn check_lengths(map: &JsonMap) -> Result<()> {
+        Self::check_content_length(map)?;
+        Self::check_embed_length(map)?;
+        Self::check_sticker_ids_length(map)?;
+
+        Ok(())
+    }
+
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
         if let Some(Value::String(content)) = map.get("content") {
             if let Some(length_over) = Message::overflow_length(content) {
