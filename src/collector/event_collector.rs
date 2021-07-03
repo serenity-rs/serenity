@@ -22,7 +22,7 @@ use crate::{
     client::bridge::gateway::ShardMessenger,
     collector::LazyArc,
     model::{
-        event::Event,
+        event::{Event, EventType},
         id::{ChannelId, GuildId, MessageId, UserId},
     },
 };
@@ -54,7 +54,10 @@ impl EventFilter {
     /// Sends a `event` to the consuming collector if the `event` conforms
     /// to the constraints and the limits are not reached yet.
     pub(crate) fn send_event(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
-        // TODO: Don't count events of other types as "filtered"
+        // Only events with matching types count towwards the filtered limit.
+        if !self.is_matching_event_type(&event) {
+            return !self.sender.is_closed();
+        }
 
         if self.is_passing_constraints(event) {
             self.collected += 1;
@@ -69,9 +72,14 @@ impl EventFilter {
         self.is_within_limits() && !self.sender.is_closed()
     }
 
+    /// Checks if the `event` is one of the types we're looking for.
+    fn is_matching_event_type(&self, event: &Event) -> bool {
+        self.options.event_types.contains(&event.event_type())
+    }
+
     /// Checks if the `event` passes set constraints.
     /// Constraints are optional, as it is possible to limit events to
-    /// be sent by a specific author or in a specifc guild.
+    /// be sent by a specific user or in a specifc guild.
     fn is_passing_constraints(&self, event: &mut LazyArc<'_, Event>) -> bool {
         // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
         self.options.guild_id.map_or(true, |id| event.guild_id().contains(&id))
@@ -92,6 +100,7 @@ impl EventFilter {
 
 #[derive(Clone, Default)]
 struct FilterOptions {
+    event_types: Vec<EventType>,
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
     filter: Option<Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>>,
@@ -136,8 +145,8 @@ impl<'a> EventCollectorBuilder<'a> {
 
     /// Limits how many events will attempt to be filtered.
     ///
-    /// The filter checks whether the event has the right related guild, channel, user,
-    /// and message.
+    /// The filter checks whether the event has the right related guild, channel, user, and message.
+    /// Only events with types passed to [`Self::add_event_type`] as counted towards this limit.
     #[allow(clippy::unwrap_used)]
     pub fn filter_limit(mut self, limit: u32) -> Self {
         self.filter.as_mut().unwrap().filter_limit = Some(limit);
@@ -166,6 +175,15 @@ impl<'a> EventCollectorBuilder<'a> {
         function: F,
     ) -> Self {
         self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
+
+        self
+    }
+
+    /// Adds an [`EventType`] that this collector will collect.
+    /// If an event does not have one of these types, it won't be received.
+    #[allow(clippy::unwrap_used)]
+    pub fn add_event_type(mut self, event_type: EventType) -> Self {
+        self.filter.as_mut().unwrap().event_types.push(event_type);
 
         self
     }
