@@ -222,48 +222,34 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            examples/target
+            target
           key: ${{ runner.os }}-examples-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
 
       - name: 'Build example 1'
-        working-directory: examples
         run: cargo build -p e01_basic_ping_bot
       - name: 'Build example 2'
-        working-directory: examples
         run: cargo build -p e02_transparent_guild_sharding
       - name: 'Build example 3'
-        working-directory: examples
         run: cargo build -p e03_struct_utilities
       - name: 'Build example 4'
-        working-directory: examples
         run: cargo build -p e04_message_builder
       - name: 'Build example 5'
-        working-directory: examples
         run: cargo build -p e05_command_framework
       - name: 'Build example 6'
-        working-directory: examples
         run: cargo build -p e06_sample_bot_structure
       - name: 'Build example 7'
-        working-directory: examples
         run: cargo build -p e07_env_logging
       - name: 'Build example 8'
-        working-directory: examples
         run: cargo build -p e08_shard_manager
       - name: 'Build example 9'
-        working-directory: examples
         run: cargo build -p e09_create_message_builder
       - name: 'Build example 10'
-        working-directory: examples
         run: cargo build -p e10_collectors
       - name: 'Build example 11'
-        working-directory: examples
         run: cargo build -p e11_gateway_intents
       - name: 'Build example 12'
-        working-directory: examples
         run: cargo build -p e12_global_data
       - name: 'Build example 13'
-        working-directory: examples
         run: cargo build -p e13_parallel_loops
       - name: 'Build example 14'
-        working-directory: examples
         run: cargo build -p e14_slash_commands

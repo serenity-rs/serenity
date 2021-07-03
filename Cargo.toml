@@ -12,6 +12,24 @@ version = "0.10.8"
 edition = "2018"
 include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
 
+[workspace]
+members = [
+    "examples/e01_basic_ping_bot",
+    "examples/e02_transparent_guild_sharding",
+    "examples/e03_struct_utilities",
+    "examples/e04_message_builder",
+    "examples/e05_command_framework",
+    "examples/e06_sample_bot_structure",
+    "examples/e07_env_logging",
+    "examples/e08_shard_manager",
+    "examples/e09_create_message_builder",
+    "examples/e10_collectors",
+    "examples/e11_gateway_intents",
+    "examples/e12_global_data",
+    "examples/e13_parallel_loops",
+    "examples/e14_slash_commands"
+]
+
 [dependencies]
 bitflags = "1.1"
 serde_json = "1"
