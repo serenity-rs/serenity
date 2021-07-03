@@ -243,6 +243,9 @@ pub struct Guild {
     pub widget_enabled: Option<bool>,
     /// The channel id that the widget will generate an invite to, or null if set to no invite
     pub widget_channel_id: Option<ChannelId>,
+    /// The stage instances in this guild.
+    #[serde(default)]
+    pub stage_instances: Vec<StageInstance>,
 }
 
 #[cfg(feature = "model")]
@@ -2607,6 +2610,11 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(SystemChannelFlags::deserialize)
             .map_err(DeError::custom)?;
 
+        let stage_instances = match map.remove("stage_instances") {
+            Some(v) => Vec::<StageInstance>::deserialize(v).map_err(DeError::custom)?,
+            None => Vec::new(),
+        };
+
         #[allow(deprecated)]
         Ok(Self {
             afk_channel_id,
@@ -2653,6 +2661,7 @@ impl<'de> Deserialize<'de> for Guild {
             max_members,
             widget_enabled,
             widget_channel_id,
+            stage_instances,
         })
     }
 }
@@ -3210,6 +3219,7 @@ mod test {
                 discovery_splash: None,
                 widget_channel_id: None,
                 public_updates_channel_id: None,
+                stage_instances: vec![],
             }
         }
 
