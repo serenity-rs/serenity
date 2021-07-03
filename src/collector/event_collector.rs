@@ -81,11 +81,18 @@ impl EventFilter {
     /// Constraints are optional, as it is possible to limit events to
     /// be sent by a specific user or in a specifc guild.
     fn is_passing_constraints(&self, event: &mut LazyArc<'_, Event>) -> bool {
+        fn empty_or_any<T, F>(slice: &[T], f: F) -> bool
+        where
+            F: FnMut(&T) -> bool,
+        {
+            slice.is_empty() || slice.iter().any(f)
+        }
+
         // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
-        self.options.guild_id.map_or(true, |id| event.guild_id().contains(&id))
-            && self.options.user_id.map_or(true, |id| event.user_id().contains(&id))
-            && self.options.channel_id.map_or(true, |id| event.channel_id().contains(&id))
-            && self.options.message_id.map_or(true, |id| event.message_id().contains(&id))
+        empty_or_any(&self.options.guild_id, |id| event.guild_id().contains(id))
+            && empty_or_any(&self.options.user_id, |id| event.user_id().contains(id))
+            && empty_or_any(&self.options.channel_id, |id| event.channel_id().contains(id))
+            && empty_or_any(&self.options.message_id, |id| event.message_id().contains(id))
             && self.options.filter.as_ref().map_or(true, |f| f(&event.as_arc()))
     }
 
@@ -104,10 +111,10 @@ struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
     filter: Option<Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>>,
-    channel_id: Option<ChannelId>,
-    guild_id: Option<GuildId>,
-    user_id: Option<UserId>,
-    message_id: Option<MessageId>,
+    channel_id: Vec<ChannelId>,
+    guild_id: Vec<GuildId>,
+    user_id: Vec<UserId>,
+    message_id: Vec<MessageId>,
 }
 
 impl std::fmt::Debug for FilterOptions {
@@ -191,8 +198,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Sets the required user ID of an event.
     /// If an event does not have this ID, it won't be received.
     #[allow(clippy::unwrap_used)]
-    pub fn user_id(mut self, user_id: impl Into<UserId>) -> Self {
-        self.filter.as_mut().unwrap().user_id = Some(user_id.into());
+    pub fn add_user_id(mut self, user_id: impl Into<UserId>) -> Self {
+        self.filter.as_mut().unwrap().user_id.push(user_id.into());
 
         self
     }
@@ -200,8 +207,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Sets the required channel ID of an event.
     /// If an event does not have this ID, it won't be received.
     #[allow(clippy::unwrap_used)]
-    pub fn channel_id(mut self, channel_id: impl Into<ChannelId>) -> Self {
-        self.filter.as_mut().unwrap().channel_id = Some(channel_id.into());
+    pub fn add_channel_id(mut self, channel_id: impl Into<ChannelId>) -> Self {
+        self.filter.as_mut().unwrap().channel_id.push(channel_id.into());
 
         self
     }
@@ -209,8 +216,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Sets the required guild ID of an event.
     /// If an event does not have this ID, it won't be received.
     #[allow(clippy::unwrap_used)]
-    pub fn guild_id(mut self, guild_id: impl Into<GuildId>) -> Self {
-        self.filter.as_mut().unwrap().guild_id = Some(guild_id.into());
+    pub fn add_guild_id(mut self, guild_id: impl Into<GuildId>) -> Self {
+        self.filter.as_mut().unwrap().guild_id.push(guild_id.into());
 
         self
     }
@@ -218,8 +225,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Sets the required message ID of an event.
     /// If an event does not have this ID, it won't be received.
     #[allow(clippy::unwrap_used)]
-    pub fn message_id(mut self, message_id: impl Into<MessageId>) -> Self {
-        self.filter.as_mut().unwrap().message_id = Some(message_id.into());
+    pub fn add_message_id(mut self, message_id: impl Into<MessageId>) -> Self {
+        self.filter.as_mut().unwrap().message_id.push(message_id.into());
 
         self
     }
