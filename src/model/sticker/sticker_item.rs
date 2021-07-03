@@ -4,6 +4,9 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+#[cfg(feature = "model")]
+use super::sticker_url;
+
 /// The smallest amount of data required to render a sticker.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -28,5 +31,13 @@ impl StickerItem {
     #[inline]
     pub async fn to_sticker(&self, http: impl AsRef<Http>) -> Result<Sticker> {
         self.id.to_sticker(&http).await
+    }
+
+    /// Retrieves the URL to the sticker image.
+    ///
+    /// **Note**: This will only be `None` if the format_type is unknown.
+    #[inline]
+    pub fn image_url(&self) -> Option<String> {
+        sticker_url(self.id, self.format_type)
     }
 }

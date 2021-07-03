@@ -10,6 +10,8 @@ use crate::model::{
     user::User,
     utils::{deserialize_comma_separated_string, serialize_comma_separated_string},
 };
+#[cfg(feature = "model")]
+use super::sticker_url;
 
 /// A sticker sent with a message.
 ///
@@ -102,6 +104,14 @@ impl Sticker {
         } else {
             Err(Error::Model(ModelError::DeleteNitroSticker))
         }
+    }
+
+    /// Retrieves the URL to the sticker image.
+    ///
+    /// **Note**: This will only be `None` if the format_type is unknown.
+    #[inline]
+    pub fn image_url(&self) -> Option<String> {
+        sticker_url(self.id, self.format_type)
     }
 }
 
