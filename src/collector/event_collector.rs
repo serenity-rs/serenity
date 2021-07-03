@@ -28,7 +28,7 @@ use crate::{
 };
 
 /// Filters events on the shard's end and sends them to the collector.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct EventFilter {
     filtered: u32,
     collected: u32,
@@ -80,7 +80,7 @@ impl EventFilter {
     /// Checks if the `event` passes set constraints.
     /// Constraints are optional, as it is possible to limit events to
     /// be sent by a specific user or in a specifc guild.
-    fn is_passing_constraints(&self, event: &mut LazyArc<'_, Event>) -> bool {
+    fn is_passing_constraints(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
         fn empty_or_any<T, F>(slice: &[T], f: F) -> bool
         where
             F: FnMut(&T) -> bool,
@@ -93,7 +93,7 @@ impl EventFilter {
             && empty_or_any(&self.options.user_id, |id| event.user_id().contains(id))
             && empty_or_any(&self.options.channel_id, |id| event.channel_id().contains(id))
             && empty_or_any(&self.options.message_id, |id| event.message_id().contains(id))
-            && self.options.filter.as_ref().map_or(true, |f| f(&event.as_arc()))
+            && self.options.filter.as_mut().map_or(true, |f| f(&event.as_arc()))
     }
 
     /// Checks if the filter is within set receive and collect limits.
@@ -105,12 +105,12 @@ impl EventFilter {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Default)]
 struct FilterOptions {
     event_types: Vec<EventType>,
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>>,
+    filter: Option<Box<dyn FnMut(&Arc<Event>) -> bool + 'static + Send + Sync>>,
     channel_id: Vec<ChannelId>,
     guild_id: Vec<GuildId>,
     user_id: Vec<UserId>,
@@ -177,11 +177,11 @@ impl<'a> EventCollectorBuilder<'a> {
     /// process.
     /// This is the last step to pass for a event to count as *collected*.
     #[allow(clippy::unwrap_used)]
-    pub fn filter<F: Fn(&Arc<Event>) -> bool + 'static + Send + Sync>(
+    pub fn filter<F: FnMut(&Arc<Event>) -> bool + 'static + Send + Sync>(
         mut self,
         function: F,
     ) -> Self {
-        self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
+        self.filter.as_mut().unwrap().filter = Some(Box::new(function));
 
         self
     }

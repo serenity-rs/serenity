@@ -23,7 +23,7 @@ pub enum ChunkGuildFilter {
 /// A message to send from a shard over a WebSocket.
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum ShardRunnerMessage {
     /// Indicates that the client is to send a member chunk message.
     ChunkGuild {

@@ -69,7 +69,7 @@ use crate::gateway::ConnectionStage;
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].
     Manager(ShardManagerMessage),
@@ -109,6 +109,7 @@ pub enum ShardManagerMessage {
     ShardInvalidGatewayIntents,
     /// If a connection has been established but privileged gateway intents
     /// were provided without enabling them prior.
+
     /// Emitted when a shard received a [`DisallowedGatewayIntents`] error.
     ///
     /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
