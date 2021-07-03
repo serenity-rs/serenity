@@ -2,14 +2,14 @@ use std::env;
 
 use serenity::{
     async_trait,
-    model::{event::ResumedEvent, gateway::Ready, channel::Message},
-    prelude::*,
     framework::standard::{
-        CommandResult, StandardFramework,
         macros::{command, group, hook},
+        CommandResult,
+        StandardFramework,
     },
+    model::{channel::Message, event::ResumedEvent, gateway::Ready},
+    prelude::*,
 };
-
 use tracing::{debug, error, info, instrument};
 
 struct Handler;
@@ -67,13 +67,10 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    let framework = StandardFramework::new()
-        .configure(|c| c.prefix("~"))
-        .before(before)
-        .group(&GENERAL_GROUP);
+    let framework =
+        StandardFramework::new().configure(|c| c.prefix("~")).before(before).group(&GENERAL_GROUP);
 
     let mut client = Client::builder(&token)
         .event_handler(Handler)

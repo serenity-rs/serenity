@@ -1,12 +1,22 @@
-use std::{env, sync::{Arc, atomic::{Ordering, AtomicBool}}, time::Duration};
-
-use serenity::{
-    async_trait,
-    model::{id::{GuildId, ChannelId}, channel::Message, gateway::{Ready, Activity}},
-    prelude::*,
+use std::{
+    env,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+    time::Duration,
 };
 
 use chrono::offset::Utc;
+use serenity::{
+    async_trait,
+    model::{
+        channel::Message,
+        gateway::{Activity, Ready},
+        id::{ChannelId, GuildId},
+    },
+    prelude::*,
+};
 
 struct Handler {
     is_loop_running: AtomicBool,
@@ -42,7 +52,6 @@ impl EventHandler for Handler {
         // An AtomicBool is used because it doesn't require a mutable reference to be changed, as
         // we don't have one due to self being an immutable reference.
         if !self.is_loop_running.load(Ordering::Relaxed) {
-
             // We have to clone the Arc, as it gets moved into the new thread.
             let ctx1 = Arc::clone(&ctx);
             // tokio::spawn creates a new green thread that can run in parallel with the rest of
@@ -77,20 +86,25 @@ async fn log_system_load(ctx: Arc<Context>) {
 
     // We can use ChannelId directly to send a message to a specific channel; in this case, the
     // message would be sent to the #testing channel on the discord server.
-    if let Err(why) = ChannelId(381926291785383946).send_message(&ctx, |m| m.embed(|e| {
-        e.title("System Resource Load");
-        e.field(
-            "CPU Load Average",
-            format!("{:.2}%", cpu_load.one * 10.0),
-            false,
-        );
-        e.field(
-            "Memory Usage",
-            format!("{:.2} MB Free out of {:.2} MB", mem_use.free as f32 / 1000.0, mem_use.total as f32 / 1000.0),
-            false,
-        );
-        e
-    })).await {
+    if let Err(why) = ChannelId(381926291785383946)
+        .send_message(&ctx, |m| {
+            m.embed(|e| {
+                e.title("System Resource Load");
+                e.field("CPU Load Average", format!("{:.2}%", cpu_load.one * 10.0), false);
+                e.field(
+                    "Memory Usage",
+                    format!(
+                        "{:.2} MB Free out of {:.2} MB",
+                        mem_use.free as f32 / 1000.0,
+                        mem_use.total as f32 / 1000.0
+                    ),
+                    false,
+                );
+                e
+            })
+        })
+        .await
+    {
         eprintln!("Error sending message: {:?}", why);
     };
 }
@@ -104,8 +118,7 @@ async fn set_status_to_current_time(ctx: Arc<Context>) {
 
 #[tokio::main]
 async fn main() {
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     let mut client = Client::builder(&token)
         .event_handler(Handler {

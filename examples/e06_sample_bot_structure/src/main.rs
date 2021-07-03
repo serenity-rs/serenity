@@ -10,35 +10,19 @@
 //! ```
 mod commands;
 
-use std::{
-    collections::HashSet,
-    env,
-    sync::Arc,
-};
+use std::{collections::HashSet, env, sync::Arc};
+
+use commands::{math::*, meta::*, owner::*};
 use serenity::{
     async_trait,
     client::bridge::gateway::ShardManager,
-    framework::{
-        StandardFramework,
-        standard::macros::group,
-    },
+    framework::{standard::macros::group, StandardFramework},
     http::Http,
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };
-
 use tracing::{error, info};
-use tracing_subscriber::{
-    FmtSubscriber,
-    EnvFilter,
-};
-
-
-use commands::{
-    math::*,
-    meta::*,
-    owner::*,
-};
+use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 pub struct ShardManagerContainer;
 
@@ -73,15 +57,12 @@ async fn main() {
     //
     // In this case, a good default is setting the environment variable
     // `RUST_LOG` to debug`.
-    let subscriber = FmtSubscriber::builder()
-        .with_env_filter(EnvFilter::from_default_env())
-        .finish();
+    let subscriber =
+        FmtSubscriber::builder().with_env_filter(EnvFilter::from_default_env()).finish();
 
     tracing::subscriber::set_global_default(subscriber).expect("Failed to start the logger");
 
-
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     let http = Http::new_with_token(&token);
 
@@ -97,11 +78,8 @@ async fn main() {
     };
 
     // Create the framework
-    let framework = StandardFramework::new()
-        .configure(|c| c
-                   .owners(owners)
-                   .prefix("~"))
-        .group(&GENERAL_GROUP);
+    let framework =
+        StandardFramework::new().configure(|c| c.owners(owners).prefix("~")).group(&GENERAL_GROUP);
 
     let mut client = Client::builder(&token)
         .framework(framework)
