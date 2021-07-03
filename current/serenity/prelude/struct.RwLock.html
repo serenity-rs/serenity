@@ -69,6 +69,10 @@ lock attempt is made, and then a subsequent read lock attempt is made
 by the current task.</p>
 <p>Returns an RAII guard which will drop this read access of the <code>RwLock</code>
 when dropped.</p>
+<h1 id="cancel-safety" class="section-header"><a href="#cancel-safety">Cancel safety</a></h1>
+<p>This method uses a queue to fairly distribute locks in the order they
+were requested. Cancelling a call to <code>read</code> makes you lose your place in
+the queue.</p>
 <h1 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -107,6 +111,10 @@ lock attempt is made, and then a subsequent read lock attempt is made
 by the current task.</p>
 <p>Returns an RAII guard which will drop this read access of the <code>RwLock</code>
 when dropped.</p>
+<h1 id="cancel-safety-1" class="section-header"><a href="#cancel-safety-1">Cancel safety</a></h1>
+<p>This method uses a queue to fairly distribute locks in the order they
+were requested. Cancelling a call to <code>read_owned</code> makes you lose your
+place in the queue.</p>
 <h1 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -192,6 +200,10 @@ task to yield until the lock has been acquired.</p>
 have access to the lock.</p>
 <p>Returns an RAII guard which will drop the write access of this <code>RwLock</code>
 when dropped.</p>
+<h1 id="cancel-safety-2" class="section-header"><a href="#cancel-safety-2">Cancel safety</a></h1>
+<p>This method uses a queue to fairly distribute locks in the order they
+were requested. Cancelling a call to <code>write</code> makes you lose your place
+in the queue.</p>
 <h1 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
@@ -214,6 +226,10 @@ method, and the guard will live for the <code>'static</code> lifetime, as it kee
 the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
 <p>Returns an RAII guard which will drop the write access of this <code>RwLock</code>
 when dropped.</p>
+<h1 id="cancel-safety-3" class="section-header"><a href="#cancel-safety-3">Cancel safety</a></h1>
+<p>This method uses a queue to fairly distribute locks in the order they
+were requested. Cancelling a call to <code>write_owned</code> makes you lose your
+place in the queue.</p>
 <h1 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
