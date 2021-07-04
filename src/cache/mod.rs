@@ -352,7 +352,7 @@ impl Cache {
 
     /// This method allows to extract specific data from the cached messages of a channel by
     /// providing a `selector` closure picking what you want to extract from the messages
-    /// iterator of a given channell.
+    /// iterator of a given channel.
     ///
     /// ```rust,no_run
     /// # let cache: serenity::cache::Cache = todo!();
