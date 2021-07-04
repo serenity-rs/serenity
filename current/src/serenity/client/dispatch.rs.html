@@ -833,6 +833,48 @@
 <span id="833">833</span>
 <span id="834">834</span>
 <span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
 </pre><pre class="rust">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1665,6 +1707,48 @@
 
             <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="ident">event_handler</span>.<span class="ident">stage_instance_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">stage_instance</span>).<span class="kw">await</span>;
+            });
+        },
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadCreate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
+
+            <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">thread_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">thread</span>).<span class="kw">await</span>;
+            });
+        },
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadUpdate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
+
+            <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">thread_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">thread</span>).<span class="kw">await</span>;
+            });
+        },
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadDelete</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
+
+            <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">thread_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">thread</span>).<span class="kw">await</span>;
+            });
+        },
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadListSync</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
+
+            <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">thread_list_sync</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
+            });
+        },
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadMemberUpdate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
+
+            <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">thread_member_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">member</span>).<span class="kw">await</span>;
+            });
+        },
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadMembersUpdate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
+
+            <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">thread_members_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
     }

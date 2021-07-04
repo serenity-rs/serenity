@@ -1266,6 +1266,21 @@
 <span id="1266">1266</span>
 <span id="1267">1267</span>
 <span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -2330,10 +2345,18 @@
     <span class="ident">GuildDiscoveryDisqualified</span> <span class="op">=</span> <span class="number">14</span>,
     <span class="doccomment">/// An indicator that the guild is requalified for Discovery Feature</span>
     <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span> <span class="number">15</span>,
+    <span class="doccomment">/// The first warning before guild discovery removal.</span>
+    <span class="ident">GuildDiscoveryGracePeriodInitialWarning</span> <span class="op">=</span> <span class="number">16</span>,
+    <span class="doccomment">/// The last warning before guild discovery removal.</span>
+    <span class="ident">GuildDiscoveryGracePeriodFinalWarning</span> <span class="op">=</span> <span class="number">17</span>,
+    <span class="doccomment">/// Message sent to inform users that a thread was created.</span>
+    <span class="ident">ThreadCreated</span> <span class="op">=</span> <span class="number">18</span>,
     <span class="doccomment">/// A message reply.</span>
     <span class="ident">InlineReply</span> <span class="op">=</span> <span class="number">19</span>,
     <span class="doccomment">/// A slash command.</span>
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">20</span>,
+    <span class="doccomment">/// A thread start message.</span>
+    <span class="ident">ThreadStarterMessage</span> <span class="op">=</span> <span class="number">21</span>,
     <span class="doccomment">/// Server setup tips.</span>
     <span class="ident">GuildInviteReminder</span> <span class="op">=</span> <span class="number">22</span>,
     <span class="doccomment">/// An indicator that the message is of unknown type.</span>
@@ -2356,8 +2379,13 @@
     <span class="ident">ChannelFollowAdd</span>,
     <span class="ident">GuildDiscoveryDisqualified</span>,
     <span class="ident">GuildDiscoveryRequalified</span>,
+    <span class="ident">GuildDiscoveryGracePeriodInitialWarning</span>,
+    <span class="ident">GuildDiscoveryGracePeriodFinalWarning</span>
+    <span class="ident">ThreadCreated</span>,
     <span class="ident">InlineReply</span>,
     <span class="ident">ApplicationCommand</span>,
+    <span class="ident">ThreadStarterMessage</span>,
+    <span class="ident">GuildInviteReminder</span>
 });
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -2474,6 +2502,8 @@
         <span class="ident">SOURCE_MESSAGE_DELETED</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_1000</span>;
         <span class="doccomment">/// This message came from the urgent message system.</span>
         <span class="ident">URGENT</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0001_0000</span>;
+        <span class="doccomment">/// This message has an associated thread, with the same id as the message.</span>
+        <span class="ident">HAS_THREAD</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0010_0000</span>;
         <span class="doccomment">/// This message is only visible to the user who invoked the Interaction.</span>
         <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0100_0000</span>;
         <span class="doccomment">/// This message is an Interaction Response and the bot is &quot;thinking&quot;.</span>

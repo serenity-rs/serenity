@@ -1159,6 +1159,12 @@
 <span id="1159">1159</span>
 <span id="1160">1160</span>
 <span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -2236,6 +2242,11 @@
             <span class="ident">slow_mode_rate</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
             <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
             <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
+            <span class="ident">message_count</span>: <span class="prelude-val">None</span>,
+            <span class="ident">member_count</span>: <span class="prelude-val">None</span>,
+            <span class="ident">thread_metadata</span>: <span class="prelude-val">None</span>,
+            <span class="ident">member</span>: <span class="prelude-val">None</span>,
+            <span class="ident">default_auto_archive_duration</span>: <span class="prelude-val">None</span>,
         };
 
         <span class="comment">// Add a channel delete event to the cache, the cached messages for that</span>
@@ -2300,6 +2311,7 @@
                     <span class="ident">widget_enabled</span>: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
                     <span class="ident">widget_channel_id</span>: <span class="prelude-val">None</span>,
                     <span class="ident">stage_instances</span>: <span class="macro">vec!</span>[],
+                    <span class="ident">threads</span>: <span class="macro">vec!</span>[],
                 },
             }
         };

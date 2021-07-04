@@ -536,6 +536,55 @@
 <span id="536">536</span>
 <span id="537">537</span>
 <span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to channels and types within channels.</span>
 
@@ -555,6 +604,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
+<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>, <span class="ident">Unexpected</span>};
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeStruct</span>, <span class="ident">Serializer</span>};
 
@@ -784,9 +834,11 @@
         };
 
         <span class="kw">match</span> <span class="ident">kind</span> {
-            <span class="number">0</span> <span class="op">|</span> <span class="number">2</span> <span class="op">|</span> <span class="number">5</span> <span class="op">|</span> <span class="number">6</span> <span class="op">|</span> <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>(<span class="ident">Value::Object</span>(<span class="ident">v</span>))
-                .<span class="ident">map</span>(<span class="ident">Channel::Guild</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
+            <span class="number">0</span> <span class="op">|</span> <span class="number">2</span> <span class="op">|</span> <span class="number">5</span> <span class="op">|</span> <span class="number">6</span> <span class="op">|</span> <span class="number">10</span> <span class="op">|</span> <span class="number">11</span> <span class="op">|</span> <span class="number">12</span> <span class="op">|</span> <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>(<span class="ident">Value::Object</span>(<span class="ident">v</span>))
+                    .<span class="ident">map</span>(<span class="ident">Channel::Guild</span>)
+                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)
+            },
             <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span>(<span class="ident">Value::Object</span>(<span class="ident">v</span>))
                 .<span class="ident">map</span>(<span class="ident">Channel::Private</span>)
                 .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
@@ -844,10 +896,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: `NewsChannel` is serialized into a [`GuildChannel`]</span>
     <span class="ident">News</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// An indicator that the channel is a `StoreChannel]</span>
+    <span class="doccomment">/// An indicator that the channel is a `StoreChannel`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: `StoreChannel` is serialized into a [`GuildChannel`]</span>
     <span class="ident">Store</span> <span class="op">=</span> <span class="number">6</span>,
+    <span class="doccomment">/// An indicator that the channel is a news thread [`GuildChannel`].</span>
+    <span class="ident">NewsThread</span> <span class="op">=</span> <span class="number">10</span>,
+    <span class="doccomment">/// An indicator that the channel is a news thread [`GuildChannel`].</span>
+    <span class="ident">PublicThread</span> <span class="op">=</span> <span class="number">11</span>,
+    <span class="doccomment">/// An indicator that the channel is a news thread [`GuildChannel`].</span>
+    <span class="ident">PrivateThread</span> <span class="op">=</span> <span class="number">12</span>,
     <span class="doccomment">/// An indicator that the channel is a stage [`GuildChannel`].</span>
     <span class="ident">Stage</span> <span class="op">=</span> <span class="number">13</span>,
     <span class="doccomment">/// An indicator that the channel is of unknown type.</span>
@@ -861,6 +919,9 @@
     <span class="ident">Category</span>,
     <span class="ident">News</span>,
     <span class="ident">Store</span>,
+    <span class="ident">NewsThread</span>,
+    <span class="ident">PublicThread</span>,
+    <span class="ident">PrivateThread</span>,
     <span class="ident">Stage</span>
 });
 
@@ -874,6 +935,9 @@
             <span class="ident">ChannelType::Category</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;category&quot;</span>,
             <span class="ident">ChannelType::News</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;news&quot;</span>,
             <span class="ident">ChannelType::Store</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;store&quot;</span>,
+            <span class="ident">ChannelType::NewsThread</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;news_thread&quot;</span>,
+            <span class="ident">ChannelType::PublicThread</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;public_thread&quot;</span>,
+            <span class="ident">ChannelType::PrivateThread</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;private_thread&quot;</span>,
             <span class="ident">ChannelType::Stage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;stage&quot;</span>,
             <span class="ident">ChannelType::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;unknown&quot;</span>,
         }
@@ -981,6 +1045,35 @@
     <span class="kw">pub</span> <span class="ident">topic</span>: <span class="ident">String</span>,
 }
 
+<span class="doccomment">/// A thread data.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadMetadata</span> {
+    <span class="doccomment">/// Whether the thread is archived.</span>
+    <span class="kw">pub</span> <span class="ident">archived</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Duration in minutes to automatically archive the thread after recent activity.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: It can currently only be set to 60, 1440, 4320, 10080.</span>
+    <span class="kw">pub</span> <span class="ident">auto_archive_duration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Timestamp when the thread&#39;s archive status was last changed, used for calculating recent activity.</span>
+    <span class="kw">pub</span> <span class="ident">archive_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">locked</span>: <span class="ident">bool</span>,
+}
+
+<span class="doccomment">/// A response to getting several threads channels.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadsData</span> {
+    <span class="doccomment">/// The threads channels.</span>
+    <span class="kw">pub</span> <span class="ident">threads</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A thread member for each returned thread the current user has joined.</span>
+    <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ThreadMember</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether there are potentially additional threads that could be returned on a subsequent call.</span>
+    <span class="kw">pub</span> <span class="ident">has_more</span>: <span class="ident">bool</span>,
+}
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
@@ -1005,6 +1098,11 @@
                 <span class="ident">slow_mode_rate</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
                 <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
                 <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
+                <span class="ident">message_count</span>: <span class="prelude-val">None</span>,
+                <span class="ident">member_count</span>: <span class="prelude-val">None</span>,
+                <span class="ident">thread_metadata</span>: <span class="prelude-val">None</span>,
+                <span class="ident">member</span>: <span class="prelude-val">None</span>,
+                <span class="ident">default_auto_archive_duration</span>: <span class="prelude-val">None</span>,
             }
         }
 

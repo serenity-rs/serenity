@@ -302,6 +302,19 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">bitflags::__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{
@@ -359,12 +372,22 @@
         <span class="doccomment">/// - CHANNEL_UPDATE</span>
         <span class="doccomment">/// - CHANNEL_DELETE</span>
         <span class="doccomment">/// - CHANNEL_PINS_UPDATE</span>
+        <span class="doccomment">/// - THREAD_CREATE</span>
+        <span class="doccomment">/// - THREAD_UPDATE</span>
+        <span class="doccomment">/// - THREAD_DELETE</span>
+        <span class="doccomment">/// - THREAD_LIST_SYNC</span>
+        <span class="doccomment">/// - THREAD_MEMBER_UPDATE</span>
+        <span class="doccomment">/// - THREAD_MEMBERS_UPDATE</span>
+        <span class="doccomment">/// - STAGE_INSTANCE_CREATE</span>
+        <span class="doccomment">/// - STAGE_INSTANCE_UPDATE</span>
+        <span class="doccomment">/// - STAGE_INSTANCE_DELETE</span>
         <span class="ident">GUILDS</span> <span class="op">=</span> <span class="number">1</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_MEMBER_ADD</span>
         <span class="doccomment">/// - GUILD_MEMBER_UPDATE</span>
         <span class="doccomment">/// - GUILD_MEMBER_REMOVE</span>
+        <span class="doccomment">/// - THREAD_MEMBERS_UPDATE</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// **Info**:</span>
         <span class="doccomment">/// This intent is *privileged*.</span>
@@ -385,6 +408,9 @@
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_INTEGRATIONS_UPDATE</span>
+        <span class="doccomment">/// - INTEGRATION_CREATE</span>
+        <span class="doccomment">/// - INTEGRATION_UPDATE</span>
+        <span class="doccomment">/// - INTEGRATION_DELETE</span>
         <span class="ident">GUILD_INTEGRATIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
@@ -415,6 +441,7 @@
         <span class="doccomment">/// - MESSAGE_CREATE</span>
         <span class="doccomment">/// - MESSAGE_UPDATE</span>
         <span class="doccomment">/// - MESSAGE_DELETE</span>
+        <span class="doccomment">/// - MESSAGE_DELETE_BULK</span>
         <span class="ident">GUILD_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
@@ -429,7 +456,6 @@
         <span class="ident">GUILD_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
         <span class="doccomment">/// Enable following gateway events:</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// - CHANNEL_CREATE</span>
         <span class="doccomment">/// - MESSAGE_CREATE</span>
         <span class="doccomment">/// - MESSAGE_UPDATE</span>
         <span class="doccomment">/// - MESSAGE_DELETE</span>
