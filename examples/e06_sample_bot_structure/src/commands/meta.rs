@@ -1,9 +1,6 @@
-use serenity::prelude::*;
+use serenity::framework::standard::{macros::command, CommandResult};
 use serenity::model::prelude::*;
-use serenity::framework::standard::{
-    CommandResult,
-    macros::command,
-};
+use serenity::prelude::*;
 
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {

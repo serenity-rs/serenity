@@ -41,9 +41,7 @@ To run an example, you have various options:
 
 2. Manually running:
 - Clone the repository: `git clone https://github.com/serenity-rs/serenity.git`
-- CD into the examples folder: `cd serenity/examples`
-- CD into the example of choice: `cd e01_basic_ping_bot`
-- Run the example: `cargo run --release`
+- Run the example of choice, selected using the `-p` flag: `cargo run --release -p e01_basic_ping_bot `
 
 3. Copy Paste:
 - Copy the contents of the example into your local binary project\

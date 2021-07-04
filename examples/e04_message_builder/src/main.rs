@@ -48,12 +48,9 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
-    let mut client = Client::builder(&token)
-        .event_handler(Handler)
-        .await
-        .expect("Err creating client");
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
+    let mut client =
+        Client::builder(&token).event_handler(Handler).await.expect("Err creating client");
 
     if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);

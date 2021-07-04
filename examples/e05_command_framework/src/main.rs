@@ -8,15 +8,29 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-use std::{collections::{HashMap, HashSet}, env, fmt::Write, sync::Arc};
+use std::{
+    collections::{HashMap, HashSet},
+    env,
+    fmt::Write,
+    sync::Arc,
+};
+
+use serenity::prelude::*;
 use serenity::{
     async_trait,
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
-        Args, CommandOptions, CommandResult, CommandGroup,
-        DispatchError, HelpOptions, help_commands, Reason, StandardFramework,
-        buckets::{RevertBucket, LimitedFor},
-        macros::{command, group, help, check, hook},
+        buckets::{LimitedFor, RevertBucket},
+        help_commands,
+        macros::{check, command, group, help, hook},
+        Args,
+        CommandGroup,
+        CommandOptions,
+        CommandResult,
+        DispatchError,
+        HelpOptions,
+        Reason,
+        StandardFramework,
     },
     http::Http,
     model::{
@@ -27,8 +41,6 @@ use serenity::{
     },
     utils::{content_safe, ContentSafeOptions},
 };
-
-use serenity::prelude::*;
 use tokio::sync::Mutex;
 
 // A container type is created for inserting into the Client's `data`, which
@@ -97,8 +109,7 @@ struct Owner;
 #[help]
 // This replaces the information that a user can pass
 // a command-name as argument to gain specific information about it.
-#[individual_command_tip =
-"Hello! こんにちは！Hola! Bonjour! 您好! 안녕하세요~\n\n\
+#[individual_command_tip = "Hello! こんにちは！Hola! Bonjour! 您好! 안녕하세요~\n\n\
 If you want more information about a specific command, just pass the command as argument."]
 // Some arguments require a `{}` in order to replace it with contextual information.
 // In this case our `{}` refers to a command's name.
@@ -130,7 +141,7 @@ async fn my_help(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>
+    owners: HashSet<UserId>,
 ) -> CommandResult {
     let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners).await;
     Ok(())
@@ -178,7 +189,6 @@ async fn delay_action(ctx: &Context, msg: &Message) {
 #[hook]
 async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
     if let DispatchError::Ratelimited(info) = error {
-
         // We notify them only once.
         if info.is_first_try {
             let _ = msg
@@ -192,10 +202,13 @@ async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
 // You can construct a hook without the use of a macro, too.
 // This requires some boilerplate though and the following additional import.
 use serenity::{futures::future::BoxFuture, FutureExt};
-fn _dispatch_error_no_macro<'fut>(ctx: &'fut mut Context, msg: &'fut Message, error: DispatchError) -> BoxFuture<'fut, ()> {
+fn _dispatch_error_no_macro<'fut>(
+    ctx: &'fut mut Context,
+    msg: &'fut Message,
+    error: DispatchError,
+) -> BoxFuture<'fut, ()> {
     async move {
         if let DispatchError::Ratelimited(info) = error {
-
             if info.is_first_try {
                 let _ = msg
                     .channel_id
@@ -203,15 +216,14 @@ fn _dispatch_error_no_macro<'fut>(ctx: &'fut mut Context, msg: &'fut Message, er
                     .await;
             }
         };
-    }.boxed()
+    }
+    .boxed()
 }
 
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN").expect(
-        "Expected a token in the environment",
-    );
+    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     let http = Http::new_with_token(&token);
 
@@ -321,7 +333,7 @@ async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
     let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
 
     for (k, v) in counter {
-        writeln!(contents, "- {name}: {amount}", name=k, amount=v)?;
+        writeln!(contents, "- {name}: {amount}", name = k, amount = v)?;
     }
 
     msg.channel_id.say(&ctx.http, &contents).await?;
@@ -335,8 +347,8 @@ async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
 #[command]
 async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let settings = if let Some(guild_id) = msg.guild_id {
-       // By default roles, users, and channel mentions are cleaned.
-       ContentSafeOptions::default()
+        // By default roles, users, and channel mentions are cleaned.
+        ContentSafeOptions::default()
             // We do not want to clean channal mentions as they
             // do not ping users.
             .clean_channel(false)
@@ -344,9 +356,7 @@ async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
             // as their display name.
             .display_as_member_from(guild_id)
     } else {
-        ContentSafeOptions::default()
-            .clean_channel(false)
-            .clean_role(false)
+        ContentSafeOptions::default().clean_channel(false).clean_role(false)
     };
 
     let content = content_safe(&ctx.cache, &args.rest(), &settings).await;
@@ -363,7 +373,12 @@ async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 // not called.
 #[check]
 #[name = "Owner"]
-async fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> Result<(), Reason> {
+async fn owner_check(
+    _: &Context,
+    msg: &Message,
+    _: &mut Args,
+    _: &CommandOptions,
+) -> Result<(), Reason> {
     // Replace 7 with your ID to make this check pass.
     //
     // 1. If you want to pass a reason alongside failure you can do:
@@ -401,7 +416,8 @@ async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         // `role_by_name()` allows us to attempt attaining a reference to a role
         // via its name.
         if let Some(role) = guild.role_by_name(&potential_role_name) {
-            if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Role-ID: {}", role.id)).await {
+            if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Role-ID: {}", role.id)).await
+            {
                 println!("Error sending message: {:?}", why);
             }
 
@@ -409,7 +425,9 @@ async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         }
     }
 
-    msg.channel_id.say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name)).await?;
+    msg.channel_id
+        .say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name))
+        .await?;
 
     Ok(())
 }
@@ -459,7 +477,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     let runner = match runners.get(&ShardId(ctx.shard_id)) {
         Some(runner) => runner,
         None => {
-            msg.reply(ctx,  "No shard found").await?;
+            msg.reply(ctx, "No shard found").await?;
 
             return Ok(());
         },
@@ -522,9 +540,12 @@ async fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     if let Some(member) = &msg.member {
-
         for role in &member.roles {
-            if role.to_role_cached(&ctx.cache).await.map_or(false, |r| r.has_permission(Permissions::ADMINISTRATOR)) {
+            if role
+                .to_role_cached(&ctx.cache)
+                .await
+                .map_or(false, |r| r.has_permission(Permissions::ADMINISTRATOR))
+            {
                 msg.channel_id.say(&ctx.http, "Yes, you are.").await?;
 
                 return Ok(());
@@ -540,14 +561,17 @@ async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult 
 #[command]
 async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
-        if let Err(why) = msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)).await {
+        if let Err(why) =
+            msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)).await
+        {
             println!("Error setting channel's slow mode rate: {:?}", why);
 
             format!("Failed to set slow mode to `{}` seconds.", slow_mode_rate_seconds)
         } else {
             format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
         }
-    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache).await {
+    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache).await
+    {
         format!("Current slow mode rate is `{}` seconds.", channel.slow_mode_rate.unwrap_or(0))
     } else {
         "Failed to find channel in cache.".to_string()

@@ -1,19 +1,26 @@
 //! In this example, you will be shown various ways of sharing data between events and commands.
 //! And how to use locks correctly to avoid deadlocking the bot.
 
-use std::{sync::{Arc, atomic::{AtomicUsize, Ordering}}, collections::HashMap, env};
-
-use serenity::{
-    async_trait,
-    model::{channel::Message, gateway::Ready},
-    prelude::*,
-
-    framework::standard::{
-        Args, CommandResult, StandardFramework,
-        macros::{command, group, hook},
+use std::{
+    collections::HashMap,
+    env,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
     },
 };
 
+use serenity::{
+    async_trait,
+    framework::standard::{
+        macros::{command, group, hook},
+        Args,
+        CommandResult,
+        StandardFramework,
+    },
+    model::{channel::Message, gateway::Ready},
+    prelude::*,
+};
 use tokio::sync::RwLock;
 
 // A container type is created for inserting into the Client's `data`, which
@@ -103,12 +110,9 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-    
+
     let framework = StandardFramework::new()
-        .configure(|c| c
-            .with_whitespace(true)
-            .prefix("~")
-        )
+        .configure(|c| c.with_whitespace(true).prefix("~"))
         .before(before)
         .group(&GENERAL_GROUP);
 
@@ -165,7 +169,7 @@ async fn command_usage(ctx: &Context, msg: &Message, mut args: Args) -> CommandR
         Err(_) => {
             msg.reply(ctx, "I require an argument to run this command.").await?;
             return Ok(());
-        }
+        },
     };
 
     // Yet again, we want to keep the locks open for the least time possible.
@@ -179,7 +183,8 @@ async fn command_usage(ctx: &Context, msg: &Message, mut args: Args) -> CommandR
         // Then we obtain the value we need from data, in this case, we want the command counter.
         // The returned value from get() is an Arc, so the reference will be cloned, rather than
         // the data.
-        let command_counter_lock = data_read.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.").clone();
+        let command_counter_lock =
+            data_read.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.").clone();
 
         let command_counter = command_counter_lock.read().await;
         // And we return a usable value from it.
@@ -190,7 +195,11 @@ async fn command_usage(ctx: &Context, msg: &Message, mut args: Args) -> CommandR
     if amount == 0 {
         msg.reply(ctx, format!("The command `{}` has not yet been used.", command_name)).await?;
     } else {
-        msg.reply(ctx, format!("The command `{}` has been used {} time/s this session!", command_name, amount)).await?;
+        msg.reply(
+            ctx,
+            format!("The command `{}` has been used {} time/s this session!", command_name, amount),
+        )
+        .await?;
     }
 
     Ok(())
@@ -206,7 +215,11 @@ async fn owo_count(ctx: &Context, msg: &Message) -> CommandResult {
     let count = raw_count.load(Ordering::Relaxed);
 
     if count == 1 {
-        msg.reply(ctx, "You are the first one to say owo this session! *because it's on the command name* :P").await?;
+        msg.reply(
+            ctx,
+            "You are the first one to say owo this session! *because it's on the command name* :P",
+        )
+        .await?;
     } else {
         msg.reply(ctx, format!("OWO Has been said {} times!", count)).await?;
     }
