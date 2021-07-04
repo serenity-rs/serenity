@@ -336,6 +336,8 @@
 <span id="336">336</span>
 <span id="337">337</span>
 <span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">boxed::Box</span>,
@@ -362,7 +364,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway::ShardMessenger</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector::LazyArc</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions::Interaction</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions::message_component::MessageComponentInteraction</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_component_interaction_collector</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -393,7 +395,7 @@
                 <span class="doccomment">/// This is the last instance to pass for an interaction to count as *collected*.</span>
                 <span class="doccomment">///</span>
                 <span class="doccomment">/// This function is intended to be an interaction filter.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">function</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">function</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                     <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">function</span>));
 
                     <span class="self">self</span>
@@ -449,12 +451,12 @@
     <span class="ident">filtered</span>: <span class="ident">u32</span>,
     <span class="ident">collected</span>: <span class="ident">u32</span>,
     <span class="ident">options</span>: <span class="ident">FilterOptions</span>,
-    <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ComponentInteractionFilter</span> {
     <span class="doccomment">/// Creates a new filter</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">FilterOptions</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">FilterOptions</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">unbounded_channel</span>();
 
         <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="self">Self</span> {
@@ -469,7 +471,10 @@
 
     <span class="doccomment">/// Sends an `interaction` to the consuming collector if the `interaction` conforms</span>
     <span class="doccomment">/// to the constraints and the limits are not reached yet.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_interaction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">interaction</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Interaction</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_interaction</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">interaction</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_passing_constraints</span>(<span class="ident">interaction</span>) {
             <span class="self">self</span>.<span class="ident">collected</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
@@ -486,15 +491,14 @@
     <span class="doccomment">/// Checks if the `interaction` passes set constraints.</span>
     <span class="doccomment">/// Constraints are optional, as it is possible to limit interactions to</span>
     <span class="doccomment">/// be sent by a specific author or in a specifc guild.</span>
-    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">interaction</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Interaction</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">interaction</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="comment">// TODO: On next branch, switch filter arg to &amp;T so this as_arc() call can be removed.</span>
         <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">guild_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">interaction</span>.<span class="ident">guild_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="number">0</span>))
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">message_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> {
-                <span class="ident">interaction</span>.<span class="ident">message</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;expected message id&quot;</span>).<span class="ident">id</span>().<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">id</span>
-            })
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> {
-                <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">interaction</span>.<span class="ident">channel_id</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;expected channel id&quot;</span>).<span class="number">0</span>
-            })
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">message_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">interaction</span>.<span class="ident">message</span>.<span class="ident">id</span>().<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">id</span>)
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">channel_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">interaction</span>.<span class="ident">channel_id</span>.<span class="ident">as_ref</span>().<span class="number">0</span>)
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">author_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">interaction</span>.<span class="ident">user</span>.<span class="ident">id</span>.<span class="number">0</span>)
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">filter</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">interaction</span>.<span class="ident">as_arc</span>()))
     }
@@ -512,7 +516,7 @@
 <span class="kw">struct</span> <span class="ident">FilterOptions</span> {
     <span class="ident">filter_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">collect_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="ident">author_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
@@ -598,7 +602,7 @@
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterOptions</span><span class="op">&gt;</span>,
     <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CollectComponentInteraction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -613,7 +617,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">CollectComponentInteraction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
@@ -640,7 +644,7 @@
 <span class="doccomment">/// A component interaction collector receives interactions matching a the given filter for a</span>
 <span class="doccomment">/// set duration.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ComponentInteractionCollector</span> {
-    <span class="ident">receiver</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">receiver</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -655,7 +659,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">ComponentInteractionCollector</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Interaction</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">timeout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span> {
             <span class="kw">match</span> <span class="ident">timeout</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">ctx</span>) {

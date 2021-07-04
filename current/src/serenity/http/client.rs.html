@@ -3405,6 +3405,11 @@
 <span id="3405">3405</span>
 <span id="3406">3406</span>
 <span id="3407">3407</span>
+<span id="3408">3408</span>
+<span id="3409">3409</span>
+<span id="3410">3410</span>
+<span id="3411">3411</span>
+<span id="3412">3412</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -3443,6 +3448,11 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::constants</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::routing::Route</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions::application_command</span>::{
+    <span class="ident">ApplicationCommand</span>,
+    <span class="ident">ApplicationCommandPermission</span>,
+};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder implementing [`Future`] building a [`Http`] client to perform</span>

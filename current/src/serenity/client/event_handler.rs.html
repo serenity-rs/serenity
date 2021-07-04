@@ -557,6 +557,7 @@
 <span id="557">557</span>
 <span id="558">558</span>
 <span id="559">559</span>
+<span id="560">560</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -565,6 +566,8 @@
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::context::Context</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway::event</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions</span>::{<span class="ident">application_command::ApplicationCommand</span>, <span class="ident">Interaction</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// The core trait for handling events by serenity.</span>
@@ -982,8 +985,7 @@
     ) {
     }
 
-    <span class="doccomment">/// Dispatched when an interaction is created (e.g a slash command was used</span>
-    <span class="doccomment">/// or a button was clicked).</span>
+    <span class="doccomment">/// Dispatched when an interaction is created (e.g a slash command was used or a button was clicked).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the created interaction.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>

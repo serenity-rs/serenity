@@ -2554,6 +2554,8 @@
 <span id="2554">2554</span>
 <span id="2555">2555</span>
 <span id="2556">2556</span>
+<span id="2557">2557</span>
+<span id="2558">2558</span>
 </pre><pre class="rust">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -2573,6 +2575,8 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::constants::OpCode</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions</span>::{<span class="ident">application_command::ApplicationCommand</span>, <span class="ident">Interaction</span>};
 
 <span class="doccomment">/// Event data for the channel creation event.</span>
 <span class="doccomment">///</span>
