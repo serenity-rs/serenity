@@ -138,7 +138,6 @@ __impl_bitflags! {
         GUILD_MESSAGE_TYPING = 1 << 11;
         /// Enable following gateway events:
         ///
-        /// - CHANNEL_CREATE
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
