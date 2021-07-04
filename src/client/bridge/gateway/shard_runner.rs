@@ -21,7 +21,7 @@ use crate::client::{EventHandler, RawEventHandler};
 #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
 use crate::collector::ComponentInteractionFilter;
 #[cfg(feature = "collector")]
-use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
+use crate::collector::{LazyArc, LazyReactionAction, MessageFilter, ReactionFilter};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
@@ -214,47 +214,29 @@ impl ShardRunner {
             }
         }
 
-        // Avoid the clone if there is no message filter.
-        if !self.message_filters.is_empty() {
-            if let Event::MessageCreate(ref msg_event) = &event {
-                let msg = Arc::new(msg_event.message.clone());
-
-                retain(&mut self.message_filters, |f| f.send_message(&msg));
-            }
-        }
-
-        // Avoid the clone if there is no reaction filter.
-        if !self.reaction_filters.is_empty() {
-            match &event {
-                Event::ReactionAdd(ref reaction_event) => {
-                    let reaction =
-                        Arc::new(ReactionAction::Added(Arc::new(reaction_event.reaction.clone())));
-
-                    retain(&mut self.reaction_filters, |f| f.send_reaction(&reaction));
-                },
-                Event::ReactionRemove(ref reaction_event) => {
-                    let reaction = Arc::new(ReactionAction::Removed(Arc::new(
-                        reaction_event.reaction.clone(),
-                    )));
-
-                    retain(&mut self.reaction_filters, |f| f.send_reaction(&reaction));
-                },
-                _ => {},
-            }
-        }
-
-        // Avoid the clone if there is no interaction filter.
-        #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-        if !self.component_interaction_filters.is_empty() {
-            if let Event::InteractionCreate(ref interaction_event) = &event {
+        match &event {
+            Event::MessageCreate(ref msg_event) => {
+                let mut msg = LazyArc::new(&msg_event.message);
+                retain(&mut self.message_filters, |f| f.send_message(&mut msg));
+            },
+            Event::ReactionAdd(ref reaction_event) => {
+                let mut reaction = LazyReactionAction::new(&reaction_event.reaction, true);
+                retain(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
+            },
+            Event::ReactionRemove(ref reaction_event) => {
+                let mut reaction = LazyReactionAction::new(&reaction_event.reaction, false);
+                retain(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
+            },
+            #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+            Event::InteractionCreate(ref interaction_event) => {
                 if interaction_event.interaction.kind == InteractionType::MessageComponent {
-                    let interaction = Arc::new(interaction_event.interaction.clone());
-
+                    let mut interaction = LazyArc::new(&interaction_event.interaction);
                     retain(&mut self.component_interaction_filters, |f| {
-                        f.send_interaction(&interaction)
+                        f.send_interaction(&mut interaction)
                     });
                 }
-            }
+            },
+            _ => {},
         }
     }
 

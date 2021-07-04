@@ -21,7 +21,12 @@ use tokio::time::{delay_for as sleep, Delay as Sleep};
 #[cfg(feature = "tokio")]
 use tokio::time::{sleep, Sleep};
 
-use crate::{client::bridge::gateway::ShardMessenger, model::channel::Reaction, model::id::UserId};
+use crate::{
+    client::bridge::gateway::ShardMessenger,
+    collector::LazyArc,
+    model::channel::Reaction,
+    model::id::UserId,
+};
 
 macro_rules! impl_reaction_collector {
     ($($name:ident;)*) => {
@@ -152,6 +157,37 @@ impl ReactionAction {
     }
 }
 
+#[derive(Debug)]
+pub(crate) struct LazyReactionAction<'a> {
+    reaction: LazyArc<'a, Reaction>,
+    added: bool,
+    arc: Option<Arc<ReactionAction>>,
+}
+
+impl<'a> LazyReactionAction<'a> {
+    pub fn new(reaction: &'a Reaction, added: bool) -> Self {
+        Self {
+            reaction: LazyArc::new(reaction),
+            added,
+            arc: None,
+        }
+    }
+
+    pub fn as_arc(&mut self) -> Arc<ReactionAction> {
+        let added = self.added;
+        let reaction = &mut self.reaction;
+        self.arc
+            .get_or_insert_with(|| {
+                if added {
+                    Arc::new(ReactionAction::Added(reaction.as_arc()))
+                } else {
+                    Arc::new(ReactionAction::Removed(reaction.as_arc()))
+                }
+            })
+            .clone()
+    }
+}
+
 /// Filters events on the shard's end and sends them to the collector.
 #[derive(Clone, Debug)]
 pub struct ReactionFilter {
@@ -178,11 +214,11 @@ impl ReactionFilter {
 
     /// Sends a `reaction` to the consuming collector if the `reaction` conforms
     /// to the constraints and the limits are not reached yet.
-    pub(crate) fn send_reaction(&mut self, reaction: &Arc<ReactionAction>) -> bool {
-        if self.is_passing_constraints(&reaction) {
+    pub(crate) fn send_reaction(&mut self, reaction: &mut LazyReactionAction<'_>) -> bool {
+        if self.is_passing_constraints(reaction) {
             self.collected += 1;
 
-            if self.sender.send(Arc::clone(reaction)).is_err() {
+            if self.sender.send(reaction.as_arc()).is_err() {
                 return false;
             }
         }
@@ -195,16 +231,16 @@ impl ReactionFilter {
     /// Checks if the `reaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit reactions to
     /// be sent by a specific author or in a specifc guild.
-    fn is_passing_constraints(&self, reaction: &Arc<ReactionAction>) -> bool {
-        let reaction = match **reaction {
-            ReactionAction::Added(ref reaction) => {
+    fn is_passing_constraints(&self, reaction: &mut LazyReactionAction<'_>) -> bool {
+        let reaction = match (reaction.added, &mut reaction.reaction) {
+            (true, reaction) => {
                 if self.options.accept_added {
                     reaction
                 } else {
                     return false;
                 }
             },
-            ReactionAction::Removed(ref reaction) => {
+            (false, reaction) => {
                 if self.options.accept_removed {
                     reaction
                 } else {
@@ -213,6 +249,7 @@ impl ReactionFilter {
             },
         };
 
+        // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
         self.options.guild_id.map_or(true, |id| Some(id) == reaction.guild_id.map(|g| g.0))
             && self.options.message_id.map_or(true, |id| id == reaction.message_id.0)
             && self.options.channel_id.map_or(true, |id| id == reaction.channel_id.0)
@@ -220,7 +257,7 @@ impl ReactionFilter {
                 .options
                 .author_id
                 .map_or(true, |id| id == reaction.user_id.unwrap_or(UserId(0)).0)
-            && self.options.filter.as_ref().map_or(true, |f| f(&reaction))
+            && self.options.filter.as_ref().map_or(true, |f| f(&reaction.as_arc()))
     }
 
     /// Checks if the filter is within set receive and collect limits.
