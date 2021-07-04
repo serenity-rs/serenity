@@ -72,11 +72,13 @@ pub struct GuildChannel {
     /// The name of the channel.
     pub name: String,
     /// Permission overwrites for [`Member`]s and for [`Role`]s.
+    #[serde(default)]
     pub permission_overwrites: Vec<PermissionOverwrite>,
     /// The position of the channel.
     ///
     /// The default text channel will _almost always_ have a position of `-1` or
     /// `0`.
+    #[serde(default)]
     pub position: i64,
     /// The topic of the channel.
     ///
@@ -105,6 +107,26 @@ pub struct GuildChannel {
     pub rtc_region: Option<String>,
     /// The video quality mode for a voice channel.
     pub video_quality_mode: Option<VideoQualityMode>,
+    /// An approximate count of messages in the thread, stops counting at 50.
+    ///
+    /// **Note**: This is only available on thread channels.
+    pub message_count: Option<u8>,
+    /// An approximate count of users in a thread, stops counting at 50.
+    ///
+    /// **Note**: This is only available on thread channels.
+    pub member_count: Option<u8>,
+    /// The thread metadata.
+    ///
+    /// **Note**: This is only available on thread channels.
+    pub thread_metadata: Option<ThreadMetadata>,
+    /// Thread member object for the current user, if they have joined the thread,
+    /// only included on certain API endpoints.
+    pub member: Option<ThreadMember>,
+    /// Default duration for newly created threads, in minutes, to automatically
+    /// archive the thread after recent activity.
+    ///
+    /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
+    pub default_auto_archive_duration: Option<u64>,
 }
 
 #[cfg(feature = "model")]
@@ -1247,4 +1269,19 @@ impl Display for GuildChannel {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         Display::fmt(&self.id.mention(), f)
     }
+}
+
+/// A partial guild channel.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PartialGuildChannel {
+    /// The channel Id.
+    pub id: ChannelId,
+    /// The channel guild Id.
+    pub guild_id: GuildId,
+    /// The channel category Id.
+    #[serde(rename = "parent_id")]
+    pub category_id: ChannelId,
+    /// The channel type.
+    #[serde(rename = "type")]
+    pub kind: ChannelType,
 }

@@ -28,6 +28,7 @@ mod create_interaction_response_followup;
 mod create_invite;
 mod create_message;
 mod create_stage_instance;
+mod create_thread;
 mod edit_channel;
 mod edit_guild;
 mod edit_guild_welcome_screen;
@@ -53,6 +54,7 @@ pub use self::{
     create_invite::CreateInvite,
     create_message::CreateMessage,
     create_stage_instance::CreateStageInstance,
+    create_thread::CreateThread,
     edit_channel::EditChannel,
     edit_guild::EditGuild,
     edit_guild_welcome_screen::EditGuildWelcomeScreen,

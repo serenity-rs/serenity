@@ -126,6 +126,9 @@ pub struct Guild {
     /// - `VERIFIED`
     /// - `VIP_REGIONS`
     /// - `WELCOME_SCREEN_ENABLED`
+    /// - `THREE_DAY_THREAD_ARCHIVE`
+    /// - `SEVEN_DAY_THREAD_ARCHIVE`
+    /// - `PRIVATE_THREADS`
     ///
     ///
     /// [`discord documentation`]: https://discord.com/developers/docs/resources/guild#guild-object-guild-features
@@ -246,6 +249,9 @@ pub struct Guild {
     /// The stage instances in this guild.
     #[serde(default)]
     pub stage_instances: Vec<StageInstance>,
+    /// All active threads in this guild that current user has permission to view.
+    #[serde(default)]
+    pub threads: Vec<GuildChannel>,
 }
 
 #[cfg(feature = "model")]
@@ -2615,6 +2621,11 @@ impl<'de> Deserialize<'de> for Guild {
             None => Vec::new(),
         };
 
+        let threads = match map.remove("threads") {
+            Some(v) => Vec::<GuildChannel>::deserialize(v).map_err(DeError::custom)?,
+            None => Vec::new(),
+        };
+
         #[allow(deprecated)]
         Ok(Self {
             afk_channel_id,
@@ -2662,6 +2673,7 @@ impl<'de> Deserialize<'de> for Guild {
             widget_enabled,
             widget_channel_id,
             stage_instances,
+            threads,
         })
     }
 }
@@ -3220,6 +3232,7 @@ mod test {
                 widget_channel_id: None,
                 public_updates_channel_id: None,
                 stage_instances: vec![],
+                threads: vec![],
             }
         }
 
