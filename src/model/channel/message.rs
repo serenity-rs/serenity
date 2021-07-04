@@ -1061,10 +1061,18 @@ pub enum MessageType {
     GuildDiscoveryDisqualified = 14,
     /// An indicator that the guild is requalified for Discovery Feature
     GuildDiscoveryRequalified = 15,
+    /// The first warning before guild discovery removal.
+    GuildDiscoveryGracePeriodInitialWarning = 16,
+    /// The last warning before guild discovery removal.
+    GuildDiscoveryGracePeriodFinalWarning = 17,
+    /// Message sent to inform users that a thread was created.
+    ThreadCreated = 18,
     /// A message reply.
     InlineReply = 19,
     /// A slash command.
     ApplicationCommand = 20,
+    /// A thread start message.
+    ThreadStarterMessage = 21,
     /// Server setup tips.
     GuildInviteReminder = 22,
     /// An indicator that the message is of unknown type.
@@ -1087,8 +1095,13 @@ enum_number!(MessageType {
     ChannelFollowAdd,
     GuildDiscoveryDisqualified,
     GuildDiscoveryRequalified,
+    GuildDiscoveryGracePeriodInitialWarning,
+    GuildDiscoveryGracePeriodFinalWarning
+    ThreadCreated,
     InlineReply,
     ApplicationCommand,
+    ThreadStarterMessage,
+    GuildInviteReminder
 });
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
@@ -1205,6 +1218,8 @@ __impl_bitflags! {
         SOURCE_MESSAGE_DELETED = 0b0000_0000_0000_0000_0000_0000_0000_1000;
         /// This message came from the urgent message system.
         URGENT = 0b0000_0000_0000_0000_0000_0000_0001_0000;
+        /// This message has an associated thread, with the same id as the message.
+        HAS_THREAD = 0b0000_0000_0000_0000_0000_0000_0010_0000;
         /// This message is only visible to the user who invoked the Interaction.
         EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
         /// This message is an Interaction Response and the bot is "thinking".

@@ -3,7 +3,10 @@ use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
+#[cfg(feature = "model")]
+use bitflags::__impl_bitflags;
 use chrono::{DateTime, Utc};
+use serde::{Serialize, Serializer};
 
 #[cfg(feature = "model")]
 use crate::builder::EditMember;
@@ -597,4 +600,48 @@ fn avatar_url(guild_id: GuildId, user_id: UserId, hash: Option<&String>) -> Opti
 
         cdn!("/guilds/{}/users/{}/avatars/{}.{}?size=1024", guild_id.0, user_id.0, hash, ext)
     })
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ThreadMember {
+    /// The id of the thread.
+    pub id: Option<ChannelId>,
+    /// The id of the user.
+    pub user_id: Option<UserId>,
+    /// The time the current user last joined the thread.
+    pub join_timestamp: DateTime<Utc>,
+    /// Any user-thread settings, currently only used for notifications
+    pub flags: ThreadMemberFlags,
+}
+
+/// Describes extra features of the message.
+#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
+pub struct ThreadMemberFlags {
+    pub bits: u64,
+}
+
+__impl_bitflags! {
+    ThreadMemberFlags: u64 {
+        // Not documented.
+        NOTIFICATIONS = 0b0000_0000_0000_0000_0000_0000_0000_0001;
+    }
+}
+
+impl<'de> Deserialize<'de> for ThreadMemberFlags {
+    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Ok(ThreadMemberFlags::from_bits_truncate(deserializer.deserialize_u64(U64Visitor)?))
+    }
+}
+
+impl Serialize for ThreadMemberFlags {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_u64(self.bits())
+    }
 }

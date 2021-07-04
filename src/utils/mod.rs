@@ -872,6 +872,7 @@ mod test {
             widget_enabled: Some(false),
             widget_channel_id: None,
             stage_instances: vec![],
+            threads: vec![],
         };
 
         let member = Member {
@@ -919,6 +920,11 @@ mod test {
             slow_mode_rate: Some(0),
             rtc_region: None,
             video_quality_mode: None,
+            message_count: None,
+            member_count: None,
+            thread_metadata: None,
+            member: None,
+            default_auto_archive_duration: None,
         };
 
         let cache = Arc::new(Cache::default());

@@ -110,6 +110,60 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdWebhooks(u64),
+    /// Route for the `/channels/:channel_id/messages/:message_id/threads` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdMessagesIdThreads(u64),
+    /// Route for the `/channels/:channel_id/threads` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdThreads(u64),
+    /// Route for the `/channels/:channel_id/thread-members/@me` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdThreadMembersMe(u64),
+    /// Route for the `/channels/:channel_id/thread-members/:user_id` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdThreadMembersUserId(u64),
+    /// Route for the `/channels/channel_id/thread-members` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdThreadMembers(u64),
+    /// Route for the `/channels/:channel_id/threads/active` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdActiveThreads(u64),
+    /// Route for the `/channels/:channel_id/threads/archived/public` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdArchivedPublicThreads(u64),
+    /// Route for the `/channels/:channel_id/threads/archived/private` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdArchivedPrivateThreads(u64),
+    /// Route for the `/channels/:channel_id/users/@me/threads/archived/private` path.
+    ///
+    /// The data is the relevant [`ChannelId`].
+    ///
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdMeJoindedArchivedPrivateThreads(u64),
     /// Route for the `/gateway` path.
     Gateway,
     /// Route for the `/gateway/bot` path.
@@ -489,6 +543,87 @@ impl Route {
 
     pub fn channel_webhooks(channel_id: u64) -> String {
         format!(api!("/channels/{}/webhooks"), channel_id)
+    }
+
+    pub fn channel_public_threads(channel_id: u64, message_id: u64) -> String {
+        format!(api!("/channels/{}/messages/{}/threads"), channel_id, message_id)
+    }
+
+    pub fn channel_private_threads(channel_id: u64) -> String {
+        format!(api!("/channels/{}/threads"), channel_id)
+    }
+
+    pub fn channel_thread_member(channel_id: u64, user_id: u64) -> String {
+        format!(api!("/channels/{}/thread-members/{}"), channel_id, user_id)
+    }
+
+    pub fn channel_thread_member_me(channel_id: u64) -> String {
+        format!(api!("/channels/{}/thread-members/@me"), channel_id)
+    }
+
+    pub fn channel_thread_members(channel_id: u64) -> String {
+        format!(api!("/channels/{}/thread-members"), channel_id)
+    }
+
+    pub fn channel_active_threads(channel_id: u64) -> String {
+        format!(api!("/channels/{}/threads/active"), channel_id)
+    }
+
+    #[allow(clippy::let_underscore_must_use)]
+    pub fn channel_archived_public_threads(
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> String {
+        let mut s = format!(api!("/channels/{}/threads/archived/public"), channel_id);
+
+        if let Some(id) = before {
+            let _ = write!(s, "&before={}", id);
+        }
+
+        if let Some(limit) = limit {
+            let _ = write!(s, "&limit={}", limit);
+        }
+
+        s
+    }
+
+    #[allow(clippy::let_underscore_must_use)]
+    pub fn channel_archived_private_threads(
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> String {
+        let mut s = format!(api!("/channels/{}/threads/archived/private"), channel_id);
+
+        if let Some(id) = before {
+            let _ = write!(s, "&before={}", id);
+        }
+
+        if let Some(limit) = limit {
+            let _ = write!(s, "&limit={}", limit);
+        }
+
+        s
+    }
+
+    #[allow(clippy::let_underscore_must_use)]
+    pub fn channel_joined_private_threads(
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
+    ) -> String {
+        let mut s = format!(api!("/channels/{}/users/@me/threads/archived/private"), channel_id);
+
+        if let Some(id) = before {
+            let _ = write!(s, "&before={}", id);
+        }
+
+        if let Some(limit) = limit {
+            let _ = write!(s, "&limit={}", limit);
+        }
+
+        s
     }
 
     pub fn gateway() -> &'static str {
@@ -892,6 +1027,13 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
     },
     CreateStageInstance,
+    CreatePublicThread {
+        channel_id: u64,
+        message_id: u64,
+    },
+    CreatePrivateThread {
+        channel_id: u64,
+    },
     CreateEmoji {
         guild_id: u64,
     },
@@ -1161,6 +1303,20 @@ pub enum RouteInfo<'a> {
         wait: bool,
         webhook_id: u64,
     },
+    JoinThread {
+        channel_id: u64,
+    },
+    LeaveThread {
+        channel_id: u64,
+    },
+    AddThreadMember {
+        channel_id: u64,
+        user_id: u64,
+    },
+    RemoveThreadMember {
+        channel_id: u64,
+        user_id: u64,
+    },
     GetActiveMaintenance,
     GetAuditLogs {
         action_type: Option<u8>,
@@ -1187,6 +1343,27 @@ pub enum RouteInfo<'a> {
     },
     GetStageInstance {
         channel_id: u64,
+    },
+    GetChannelThreadMembers {
+        channel_id: u64,
+    },
+    GetChannelActiveThreads {
+        channel_id: u64,
+    },
+    GetChannelArchivedPublicThreads {
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
+    },
+    GetChannelArchivedPrivateThreads {
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
+    },
+    GetChannelJoinedPrivateArchivedThreads {
+        channel_id: u64,
+        before: Option<u64>,
+        limit: Option<u64>,
     },
     GetCurrentApplicationInfo,
     GetCurrentUser,
@@ -1414,6 +1591,21 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::CreateStageInstance => {
                 (LightMethod::Post, Route::StageInstances, Cow::from(Route::stage_instances()))
             },
+            RouteInfo::CreatePublicThread {
+                channel_id,
+                message_id,
+            } => (
+                LightMethod::Post,
+                Route::ChannelsIdMessagesIdThreads(channel_id),
+                Cow::from(Route::channel_public_threads(channel_id, message_id)),
+            ),
+            RouteInfo::CreatePrivateThread {
+                channel_id,
+            } => (
+                LightMethod::Post,
+                Route::ChannelsIdThreads(channel_id),
+                Cow::from(Route::channel_private_threads(channel_id)),
+            ),
             RouteInfo::CreateEmoji {
                 guild_id,
             } => (
@@ -1987,6 +2179,77 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::GuildsIdChannels(guild_id),
                 Cow::from(Route::guild_channels(guild_id)),
+            ),
+            RouteInfo::GetChannelThreadMembers {
+                channel_id,
+            } => (
+                LightMethod::Get,
+                Route::ChannelsIdThreadMembers(channel_id),
+                Cow::from(Route::channel_thread_members(channel_id)),
+            ),
+            RouteInfo::GetChannelActiveThreads {
+                channel_id,
+            } => (
+                LightMethod::Get,
+                Route::ChannelsIdActiveThreads(channel_id),
+                Cow::from(Route::channel_active_threads(channel_id)),
+            ),
+            RouteInfo::GetChannelArchivedPublicThreads {
+                channel_id,
+                before,
+                limit,
+            } => (
+                LightMethod::Get,
+                Route::ChannelsIdArchivedPublicThreads(channel_id),
+                Cow::from(Route::channel_archived_public_threads(channel_id, before, limit)),
+            ),
+            RouteInfo::GetChannelArchivedPrivateThreads {
+                channel_id,
+                before,
+                limit,
+            } => (
+                LightMethod::Get,
+                Route::ChannelsIdArchivedPrivateThreads(channel_id),
+                Cow::from(Route::channel_archived_private_threads(channel_id, before, limit)),
+            ),
+            RouteInfo::GetChannelJoinedPrivateArchivedThreads {
+                channel_id,
+                before,
+                limit,
+            } => (
+                LightMethod::Get,
+                Route::ChannelsIdMeJoindedArchivedPrivateThreads(channel_id),
+                Cow::from(Route::channel_joined_private_threads(channel_id, before, limit)),
+            ),
+            RouteInfo::JoinThread {
+                channel_id,
+            } => (
+                LightMethod::Put,
+                Route::ChannelsIdThreadMembersMe(channel_id),
+                Cow::from(Route::channel_thread_member_me(channel_id)),
+            ),
+            RouteInfo::LeaveThread {
+                channel_id,
+            } => (
+                LightMethod::Delete,
+                Route::ChannelsIdThreadMembersMe(channel_id),
+                Cow::from(Route::channel_thread_member_me(channel_id)),
+            ),
+            RouteInfo::AddThreadMember {
+                channel_id,
+                user_id,
+            } => (
+                LightMethod::Put,
+                Route::ChannelsIdThreadMembersUserId(channel_id),
+                Cow::from(Route::channel_thread_member(channel_id, user_id)),
+            ),
+            RouteInfo::RemoveThreadMember {
+                channel_id,
+                user_id,
+            } => (
+                LightMethod::Delete,
+                Route::ChannelsIdThreadMembersUserId(channel_id),
+                Cow::from(Route::channel_thread_member(channel_id, user_id)),
             ),
             RouteInfo::GetCurrentApplicationInfo => {
                 (LightMethod::Get, Route::None, Cow::from(Route::oauth2_application_current()))

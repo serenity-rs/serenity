@@ -319,6 +319,12 @@ __impl_bitflags! {
         REQUEST_TO_SPEAK = 0b1_0000_0000_0000_0000_0000_0000_0000_0000;
         /// Allows using slash commands.
         USE_SLASH_COMMANDS = 0b1000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows for deleting and archiving threads, and viewing all private threads.
+        MANAGE_THREADS = 0b0001_0000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows for creating and participating in public threads.
+        USE_PUBLIC_THREADS = 0b0010_0000_0000_0000_0000_0000_0000_0000_0000;
+        // Allows for creating and participating in private threads.
+        USE_PRIVATE_THREADS = 0b0100_0000_0000_0000_0000_0000_0000_0000_0000;
     }
 }
 

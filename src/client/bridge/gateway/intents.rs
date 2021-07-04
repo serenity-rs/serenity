@@ -54,12 +54,22 @@ __impl_bitflags! {
         /// - CHANNEL_UPDATE
         /// - CHANNEL_DELETE
         /// - CHANNEL_PINS_UPDATE
+        /// - THREAD_CREATE
+        /// - THREAD_UPDATE
+        /// - THREAD_DELETE
+        /// - THREAD_LIST_SYNC
+        /// - THREAD_MEMBER_UPDATE
+        /// - THREAD_MEMBERS_UPDATE
+        /// - STAGE_INSTANCE_CREATE
+        /// - STAGE_INSTANCE_UPDATE
+        /// - STAGE_INSTANCE_DELETE
         GUILDS = 1;
         /// Enables following gateway events:
         ///
         /// - GUILD_MEMBER_ADD
         /// - GUILD_MEMBER_UPDATE
         /// - GUILD_MEMBER_REMOVE
+        /// - THREAD_MEMBERS_UPDATE
         ///
         /// **Info**:
         /// This intent is *privileged*.
@@ -80,6 +90,9 @@ __impl_bitflags! {
         /// Enables following gateway event:
         ///
         /// - GUILD_INTEGRATIONS_UPDATE
+        /// - INTEGRATION_CREATE
+        /// - INTEGRATION_UPDATE
+        /// - INTEGRATION_DELETE
         GUILD_INTEGRATIONS = 1 << 4;
         /// Enables following gateway event:
         ///
@@ -110,6 +123,7 @@ __impl_bitflags! {
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
+        /// - MESSAGE_DELETE_BULK
         GUILD_MESSAGES = 1 << 9;
         /// Enables following gateway events:
         ///
@@ -124,7 +138,6 @@ __impl_bitflags! {
         GUILD_MESSAGE_TYPING = 1 << 11;
         /// Enable following gateway events:
         ///
-        /// - CHANNEL_CREATE
         /// - MESSAGE_CREATE
         /// - MESSAGE_UPDATE
         /// - MESSAGE_DELETE
