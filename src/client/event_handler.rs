@@ -524,6 +524,31 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the partial deleted thread.
     async fn thread_delete(&self, _ctx: Context, _thread: PartialGuildChannel) {}
+
+    /// Dispatched when the current user gains access to a channel
+    ///
+    /// Provides the threads the current user can access, the thread members,
+    /// the guild Id, and the channel Ids of the parent channels being synced.
+    async fn thread_list_sync(&self, _ctx: Context, _thread_list_sync: ThreadListSyncEvent) {}
+
+    /// Dispatched when the [`ThreadMember`] for the current user is updated.
+    ///
+    /// Provides the updated thread member.
+    async fn thread_member_update(&self, _ctx: Context, _thread_member: ThreadMember) {}
+
+    /// Dispatched when anyone is added to or removed from a thread. If the current user does not have the [`GatewayIntents::GUILDS`],
+    /// then this event will only be sent if the current user was added to or removed from the thread.
+    ///
+    /// Provides the added/removed members, the approximate member count of members in the thread,
+    /// the thread Id and its guild Id.
+    ///
+    /// [`GatewayIntents::GUILDS`]: crate::client::bridge::gateway::GatewayIntents::GUILDS
+    async fn thread_members_update(
+        &self,
+        _ctx: Context,
+        _thread_members_update: ThreadMembersUpdateEvent,
+    ) {
+    }
 }
 
 /// This core trait for handling raw events

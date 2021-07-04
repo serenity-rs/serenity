@@ -852,5 +852,26 @@ async fn handle_event(
                 event_handler.thread_delete(context, event.thread).await;
             });
         },
+        DispatchEvent::Model(Event::ThreadListSync(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.thread_list_sync(context, event).await;
+            });
+        },
+        DispatchEvent::Model(Event::ThreadMemberUpdate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.thread_member_update(context, event.member).await;
+            });
+        },
+        DispatchEvent::Model(Event::ThreadMembersUpdate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.thread_members_update(context, event).await;
+            });
+        },
     }
 }
