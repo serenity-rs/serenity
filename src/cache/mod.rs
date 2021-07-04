@@ -86,6 +86,23 @@ impl<F: FromStr> FromStrAndCache for F {
     }
 }
 
+/// Iterator given to the selector closure in [`Cache::channel_messages_field`].
+// Wrapper around a specific iterator type to allow swapping out iterators on cache design changes
+#[derive(Clone, Debug)]
+pub struct MessageIterator<'a>(std::collections::hash_map::Values<'a, MessageId, Message>);
+
+impl<'a> Iterator for MessageIterator<'a> {
+    type Item = &'a Message;
+
+    fn next(&mut self) -> Option<&'a Message> {
+        self.0.next()
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.0.size_hint()
+    }
+}
+
 /// A cache containing data received from [`Shard`]s.
 ///
 /// Using the cache allows to avoid REST API requests via the [`http`] module
@@ -331,6 +348,28 @@ impl Cache {
         }
 
         None
+    }
+
+    /// This method allows to extract specific data from the cached messages of a channel by
+    /// providing a `selector` closure picking what you want to extract from the messages
+    /// iterator of a given channel.
+    ///
+    /// ```rust,no_run
+    /// # let cache: serenity::cache::Cache = todo!();
+    /// // Find all messages by user ID 8 in channel ID 7
+    /// let messages_by_user = cache.channel_messages_field(7, |msgs| {
+    ///     msgs.filter(|m| m.author.id == 8).cloned().collect::<Vec<_>>()
+    /// });
+    /// ```
+    pub async fn channel_messages_field<T>(
+        &self,
+        channel_id: impl Into<ChannelId>,
+        selector: impl FnOnce(MessageIterator<'_>) -> T,
+    ) -> Option<T> {
+        let messages = self.messages.read().await;
+        let message_iter = MessageIterator(messages.get(&channel_id.into())?.values());
+
+        Some(selector(message_iter))
     }
 
     /// Clones an entire guild from the cache based on the given `id`.
