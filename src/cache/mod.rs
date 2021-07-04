@@ -1143,6 +1143,7 @@ mod test {
                     widget_enabled: Some(false),
                     widget_channel_id: None,
                     stage_instances: vec![],
+                    threads: vec![],
                 },
             }
         };
