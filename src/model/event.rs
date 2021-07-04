@@ -1560,6 +1560,54 @@ impl<'de> Deserialize<'de> for StageInstanceDeleteEvent {
     }
 }
 
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ThreadCreateEvent {
+    pub thread: GuildChannel,
+}
+
+impl<'de> Deserialize<'de> for ThreadCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let thread = GuildChannel::deserialize(deserializer)?;
+
+        Ok(Self {
+            thread,
+        })
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ThreadUpdateEvent {
+    pub thread: GuildChannel,
+}
+
+impl<'de> Deserialize<'de> for ThreadUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let thread = GuildChannel::deserialize(deserializer)?;
+
+        Ok(Self {
+            thread,
+        })
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct ThreadDeleteEvent {
+    pub thread: PartialGuildChannel
+}
+
+impl<'de> Deserialize<'de> for ThreadDeleteEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let thread = PartialGuildChannel::deserialize(deserializer)?;
+
+        Ok(Self {
+            thread,
+        })
+    }
+}
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -1780,6 +1828,13 @@ pub enum Event {
     StageInstanceUpdate(StageInstanceUpdateEvent),
     /// A stage instance was deleted.
     StageInstanceDelete(StageInstanceDeleteEvent),
+    /// A thread was created or the current user was added
+    /// to a private thread.
+    ThreadCreate(ThreadCreateEvent),
+    /// A thread was updated.
+    ThreadUpdate(ThreadUpdateEvent),
+    /// A thread was deleted.
+    ThreadDelete(ThreadDeleteEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
 }
@@ -1842,6 +1897,9 @@ impl Event {
             Self::StageInstanceCreate(_) => EventType::StageInstanceCreate,
             Self::StageInstanceUpdate(_) => EventType::StageInstanceUpdate,
             Self::StageInstanceDelete(_) => EventType::StageInstanceDelete,
+            Self::ThreadCreate(_) => EventType::ThreadCreate,
+            Self::ThreadUpdate(_) => EventType::ThreadUpdate,
+            Self::ThreadDelete(_) => EventType::ThreadDelete,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
     }
@@ -1948,6 +2006,9 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::StageInstanceCreate => Event::StageInstanceCreate(serde_json::from_value(v)?),
         EventType::StageInstanceUpdate => Event::StageInstanceUpdate(serde_json::from_value(v)?),
         EventType::StageInstanceDelete => Event::StageInstanceDelete(serde_json::from_value(v)?),
+        EventType::ThreadCreate => Event::ThreadCreate(serde_json::from_value(v)?),
+        EventType::ThreadUpdate => Event::ThreadUpdate(serde_json::from_value(v)?),
+        EventType::ThreadDelete => Event::ThreadDelete(serde_json::from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
             value: v,
@@ -2120,44 +2181,66 @@ pub enum EventType {
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     InteractionCreate,
     /// Indicator that an integration was created.
+    ///
     /// This maps to [`IntegrationCreateEvent`].
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     IntegrationCreate,
     /// Indicator that an integration was created.
+    ///
     /// This maps to [`IntegrationUpdateEvent`].
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     IntegrationUpdate,
     /// Indicator that an integration was created.
+    ///
     /// This maps to [`IntegrationDeleteEvent`].
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     IntegrationDelete,
     /// Indicator that an application command was created.
+    ///
     /// This maps to [`ApplicationCommandCreateEvent`].
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationCommandCreate,
     /// Indicator that an application command was updated.
+    ///
     /// This maps to [`ApplicationCommandUpdateEvent`].
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationCommandUpdate,
     /// Indicator that an application command was deleted.
+    ///
     /// This maps to [`ApplicationCommandDeleteEvent`].
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     ApplicationCommandDelete,
     /// Indicator that a stage instance was created.
+    ///
     /// This maps to [`StageInstanceCreateEvent`].
     StageInstanceCreate,
     /// Indicator that a stage instance was updated.
+    ///
     /// This maps to [`StageInstanceUpdateEvent`].
     StageInstanceUpdate,
     /// Indicator that a stage instance was deleted.
+    ///
     /// This maps to [`StageInstanceDeleteEvent`].
     StageInstanceDelete,
+    /// Indicator that a thread was created or the current user
+    /// was added to a private thread.
+    ///
+    /// This maps to [`ThreadCreateEvent`].
+    ThreadCreate,
+    /// Indicator that a thread was updated.
+    ///
+    /// This maps to [`ThreadUpdateEvent`].
+    ThreadUpdate,
+    /// Indicator that a thread was deleted.
+    ///
+    /// This maps to [`ThreadDeleteEvent`].
+    ThreadDelete,
     /// An unknown event was received over the gateway.
     ///
     /// This should be logged so that support for it can be added in the
@@ -2232,6 +2315,9 @@ impl EventType {
     const STAGE_INSTANCE_CREATE: &'static str = "STAGE_INSTANCE_CREATE";
     const STAGE_INSTANCE_UPDATE: &'static str = "STAGE_INSTANCE_UPDATE";
     const STAGE_INSTANCE_DELETE: &'static str = "STAGE_INSTANCE_DELETE";
+    const THREAD_CREATE: &'static str = "THREAD_CREATE";
+    const THREAD_UPDATE: &'static str = "THREAD_UPDATE";
+    const THREAD_DELETE: &'static str = "THREAD_DELETE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
@@ -2291,6 +2377,9 @@ impl EventType {
             Self::StageInstanceCreate => Some(Self::STAGE_INSTANCE_CREATE),
             Self::StageInstanceUpdate => Some(Self::STAGE_INSTANCE_UPDATE),
             Self::StageInstanceDelete => Some(Self::STAGE_INSTANCE_DELETE),
+            Self::ThreadCreate => Some(Self::THREAD_CREATE),
+            Self::ThreadUpdate => Some(Self::THREAD_UPDATE),
+            Self::ThreadDelete => Some(Self::THREAD_DELETE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
             // to recover the name here, so we return `None` instead.
@@ -2372,6 +2461,9 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::STAGE_INSTANCE_CREATE => EventType::StageInstanceCreate,
                     EventType::STAGE_INSTANCE_UPDATE => EventType::StageInstanceUpdate,
                     EventType::STAGE_INSTANCE_DELETE => EventType::StageInstanceDelete,
+                    EventType::THREAD_CREATE => EventType::ThreadCreate,
+                    EventType::THREAD_UPDATE => EventType::ThreadUpdate,
+                    EventType::THREAD_DELETE => EventType::ThreadDelete,
                     other => EventType::Other(other.to_owned()),
                 })
             }

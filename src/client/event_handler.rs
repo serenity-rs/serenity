@@ -501,13 +501,29 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a stage instance is updated.
     ///
-    /// Provides the created stage instance.
+    /// Provides the updated stage instance.
     async fn stage_instance_update(&self, _ctx: Context, _stage_instance: StageInstance) {}
 
     /// Dispatched when a stage instance is deleted.
     ///
-    /// Provides the created stage instance.
+    /// Provides the deleted stage instance.
     async fn stage_instance_delete(&self, _ctx: Context, _stage_instance: StageInstance) {}
+
+    /// Dispatched when a thread is created or the current user is added
+    /// to a private thread.
+    ///
+    /// Provides the thread.
+    async fn thread_create(&self, _ctx: Context, _thread: GuildChannel) {}
+
+    /// Dispatched when a thread is updated.
+    ///
+    /// Provides the updated thread.
+    async fn thread_update(&self, _ctx: Context, _thread: GuildChannel) {}
+
+    /// Dispatched when a thread is deleted.
+    ///
+    /// Provides the partial deleted thread.
+    async fn thread_delete(&self, _ctx: Context, _thread: PartialGuildChannel) {}
 }
 
 /// This core trait for handling raw events

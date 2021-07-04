@@ -1270,3 +1270,18 @@ impl Display for GuildChannel {
         Display::fmt(&self.id.mention(), f)
     }
 }
+
+/// A partial guild channel.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PartialGuildChannel {
+    /// The channel Id.
+    pub id: ChannelId,
+    /// The channel guild Id.
+    pub guild_id: GuildId,
+    /// The channel category Id.
+    #[serde(rename = "parent_id")]
+    pub category_id: ChannelId,
+    /// The channel type.
+    #[serde(rename = "type")]
+    pub kind: ChannelType
+}
