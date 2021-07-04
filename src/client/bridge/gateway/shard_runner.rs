@@ -230,10 +230,14 @@ impl ShardRunner {
             #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
             Event::InteractionCreate(ref interaction_event) => {
                 if interaction_event.interaction.kind() == InteractionType::MessageComponent {
-                    let mut interaction = LazyArc::new(&interaction_event.interaction.message_component.expect("expected message component interaction"));
-                    retain(&mut self.component_interaction_filters, |f| {
-                        f.send_interaction(&mut interaction)
-                    });
+                    if let Interaction::MessageComponent(ref interaction) =
+                        interaction_event.interaction
+                    {
+                        let mut interaction = LazyArc::new(interaction);
+                        retain(&mut self.component_interaction_filters, |f| {
+                            f.send_interaction(&mut interaction)
+                        });
+                    }
                 }
             },
             _ => {},

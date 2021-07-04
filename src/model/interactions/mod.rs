@@ -49,11 +49,11 @@ impl Interaction {
     }
 
     /// Gets the interaction token.
-    pub fn token(&self) -> &String {
+    pub fn token(&self) -> &str {
         match self {
-            Interaction::Ping(i) => &i.token,
-            Interaction::ApplicationCommand(i) => &i.token,
-            Interaction::MessageComponent(i) => &i.token,
+            Interaction::Ping(ref i) => i.token.as_str(),
+            Interaction::ApplicationCommand(i) => i.token.as_str(),
+            Interaction::MessageComponent(i) => i.token.as_str(),
         }
     }
 
@@ -61,7 +61,7 @@ impl Interaction {
     pub fn ping(self) -> Option<PingInteraction> {
         match self {
             Interaction::Ping(i) => Some(i),
-            _ => None
+            _ => None,
         }
     }
 
@@ -69,7 +69,7 @@ impl Interaction {
     pub fn application_command(self) -> Option<ApplicationCommandInteraction> {
         match self {
             Interaction::ApplicationCommand(i) => Some(i),
-            _ => None
+            _ => None,
         }
     }
 
@@ -77,7 +77,7 @@ impl Interaction {
     pub fn message_component(self) -> Option<MessageComponentInteraction> {
         match self {
             Interaction::MessageComponent(i) => Some(i),
-            _ => None
+            _ => None,
         }
     }
 }
