@@ -37,7 +37,7 @@ use crate::{
         CreateApplicationCommands,
         CreateApplicationCommandsPermissions,
     },
-    model::interactions::ApplicationCommand,
+    model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
 };
 
 /// Partial information about a [`Guild`]. This does not include information
@@ -367,7 +367,7 @@ impl PartialGuild {
     ///
     /// Returns the same possible errors as `create_global_application_command`.
     ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     #[allow(clippy::missing_errors_doc)]
@@ -403,7 +403,7 @@ impl PartialGuild {
     ///
     /// **Note**: It will update instantly.
     ///
-    /// [`ApplicationCommandPermission`]: crate::model::interactions::ApplicationCommandPermission
+    /// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_command_permission<F>(

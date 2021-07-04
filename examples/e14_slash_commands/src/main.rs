@@ -7,13 +7,13 @@ use serenity::{
         gateway::Ready,
         id::GuildId,
         interactions::{
-            ApplicationCommand,
-            ApplicationCommandInteractionDataOptionValue,
-            ApplicationCommandOptionType,
+            application_command::{
+                ApplicationCommand,
+                ApplicationCommandInteractionDataOptionValue,
+                ApplicationCommandOptionType,
+            },
             Interaction,
-            InteractionData,
             InteractionResponseType,
-            InteractionType,
         },
     },
     prelude::*,
@@ -24,47 +24,39 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
-        if interaction.kind == InteractionType::ApplicationCommand {
-            if let Some(data) = interaction.data.as_ref() {
-                match data {
-                    InteractionData::ApplicationCommand(data) => {
-                        let content = match data.name.as_str() {
-                            "ping" => "Hey, I'm alive!".to_string(),
-                            "id" => {
-                                let options = data
-                                    .options
-                                    .get(0)
-                                    .expect("Expected user option")
-                                    .resolved
-                                    .as_ref()
-                                    .expect("Expected user object");
+        if let Interaction::ApplicationCommand(command) = interaction {
+            let content = match command.data.name.as_str() {
+                "ping" => "Hey, I'm alive!".to_string(),
+                "id" => {
+                    let options = command
+                        .data
+                        .options
+                        .get(0)
+                        .expect("Expected user option")
+                        .resolved
+                        .as_ref()
+                        .expect("Expected user object");
 
-                                if let ApplicationCommandInteractionDataOptionValue::User(
-                                    user,
-                                    _member,
-                                ) = options
-                                {
-                                    format!("{}'s id is {}", user.tag(), user.id)
-                                } else {
-                                    "Please provide a valid user".to_string()
-                                }
-                            },
-                            _ => "not implemented :(".to_string(),
-                        };
+                    if let ApplicationCommandInteractionDataOptionValue::User(user, _member) =
+                        options
+                    {
+                        format!("{}'s id is {}", user.tag(), user.id)
+                    } else {
+                        "Please provide a valid user".to_string()
+                    }
+                },
+                _ => "not implemented :(".to_string(),
+            };
 
-                        if let Err(why) = interaction
-                            .create_interaction_response(&ctx.http, |response| {
-                                response
-                                    .kind(InteractionResponseType::ChannelMessageWithSource)
-                                    .interaction_response_data(|message| message.content(content))
-                            })
-                            .await
-                        {
-                            println!("Cannot respond to slash command: {}", why);
-                        }
-                    },
-                    _ => {},
-                }
+            if let Err(why) = command
+                .create_interaction_response(&ctx.http, |response| {
+                    response
+                        .kind(InteractionResponseType::ChannelMessageWithSource)
+                        .interaction_response_data(|message| message.content(content))
+                })
+                .await
+            {
+                println!("Cannot respond to slash command: {}", why);
             }
         }
     }

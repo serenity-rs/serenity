@@ -16,6 +16,8 @@ use super::utils::deserialize_emojis;
 use crate::cache::{Cache, CacheUpdate};
 use crate::constants::OpCode;
 use crate::internal::prelude::*;
+#[cfg(feature = "unstable_discord_api")]
+use crate::model::interactions::{application_command::ApplicationCommand, Interaction};
 
 /// Event data for the channel creation event.
 ///

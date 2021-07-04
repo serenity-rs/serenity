@@ -1,9 +1,7 @@
-//! Interactions information-related models.
+use std::collections::HashMap;
 
-use bitflags::__impl_bitflags;
-use serde::de::{Deserialize, Deserializer, Error as DeError};
-use serde::ser::{Serialize, Serializer};
-use serde_json::{Map, Number, Value};
+use serde::de::Error as DeError;
+use serde::{Deserialize, Deserializer};
 
 use super::prelude::*;
 use crate::builder::{
@@ -14,16 +12,34 @@ use crate::builder::{
     EditInteractionResponse,
 };
 use crate::http::Http;
-use crate::internal::prelude::*;
+use crate::internal::prelude::{JsonMap, StdResult, Value};
+use crate::model::channel::PartialChannel;
+use crate::model::guild::{Member, PartialMember, Role};
+use crate::model::id::{
+    ApplicationId,
+    ChannelId,
+    CommandId,
+    GuildId,
+    InteractionId,
+    RoleId,
+    UserId,
+};
+use crate::model::interactions::InteractionType;
+use crate::model::prelude::User;
+use crate::model::utils::{
+    deserialize_channels_map,
+    deserialize_options,
+    deserialize_options_with_resolved,
+    deserialize_partial_members_map,
+    deserialize_roles_map,
+    deserialize_users,
+};
 use crate::utils;
 
-/// Information about an interaction.
-///
-/// An interaction is sent when a user invokes a slash command, clicks a button,
-/// or other future interaction types.
+/// An interaction when a user invokes a slash command.
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-pub struct Interaction {
+pub struct ApplicationCommandInteraction {
     /// Id of the interaction.
     pub id: InteractionId,
     /// Id of the application this interaction is for.
@@ -32,24 +48,12 @@ pub struct Interaction {
     #[serde(rename = "type")]
     pub kind: InteractionType,
     /// The data of the interaction which was triggered.
-    ///
-    /// **Note**: It is always present if the interaction [`kind`] is not
-    /// [`Ping`].
-    ///
-    /// [`Ping`]: self::InteractionType::Ping
-    /// [`kind`]: Interaction::kind
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub data: Option<InteractionData>,
-    /// The message this interaction was triggered by, if
-    /// it is a component.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub message: Option<InteractionMessage>,
+    pub data: ApplicationCommandInteractionData,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
-    /// The channel Id this interaction was sent from, if there is one.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub channel_id: Option<ChannelId>,
+    /// The channel Id this interaction was sent from.
+    pub channel_id: ChannelId,
     /// The `member` data for the invoking user.
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.
@@ -63,7 +67,7 @@ pub struct Interaction {
     pub version: u8,
 }
 
-impl Interaction {
+impl ApplicationCommandInteraction {
     /// Gets the interaction response.
     ///
     /// # Errors
@@ -240,7 +244,7 @@ impl Interaction {
     }
 }
 
-impl<'de> Deserialize<'de> for Interaction {
+impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
@@ -296,29 +300,11 @@ impl<'de> Deserialize<'de> for Interaction {
             .and_then(InteractionType::deserialize)
             .map_err(DeError::custom)?;
 
-        let data = {
-            if map.contains_key("data") {
-                match kind {
-                    InteractionType::ApplicationCommand => {
-                        Some(InteractionData::ApplicationCommand(
-                            map.remove("data")
-                                .ok_or_else(|| DeError::custom("expected data"))
-                                .and_then(ApplicationCommandInteractionData::deserialize)
-                                .map_err(DeError::custom)?,
-                        ))
-                    },
-                    InteractionType::MessageComponent => Some(InteractionData::MessageComponent(
-                        map.remove("data")
-                            .ok_or_else(|| DeError::custom("expected data"))
-                            .and_then(MessageComponent::deserialize)
-                            .map_err(DeError::custom)?,
-                    )),
-                    _ => None,
-                }
-            } else {
-                None
-            }
-        };
+        let data = map
+            .remove("data")
+            .ok_or_else(|| DeError::custom("expected data"))
+            .and_then(ApplicationCommandInteractionData::deserialize)
+            .map_err(DeError::custom)?;
 
         let guild_id = match map.contains_key("guild_id") {
             true => Some(
@@ -330,15 +316,11 @@ impl<'de> Deserialize<'de> for Interaction {
             false => None,
         };
 
-        let channel_id = match map.contains_key("channel_id") {
-            true => Some(
-                map.remove("channel_id")
-                    .ok_or_else(|| DeError::custom("expected channel_id"))
-                    .and_then(ChannelId::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let channel_id = map
+            .remove("channel_id")
+            .ok_or_else(|| DeError::custom("expected channel_id"))
+            .and_then(ChannelId::deserialize)
+            .map_err(DeError::custom)?;
 
         let member = match map.contains_key("member") {
             true => Some(
@@ -359,30 +341,6 @@ impl<'de> Deserialize<'de> for Interaction {
             false => member.as_ref().expect("expected user or member").user.clone(),
         };
 
-        let message = match map.contains_key("message") {
-            true => {
-                let message = map
-                    .remove("message")
-                    .ok_or_else(|| DeError::custom("expected message"))
-                    .and_then(JsonMap::deserialize)
-                    .map_err(DeError::custom)?;
-                let partial = !message.contains_key("author");
-
-                let value: Value = message.into();
-
-                if partial {
-                    Some(InteractionMessage::Ephemeral(
-                        EphemeralMessage::deserialize(value).map_err(DeError::custom)?,
-                    ))
-                } else {
-                    Some(InteractionMessage::Regular(
-                        Message::deserialize(value).map_err(DeError::custom)?,
-                    ))
-                }
-            },
-            false => None,
-        };
-
         let token = map
             .remove("token")
             .ok_or_else(|| DeError::custom("expected token"))
@@ -400,7 +358,6 @@ impl<'de> Deserialize<'de> for Interaction {
             application_id,
             kind,
             data,
-            message,
             guild_id,
             channel_id,
             member,
@@ -411,57 +368,6 @@ impl<'de> Deserialize<'de> for Interaction {
     }
 }
 
-/// The type of an Interaction
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum InteractionType {
-    Ping = 1,
-    ApplicationCommand = 2,
-    MessageComponent = 3,
-    Unknown = !0,
-}
-
-enum_number!(InteractionType {
-    Ping,
-    MessageComponent,
-    ApplicationCommand
-});
-
-/// The [`Interaction::data`] field.
-#[derive(Clone, Debug, Deserialize)]
-pub enum InteractionData {
-    ApplicationCommand(ApplicationCommandInteractionData),
-    MessageComponent(MessageComponent),
-}
-
-impl Serialize for InteractionData {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match self {
-            InteractionData::ApplicationCommand(c) => {
-                ApplicationCommandInteractionData::serialize(c, serializer)
-            },
-            InteractionData::MessageComponent(c) => MessageComponent::serialize(c, serializer),
-        }
-    }
-}
-
-/// A message component data, provided by [`Interaction::data`]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct MessageComponent {
-    /// The custom id of the component.
-    pub custom_id: String,
-    /// The type of the component.
-    pub component_type: ComponentType,
-    /// The given values of the [`SelectMenu`]s
-    #[serde(default)]
-    pub values: Vec<String>,
-}
-
 /// The command data payload.
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
@@ -470,11 +376,11 @@ pub struct ApplicationCommandInteractionData {
     pub id: CommandId,
     /// The name of the invoked command.
     pub name: String,
-    #[serde(default)]
     /// The parameters and the given values.
-    pub options: Vec<ApplicationCommandInteractionDataOption>,
     #[serde(default)]
+    pub options: Vec<ApplicationCommandInteractionDataOption>,
     /// The converted objects from the given options.
+    #[serde(default)]
     pub resolved: ApplicationCommandInteractionDataResolved,
 }
 
@@ -521,75 +427,18 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
     }
 }
 
-/// The [`Interaction::message`] field.
-#[derive(Clone, Debug, Deserialize)]
-pub enum InteractionMessage {
-    Regular(Message),
-    Ephemeral(EphemeralMessage),
-}
-
-impl InteractionMessage {
-    /// Whether the message is ephemeral.
-    pub fn is_ephemeral(&self) -> bool {
-        matches!(self, InteractionMessage::Ephemeral(_))
-    }
-
-    /// Gets the message Id.
-    pub fn id(&self) -> MessageId {
-        match self {
-            InteractionMessage::Regular(m) => m.id,
-            InteractionMessage::Ephemeral(m) => m.id,
-        }
-    }
-
-    /// Converts this to a regular message,
-    /// if it is one.
-    pub fn regular(self) -> Option<Message> {
-        match self {
-            InteractionMessage::Regular(m) => Some(m),
-            InteractionMessage::Ephemeral(_) => None,
-        }
-    }
-
-    /// Converts this to an ephemeral message,
-    /// if it is one.
-    pub fn ephemeral(self) -> Option<EphemeralMessage> {
-        match self {
-            InteractionMessage::Regular(_) => None,
-            InteractionMessage::Ephemeral(m) => Some(m),
-        }
-    }
-}
-
-impl Serialize for InteractionMessage {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match self {
-            InteractionMessage::Regular(c) => Message::serialize(c, serializer),
-            InteractionMessage::Ephemeral(c) => EphemeralMessage::serialize(c, serializer),
-        }
-    }
-}
-
-/// An ephemeral message given in an interaction.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct EphemeralMessage {
-    /// The message flags.
-    pub flags: MessageFlags,
-    /// The message Id.
-    pub id: MessageId,
-}
-
 /// The resolved data of a command data interaction payload.
 /// It contains the objects of [`ApplicationCommandInteractionDataOption`]s.
 #[derive(Clone, Debug, Serialize, Default)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataResolved {
+    /// The resolved users.
     pub users: HashMap<UserId, User>,
+    /// The resolved partial members.
     pub members: HashMap<UserId, PartialMember>,
+    /// The resolved roles.
     pub roles: HashMap<RoleId, Role>,
+    /// The resolved partial channels.
     pub channels: HashMap<ChannelId, PartialChannel>,
 }
 
@@ -778,7 +627,7 @@ impl ApplicationCommand {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
-    /// use serenity::model::{interactions::ApplicationCommand, id::ApplicationId};
+    /// use serenity::model::{interactions::application_command::ApplicationCommand, id::ApplicationId};
     ///
     /// let _ = ApplicationCommand::create_global_application_command(&http, |command| {
     ///    command.name("ping")
@@ -797,7 +646,7 @@ impl ApplicationCommand {
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::{
-    ///     interactions::{ApplicationCommand, ApplicationCommandOptionType},
+    ///     interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},
     ///     id::ApplicationId
     /// };
     ///
@@ -823,12 +672,12 @@ impl ApplicationCommand {
     /// Can also return an [`Error::Json`] if there is an error in deserializing
     /// the response.
     ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
     /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    /// [`choices`]: crate::model::interactions::ApplicationCommandOption::choices
+    /// [`choices`]: crate::model::interactions::application_command::ApplicationCommandOption::choices
     pub async fn create_global_application_command<F>(
         http: impl AsRef<Http>,
         f: F,
@@ -966,6 +815,54 @@ pub struct ApplicationCommandPermissionData {
     pub permission: bool,
 }
 
+impl CommandPermissionId {
+    /// Converts this [`CommandPermissionId`] to [`UserId`].
+    pub fn to_user_id(self) -> UserId {
+        UserId(self.0)
+    }
+
+    /// Converts this [`CommandPermissionId`] to [`RoleId`].
+    pub fn to_role_id(self) -> RoleId {
+        RoleId(self.0)
+    }
+}
+
+impl From<RoleId> for CommandPermissionId {
+    fn from(id: RoleId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl<'a> From<&'a RoleId> for CommandPermissionId {
+    fn from(id: &RoleId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl From<UserId> for CommandPermissionId {
+    fn from(id: UserId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl<'a> From<&'a UserId> for CommandPermissionId {
+    fn from(id: &UserId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl From<CommandPermissionId> for RoleId {
+    fn from(id: CommandPermissionId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl From<CommandPermissionId> for UserId {
+    fn from(id: CommandPermissionId) -> Self {
+        Self(id.0)
+    }
+}
+
 /// The type of an [`ApplicationCommandOption`].
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
@@ -1018,247 +915,4 @@ pub struct ApplicationCommandOptionChoice {
     pub name: String,
     /// The choice value.
     pub value: Value,
-}
-
-/// The available responses types for an interaction response.
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum InteractionResponseType {
-    Pong = 1,
-    ChannelMessageWithSource = 4,
-    DeferredChannelMessageWithSource = 5,
-    DeferredUpdateMessage = 6,
-    UpdateMessage = 7,
-}
-
-/// The flags for an interaction response.
-#[derive(Clone, Serialize, Deserialize)]
-#[non_exhaustive]
-pub struct InteractionApplicationCommandCallbackDataFlags {
-    bits: u64,
-}
-
-__impl_bitflags! {
-    InteractionApplicationCommandCallbackDataFlags: u64 {
-        /// Interaction message will only be visible to sender and will
-        /// be quickly deleted.
-        EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
-    }
-}
-
-/// Sent when a [`Message`] is a response to an [`Interaction`].
-///
-/// [`Message`]: crate::model::channel::Message
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct MessageInteraction {
-    /// The id of the interaction.
-    pub id: InteractionId,
-    /// The type of the interaction.
-    #[serde(rename = "type")]
-    pub kind: InteractionType,
-    /// The name of the [`ApplicationCommand`].
-    pub name: String,
-    /// The user who invoked the interaction.
-    pub user: User,
-}
-
-impl CommandPermissionId {
-    /// Converts this [`CommandPermissionId`] to [`UserId`].
-    pub fn to_user_id(self) -> UserId {
-        UserId(self.0)
-    }
-
-    /// Converts this [`CommandPermissionId`] to [`RoleId`].
-    pub fn to_role_id(self) -> RoleId {
-        RoleId(self.0)
-    }
-}
-
-impl From<RoleId> for CommandPermissionId {
-    fn from(id: RoleId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl<'a> From<&'a RoleId> for CommandPermissionId {
-    fn from(id: &RoleId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl From<UserId> for CommandPermissionId {
-    fn from(id: UserId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl<'a> From<&'a UserId> for CommandPermissionId {
-    fn from(id: &UserId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl From<CommandPermissionId> for RoleId {
-    fn from(id: CommandPermissionId) -> Self {
-        Self(id.0)
-    }
-}
-
-impl From<CommandPermissionId> for UserId {
-    fn from(id: CommandPermissionId) -> Self {
-        Self(id.0)
-    }
-}
-
-/// A component.
-#[derive(Clone, Debug)]
-#[non_exhaustive]
-pub enum Component {
-    ActionRow(ActionRow),
-    Button(Button),
-    SelectMenu(SelectMenu),
-}
-
-impl<'de> Deserialize<'de> for Component {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
-
-        let kind = map
-            .get("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(ComponentType::deserialize)
-            .map_err(DeError::custom)?;
-
-        match kind {
-            ComponentType::ActionRow => serde_json::from_value::<ActionRow>(Value::Object(map))
-                .map(Component::ActionRow)
-                .map_err(DeError::custom),
-            ComponentType::Button => serde_json::from_value::<Button>(Value::Object(map))
-                .map(Component::Button)
-                .map_err(DeError::custom),
-            ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
-                .map(Component::SelectMenu)
-                .map_err(DeError::custom),
-            ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
-        }
-    }
-}
-
-impl Serialize for Component {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match self {
-            Component::ActionRow(c) => ActionRow::serialize(c, serializer),
-            Component::Button(c) => Button::serialize(c, serializer),
-            Component::SelectMenu(c) => SelectMenu::serialize(c, serializer),
-        }
-    }
-}
-
-/// The type of a component
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum ComponentType {
-    ActionRow = 1,
-    Button = 2,
-    SelectMenu = 3,
-    Unknown = !0,
-}
-
-enum_number!(ComponentType {
-    ActionRow,
-    Button,
-    SelectMenu
-});
-
-/// An action row.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ActionRow {
-    /// The type of component this ActionRow is.
-    #[serde(rename = "type")]
-    pub kind: ComponentType,
-    /// The components of this ActionRow.
-    #[serde(default)]
-    pub components: Vec<Component>,
-}
-
-/// A button component.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Button {
-    /// The component type, it will always be [`ComponentType::Button`].
-    #[serde(rename = "type")]
-    pub kind: ComponentType,
-    /// The button style.
-    pub style: ButtonStyle,
-    /// The text which appears on the button.
-    pub label: Option<String>,
-    /// The emoji of this button, if there is one.
-    pub emoji: Option<ReactionType>,
-    /// An identifier defined by the developer for the button.
-    pub custom_id: Option<String>,
-    /// The url of the button, if there is one.
-    pub url: Option<String>,
-    /// Whether the button is disabled.
-    #[serde(default)]
-    pub disabled: bool,
-}
-
-/// The style of a button.
-#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum ButtonStyle {
-    Primary = 1,
-    Secondary = 2,
-    Success = 3,
-    Danger = 4,
-    Link = 5,
-    Unknown = !0,
-}
-
-enum_number!(ButtonStyle {
-    Primary,
-    Secondary,
-    Success,
-    Danger,
-    Link
-});
-
-/// A select menu component.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct SelectMenu {
-    /// The component type, it will always be [`ComponentType::SelectMenu`].
-    #[serde(rename = "type")]
-    pub kind: ComponentType,
-    /// The placeholder shown when nothing is selected.
-    pub placeholder: Option<String>,
-    /// An identifier defined by the developer for the select menu.
-    pub custom_id: Option<String>,
-    /// The minimum number of selections allowed.
-    pub min_values: Option<u64>,
-    /// The maximum number of selections allowed.
-    pub max_values: Option<u64>,
-    /// The options of this select menu.
-    #[serde(default)]
-    pub options: Vec<SelectMenuOption>,
-}
-
-/// A select menu component options.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct SelectMenuOption {
-    /// The text displayed on this option.
-    pub label: String,
-    /// The value to be sent for this option.
-    pub value: String,
-    /// The description shown for this option.
-    pub description: Option<String>,
-    /// The emoji displayed on this option.
-    pub emoji: Option<ReactionType>,
-    /// Render this option as the default selection.
-    #[serde(default)]
-    pub default: bool,
 }

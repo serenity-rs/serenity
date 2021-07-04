@@ -2,13 +2,13 @@ use std::collections::HashMap;
 
 use serde_json::{json, Value};
 
-use crate::{model::interactions::ApplicationCommandOptionType, utils};
+use crate::{model::interactions::application_command::ApplicationCommandOptionType, utils};
 
 /// A builder for creating a new [`ApplicationCommandOption`].
 ///
 /// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.
 ///
-/// [`ApplicationCommandOption`]: crate::model::interactions::ApplicationCommandOption
+/// [`ApplicationCommandOption`]: crate::model::interactions::application_command::ApplicationCommandOption
 /// [`kind`]: Self::kind
 /// [`name`]: Self::name
 /// [`description`]: Self::description
@@ -84,8 +84,8 @@ impl CreateApplicationCommandOption {
 
     /// If the option is a [`SubCommand`] or [`SubCommandGroup`] nested options are its parameters.
     ///
-    /// [`SubCommand`]: crate::model::interactions::ApplicationCommandOptionType::SubCommand
-    /// [`SubCommandGroup`]: crate::model::interactions::ApplicationCommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommand
+    /// [`SubCommandGroup`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommandGroup
     pub fn create_sub_option<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
@@ -109,7 +109,7 @@ impl CreateApplicationCommandOption {
 ///
 /// [`Self::name`] and [`Self::description`] are required fields.
 ///
-/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+/// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
 #[derive(Clone, Debug, Default)]
 pub struct CreateApplicationCommand(pub HashMap<&'static str, Value>);
 

@@ -12,7 +12,7 @@ use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "unstable_discord_api", feature = "model"))]
-use crate::model::interactions::ApplicationCommandInteractionDataOption;
+use crate::model::interactions::application_command::*;
 
 pub fn default_true() -> bool {
     true

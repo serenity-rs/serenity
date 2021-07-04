@@ -32,7 +32,7 @@ use crate::{
         CreateApplicationCommands,
         CreateApplicationCommandsPermissions,
     },
-    model::interactions::ApplicationCommand,
+    model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
 };
 
 #[cfg(feature = "model")]
@@ -1153,8 +1153,8 @@ impl GuildId {
     ///
     /// Returns the same possible errors as [`create_global_application_command`].
     ///
-    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
-    /// [`create_global_application_command`]: crate::model::interactions::ApplicationCommand::create_global_application_command
+    /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
+    /// [`create_global_application_command`]: crate::model::interactions::application_command::ApplicationCommand::create_global_application_command
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_command<F>(
@@ -1191,7 +1191,7 @@ impl GuildId {
     ///
     /// **Note**: It will update instantly.
     ///
-    /// [`ApplicationCommandPermission`]: crate::model::interactions::ApplicationCommandPermission
+    /// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_command_permission<F>(

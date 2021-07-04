@@ -164,6 +164,8 @@ pub enum Error {
     NotAuthor,
     /// Indicates that the webhook token is missing.
     NoTokenSet,
+    /// Indicates that the component type cannot be used in this context.
+    InvalidComponentType,
 }
 
 impl Error {
@@ -194,6 +196,7 @@ impl Display for Error {
             Error::ChannelNotFound => f.write_str("Channel not found in the cache."),
             Error::Hierarchy => f.write_str("Role hierarchy prevents this action."),
             Error::InvalidChannelType => f.write_str("The channel cannot perform the action."),
+            Error::InvalidComponentType => f.write_str("The component cannot perform this action."),
             Error::InvalidPermissions(_) => f.write_str("Invalid permissions."),
             Error::InvalidUser => f.write_str("The current user cannot perform the action."),
             Error::ItemMissing => f.write_str("The required item is missing from the cache."),
