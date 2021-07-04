@@ -94,6 +94,8 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
@@ -112,6 +114,7 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
 <span class="kw">mod</span> <span class="ident">create_application_command_permission</span>;
 
+<span class="kw">mod</span> <span class="ident">bot_auth_parameters</span>;
 <span class="kw">mod</span> <span class="ident">create_allowed_mentions</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
@@ -144,6 +147,7 @@
 <span class="kw">mod</span> <span class="ident">get_messages</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
+    <span class="ident">bot_auth_parameters::CreateBotAuthParameters</span>,
     <span class="ident">create_allowed_mentions::CreateAllowedMentions</span>,
     <span class="ident">create_allowed_mentions::ParseValue</span>,
     <span class="ident">create_channel::CreateChannel</span>,

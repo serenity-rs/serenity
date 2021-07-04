@@ -3402,6 +3402,9 @@
 <span id="3402">3402</span>
 <span id="3403">3403</span>
 <span id="3404">3404</span>
+<span id="3405">3405</span>
+<span id="3406">3406</span>
+<span id="3407">3407</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -6239,7 +6242,10 @@
 
     <span class="doccomment">/// Gets the current user&#39;s third party connections.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method only works for user tokens with the `connections` OAuth2 scope.</span>
+    <span class="doccomment">/// This method only works for user tokens with the</span>
+    <span class="doccomment">/// [`Connections`] OAuth2 scope.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Connections`]: crate::model::oauth2::OAuth2Scope::Connections</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_connections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,

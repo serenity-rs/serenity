@@ -3251,10 +3251,6 @@
 <span id="3251">3251</span>
 <span id="3252">3252</span>
 <span id="3253">3253</span>
-<span id="3254">3254</span>
-<span id="3255">3255</span>
-<span id="3256">3256</span>
-<span id="3257">3257</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -4907,13 +4903,9 @@
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">name</span>;
 
-                <span class="kw">if</span> <span class="ident">case_sensitive</span> {
-                    <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">contains</span>(<span class="ident">substring</span>) {
-                        <span class="prelude-val">Some</span>((<span class="ident">member</span>, <span class="ident">name</span>.<span class="ident">to_string</span>()))
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    }
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">contains_case_insensitive</span>(<span class="ident">name</span>, <span class="ident">substring</span>) {
+                <span class="kw">if</span> (<span class="ident">case_sensitive</span> <span class="op">&amp;&amp;</span> <span class="ident">name</span>.<span class="ident">contains</span>(<span class="ident">substring</span>))
+                    <span class="op">|</span><span class="op">|</span> <span class="ident">contains_case_insensitive</span>(<span class="ident">name</span>, <span class="ident">substring</span>)
+                {
                     <span class="prelude-val">Some</span>((<span class="ident">member</span>, <span class="ident">name</span>.<span class="ident">to_string</span>()))
                 } <span class="kw">else</span> {
                     <span class="prelude-val">None</span>
