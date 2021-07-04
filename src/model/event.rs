@@ -1595,7 +1595,7 @@ impl<'de> Deserialize<'de> for ThreadUpdateEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ThreadDeleteEvent {
-    pub thread: PartialGuildChannel
+    pub thread: PartialGuildChannel,
 }
 
 impl<'de> Deserialize<'de> for ThreadDeleteEvent {

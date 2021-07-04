@@ -1283,5 +1283,5 @@ pub struct PartialGuildChannel {
     pub category_id: ChannelId,
     /// The channel type.
     #[serde(rename = "type")]
-    pub kind: ChannelType
+    pub kind: ChannelType,
 }
