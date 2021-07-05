@@ -40,8 +40,8 @@ pub struct Sticker {
     pub kind: StickerType,
     /// The type of sticker format.
     pub format_type: StickerFormatType,
-    /// Whether or not this sticker can be used, may be false due to loss of
-    /// Server Boosts.
+    /// Whether or not this guild sticker can be used, may be false due to loss
+    /// of Server Boosts.
     #[serde(default)]
     pub available: bool,
     /// Id of the guild that owns this sticker.
