@@ -39,6 +39,6 @@ impl<'a, T> std::ops::Deref for LazyArc<'a, T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
-        &self.value
+        self.value
     }
 }

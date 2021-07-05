@@ -127,7 +127,7 @@ impl ShardManager {
             event_handler: opt.event_handler.as_ref().map(|h| Arc::clone(h)),
             raw_event_handler: opt.raw_event_handler.as_ref().map(|rh| Arc::clone(rh)),
             #[cfg(feature = "framework")]
-            framework: Arc::clone(&opt.framework),
+            framework: Arc::clone(opt.framework),
             last_start: None,
             manager_tx: thread_tx.clone(),
             queue: VecDeque::new(),
@@ -136,7 +136,7 @@ impl ShardManager {
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager.clone(),
             ws_url: Arc::clone(opt.ws_url),
-            cache_and_http: Arc::clone(&opt.cache_and_http),
+            cache_and_http: Arc::clone(opt.cache_and_http),
             intents: opt.intents,
         };
 

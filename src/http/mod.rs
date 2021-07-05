@@ -123,10 +123,10 @@ impl CacheHttp for Arc<CacheAndHttp> {
 #[cfg(feature = "cache")]
 impl CacheHttp for (&Arc<Cache>, &Http) {
     fn cache(&self) -> Option<&Arc<Cache>> {
-        Some(&self.0)
+        Some(self.0)
     }
     fn http(&self) -> &Http {
-        &self.1
+        self.1
     }
 }
 

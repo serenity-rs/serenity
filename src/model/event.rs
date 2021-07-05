@@ -1011,7 +1011,7 @@ impl CacheUpdate for PresenceUpdateEvent {
         let user_id = self.presence.user_id;
 
         if let Some(user) = self.presence.user.as_mut() {
-            cache.update_user_entry(&user).await;
+            cache.update_user_entry(user).await;
             if let Some(u) = cache.user(user_id).await {
                 *user = u;
             }
@@ -2468,7 +2468,7 @@ impl EventType {
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
             // to recover the name here, so we return `None` instead.
             Self::GuildUnavailable => None,
-            Self::Other(other) => Some(&other),
+            Self::Other(other) => Some(other),
         }
     }
 }

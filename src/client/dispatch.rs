@@ -177,7 +177,7 @@ pub(crate) fn dispatch<'rec>(
                             &cache_and_http.cache,
                         );
 
-                        let framework = Arc::clone(&framework);
+                        let framework = Arc::clone(framework);
 
                         tokio::spawn(async move {
                             framework.dispatch(context, event.message).await;
@@ -210,7 +210,7 @@ pub(crate) fn dispatch<'rec>(
                     {
                         dispatch_message(context.clone(), event.message.clone(), h).await;
 
-                        let framework = Arc::clone(&framework);
+                        let framework = Arc::clone(framework);
 
                         tokio::spawn(async move {
                             framework.dispatch(context, event.message).await;
@@ -251,7 +251,7 @@ pub(crate) fn dispatch<'rec>(
                             let message = msg_event.message.clone();
                             event_handler.raw_event(context.clone(), event).await;
 
-                            let framework = Arc::clone(&framework);
+                            let framework = Arc::clone(framework);
 
                             tokio::spawn(async move {
                                 framework.dispatch(context, message).await;
@@ -288,7 +288,7 @@ pub(crate) fn dispatch<'rec>(
                         {
                             dispatch_message(context.clone(), event.message.clone(), handler).await;
 
-                            let framework = Arc::clone(&framework);
+                            let framework = Arc::clone(framework);
                             let message = event.message;
                             tokio::spawn(async move {
                                 framework.dispatch(context, message).await;
@@ -687,14 +687,14 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::Ready(mut event)) => {
             update(&cache_and_http, &mut event).await;
-            let event_handler = Arc::clone(&event_handler);
+            let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
                 event_handler.ready(context, event.ready).await;
             });
         },
         DispatchEvent::Model(Event::Resumed(event)) => {
-            let event_handler = Arc::clone(&event_handler);
+            let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
                 event_handler.resume(context, event).await;

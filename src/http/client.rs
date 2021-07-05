@@ -1799,7 +1799,7 @@ impl Http {
         let body = serde_json::to_vec(map)?;
 
         let mut headers = Headers::new();
-        headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
 
         let response = self
             .request(Request {
@@ -1899,7 +1899,7 @@ impl Http {
             .client
             .post(&Route::webhook_with_token_optioned(webhook_id, token, wait))
             .multipart(multipart)
-            .header(CONTENT_TYPE, HeaderValue::from_static(&"multipart/form-data"))
+            .header(CONTENT_TYPE, HeaderValue::from_static("multipart/form-data"))
             .send()
             .await?;
 
@@ -3059,7 +3059,7 @@ impl Http {
             .client
             .post(url)
             .header(AUTHORIZATION, HeaderValue::from_str(&self.token)?)
-            .header(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT))
+            .header(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT))
             .multipart(multipart)
             .send()
             .await?;
@@ -3389,7 +3389,7 @@ fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
 
 impl AsRef<Http> for Http {
     fn as_ref(&self) -> &Http {
-        &self
+        self
     }
 }
 

@@ -381,8 +381,8 @@ impl StandardFramework {
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(
-                GroupMap::new(&group.options.sub_groups, &self.config),
-                CommandMap::new(&group.options.commands, &self.config),
+                GroupMap::new(group.options.sub_groups, &self.config),
+                CommandMap::new(group.options.commands, &self.config),
             )
         } else {
             Map::WithPrefixes(GroupMap::new(&[group], &self.config))
@@ -721,7 +721,7 @@ impl Framework for StandardFramework {
                 };
 
                 if let Some(error) =
-                    self.should_fail(&ctx, &msg, &mut args, &command.options, &group.options).await
+                    self.should_fail(&ctx, &msg, &mut args, command.options, group.options).await
                 {
                     if let Some(dispatch) = &self.dispatch {
                         dispatch(&mut ctx, &msg, error).await;
@@ -775,11 +775,11 @@ impl CommonOptions for &GroupOptions {
     }
 
     fn allowed_roles(&self) -> &'static [&'static str] {
-        &self.allowed_roles
+        self.allowed_roles
     }
 
     fn checks(&self) -> &'static [&'static Check] {
-        &self.checks
+        self.checks
     }
 
     fn only_in(&self) -> OnlyIn {
@@ -805,11 +805,11 @@ impl CommonOptions for &CommandOptions {
     }
 
     fn allowed_roles(&self) -> &'static [&'static str] {
-        &self.allowed_roles
+        self.allowed_roles
     }
 
     fn checks(&self) -> &'static [&'static Check] {
-        &self.checks
+        self.checks
     }
 
     fn only_in(&self) -> OnlyIn {

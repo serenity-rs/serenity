@@ -542,9 +542,7 @@ impl Shard {
                 }))
             },
             Ok(GatewayEvent::Reconnect) => Ok(Some(ShardAction::Reconnect(ReconnectType::Resume))),
-            Err(Error::Gateway(GatewayError::Closed(ref data))) => {
-                self.handle_gateway_closed(&data)
-            },
+            Err(Error::Gateway(GatewayError::Closed(ref data))) => self.handle_gateway_closed(data),
             Err(Error::Tungstenite(ref why)) => {
                 warn!("[Shard {:?}] Websocket error: {:?}", self.shard_info, why);
                 info!("[Shard {:?}] Will attempt to auto-reconnect", self.shard_info);
@@ -760,7 +758,7 @@ impl Shard {
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
         let url = &self.ws_url.lock().await.clone();
-        let client = connect(&url).await?;
+        let client = connect(url).await?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)

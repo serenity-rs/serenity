@@ -185,7 +185,7 @@ impl Ratelimiter {
             // - get the global rate;
             // - sleep if there is 0 remaining
             // - then, perform the request
-            let bucket = Arc::clone(&self.routes.write().await.entry(route).or_default());
+            let bucket = Arc::clone(self.routes.write().await.entry(route).or_default());
 
             bucket.lock().await.pre_hook(&route).await;
 
@@ -213,7 +213,7 @@ impl Ratelimiter {
 
                     Ok(
                         if let Some(retry_after) =
-                            parse_header::<f64>(&response.headers(), "retry-after")?
+                            parse_header::<f64>(response.headers(), "retry-after")?
                         {
                             debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
                             sleep(Duration::from_secs_f64(retry_after)).await;
@@ -299,11 +299,11 @@ impl Ratelimit {
 
     #[instrument]
     pub async fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
-        if let Some(limit) = parse_header(&response.headers(), "x-ratelimit-limit")? {
+        if let Some(limit) = parse_header(response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
         }
 
-        if let Some(remaining) = parse_header(&response.headers(), "x-ratelimit-remaining")? {
+        if let Some(remaining) = parse_header(response.headers(), "x-ratelimit-remaining")? {
             self.remaining = remaining;
         }
 
@@ -313,7 +313,7 @@ impl Ratelimit {
         }
 
         if let Some(reset_after) =
-            parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")?
+            parse_header::<f64>(response.headers(), "x-ratelimit-reset-after")?
         {
             #[cfg(not(feature = "absolute_ratelimits"))]
             {
@@ -325,7 +325,7 @@ impl Ratelimit {
 
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             false
-        } else if let Some(retry_after) = parse_header::<f64>(&response.headers(), "retry-after")? {
+        } else if let Some(retry_after) = parse_header::<f64>(response.headers(), "retry-after")? {
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
             sleep(Duration::from_secs_f64(retry_after)).await;
 
@@ -397,7 +397,7 @@ fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<
     };
 
     let unicode =
-        str::from_utf8(&header.as_bytes()).map_err(|_| Error::from(HttpError::RateLimitUtf8))?;
+        str::from_utf8(header.as_bytes()).map_err(|_| Error::from(HttpError::RateLimitUtf8))?;
 
     let num = unicode.parse().map_err(|_| Error::from(HttpError::RateLimitI64F64))?;
 

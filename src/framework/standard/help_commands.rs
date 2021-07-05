@@ -341,7 +341,7 @@ async fn check_common_behaviour(
 
     msg.guild_field(&cache_http, |guild| {
         if let Some(member) = guild.members.get(&msg.author.id) {
-            if !has_correct_roles(options, &guild.roles, &member) {
+            if !has_correct_roles(options, &guild.roles, member) {
                 return help_options.lacking_role;
             }
         }
@@ -421,23 +421,23 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                     // We iterate all command names and check if one matches, if it does,
                     // we potentially have a sub-command.
                     for command_name in command.options.names {
-                        if starts_with_whole_word(&name, &command_name) {
+                        if starts_with_whole_word(name, command_name) {
                             name.drain(..=command_name.len());
                             break;
                         }
 
                         if help_options.max_levenshtein_distance > 0 {
-                            let levenshtein_distance = levenshtein_distance(&command_name, &name);
+                            let levenshtein_distance = levenshtein_distance(command_name, name);
 
                             if levenshtein_distance <= help_options.max_levenshtein_distance
                                 && HelpBehaviour::Nothing
                                     == check_command_behaviour(
                                         ctx,
                                         msg,
-                                        &command.options,
+                                        command.options,
                                         group.options.checks,
-                                        &owners,
-                                        &help_options,
+                                        owners,
+                                        help_options,
                                     )
                                     .await
                             {
@@ -462,17 +462,17 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                     // If we found a sub-command, we replace the parent with
                     // it. This allows the help-system to extract information
                     // from the sub-command.
-                    if let Some(ref sub_command) = sub_command_found {
+                    if let Some(sub_command) = sub_command_found {
                         // Check parent command's behaviour and permission first
                         // before we consider the sub-command overwrite it.
                         if HelpBehaviour::Nothing
                             == check_command_behaviour(
                                 ctx,
                                 msg,
-                                &command.options,
+                                command.options,
                                 group.options.checks,
-                                &owners,
-                                &help_options,
+                                owners,
+                                help_options,
                             )
                             .await
                         {
@@ -507,10 +507,10 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                     == check_command_behaviour(
                         ctx,
                         msg,
-                        &command.options,
+                        command.options,
                         group.options.checks,
-                        &owners,
-                        &help_options,
+                        owners,
+                        help_options,
                     )
                     .await
                 {
@@ -543,7 +543,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
         for group in groups {
             let group = *group;
             let group_behaviour =
-                check_common_behaviour(&ctx, msg, &group.options, &owners, &help_options).await;
+                check_common_behaviour(&ctx, msg, &group.options, owners, help_options).await;
 
             match &group_behaviour {
                 HelpBehaviour::Nothing => (),
@@ -577,7 +577,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
 
                 if !options.help_available {
                     return Ok(CustomisedHelpData::NoCommandFound {
-                        help_error_message: &help_options.no_help_available_text,
+                        help_error_message: help_options.no_help_available_text,
                     });
                 }
 
@@ -625,7 +625,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                         name: options.names[0],
                         description: options.desc,
                         group_name: group.name,
-                        group_prefixes: &group.options.prefixes,
+                        group_prefixes: group.options.prefixes,
                         checks: check_names,
                         aliases: options.names[1..].to_vec(),
                         availability: available_text,
@@ -639,7 +639,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
             match nested_group_command_search(
                 ctx,
                 msg,
-                &group.options.sub_groups,
+                group.options.sub_groups,
                 name,
                 help_options,
                 similar_commands,
@@ -674,11 +674,11 @@ async fn fetch_single_command<'a>(
     match nested_group_command_search(
         ctx,
         msg,
-        &groups,
+        groups,
         &mut name,
-        &help_options,
+        help_options,
         &mut similar_commands,
-        &owners,
+        owners,
     )
     .await
     {
@@ -733,7 +733,7 @@ async fn fill_eligible_commands<'a>(
         let command_behaviour = check_command_behaviour(
             ctx,
             msg,
-            &command.options,
+            command.options,
             group.options.checks,
             owners,
             help_options,
@@ -765,10 +765,10 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
         fill_eligible_commands(
             ctx,
             msg,
-            &commands,
-            &owners,
-            &help_options,
-            &group,
+            commands,
+            owners,
+            help_options,
+            group,
             &mut group_with_cmds,
             &mut highest_formatter,
         )
@@ -786,10 +786,10 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
             let grouped_cmd = fetch_all_eligible_commands_in_group(
                 ctx,
                 msg,
-                &sub_group.options.commands,
-                &owners,
-                &help_options,
-                &sub_group,
+                sub_group.options.commands,
+                owners,
+                help_options,
+                sub_group,
                 highest_formatter,
             )
             .await;
@@ -816,7 +816,7 @@ async fn create_command_group_commands_pair_from_groups<'a>(
     for group in groups {
         let group = *group;
 
-        let group_with_cmds = create_single_group(ctx, msg, group, &owners, &help_options).await;
+        let group_with_cmds = create_single_group(ctx, msg, group, owners, help_options).await;
 
         if !group_with_cmds.command_names.is_empty() || !group_with_cmds.sub_groups.is_empty() {
             listed_groups.push(group_with_cmds);
@@ -837,11 +837,11 @@ async fn create_single_group(
 ) -> GroupCommandsPair {
     let mut group_with_cmds = fetch_all_eligible_commands_in_group(
         ctx,
-        &msg,
-        &group.options.commands,
-        &owners,
-        &help_options,
-        &group,
+        msg,
+        group.options.commands,
+        owners,
+        help_options,
+        group,
         HelpBehaviour::Nothing,
     )
     .await;
@@ -863,7 +863,7 @@ async fn create_single_group(
 fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool {
     if group_name == searched_group.as_str() {
         return true;
-    } else if starts_with_whole_word(&searched_group, &group_name) {
+    } else if starts_with_whole_word(searched_group, group_name) {
         searched_group.drain(..=group_name.len());
         return true;
     }
@@ -888,7 +888,7 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
         };
         let mut progressed = is_prefixless_group;
         let is_word_prefix = group.options.prefixes.iter().any(|prefix| {
-            if starts_with_whole_word(&searched_named_lowercase, &prefix) {
+            if starts_with_whole_word(searched_named_lowercase, prefix) {
                 searched_named_lowercase.drain(..=prefix.len());
                 progressed = true;
             }
@@ -897,7 +897,7 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
         });
 
         if is_prefixless_group || is_word_prefix {
-            let single_group = create_single_group(ctx, msg, &group, owners, &help_options).await;
+            let single_group = create_single_group(ctx, msg, group, owners, help_options).await;
 
             if !single_group.command_names.is_empty() {
                 return Some(CustomisedHelpData::GroupedCommands {
@@ -948,7 +948,7 @@ pub async fn create_customised_help_data<'a>(
     if !args.is_empty() {
         let name = args.message();
 
-        return match fetch_single_command(ctx, msg, &groups, &name, &help_options, owners).await {
+        return match fetch_single_command(ctx, msg, groups, name, help_options, owners).await {
             Ok(single_command) => single_command,
             Err(suggestions) => {
                 let mut searched_named_lowercase = name.to_lowercase();
@@ -970,7 +970,7 @@ pub async fn create_customised_help_data<'a>(
 
                 if suggestions.is_empty() {
                     CustomisedHelpData::NoCommandFound {
-                        help_error_message: &help_options.no_help_available_text,
+                        help_error_message: help_options.no_help_available_text,
                     }
                 } else {
                     CustomisedHelpData::SuggestedCommands {
@@ -995,12 +995,12 @@ pub async fn create_customised_help_data<'a>(
     };
 
     let listed_groups =
-        create_command_group_commands_pair_from_groups(ctx, msg, &groups, owners, &help_options)
+        create_command_group_commands_pair_from_groups(ctx, msg, groups, owners, help_options)
             .await;
 
     if listed_groups.is_empty() {
         CustomisedHelpData::NoCommandFound {
-            help_error_message: &help_options.no_help_available_text,
+            help_error_message: help_options.no_help_available_text,
         }
     } else {
         CustomisedHelpData::GroupedCommands {
@@ -1060,12 +1060,7 @@ fn flatten_group_to_string(
         if !(sub_group.command_names.is_empty() && sub_group.sub_groups.is_empty()) {
             let mut sub_group_text = String::default();
 
-            flatten_group_to_string(
-                &mut sub_group_text,
-                &sub_group,
-                nest_level + 1,
-                &help_options,
-            )?;
+            flatten_group_to_string(&mut sub_group_text, sub_group, nest_level + 1, help_options)?;
 
             write!(group_text, "{}", sub_group_text)?;
         }
@@ -1109,12 +1104,7 @@ fn flatten_group_to_plain_string(
     for sub_group in &group.sub_groups {
         let mut sub_group_text = String::default();
 
-        flatten_group_to_plain_string(
-            &mut sub_group_text,
-            &sub_group,
-            nest_level + 1,
-            &help_options,
-        );
+        flatten_group_to_plain_string(&mut sub_group_text, sub_group, nest_level + 1, help_options);
 
         let _ = write!(group_text, "{}", sub_group_text);
     }
@@ -1139,7 +1129,7 @@ async fn send_grouped_commands_embed(
     for group in groups {
         let mut embed_text = String::default();
 
-        flatten_group_to_string(&mut embed_text, &group, 0, &help_options)?;
+        flatten_group_to_string(&mut embed_text, group, 0, help_options)?;
 
         embed.field(group.name, &embed_text, true);
     }
@@ -1314,7 +1304,7 @@ pub async fn with_embeds(
     owners: HashSet<UserId>,
 ) -> Option<Message> {
     let formatted_help =
-        create_customised_help_data(ctx, msg, &args, &groups, &owners, help_options).await;
+        create_customised_help_data(ctx, msg, &args, groups, &owners, help_options).await;
 
     let response_result = match formatted_help {
         CustomisedHelpData::SuggestedCommands {
@@ -1324,14 +1314,14 @@ pub async fn with_embeds(
             send_suggestion_embed(
                 &ctx.http,
                 msg.channel_id,
-                &help_description,
-                &suggestions,
+                help_description,
+                suggestions,
                 help_options.embed_error_colour,
             )
             .await
         },
         CustomisedHelpData::NoCommandFound {
-            ref help_error_message,
+            help_error_message,
         } => {
             send_error_embed(
                 &ctx.http,
@@ -1347,10 +1337,10 @@ pub async fn with_embeds(
         } => {
             send_grouped_commands_embed(
                 &ctx.http,
-                &help_options,
+                help_options,
                 msg.channel_id,
-                &help_description,
-                &groups,
+                help_description,
+                groups,
                 help_options.embed_success_colour,
             )
             .await
@@ -1360,9 +1350,9 @@ pub async fn with_embeds(
         } => {
             send_single_command_embed(
                 &ctx.http,
-                &help_options,
+                help_options,
                 msg.channel_id,
-                &command,
+                command,
                 help_options.embed_success_colour,
             )
             .await
@@ -1393,7 +1383,7 @@ fn grouped_commands_to_plain_string(
     for group in groups {
         let _ = write!(result, "\n**{}**", &group.name);
 
-        flatten_group_to_plain_string(&mut result, &group, 0, &help_options);
+        flatten_group_to_plain_string(&mut result, group, 0, help_options);
     }
 
     result
@@ -1514,7 +1504,7 @@ pub async fn plain(
     owners: HashSet<UserId>,
 ) -> Option<Message> {
     let formatted_help =
-        create_customised_help_data(ctx, msg, &args, &groups, &owners, help_options).await;
+        create_customised_help_data(ctx, msg, &args, groups, &owners, help_options).await;
 
     let result = match formatted_help {
         CustomisedHelpData::SuggestedCommands {
@@ -1527,10 +1517,10 @@ pub async fn plain(
         CustomisedHelpData::GroupedCommands {
             ref help_description,
             ref groups,
-        } => grouped_commands_to_plain_string(&help_options, &help_description, &groups),
+        } => grouped_commands_to_plain_string(help_options, help_description, groups),
         CustomisedHelpData::SingleCommand {
             ref command,
-        } => single_command_to_plain_string(&help_options, &command),
+        } => single_command_to_plain_string(help_options, command),
     };
 
     match msg.channel_id.say(&ctx, result).await {
@@ -1551,34 +1541,34 @@ mod levenshtein_tests {
     fn reflexive() {
         let word_a = "rusty ferris";
         let word_b = "rusty ferris";
-        assert_eq!(0, levenshtein_distance(&word_a, &word_b));
+        assert_eq!(0, levenshtein_distance(word_a, word_b));
 
         let word_a = "";
         let word_b = "";
-        assert_eq!(0, levenshtein_distance(&word_a, &word_b));
+        assert_eq!(0, levenshtein_distance(word_a, word_b));
 
         let word_a = "rusty ferris";
         let word_b = "RuSty FerriS";
-        assert_eq!(4, levenshtein_distance(&word_a, &word_b));
+        assert_eq!(4, levenshtein_distance(word_a, word_b));
     }
 
     #[test]
     fn symmetric() {
         let word_a = "ferris";
         let word_b = "rusty ferris";
-        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+        assert_eq!(6, levenshtein_distance(word_a, word_b));
 
         let word_a = "rusty ferris";
         let word_b = "ferris";
-        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+        assert_eq!(6, levenshtein_distance(word_a, word_b));
 
         let word_a = "";
         let word_b = "ferris";
-        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+        assert_eq!(6, levenshtein_distance(word_a, word_b));
 
         let word_a = "ferris";
         let word_b = "";
-        assert_eq!(6, levenshtein_distance(&word_a, &word_b));
+        assert_eq!(6, levenshtein_distance(word_a, word_b));
     }
 
     #[test]
@@ -1587,9 +1577,9 @@ mod levenshtein_tests {
         let word_b = "turbo fish";
         let word_c = "unsafe";
 
-        let distance_of_a_c = levenshtein_distance(&word_a, &word_c);
-        let distance_of_a_b = levenshtein_distance(&word_a, &word_b);
-        let distance_of_b_c = levenshtein_distance(&word_b, &word_c);
+        let distance_of_a_c = levenshtein_distance(word_a, word_c);
+        let distance_of_a_b = levenshtein_distance(word_a, word_b);
+        let distance_of_b_c = levenshtein_distance(word_b, word_c);
 
         assert!(distance_of_a_c <= (distance_of_a_b + distance_of_b_c));
     }
