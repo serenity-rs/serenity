@@ -496,7 +496,7 @@ pub struct User {
 }
 
 /// User's public flags
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct UserPublicFlags {
     pub bits: u32,
 }
