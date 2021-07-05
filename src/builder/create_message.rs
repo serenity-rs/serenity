@@ -19,7 +19,8 @@ use crate::utils;
 /// 1. When sending a message without embeds or stickers, [`Self::content`] is
 ///    the only required field that is required to be set.
 /// 2. When sending an [`Self::embed`], no other field is required.
-/// 3. When sending an [`Self::sticker`], no other field is required.
+/// 3. When sending stickers with [`Self::sticker_id`] or other sticker methods,
+///    no other field is required.
 ///
 /// Note that if you only need to send the content of a message, without
 /// specifying other fields, then [`ChannelId::say`] may be a more preferable
@@ -259,13 +260,13 @@ impl<'a> CreateMessage<'a> {
         self
     }
 
-    /// Sets a list of sticker IDs to include in the message.
+    /// Add multiple sticker IDs for the message.
     ///
     /// **Note**: There can be a maximum of 3 stickers in a message.
     ///
-    /// **Note**: This will replace all existing stickers. Use
-    /// [`Self::add_sticker_id()`] to keep existing stickers.
-    pub fn sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
+    /// **Note**: This will keep all existing stickers. Use
+    /// [`Self::set_sticker_ids()`] to replace existing stickers.
+    pub fn add_sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
         &mut self,
         sticker_ids: It,
     ) -> &mut Self {
@@ -274,6 +275,21 @@ impl<'a> CreateMessage<'a> {
         }
 
         self
+    }
+
+    /// Sets a list of sticker IDs to include in the message.
+    ///
+    /// **Note**: There can be a maximum of 3 stickers in a message.
+    ///
+    /// **Note**: This will replace all existing stickers. Use
+    /// [`Self::add_sticker_id()`] or [`Self::add_sticker_ids()`] to keep
+    /// existing stickers.
+    pub fn set_sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
+        &mut self,
+        sticker_ids: It,
+    ) -> &mut Self {
+        self.0.insert("sticker_ids", Value::Array(Vec::new()));
+        self.add_sticker_ids(sticker_ids)
     }
 
     /// Sets the components of this message.
