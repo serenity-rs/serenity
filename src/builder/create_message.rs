@@ -230,7 +230,7 @@ impl<'a> CreateMessage<'a> {
         let sticker_ids = self.0.entry("sticker_ids").or_insert_with(|| Value::Array(Vec::new()));
         let sticker_ids_array = sticker_ids.as_array_mut().expect("Sticker_ids must be an array");
 
-        sticker_ids_array.push(to_value(sticker_id.into()).unwrap());
+        sticker_ids_array.push(Value::from(sticker_id.into().0));
 
         self
     }
@@ -254,7 +254,7 @@ impl<'a> CreateMessage<'a> {
         let sticker_ids = self.0.entry("sticker_ids").or_insert_with(|| Value::Array(Vec::new()));
         let sticker_ids_array = sticker_ids.as_array_mut().expect("Sticker_ids must be an array");
 
-        sticker_ids_array.push(to_value(sticker_id.into()).unwrap());
+        sticker_ids_array.push(Value::from(sticker_id.into().0));
 
         self
     }

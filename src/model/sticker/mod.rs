@@ -4,7 +4,6 @@ pub mod sticker_item;
 pub mod sticker_pack;
 
 pub use self::{sticker::*, sticker_id::*, sticker_item::*, sticker_pack::*};
-
 #[cfg(feature = "model")]
 use crate::model::prelude::*;
 

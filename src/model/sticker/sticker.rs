@@ -1,4 +1,6 @@
 #[cfg(feature = "model")]
+use super::sticker_url;
+#[cfg(feature = "model")]
 use crate::builder::EditSticker;
 #[cfg(feature = "model")]
 use crate::http::Http;
@@ -10,8 +12,6 @@ use crate::model::{
     user::User,
     utils::{deserialize_comma_separated_string, serialize_comma_separated_string},
 };
-#[cfg(feature = "model")]
-use super::sticker_url;
 
 /// A sticker sent with a message.
 ///

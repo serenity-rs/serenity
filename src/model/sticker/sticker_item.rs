@@ -1,11 +1,10 @@
 #[cfg(feature = "model")]
+use super::sticker_url;
+#[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-
-#[cfg(feature = "model")]
-use super::sticker_url;
 
 /// The smallest amount of data required to render a sticker.
 #[derive(Clone, Debug, Deserialize, Serialize)]
