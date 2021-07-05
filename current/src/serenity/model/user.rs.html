@@ -1676,7 +1676,7 @@
 }
 
 <span class="doccomment">/// User&#39;s public flags</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserPublicFlags</span> {
     <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u32</span>,
 }
