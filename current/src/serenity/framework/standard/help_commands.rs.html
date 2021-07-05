@@ -1615,16 +1615,6 @@
 <span id="1615">1615</span>
 <span id="1616">1616</span>
 <span id="1617">1617</span>
-<span id="1618">1618</span>
-<span id="1619">1619</span>
-<span id="1620">1620</span>
-<span id="1621">1621</span>
-<span id="1622">1622</span>
-<span id="1623">1623</span>
-<span id="1624">1624</span>
-<span id="1625">1625</span>
-<span id="1626">1626</span>
-<span id="1627">1627</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -1969,7 +1959,7 @@
 
     <span class="ident">msg</span>.<span class="ident">guild_field</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="op">|</span><span class="ident">guild</span><span class="op">|</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">has_correct_roles</span>(<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">guild</span>.<span class="ident">roles</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>) {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">has_correct_roles</span>(<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">guild</span>.<span class="ident">roles</span>, <span class="ident">member</span>) {
                 <span class="kw">return</span> <span class="ident">help_options</span>.<span class="ident">lacking_role</span>;
             }
         }
@@ -2049,23 +2039,23 @@
                     <span class="comment">// We iterate all command names and check if one matches, if it does,</span>
                     <span class="comment">// we potentially have a sub-command.</span>
                     <span class="kw">for</span> <span class="ident">command_name</span> <span class="kw">in</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span> {
-                        <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">command_name</span>) {
+                        <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="ident">name</span>, <span class="ident">command_name</span>) {
                             <span class="ident">name</span>.<span class="ident">drain</span>(..<span class="op">=</span><span class="ident">command_name</span>.<span class="ident">len</span>());
                             <span class="kw">break</span>;
                         }
 
                         <span class="kw">if</span> <span class="ident">help_options</span>.<span class="ident">max_levenshtein_distance</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                            <span class="kw">let</span> <span class="ident">levenshtein_distance</span> <span class="op">=</span> <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">command_name</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>);
+                            <span class="kw">let</span> <span class="ident">levenshtein_distance</span> <span class="op">=</span> <span class="ident">levenshtein_distance</span>(<span class="ident">command_name</span>, <span class="ident">name</span>);
 
                             <span class="kw">if</span> <span class="ident">levenshtein_distance</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">help_options</span>.<span class="ident">max_levenshtein_distance</span>
                                 <span class="op">&amp;&amp;</span> <span class="ident">HelpBehaviour::Nothing</span>
                                     <span class="op">=</span><span class="op">=</span> <span class="ident">check_command_behaviour</span>(
                                         <span class="ident">ctx</span>,
                                         <span class="ident">msg</span>,
-                                        <span class="kw-2">&amp;</span><span class="ident">command</span>.<span class="ident">options</span>,
+                                        <span class="ident">command</span>.<span class="ident">options</span>,
                                         <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">checks</span>,
-                                        <span class="kw-2">&amp;</span><span class="ident">owners</span>,
-                                        <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
+                                        <span class="ident">owners</span>,
+                                        <span class="ident">help_options</span>,
                                     )
                                     .<span class="kw">await</span>
                             {
@@ -2090,17 +2080,17 @@
                     <span class="comment">// If we found a sub-command, we replace the parent with</span>
                     <span class="comment">// it. This allows the help-system to extract information</span>
                     <span class="comment">// from the sub-command.</span>
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">sub_command</span>) <span class="op">=</span> <span class="ident">sub_command_found</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sub_command</span>) <span class="op">=</span> <span class="ident">sub_command_found</span> {
                         <span class="comment">// Check parent command&#39;s behaviour and permission first</span>
                         <span class="comment">// before we consider the sub-command overwrite it.</span>
                         <span class="kw">if</span> <span class="ident">HelpBehaviour::Nothing</span>
                             <span class="op">=</span><span class="op">=</span> <span class="ident">check_command_behaviour</span>(
                                 <span class="ident">ctx</span>,
                                 <span class="ident">msg</span>,
-                                <span class="kw-2">&amp;</span><span class="ident">command</span>.<span class="ident">options</span>,
+                                <span class="ident">command</span>.<span class="ident">options</span>,
                                 <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">checks</span>,
-                                <span class="kw-2">&amp;</span><span class="ident">owners</span>,
-                                <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
+                                <span class="ident">owners</span>,
+                                <span class="ident">help_options</span>,
                             )
                             .<span class="kw">await</span>
                         {
@@ -2135,10 +2125,10 @@
                     <span class="op">=</span><span class="op">=</span> <span class="ident">check_command_behaviour</span>(
                         <span class="ident">ctx</span>,
                         <span class="ident">msg</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">command</span>.<span class="ident">options</span>,
+                        <span class="ident">command</span>.<span class="ident">options</span>,
                         <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">checks</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">owners</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
+                        <span class="ident">owners</span>,
+                        <span class="ident">help_options</span>,
                     )
                     .<span class="kw">await</span>
                 {
@@ -2171,7 +2161,7 @@
         <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
             <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">group</span>;
             <span class="kw">let</span> <span class="ident">group_behaviour</span> <span class="op">=</span>
-                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>).<span class="kw">await</span>;
+                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">group_behaviour</span> {
                 <span class="ident">HelpBehaviour::Nothing</span> <span class="op">=</span><span class="op">&gt;</span> (),
@@ -2205,7 +2195,7 @@
 
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">options</span>.<span class="ident">help_available</span> {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">CustomisedHelpData::NoCommandFound</span> {
-                        <span class="ident">help_error_message</span>: <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">no_help_available_text</span>,
+                        <span class="ident">help_error_message</span>: <span class="ident">help_options</span>.<span class="ident">no_help_available_text</span>,
                     });
                 }
 
@@ -2253,7 +2243,7 @@
                         <span class="ident">name</span>: <span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>],
                         <span class="ident">description</span>: <span class="ident">options</span>.<span class="ident">desc</span>,
                         <span class="ident">group_name</span>: <span class="ident">group</span>.<span class="ident">name</span>,
-                        <span class="ident">group_prefixes</span>: <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>,
+                        <span class="ident">group_prefixes</span>: <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>,
                         <span class="ident">checks</span>: <span class="ident">check_names</span>,
                         <span class="ident">aliases</span>: <span class="ident">options</span>.<span class="ident">names</span>[<span class="number">1</span>..].<span class="ident">to_vec</span>(),
                         <span class="ident">availability</span>: <span class="ident">available_text</span>,
@@ -2267,7 +2257,7 @@
             <span class="kw">match</span> <span class="ident">nested_group_command_search</span>(
                 <span class="ident">ctx</span>,
                 <span class="ident">msg</span>,
-                <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>,
+                <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>,
                 <span class="ident">name</span>,
                 <span class="ident">help_options</span>,
                 <span class="ident">similar_commands</span>,
@@ -2302,11 +2292,11 @@
     <span class="kw">match</span> <span class="ident">nested_group_command_search</span>(
         <span class="ident">ctx</span>,
         <span class="ident">msg</span>,
-        <span class="kw-2">&amp;</span><span class="ident">groups</span>,
+        <span class="ident">groups</span>,
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">name</span>,
-        <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
+        <span class="ident">help_options</span>,
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">similar_commands</span>,
-        <span class="kw-2">&amp;</span><span class="ident">owners</span>,
+        <span class="ident">owners</span>,
     )
     .<span class="kw">await</span>
     {
@@ -2361,7 +2351,7 @@
         <span class="kw">let</span> <span class="ident">command_behaviour</span> <span class="op">=</span> <span class="ident">check_command_behaviour</span>(
             <span class="ident">ctx</span>,
             <span class="ident">msg</span>,
-            <span class="kw-2">&amp;</span><span class="ident">command</span>.<span class="ident">options</span>,
+            <span class="ident">command</span>.<span class="ident">options</span>,
             <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">checks</span>,
             <span class="ident">owners</span>,
             <span class="ident">help_options</span>,
@@ -2393,10 +2383,10 @@
         <span class="ident">fill_eligible_commands</span>(
             <span class="ident">ctx</span>,
             <span class="ident">msg</span>,
-            <span class="kw-2">&amp;</span><span class="ident">commands</span>,
-            <span class="kw-2">&amp;</span><span class="ident">owners</span>,
-            <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
-            <span class="kw-2">&amp;</span><span class="ident">group</span>,
+            <span class="ident">commands</span>,
+            <span class="ident">owners</span>,
+            <span class="ident">help_options</span>,
+            <span class="ident">group</span>,
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">group_with_cmds</span>,
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">highest_formatter</span>,
         )
@@ -2414,10 +2404,10 @@
             <span class="kw">let</span> <span class="ident">grouped_cmd</span> <span class="op">=</span> <span class="ident">fetch_all_eligible_commands_in_group</span>(
                 <span class="ident">ctx</span>,
                 <span class="ident">msg</span>,
-                <span class="kw-2">&amp;</span><span class="ident">sub_group</span>.<span class="ident">options</span>.<span class="ident">commands</span>,
-                <span class="kw-2">&amp;</span><span class="ident">owners</span>,
-                <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
-                <span class="kw-2">&amp;</span><span class="ident">sub_group</span>,
+                <span class="ident">sub_group</span>.<span class="ident">options</span>.<span class="ident">commands</span>,
+                <span class="ident">owners</span>,
+                <span class="ident">help_options</span>,
+                <span class="ident">sub_group</span>,
                 <span class="ident">highest_formatter</span>,
             )
             .<span class="kw">await</span>;
@@ -2444,7 +2434,7 @@
     <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
         <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">group</span>;
 
-        <span class="kw">let</span> <span class="ident">group_with_cmds</span> <span class="op">=</span> <span class="ident">create_single_group</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">group</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">group_with_cmds</span> <span class="op">=</span> <span class="ident">create_single_group</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">group</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">group_with_cmds</span>.<span class="ident">command_names</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">group_with_cmds</span>.<span class="ident">sub_groups</span>.<span class="ident">is_empty</span>() {
             <span class="ident">listed_groups</span>.<span class="ident">push</span>(<span class="ident">group_with_cmds</span>);
@@ -2465,11 +2455,11 @@
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GroupCommandsPair</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group_with_cmds</span> <span class="op">=</span> <span class="ident">fetch_all_eligible_commands_in_group</span>(
         <span class="ident">ctx</span>,
-        <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-        <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span>,
-        <span class="kw-2">&amp;</span><span class="ident">owners</span>,
-        <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
-        <span class="kw-2">&amp;</span><span class="ident">group</span>,
+        <span class="ident">msg</span>,
+        <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span>,
+        <span class="ident">owners</span>,
+        <span class="ident">help_options</span>,
+        <span class="ident">group</span>,
         <span class="ident">HelpBehaviour::Nothing</span>,
     )
     .<span class="kw">await</span>;
@@ -2491,7 +2481,7 @@
 <span class="kw">fn</span> <span class="ident">trim_prefixless_group</span>(<span class="ident">group_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">searched_group</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="ident">group_name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">searched_group</span>.<span class="ident">as_str</span>() {
         <span class="kw">return</span> <span class="bool-val">true</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="kw-2">&amp;</span><span class="ident">searched_group</span>, <span class="kw-2">&amp;</span><span class="ident">group_name</span>) {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="ident">searched_group</span>, <span class="ident">group_name</span>) {
         <span class="ident">searched_group</span>.<span class="ident">drain</span>(..<span class="op">=</span><span class="ident">group_name</span>.<span class="ident">len</span>());
         <span class="kw">return</span> <span class="bool-val">true</span>;
     }
@@ -2516,7 +2506,7 @@
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">progressed</span> <span class="op">=</span> <span class="ident">is_prefixless_group</span>;
         <span class="kw">let</span> <span class="ident">is_word_prefix</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">prefix</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="kw-2">&amp;</span><span class="ident">searched_named_lowercase</span>, <span class="kw-2">&amp;</span><span class="ident">prefix</span>) {
+            <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="ident">searched_named_lowercase</span>, <span class="ident">prefix</span>) {
                 <span class="ident">searched_named_lowercase</span>.<span class="ident">drain</span>(..<span class="op">=</span><span class="ident">prefix</span>.<span class="ident">len</span>());
                 <span class="ident">progressed</span> <span class="op">=</span> <span class="bool-val">true</span>;
             }
@@ -2525,7 +2515,7 @@
         });
 
         <span class="kw">if</span> <span class="ident">is_prefixless_group</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_word_prefix</span> {
-            <span class="kw">let</span> <span class="ident">single_group</span> <span class="op">=</span> <span class="ident">create_single_group</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>, <span class="ident">owners</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>).<span class="kw">await</span>;
+            <span class="kw">let</span> <span class="ident">single_group</span> <span class="op">=</span> <span class="ident">create_single_group</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">group</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">single_group</span>.<span class="ident">command_names</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">CustomisedHelpData::GroupedCommands</span> {
@@ -2576,7 +2566,7 @@
     <span class="kw">if</span> <span class="op">!</span><span class="ident">args</span>.<span class="ident">is_empty</span>() {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">message</span>();
 
-        <span class="kw">return</span> <span class="kw">match</span> <span class="ident">fetch_single_command</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>, <span class="ident">owners</span>).<span class="kw">await</span> {
+        <span class="kw">return</span> <span class="kw">match</span> <span class="ident">fetch_single_command</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">groups</span>, <span class="ident">name</span>, <span class="ident">help_options</span>, <span class="ident">owners</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">single_command</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">single_command</span>,
             <span class="prelude-val">Err</span>(<span class="ident">suggestions</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">searched_named_lowercase</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_lowercase</span>();
@@ -2598,7 +2588,7 @@
 
                 <span class="kw">if</span> <span class="ident">suggestions</span>.<span class="ident">is_empty</span>() {
                     <span class="ident">CustomisedHelpData::NoCommandFound</span> {
-                        <span class="ident">help_error_message</span>: <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">no_help_available_text</span>,
+                        <span class="ident">help_error_message</span>: <span class="ident">help_options</span>.<span class="ident">no_help_available_text</span>,
                     }
                 } <span class="kw">else</span> {
                     <span class="ident">CustomisedHelpData::SuggestedCommands</span> {
@@ -2623,12 +2613,12 @@
     };
 
     <span class="kw">let</span> <span class="ident">listed_groups</span> <span class="op">=</span>
-        <span class="ident">create_command_group_commands_pair_from_groups</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="ident">owners</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>)
+        <span class="ident">create_command_group_commands_pair_from_groups</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">groups</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>)
             .<span class="kw">await</span>;
 
     <span class="kw">if</span> <span class="ident">listed_groups</span>.<span class="ident">is_empty</span>() {
         <span class="ident">CustomisedHelpData::NoCommandFound</span> {
-            <span class="ident">help_error_message</span>: <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">no_help_available_text</span>,
+            <span class="ident">help_error_message</span>: <span class="ident">help_options</span>.<span class="ident">no_help_available_text</span>,
         }
     } <span class="kw">else</span> {
         <span class="ident">CustomisedHelpData::GroupedCommands</span> {
@@ -2688,12 +2678,7 @@
         <span class="kw">if</span> <span class="op">!</span>(<span class="ident">sub_group</span>.<span class="ident">command_names</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">sub_group</span>.<span class="ident">sub_groups</span>.<span class="ident">is_empty</span>()) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub_group_text</span> <span class="op">=</span> <span class="ident">String::default</span>();
 
-            <span class="ident">flatten_group_to_string</span>(
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub_group_text</span>,
-                <span class="kw-2">&amp;</span><span class="ident">sub_group</span>,
-                <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>,
-                <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
-            )<span class="question-mark">?</span>;
+            <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub_group_text</span>, <span class="ident">sub_group</span>, <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">help_options</span>)<span class="question-mark">?</span>;
 
             <span class="macro">write!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">sub_group_text</span>)<span class="question-mark">?</span>;
         }
@@ -2737,12 +2722,7 @@
     <span class="kw">for</span> <span class="ident">sub_group</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">sub_groups</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub_group_text</span> <span class="op">=</span> <span class="ident">String::default</span>();
 
-        <span class="ident">flatten_group_to_plain_string</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub_group_text</span>,
-            <span class="kw-2">&amp;</span><span class="ident">sub_group</span>,
-            <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>,
-            <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
-        );
+        <span class="ident">flatten_group_to_plain_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub_group_text</span>, <span class="ident">sub_group</span>, <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">help_options</span>);
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">sub_group_text</span>);
     }
@@ -2767,7 +2747,7 @@
     <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed_text</span> <span class="op">=</span> <span class="ident">String::default</span>();
 
-        <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed_text</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>)<span class="question-mark">?</span>;
+        <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed_text</span>, <span class="ident">group</span>, <span class="number">0</span>, <span class="ident">help_options</span>)<span class="question-mark">?</span>;
 
         <span class="ident">embed</span>.<span class="ident">field</span>(<span class="ident">group</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">embed_text</span>, <span class="bool-val">true</span>);
     }
@@ -2942,7 +2922,7 @@
     <span class="ident">owners</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">formatted_help</span> <span class="op">=</span>
-        <span class="ident">create_customised_help_data</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
+        <span class="ident">create_customised_help_data</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
     <span class="kw">let</span> <span class="ident">response_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">formatted_help</span> {
         <span class="ident">CustomisedHelpData::SuggestedCommands</span> {
@@ -2952,14 +2932,14 @@
             <span class="ident">send_suggestion_embed</span>(
                 <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>,
                 <span class="ident">msg</span>.<span class="ident">channel_id</span>,
-                <span class="kw-2">&amp;</span><span class="ident">help_description</span>,
-                <span class="kw-2">&amp;</span><span class="ident">suggestions</span>,
+                <span class="ident">help_description</span>,
+                <span class="ident">suggestions</span>,
                 <span class="ident">help_options</span>.<span class="ident">embed_error_colour</span>,
             )
             .<span class="kw">await</span>
         },
         <span class="ident">CustomisedHelpData::NoCommandFound</span> {
-            <span class="kw-2">ref</span> <span class="ident">help_error_message</span>,
+            <span class="ident">help_error_message</span>,
         } <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">send_error_embed</span>(
                 <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>,
@@ -2975,10 +2955,10 @@
         } <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">send_grouped_commands_embed</span>(
                 <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>,
-                <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
+                <span class="ident">help_options</span>,
                 <span class="ident">msg</span>.<span class="ident">channel_id</span>,
-                <span class="kw-2">&amp;</span><span class="ident">help_description</span>,
-                <span class="kw-2">&amp;</span><span class="ident">groups</span>,
+                <span class="ident">help_description</span>,
+                <span class="ident">groups</span>,
                 <span class="ident">help_options</span>.<span class="ident">embed_success_colour</span>,
             )
             .<span class="kw">await</span>
@@ -2988,9 +2968,9 @@
         } <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">send_single_command_embed</span>(
                 <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>,
-                <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
+                <span class="ident">help_options</span>,
                 <span class="ident">msg</span>.<span class="ident">channel_id</span>,
-                <span class="kw-2">&amp;</span><span class="ident">command</span>,
+                <span class="ident">command</span>,
                 <span class="ident">help_options</span>.<span class="ident">embed_success_colour</span>,
             )
             .<span class="kw">await</span>
@@ -3021,7 +3001,7 @@
     <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;\n**{}**&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">name</span>);
 
-        <span class="ident">flatten_group_to_plain_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>);
+        <span class="ident">flatten_group_to_plain_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="ident">group</span>, <span class="number">0</span>, <span class="ident">help_options</span>);
     }
 
     <span class="ident">result</span>
@@ -3142,7 +3122,7 @@
     <span class="ident">owners</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">formatted_help</span> <span class="op">=</span>
-        <span class="ident">create_customised_help_data</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
+        <span class="ident">create_customised_help_data</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">formatted_help</span> {
         <span class="ident">CustomisedHelpData::SuggestedCommands</span> {
@@ -3155,10 +3135,10 @@
         <span class="ident">CustomisedHelpData::GroupedCommands</span> {
             <span class="kw-2">ref</span> <span class="ident">help_description</span>,
             <span class="kw-2">ref</span> <span class="ident">groups</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">grouped_commands_to_plain_string</span>(<span class="kw-2">&amp;</span><span class="ident">help_options</span>, <span class="kw-2">&amp;</span><span class="ident">help_description</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>),
+        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">grouped_commands_to_plain_string</span>(<span class="ident">help_options</span>, <span class="ident">help_description</span>, <span class="ident">groups</span>),
         <span class="ident">CustomisedHelpData::SingleCommand</span> {
             <span class="kw-2">ref</span> <span class="ident">command</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">single_command_to_plain_string</span>(<span class="kw-2">&amp;</span><span class="ident">help_options</span>, <span class="kw-2">&amp;</span><span class="ident">command</span>),
+        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">single_command_to_plain_string</span>(<span class="ident">help_options</span>, <span class="ident">command</span>),
     };
 
     <span class="kw">match</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">result</span>).<span class="kw">await</span> {
@@ -3179,34 +3159,34 @@
     <span class="kw">fn</span> <span class="ident">reflexive</span>() {
         <span class="kw">let</span> <span class="ident">word_a</span> <span class="op">=</span> <span class="string">&quot;rusty ferris&quot;</span>;
         <span class="kw">let</span> <span class="ident">word_b</span> <span class="op">=</span> <span class="string">&quot;rusty ferris&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_b</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_b</span>));
 
         <span class="kw">let</span> <span class="ident">word_a</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>;
         <span class="kw">let</span> <span class="ident">word_b</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_b</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_b</span>));
 
         <span class="kw">let</span> <span class="ident">word_a</span> <span class="op">=</span> <span class="string">&quot;rusty ferris&quot;</span>;
         <span class="kw">let</span> <span class="ident">word_b</span> <span class="op">=</span> <span class="string">&quot;RuSty FerriS&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">4</span>, <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_b</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">4</span>, <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_b</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">symmetric</span>() {
         <span class="kw">let</span> <span class="ident">word_a</span> <span class="op">=</span> <span class="string">&quot;ferris&quot;</span>;
         <span class="kw">let</span> <span class="ident">word_b</span> <span class="op">=</span> <span class="string">&quot;rusty ferris&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_b</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_b</span>));
 
         <span class="kw">let</span> <span class="ident">word_a</span> <span class="op">=</span> <span class="string">&quot;rusty ferris&quot;</span>;
         <span class="kw">let</span> <span class="ident">word_b</span> <span class="op">=</span> <span class="string">&quot;ferris&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_b</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_b</span>));
 
         <span class="kw">let</span> <span class="ident">word_a</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>;
         <span class="kw">let</span> <span class="ident">word_b</span> <span class="op">=</span> <span class="string">&quot;ferris&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_b</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_b</span>));
 
         <span class="kw">let</span> <span class="ident">word_a</span> <span class="op">=</span> <span class="string">&quot;ferris&quot;</span>;
         <span class="kw">let</span> <span class="ident">word_b</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_b</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">6</span>, <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_b</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -3215,9 +3195,9 @@
         <span class="kw">let</span> <span class="ident">word_b</span> <span class="op">=</span> <span class="string">&quot;turbo fish&quot;</span>;
         <span class="kw">let</span> <span class="ident">word_c</span> <span class="op">=</span> <span class="string">&quot;unsafe&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">distance_of_a_c</span> <span class="op">=</span> <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_c</span>);
-        <span class="kw">let</span> <span class="ident">distance_of_a_b</span> <span class="op">=</span> <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_a</span>, <span class="kw-2">&amp;</span><span class="ident">word_b</span>);
-        <span class="kw">let</span> <span class="ident">distance_of_b_c</span> <span class="op">=</span> <span class="ident">levenshtein_distance</span>(<span class="kw-2">&amp;</span><span class="ident">word_b</span>, <span class="kw-2">&amp;</span><span class="ident">word_c</span>);
+        <span class="kw">let</span> <span class="ident">distance_of_a_c</span> <span class="op">=</span> <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_c</span>);
+        <span class="kw">let</span> <span class="ident">distance_of_a_b</span> <span class="op">=</span> <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>, <span class="ident">word_b</span>);
+        <span class="kw">let</span> <span class="ident">distance_of_b_c</span> <span class="op">=</span> <span class="ident">levenshtein_distance</span>(<span class="ident">word_b</span>, <span class="ident">word_c</span>);
 
         <span class="macro">assert!</span>(<span class="ident">distance_of_a_c</span> <span class="op">&lt;</span><span class="op">=</span> (<span class="ident">distance_of_a_b</span> <span class="op">+</span> <span class="ident">distance_of_b_c</span>));
     }

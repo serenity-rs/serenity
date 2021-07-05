@@ -1074,7 +1074,7 @@
         <span class="kw">for</span> <span class="ident">delim</span> <span class="kw">in</span> <span class="ident">delims</span> {
             <span class="ident">end</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">offset</span>();
 
-            <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">eat</span>(<span class="kw-2">&amp;</span><span class="ident">delim</span>) {
+            <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">eat</span>(<span class="ident">delim</span>) {
                 <span class="kw">break</span> <span class="lifetime">&#39;outer</span>;
             }
         }

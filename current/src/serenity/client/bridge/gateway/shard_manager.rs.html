@@ -488,7 +488,7 @@
             <span class="ident">event_handler</span>: <span class="ident">opt</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">Arc::clone</span>(<span class="ident">h</span>)),
             <span class="ident">raw_event_handler</span>: <span class="ident">opt</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">rh</span><span class="op">|</span> <span class="ident">Arc::clone</span>(<span class="ident">rh</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-            <span class="ident">framework</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">opt</span>.<span class="ident">framework</span>),
+            <span class="ident">framework</span>: <span class="ident">Arc::clone</span>(<span class="ident">opt</span>.<span class="ident">framework</span>),
             <span class="ident">last_start</span>: <span class="prelude-val">None</span>,
             <span class="ident">manager_tx</span>: <span class="ident">thread_tx</span>.<span class="ident">clone</span>(),
             <span class="ident">queue</span>: <span class="ident">VecDeque::new</span>(),
@@ -497,7 +497,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
             <span class="ident">voice_manager</span>: <span class="ident">opt</span>.<span class="ident">voice_manager</span>.<span class="ident">clone</span>(),
             <span class="ident">ws_url</span>: <span class="ident">Arc::clone</span>(<span class="ident">opt</span>.<span class="ident">ws_url</span>),
-            <span class="ident">cache_and_http</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">opt</span>.<span class="ident">cache_and_http</span>),
+            <span class="ident">cache_and_http</span>: <span class="ident">Arc::clone</span>(<span class="ident">opt</span>.<span class="ident">cache_and_http</span>),
             <span class="ident">intents</span>: <span class="ident">opt</span>.<span class="ident">intents</span>,
         };
 

@@ -826,8 +826,6 @@
 <span id="826">826</span>
 <span id="827">827</span>
 <span id="828">828</span>
-<span id="829">829</span>
-<span id="830">830</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync::Arc</span>,
@@ -1373,9 +1371,7 @@
                 }))
             },
             <span class="prelude-val">Ok</span>(<span class="ident">GatewayEvent::Reconnect</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardAction::Reconnect</span>(<span class="ident">ReconnectType::Resume</span>))),
-            <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::Closed</span>(<span class="kw-2">ref</span> <span class="ident">data</span>))) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">handle_gateway_closed</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>)
-            },
+            <span class="prelude-val">Err</span>(<span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::Closed</span>(<span class="kw-2">ref</span> <span class="ident">data</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">handle_gateway_closed</span>(<span class="ident">data</span>),
             <span class="prelude-val">Err</span>(<span class="ident">Error::Tungstenite</span>(<span class="kw-2">ref</span> <span class="ident">why</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Websocket error: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>, <span class="ident">why</span>);
                 <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Will attempt to auto-reconnect&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
@@ -1591,7 +1587,7 @@
         <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connecting</span>;
         <span class="self">self</span>.<span class="ident">started</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Handshake</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">client</span>)

@@ -645,7 +645,7 @@
 
         <span class="ident">options</span>.<span class="ident">resolved</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">options</span>.<span class="ident">kind</span> {
             <span class="ident">ApplicationCommandOptionType::User</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="kw-2">*</span><span class="kw-2">&amp;</span><span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span>(<span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>());
 
                 <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
                 <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">to_owned</span>());
@@ -653,14 +653,14 @@
                 <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::User</span>(<span class="ident">user</span>, <span class="ident">member</span>))
             },
             <span class="ident">ApplicationCommandOptionType::Role</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="kw-2">*</span><span class="kw-2">&amp;</span><span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>());
 
                 <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
 
                 <span class="prelude-val">Some</span>(<span class="ident">ApplicationCommandInteractionDataOptionValue::Role</span>(<span class="ident">role</span>))
             },
             <span class="ident">ApplicationCommandOptionType::Channel</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ChannelId</span>(<span class="kw-2">*</span><span class="kw-2">&amp;</span><span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>());
+                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ChannelId</span>(<span class="ident">string</span>.<span class="ident">unwrap</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>());
 
                 <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
 

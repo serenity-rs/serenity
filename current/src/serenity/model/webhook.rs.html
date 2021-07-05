@@ -556,7 +556,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the webhook in-place. All fields are optional.</span>
@@ -744,7 +744,7 @@
                 .<span class="ident">execute_webhook_with_files</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>, <span class="ident">wait</span>, <span class="ident">execute_webhook</span>.<span class="number">1</span>.<span class="ident">clone</span>(), <span class="ident">map</span>)
                 .<span class="kw">await</span>
         } <span class="kw">else</span> {
-            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">execute_webhook</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">token</span>, <span class="ident">wait</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">execute_webhook</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>, <span class="ident">wait</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
         }
     }
 
