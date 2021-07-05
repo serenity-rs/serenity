@@ -98,7 +98,7 @@ impl CreateActionRow {
     }
 
     pub fn build(&mut self) -> Value {
-        self.0.insert("type", Value::Number(serde_json::Number::from(1 as u8)));
+        self.0.insert("type", Value::Number(serde_json::Number::from(1_u8)));
 
         utils::hashmap_to_json_map(self.0.clone()).into()
     }
@@ -168,7 +168,7 @@ impl CreateButton {
     }
 
     pub fn build(mut self) -> Value {
-        self.0.insert("type", Value::Number(serde_json::Number::from(2 as u8)));
+        self.0.insert("type", Value::Number(serde_json::Number::from(2_u8)));
 
         utils::hashmap_to_json_map(self.0.clone()).into()
     }
@@ -218,7 +218,7 @@ impl CreateSelectMenu {
     }
 
     pub fn build(mut self) -> Value {
-        self.0.insert("type", Value::Number(serde_json::Number::from(3 as u8)));
+        self.0.insert("type", Value::Number(serde_json::Number::from(3_u8)));
 
         utils::hashmap_to_json_map(self.0.clone()).into()
     }

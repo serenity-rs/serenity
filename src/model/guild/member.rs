@@ -254,7 +254,7 @@ impl Member {
         let mut highest = None;
 
         for role_id in &self.roles {
-            if let Some(role) = guild_roles.get(&role_id) {
+            if let Some(role) = guild_roles.get(role_id) {
                 // Skip this role if this role in iteration has:
                 //
                 // - a position less than the recorded highest

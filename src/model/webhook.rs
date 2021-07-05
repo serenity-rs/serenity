@@ -120,7 +120,7 @@ impl Webhook {
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-        http.as_ref().delete_webhook_with_token(self.id.0, &token).await
+        http.as_ref().delete_webhook_with_token(self.id.0, token).await
     }
 
     /// Edits the webhook in-place. All fields are optional.
@@ -308,7 +308,7 @@ impl Webhook {
                 .execute_webhook_with_files(self.id.0, token, wait, execute_webhook.1.clone(), map)
                 .await
         } else {
-            http.as_ref().execute_webhook(self.id.0, &token, wait, &map).await
+            http.as_ref().execute_webhook(self.id.0, token, wait, &map).await
         }
     }
 

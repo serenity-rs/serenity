@@ -21,7 +21,7 @@ fn deserialize_identify_json() {
       "op": 0
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let ident = Identify {
         session_id: "my_session_id".into(),
@@ -50,7 +50,7 @@ fn deserialize_select_protocol_json() {
         }
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let proto = SelectProtocol {
         protocol: "udp".into(),
@@ -82,7 +82,7 @@ fn deserialize_ready_json() {
 
     // NOTE: we *need* to discard the interval here, as using it is an API footgun.
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let ready = Ready {
         ssrc: 1,
@@ -108,7 +108,7 @@ fn deserialize_heartbeat_json() {
       "d": 1501184119561
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let hb = Heartbeat {
         nonce: 1501184119561,
@@ -129,7 +129,7 @@ fn deserialize_session_description_json() {
             "secret_key": [251, 100, 11]
         }
     }"#;
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let sd = SessionDescription {
         mode: "xsalsa20_poly1305_lite".into(),
@@ -152,7 +152,7 @@ fn deserialize_speaking_json() {
             "ssrc": 1
         }
     }"#;
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let speak = Speaking {
         speaking: SpeakingState::PRIORITY | SpeakingState::MICROPHONE,
@@ -174,7 +174,7 @@ fn deserialize_heartbeat_ack_json() {
       "d": 1501184119561
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let hb = HeartbeatAck {
         nonce: 1501184119561,
@@ -197,7 +197,7 @@ fn deserialize_resume_json() {
       }
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let resume = Resume {
         server_id: GuildId(41771983423143937),
@@ -220,7 +220,7 @@ fn deserialize_hello_json() {
       }
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let hello = Hello {
         heartbeat_interval: 41250.0,
@@ -240,7 +240,7 @@ fn deserialize_resumed_json() {
       "d": null
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     assert!(match event {
         Ok(Event::Resumed) => true,
@@ -259,7 +259,7 @@ fn deserialize_client_connect_json() {
       }
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let conn = ClientConnect {
         audio_ssrc: 5678,
@@ -282,7 +282,7 @@ fn deserialize_client_disconnect_json() {
       }
     }"#;
 
-    let event = serde_json::from_str(&json_data);
+    let event = serde_json::from_str(json_data);
 
     let conn = ClientDisconnect {
         user_id: UserId(1234),

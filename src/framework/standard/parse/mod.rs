@@ -202,7 +202,7 @@ async fn find_prefix<'a>(
         }
     }
 
-    config.prefixes.iter().find_map(|p| try_match(&p))
+    config.prefixes.iter().find_map(|p| try_match(p))
 }
 
 /// Parse a prefix in the message.

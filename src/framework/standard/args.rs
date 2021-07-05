@@ -138,7 +138,7 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
         for delim in delims {
             end = stream.offset();
 
-            if stream.eat(&delim) {
+            if stream.eat(delim) {
                 break 'outer;
             }
         }

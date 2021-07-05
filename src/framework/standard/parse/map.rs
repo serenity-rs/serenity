@@ -30,7 +30,7 @@ impl CommandMap {
         let mut map = Self::default();
 
         for cmd in cmds {
-            let sub_map = Arc::new(Self::new(&cmd.options.sub_commands, conf));
+            let sub_map = Arc::new(Self::new(cmd.options.sub_commands, conf));
 
             for name in cmd.options.names {
                 let len = name.chars().count();
@@ -84,8 +84,8 @@ impl GroupMap {
         let mut map = Self::default();
 
         for group in groups {
-            let subgroups_map = Arc::new(Self::new(&group.options.sub_groups, conf));
-            let commands_map = Arc::new(CommandMap::new(&group.options.commands, conf));
+            let subgroups_map = Arc::new(Self::new(group.options.sub_groups, conf));
+            let commands_map = Arc::new(CommandMap::new(group.options.commands, conf));
 
             for prefix in group.options.prefixes {
                 let len = prefix.chars().count();

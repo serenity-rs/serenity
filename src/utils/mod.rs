@@ -565,7 +565,7 @@ async fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
                 *s = if let Some(role) = id.to_role_cached(&cache).await {
                     s.replace(&to_replace, &format!("@{}", &role.name))
                 } else {
-                    s.replace(&to_replace, &"@deleted-role")
+                    s.replace(&to_replace, "@deleted-role")
                 };
             } else {
                 let id = &s[mention_start..mention_end].to_string();
@@ -573,7 +573,7 @@ async fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
                 if !id.is_empty() && id.as_bytes().iter().all(u8::is_ascii_digit) {
                     let to_replace = format!("<@&{}>", id);
 
-                    *s = s.replace(&to_replace, &"@deleted-role");
+                    *s = s.replace(&to_replace, "@deleted-role");
                 } else {
                     progress = mention_end;
                 }
@@ -603,7 +603,7 @@ async fn clean_channels(cache: &impl AsRef<Cache>, s: &mut String) {
                     let replacement = format!("#{}", &channel.name);
                     s.replace(&to_replace, &replacement)
                 } else {
-                    s.replace(&to_replace, &"#deleted-channel")
+                    s.replace(&to_replace, "#deleted-channel")
                 };
             } else {
                 let id = &s[mention_start..mention_end].to_string();
@@ -611,7 +611,7 @@ async fn clean_channels(cache: &impl AsRef<Cache>, s: &mut String) {
                 if !id.is_empty() && id.as_bytes().iter().all(u8::is_ascii_digit) {
                     let to_replace = format!("<#{}>", id);
 
-                    *s = s.replace(&to_replace, &"#deleted-channel");
+                    *s = s.replace(&to_replace, "#deleted-channel");
                 } else {
                     progress = mention_end;
                 }
@@ -685,7 +685,7 @@ async fn clean_users(
                     let code_start = if has_exclamation { "<@!" } else { "<@" };
                     let to_replace = format!("{}{}>", code_start, id);
 
-                    *s = s.replace(&to_replace, &"@invalid-user");
+                    *s = s.replace(&to_replace, "@invalid-user");
                 } else {
                     progress = mention_end;
                 }
