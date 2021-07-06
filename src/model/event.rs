@@ -1,5 +1,6 @@
 //! All the events this library handles.
 
+use std::convert::TryFrom;
 #[cfg(feature = "cache")]
 use std::mem;
 use std::{collections::HashMap, fmt};
@@ -1964,6 +1965,327 @@ impl Event {
             Self::ThreadMemberUpdate(_) => EventType::ThreadMemberUpdate,
             Self::ThreadMembersUpdate(_) => EventType::ThreadMembersUpdate,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
+        }
+    }
+
+    /// User ID(s) related to this event.
+    pub fn user_id(&self) -> RelatedId<UserId> {
+        use RelatedId::*;
+        match self {
+            Event::ChannelCreate(_)
+            | Event::ChannelDelete(_)
+            | Event::ChannelPinsUpdate(_)
+            | Event::ChannelUpdate(_)
+            | Event::GuildCreate(_)
+            | Event::GuildDelete(_)
+            | Event::GuildEmojisUpdate(_)
+            | Event::GuildIntegrationsUpdate(_)
+            | Event::GuildRoleCreate(_)
+            | Event::GuildRoleDelete(_)
+            | Event::GuildRoleUpdate(_)
+            | Event::GuildUnavailable(_)
+            | Event::GuildUpdate(_)
+            | Event::InviteDelete(_)
+            | Event::MessageDelete(_)
+            | Event::MessageDeleteBulk(_)
+            | Event::ReactionRemoveAll(_)
+            | Event::StageInstanceCreate(_)
+            | Event::StageInstanceUpdate(_)
+            | Event::StageInstanceDelete(_)
+            | Event::ThreadCreate(_)
+            | Event::ThreadUpdate(_)
+            | Event::ThreadDelete(_)
+            | Event::ThreadListSync(_)
+            | Event::Ready(_)
+            | Event::Resumed(_)
+            | Event::Unknown(_)
+            | Event::VoiceServerUpdate(_)
+            | Event::WebhookUpdate(_) => Never,
+            Event::GuildBanAdd(e) => Some(e.user.id),
+            Event::GuildBanRemove(e) => Some(e.user.id),
+            Event::GuildMemberAdd(e) => Some(e.member.user.id),
+            Event::GuildMemberRemove(e) => Some(e.user.id),
+            Event::GuildMemberUpdate(e) => Some(e.user.id),
+            Event::GuildMembersChunk(e) => Multiple(e.members.keys().copied().collect()),
+            Event::InviteCreate(e) => e.inviter.as_ref().map(|u| u.id).into(),
+            Event::MessageCreate(e) => Some(e.message.author.id),
+            Event::MessageUpdate(e) => e.author.as_ref().map(|u| u.id).into(),
+            Event::PresenceUpdate(e) => Some(e.presence.user_id),
+            Event::PresencesReplace(e) => Multiple(e.presences.iter().map(|p| p.user_id).collect()),
+            Event::ReactionAdd(e) => e.reaction.user_id.into(),
+            Event::ReactionRemove(e) => e.reaction.user_id.into(),
+            Event::TypingStart(e) => Some(e.user_id),
+            Event::UserUpdate(e) => Some(e.current_user.id),
+            Event::VoiceStateUpdate(e) => Some(e.voice_state.user_id),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::InteractionCreate(e) => match &e.interaction {
+                Interaction::Ping(_) => None,
+                Interaction::ApplicationCommand(i) => Some(i.user.id),
+                Interaction::MessageComponent(i) => Some(i.user.id),
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Event::IntegrationCreate(e) => e.integration.user.as_ref().map(|u| u.id).into(),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::IntegrationUpdate(e) => e.integration.user.as_ref().map(|u| u.id).into(),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::IntegrationDelete(_) => Never,
+            #[cfg(feature = "unstable_discord_api")]
+            Event::ApplicationCommandCreate(_)
+            | Event::ApplicationCommandUpdate(_)
+            | Event::ApplicationCommandDelete(_) => Never,
+            Event::ThreadMemberUpdate(e) => e.member.user_id.into(),
+            Event::ThreadMembersUpdate(e) => Multiple(
+                e.added_members
+                    .iter()
+                    .filter_map(|m| m.user_id.as_ref())
+                    .chain(e.removed_members_ids.iter())
+                    .copied()
+                    .collect(),
+            ),
+        }
+    }
+
+    /// Guild ID related to this event.
+    pub fn guild_id(&self) -> RelatedId<GuildId> {
+        use RelatedId::*;
+        let gid_from_channel = |c: &Channel| match c {
+            Channel::Guild(g) => Some(g.guild_id),
+            _ => None,
+        };
+        match self {
+            Event::PresencesReplace(_)
+            | Event::Ready(_)
+            | Event::Resumed(_)
+            | Event::ThreadMemberUpdate(_)
+            | Event::UserUpdate(_)
+            | Event::Unknown(_) => Never,
+            Event::ChannelCreate(e) => gid_from_channel(&e.channel),
+            Event::ChannelDelete(e) => gid_from_channel(&e.channel),
+            Event::ChannelPinsUpdate(e) => e.guild_id.into(),
+            Event::ChannelUpdate(e) => gid_from_channel(&e.channel),
+            Event::GuildBanAdd(e) => Some(e.guild_id),
+            Event::GuildBanRemove(e) => Some(e.guild_id),
+            Event::GuildCreate(e) => Some(e.guild.id),
+            Event::GuildDelete(e) => Some(e.guild.id),
+            Event::GuildEmojisUpdate(e) => Some(e.guild_id),
+            Event::GuildIntegrationsUpdate(e) => Some(e.guild_id),
+            Event::GuildMemberAdd(e) => Some(e.guild_id),
+            Event::GuildMemberRemove(e) => Some(e.guild_id),
+            Event::GuildMemberUpdate(e) => Some(e.guild_id),
+            Event::GuildMembersChunk(e) => Some(e.guild_id),
+            Event::GuildRoleCreate(e) => Some(e.guild_id),
+            Event::GuildRoleDelete(e) => Some(e.guild_id),
+            Event::GuildRoleUpdate(e) => Some(e.guild_id),
+            Event::GuildUnavailable(e) => Some(e.guild_id),
+            Event::GuildUpdate(e) => Some(e.guild.id),
+            Event::InviteCreate(e) => e.guild_id.into(),
+            Event::InviteDelete(e) => e.guild_id.into(),
+            Event::MessageCreate(e) => e.message.guild_id.into(),
+            Event::MessageDelete(e) => e.guild_id.into(),
+            Event::MessageDeleteBulk(e) => e.guild_id.into(),
+            Event::MessageUpdate(e) => e.guild_id.into(),
+            Event::PresenceUpdate(e) => e.guild_id.into(),
+            Event::ReactionAdd(e) => e.reaction.guild_id.into(),
+            Event::ReactionRemove(e) => e.reaction.guild_id.into(),
+            Event::ReactionRemoveAll(e) => e.guild_id.into(),
+            Event::TypingStart(e) => e.guild_id.into(),
+            Event::VoiceStateUpdate(e) => e.guild_id.into(),
+            Event::VoiceServerUpdate(e) => e.guild_id.into(),
+            Event::WebhookUpdate(e) => Some(e.guild_id),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::InteractionCreate(e) => match &e.interaction {
+                Interaction::Ping(_) => None,
+                Interaction::ApplicationCommand(i) => i.guild_id.into(),
+                Interaction::MessageComponent(i) => i.guild_id.into(),
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Event::IntegrationCreate(e) => Some(e.integration.guild_id),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::IntegrationUpdate(e) => Some(e.integration.guild_id),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::IntegrationDelete(e) => Some(e.guild_id),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::ApplicationCommandCreate(e) => e.application_command.guild_id.into(),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::ApplicationCommandUpdate(e) => e.application_command.guild_id.into(),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::ApplicationCommandDelete(e) => e.application_command.guild_id.into(),
+            Event::StageInstanceCreate(e) => Some(e.stage_instance.guild_id),
+            Event::StageInstanceUpdate(e) => Some(e.stage_instance.guild_id),
+            Event::StageInstanceDelete(e) => Some(e.stage_instance.guild_id),
+            Event::ThreadCreate(e) => Some(e.thread.guild_id),
+            Event::ThreadUpdate(e) => Some(e.thread.guild_id),
+            Event::ThreadDelete(e) => Some(e.thread.guild_id),
+            Event::ThreadListSync(e) => Some(e.guild_id),
+            Event::ThreadMembersUpdate(e) => Some(e.guild_id),
+        }
+    }
+
+    /// Channel ID related to this event.
+    pub fn channel_id(&self) -> RelatedId<ChannelId> {
+        use RelatedId::*;
+        match self {
+            Event::GuildBanAdd(_)
+            | Event::GuildBanRemove(_)
+            | Event::GuildCreate(_)
+            | Event::GuildDelete(_)
+            | Event::GuildEmojisUpdate(_)
+            | Event::GuildIntegrationsUpdate(_)
+            | Event::GuildMemberAdd(_)
+            | Event::GuildMemberRemove(_)
+            | Event::GuildMemberUpdate(_)
+            | Event::GuildMembersChunk(_)
+            | Event::GuildRoleCreate(_)
+            | Event::GuildRoleDelete(_)
+            | Event::GuildRoleUpdate(_)
+            | Event::GuildUnavailable(_)
+            | Event::GuildUpdate(_)
+            | Event::PresenceUpdate(_)
+            | Event::PresencesReplace(_)
+            | Event::Ready(_)
+            | Event::Resumed(_)
+            | Event::UserUpdate(_)
+            | Event::VoiceStateUpdate(_)
+            | Event::Unknown(_) => Never,
+            Event::ChannelCreate(e) => Some(e.channel.id()),
+            Event::ChannelDelete(e) => Some(e.channel.id()),
+            Event::ChannelPinsUpdate(e) => Some(e.channel_id),
+            Event::ChannelUpdate(e) => Some(e.channel.id()),
+            Event::InviteCreate(e) => Some(e.channel_id),
+            Event::InviteDelete(e) => Some(e.channel_id),
+            Event::MessageCreate(e) => Some(e.message.channel_id),
+            Event::MessageDelete(e) => Some(e.channel_id),
+            Event::MessageDeleteBulk(e) => Some(e.channel_id),
+            Event::MessageUpdate(e) => Some(e.channel_id),
+            Event::ReactionAdd(e) => Some(e.reaction.channel_id),
+            Event::ReactionRemove(e) => Some(e.reaction.channel_id),
+            Event::ReactionRemoveAll(e) => Some(e.channel_id),
+            Event::TypingStart(e) => Some(e.channel_id),
+            Event::VoiceServerUpdate(e) => e.channel_id.into(),
+            Event::WebhookUpdate(e) => Some(e.channel_id),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::InteractionCreate(e) => match &e.interaction {
+                Interaction::Ping(_) => None,
+                Interaction::ApplicationCommand(i) => Some(i.channel_id),
+                Interaction::MessageComponent(i) => Some(i.channel_id),
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Event::IntegrationCreate(_)
+            | Event::IntegrationUpdate(_)
+            | Event::IntegrationDelete(_)
+            | Event::ApplicationCommandCreate(_)
+            | Event::ApplicationCommandUpdate(_)
+            | Event::ApplicationCommandDelete(_) => Never,
+            Event::StageInstanceCreate(e) => Some(e.stage_instance.channel_id),
+            Event::StageInstanceUpdate(e) => Some(e.stage_instance.channel_id),
+            Event::StageInstanceDelete(e) => Some(e.stage_instance.channel_id),
+            Event::ThreadCreate(e) => Some(e.thread.id),
+            Event::ThreadUpdate(e) => Some(e.thread.id),
+            Event::ThreadDelete(e) => Some(e.thread.id),
+            Event::ThreadListSync(e) => Multiple(e.threads.iter().map(|c| c.id).collect()),
+            Event::ThreadMemberUpdate(e) => e.member.id.into(),
+            Event::ThreadMembersUpdate(e) => Some(e.id),
+        }
+    }
+
+    /// Message ID related to this event.
+    pub fn message_id(&self) -> RelatedId<MessageId> {
+        use RelatedId::*;
+        match self {
+            Event::ChannelCreate(_)
+            | Event::ChannelDelete(_)
+            | Event::ChannelPinsUpdate(_)
+            | Event::ChannelUpdate(_)
+            | Event::GuildBanAdd(_)
+            | Event::GuildBanRemove(_)
+            | Event::GuildCreate(_)
+            | Event::GuildDelete(_)
+            | Event::GuildEmojisUpdate(_)
+            | Event::GuildIntegrationsUpdate(_)
+            | Event::GuildMemberAdd(_)
+            | Event::GuildMemberRemove(_)
+            | Event::GuildMemberUpdate(_)
+            | Event::GuildMembersChunk(_)
+            | Event::GuildRoleCreate(_)
+            | Event::GuildRoleDelete(_)
+            | Event::GuildRoleUpdate(_)
+            | Event::GuildUnavailable(_)
+            | Event::GuildUpdate(_)
+            | Event::InviteCreate(_)
+            | Event::InviteDelete(_)
+            | Event::PresenceUpdate(_)
+            | Event::PresencesReplace(_)
+            | Event::Ready(_)
+            | Event::Resumed(_)
+            | Event::StageInstanceCreate(_)
+            | Event::StageInstanceUpdate(_)
+            | Event::StageInstanceDelete(_)
+            | Event::ThreadCreate(_)
+            | Event::ThreadUpdate(_)
+            | Event::ThreadDelete(_)
+            | Event::ThreadListSync(_)
+            | Event::ThreadMemberUpdate(_)
+            | Event::ThreadMembersUpdate(_)
+            | Event::TypingStart(_)
+            | Event::UserUpdate(_)
+            | Event::VoiceServerUpdate(_)
+            | Event::VoiceStateUpdate(_)
+            | Event::WebhookUpdate(_)
+            | Event::Unknown(_) => Never,
+            Event::MessageCreate(e) => Some(e.message.id),
+            Event::MessageDelete(e) => Some(e.message_id),
+            Event::MessageDeleteBulk(e) => Multiple(e.ids.clone()),
+            Event::MessageUpdate(e) => Some(e.id),
+            Event::ReactionAdd(e) => Some(e.reaction.message_id),
+            Event::ReactionRemove(e) => Some(e.reaction.message_id),
+            Event::ReactionRemoveAll(e) => Some(e.message_id),
+            #[cfg(feature = "unstable_discord_api")]
+            Event::InteractionCreate(e) => match &e.interaction {
+                Interaction::Ping(_) => None,
+                Interaction::ApplicationCommand(_) => None,
+                Interaction::MessageComponent(i) => Some(i.message.id()),
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Event::IntegrationCreate(_)
+            | Event::IntegrationUpdate(_)
+            | Event::IntegrationDelete(_)
+            | Event::ApplicationCommandCreate(_)
+            | Event::ApplicationCommandUpdate(_)
+            | Event::ApplicationCommandDelete(_) => Never,
+        }
+    }
+}
+
+/// Similar to [`Option`], but with additional variants relevant to [`Event`]'s id methods (such as
+/// [`Event::user_id`]).
+pub enum RelatedId<T> {
+    /// This event type will never have this kind of related ID
+    Never,
+    /// This particular event has no related ID of this type, but other events of this type may.
+    None,
+    /// A single related ID
+    Some(T),
+    /// Multiple related IDs
+    Multiple(Vec<T>),
+}
+
+impl<T> From<Option<T>> for RelatedId<T> {
+    fn from(value: Option<T>) -> Self {
+        match value {
+            None => RelatedId::None,
+            Some(t) => RelatedId::Some(t),
+        }
+    }
+}
+
+impl<T> TryFrom<RelatedId<T>> for Option<T> {
+    type Error = Vec<T>;
+
+    fn try_from(value: RelatedId<T>) -> StdResult<Self, Self::Error> {
+        match value {
+            RelatedId::Never | RelatedId::None => Ok(None),
+            RelatedId::Some(t) => Ok(Some(t)),
+            RelatedId::Multiple(t) => Err(t),
         }
     }
 }
