@@ -25,6 +25,7 @@ use crate::{
         event::{Event, EventType},
         id::{ChannelId, GuildId, MessageId, UserId},
     },
+    Result,
 };
 
 /// Filters events on the shard's end and sends them to the collector.
@@ -38,7 +39,9 @@ pub struct EventFilter {
 
 impl EventFilter {
     /// Creates a new filter
-    fn new(options: FilterOptions) -> (Self, Receiver<Arc<Event>>) {
+    fn new(options: FilterOptions) -> Result<(Self, Receiver<Arc<Event>>)> {
+        Self::validate_options(&options)?;
+
         let (sender, receiver) = unbounded_channel();
 
         let filter = Self {
@@ -48,7 +51,13 @@ impl EventFilter {
             options,
         };
 
-        (filter, receiver)
+        Ok((filter, receiver))
+    }
+
+    fn validate_options(options: &FilterOptions) -> Result<()> {
+        // TODO: Check whether the filter will never match any events based on the event types and
+        // possible related IDs.
+        Ok(())
     }
 
     /// Sends a `event` to the consuming collector if the `event` conforms
@@ -136,7 +145,7 @@ pub struct EventCollectorBuilder<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, EventCollector>>,
+    fut: Option<BoxFuture<'a, Result<EventCollector>>>,
 }
 
 impl<'a> EventCollectorBuilder<'a> {
@@ -241,23 +250,24 @@ impl<'a> EventCollectorBuilder<'a> {
 }
 
 impl<'a> Future for EventCollectorBuilder<'a> {
-    // TODO: Check whether the filter will never match any events based on the event types and
-    // possible related IDs and switch to Result<EventCollector>.
-    type Output = EventCollector;
+    type Output = Result<EventCollector>;
     #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = EventFilter::new(self.filter.take().unwrap());
+            let (filter, receiver) = match EventFilter::new(self.filter.take().unwrap()) {
+                Ok(ret) => ret,
+                Err(err) => return Poll::Ready(Err(err)),
+            };
             let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
                 shard_messenger.set_event_filter(filter);
 
-                EventCollector {
+                Ok(EventCollector {
                     receiver: Box::pin(receiver),
                     timeout,
-                }
+                })
             }))
         }
 

@@ -178,7 +178,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         })
         .collect_limit(5)
         .timeout(Duration::from_secs(20));
-    let collector = collected.iter().fold(builder, |b, msg| b.add_message_id(msg.id)).await;
+    let collector = collected.iter().fold(builder, |b, msg| b.add_message_id(msg.id)).await?;
 
     let _ = msg.reply(ctx, "Edit each of those 5 messages in 20 seconds").await;
     let edited: Vec<_> = collector.collect().await;

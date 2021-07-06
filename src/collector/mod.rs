@@ -1,13 +1,17 @@
 //! Collectors will receive events from the contextual shard, check if the
 //! filter lets them pass, and collects if the receive, collect, or time limits
 //! are not reached yet.
+
+use std::sync::Arc;
+
+mod error;
+pub use error::Error as CollectorError;
+
 #[cfg(feature = "unstable_discord_api")]
 pub mod component_interaction_collector;
 pub mod event_collector;
 pub mod message_collector;
 pub mod reaction_collector;
-
-use std::sync::Arc;
 
 #[cfg(feature = "unstable_discord_api")]
 pub use component_interaction_collector::*;
