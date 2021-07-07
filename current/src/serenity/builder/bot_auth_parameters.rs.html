@@ -121,7 +121,7 @@
         <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>();
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">client_id</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">valid_data</span>.<span class="ident">push</span>((<span class="string">&quot;cliend_id&quot;</span>, <span class="self">self</span>.<span class="ident">client_id</span>.<span class="number">0</span>.<span class="ident">to_string</span>()));
+            <span class="ident">valid_data</span>.<span class="ident">push</span>((<span class="string">&quot;client_id&quot;</span>, <span class="self">self</span>.<span class="ident">client_id</span>.<span class="number">0</span>.<span class="ident">to_string</span>()));
         }
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">scopes</span>.<span class="ident">is_empty</span>() {
