@@ -96,38 +96,6 @@ jobs:
         if: matrix.toolchain == 'nightly'
         run: cargo clean; cargo update -Z minimal-versions; cargo check
 
-  clippy:
-    name: Run clippy
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
-
-      - name: Install toolchain
-        id: tc
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopus-dev
-
-      - name: Setup cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-clippy-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
-
-      - run: cargo clippy
-
   MSRV:
     runs-on: ubuntu-latest
 
