@@ -2808,6 +2808,68 @@ impl From<&Event> for EventType {
     }
 }
 
+/// Defines the related IDs that may exist for an [`EventType`].
+///
+/// If a field equals `false`, the corresponding [`Event`] method (i.e. [`Event::user_id`] for the
+/// `user_id` field ) will always return [`RelatedId::Never`] for this [`EventType`]. Otherwise, an
+/// event of this type may have one or more related IDs.
+#[derive(Debug)]
+pub struct RelatedIdsForEventType {
+    pub user_id: bool,
+    pub guild_id: bool,
+    pub channel_id: bool,
+    pub message_id: bool,
+}
+
+macro_rules! define_related_ids_for_event_type {
+    (
+        $(
+            $(#[$attr:meta])?
+            $variant:path, $_:pat => { $($input:tt)* }
+        ),+ $(,)?
+    ) => {
+        pub fn related_ids(&self) -> RelatedIdsForEventType {
+            match self {
+                Self::Other(_) => RelatedIdsForEventType {
+                    user_id: false,
+                    guild_id: false,
+                    channel_id: false,
+                    message_id: false,
+                },
+                $(
+                    $(#[$attr])?
+                    $variant =>
+                        define_related_ids_for_event_type!{ @munch ($($input)*) -> {} }
+                ),+
+            }
+        }
+    };
+    // Use tt munching to consume "fields" from macro input one at a time and generate the
+    // true/false values we actually want based on whether the input is "Never" or some other
+    // arbitrary expression.
+    (@munch ($id:ident: Never, $($next:tt)*) -> {$($output:tt)*}) => {
+        define_related_ids_for_event_type!{ @munch ($($next)*) -> {$($output)* ($id: false)} }
+    };
+    (@munch ($id:ident: $_:expr, $($next:tt)*) -> {$($output:tt)*}) => {
+        define_related_ids_for_event_type!{ @munch ($($next)*) -> {$($output)* ($id: true)} }
+    };
+    // These are variants of the above to munch the last field.
+    (@munch ($id:ident: Never $(,)?) -> {$($output:tt)*}) => {
+        define_related_ids_for_event_type!{ @munch () -> {$($output)* ($id: false)} }
+    };
+    (@munch ($id:ident: $_:expr $(,)?) -> {$($output:tt)*}) => {
+        define_related_ids_for_event_type!{ @munch () -> {$($output)* ($id: true)} }
+    };
+    // All input fields consumed; create the struct.
+    (@munch () -> {$(($id:ident: $value:literal))+}) => {
+        RelatedIdsForEventType {
+            $(
+                $id: $value
+            ),+
+        }
+    };
+}
+
 impl EventType {
     const CHANNEL_CREATE: &'static str = "CHANNEL_CREATE";
     const CHANNEL_DELETE: &'static str = "CHANNEL_DELETE";
@@ -2947,6 +3009,8 @@ impl EventType {
             Self::Other(other) => Some(other),
         }
     }
+
+    with_related_ids_for_event_types!(define_related_ids_for_event_type);
 }
 
 impl<'de> Deserialize<'de> for EventType {
