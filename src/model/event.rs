@@ -2813,7 +2813,7 @@ impl From<&Event> for EventType {
 /// If a field equals `false`, the corresponding [`Event`] method (i.e. [`Event::user_id`] for the
 /// `user_id` field ) will always return [`RelatedId::Never`] for this [`EventType`]. Otherwise, an
 /// event of this type may have one or more related IDs.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RelatedIdsForEventType {
     pub user_id: bool,
     pub guild_id: bool,
@@ -2830,12 +2830,7 @@ macro_rules! define_related_ids_for_event_type {
     ) => {
         pub fn related_ids(&self) -> RelatedIdsForEventType {
             match self {
-                Self::Other(_) => RelatedIdsForEventType {
-                    user_id: false,
-                    guild_id: false,
-                    channel_id: false,
-                    message_id: false,
-                },
+                Self::Other(_) => Default::default(),
                 $(
                     $(#[$attr])?
                     $variant =>

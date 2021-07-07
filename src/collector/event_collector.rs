@@ -22,7 +22,7 @@ use crate::{
     client::bridge::gateway::ShardMessenger,
     collector::{CollectorError, LazyArc},
     model::{
-        event::{Event, EventType},
+        event::{Event, EventType, RelatedIdsForEventType},
         id::{ChannelId, GuildId, MessageId, UserId},
     },
     Error,
@@ -56,18 +56,19 @@ impl EventFilter {
     }
 
     fn validate_options(options: &FilterOptions) -> Result<()> {
-        let related = options
-            .event_types
-            .iter()
-            .map(EventType::related_ids)
-            .reduce(|mut a, b| {
-                a.user_id |= b.user_id;
-                a.guild_id |= b.guild_id;
-                a.channel_id |= b.channel_id;
-                a.message_id |= b.message_id;
-                a
-            })
-            .ok_or(Error::Collector(CollectorError::NoEventTypes))?;
+        if options.event_types.is_empty() {
+            return Err(Error::Collector(CollectorError::NoEventTypes));
+        }
+        let related = options.event_types.iter().map(EventType::related_ids).fold(
+            RelatedIdsForEventType::default(),
+            |mut acc, e| {
+                acc.user_id |= e.user_id;
+                acc.guild_id |= e.guild_id;
+                acc.channel_id |= e.channel_id;
+                acc.message_id |= e.message_id;
+                acc
+            },
+        );
         dbg!(options);
         dbg!(&related);
         if (options.user_id.is_empty() || related.user_id)
