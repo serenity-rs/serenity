@@ -1,5 +1,6 @@
 //! All the events this library handles.
 
+use std::convert::TryFrom;
 #[cfg(feature = "cache")]
 use std::mem;
 use std::{collections::HashMap, fmt};
@@ -1899,6 +1900,432 @@ pub enum Event {
     Unknown(UnknownEvent),
 }
 
+fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
+    use RelatedId::*;
+    match c {
+        Channel::Guild(g) => Some(g.guild_id),
+        _ => None,
+    }
+}
+
+macro_rules! with_related_ids_for_event_types {
+    ($macro:ident) => {
+        $macro! {
+            Self::ChannelCreate, Self::ChannelCreate(e) => {
+                user_id: Never,
+                guild_id: gid_from_channel(&e.channel),
+                channel_id: Some(e.channel.id()),
+                message_id: Never,
+            },
+            Self::ChannelDelete, Self::ChannelDelete(e) => {
+                user_id: Never,
+                guild_id: gid_from_channel(&e.channel),
+                channel_id: Some(e.channel.id()),
+                message_id: Never,
+            },
+            Self::ChannelPinsUpdate, Self::ChannelPinsUpdate(e) => {
+                user_id: Never,
+                guild_id: e.guild_id.into(),
+                channel_id: Some(e.channel_id),
+                message_id: Never,
+            },
+            Self::ChannelUpdate, Self::ChannelUpdate(e) => {
+                user_id: Never,
+                guild_id: gid_from_channel(&e.channel),
+                channel_id: Some(e.channel.id()),
+                message_id: Never,
+            },
+            Self::GuildBanAdd, Self::GuildBanAdd(e) => {
+                user_id: Some(e.user.id),
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildBanRemove, Self::GuildBanRemove(e) => {
+                user_id: Some(e.user.id),
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildCreate, Self::GuildCreate(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild.id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildDelete, Self::GuildDelete(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild.id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildEmojisUpdate, Self::GuildEmojisUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildIntegrationsUpdate, Self::GuildIntegrationsUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildMemberAdd, Self::GuildMemberAdd(e) => {
+                user_id: Some(e.member.user.id),
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildMemberRemove, Self::GuildMemberRemove(e) => {
+                user_id: Some(e.user.id),
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildMemberUpdate, Self::GuildMemberUpdate(e) => {
+                user_id: Some(e.user.id),
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildMembersChunk, Self::GuildMembersChunk(e) => {
+                user_id: Multiple(e.members.keys().copied().collect()),
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildRoleCreate, Self::GuildRoleCreate(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildRoleDelete, Self::GuildRoleDelete(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildRoleUpdate, Self::GuildRoleUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildUnavailable, Self::GuildUnavailable(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildUpdate, Self::GuildUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild.id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::InviteCreate, Self::InviteCreate(e) => {
+                user_id: e.inviter.as_ref().map(|u| u.id).into(),
+                guild_id: e.guild_id.into(),
+                channel_id: Some(e.channel_id),
+                message_id: Never,
+            },
+            Self::InviteDelete, Self::InviteDelete(e) => {
+                user_id: Never,
+                guild_id: e.guild_id.into(),
+                channel_id: Some(e.channel_id),
+                message_id: Never,
+            },
+            Self::MessageCreate, Self::MessageCreate(e) => {
+                user_id: Some(e.message.author.id),
+                guild_id: e.message.guild_id.into(),
+                channel_id: Some(e.message.channel_id),
+                message_id: Some(e.message.id),
+            },
+            Self::MessageDelete, Self::MessageDelete(e) => {
+                user_id: Never,
+                guild_id: e.guild_id.into(),
+                channel_id: Some(e.channel_id),
+                message_id: Some(e.message_id),
+            },
+            Self::MessageDeleteBulk, Self::MessageDeleteBulk(e) => {
+                user_id: Never,
+                guild_id: e.guild_id.into(),
+                channel_id: Some(e.channel_id),
+                message_id: Multiple(e.ids.clone()),
+            },
+            Self::MessageUpdate, Self::MessageUpdate(e) => {
+                user_id: e.author.as_ref().map(|u| u.id).into(),
+                guild_id: e.guild_id.into(),
+                channel_id: Some(e.channel_id),
+                message_id: Some(e.id),
+            },
+            Self::PresenceUpdate, Self::PresenceUpdate(e) => {
+                user_id: Some(e.presence.user_id),
+                guild_id: e.guild_id.into(),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::PresencesReplace, Self::PresencesReplace(e) => {
+                user_id: Multiple(e.presences.iter().map(|p| p.user_id).collect()),
+                guild_id: Never,
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::ReactionAdd, Self::ReactionAdd(e) => {
+                user_id: e.reaction.user_id.into(),
+                guild_id: e.reaction.guild_id.into(),
+                channel_id: Some(e.reaction.channel_id),
+                message_id: Some(e.reaction.message_id),
+            },
+            Self::ReactionRemove, Self::ReactionRemove(e) => {
+                user_id: e.reaction.user_id.into(),
+                guild_id: e.reaction.guild_id.into(),
+                channel_id: Some(e.reaction.channel_id),
+                message_id: Some(e.reaction.message_id),
+            },
+            Self::ReactionRemoveAll, Self::ReactionRemoveAll(e) => {
+                user_id: Never,
+                guild_id: e.guild_id.into(),
+                channel_id: Some(e.channel_id),
+                message_id: Some(e.message_id),
+            },
+            Self::Ready, Self::Ready(e) => {
+                user_id: Never,
+                guild_id: Never,
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::Resumed, Self::Resumed(e) => {
+                user_id: Never,
+                guild_id: Never,
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::StageInstanceCreate, Self::StageInstanceCreate(e) => {
+                user_id: Never,
+                guild_id: Some(e.stage_instance.guild_id),
+                channel_id: Some(e.stage_instance.channel_id),
+                message_id: Never,
+            },
+            Self::StageInstanceDelete, Self::StageInstanceDelete(e) => {
+                user_id: Never,
+                guild_id: Some(e.stage_instance.guild_id),
+                channel_id: Some(e.stage_instance.channel_id),
+                message_id: Never,
+            },
+            Self::StageInstanceUpdate, Self::StageInstanceUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.stage_instance.guild_id),
+                channel_id: Some(e.stage_instance.channel_id),
+                message_id: Never,
+            },
+            Self::ThreadCreate, Self::ThreadCreate(e) => {
+                user_id: Never,
+                guild_id: Some(e.thread.guild_id),
+                channel_id: Some(e.thread.id),
+                message_id: Never,
+            },
+            Self::ThreadDelete, Self::ThreadDelete(e) => {
+                user_id: Never,
+                guild_id: Some(e.thread.guild_id),
+                channel_id: Some(e.thread.id),
+                message_id: Never,
+            },
+            Self::ThreadListSync, Self::ThreadListSync(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Multiple(e.threads.iter().map(|c| c.id).collect()),
+                message_id: Never,
+            },
+            Self::ThreadMembersUpdate, Self::ThreadMembersUpdate(e) => {
+                user_id: Multiple(e.added_members
+                        .iter()
+                        .filter_map(|m| m.user_id.as_ref())
+                        .chain(e.removed_members_ids.iter())
+                        .copied()
+                        .collect(),
+                    ),
+                guild_id: Some(e.guild_id),
+                channel_id: Some(e.id),
+                message_id: Never,
+            },
+            Self::ThreadMemberUpdate, Self::ThreadMemberUpdate(e) => {
+                user_id: e.member.user_id.into(),
+                guild_id: Never,
+                channel_id: e.member.id.into(),
+                message_id: Never,
+            },
+            Self::ThreadUpdate, Self::ThreadUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.thread.guild_id),
+                channel_id: Some(e.thread.id),
+                message_id: Never,
+            },
+            Self::TypingStart, Self::TypingStart(e) => {
+                user_id: Some(e.user_id),
+                guild_id: e.guild_id.into(),
+                channel_id: Some(e.channel_id),
+                message_id: Never,
+            },
+            Self::UserUpdate, Self::UserUpdate(e) => {
+                user_id: Some(e.current_user.id),
+                guild_id: Never,
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::VoiceServerUpdate, Self::VoiceServerUpdate(e) => {
+                user_id: Never,
+                guild_id: e.guild_id.into(),
+                channel_id: e.channel_id.into(),
+                message_id: Never,
+            },
+            Self::VoiceStateUpdate, Self::VoiceStateUpdate(e) => {
+                user_id: Some(e.voice_state.user_id),
+                guild_id: e.guild_id.into(),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::WebhookUpdate, Self::WebhookUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Some(e.channel_id),
+                message_id: Never,
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Self::InteractionCreate, Self::InteractionCreate(e) => {
+                user_id: match &e.interaction {
+                    Interaction::Ping(_) => None,
+                    Interaction::ApplicationCommand(i) => Some(i.user.id),
+                    Interaction::MessageComponent(i) => Some(i.user.id),
+                },
+                guild_id: match &e.interaction {
+                    Interaction::Ping(_) => None,
+                    Interaction::ApplicationCommand(i) => i.guild_id.into(),
+                    Interaction::MessageComponent(i) => i.guild_id.into(),
+                },
+                channel_id: match &e.interaction {
+                    Interaction::Ping(_) => None,
+                    Interaction::ApplicationCommand(i) => Some(i.channel_id),
+                    Interaction::MessageComponent(i) => Some(i.channel_id),
+                },
+                message_id: match &e.interaction {
+                    Interaction::Ping(_) => None,
+                    Interaction::ApplicationCommand(_) => None,
+                    Interaction::MessageComponent(i) => Some(i.message.id()),
+                },
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationCreate, Self::IntegrationCreate(e) => {
+                user_id: e.integration.user.as_ref().map(|u| u.id).into(),
+                guild_id: Some(e.integration.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationUpdate, Self::IntegrationUpdate(e) => {
+                user_id: e.integration.user.as_ref().map(|u| u.id).into(),
+                guild_id: Some(e.integration.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Self::IntegrationDelete, Self::IntegrationDelete(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandCreate, Self::ApplicationCommandCreate(e) => {
+                user_id: Never,
+                guild_id: e.application_command.guild_id.into(),
+                channel_id: Never,
+                message_id: Never,
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandUpdate, Self::ApplicationCommandUpdate(e) => {
+                user_id: Never,
+                guild_id: e.application_command.guild_id.into(),
+                channel_id: Never,
+                message_id: Never,
+            },
+            #[cfg(feature = "unstable_discord_api")]
+            Self::ApplicationCommandDelete, Self::ApplicationCommandDelete(e) => {
+                user_id: Never,
+                guild_id: e.application_command.guild_id.into(),
+                channel_id: Never,
+                message_id: Never,
+            },
+        }
+    };
+}
+
+macro_rules! define_event_related_id_methods {
+    ($(
+        $(#[$attr:meta])?
+        $_:path, $variant:pat => {
+            user_id: $user_id:expr,
+            guild_id: $guild_id:expr,
+            channel_id: $channel_id:expr,
+            message_id: $message_id:expr,
+        }
+    ),+ $(,)?) => {
+        /// User ID(s) related to this event.
+        pub fn user_id(&self) -> RelatedId<UserId> {
+            use RelatedId::*;
+            #[allow(unused_variables)]
+            match self {
+                Self::Unknown(_) => Never,
+                $(
+                    $(#[$attr])?
+                    $variant => $user_id
+                ),+
+            }
+        }
+
+        /// Guild ID related to this event.
+        pub fn guild_id(&self) -> RelatedId<GuildId> {
+            use RelatedId::*;
+            #[allow(unused_variables)]
+            match self {
+                Self::Unknown(_) => Never,
+                $(
+                    $(#[$attr])?
+                    $variant => $guild_id
+                ),+
+            }
+        }
+
+        /// Channel ID(s) related to this event.
+        pub fn channel_id(&self) -> RelatedId<ChannelId> {
+            use RelatedId::*;
+            #[allow(unused_variables)]
+            match self {
+                Self::Unknown(_) => Never,
+                $(
+                    $(#[$attr])?
+                    $variant => $channel_id
+                ),+
+            }
+        }
+
+        /// Message ID(s) related to this event.
+        pub fn message_id(&self) -> RelatedId<MessageId> {
+            use RelatedId::*;
+            #[allow(unused_variables)]
+            match self {
+                Self::Unknown(_) => Never,
+                $(
+                    $(#[$attr])?
+                    $variant => $message_id
+                ),+
+            }
+        }
+    };
+}
+
 impl Event {
     /// Return the type of this event.
     pub fn event_type(&self) -> EventType {
@@ -1964,6 +2391,42 @@ impl Event {
             Self::ThreadMemberUpdate(_) => EventType::ThreadMemberUpdate,
             Self::ThreadMembersUpdate(_) => EventType::ThreadMembersUpdate,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
+        }
+    }
+
+    with_related_ids_for_event_types!(define_event_related_id_methods);
+}
+
+/// Similar to [`Option`], but with additional variants relevant to [`Event`]'s id methods (such as
+/// [`Event::user_id`]).
+pub enum RelatedId<T> {
+    /// This event type will never have this kind of related ID
+    Never,
+    /// This particular event has no related ID of this type, but other events of this type may.
+    None,
+    /// A single related ID
+    Some(T),
+    /// Multiple related IDs
+    Multiple(Vec<T>),
+}
+
+impl<T> From<Option<T>> for RelatedId<T> {
+    fn from(value: Option<T>) -> Self {
+        match value {
+            None => RelatedId::None,
+            Some(t) => RelatedId::Some(t),
+        }
+    }
+}
+
+impl<T> TryFrom<RelatedId<T>> for Option<T> {
+    type Error = Vec<T>;
+
+    fn try_from(value: RelatedId<T>) -> StdResult<Self, Self::Error> {
+        match value {
+            RelatedId::Never | RelatedId::None => Ok(None),
+            RelatedId::Some(t) => Ok(Some(t)),
+            RelatedId::Multiple(t) => Err(t),
         }
     }
 }
