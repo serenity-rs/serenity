@@ -765,7 +765,7 @@ impl Http {
     pub async fn create_sticker<'a, T>(
         &self,
         guild_id: u64,
-        map: &Value,
+        map: JsonMap,
         file: T,
     ) -> Result<Sticker>
     where
@@ -775,7 +775,21 @@ impl Http {
             body: None,
             multipart: Some(Multipart {
                 files: vec![file.into()],
-                payload_json: map.clone(),
+                fields: map
+                    .into_iter()
+                    .map(|(name, value)| {
+                        (
+                            Cow::Owned(name),
+                            Cow::Owned(
+                                value
+                                    .as_str()
+                                    .expect("Create_sticker map must be strings")
+                                    .to_string(),
+                            ),
+                        )
+                    })
+                    .collect(),
+                payload_json: None,
             }),
             headers: None,
             route: RouteInfo::CreateSticker {
@@ -1533,7 +1547,8 @@ impl Http {
             body: None,
             multipart: Some(Multipart {
                 files: new_attachments.into_iter().map(Into::into).collect(),
-                payload_json: map.clone(),
+                payload_json: Some(map.clone()),
+                fields: vec![],
             }),
             headers: None,
             route: RouteInfo::EditMessage {
@@ -2052,7 +2067,8 @@ impl Http {
             body: None,
             multipart: Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
-                payload_json: to_value(map)?,
+                payload_json: Some(to_value(map)?),
+                fields: vec![],
             }),
             headers: None,
             route: RouteInfo::ExecuteWebhook {
@@ -3153,7 +3169,8 @@ impl Http {
             body: None,
             multipart: Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
-                payload_json: to_value(map)?,
+                payload_json: Some(to_value(map)?),
+                fields: vec![],
             }),
             headers: None,
             route: RouteInfo::CreateMessage {
