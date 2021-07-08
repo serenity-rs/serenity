@@ -109,7 +109,6 @@ pub enum ShardManagerMessage {
     ShardInvalidGatewayIntents,
     /// If a connection has been established but privileged gateway intents
     /// were provided without enabling them prior.
-
     /// Emitted when a shard received a [`DisallowedGatewayIntents`] error.
     ///
     /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
