@@ -21,6 +21,9 @@ use reqwest::{Client, ClientBuilder, Response as ReqwestResponse};
 use serde::de::DeserializeOwned;
 use tracing::{debug, instrument, trace};
 
+#[cfg(feature = "simd-json")]
+use simd_json::ValueAccess;
+
 use super::{
     multipart::Multipart,
     ratelimiting::{RatelimitedRequest, Ratelimiter},
