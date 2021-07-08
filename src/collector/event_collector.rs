@@ -69,8 +69,6 @@ impl EventFilter {
                 acc
             },
         );
-        dbg!(options);
-        dbg!(&related);
         if (options.user_id.is_empty() || related.user_id)
             && (options.guild_id.is_empty() || related.guild_id)
             && (options.channel_id.is_empty() || related.channel_id)
@@ -361,9 +359,6 @@ mod test {
     async fn test_build_with_single_id_filter() {
         let (sender, _) = unbounded();
         let msg = ShardMessenger::new(sender);
-
-        dbg!(EventType::GuildBanAdd.related_ids());
-        dbg!(EventType::GuildCreate.related_ids());
 
         assert!(matches!(
             EventCollectorBuilder::new(&msg)
