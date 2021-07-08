@@ -779,13 +779,12 @@ impl Http {
                     .into_iter()
                     .map(|(name, value)| {
                         (
-                            Cow::Owned(name),
-                            Cow::Owned(
-                                value
-                                    .as_str()
-                                    .expect("Create_sticker map must be strings")
-                                    .to_string(),
-                            ),
+                            name.into(),
+                            value
+                                .as_str()
+                                .expect("Create_sticker map must be strings")
+                                .to_string()
+                                .into(),
                         )
                     })
                     .collect(),

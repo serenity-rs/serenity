@@ -41,10 +41,11 @@ impl<'a> Multipart<'a> {
                     data,
                     filename,
                 } => {
-                    multipart = multipart.part(
-                        file_name,
-                        Part::bytes(data.clone().into_owned()).file_name(filename.clone()),
-                    );
+                    let mut part =
+                        Part::bytes(data.clone().into_owned()).file_name(filename.clone());
+                    part = part_add_mime_str(part, &filename)?;
+
+                    multipart = multipart.part(file_name, part);
                 },
                 AttachmentType::File {
                     file,
@@ -53,8 +54,10 @@ impl<'a> Multipart<'a> {
                     let mut buf = Vec::new();
                     file.try_clone().await?.read_to_end(&mut buf).await?;
 
-                    multipart =
-                        multipart.part(file_name, Part::stream(buf).file_name(filename.clone()));
+                    let mut part = Part::stream(buf).file_name(filename.clone());
+                    part = part_add_mime_str(part, &filename)?;
+
+                    multipart = multipart.part(file_name, part);
                 },
                 AttachmentType::Path(path) => {
                     let filename =
@@ -70,10 +73,12 @@ impl<'a> Multipart<'a> {
                         filename: filename.clone().unwrap_or_else(String::new),
                     };
 
-                    let part = match filename {
-                        Some(filename) => Part::bytes(buf).file_name(filename),
-                        None => Part::bytes(buf),
-                    };
+                    let mut part = Part::bytes(buf);
+
+                    if let Some(filename) = filename {
+                        part = part_add_mime_str(part, &filename)?;
+                        part = part.file_name(filename);
+                    }
 
                     multipart = multipart.part(file_name, part);
                 },
@@ -97,8 +102,10 @@ impl<'a> Multipart<'a> {
                         filename: filename.to_string(),
                     };
 
-                    multipart = multipart
-                        .part(file_name, Part::bytes(picture).file_name(filename.to_string()));
+                    let mut part = Part::bytes(picture).file_name(filename.to_string());
+                    part = part_add_mime_str(part, &filename)?;
+
+                    multipart = multipart.part(file_name, part);
                 },
             }
         }
@@ -113,4 +120,16 @@ impl<'a> Multipart<'a> {
 
         Ok(multipart)
     }
+}
+
+fn part_add_mime_str(part: Part, filename: &str) -> Result<Part> {
+    // This is required for certain endpoints like create sticker, otherwise
+    // the Discord API will respond with a 500 Internal Server Error.
+    // The mime type chosen is the same as what reqwest does internally when
+    // using Part::file(), but it is not done for any of the other methods we
+    // use.
+    // https://datatracker.ietf.org/doc/html/rfc7578#section-4.4
+    let mime_type = mime_guess::from_path(&filename).first_or_octet_stream();
+
+    part.mime_str(mime_type.essence_str()).map_err(Into::into)
 }
