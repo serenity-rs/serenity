@@ -1701,7 +1701,12 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                     .ok_or(Error::Decode("expected gateway event d", Value::Object(map)))
                     .map_err(DeError::custom)?;
 
-                let x = deserialize_event_with_type(kind, payload).map_err(DeError::custom)?;
+                let x = match deserialize_event_with_type(kind.clone(), payload) {
+                    Ok(x) => x,
+                    Err(why) => {
+                        return Err(DeError::custom(format_args!("event {:?}: {}", kind, why)));
+                    },
+                };
 
                 GatewayEvent::Dispatch(s, x)
             },
