@@ -3019,6 +3019,11 @@
 <span id="3019">3019</span>
 <span id="3020">3020</span>
 <span id="3021">3021</span>
+<span id="3022">3022</span>
+<span id="3023">3023</span>
+<span id="3024">3024</span>
+<span id="3025">3025</span>
+<span id="3026">3026</span>
 </pre><pre class="rust">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -4723,7 +4728,12 @@
                     .<span class="ident">ok_or</span>(<span class="ident">Error::Decode</span>(<span class="string">&quot;expected gateway event d&quot;</span>, <span class="ident">Value::Object</span>(<span class="ident">map</span>)))
                     .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">deserialize_event_with_type</span>(<span class="ident">kind</span>, <span class="ident">payload</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">deserialize_event_with_type</span>(<span class="ident">kind</span>.<span class="ident">clone</span>(), <span class="ident">payload</span>) {
+                    <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="macro">format_args!</span>(<span class="string">&quot;event {:?}: {}&quot;</span>, <span class="ident">kind</span>, <span class="ident">why</span>)));
+                    },
+                };
 
                 <span class="ident">GatewayEvent::Dispatch</span>(<span class="ident">s</span>, <span class="ident">x</span>)
             },
