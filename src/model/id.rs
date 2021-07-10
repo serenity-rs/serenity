@@ -137,6 +137,14 @@ pub struct StickerId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct StickerPackId(pub u64);
 
+/// An identifier for a sticker pack banner.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct StickerPackBannerId(pub u64);
+
+/// An identifier for a SKU.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct SkuId(pub u64);
+
 /// An identifier for an interaction.
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct InteractionId(pub u64);
@@ -174,6 +182,8 @@ id_u64! {
     RoleId;
     StickerId;
     StickerPackId;
+    StickerPackBannerId;
+    SkuId;
     UserId;
     WebhookId;
     AuditLogEntryId;
