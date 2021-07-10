@@ -3024,6 +3024,11 @@
 <span id="3024">3024</span>
 <span id="3025">3025</span>
 <span id="3026">3026</span>
+<span id="3027">3027</span>
+<span id="3028">3028</span>
+<span id="3029">3029</span>
+<span id="3030">3030</span>
+<span id="3031">3031</span>
 </pre><pre class="rust">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -3975,6 +3980,7 @@
     <span class="kw">pub</span> <span class="ident">mention_roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">attachments</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attachment</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">embeds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Embed</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -4013,6 +4019,10 @@
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pinned</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pinned</span> {
                     <span class="ident">message</span>.<span class="ident">pinned</span> <span class="op">=</span> <span class="ident">pinned</span>;
+                }
+
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">is_some</span>() {
+                    <span class="ident">message</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flags</span>;
                 }
 
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>);
