@@ -310,11 +310,11 @@ __impl_bitflags! {
         MANAGE_ROLES = 0b0001_0000_0000_0000_0000_0000_0000_0000;
         /// Allows management of webhooks.
         MANAGE_WEBHOOKS = 0b0010_0000_0000_0000_0000_0000_0000_0000;
-        /// Allows management of emojis created without the use of an
-        /// [`Integration`].
+        /// Allows management of emoji and stickers created without the use of
+        /// an [`Integration`].
         ///
         /// [`Integration`]: super::guild::Integration
-        MANAGE_EMOJIS = 0b0100_0000_0000_0000_0000_0000_0000_0000;
+        MANAGE_EMOJIS_AND_STICKERS = 0b0100_0000_0000_0000_0000_0000_0000_0000;
         /// Allows for requesting to speak in stage channels.
         REQUEST_TO_SPEAK = 0b1_0000_0000_0000_0000_0000_0000_0000_0000;
         /// Allows using slash commands.
@@ -341,7 +341,7 @@ generate_get_permission_names! {
     external_emojis: "Use External Emojis",
     kick_members: "Kick Members",
     manage_channels: "Manage Channels",
-    manage_emojis: "Manage Emojis",
+    manage_emojis_and_stickers: "Manage Emojis and Stickers",
     manage_guild: "Manage Guilds",
     manage_messages: "Manage Messages",
     manage_nicknames: "Manage Nicknames",
@@ -487,11 +487,11 @@ impl Permissions {
     }
 
     /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Emojis] permission.
+    /// [Manage Emojis and Stickers] permission.
     ///
-    /// [Manage Emojis]: Self::MANAGE_EMOJIS
-    pub fn manage_emojis(self) -> bool {
-        self.contains(Self::MANAGE_EMOJIS)
+    /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
+    pub fn manage_emojis_and_stickers(self) -> bool {
+        self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
     }
 
     /// Shorthand for checking that the set of permissions contains the

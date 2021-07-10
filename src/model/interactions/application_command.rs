@@ -107,8 +107,7 @@ impl ApplicationCommandInteraction {
 
         let map = utils::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
+        Message::check_lengths(&map)?;
 
         http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
     }
@@ -145,8 +144,7 @@ impl ApplicationCommandInteraction {
 
         let map = utils::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
+        Message::check_lengths(&map)?;
 
         http.as_ref().edit_original_interaction_response(&self.token, &Value::from(map)).await
     }
@@ -189,8 +187,7 @@ impl ApplicationCommandInteraction {
 
         let map = utils::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
+        Message::check_lengths(&map)?;
 
         http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
     }
@@ -224,8 +221,7 @@ impl ApplicationCommandInteraction {
 
         let map = utils::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
+        Message::check_lengths(&map)?;
 
         http.as_ref()
             .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
