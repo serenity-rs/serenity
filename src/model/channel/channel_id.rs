@@ -743,8 +743,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(msg.0.clone());
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
+        Message::check_lengths(&map)?;
 
         http.as_ref().send_files(self.0, files, map).await
     }
@@ -779,8 +778,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(msg.0.clone());
 
-        Message::check_content_length(&map)?;
-        Message::check_embed_length(&map)?;
+        Message::check_lengths(&map)?;
 
         let message = if msg.2.is_empty() {
             http.as_ref().send_message(self.0, &Value::from(map)).await?

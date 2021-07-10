@@ -916,6 +916,7 @@ mod test {
             widget_channel_id: None,
             stage_instances: vec![],
             threads: vec![],
+            stickers: HashMap::new(),
         };
 
         let member = Member {

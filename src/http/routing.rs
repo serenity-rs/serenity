@@ -305,6 +305,18 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdRolesId(u64),
+    /// Route for the `/guilds/:guild_id/stickers` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdStickers(u64),
+    /// Route for the `/guilds/:guild_id/stickers/:sticker_id` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdStickersId(u64),
     /// Route for the `/guilds/:guild_id/vanity-url` path.
     ///
     /// The data is the relevant [`GuildId`].
@@ -343,6 +355,10 @@ pub enum Route {
     GuildsIdThreadsActive,
     /// Route for the `/invites/:code` path.
     InvitesCode,
+    /// Route for the `/sticker-packs` path.
+    StickerPacks,
+    /// Route for the `/stickers/:sticker_id` path.
+    StickersId,
     /// Route for the `/users/:user_id` path.
     UsersId,
     /// Route for the `/users/@me` path.
@@ -788,6 +804,14 @@ impl Route {
         format!(api!("/guilds/{}/roles"), guild_id)
     }
 
+    pub fn guild_sticker(guild_id: u64, sticker_id: u64) -> String {
+        format!(api!("/guilds/{}/stickers/{}"), guild_id, sticker_id)
+    }
+
+    pub fn guild_stickers(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/stickers"), guild_id)
+    }
+
     pub fn guild_vanity_url(guild_id: u64) -> String {
         format!(api!("/guilds/{}/vanity-url"), guild_id)
     }
@@ -842,6 +866,14 @@ impl Route {
 
     pub fn status_maintenances_upcoming() -> &'static str {
         status!("/scheduled-maintenances/upcoming.json")
+    }
+
+    pub fn sticker(sticker_id: u64) -> String {
+        format!(api!("/stickers/{}"), sticker_id)
+    }
+
+    pub fn sticker_packs() -> &'static str {
+        api!("/sticker-packs")
     }
 
     pub fn user<D: Display>(target: D) -> String {
@@ -1087,6 +1119,9 @@ pub enum RouteInfo<'a> {
     CreateRole {
         guild_id: u64,
     },
+    CreateSticker {
+        guild_id: u64,
+    },
     CreateWebhook {
         channel_id: u64,
     },
@@ -1161,6 +1196,10 @@ pub enum RouteInfo<'a> {
     DeleteRole {
         guild_id: u64,
         role_id: u64,
+    },
+    DeleteSticker {
+        guild_id: u64,
+        sticker_id: u64,
     },
     DeleteWebhook {
         webhook_id: u64,
@@ -1259,6 +1298,10 @@ pub enum RouteInfo<'a> {
     },
     EditRolePosition {
         guild_id: u64,
+    },
+    EditSticker {
+        guild_id: u64,
+        sticker_id: u64,
     },
     EditThread {
         channel_id: u64,
@@ -1435,6 +1478,9 @@ pub enum RouteInfo<'a> {
     GetGuildRoles {
         guild_id: u64,
     },
+    GetGuildStickers {
+        guild_id: u64,
+    },
     GetGuildVanityUrl {
         guild_id: u64,
     },
@@ -1471,6 +1517,14 @@ pub enum RouteInfo<'a> {
         limit: u8,
         message_id: u64,
         reaction: String,
+    },
+    GetSticker {
+        sticker_id: u64,
+    },
+    GetStickerPacks,
+    GetGuildSticker {
+        guild_id: u64,
+        sticker_id: u64,
     },
     GetUnresolvedIncidents,
     GetUpcomingMaintenances,
@@ -1719,6 +1773,13 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdRoles(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
             ),
+            RouteInfo::CreateSticker {
+                guild_id,
+            } => (
+                LightMethod::Post,
+                Route::GuildsIdStickers(guild_id),
+                Cow::from(Route::guild_stickers(guild_id)),
+            ),
             RouteInfo::CrosspostMessage {
                 channel_id,
                 message_id,
@@ -1874,6 +1935,14 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::GuildsIdRolesId(guild_id),
                 Cow::from(Route::guild_role(guild_id, role_id)),
+            ),
+            RouteInfo::DeleteSticker {
+                guild_id,
+                sticker_id,
+            } => (
+                LightMethod::Delete,
+                Route::GuildsIdStickersId(guild_id),
+                Cow::from(Route::guild_sticker(guild_id, sticker_id)),
             ),
             RouteInfo::DeleteWebhook {
                 webhook_id,
@@ -2072,6 +2141,14 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::GuildsIdRolesId(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
+            ),
+            RouteInfo::EditSticker {
+                guild_id,
+                sticker_id,
+            } => (
+                LightMethod::Patch,
+                Route::GuildsIdStickersId(guild_id),
+                Cow::from(Route::guild_sticker(guild_id, sticker_id)),
             ),
             RouteInfo::EditThread {
                 channel_id,
@@ -2447,6 +2524,21 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdRoles(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
             ),
+            RouteInfo::GetGuildSticker {
+                guild_id,
+                sticker_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdStickersId(guild_id),
+                Cow::from(Route::guild_sticker(guild_id, sticker_id)),
+            ),
+            RouteInfo::GetGuildStickers {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdStickers(guild_id),
+                Cow::from(Route::guild_stickers(guild_id)),
+            ),
             RouteInfo::GetGuildVanityUrl {
                 guild_id,
             } => (
@@ -2522,6 +2614,12 @@ impl<'a> RouteInfo<'a> {
                     channel_id, message_id, reaction, limit, after,
                 )),
             ),
+            RouteInfo::GetSticker {
+                sticker_id,
+            } => (LightMethod::Get, Route::StickersId, Cow::from(Route::sticker(sticker_id))),
+            RouteInfo::GetStickerPacks => {
+                (LightMethod::Get, Route::StickerPacks, Cow::from(Route::sticker_packs()))
+            },
             RouteInfo::GetUnresolvedIncidents => {
                 (LightMethod::Get, Route::None, Cow::from(Route::status_incidents_unresolved()))
             },
