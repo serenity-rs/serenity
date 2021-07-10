@@ -122,7 +122,7 @@ impl EventFilter {
             && empty_or_any(&self.options.user_id, |id| event.user_id().contains(id))
             && empty_or_any(&self.options.channel_id, |id| event.channel_id().contains(id))
             && empty_or_any(&self.options.message_id, |id| event.message_id().contains(id))
-            && self.options.filter.as_mut().map_or(true, |f| f(&event.as_arc()))
+            && self.options.filter.as_mut().map_or(true, |f| f.0(&event.as_arc()))
     }
 
     /// Checks if the filter is within set receive and collect limits.
@@ -134,31 +134,24 @@ impl EventFilter {
     }
 }
 
-#[derive(Default)]
+struct FilterFn(Box<dyn FnMut(&Arc<Event>) -> bool + 'static + Send + Sync>);
+
+impl std::fmt::Debug for FilterFn {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Box<dyn FnMut(&Arc<Event>) -> bool + 'static + Send + Sync>")
+    }
+}
+
+#[derive(Debug, Default)]
 struct FilterOptions {
     event_types: Vec<EventType>,
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Box<dyn FnMut(&Arc<Event>) -> bool + 'static + Send + Sync>>,
+    filter: Option<FilterFn>,
     channel_id: Vec<ChannelId>,
     guild_id: Vec<GuildId>,
     user_id: Vec<UserId>,
     message_id: Vec<MessageId>,
-}
-
-impl std::fmt::Debug for FilterOptions {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("EventFilter")
-            .field("event_types", &self.event_types)
-            .field("filter_limit", &self.filter_limit)
-            .field("collect_limit", &self.collect_limit)
-            .field("filter", &"Option<Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>>")
-            .field("channel_id", &self.channel_id)
-            .field("guild_id", &self.guild_id)
-            .field("user_id", &self.user_id)
-            .field("user_id", &self.message_id)
-            .finish()
-    }
 }
 
 /// Future building a stream of events.
@@ -211,7 +204,7 @@ impl<'a> EventCollectorBuilder<'a> {
         mut self,
         function: F,
     ) -> Self {
-        self.filter.as_mut().unwrap().filter = Some(Box::new(function));
+        self.filter.as_mut().unwrap().filter = Some(FilterFn(Box::new(function)));
 
         self
     }
