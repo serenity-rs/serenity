@@ -341,7 +341,7 @@ __impl_bitflags! {
         /// [`Integration`].
         ///
         /// [`Integration`]: super::guild::Integration
-        MANAGE_EMOJIS = 1 << 30;
+        MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
         /// Allows using slash commands.
         USE_SLASH_COMMANDS = 1 << 31;
         /// Allows for requesting to speak in stage channels.
@@ -358,12 +358,6 @@ __impl_bitflags! {
         SEND_MESSAGES_IN_THREADS = 1 << 38;
         /// Allows for launching activities in a voice channel
         START_EMBEDDED_ACTIVITIES = 1 << 39;
-        /// Allows for creating and participating in public threads.
-        #[deprecated(note = "This permission no longer exists")]
-        USE_PUBLIC_THREADS = 0b0010_0000_0000_0000_0000_0000_0000_0000_0000;
-        // Allows for creating and participating in private threads.
-        #[deprecated(note = "This permission no longer exists")]
-        USE_PRIVATE_THREADS = 0b0100_0000_0000_0000_0000_0000_0000_0000_0000;
     }
 }
 
@@ -381,7 +375,7 @@ generate_get_permission_names! {
     external_emojis: "Use External Emojis",
     kick_members: "Kick Members",
     manage_channels: "Manage Channels",
-    manage_emojis: "Manage Emojis",
+    manage_emojis_and_stickers: "Manage Emojis and Stickers",
     manage_guild: "Manage Guilds",
     manage_messages: "Manage Messages",
     manage_nicknames: "Manage Nicknames",
@@ -527,11 +521,11 @@ impl Permissions {
     }
 
     /// Shorthand for checking that the set of permissions contains the
-    /// [Manage Emojis] permission.
+    /// [Manage Emojis and Stickers] permission.
     ///
-    /// [Manage Emojis]: Self::MANAGE_EMOJIS
-    pub fn manage_emojis(self) -> bool {
-        self.contains(Self::MANAGE_EMOJIS)
+    /// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS
+    pub fn manage_emojis_and_stickers(self) -> bool {
+        self.contains(Self::MANAGE_EMOJIS_AND_STICKERS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
