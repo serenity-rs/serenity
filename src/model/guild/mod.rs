@@ -40,11 +40,13 @@ use super::utils::*;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateChannel,
+    CreateSticker,
     EditGuild,
     EditGuildWelcomeScreen,
     EditGuildWidget,
     EditMember,
     EditRole,
+    EditSticker,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -258,6 +260,9 @@ pub struct Guild {
     /// All active threads in this guild that current user has permission to view.
     #[serde(default)]
     pub threads: Vec<GuildChannel>,
+    /// All of the guild's custom stickers.
+    #[serde(serialize_with = "serialize_gen_map")]
+    pub stickers: HashMap<StickerId, Sticker>,
 }
 
 #[cfg(feature = "model")]
@@ -591,7 +596,7 @@ impl Guild {
     /// The name of the emoji must be at least 2 characters long and can only
     /// contain alphanumeric characters and underscores.
     ///
-    /// Requires the [Manage Emojis] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Examples
     ///
@@ -605,7 +610,7 @@ impl Guild {
     ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
-    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn create_emoji(
         &self,
@@ -874,6 +879,34 @@ impl Guild {
         self.id.create_role(cache_http.http(), f).await
     }
 
+    /// Creates a new sticker in the guild with the data set, if any.
+    ///
+    /// **Note**: Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
+    /// if the current user does not have permission to manage roles.
+    ///
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    pub async fn create_sticker<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Sticker>
+    where
+        for<'a, 'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
+    {
+        #[cfg(feature = "cache")]
+        {
+            if cache_http.cache().is_some() {
+                let req = Permissions::MANAGE_EMOJIS_AND_STICKERS;
+
+                if !self.has_perms(&cache_http, req).await {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+            }
+        }
+
+        self.id.create_sticker(cache_http.http(), f).await
+    }
+
     /// Deletes the current guild if the current user is the owner of the
     /// guild.
     ///
@@ -903,13 +936,13 @@ impl Guild {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// Requires the [Manage Emojis] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
     pub async fn delete_emoji(
         &self,
@@ -958,6 +991,25 @@ impl Guild {
         role_id: impl Into<RoleId>,
     ) -> Result<()> {
         self.id.delete_role(&http, role_id).await
+    }
+
+    /// Deletes a [`Sticker`] by Id from the guild.
+    ///
+    /// Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission
+    /// to delete the sticker.
+    ///
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    #[inline]
+    pub async fn delete_sticker(
+        &self,
+        http: impl AsRef<Http>,
+        sticker_id: impl Into<StickerId>,
+    ) -> Result<()> {
+        self.id.delete_sticker(&http, sticker_id).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -1037,13 +1089,13 @@ impl Guild {
     /// Also see [`Emoji::edit`] if you have the `cache` and `model` features
     /// enabled.
     ///
-    /// Requires the [Manage Emojis] permission.
+    /// Requires the [Manage Emojis and Stickers] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
+    /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_emoji(
@@ -1179,6 +1231,37 @@ impl Guild {
         position: u64,
     ) -> Result<Vec<Role>> {
         self.id.edit_role_position(&http, role_id, position).await
+    }
+
+    /// Edits a sticker, optionally setting its fields.
+    ///
+    /// Requires the [Manage Emojis and Stickers] permission.
+    ///
+    /// # Examples
+    ///
+    /// Rename a sticker:
+    ///
+    /// ```rust,ignore
+    /// guild.edit_sticker(&context, StickerId(7), |r| r.name("Bun bun meow"));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
+    #[inline]
+    pub async fn edit_sticker<F>(
+        &self,
+        http: impl AsRef<Http>,
+        sticker_id: impl Into<StickerId>,
+        f: F,
+    ) -> Result<Sticker>
+    where
+        F: FnOnce(&mut EditSticker) -> &mut EditSticker,
+    {
+        self.id.edit_sticker(&http, sticker_id, f).await
     }
 
     /// Edits the [`GuildWelcomeScreen`].
@@ -2700,6 +2783,12 @@ impl<'de> Deserialize<'de> for Guild {
             None => Vec::new(),
         };
 
+        let stickers = map
+            .remove("stickers")
+            .ok_or_else(|| DeError::custom("expected guild stickers"))
+            .and_then(deserialize_stickers)
+            .map_err(DeError::custom)?;
+
         #[allow(deprecated)]
         Ok(Self {
             afk_channel_id,
@@ -2748,6 +2837,7 @@ impl<'de> Deserialize<'de> for Guild {
             widget_channel_id,
             stage_instances,
             threads,
+            stickers,
         })
     }
 }
@@ -3255,6 +3345,7 @@ mod test {
             let hm4 = HashMap::new();
             let hm5 = HashMap::new();
             let hm6 = HashMap::new();
+            let hm7 = HashMap::new();
 
             hm3.insert(u.id, m);
 
@@ -3307,6 +3398,7 @@ mod test {
                 public_updates_channel_id: None,
                 stage_instances: vec![],
                 threads: vec![],
+                stickers: hm7,
             }
         }
 
