@@ -86,7 +86,8 @@ __impl_bitflags! {
         /// Enables following gateway event:
         ///
         /// - GUILD_EMOJIS_UPDATE
-        GUILD_EMOJIS = 1 << 3;
+        /// - GUILD_STICKERS_UPDATE
+        GUILD_EMOJIS_AND_STICKERS = 1 << 3;
         /// Enables following gateway event:
         ///
         /// - GUILD_INTEGRATIONS_UPDATE
@@ -228,11 +229,11 @@ impl GatewayIntents {
     }
 
     /// Shorthand for checking that the set of intents contains the
-    /// [GUILD_EMOJIS] intent.
+    /// [GUILD_EMOJIS_AND_STICKERS] intent.
     ///
-    /// [GUILD_EMOJIS]: Self::GUILD_EMOJIS
-    pub fn guild_emojis(self) -> bool {
-        self.contains(Self::GUILD_EMOJIS)
+    /// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS
+    pub fn guild_emojis_and_stickers(self) -> bool {
+        self.contains(Self::GUILD_EMOJIS_AND_STICKERS)
     }
 
     /// Shorthand for checking that the set of intents contains the
