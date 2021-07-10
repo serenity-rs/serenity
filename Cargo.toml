@@ -146,6 +146,12 @@ features = ["std"]
 [dependencies.percent-encoding]
 version = "2.1"
 
+[dependencies.mime]
+version = "0.3.16"
+
+[dependencies.mime_guess]
+version = "2.0"
+
 [dev-dependencies.http_crate]
 version = "0.2"
 package = "http"

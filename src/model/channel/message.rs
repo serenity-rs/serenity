@@ -38,7 +38,10 @@ use crate::model::utils::U64Visitor;
 #[cfg(feature = "model")]
 use crate::{
     constants,
-    model::id::{ApplicationId, ChannelId, GuildId, MessageId},
+    model::{
+        id::{ApplicationId, ChannelId, GuildId, MessageId},
+        sticker::StickerItem,
+    },
 };
 
 /// A representation of a message over a guild's text channel, a group, or a
@@ -119,9 +122,9 @@ pub struct Message {
     pub message_reference: Option<MessageReference>,
     /// Bit flags describing extra features of the message.
     pub flags: Option<MessageFlags>,
-    /// Array of stickers sent with the message.
+    /// Array of message sticker item objects.
     #[serde(default)]
-    pub stickers: Vec<Sticker>,
+    pub sticker_items: Vec<StickerItem>,
     /// The message that was replied to using this message.
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recusion
     /// Sent if the message is a response to an [`Interaction`].
@@ -926,6 +929,14 @@ impl Message {
         cache.as_ref().channel_category_id(self.channel_id).await
     }
 
+    pub(crate) fn check_lengths(map: &JsonMap) -> Result<()> {
+        Self::check_content_length(map)?;
+        Self::check_embed_length(map)?;
+        Self::check_sticker_ids_length(map)?;
+
+        Ok(())
+    }
+
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
         if let Some(Value::String(content)) = map.get("content") {
             if let Some(length_over) = Message::overflow_length(content) {
@@ -986,6 +997,16 @@ impl Message {
             if total > constants::EMBED_MAX_LENGTH {
                 let overflow = total - constants::EMBED_MAX_LENGTH;
                 return Err(Error::Model(ModelError::EmbedTooLarge(overflow)));
+            }
+        }
+
+        Ok(())
+    }
+
+    pub(crate) fn check_sticker_ids_length(map: &JsonMap) -> Result<()> {
+        if let Some(Value::Array(sticker_ids)) = map.get("sticker_ids") {
+            if sticker_ids.len() > constants::STICKER_MAX_COUNT {
+                return Err(Error::Model(ModelError::StickerAmount));
             }
         }
 

@@ -35,6 +35,7 @@ pub enum Action {
     Emoji(ActionEmoji),
     Message(ActionMessage),
     Integration(ActionIntegration),
+    Sticker(ActionSticker),
 }
 
 impl Action {
@@ -52,6 +53,7 @@ impl Action {
             Action::Emoji(ref x) => x.num(),
             Action::Message(ref x) => x.num(),
             Action::Integration(ref x) => x.num(),
+            Action::Sticker(ref x) => x.num(),
         }
     }
 }
@@ -241,6 +243,25 @@ impl ActionIntegration {
     }
 }
 
+#[derive(Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ActionSticker {
+    Create = 90,
+    Delete = 91,
+    Update = 92,
+}
+
+impl ActionSticker {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionSticker::Create => 90,
+            ActionSticker::Update => 91,
+            ActionSticker::Delete => 92,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Change {
     #[serde(rename = "key")]
@@ -378,6 +399,7 @@ mod action_handler {
                     60..=62 => Action::Emoji(unsafe { transmute(value) }),
                     72..=75 => Action::Message(unsafe { transmute(value) }),
                     80..=82 => Action::Integration(unsafe { transmute(value) }),
+                    90..=92 => Action::Sticker(unsafe { transmute(value) }),
                     _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
                 })
             }
