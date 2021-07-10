@@ -948,6 +948,7 @@ pub struct MessageUpdateEvent {
     pub mention_roles: Option<Vec<RoleId>>,
     pub attachments: Option<Vec<Attachment>>,
     pub embeds: Option<Vec<Embed>>,
+    pub flags: Option<MessageFlags>,
 }
 
 #[cfg(feature = "cache")]
@@ -986,6 +987,10 @@ impl CacheUpdate for MessageUpdateEvent {
 
                 if let Some(pinned) = self.pinned {
                     message.pinned = pinned;
+                }
+
+                if self.flags.is_some() {
+                    message.flags = self.flags;
                 }
 
                 return Some(item);
