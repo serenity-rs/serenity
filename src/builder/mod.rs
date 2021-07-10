@@ -25,6 +25,7 @@ mod create_interaction_response_followup;
 mod create_invite;
 mod create_message;
 mod create_stage_instance;
+mod create_sticker;
 mod create_thread;
 mod edit_channel;
 mod edit_guild;
@@ -37,6 +38,7 @@ mod edit_message;
 mod edit_profile;
 mod edit_role;
 mod edit_stage_instance;
+mod edit_sticker;
 mod edit_thread;
 mod edit_voice_state;
 mod edit_webhook_message;
@@ -53,6 +55,7 @@ pub use self::{
     create_invite::CreateInvite,
     create_message::CreateMessage,
     create_stage_instance::CreateStageInstance,
+    create_sticker::CreateSticker,
     create_thread::CreateThread,
     edit_channel::EditChannel,
     edit_guild::EditGuild,
@@ -63,6 +66,7 @@ pub use self::{
     edit_profile::EditProfile,
     edit_role::EditRole,
     edit_stage_instance::EditStageInstance,
+    edit_sticker::EditSticker,
     edit_thread::EditThread,
     edit_voice_state::EditVoiceState,
     edit_webhook_message::EditWebhookMessage,

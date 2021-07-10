@@ -801,6 +801,28 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
+pub struct GuildStickersUpdateEvent {
+    #[serde(serialize_with = "serialize_stickers", deserialize_with = "deserialize_stickers")]
+    pub stickers: HashMap<StickerId, Sticker>,
+    pub guild_id: GuildId,
+}
+
+#[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for GuildStickersUpdateEvent {
+    type Output = ();
+
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild_id) {
+            guild.stickers.clone_from(&self.stickers);
+        }
+
+        None
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct InviteCreateEvent {
     pub channel_id: ChannelId,
     pub code: String,
@@ -1869,6 +1891,8 @@ pub enum Event {
     GuildRoleCreate(GuildRoleCreateEvent),
     GuildRoleDelete(GuildRoleDeleteEvent),
     GuildRoleUpdate(GuildRoleUpdateEvent),
+    /// A [`Sticker`] was created, updated, or deleted
+    GuildStickersUpdate(GuildStickersUpdateEvent),
     /// When a guild is unavailable, such as due to a Discord server outage.
     GuildUnavailable(GuildUnavailableEvent),
     GuildUpdate(GuildUpdateEvent),
@@ -2090,6 +2114,12 @@ macro_rules! with_related_ids_for_event_types {
                 message_id: Never,
             },
             Self::GuildRoleUpdate, Self::GuildRoleUpdate(e) => {
+                user_id: Never,
+                guild_id: Some(e.guild_id),
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::GuildStickersUpdate, Self::GuildStickersUpdate(e) => {
                 user_id: Never,
                 guild_id: Some(e.guild_id),
                 channel_id: Never,
@@ -2438,6 +2468,7 @@ impl Event {
             Self::GuildRoleCreate(_) => EventType::GuildRoleCreate,
             Self::GuildRoleDelete(_) => EventType::GuildRoleDelete,
             Self::GuildRoleUpdate(_) => EventType::GuildRoleUpdate,
+            Self::GuildStickersUpdate(_) => EventType::GuildStickersUpdate,
             Self::GuildUnavailable(_) => EventType::GuildUnavailable,
             Self::GuildUpdate(_) => EventType::GuildUpdate,
             Self::InviteCreate(_) => EventType::InviteCreate,
@@ -2596,6 +2627,7 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::GuildRoleCreate => Event::GuildRoleCreate(from_value(v)?),
         EventType::GuildRoleDelete => Event::GuildRoleDelete(from_value(v)?),
         EventType::GuildRoleUpdate => Event::GuildRoleUpdate(from_value(v)?),
+        EventType::GuildStickersUpdate => Event::GuildStickersUpdate(from_value(v)?),
         EventType::InviteCreate => Event::InviteCreate(from_value(v)?),
         EventType::InviteDelete => Event::InviteDelete(from_value(v)?),
         EventType::GuildUpdate => Event::GuildUpdate(from_value(v)?),
@@ -2726,6 +2758,10 @@ pub enum EventType {
     ///
     /// This maps to [`GuildRoleUpdateEvent`].
     GuildRoleUpdate,
+    /// Indicator that a guild sticker update payload was received.
+    ///
+    /// This maps to [`GuildStickersUpdateEvent`].
+    GuildStickersUpdate,
     /// Indicator that a guild unavailable payload was received.
     ///
     /// This maps to [`GuildUnavailableEvent`].
@@ -2969,6 +3005,7 @@ impl EventType {
     const GUILD_ROLE_CREATE: &'static str = "GUILD_ROLE_CREATE";
     const GUILD_ROLE_DELETE: &'static str = "GUILD_ROLE_DELETE";
     const GUILD_ROLE_UPDATE: &'static str = "GUILD_ROLE_UPDATE";
+    const GUILD_STICKERS_UPDATE: &'static str = "GUILD_STICKERS_UPDATE";
     const INVITE_CREATE: &'static str = "INVITE_CREATE";
     const INVITE_DELETE: &'static str = "INVITE_DELETE";
     const GUILD_UPDATE: &'static str = "GUILD_UPDATE";
@@ -3034,6 +3071,7 @@ impl EventType {
             Self::GuildRoleCreate => Some(Self::GUILD_ROLE_CREATE),
             Self::GuildRoleDelete => Some(Self::GUILD_ROLE_DELETE),
             Self::GuildRoleUpdate => Some(Self::GUILD_ROLE_UPDATE),
+            Self::GuildStickersUpdate => Some(Self::GUILD_STICKERS_UPDATE),
             Self::InviteCreate => Some(Self::INVITE_CREATE),
             Self::InviteDelete => Some(Self::INVITE_DELETE),
             Self::GuildUpdate => Some(Self::GUILD_UPDATE),
@@ -3126,6 +3164,7 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::GUILD_ROLE_CREATE => EventType::GuildRoleCreate,
                     EventType::GUILD_ROLE_DELETE => EventType::GuildRoleDelete,
                     EventType::GUILD_ROLE_UPDATE => EventType::GuildRoleUpdate,
+                    EventType::GUILD_STICKERS_UPDATE => EventType::GuildStickersUpdate,
                     EventType::INVITE_CREATE => EventType::InviteCreate,
                     EventType::INVITE_DELETE => EventType::InviteDelete,
                     EventType::GUILD_UPDATE => EventType::GuildUpdate,

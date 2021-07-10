@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use bytes::Buf;
 use reqwest::{
     multipart::{Form, Part},
@@ -9,12 +11,18 @@ use tokio::{fs::File, io::AsyncReadExt};
 use super::AttachmentType;
 use crate::internal::prelude::*;
 
-/// Holder for multipart body. Contains files and payload_json for creating
-/// messages with attachments.
+/// Holder for multipart body. Contains files, multipart fields, and
+/// payload_json for creating requests with attachments.
 #[derive(Clone, Debug)]
 pub struct Multipart<'a> {
     pub files: Vec<AttachmentType<'a>>,
-    pub payload_json: Value,
+    /// Multipart text fields that are sent with the form data as individual
+    /// fields. If a certain endpoint does not support passing JSON body via
+    /// `payload_json`, this must be used instead.
+    pub fields: Vec<(Cow<'static, str>, Cow<'static, str>)>,
+    /// JSON body that will be stringified and set as the form value as
+    /// `payload_json`.
+    pub payload_json: Option<Value>,
 }
 
 impl<'a> Multipart<'a> {
@@ -22,15 +30,22 @@ impl<'a> Multipart<'a> {
         let mut multipart = Form::new();
 
         for (file_num, file) in self.files.iter_mut().enumerate() {
+            // For endpoints that require a single file (e.g. create sticker),
+            // it will error if the part name is not `file`.
+            // https://github.com/discord/discord-api-docs/issues/2064#issuecomment-691650970
+            let file_name =
+                if file_num == 0 { "file".to_string() } else { format!("file{}", file_num) };
+
             match file {
                 AttachmentType::Bytes {
                     data,
                     filename,
                 } => {
-                    multipart = multipart.part(
-                        file_num.to_string(),
-                        Part::bytes(data.clone().into_owned()).file_name(filename.clone()),
-                    );
+                    let mut part =
+                        Part::bytes(data.clone().into_owned()).file_name(filename.clone());
+                    part = part_add_mime_str(part, &filename)?;
+
+                    multipart = multipart.part(file_name, part);
                 },
                 AttachmentType::File {
                     file,
@@ -39,8 +54,10 @@ impl<'a> Multipart<'a> {
                     let mut buf = Vec::new();
                     file.try_clone().await?.read_to_end(&mut buf).await?;
 
-                    multipart = multipart
-                        .part(file_num.to_string(), Part::stream(buf).file_name(filename.clone()));
+                    let mut part = Part::stream(buf).file_name(filename.clone());
+                    part = part_add_mime_str(part, &filename)?;
+
+                    multipart = multipart.part(file_name, part);
                 },
                 AttachmentType::Path(path) => {
                     let filename =
@@ -56,12 +73,14 @@ impl<'a> Multipart<'a> {
                         filename: filename.clone().unwrap_or_else(String::new),
                     };
 
-                    let part = match filename {
-                        Some(filename) => Part::bytes(buf).file_name(filename),
-                        None => Part::bytes(buf),
-                    };
+                    let mut part = Part::bytes(buf);
 
-                    multipart = multipart.part(file_num.to_string(), part);
+                    if let Some(filename) = filename {
+                        part = part_add_mime_str(part, &filename)?;
+                        part = part.file_name(filename);
+                    }
+
+                    multipart = multipart.part(file_name, part);
                 },
                 AttachmentType::Image(url) => {
                     let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
@@ -83,16 +102,34 @@ impl<'a> Multipart<'a> {
                         filename: filename.to_string(),
                     };
 
-                    multipart = multipart.part(
-                        file_num.to_string(),
-                        Part::bytes(picture).file_name(filename.to_string()),
-                    );
+                    let mut part = Part::bytes(picture).file_name(filename.to_string());
+                    part = part_add_mime_str(part, &filename)?;
+
+                    multipart = multipart.part(file_name, part);
                 },
             }
         }
 
-        multipart = multipart.text("payload_json", serde_json::to_string(&self.payload_json)?);
+        for (name, value) in &self.fields {
+            multipart = multipart.text(name.clone(), value.clone());
+        }
+
+        if let Some(ref payload_json) = self.payload_json {
+            multipart = multipart.text("payload_json", serde_json::to_string(payload_json)?);
+        }
 
         Ok(multipart)
     }
+}
+
+fn part_add_mime_str(part: Part, filename: &str) -> Result<Part> {
+    // This is required for certain endpoints like create sticker, otherwise
+    // the Discord API will respond with a 500 Internal Server Error.
+    // The mime type chosen is the same as what reqwest does internally when
+    // using Part::file(), but it is not done for any of the other methods we
+    // use.
+    // https://datatracker.ietf.org/doc/html/rfc7578#section-4.4
+    let mime_type = mime_guess::from_path(&filename).first_or_octet_stream();
+
+    part.mime_str(mime_type.essence_str()).map_err(Into::into)
 }
