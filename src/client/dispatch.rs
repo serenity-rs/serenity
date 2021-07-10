@@ -118,6 +118,9 @@ impl DispatchEvent {
             Self::Model(Event::GuildRoleUpdate(ref mut event)) => {
                 update(cache_and_http, event).await;
             },
+            Self::Model(Event::GuildStickersUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
             Self::Model(Event::GuildUnavailable(ref mut event)) => {
                 update(cache_and_http, event).await;
             },
@@ -569,6 +572,14 @@ async fn handle_event(
                 } else {
                     event_handler.guild_role_update(context, event.guild_id, event.role).await;
                 }}
+            });
+        },
+        DispatchEvent::Model(Event::GuildStickersUpdate(mut event)) => {
+            update(&cache_and_http, &mut event).await;
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.guild_stickers_update(context, event.guild_id, event.stickers).await;
             });
         },
         DispatchEvent::Model(Event::GuildUnavailable(mut event)) => {

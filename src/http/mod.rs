@@ -202,58 +202,6 @@ pub enum AttachmentType<'a> {
     Image(&'a str),
 }
 
-impl AttachmentType<'_> {
-    pub(crate) async fn into_http_form_part(
-        self,
-        client: &reqwest::Client,
-    ) -> Result<reqwest::multipart::Part, crate::Error> {
-        use bytes::buf::Buf;
-        use tokio::io::AsyncReadExt;
-
-        Ok(match self {
-            AttachmentType::Bytes {
-                data,
-                filename,
-            } => reqwest::multipart::Part::bytes(data.into_owned()).file_name(filename),
-            AttachmentType::File {
-                file,
-                filename,
-            } => {
-                let mut buf = Vec::new();
-                file.try_clone().await?.read_to_end(&mut buf).await?;
-
-                reqwest::multipart::Part::stream(buf).file_name(filename)
-            },
-            AttachmentType::Path(path) => {
-                let filename =
-                    path.file_name().map(|filename| filename.to_string_lossy().into_owned());
-                let mut file = File::open(path).await?;
-                let mut buf = vec![];
-                file.read_to_end(&mut buf).await?;
-
-                match filename {
-                    Some(filename) => reqwest::multipart::Part::bytes(buf).file_name(filename),
-                    None => reqwest::multipart::Part::bytes(buf),
-                }
-            },
-            AttachmentType::Image(url) => {
-                let url =
-                    reqwest::Url::parse(url).map_err(|_| crate::Error::Url(url.to_string()))?;
-                let filename = url
-                    .path_segments()
-                    .and_then(|segments| segments.last().map(ToString::to_string))
-                    .ok_or_else(|| crate::Error::Url(url.to_string()))?;
-                let response = client.get(url).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = vec![0; bytes.len()];
-                bytes.copy_to_slice(&mut picture[..]);
-
-                reqwest::multipart::Part::bytes(picture).file_name(filename.to_string())
-            },
-        })
-    }
-}
-
 impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
     fn from(params: (&'a [u8], &str)) -> AttachmentType<'a> {
         AttachmentType::Bytes {

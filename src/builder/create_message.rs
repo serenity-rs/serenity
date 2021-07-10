@@ -8,16 +8,19 @@ use crate::http::AttachmentType;
 use crate::internal::prelude::*;
 use crate::json::to_value;
 use crate::model::channel::{MessageReference, ReactionType};
+use crate::model::id::StickerId;
 use crate::utils;
 
 /// A builder to specify the contents of an [`Http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].
 ///
-/// There are two situations where different field requirements are present:
+/// There are three situations where different field requirements are present:
 ///
-/// 1. When sending an [`Self::embed`], no other field is required;
-/// 2. Otherwise, [`Self::content`] is the only required field that is required to be
-/// set.
+/// 1. When sending a message without embeds or stickers, [`Self::content`] is
+///    the only required field that is required to be set.
+/// 2. When sending an [`Self::embed`], no other field is required.
+/// 3. When sending stickers with [`Self::sticker_id`] or other sticker methods,
+///    no other field is required.
 ///
 /// Note that if you only need to send the content of a message, without
 /// specifying other fields, then [`ChannelId::say`] may be a more preferable
@@ -235,6 +238,71 @@ impl<'a> CreateMessage<'a> {
 
         self.0.insert("components", Value::from(components.0));
         self
+    }
+
+    fn _add_sticker_id(&mut self, sticker_id: impl Into<StickerId>) -> &mut Self {
+        let sticker_ids = self.0.entry("sticker_ids").or_insert_with(|| Value::Array(Vec::new()));
+        let sticker_ids_array = sticker_ids.as_array_mut().expect("Sticker_ids must be an array");
+
+        sticker_ids_array.push(Value::from(sticker_id.into().0));
+
+        self
+    }
+
+    /// Sets a single sticker ID to include in the message.
+    ///
+    /// **Note**: This will replace all existing stickers. Use
+    /// [`Self::add_sticker_id()`] to add an additional sticker.
+    pub fn sticker_id(&mut self, sticker_id: impl Into<StickerId>) -> &mut Self {
+        self.0.insert("sticker_ids", Value::Array(Vec::new()));
+        self._add_sticker_id(sticker_id)
+    }
+
+    /// Add a sticker ID for the message.
+    ///
+    /// **Note**: There can be a maximum of 3 stickers in a message.
+    ///
+    /// **Note**: This will keep all existing stickers. Use
+    /// [`Self::set_sticker_ids()`] to replace existing stickers.
+    pub fn add_sticker_id(&mut self, sticker_id: impl Into<StickerId>) -> &mut Self {
+        let sticker_ids = self.0.entry("sticker_ids").or_insert_with(|| Value::Array(Vec::new()));
+        let sticker_ids_array = sticker_ids.as_array_mut().expect("Sticker_ids must be an array");
+
+        sticker_ids_array.push(Value::from(sticker_id.into().0));
+
+        self
+    }
+
+    /// Add multiple sticker IDs for the message.
+    ///
+    /// **Note**: There can be a maximum of 3 stickers in a message.
+    ///
+    /// **Note**: This will keep all existing stickers. Use
+    /// [`Self::set_sticker_ids()`] to replace existing stickers.
+    pub fn add_sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
+        &mut self,
+        sticker_ids: It,
+    ) -> &mut Self {
+        for sticker_id in sticker_ids.into_iter() {
+            self._add_sticker_id(sticker_id);
+        }
+
+        self
+    }
+
+    /// Sets a list of sticker IDs to include in the message.
+    ///
+    /// **Note**: There can be a maximum of 3 stickers in a message.
+    ///
+    /// **Note**: This will replace all existing stickers. Use
+    /// [`Self::add_sticker_id()`] or [`Self::add_sticker_ids()`] to keep
+    /// existing stickers.
+    pub fn set_sticker_ids<T: Into<StickerId>, It: IntoIterator<Item = T>>(
+        &mut self,
+        sticker_ids: It,
+    ) -> &mut Self {
+        self.0.insert("sticker_ids", Value::Array(Vec::new()));
+        self.add_sticker_ids(sticker_ids)
     }
 }
 

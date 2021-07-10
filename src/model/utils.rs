@@ -306,6 +306,48 @@ pub fn serialize_roles<S: Serializer>(
     seq.end()
 }
 
+pub fn deserialize_stickers<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<StickerId, Sticker>, D::Error> {
+    let vec: Vec<Sticker> = Deserialize::deserialize(deserializer)?;
+    let mut stickers = HashMap::new();
+
+    for sticker in vec {
+        stickers.insert(sticker.id, sticker);
+    }
+
+    Ok(stickers)
+}
+
+pub fn serialize_stickers<S: Serializer>(
+    stickers: &HashMap<StickerId, Sticker>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(stickers.len()))?;
+
+    for sticker in stickers.values() {
+        seq.serialize_element(sticker)?;
+    }
+
+    seq.end()
+}
+
+pub fn deserialize_comma_separated_string<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Vec<String>, D::Error> {
+    let str_sequence = String::deserialize(deserializer)?;
+    let vec = str_sequence.split(", ").map(str::to_owned).collect();
+
+    Ok(vec)
+}
+
+pub fn serialize_comma_separated_string<S: Serializer>(
+    vec: &Vec<String>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    serializer.serialize_str(&vec.join(", "))
+}
+
 pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<User, D::Error> {

@@ -166,6 +166,13 @@ pub enum Error {
     NoTokenSet,
     /// Indicates that the component type cannot be used in this context.
     InvalidComponentType,
+    /// When attempting to delete a built in nitro sticker instead of a guild
+    /// sticker.
+    DeleteNitroSticker,
+    /// Indicates that the sticker file is missing.
+    NoStickerFileSet,
+    /// When attempting to send a message with over 3 stickers.
+    StickerAmount,
 }
 
 impl Error {
@@ -209,6 +216,9 @@ impl Display for Error {
             Error::NameTooLong => f.write_str("Name is over the character limit."),
             Error::NotAuthor => f.write_str("The bot is not author of this message."),
             Error::NoTokenSet => f.write_str("Token is not set."),
+            Error::DeleteNitroSticker => f.write_str("Cannot delete an official sticker."),
+            Error::NoStickerFileSet => f.write_str("Sticker file is not set."),
+            Error::StickerAmount => f.write_str("Too many stickers in a message."),
         }
     }
 }

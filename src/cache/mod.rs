@@ -1091,7 +1091,7 @@ mod test {
                 application: None,
                 message_reference: None,
                 flags: None,
-                stickers: vec![],
+                sticker_items: vec![],
                 referenced_message: None,
                 #[cfg(feature = "unstable_discord_api")]
                 interaction: None,
@@ -1214,6 +1214,7 @@ mod test {
                     widget_channel_id: None,
                     stage_instances: vec![],
                     threads: vec![],
+                    stickers: HashMap::new(),
                 },
             }
         };
