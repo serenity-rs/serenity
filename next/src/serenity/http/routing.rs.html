@@ -2357,6 +2357,104 @@
 <span id="2357">2357</span>
 <span id="2358">2358</span>
 <span id="2359">2359</span>
+<span id="2360">2360</span>
+<span id="2361">2361</span>
+<span id="2362">2362</span>
+<span id="2363">2363</span>
+<span id="2364">2364</span>
+<span id="2365">2365</span>
+<span id="2366">2366</span>
+<span id="2367">2367</span>
+<span id="2368">2368</span>
+<span id="2369">2369</span>
+<span id="2370">2370</span>
+<span id="2371">2371</span>
+<span id="2372">2372</span>
+<span id="2373">2373</span>
+<span id="2374">2374</span>
+<span id="2375">2375</span>
+<span id="2376">2376</span>
+<span id="2377">2377</span>
+<span id="2378">2378</span>
+<span id="2379">2379</span>
+<span id="2380">2380</span>
+<span id="2381">2381</span>
+<span id="2382">2382</span>
+<span id="2383">2383</span>
+<span id="2384">2384</span>
+<span id="2385">2385</span>
+<span id="2386">2386</span>
+<span id="2387">2387</span>
+<span id="2388">2388</span>
+<span id="2389">2389</span>
+<span id="2390">2390</span>
+<span id="2391">2391</span>
+<span id="2392">2392</span>
+<span id="2393">2393</span>
+<span id="2394">2394</span>
+<span id="2395">2395</span>
+<span id="2396">2396</span>
+<span id="2397">2397</span>
+<span id="2398">2398</span>
+<span id="2399">2399</span>
+<span id="2400">2400</span>
+<span id="2401">2401</span>
+<span id="2402">2402</span>
+<span id="2403">2403</span>
+<span id="2404">2404</span>
+<span id="2405">2405</span>
+<span id="2406">2406</span>
+<span id="2407">2407</span>
+<span id="2408">2408</span>
+<span id="2409">2409</span>
+<span id="2410">2410</span>
+<span id="2411">2411</span>
+<span id="2412">2412</span>
+<span id="2413">2413</span>
+<span id="2414">2414</span>
+<span id="2415">2415</span>
+<span id="2416">2416</span>
+<span id="2417">2417</span>
+<span id="2418">2418</span>
+<span id="2419">2419</span>
+<span id="2420">2420</span>
+<span id="2421">2421</span>
+<span id="2422">2422</span>
+<span id="2423">2423</span>
+<span id="2424">2424</span>
+<span id="2425">2425</span>
+<span id="2426">2426</span>
+<span id="2427">2427</span>
+<span id="2428">2428</span>
+<span id="2429">2429</span>
+<span id="2430">2430</span>
+<span id="2431">2431</span>
+<span id="2432">2432</span>
+<span id="2433">2433</span>
+<span id="2434">2434</span>
+<span id="2435">2435</span>
+<span id="2436">2436</span>
+<span id="2437">2437</span>
+<span id="2438">2438</span>
+<span id="2439">2439</span>
+<span id="2440">2440</span>
+<span id="2441">2441</span>
+<span id="2442">2442</span>
+<span id="2443">2443</span>
+<span id="2444">2444</span>
+<span id="2445">2445</span>
+<span id="2446">2446</span>
+<span id="2447">2447</span>
+<span id="2448">2448</span>
+<span id="2449">2449</span>
+<span id="2450">2450</span>
+<span id="2451">2451</span>
+<span id="2452">2452</span>
+<span id="2453">2453</span>
+<span id="2454">2454</span>
+<span id="2455">2455</span>
+<span id="2456">2456</span>
+<span id="2457">2457</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
@@ -2614,6 +2712,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdRolesId</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/stickers` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdStickers</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/stickers/:sticker_id` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdStickersId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/vanity-url` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
@@ -2646,6 +2756,10 @@
     <span class="ident">GuildsIdWelcomeScreen</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/invites/:code` path.</span>
     <span class="ident">InvitesCode</span>,
+    <span class="doccomment">/// Route for the `/sticker-packs` path.</span>
+    <span class="ident">StickerPacks</span>,
+    <span class="doccomment">/// Route for the `/stickers/:sticker_id` path.</span>
+    <span class="ident">StickersId</span>,
     <span class="doccomment">/// Route for the `/users/:user_id` path.</span>
     <span class="ident">UsersId</span>,
     <span class="doccomment">/// Route for the `/users/@me` path.</span>
@@ -3018,6 +3132,14 @@
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/roles&quot;</span>), <span class="ident">guild_id</span>)
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_sticker</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">sticker_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/stickers/{}&quot;</span>), <span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_stickers</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/stickers&quot;</span>), <span class="ident">guild_id</span>)
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_vanity_url</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/vanity-url&quot;</span>), <span class="ident">guild_id</span>)
     }
@@ -3068,6 +3190,14 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_maintenances_upcoming</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="macro">status!</span>(<span class="string">&quot;/scheduled-maintenances/upcoming.json&quot;</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sticker</span>(<span class="ident">sticker_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/stickers/{}&quot;</span>), <span class="ident">sticker_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sticker_packs</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/sticker-packs&quot;</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">target</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
@@ -3318,6 +3448,9 @@
     <span class="ident">CreateRole</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">CreateSticker</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">CreateWebhook</span> {
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
     },
@@ -3396,6 +3529,10 @@
     <span class="ident">DeleteRole</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">role_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">DeleteSticker</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">DeleteWebhook</span> {
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
@@ -3501,6 +3638,10 @@
     },
     <span class="ident">EditRolePosition</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">EditSticker</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">EditVoiceState</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3636,6 +3777,9 @@
     <span class="ident">GetGuildRoles</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">GetGuildStickers</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">GetGuildVanityUrl</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
@@ -3672,6 +3816,14 @@
         <span class="ident">limit</span>: <span class="ident">u8</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
         <span class="ident">reaction</span>: <span class="ident">String</span>,
+    },
+    <span class="ident">GetSticker</span> {
+        <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetStickerPacks</span>,
+    <span class="ident">GetGuildSticker</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetUnresolvedIncidents</span>,
     <span class="ident">GetUpcomingMaintenances</span>,
@@ -3892,6 +4044,13 @@
                 <span class="ident">Route::GuildsIdRoles</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_roles</span>(<span class="ident">guild_id</span>)),
             ),
+            <span class="ident">RouteInfo::CreateSticker</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Post</span>,
+                <span class="ident">Route::GuildsIdStickers</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_stickers</span>(<span class="ident">guild_id</span>)),
+            ),
             <span class="ident">RouteInfo::CrosspostMessage</span> {
                 <span class="ident">channel_id</span>,
                 <span class="ident">message_id</span>,
@@ -4047,6 +4206,14 @@
                 <span class="ident">LightMethod::Delete</span>,
                 <span class="ident">Route::GuildsIdRolesId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_role</span>(<span class="ident">guild_id</span>, <span class="ident">role_id</span>)),
+            ),
+            <span class="ident">RouteInfo::DeleteSticker</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">sticker_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Delete</span>,
+                <span class="ident">Route::GuildsIdStickersId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_sticker</span>(<span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)),
             ),
             <span class="ident">RouteInfo::DeleteWebhook</span> {
                 <span class="ident">webhook_id</span>,
@@ -4245,6 +4412,14 @@
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::GuildsIdRolesId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_roles</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="ident">RouteInfo::EditSticker</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">sticker_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::GuildsIdStickersId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_sticker</span>(<span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)),
             ),
             <span class="ident">RouteInfo::EditVoiceState</span> {
                 <span class="ident">guild_id</span>,
@@ -4512,6 +4687,21 @@
                 <span class="ident">Route::GuildsIdRoles</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_roles</span>(<span class="ident">guild_id</span>)),
             ),
+            <span class="ident">RouteInfo::GetGuildSticker</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">sticker_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdStickersId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_sticker</span>(<span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)),
+            ),
+            <span class="ident">RouteInfo::GetGuildStickers</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdStickers</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_stickers</span>(<span class="ident">guild_id</span>)),
+            ),
             <span class="ident">RouteInfo::GetGuildVanityUrl</span> {
                 <span class="ident">guild_id</span>,
             } <span class="op">=</span><span class="op">&gt;</span> (
@@ -4587,6 +4777,12 @@
                     <span class="ident">channel_id</span>, <span class="ident">message_id</span>, <span class="ident">reaction</span>, <span class="ident">limit</span>, <span class="ident">after</span>,
                 )),
             ),
+            <span class="ident">RouteInfo::GetSticker</span> {
+                <span class="ident">sticker_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::StickersId</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::sticker</span>(<span class="ident">sticker_id</span>))),
+            <span class="ident">RouteInfo::GetStickerPacks</span> <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::StickerPacks</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::sticker_packs</span>()))
+            },
             <span class="ident">RouteInfo::GetUnresolvedIncidents</span> <span class="op">=</span><span class="op">&gt;</span> {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_incidents_unresolved</span>()))
             },

@@ -1189,6 +1189,7 @@
 <span id="1189">1189</span>
 <span id="1190">1190</span>
 <span id="1191">1191</span>
+<span id="1192">1192</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -2244,7 +2245,7 @@
                 <span class="ident">application</span>: <span class="prelude-val">None</span>,
                 <span class="ident">message_reference</span>: <span class="prelude-val">None</span>,
                 <span class="ident">flags</span>: <span class="prelude-val">None</span>,
-                <span class="ident">stickers</span>: <span class="macro">vec!</span>[],
+                <span class="ident">sticker_items</span>: <span class="macro">vec!</span>[],
                 <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                 <span class="ident">interaction</span>: <span class="prelude-val">None</span>,
@@ -2360,6 +2361,7 @@
                     <span class="ident">max_members</span>: <span class="prelude-val">None</span>,
                     <span class="ident">widget_enabled</span>: <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
                     <span class="ident">widget_channel_id</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">stickers</span>: <span class="ident">HashMap::new</span>(),
                 },
             }
         };

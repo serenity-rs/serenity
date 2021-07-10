@@ -471,6 +471,7 @@
 <span id="471">471</span>
 <span id="472">472</span>
 <span id="473">473</span>
+<span id="474">474</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the</span>
 <span class="doccomment">//! different _types_ of routes - such as getting the current user&#39;s channels -</span>
@@ -664,6 +665,7 @@
             <span class="ident">bucket</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">pre_hook</span>(<span class="kw-2">&amp;</span><span class="ident">route</span>).<span class="kw">await</span>;
 
             <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
+
             <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">execute</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="comment">// Check if the request got ratelimited by checking for status 429,</span>

@@ -516,6 +516,17 @@
 <span id="516">516</span>
 <span id="517">517</span>
 <span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -755,6 +766,17 @@
     <span class="doccomment">/// Provides the guild&#39;s id and the role&#39;s new data.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_role_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">_new_data</span>: <span class="ident">Role</span>) {}
+
+    <span class="doccomment">/// Dispatched when the stickers are updated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Provides the guild&#39;s id and the new state of the stickers in the guild.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_stickers_update</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
+        <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>,
+        <span class="ident">_current_state</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StickerId</span>, <span class="ident">Sticker</span><span class="op">&gt;</span>,
+    ) {
+    }
 
     <span class="doccomment">/// Dispatched when a guild became unavailable.</span>
     <span class="doccomment">///</span>

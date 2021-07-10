@@ -534,8 +534,6 @@
 <span id="534">534</span>
 <span id="535">535</span>
 <span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to channels and types within channels.</span>
 
@@ -548,7 +546,6 @@
 <span class="kw">mod</span> <span class="ident">partial_channel</span>;
 <span class="kw">mod</span> <span class="ident">private_channel</span>;
 <span class="kw">mod</span> <span class="ident">reaction</span>;
-<span class="kw">mod</span> <span class="ident">sticker</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
@@ -567,7 +564,6 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::partial_channel</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::private_channel</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::reaction</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::sticker</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::utils::deserialize_u64</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;

@@ -980,11 +980,11 @@
         <span class="ident">MANAGE_ROLES</span> <span class="op">=</span> <span class="number">0b0001_0000_0000_0000_0000_0000_0000_0000</span>;
         <span class="doccomment">/// Allows management of webhooks.</span>
         <span class="ident">MANAGE_WEBHOOKS</span> <span class="op">=</span> <span class="number">0b0010_0000_0000_0000_0000_0000_0000_0000</span>;
-        <span class="doccomment">/// Allows management of emojis created without the use of an</span>
-        <span class="doccomment">/// [`Integration`].</span>
+        <span class="doccomment">/// Allows management of emoji and stickers created without the use of</span>
+        <span class="doccomment">/// an [`Integration`].</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`Integration`]: super::guild::Integration</span>
-        <span class="ident">MANAGE_EMOJIS</span> <span class="op">=</span> <span class="number">0b0100_0000_0000_0000_0000_0000_0000_0000</span>;
+        <span class="ident">MANAGE_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">0b0100_0000_0000_0000_0000_0000_0000_0000</span>;
         <span class="doccomment">/// Allows for requesting to speak in stage channels.</span>
         <span class="ident">REQUEST_TO_SPEAK</span> <span class="op">=</span> <span class="number">0b1_0000_0000_0000_0000_0000_0000_0000_0000</span>;
         <span class="doccomment">/// Allows using slash commands.</span>
@@ -1005,7 +1005,7 @@
     <span class="ident">external_emojis</span>: <span class="string">&quot;Use External Emojis&quot;</span>,
     <span class="ident">kick_members</span>: <span class="string">&quot;Kick Members&quot;</span>,
     <span class="ident">manage_channels</span>: <span class="string">&quot;Manage Channels&quot;</span>,
-    <span class="ident">manage_emojis</span>: <span class="string">&quot;Manage Emojis&quot;</span>,
+    <span class="ident">manage_emojis_and_stickers</span>: <span class="string">&quot;Manage Emojis and Stickers&quot;</span>,
     <span class="ident">manage_guild</span>: <span class="string">&quot;Manage Guilds&quot;</span>,
     <span class="ident">manage_messages</span>: <span class="string">&quot;Manage Messages&quot;</span>,
     <span class="ident">manage_nicknames</span>: <span class="string">&quot;Manage Nicknames&quot;</span>,
@@ -1151,11 +1151,11 @@
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Manage Emojis] permission.</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis]: Self::MANAGE_EMOJIS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">manage_emojis</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span><span class="ident">::MANAGE_EMOJIS</span>)
+    <span class="doccomment">/// [Manage Emojis and Stickers]: Self::MANAGE_EMOJIS_AND_STICKERS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">manage_emojis_and_stickers</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span><span class="ident">::MANAGE_EMOJIS_AND_STICKERS</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>

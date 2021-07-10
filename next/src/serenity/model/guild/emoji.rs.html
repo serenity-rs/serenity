@@ -307,7 +307,7 @@
     <span class="doccomment">/// Deletes the emoji.</span>
     <span class="doccomment">/// This method requires the cache to fetch the guild ID.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: The [Manage Emojis] permission is required.</span>
+    <span class="doccomment">/// **Note**: The [Manage Emojis and Stickers] permission is required.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
@@ -346,7 +346,7 @@
     <span class="doccomment">/// or may return [`ModelError::ItemMissing`] if the emoji is not</span>
     <span class="doccomment">/// in the cache.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -361,14 +361,14 @@
     <span class="doccomment">/// Edits the emoji by updating it with a new name.</span>
     <span class="doccomment">/// This method requires the cache to fetch the guild ID.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: The [Manage Emojis] permission is required.</span>
+    <span class="doccomment">/// **Note**: The [Manage Emojis and Stickers] permission is required.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
     <span class="doccomment">/// or if an invalid name is given.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,

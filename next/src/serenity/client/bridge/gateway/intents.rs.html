@@ -302,6 +302,7 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
+<span id="305">305</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">bitflags::__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{
@@ -381,7 +382,8 @@
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_EMOJIS_UPDATE</span>
-        <span class="ident">GUILD_EMOJIS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
+        <span class="doccomment">/// - GUILD_STICKERS_UPDATE</span>
+        <span class="ident">GUILD_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_INTEGRATIONS_UPDATE</span>
@@ -520,11 +522,11 @@
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
-    <span class="doccomment">/// [GUILD_EMOJIS] intent.</span>
+    <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_EMOJIS]: Self::GUILD_EMOJIS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emojis</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span><span class="ident">::GUILD_EMOJIS</span>)
+    <span class="doccomment">/// [GUILD_EMOJIS_AND_STICKERS]: Self::GUILD_EMOJIS_AND_STICKERS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emojis_and_stickers</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span><span class="ident">::GUILD_EMOJIS_AND_STICKERS</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>

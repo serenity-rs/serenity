@@ -177,6 +177,16 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
@@ -321,6 +331,14 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerPackId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
 
+<span class="doccomment">/// An identifier for a sticker pack banner.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerPackBannerId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+
+<span class="doccomment">/// An identifier for a SKU.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SkuId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+
 <span class="doccomment">/// An identifier for an interaction.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
@@ -349,6 +367,8 @@
     <span class="ident">RoleId</span>;
     <span class="ident">StickerId</span>;
     <span class="ident">StickerPackId</span>;
+    <span class="ident">StickerPackBannerId</span>;
+    <span class="ident">SkuId</span>;
     <span class="ident">UserId</span>;
     <span class="ident">WebhookId</span>;
     <span class="ident">AuditLogEntryId</span>;

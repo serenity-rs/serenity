@@ -211,6 +211,16 @@
 <span id="211">211</span>
 <span id="212">212</span>
 <span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Error enum definition wrapping potential model implementation errors.</span>
 
@@ -378,6 +388,13 @@
     <span class="ident">NotAuthor</span>,
     <span class="doccomment">/// Indicates that the webhook token is missing.</span>
     <span class="ident">NoTokenSet</span>,
+    <span class="doccomment">/// When attempting to delete a built in nitro sticker instead of a guild</span>
+    <span class="doccomment">/// sticker.</span>
+    <span class="ident">DeleteNitroSticker</span>,
+    <span class="doccomment">/// Indicates that the sticker file is missing.</span>
+    <span class="ident">NoStickerFileSet</span>,
+    <span class="doccomment">/// When attempting to send a message with over 3 stickers.</span>
+    <span class="ident">StickerAmount</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
@@ -420,6 +437,9 @@
             <span class="ident">Error::NameTooLong</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is over the character limit.&quot;</span>),
             <span class="ident">Error::NotAuthor</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The bot is not author of this message.&quot;</span>),
             <span class="ident">Error::NoTokenSet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Token is not set.&quot;</span>),
+            <span class="ident">Error::DeleteNitroSticker</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Cannot delete an official sticker.&quot;</span>),
+            <span class="ident">Error::NoStickerFileSet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Sticker file is not set.&quot;</span>),
+            <span class="ident">Error::StickerAmount</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Too many stickers in a message.&quot;</span>),
         }
     }
 }

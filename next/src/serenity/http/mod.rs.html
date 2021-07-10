@@ -274,58 +274,6 @@
 <span id="274">274</span>
 <span id="275">275</span>
 <span id="276">276</span>
-<span id="277">277</span>
-<span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
 </pre><pre class="rust">
 <span class="doccomment">//! The HTTP module which provides functions for performing requests to</span>
 <span class="doccomment">//! endpoints in Discord&#39;s API.</span>
@@ -529,58 +477,6 @@
     <span class="ident">Path</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Path</span>),
     <span class="doccomment">/// Indicates that the [`AttachmentType`] is an image URL.</span>
     <span class="ident">Image</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-}
-
-<span class="kw">impl</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">into_http_form_part</span>(
-        <span class="self">self</span>,
-        <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">reqwest::Client</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">reqwest::multipart::Part</span>, <span class="kw">crate</span><span class="ident">::Error</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">bytes::buf::Buf</span>;
-        <span class="kw">use</span> <span class="ident">tokio::io::AsyncReadExt</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AttachmentType::Bytes</span> {
-                <span class="ident">data</span>,
-                <span class="ident">filename</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reqwest::multipart::Part::bytes</span>(<span class="ident">data</span>.<span class="ident">into_owned</span>()).<span class="ident">file_name</span>(<span class="ident">filename</span>),
-            <span class="ident">AttachmentType::File</span> {
-                <span class="ident">file</span>,
-                <span class="ident">filename</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                <span class="ident">file</span>.<span class="ident">try_clone</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-                <span class="ident">reqwest::multipart::Part::stream</span>(<span class="ident">buf</span>).<span class="ident">file_name</span>(<span class="ident">filename</span>)
-            },
-            <span class="ident">AttachmentType::Path</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span>
-                    <span class="ident">path</span>.<span class="ident">file_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">filename</span><span class="op">|</span> <span class="ident">filename</span>.<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>());
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-                <span class="ident">file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-                <span class="kw">match</span> <span class="ident">filename</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">filename</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reqwest::multipart::Part::bytes</span>(<span class="ident">buf</span>).<span class="ident">file_name</span>(<span class="ident">filename</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">reqwest::multipart::Part::bytes</span>(<span class="ident">buf</span>),
-                }
-            },
-            <span class="ident">AttachmentType::Image</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span>
-                    <span class="ident">reqwest::Url::parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">crate</span><span class="ident">::Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">url</span>
-                    .<span class="ident">path_segments</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">segments</span><span class="op">|</span> <span class="ident">segments</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>))
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">crate</span><span class="ident">::Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get</span>(<span class="ident">url</span>).<span class="ident">send</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">bytes</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">picture</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">bytes</span>.<span class="ident">len</span>()];
-                <span class="ident">bytes</span>.<span class="ident">copy_to_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">picture</span>[..]);
-
-                <span class="ident">reqwest::multipart::Part::bytes</span>(<span class="ident">picture</span>).<span class="ident">file_name</span>(<span class="ident">filename</span>.<span class="ident">to_string</span>())
-            },
-        })
-    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {

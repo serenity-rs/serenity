@@ -1510,13 +1510,136 @@
 <span id="1510">1510</span>
 <span id="1511">1511</span>
 <span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder::CreateChannel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">EditGuild</span>, <span class="ident">EditGuildWelcomeScreen</span>, <span class="ident">EditGuildWidget</span>, <span class="ident">EditMember</span>, <span class="ident">EditRole</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{
+    <span class="ident">CreateSticker</span>,
+    <span class="ident">EditGuild</span>,
+    <span class="ident">EditGuildWelcomeScreen</span>,
+    <span class="ident">EditGuildWidget</span>,
+    <span class="ident">EditMember</span>,
+    <span class="ident">EditRole</span>,
+    <span class="ident">EditSticker</span>,
+};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -1731,7 +1854,7 @@
     <span class="doccomment">/// Refer to the documentation for [`Guild::create_emoji`] for more</span>
     <span class="doccomment">/// information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the [Manage Emojis] permission.</span>
+    <span class="doccomment">/// Requires the [Manage Emojis and Stickers] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1745,7 +1868,7 @@
     <span class="doccomment">/// if the name is too long, or if the image is too big.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar</span>
-    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_emoji</span>(
         <span class="self">self</span>,
@@ -1816,6 +1939,35 @@
         <span class="prelude-val">Ok</span>(<span class="ident">role</span>)
     }
 
+    <span class="doccomment">/// Creates a new sticker in the guild with the data set, if any.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Emojis and Stickers] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if invalid data is given.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_sticker</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateSticker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateSticker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_sticker</span> <span class="op">=</span> <span class="ident">CreateSticker::default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">create_sticker</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">create_sticker</span>.<span class="number">0</span>);
+
+        <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">create_sticker</span>.<span class="number">1</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::NoStickerFileSet</span>)),
+        };
+
+        <span class="kw">let</span> <span class="ident">sticker</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_sticker</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">map</span>, <span class="ident">file</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="ident">sticker</span>)
+    }
+
     <span class="doccomment">/// Deletes the current guild if the current account is the owner of the</span>
     <span class="doccomment">/// guild.</span>
     <span class="doccomment">///</span>
@@ -1833,14 +1985,14 @@
 
     <span class="doccomment">/// Deletes an [`Emoji`] from the guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Manage Emojis] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Emojis and Stickers] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
     <span class="doccomment">/// or if an Emoji with that Id does not exist.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_emoji</span>(
         <span class="self">self</span>,
@@ -1891,6 +2043,25 @@
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_role</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
     }
 
+    <span class="doccomment">/// Deletes a [`Sticker`] by Id from the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Manage Emojis and Stickers] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if a sticker with that Id does not exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_sticker</span>(
+        <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">sticker_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_sticker</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">sticker_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Edits the current guild with new data where specified.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to [`Guild::edit`] for more information.</span>
@@ -1921,13 +2092,13 @@
     <span class="doccomment">/// Also see [`Emoji::edit`] if you have the `cache` and `methods` features</span>
     <span class="doccomment">/// enabled.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the [Manage Emojis] permission.</span>
+    <span class="doccomment">/// Requires the [Manage Emojis and Stickers] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_emoji</span>(
@@ -2035,6 +2206,41 @@
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">edit_role</span>.<span class="number">0</span>);
 
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_role</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Edits a [`Sticker`], optionally setting its fields.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Requires the [Manage Emojis and Stickers] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Rename a sticker:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,ignore</span>
+    <span class="doccomment">/// guild.edit_sticker(&amp;context, StickerId(7), |r| r.name(&quot;Bun bun meow&quot;));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_sticker</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">sticker_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StickerId</span><span class="op">&gt;</span>,
+        <span class="ident">f</span>: <span class="ident">F</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditSticker</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditSticker</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_sticker</span> <span class="op">=</span> <span class="ident">EditSticker::default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">edit_sticker</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">edit_sticker</span>.<span class="number">0</span>);
+
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_sticker</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">sticker_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Edits the order of [`Role`]s</span>
@@ -2189,6 +2395,30 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="ident">EmojiId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_emoji</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">emoji_id</span>.<span class="number">0</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Gets all [`Sticker`]s of this guild via HTTP.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an [`Error::Http`] if the guild is unavailable.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stickers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_stickers</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Gets an [`Sticker`] of this guild by its ID via HTTP.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an [`Error::Http`] if an sticker with that Id does not exist.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sticker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">sticker_id</span>: <span class="ident">StickerId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_sticker</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">sticker_id</span>.<span class="number">0</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Gets all integration of the guild.</span>
