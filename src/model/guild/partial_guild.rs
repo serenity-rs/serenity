@@ -1645,7 +1645,7 @@ impl<'de> Deserialize<'de> for PartialGuild {
             .map_err(DeError::custom)?;
         let features = map
             .remove("features")
-            .ok_or_else(|| Error::Other("expected guild features"))
+            .ok_or(Error::Other("expected guild features"))
             .and_then(from_value::<Vec<String>>)
             .map_err(DeError::custom)?;
         let icon = match map.remove("icon") {
