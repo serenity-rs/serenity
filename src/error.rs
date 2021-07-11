@@ -214,7 +214,7 @@ impl Display for Error {
             Error::Json(inner) => fmt::Display::fmt(&inner, f),
             Error::Model(inner) => fmt::Display::fmt(&inner, f),
             Error::Num(inner) => fmt::Display::fmt(&inner, f),
-            Error::Url(msg) => f.write_str(&msg),
+            Error::Url(msg) => f.write_str(msg),
             #[cfg(feature = "simd-json")]
             Error::SimdJson(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "client")]

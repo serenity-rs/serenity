@@ -366,6 +366,7 @@ pub fn deserialize_comma_separated_string<'de, D: Deserializer<'de>>(
     Ok(vec)
 }
 
+#[allow(clippy::ptr_arg)]
 pub fn serialize_comma_separated_string<S: Serializer>(
     vec: &Vec<String>,
     serializer: S,
