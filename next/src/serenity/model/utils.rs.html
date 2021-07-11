@@ -543,6 +543,7 @@
 <span id="543">543</span>
 <span id="544">544</span>
 <span id="545">545</span>
+<span id="546">546</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">hash::Hash</span>};
 
@@ -887,6 +888,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">vec</span>)
 }
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_comma_separated_string</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
     <span class="ident">vec</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">serializer</span>: <span class="ident">S</span>,
