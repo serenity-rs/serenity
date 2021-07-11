@@ -224,24 +224,20 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">simd_json::Mutable</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::from_number</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::Value</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::interactions::ApplicationCommandOptionType</span>, <span class="ident">utils</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::interactions::application_command::ApplicationCommandOptionType</span>, <span class="ident">utils</span>};
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommandOption`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Self::kind`], [`Self::name`], and [`Self::description`] are required fields.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ApplicationCommandOption`]: crate::model::interactions::ApplicationCommandOption</span>
+<span class="doccomment">/// [`ApplicationCommandOption`]: crate::model::interactions::application_command::ApplicationCommandOption</span>
 <span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="doccomment">/// [`name`]: Self::name</span>
 <span class="doccomment">/// [`description`]: Self::description</span>
@@ -317,8 +313,8 @@
 
     <span class="doccomment">/// If the option is a [`SubCommand`] or [`SubCommandGroup`] nested options are its parameters.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SubCommand`]: crate::model::interactions::ApplicationCommandOptionType::SubCommand</span>
-    <span class="doccomment">/// [`SubCommandGroup`]: crate::model::interactions::ApplicationCommandOptionType::SubCommandGroup</span>
+    <span class="doccomment">/// [`SubCommand`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommand</span>
+    <span class="doccomment">/// [`SubCommandGroup`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommandGroup</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_sub_option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateApplicationCommandOption</span>,
@@ -342,7 +338,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Self::name`] and [`Self::description`] are required fields.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand</span>
+<span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommand</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 

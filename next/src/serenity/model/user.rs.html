@@ -1131,6 +1131,55 @@
 <span id="1131">1131</span>
 <span id="1132">1132</span>
 <span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
+<span id="1153">1153</span>
+<span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
 </pre><pre class="rust">
 <span class="doccomment">//! User information-related models.</span>
 
@@ -1145,7 +1194,7 @@
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::utils::deserialize_u16</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateMessage</span>, <span class="ident">EditProfile</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateBotAuthParameters</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditProfile</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -1348,6 +1397,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the permissions passed are empty, the permissions part will be dropped.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// Only the `bot` scope is used, if you wish to use more, such as slash commands, see</span>
+    <span class="doccomment">/// [`Self::invite_url_with_oauth2_scopes`]</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Get the invite url with no permissions set:</span>
@@ -1410,7 +1462,7 @@
     <span class="doccomment">/// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]</span>
     <span class="doccomment">/// If the user is not authorized for this end point.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// May return [`Error::Format`] while writing url to the buffer.</span>
+    <span class="doccomment">/// Should never return [`Error::Url`] as all the data is controlled over.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_url</span>(
@@ -1418,17 +1470,63 @@
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">permissions</span>.<span class="ident">bits</span>();
-        <span class="kw">let</span> <span class="ident">client_id</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_current_application_info</span>().<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">invite_url_with_oauth2_scopes</span>(<span class="ident">http</span>, <span class="ident">permissions</span>, <span class="kw-2">&amp;</span>[<span class="ident">OAuth2Scope::Bot</span>]).<span class="kw">await</span>
+    }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span>
-            <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/api/oauth2/authorize?client_id={}&amp;scope=bot&quot;</span>, <span class="ident">client_id</span>);
+    <span class="doccomment">/// Generate an invite url, but with custom scopes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Get the invite url with no permissions set and slash commands support:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// # use serenity::model::user::CurrentUser;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # async fn run() {</span>
+    <span class="doccomment">/// #     let user = CurrentUser::default();</span>
+    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// use serenity::model::Permissions;</span>
+    <span class="doccomment">/// use serenity::model::oauth2::OAuth2Scope;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let scopes = vec![OAuth2Scope::Bot, OAuth2Scope::ApplicationsCommands];</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // assuming the user has been bound</span>
+    <span class="doccomment">/// let url = match user.invite_url_with_oauth2_scopes(&amp;http, Permissions::empty(), &amp;scopes).await {</span>
+    <span class="doccomment">///     Ok(v) =&gt; v,</span>
+    <span class="doccomment">///     Err(why) =&gt; {</span>
+    <span class="doccomment">///         println!(&quot;Error getting invite url: {:?}&quot;, why);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///         return;</span>
+    <span class="doccomment">///     },</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(url, &quot;https://discordapp.com/api/oauth2/authorize? \</span>
+    <span class="doccomment">///                  client_id=249608697955745802&amp;scope=bot%20applications.commands&quot;);</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an</span>
+    <span class="doccomment">/// [`HttpError::UnsuccessfulRequest(Unauthorized)`][`HttpError::UnsuccessfulRequest`]</span>
+    <span class="doccomment">/// If the user is not authorized for this end point.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Should never return [`Error::Url`] as all the data is controlled over.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_url_with_oauth2_scopes</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
+        <span class="ident">scopes</span>: <span class="kw-2">&amp;</span>[<span class="ident">OAuth2Scope</span>],
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateBotAuthParameters::default</span>();
 
-        <span class="kw">if</span> <span class="ident">bits</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="macro">write!</span>(<span class="ident">url</span>, <span class="string">&quot;&amp;permissions={}&quot;</span>, <span class="ident">bits</span>)<span class="question-mark">?</span>;
-        }
+        <span class="ident">builder</span>.<span class="ident">permissions</span>(<span class="ident">permissions</span>);
+        <span class="ident">builder</span>.<span class="ident">auto_client_id</span>(<span class="ident">http</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">builder</span>.<span class="ident">scopes</span>(<span class="ident">scopes</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">url</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">builder</span>.<span class="ident">build</span>())
     }
 
     <span class="doccomment">/// Returns a static formatted URL of the user&#39;s icon, if one exists.</span>
@@ -1584,7 +1682,7 @@
 }
 
 <span class="doccomment">/// User&#39;s public flags</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserPublicFlags</span> {
     <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u32</span>,
 }

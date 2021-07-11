@@ -334,12 +334,12 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::channel::ReactionType</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude::ButtonStyle</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions::message_component::ButtonStyle</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
 
 <span class="doccomment">/// A builder for creating several [`ActionRow`]s.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ActionRow`]: crate::model::interactions::ActionRow</span>
+<span class="doccomment">/// [`ActionRow`]: crate::model::interactions::message_component::ActionRow</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateComponents</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -378,7 +378,7 @@
 
 <span class="doccomment">/// A builder for creating an [`ActionRow`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ActionRow`]: crate::model::interactions::ActionRow</span>
+<span class="doccomment">/// [`ActionRow`]: crate::model::interactions::message_component::ActionRow</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateActionRow</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -432,7 +432,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">1</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">1_u8</span>));
 
         <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
@@ -440,7 +440,7 @@
 
 <span class="doccomment">/// A builder for creating a [`Button`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Button`]: crate::model::interactions::Button</span>
+<span class="doccomment">/// [`Button`]: crate::model::interactions::message_component::Button</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateButton</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -502,7 +502,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">2</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">2_u8</span> <span class="kw">as</span> <span class="ident">u8</span>));
 
         <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
@@ -510,7 +510,7 @@
 
 <span class="doccomment">/// A builder for creating a [`SelectMenu`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`SelectMenu`]: crate::model::interactions::SelectMenu</span>
+<span class="doccomment">/// [`SelectMenu`]: crate::model::interactions::message_component::SelectMenu</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateSelectMenu</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -552,7 +552,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">3</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">3_u8</span>));
 
         <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
@@ -560,7 +560,7 @@
 
 <span class="doccomment">/// A builder for creating several [`SelectMenuOption`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`SelectMenuOption`]: crate::model::interactions::SelectMenuOption</span>
+<span class="doccomment">/// [`SelectMenuOption`]: crate::model::interactions::message_component::SelectMenuOption</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateSelectMenuOptions</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -604,7 +604,7 @@
 
 <span class="doccomment">/// A builder for creating a [`SelectMenuOption`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`SelectMenuOption`]: crate::model::interactions::SelectMenuOption</span>
+<span class="doccomment">/// [`SelectMenuOption`]: crate::model::interactions::message_component::SelectMenuOption</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateSelectMenuOption</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 

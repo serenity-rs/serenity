@@ -1248,6 +1248,43 @@
 <span id="1248">1248</span>
 <span id="1249">1249</span>
 <span id="1250">1250</span>
+<span id="1251">1251</span>
+<span id="1252">1252</span>
+<span id="1253">1253</span>
+<span id="1254">1254</span>
+<span id="1255">1255</span>
+<span id="1256">1256</span>
+<span id="1257">1257</span>
+<span id="1258">1258</span>
+<span id="1259">1259</span>
+<span id="1260">1260</span>
+<span id="1261">1261</span>
+<span id="1262">1262</span>
+<span id="1263">1263</span>
+<span id="1264">1264</span>
+<span id="1265">1265</span>
+<span id="1266">1266</span>
+<span id="1267">1267</span>
+<span id="1268">1268</span>
+<span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
 </pre><pre class="rust">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
@@ -1323,11 +1360,13 @@
     <span class="doccomment">/// The name of the channel.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Permission overwrites for [`Member`]s and for [`Role`]s.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">permission_overwrites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PermissionOverwrite</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The position of the channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The default text channel will _almost always_ have a position of `-1` or</span>
     <span class="doccomment">/// `0`.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
     <span class="doccomment">/// The topic of the channel.</span>
     <span class="doccomment">///</span>
@@ -1356,6 +1395,26 @@
     <span class="kw">pub</span> <span class="ident">rtc_region</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The video quality mode for a voice channel.</span>
     <span class="kw">pub</span> <span class="ident">video_quality_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VideoQualityMode</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An approximate count of messages in the thread, stops counting at 50.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This is only available on thread channels.</span>
+    <span class="kw">pub</span> <span class="ident">message_count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An approximate count of users in a thread, stops counting at 50.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This is only available on thread channels.</span>
+    <span class="kw">pub</span> <span class="ident">member_count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The thread metadata.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This is only available on thread channels.</span>
+    <span class="kw">pub</span> <span class="ident">thread_metadata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ThreadMetadata</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Thread member object for the current user, if they have joined the thread,</span>
+    <span class="doccomment">/// only included on certain API endpoints.</span>
+    <span class="kw">pub</span> <span class="ident">member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ThreadMember</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Default duration for newly created threads, in minutes, to automatically</span>
+    <span class="doccomment">/// archive the thread after recent activity.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: It can currently only be set to 60, 1440, 4320, 10080.</span>
+    <span class="kw">pub</span> <span class="ident">default_auto_archive_duration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2498,6 +2557,21 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
         <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>.<span class="ident">mention</span>(), <span class="ident">f</span>)
     }
+}
+
+<span class="doccomment">/// A partial guild channel.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PartialGuildChannel</span> {
+    <span class="doccomment">/// The channel Id.</span>
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ChannelId</span>,
+    <span class="doccomment">/// The channel guild Id.</span>
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    <span class="doccomment">/// The channel category Id.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;parent_id&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">category_id</span>: <span class="ident">ChannelId</span>,
+    <span class="doccomment">/// The channel type.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>

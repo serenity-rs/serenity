@@ -667,6 +667,12 @@
 <span id="667">667</span>
 <span id="668">668</span>
 <span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
@@ -989,6 +995,12 @@
         <span class="ident">REQUEST_TO_SPEAK</span> <span class="op">=</span> <span class="number">0b1_0000_0000_0000_0000_0000_0000_0000_0000</span>;
         <span class="doccomment">/// Allows using slash commands.</span>
         <span class="ident">USE_SLASH_COMMANDS</span> <span class="op">=</span> <span class="number">0b1000_0000_0000_0000_0000_0000_0000_0000</span>;
+        <span class="doccomment">/// Allows for deleting and archiving threads, and viewing all private threads.</span>
+        <span class="ident">MANAGE_THREADS</span> <span class="op">=</span> <span class="number">0b0001_0000_0000_0000_0000_0000_0000_0000_0000</span>;
+        <span class="doccomment">/// Allows for creating and participating in public threads.</span>
+        <span class="ident">USE_PUBLIC_THREADS</span> <span class="op">=</span> <span class="number">0b0010_0000_0000_0000_0000_0000_0000_0000_0000</span>;
+        <span class="comment">// Allows for creating and participating in private threads.</span>
+        <span class="ident">USE_PRIVATE_THREADS</span> <span class="op">=</span> <span class="number">0b0100_0000_0000_0000_0000_0000_0000_0000_0000</span>;
     }
 }
 
