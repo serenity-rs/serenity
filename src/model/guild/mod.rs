@@ -286,13 +286,10 @@ impl Guild {
     pub async fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
-            match channel {
-                Channel::Guild(ref channel) => {
-                    if self.user_permissions_in(channel, member).ok()?.read_messages() {
-                        return Some(channel);
-                    }
-                },
-                _ => {},
+            if let Channel::Guild(channel) = channel {
+                if self.user_permissions_in(channel, member).ok()?.read_messages() {
+                    return Some(channel);
+                }
             }
         }
 
@@ -307,15 +304,12 @@ impl Guild {
     /// members, or both.
     pub async fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         for channel in self.channels.values() {
-            match channel {
-                Channel::Guild(ref channel) => {
-                    for member in self.members.values() {
-                        if self.user_permissions_in(channel, member).ok()?.read_messages() {
-                            return Some(channel);
-                        }
+            if let Channel::Guild(channel) = channel {
+                for member in self.members.values() {
+                    if self.user_permissions_in(channel, member).ok()?.read_messages() {
+                        return Some(channel);
                     }
-                },
-                _ => {},
+                }
             }
         }
 
@@ -2565,7 +2559,7 @@ impl<'de> Deserialize<'de> for Guild {
             .map_err(DeError::custom)?;
         let features = map
             .remove("features")
-            .ok_or_else(|| Error::Other("expected guild features"))
+            .ok_or(Error::Other("expected guild features"))
             .and_then(from_value::<Vec<String>>)
             .map_err(DeError::custom)?;
         let icon = match map.remove("icon") {

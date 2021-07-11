@@ -191,13 +191,10 @@ impl Member {
         let member = guild.members.get(&self.user.id)?;
 
         for channel in guild.channels.values() {
-            match channel {
-                Channel::Guild(channel) => {
-                    if guild.user_permissions_in(channel, member).ok()?.read_messages() {
-                        return Some(channel.clone());
-                    }
-                },
-                _ => {},
+            if let Channel::Guild(channel) = channel {
+                if guild.user_permissions_in(channel, member).ok()?.read_messages() {
+                    return Some(channel.clone());
+                }
             }
         }
 
