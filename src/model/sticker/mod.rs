@@ -1,11 +1,11 @@
 #[cfg(feature = "model")]
-use crate::model::prelude::*;
-#[cfg(feature = "model")]
 use crate::builder::EditSticker;
 #[cfg(feature = "model")]
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+#[cfg(feature = "model")]
+use crate::model::prelude::*;
 use crate::model::{
     id::{GuildId, StickerId, StickerPackId},
     user::User,
