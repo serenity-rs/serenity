@@ -518,7 +518,7 @@ impl Http {
             body: None,
             multipart: Some(Multipart {
                 files: files.into_iter().map(Into::into).collect(),
-                payload_json: Some(to_value(map)?),
+                payload_json: Some(map.clone()),
                 fields: vec![],
             }),
             headers: None,
@@ -1393,7 +1393,7 @@ impl Http {
             body: None,
             multipart: Some(Multipart {
                 files: new_attachments.into_iter().map(Into::into).collect(),
-                payload_json: Some(to_value(map)?),
+                payload_json: Some(map.clone()),
                 fields: vec![],
             }),
             headers: None,
