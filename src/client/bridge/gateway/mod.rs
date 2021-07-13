@@ -69,7 +69,7 @@ use crate::gateway::ConnectionStage;
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::large_enum_variant)]
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].
     Manager(ShardManagerMessage),

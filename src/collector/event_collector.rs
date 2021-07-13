@@ -30,7 +30,7 @@ use crate::{
 };
 
 /// Filters events on the shard's end and sends them to the collector.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct EventFilter {
     filtered: u32,
     collected: u32,
@@ -112,7 +112,7 @@ impl EventFilter {
     fn is_passing_constraints(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
         fn empty_or_any<T, F>(slice: &[T], f: F) -> bool
         where
-            F: FnMut(&T) -> bool,
+            F: Fn(&T) -> bool,
         {
             slice.is_empty() || slice.iter().any(f)
         }
@@ -134,15 +134,16 @@ impl EventFilter {
     }
 }
 
-struct FilterFn(Box<dyn FnMut(&Arc<Event>) -> bool + 'static + Send + Sync>);
+#[derive(Clone)]
+struct FilterFn(Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>);
 
 impl std::fmt::Debug for FilterFn {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("Box<dyn FnMut(&Arc<Event>) -> bool + 'static + Send + Sync>")
+        f.write_str("Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>")
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 struct FilterOptions {
     event_types: Vec<EventType>,
     filter_limit: Option<u32>,
@@ -200,11 +201,11 @@ impl<'a> EventCollectorBuilder<'a> {
     /// process.
     /// This is the last step to pass for a event to count as *collected*.
     #[allow(clippy::unwrap_used)]
-    pub fn filter<F: FnMut(&Arc<Event>) -> bool + 'static + Send + Sync>(
+    pub fn filter<F: Fn(&Arc<Event>) -> bool + 'static + Send + Sync>(
         mut self,
         function: F,
     ) -> Self {
-        self.filter.as_mut().unwrap().filter = Some(FilterFn(Box::new(function)));
+        self.filter.as_mut().unwrap().filter = Some(FilterFn(Arc::new(function)));
 
         self
     }

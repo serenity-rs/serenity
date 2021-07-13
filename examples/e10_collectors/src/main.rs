@@ -169,19 +169,25 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     // We can also collect arbitrary events using the generic EventCollector. For example, here we
     // collect updates to the messages that the user sent above and check for them updating all 5 of
     // them.
-    let mut edited = HashSet::new();
     let builder = EventCollectorBuilder::new(&ctx)
         .add_event_type(EventType::MessageUpdate)
-        .filter(move |event| match event.as_ref() {
-            Event::MessageUpdate(e) => edited.insert(e.id),
-            e => panic!("Unexpected event type received: {:?}", e.event_type()),
-        })
-        .collect_limit(5)
         .timeout(Duration::from_secs(20));
-    let collector = collected.iter().fold(builder, |b, msg| b.add_message_id(msg.id)).await?;
+    // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
+    let mut collector = collected.iter().fold(builder, |b, msg| b.add_message_id(msg.id)).await?;
 
     let _ = msg.reply(ctx, "Edit each of those 5 messages in 20 seconds").await;
-    let edited: Vec<_> = collector.collect().await;
+    let mut edited = HashSet::new();
+    while let Some(event) = collector.next().await {
+        match event.as_ref() {
+            Event::MessageUpdate(e) => {
+                edited.insert(e.id);
+            },
+            e => panic!("Unexpected event type received: {:?}", e.event_type()),
+        }
+        if edited.len() >= 5 {
+            break;
+        }
+    }
 
     if edited.len() >= 5 {
         score += 1;
