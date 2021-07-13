@@ -503,6 +503,33 @@ impl Http {
         .await
     }
 
+    /// Create a follow-up message with attachments for an Interaction.
+    ///
+    /// Functions the same as [`Self::execute_webhook`]
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn create_followup_message_with_files(
+        &self,
+        interaction_token: &str,
+        map: &Value,
+        files: impl IntoIterator<Item = AttachmentType<'_>>,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            multipart: Some(Multipart {
+                files: files.into_iter().map(Into::into).collect(),
+                payload_json: Some(to_value(map)?),
+                fields: vec![],
+            }),
+            headers: None,
+            route: RouteInfo::CreateFollowupMessage {
+                application_id: self.application_id,
+                interaction_token,
+            },
+        })
+        .await
+    }
+
     /// Creates a new global command.
     ///
     /// New global commands will be available in all guilds after 1 hour.

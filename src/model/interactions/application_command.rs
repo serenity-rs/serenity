@@ -189,7 +189,17 @@ impl ApplicationCommandInteraction {
 
         Message::check_lengths(&map)?;
 
-        http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
+        if interaction_response.1.is_empty() {
+            http.as_ref().create_followup_message(&self.token, &Value::from(map)).await
+        } else {
+            http.as_ref()
+                .create_followup_message_with_files(
+                    &self.token,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
     }
 
     /// Edits a followup response to the response sent.
