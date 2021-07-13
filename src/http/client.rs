@@ -1375,6 +1375,37 @@ impl Http {
         .await
     }
 
+    /// Edits a follow-up message and its attachments for an interaction.
+    ///
+    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub async fn edit_followup_message_and_attachments(
+        &self,
+        interaction_token: &str,
+        message_id: u64,
+        map: &Value,
+        new_attachments: impl IntoIterator<Item = AttachmentType<'_>>,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            multipart: Some(Multipart {
+                files: new_attachments.into_iter().map(Into::into).collect(),
+                payload_json: Some(to_value(map)?),
+                fields: vec![],
+            }),
+            headers: None,
+            route: RouteInfo::EditFollowupMessage {
+                application_id: self.application_id,
+                interaction_token,
+                message_id,
+            },
+        })
+        .await
+    }
+
     /// Edits a global command.
     ///
     /// Updates will be available in all guilds after 1 hour.

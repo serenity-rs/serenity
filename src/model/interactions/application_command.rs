@@ -233,9 +233,20 @@ impl ApplicationCommandInteraction {
 
         Message::check_lengths(&map)?;
 
-        http.as_ref()
-            .edit_followup_message(&self.token, message_id.into().into(), &Value::from(map))
-            .await
+        let message_id = message_id.into().into();
+
+        if interaction_response.1.is_empty() {
+            http.as_ref().edit_followup_message(&self.token, message_id, &Value::from(map)).await
+        } else {
+            http.as_ref()
+                .edit_followup_message_and_attachments(
+                    &self.token,
+                    message_id,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
     }
 
     /// Deletes a followup message.
