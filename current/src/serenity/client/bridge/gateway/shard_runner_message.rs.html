@@ -74,13 +74,17 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector::ComponentInteractionFilter</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">EventFilter</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{
     <span class="ident">gateway::Activity</span>,
     <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
@@ -138,6 +142,10 @@
     <span class="ident">SetPresence</span>(<span class="ident">OnlineStatus</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>),
     <span class="doccomment">/// Indicates that the client is to update the shard&#39;s presence&#39;s status.</span>
     <span class="ident">SetStatus</span>(<span class="ident">OnlineStatus</span>),
+    <span class="doccomment">/// Sends a new filter for events to the shard.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
+    <span class="ident">SetEventFilter</span>(<span class="ident">EventFilter</span>),
     <span class="doccomment">/// Sends a new filter for messages to the shard.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>

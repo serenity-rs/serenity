@@ -42,19 +42,31 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Collectors will receive events from the contextual shard, check if the</span>
 <span class="doccomment">//! filter lets them pass, and collects if the receive, collect, or time limits</span>
 <span class="doccomment">//! are not reached yet.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">component_interaction_collector</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_collector</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reaction_collector</span>;
 
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
+<span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">CollectorError</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">component_interaction_collector</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event_collector</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_collector</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reaction_collector</span>;
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">component_interaction_collector</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">event_collector</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">message_collector</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reaction_collector</span>::<span class="kw-2">*</span>;
 

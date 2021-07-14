@@ -3029,6 +3029,78 @@
 <span id="3029">3029</span>
 <span id="3030">3030</span>
 <span id="3031">3031</span>
+<span id="3032">3032</span>
+<span id="3033">3033</span>
+<span id="3034">3034</span>
+<span id="3035">3035</span>
+<span id="3036">3036</span>
+<span id="3037">3037</span>
+<span id="3038">3038</span>
+<span id="3039">3039</span>
+<span id="3040">3040</span>
+<span id="3041">3041</span>
+<span id="3042">3042</span>
+<span id="3043">3043</span>
+<span id="3044">3044</span>
+<span id="3045">3045</span>
+<span id="3046">3046</span>
+<span id="3047">3047</span>
+<span id="3048">3048</span>
+<span id="3049">3049</span>
+<span id="3050">3050</span>
+<span id="3051">3051</span>
+<span id="3052">3052</span>
+<span id="3053">3053</span>
+<span id="3054">3054</span>
+<span id="3055">3055</span>
+<span id="3056">3056</span>
+<span id="3057">3057</span>
+<span id="3058">3058</span>
+<span id="3059">3059</span>
+<span id="3060">3060</span>
+<span id="3061">3061</span>
+<span id="3062">3062</span>
+<span id="3063">3063</span>
+<span id="3064">3064</span>
+<span id="3065">3065</span>
+<span id="3066">3066</span>
+<span id="3067">3067</span>
+<span id="3068">3068</span>
+<span id="3069">3069</span>
+<span id="3070">3070</span>
+<span id="3071">3071</span>
+<span id="3072">3072</span>
+<span id="3073">3073</span>
+<span id="3074">3074</span>
+<span id="3075">3075</span>
+<span id="3076">3076</span>
+<span id="3077">3077</span>
+<span id="3078">3078</span>
+<span id="3079">3079</span>
+<span id="3080">3080</span>
+<span id="3081">3081</span>
+<span id="3082">3082</span>
+<span id="3083">3083</span>
+<span id="3084">3084</span>
+<span id="3085">3085</span>
+<span id="3086">3086</span>
+<span id="3087">3087</span>
+<span id="3088">3088</span>
+<span id="3089">3089</span>
+<span id="3090">3090</span>
+<span id="3091">3091</span>
+<span id="3092">3092</span>
+<span id="3093">3093</span>
+<span id="3094">3094</span>
+<span id="3095">3095</span>
+<span id="3096">3096</span>
+<span id="3097">3097</span>
+<span id="3098">3098</span>
+<span id="3099">3099</span>
+<span id="3100">3100</span>
+<span id="3101">3101</span>
+<span id="3102">3102</span>
+<span id="3103">3103</span>
 </pre><pre class="rust">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -5452,6 +5524,19 @@
     <span class="ident">Multiple</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">std::cmp::PartialEq</span>,
+    {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">RelatedId::Never</span> <span class="op">|</span> <span class="ident">RelatedId::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">RelatedId::Some</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">value</span>,
+            <span class="ident">RelatedId::Multiple</span>(<span class="ident">ids</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ids</span>.<span class="ident">contains</span>(<span class="ident">value</span>),
+        }
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
@@ -5837,6 +5922,63 @@
     }
 }
 
+<span class="doccomment">/// Defines the related IDs that may exist for an [`EventType`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If a field equals `false`, the corresponding [`Event`] method (i.e. [`Event::user_id`] for the</span>
+<span class="doccomment">/// `user_id` field ) will always return [`RelatedId::Never`] for this [`EventType`]. Otherwise, an</span>
+<span class="doccomment">/// event of this type may have one or more related IDs.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelatedIdsForEventType</span> {
+    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="ident">bool</span>,
+}
+
+<span class="macro">macro_rules!</span> <span class="ident">define_related_ids_for_event_type</span> {
+    (
+        $(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">pat</span> <span class="op">=</span><span class="op">&gt;</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">tt</span>)<span class="op">*</span> }
+        ),<span class="op">+</span> $(,)<span class="question-mark">?</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelatedIdsForEventType</span> {
+            <span class="kw">match</span> <span class="self">self</span> {
+                <span class="self">Self</span><span class="ident">::Other</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Default::default</span>(),
+                $(
+                    $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="question-mark">?</span>
+                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="op">=</span><span class="op">&gt;</span>
+                        <span class="macro">define_related_ids_for_event_type!</span>{ @<span class="ident">munch</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>)<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> {} }
+                ),<span class="op">+</span>
+            }
+        }
+    };
+    <span class="comment">// Use tt munching to consume &quot;fields&quot; from macro input one at a time and generate the</span>
+    <span class="comment">// true/false values we actually want based on whether the input is &quot;Never&quot; or some other</span>
+    <span class="comment">// arbitrary expression.</span>
+    (@<span class="ident">munch</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="ident">Never</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>}) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">define_related_ids_for_event_type!</span>{ @<span class="ident">munch</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>)<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>)<span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="bool-val">false</span>)} }
+    };
+    (@<span class="ident">munch</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>}) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">define_related_ids_for_event_type!</span>{ @<span class="ident">munch</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>)<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>)<span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="bool-val">true</span>)} }
+    };
+    <span class="comment">// These are variants of the above to munch the last field.</span>
+    (@<span class="ident">munch</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="ident">Never</span> $(,)<span class="question-mark">?</span>) <span class="op">-</span><span class="op">&gt;</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>}) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">define_related_ids_for_event_type!</span>{ @<span class="ident">munch</span> () <span class="op">-</span><span class="op">&gt;</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>)<span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="bool-val">false</span>)} }
+    };
+    (@<span class="ident">munch</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="kw">_</span>:<span class="macro-nonterminal">expr</span> $(,)<span class="question-mark">?</span>) <span class="op">-</span><span class="op">&gt;</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>}) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">define_related_ids_for_event_type!</span>{ @<span class="ident">munch</span> () <span class="op">-</span><span class="op">&gt;</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>)<span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="bool-val">true</span>)} }
+    };
+    <span class="comment">// All input fields consumed; create the struct.</span>
+    (@<span class="ident">munch</span> () <span class="op">-</span><span class="op">&gt;</span> {$((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">literal</span>))<span class="op">+</span>}) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">RelatedIdsForEventType</span> {
+            $(
+                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>
+            ),<span class="op">+</span>
+        }
+    };
+}
+
 <span class="kw">impl</span> <span class="ident">EventType</span> {
     <span class="kw">const</span> <span class="ident">CHANNEL_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CHANNEL_CREATE&quot;</span>;
     <span class="kw">const</span> <span class="ident">CHANNEL_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;CHANNEL_DELETE&quot;</span>;
@@ -5976,6 +6118,8 @@
             <span class="self">Self</span><span class="ident">::Other</span>(<span class="ident">other</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>),
         }
     }
+
+    <span class="macro">with_related_ids_for_event_types!</span>(<span class="ident">define_related_ids_for_event_type</span>);
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EventType</span> {

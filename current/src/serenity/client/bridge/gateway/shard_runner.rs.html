@@ -670,6 +670,19 @@
 <span id="670">670</span>
 <span id="671">671</span>
 <span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">sync::Arc</span>};
 
@@ -694,7 +707,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector::ComponentInteractionFilter</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">LazyArc</span>, <span class="ident">LazyReactionAction</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">EventFilter</span>, <span class="ident">LazyArc</span>, <span class="ident">LazyReactionAction</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::framework::Framework</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>};
@@ -722,6 +735,8 @@
     <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+    <span class="ident">event_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EventFilter</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">message_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageFilter</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">reaction_filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReactionFilter</span><span class="op">&gt;</span>,
@@ -747,6 +762,8 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
             <span class="ident">voice_manager</span>: <span class="ident">opt</span>.<span class="ident">voice_manager</span>,
             <span class="ident">cache_and_http</span>: <span class="ident">opt</span>.<span class="ident">cache_and_http</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+            <span class="ident">event_filters</span>: <span class="ident">Vec::new</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
             <span class="ident">message_filters</span>: <span class="ident">Vec::new</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -915,6 +932,9 @@
             },
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
         }
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">LazyArc::new</span>(<span class="ident">event</span>);
+        <span class="ident">retain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">event_filters</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">send_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>));
     }
 
     <span class="doccomment">/// Clones the internal copy of the Sender to the shard runner.</span>
@@ -1107,6 +1127,12 @@
                     <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">set_status</span>(<span class="ident">status</span>);
 
                     <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">update_presence</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                },
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+                <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetEventFilter</span>(<span class="ident">collector</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="self">self</span>.<span class="ident">event_filters</span>.<span class="ident">push</span>(<span class="ident">collector</span>);
+
+                    <span class="bool-val">true</span>
                 },
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
                 <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetMessageFilter</span>(<span class="ident">collector</span>)) <span class="op">=</span><span class="op">&gt;</span> {
