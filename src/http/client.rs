@@ -423,7 +423,7 @@ impl Http {
         message_id: u64,
         map: &JsonMap,
     ) -> Result<GuildChannel> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -443,7 +443,7 @@ impl Http {
         channel_id: u64,
         map: &JsonMap,
     ) -> Result<GuildChannel> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1666,7 +1666,7 @@ impl Http {
 
     /// Edits the current member for the provided [`Guild`] via its Id.
     pub async fn edit_member_me(&self, guild_id: u64, map: &JsonMap) -> Result<Member> {
-        let body = serde_json::to_vec(map)?;
+        let body = to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
@@ -1832,7 +1832,7 @@ impl Http {
         sticker_id: u64,
         map: &JsonMap,
     ) -> Result<Sticker> {
-        let body = serde_json::to_vec(&map)?;
+        let body = to_vec(&map)?;
         let mut value = self
             .request(Request {
                 body: Some(&body),
