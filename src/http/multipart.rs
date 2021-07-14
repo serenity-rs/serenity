@@ -10,6 +10,7 @@ use tokio::{fs::File, io::AsyncReadExt};
 
 use super::AttachmentType;
 use crate::internal::prelude::*;
+use crate::json::to_string;
 
 /// Holder for multipart body. Contains files, multipart fields, and
 /// payload_json for creating requests with attachments.
@@ -115,7 +116,7 @@ impl<'a> Multipart<'a> {
         }
 
         if let Some(ref payload_json) = self.payload_json {
-            multipart = multipart.text("payload_json", serde_json::to_string(payload_json)?);
+            multipart = multipart.text("payload_json", to_string(payload_json)?);
         }
 
         Ok(multipart)
