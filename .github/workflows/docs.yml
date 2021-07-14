@@ -39,7 +39,7 @@ jobs:
 
       - name: Build docs
         env:
-          RUSTDOCFLAGS: --cfg docsrs -D broken_intra_doc_links
+          RUSTDOCFLAGS: --cfg docsrs -D rustdoc::broken_intra_doc_links
         run: |
           cargo doc --no-deps --features collector,voice,unstable_discord_api
           cargo doc --no-deps -p command_attr
