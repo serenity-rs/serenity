@@ -220,7 +220,7 @@ impl<'a> ClientBuilder<'a> {
     where
         F: Framework + Send + Sync + 'static,
     {
-        self.framework = Some(Arc::new(Box::new(framework)));
+        self.framework = Some(Arc::new(framework));
 
         self
     }
