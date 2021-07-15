@@ -100,7 +100,7 @@ impl Emoji {
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn delete<T: AsRef<Cache> + AsRef<Http>>(&self, cache_http: T) -> Result<()> {
-        match self.find_guild_id(&cache_http).await {
+        match self.find_guild_id(&cache_http) {
             Some(guild_id) => {
                 AsRef::<Http>::as_ref(&cache_http).delete_emoji(guild_id.0, self.id.0).await
             },
@@ -125,7 +125,7 @@ impl Emoji {
         cache_http: T,
         name: &str,
     ) -> Result<()> {
-        match self.find_guild_id(&cache_http).await {
+        match self.find_guild_id(&cache_http) {
             Some(guild_id) => {
                 let map = json!({
                     "name": name,
@@ -174,8 +174,10 @@ impl Emoji {
     /// # }
     /// ```
     #[cfg(feature = "cache")]
-    pub async fn find_guild_id(&self, cache: impl AsRef<Cache>) -> Option<GuildId> {
-        for guild in cache.as_ref().guilds.read().await.values() {
+    pub fn find_guild_id(&self, cache: impl AsRef<Cache>) -> Option<GuildId> {
+        for guild_entry in cache.as_ref().guilds.iter() {
+            let guild = guild_entry.value();
+
             if guild.emojis.contains_key(&self.id) {
                 return Some(guild.id);
             }

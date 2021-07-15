@@ -163,14 +163,13 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user_id().await && self.guild_id.is_some() {
+                if self.author.id != cache.current_user_id() && self.guild_id.is_some() {
                     utils::user_has_perms_cache(
                         cache,
                         self.channel_id,
                         self.guild_id,
                         Permissions::MANAGE_MESSAGES,
-                    )
-                    .await?;
+                    )?;
                 }
             }
         }
@@ -193,15 +192,15 @@ impl Message {
     /// Returns [`None`] if the channel is not in the cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn channel(&self, cache: impl AsRef<Cache>) -> Option<Channel> {
-        cache.as_ref().channel(self.channel_id).await
+    pub fn channel(&self, cache: impl AsRef<Cache>) -> Option<Channel> {
+        cache.as_ref().channel(self.channel_id)
     }
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub async fn is_own(&self, cache: impl AsRef<Cache>) -> bool {
-        self.author.id == cache.as_ref().current_user().await.id
+    pub fn is_own(&self, cache: impl AsRef<Cache>) -> bool {
+        self.author.id == cache.as_ref().current_user().id
     }
 
     /// Deletes the message.
@@ -220,7 +219,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user_id().await {
+                if self.author.id != cache.current_user_id() {
                     if self.is_private() {
                         return Err(Error::Model(ModelError::NotAuthor));
                     } else {
@@ -229,8 +228,7 @@ impl Message {
                             self.channel_id,
                             self.guild_id,
                             Permissions::MANAGE_MESSAGES,
-                        )
-                        .await?;
+                        )?;
                     }
                 }
             }
@@ -259,8 +257,7 @@ impl Message {
                     self.channel_id,
                     self.guild_id,
                     Permissions::MANAGE_MESSAGES,
-                )
-                .await?;
+                )?;
             }
         }
 
@@ -291,8 +288,7 @@ impl Message {
                     self.channel_id,
                     self.guild_id,
                     Permissions::MANAGE_MESSAGES,
-                )
-                .await?;
+                )?;
             }
         }
 
@@ -341,7 +337,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user_id().await {
+                if self.author.id != cache.current_user_id() {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
@@ -396,7 +392,7 @@ impl Message {
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
     #[cfg(feature = "cache")]
-    pub async fn content_safe(&self, cache: impl AsRef<Cache>) -> String {
+    pub fn content_safe(&self, cache: impl AsRef<Cache>) -> String {
         let mut result = self.content.clone();
 
         // First replace all user mentions.
@@ -423,7 +419,7 @@ impl Message {
         for id in &self.mention_roles {
             let mention = id.mention().to_string();
 
-            if let Some(role) = id.to_role_cached(&cache).await {
+            if let Some(role) = id.to_role_cached(&cache) {
                 result = result.replace(&mention, &format!("@{}", role.name));
             } else {
                 result = result.replace(&mention, "@deleted-role");
@@ -469,8 +465,8 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     #[cfg(feature = "cache")]
-    pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
-        cache.as_ref().guild(self.guild_id?).await
+    pub fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
+        cache.as_ref().guild(self.guild_id?)
     }
 
     /// Returns a field to the [`Guild`] for the message if one is in the cache.
@@ -481,7 +477,7 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     #[cfg(feature = "cache")]
-    pub async fn guild_field<Ret, Fun>(
+    pub fn guild_field<Ret, Fun>(
         &self,
         cache: impl AsRef<Cache>,
         field_accessor: Fun,
@@ -490,7 +486,7 @@ impl Message {
         Ret: Clone,
         Fun: FnOnce(&Guild) -> Ret,
     {
-        cache.as_ref().guild_field(self.guild_id?, field_accessor).await
+        cache.as_ref().guild_field(self.guild_id?, field_accessor)
     }
 
     /// True if message was sent using direct messages.
@@ -517,7 +513,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(member) = cache.member(guild_id, self.author.id).await {
+                if let Some(member) = cache.member(guild_id, self.author.id) {
                     return Ok(member);
                 }
             }
@@ -565,8 +561,7 @@ impl Message {
                         self.channel_id,
                         self.guild_id,
                         Permissions::MANAGE_MESSAGES,
-                    )
-                    .await?;
+                    )?;
                 }
             }
         }
@@ -612,11 +607,10 @@ impl Message {
                         self.channel_id,
                         self.guild_id,
                         Permissions::ADD_REACTIONS,
-                    )
-                    .await?;
+                    )?;
                 }
 
-                user_id = Some(cache.current_user().await.id);
+                user_id = Some(cache.current_user_id());
             }
         }
 
@@ -731,8 +725,7 @@ impl Message {
                         self.channel_id,
                         self.guild_id,
                         Permissions::SEND_MESSAGES,
-                    )
-                    .await?;
+                    )?;
                 }
             }
         }
@@ -778,10 +771,9 @@ impl Message {
                     self.channel_id,
                     self.guild_id,
                     Permissions::MANAGE_MESSAGES,
-                )
-                .await?;
+                )?;
 
-                if self.author.id != cache.current_user_id().await {
+                if self.author.id != cache.current_user_id() {
                     return Err(Error::Model(ModelError::NotAuthor));
                 }
             }
@@ -821,7 +813,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                return Ok(self.mentions_user_id(cache.user.read().await.id));
+                return Ok(self.mentions_user_id(cache.current_user_id()));
             }
         }
 
@@ -850,8 +842,7 @@ impl Message {
                         self.channel_id,
                         self.guild_id,
                         Permissions::MANAGE_MESSAGES,
-                    )
-                    .await?;
+                    )?;
                 }
             }
         }
@@ -925,8 +916,8 @@ impl Message {
 
     /// Retrieves the message channel's category ID if the channel has one.
     #[cfg(feature = "cache")]
-    pub async fn category_id(&self, cache: impl AsRef<Cache>) -> Option<ChannelId> {
-        cache.as_ref().channel_category_id(self.channel_id).await
+    pub fn category_id(&self, cache: impl AsRef<Cache>) -> Option<ChannelId> {
+        cache.as_ref().channel_category_id(self.channel_id)
     }
 
     pub(crate) fn check_lengths(map: &JsonMap) -> Result<()> {

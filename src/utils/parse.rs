@@ -66,7 +66,7 @@ impl Parse for Member {
     type Err = MemberParseError;
 
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
-        let guild = msg.guild(&ctx.cache).await.ok_or(MemberParseError::GuildNotInCache)?;
+        let guild = msg.guild(&ctx.cache).ok_or(MemberParseError::GuildNotInCache)?;
 
         let lookup_by_id = || guild.members.get(&UserId(s.parse().ok()?));
 
@@ -175,7 +175,7 @@ impl Parse for Message {
             .ok_or(MessageParseError::Malformed)?;
 
         #[cfg(feature = "cache")]
-        if let Some(msg) = ctx.cache.message(channel_id, message_id).await {
+        if let Some(msg) = ctx.cache.message(channel_id, message_id) {
             return Ok(msg);
         }
 
