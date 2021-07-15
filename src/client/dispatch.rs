@@ -428,7 +428,7 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildCreate(mut event)) => {
             #[cfg(feature = "cache")]
-            let _is_new = { !cache_and_http.cache.unavailable_guilds.contains(&event.guild.id) };
+            let _is_new = !cache_and_http.cache.unavailable_guilds.contains(&event.guild.id);
 
             update(&cache_and_http, &mut event);
 

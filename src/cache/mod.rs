@@ -1157,7 +1157,7 @@ mod test {
         // is received.
         let mut guild_create = {
             let mut channels = HashMap::new();
-            channels.insert(ChannelId(2), channel.clone());
+            channels.insert(ChannelId(2), channel);
 
             #[allow(deprecated)]
             GuildCreateEvent {
