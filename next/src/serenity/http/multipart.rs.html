@@ -133,6 +133,7 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
+<span id="136">136</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
@@ -146,6 +147,7 @@
 
 <span class="kw">use</span> <span class="kw">super</span><span class="ident">::AttachmentType</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::to_string</span>;
 
 <span class="doccomment">/// Holder for multipart body. Contains files, multipart fields, and</span>
 <span class="doccomment">/// payload_json for creating requests with attachments.</span>
@@ -251,7 +253,7 @@
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">payload_json</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">payload_json</span> {
-            <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">serde_json::to_string</span>(<span class="ident">payload_json</span>)<span class="question-mark">?</span>);
+            <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">to_string</span>(<span class="ident">payload_json</span>)<span class="question-mark">?</span>);
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">multipart</span>)
