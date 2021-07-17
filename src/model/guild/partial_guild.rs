@@ -1486,7 +1486,7 @@ impl PartialGuild {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
-    ///             if let Some(guild) = guild_id.to_guild_cached(&context).await {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&context) {
     ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("Obtained role's reference: {:?}", role);
     ///                 }

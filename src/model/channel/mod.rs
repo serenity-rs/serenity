@@ -76,7 +76,7 @@ impl Channel {
     /// # use std::sync::Arc;
     /// #
     /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.guild() {
     ///     Some(guild) => {
@@ -111,7 +111,7 @@ impl Channel {
     /// # use std::sync::Arc;
     /// #
     /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.private() {
     ///     Some(private) => {
@@ -146,7 +146,7 @@ impl Channel {
     /// # use std::sync::Arc;
     /// #
     /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.category() {
     ///     Some(category) => {

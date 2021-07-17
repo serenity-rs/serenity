@@ -229,7 +229,7 @@ impl Cache {
     /// # use serenity::prelude::*;
     /// #
     /// # #[cfg(feature = "client")]
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use std::thread;
     /// use std::time::Duration;
     ///
@@ -237,7 +237,7 @@ impl Cache {
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
+    ///     async fn ready(&self, ctx: Context, _: Ready) {
     ///         // Wait some time for guilds to be received.
     ///         //
     ///         // You should keep track of this in a better fashion by tracking how
@@ -247,15 +247,15 @@ impl Cache {
     ///         //
     ///         // For demonstrative purposes we're just sleeping the thread for 5
     ///         // seconds.
-    ///         tokio::time::sleep(Duration::from_secs(5));
+    ///         tokio::time::sleep(Duration::from_secs(5)).await;
     ///
     ///         println!("{} unknown members", ctx.cache.unknown_members());
     ///     }
     /// }
     ///
-    /// let mut client = Client::builder("token").event_handler(Handler)?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
-    /// client.start()?;
+    /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -321,7 +321,7 @@ impl Cache {
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, context: Context, _: Ready) {
+    ///     async fn ready(&self, context: Context, _: Ready) {
     ///         let guilds = context.cache.guilds().len();
     ///
     ///         println!("Guilds in the Cache: {}", guilds);
@@ -371,7 +371,7 @@ impl Cache {
     /// # let cache: serenity::cache::Cache = todo!();
     /// // Find all messages by user ID 8 in channel ID 7
     /// let messages_by_user = cache.channel_messages_field(7, |msgs| {
-    ///     msgs.filter(|m| m.author.id == 8).cloned().collect::<Vec<_>>()
+    ///     msgs.filter_map(|m| if m.author.id == 8 { Some(m.clone()) } else { None } ).collect::<Vec<_>>()
     /// });
     /// ```
     pub fn channel_messages_field<T>(
@@ -474,12 +474,12 @@ impl Cache {
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, message: Message) {
+    ///     async fn message(&self, context: Context, message: Message) {
     ///
     ///         let channel = match context.cache.guild_channel(message.channel_id) {
     ///             Some(channel) => channel,
     ///             None => {
-    ///                 let result = message.channel_id.say(&context, "Could not find guild's channel data");
+    ///                 let result = message.channel_id.say(&context, "Could not find guild's channel data").await;
     ///                 if let Err(why) = result {
     ///                     println!("Error sending message: {:?}", why);
     ///                 }
@@ -491,10 +491,10 @@ impl Cache {
     /// }
     ///
     /// # #[cfg(feature = "client")]
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client = Client::builder("token").event_handler(Handler)?;
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
-    /// client.start()?;
+    /// client.start().await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -563,16 +563,16 @@ impl Cache {
     /// # use serenity::model::id::{ChannelId, MessageId};
     /// # use std::sync::Arc;
     /// #
-    /// # fn run() {
+    /// # async fn run() {
     /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
-    /// # let message = ChannelId(0).message(&http, MessageId(1)).unwrap();
+    /// # let message = ChannelId(0).message(&http, MessageId(1)).await.unwrap();
     /// # let cache = Cache::default();
     /// #
     /// let member = {
     ///     let channel = match cache.guild_channel(message.channel_id) {
     ///         Some(channel) => channel,
     ///         None => {
-    ///             if let Err(why) = message.channel_id.say(http, "Error finding channel data") {
+    ///             if let Err(why) = message.channel_id.say(http, "Error finding channel data").await {
     ///                 println!("Error sending message: {:?}", why);
     ///             }
     ///             return;
@@ -582,7 +582,7 @@ impl Cache {
     ///     match cache.member(channel.guild_id, message.author.id) {
     ///         Some(member) => member,
     ///         None => {
-    ///             if let Err(why) = message.channel_id.say(&http, "Error finding member data") {
+    ///             if let Err(why) = message.channel_id.say(&http, "Error finding member data").await {
     ///                 println!("Error sending message: {:?}", why);
     ///             }
     ///             return;
@@ -592,7 +592,7 @@ impl Cache {
     ///
     /// let msg = format!("You have {} roles", member.roles.len());
     ///
-    /// if let Err(why) = message.channel_id.say(&http, &msg) {
+    /// if let Err(why) = message.channel_id.say(&http, &msg).await {
     ///     println!("Error sending message: {:?}", why);
     /// }
     /// # }
@@ -745,9 +745,9 @@ impl Cache {
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
-    /// # let message = ChannelId(0).message(&http, MessageId(1))?;
+    /// # let message = ChannelId(0).message(&http, MessageId(1)).await?;
     /// # let cache = Cache::default();
     /// #
     /// match cache.message(message.channel_id, message.id) {
@@ -889,7 +889,7 @@ impl Cache {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// #
     /// # #[command]
-    /// # fn test(context: &Context) -> CommandResult {
+    /// # async fn test(context: &Context) -> CommandResult {
     /// if let Some(user) = context.cache.user(7) {
     ///     println!("User with Id 7 is currently named {}", user.name);
     /// }

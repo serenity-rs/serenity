@@ -71,7 +71,7 @@ impl CurrentUser {
     /// #
     /// # let cache = Cache::default();
     /// // assuming the cache has been unlocked
-    /// let user = cache.current_user().await;
+    /// let user = cache.current_user();
     ///
     /// match user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
@@ -659,7 +659,7 @@ impl User {
     /// #   #[cfg(feature = "cache")]
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url = match ctx.cache.current_user().await.invite_url(&ctx, Permissions::empty()).await {
+    ///             let url = match ctx.cache.current_user().invite_url(&ctx, Permissions::empty()).await {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);

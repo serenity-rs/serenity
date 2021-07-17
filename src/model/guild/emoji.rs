@@ -168,7 +168,7 @@ impl Emoji {
     /// # })).unwrap();
     /// #
     /// // assuming emoji has been set already
-    /// if let Some(guild_id) = emoji.find_guild_id(&cache).await {
+    /// if let Some(guild_id) = emoji.find_guild_id(&cache) {
     ///     println!("{} is owned by {}", emoji.name, guild_id);
     /// }
     /// # }

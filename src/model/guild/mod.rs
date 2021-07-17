@@ -2368,7 +2368,7 @@ impl Guild {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
-    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx).await {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx) {
     ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("{:?}", role);
     ///                 }

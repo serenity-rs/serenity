@@ -236,7 +236,6 @@ impl GuildChannel {
     /// // assuming the cache has been unlocked
     /// let channel = cache
     ///     .guild_channel(channel_id)
-    ///     .await
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, &overwrite).await?;
@@ -276,7 +275,6 @@ impl GuildChannel {
     ///
     /// let channel = cache
     ///     .guild_channel(channel_id)
-    ///     .await
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, &overwrite).await?;
@@ -501,7 +499,7 @@ impl GuildChannel {
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.edit_voice_state(&http, user_id, |v| v.suppress(false)).await?;
     /// #   Ok(())
@@ -551,7 +549,7 @@ impl GuildChannel {
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// // Send a request to speak
     /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(true)).await?;
@@ -698,12 +696,12 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
-    ///         let channel = match context.cache.guild_channel(msg.channel_id).await {
+    ///         let channel = match context.cache.guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author).await {
+    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author) {
     ///             println!("The user's permissions: {:?}", permissions);
     ///         }
     ///     }
@@ -732,13 +730,13 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
-    ///         let channel = match context.cache.guild_channel(msg.channel_id).await {
+    ///         let channel = match context.cache.guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = context.cache.current_user().await.id;
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id).await {
+    ///         let current_user_id = context.cache.current_user_id();
+    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id) {
     ///
     ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///                 return;
@@ -994,7 +992,7 @@ impl GuildChannel {
     /// # let cache = Cache::default();
     /// # let channel = cache
     /// #    .guild_channel(ChannelId(7))
-    /// #    .await.ok_or(ModelError::ItemMissing)?;
+    /// #    .ok_or(ModelError::ItemMissing)?;
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
     /// let typing = channel.start_typing(&http)?;
     ///
