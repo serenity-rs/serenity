@@ -42,7 +42,7 @@ fn update<E: CacheUpdate + fmt::Debug>(
 
 #[inline]
 #[cfg(not(feature = "cache"))]
-async fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> {
+fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> {
     None
 }
 
@@ -406,7 +406,7 @@ async fn handle_event(
 
                     event_handler.channel_update(context, old_channel, event.channel).await;
                 } else {
-                    update(&cache_and_http, &mut event).await;
+                    update(&cache_and_http, &mut event);
 
                     event_handler.channel_update(context, event.channel).await;
                 }}
@@ -597,7 +597,7 @@ async fn handle_event(
 
                     event_handler.guild_update(context, before, event.guild).await;
                 } else {
-                    update(&cache_and_http, &mut event).await;
+                    update(&cache_and_http, &mut event);
 
                     event_handler.guild_update(context, event.guild).await;
                 }}

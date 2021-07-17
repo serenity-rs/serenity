@@ -2,6 +2,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
+#[cfg(feature = "cache")]
 use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;

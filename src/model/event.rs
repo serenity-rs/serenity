@@ -5,7 +5,6 @@ use std::convert::TryFrom;
 use std::mem;
 use std::{collections::HashMap, fmt};
 
-#[cfg(feature = "cache")]
 use chrono::{DateTime, Utc};
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
