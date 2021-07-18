@@ -201,7 +201,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 
 # Projects extending Serenity
 
-- [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
+- [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink] and [Andesite][repo:andesite], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 - [Songbird][project:songbird]: An async Rust library for the Discord voice API.
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
@@ -230,6 +230,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [project:lavalink-rs]: https://gitlab.com/vicky5124/lavalink-rs/
 [project:songbird]: https://github.com/serenity-rs/songbird
 [repo:lavalink]: https://github.com/freyacodes/Lavalink
+[repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
 [rust 1.48.0+ badge]: https://img.shields.io/badge/rust-1.48.0+-93450a.svg?style=flat-square
