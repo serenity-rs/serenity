@@ -90,7 +90,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 }
 ```
 
-### Full Examples
+## Full Examples
 
 Full examples, detailing and explaining usage of the basic functionality of the
 library, can be found in the [`examples`] directory.
