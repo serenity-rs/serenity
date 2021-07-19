@@ -136,7 +136,7 @@ The following is a full list of features:
 - **cache**: The cache will store information about guilds, channels, users, and
 other data, to avoid performing REST requests. If you are low on RAM, do not
 enable this.
-- **collector**: A collector awaits events, such as receiving a message from a user or reactions on a message, and allows for responding to the events in a convenient fashion. Collectors can be configured to enforce certain critera the events must meet.
+- **collector**: A collector awaits events, such as receiving a message from a user or reactions on a message, and allows for responding to the events in a convenient fashion. Collectors can be configured to enforce certain criteria the events must meet.
 - **client**: A manager for shards and event handlers, abstracting away the
 work of handling shard events and updating the cache, if enabled.
 - **framework**: Enables the framework, which is a utility to allow simple
