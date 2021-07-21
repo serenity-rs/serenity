@@ -327,6 +327,8 @@ __impl_bitflags! {
         USE_PUBLIC_THREADS = 0b0010_0000_0000_0000_0000_0000_0000_0000_0000;
         // Allows for creating and participating in private threads.
         USE_PRIVATE_THREADS = 0b0100_0000_0000_0000_0000_0000_0000_0000_0000;
+        // Allows the usage of custom stickers from other servers.
+        USE_EXTERNAL_STICKERS = 0b1000_0000_0000_0000_0000_0000_0000_0000_0000;
     }
 }
 
@@ -362,6 +364,7 @@ generate_get_permission_names! {
     speak: "Speak",
     stream: "Stream",
     use_external_emojis: "Use External Emojis",
+    use_external_stickers: "Use External Stickers",
     use_slash_commands: "Use Slash Commands",
     use_vad: "Use Voice Activity",
     view_audit_log: "View Audit Log"
@@ -615,6 +618,14 @@ impl Permissions {
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     pub fn use_external_emojis(self) -> bool {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Use External Stickers] permission.
+    ///
+    /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
+    pub fn use_external_stickers(self) -> bool {
+        self.contains(Self::USE_EXTERNAL_STICKERS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
