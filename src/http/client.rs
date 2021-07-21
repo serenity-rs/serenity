@@ -866,6 +866,7 @@ impl Http {
         guild_id: u64,
         map: JsonMap,
         file: T,
+        audit_log_reason: Option<&str>,
     ) -> Result<Sticker>
     where
         T: Into<AttachmentType<'a>>,
@@ -889,7 +890,7 @@ impl Http {
                     .collect(),
                 payload_json: None,
             }),
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::CreateSticker {
                 guild_id,
             },
@@ -1236,11 +1237,16 @@ impl Http {
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn delete_sticker(&self, guild_id: u64, sticker_id: u64) -> Result<()> {
+    pub async fn delete_sticker(
+        &self,
+        guild_id: u64,
+        sticker_id: u64,
+        audit_log_reason: Option<&str>,
+    ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: audit_log_reason.map(reason_into_header),
             route: RouteInfo::DeleteSticker {
                 guild_id,
                 sticker_id,
@@ -1884,13 +1890,14 @@ impl Http {
         guild_id: u64,
         sticker_id: u64,
         map: &JsonMap,
+        audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
         let body = to_vec(&map)?;
         let mut value = self
             .request(Request {
                 body: Some(&body),
                 multipart: None,
-                headers: None,
+                headers: audit_log_reason.map(reason_into_header),
                 route: RouteInfo::EditSticker {
                     guild_id,
                     sticker_id,
