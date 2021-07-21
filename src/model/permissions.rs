@@ -396,6 +396,7 @@ generate_get_permission_names! {
     speak: "Speak",
     stream: "Stream",
     use_external_emojis: "Use External Emojis",
+    use_external_stickers: "Use External Stickers",
     use_slash_commands: "Use Slash Commands",
     use_vad: "Use Voice Activity",
     view_audit_log: "View Audit Log"
@@ -649,6 +650,14 @@ impl Permissions {
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
     pub fn use_external_emojis(self) -> bool {
         self.contains(Self::USE_EXTERNAL_EMOJIS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Use External Stickers] permission.
+    ///
+    /// [Use External Stickers]: Self::USE_EXTERNAL_STICKERS
+    pub fn use_external_stickers(self) -> bool {
+        self.contains(Self::USE_EXTERNAL_STICKERS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
