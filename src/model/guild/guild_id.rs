@@ -337,7 +337,7 @@ impl GuildId {
             None => return Err(Error::Model(ModelError::NoStickerFileSet)),
         };
 
-        let sticker = http.as_ref().create_sticker(self.0, map, file).await?;
+        let sticker = http.as_ref().create_sticker(self.0, map, file, None).await?;
 
         Ok(sticker)
     }
@@ -433,7 +433,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         sticker_id: impl Into<StickerId>,
     ) -> Result<()> {
-        http.as_ref().delete_sticker(self.0, sticker_id.into().0).await
+        http.as_ref().delete_sticker(self.0, sticker_id.into().0, None).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -614,7 +614,7 @@ impl GuildId {
         f(&mut edit_sticker);
         let map = utils::hashmap_to_json_map(edit_sticker.0);
 
-        http.as_ref().edit_sticker(self.0, sticker_id.into().0, &map).await
+        http.as_ref().edit_sticker(self.0, sticker_id.into().0, &map, None).await
     }
 
     /// Edits the order of [`Role`]s
