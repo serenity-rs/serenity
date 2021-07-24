@@ -22,7 +22,7 @@ impl std::fmt::Display for UserParseError {
 
 /// Look up a user by a string case-insensitively.
 ///
-/// Requires the cache feature to be enabled.
+/// Requires the cache feature to be enabled. If a user is not in cache, they will not be found!
 ///
 /// The lookup strategy is as follows (in order):
 /// 1. Lookup by ID.
