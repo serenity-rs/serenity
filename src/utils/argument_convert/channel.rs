@@ -13,7 +13,7 @@ pub enum ChannelParseError {
 }
 
 impl std::error::Error for ChannelParseError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Http(e) => Some(e),
             Self::NotFoundOrMalformed => None,
@@ -101,7 +101,7 @@ pub enum GuildChannelParseError {
 }
 
 impl std::error::Error for GuildChannelParseError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Http(e) => Some(e),
             Self::NotFoundOrMalformed => None,
@@ -161,7 +161,7 @@ pub enum ChannelCategoryParseError {
 }
 
 impl std::error::Error for ChannelCategoryParseError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Http(e) => Some(e),
             Self::NotFoundOrMalformed => None,
