@@ -2388,44 +2388,44 @@
         }
     }
 
-    <span class="doccomment">/// Returns a future that will await one message by this guild.</span>
+    <span class="doccomment">/// Returns a future that will await one message by this guild channel.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reply</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CollectReply</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">CollectReply::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+        <span class="ident">CollectReply::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">channel_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of messages sent by this guild.</span>
+    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of messages sent by this guild channel.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_replies</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">MessageCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+        <span class="ident">MessageCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">channel_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Await a single reaction by this guild.</span>
+    <span class="doccomment">/// Await a single reaction by this guild channel.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CollectReaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">CollectReaction::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+        <span class="ident">CollectReaction::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">channel_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this guild.</span>
+    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this guild channel.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reactions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReactionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ReactionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+        <span class="ident">ReactionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">channel_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// Creates a webhook with only a name.</span>
