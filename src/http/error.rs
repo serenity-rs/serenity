@@ -171,7 +171,23 @@ impl From<InvalidHeaderValue> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
-            Error::UnsuccessfulRequest(e) => f.write_str(&e.error.message),
+            Error::UnsuccessfulRequest(e) => {
+                f.write_str(&e.error.message)?;
+
+                // Put Discord's human readable error explanations in parantheses
+                let mut errors_iter = e.error.errors.iter();
+                if let Some(error) = errors_iter.next() {
+                    f.write_str(" (")?;
+                    f.write_str(&error.message)?;
+                    for error in errors_iter {
+                        f.write_str(", ")?;
+                        f.write_str(&error.message);
+                    }
+                    f.write_str(")")?;
+                }
+
+                Ok(())
+            },
             Error::RateLimitI64F64 => f.write_str("Error decoding a header into an i64 or f64"),
             Error::RateLimitUtf8 => f.write_str("Error decoding a header from UTF-8"),
             Error::Url(_) => f.write_str("Provided URL is incorrect."),
