@@ -12,12 +12,19 @@ pub enum ChannelParseError {
     NotFoundOrMalformed,
 }
 
-impl std::error::Error for ChannelParseError {}
+impl std::error::Error for ChannelParseError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Http(e) => Some(e),
+            Self::NotFoundOrMalformed => None,
+        }
+    }
+}
 
 impl std::fmt::Display for ChannelParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Http(e) => write!(f, "Failed to request channel via HTTP: {}", e),
+            Self::Http(_) => write!(f, "Failed to request channel via HTTP"),
             Self::NotFoundOrMalformed => write!(f, "Channel not found or unknown format"),
         }
     }
@@ -93,12 +100,20 @@ pub enum GuildChannelParseError {
     NotAGuildChannel,
 }
 
-impl std::error::Error for GuildChannelParseError {}
+impl std::error::Error for GuildChannelParseError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Http(e) => Some(e),
+            Self::NotFoundOrMalformed => None,
+            Self::NotAGuildChannel => None,
+        }
+    }
+}
 
 impl std::fmt::Display for GuildChannelParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Http(e) => write!(f, "Failed to request channel via HTTP: {}", e),
+            Self::Http(_) => write!(f, "Failed to request channel via HTTP"),
             Self::NotFoundOrMalformed => write!(f, "Channel not found or unknown format"),
             Self::NotAGuildChannel => write!(f, "Channel is not a guild channel"),
         }
@@ -145,12 +160,20 @@ pub enum ChannelCategoryParseError {
     NotAChannelCategory,
 }
 
-impl std::error::Error for ChannelCategoryParseError {}
+impl std::error::Error for ChannelCategoryParseError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::Http(e) => Some(e),
+            Self::NotFoundOrMalformed => None,
+            Self::NotAChannelCategory => None,
+        }
+    }
+}
 
 impl std::fmt::Display for ChannelCategoryParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Http(e) => write!(f, "Failed to request channel via HTTP: {}", e),
+            Self::Http(_) => write!(f, "Failed to request channel via HTTP"),
             Self::NotFoundOrMalformed => write!(f, "Channel not found or unknown format"),
             Self::NotAChannelCategory => write!(f, "Channel is not a channel category"),
         }

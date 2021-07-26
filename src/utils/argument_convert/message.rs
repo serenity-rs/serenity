@@ -29,7 +29,7 @@ impl std::fmt::Display for MessageParseError {
             Self::Malformed => {
                 write!(f, "Provided string did not adhere to any known guild message format")
             },
-            Self::Http(e) => write!(f, "Failed to request message data via HTTP: {}", e),
+            Self::Http(_) => write!(f, "Failed to request message data via HTTP"),
             Self::HttpNotAvailable => write!(
                 f,
                 "Gateway feature is disabled and the required information was not in cache"
