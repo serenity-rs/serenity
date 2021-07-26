@@ -83,10 +83,10 @@ impl Channel {
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.guild() {
-    ///     Some(guild) => {
-    ///         println!("It's a guild named {}!", guild.name);
+    ///     Some(guild_channel) => {
+    ///         println!("It's a guild channel named {}!", guild_channel.name);
     ///     },
-    ///     None => { println!("It's not a guild!"); },
+    ///     None => { println!("It's not in a guild!"); },
     /// }
     /// # }
     /// ```
