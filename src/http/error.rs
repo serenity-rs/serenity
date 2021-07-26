@@ -181,7 +181,7 @@ impl Display for Error {
                     f.write_str(&error.message)?;
                     for error in errors_iter {
                         f.write_str(", ")?;
-                        f.write_str(&error.message);
+                        f.write_str(&error.message)?;
                     }
                     f.write_str(")")?;
                 }
