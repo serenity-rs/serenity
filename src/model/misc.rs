@@ -288,12 +288,30 @@ impl EmojiIdentifier {
     }
 }
 
+#[derive(Debug)]
+#[cfg(all(feature = "model", feature = "utils"))]
+pub struct EmojiIdentifierParseError {
+    parsed_string: String,
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl Display for EmojiIdentifierParseError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "`{}` is not a valid emoji identifier", self.parsed_string)
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl StdError for EmojiIdentifierParseError {}
+
 #[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for EmojiIdentifier {
-    type Err = ();
+    type Err = EmojiIdentifierParseError;
 
-    fn from_str(s: &str) -> StdResult<Self, ()> {
-        utils::parse_emoji(s).ok_or(())
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
+            parsed_string: s.to_owned(),
+        })
     }
 }
 
