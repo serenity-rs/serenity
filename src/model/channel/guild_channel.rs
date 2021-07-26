@@ -1100,44 +1100,44 @@ impl GuildChannel {
         }
     }
 
-    /// Returns a future that will await one message by this guild.
+    /// Returns a future that will await one message by this guild channel.
     #[cfg(feature = "collector")]
     #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reply<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> CollectReply<'a> {
-        CollectReply::new(shard_messenger).guild_id(self.id.0)
+        CollectReply::new(shard_messenger).channel_id(self.id.0)
     }
 
-    /// Returns a stream builder which can be awaited to obtain a stream of messages sent by this guild.
+    /// Returns a stream builder which can be awaited to obtain a stream of messages sent by this guild channel.
     #[cfg(feature = "collector")]
     #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_replies<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> MessageCollectorBuilder<'a> {
-        MessageCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+        MessageCollectorBuilder::new(shard_messenger).channel_id(self.id.0)
     }
 
-    /// Await a single reaction by this guild.
+    /// Await a single reaction by this guild channel.
     #[cfg(feature = "collector")]
     #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reaction<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> CollectReaction<'a> {
-        CollectReaction::new(shard_messenger).guild_id(self.id.0)
+        CollectReaction::new(shard_messenger).channel_id(self.id.0)
     }
 
-    /// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this guild.
+    /// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this guild channel.
     #[cfg(feature = "collector")]
     #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reactions<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> ReactionCollectorBuilder<'a> {
-        ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+        ReactionCollectorBuilder::new(shard_messenger).channel_id(self.id.0)
     }
 
     /// Creates a webhook with only a name.
