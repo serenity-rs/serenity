@@ -74,6 +74,14 @@ impl CreateApplicationCommandOption {
         self.add_choice(choice)
     }
 
+    pub fn add_number_choice<D: ToString>(&mut self, name: D, value: f64) -> &mut Self {
+        let choice = json!({
+            "name": name.to_string(),
+            "value" : value
+        });
+        self.add_choice(choice)
+    }
+
     fn add_choice(&mut self, value: Value) -> &mut Self {
         let choices = self.0.entry("choices").or_insert_with(|| Value::Array(Vec::new()));
         let choices_arr = choices.as_array_mut().expect("Must be an array");

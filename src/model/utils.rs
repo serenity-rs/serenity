@@ -187,6 +187,9 @@ fn set_resolved(
             ApplicationCommandOptionType::Boolean => Some(
                 ApplicationCommandInteractionDataOptionValue::Boolean(value.as_bool().unwrap()),
             ),
+            ApplicationCommandOptionType::Number => {
+                Some(ApplicationCommandInteractionDataOptionValue::Number(value.as_f64().unwrap()))
+            },
             _ => None,
         }
     }
