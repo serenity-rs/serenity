@@ -55,9 +55,9 @@ impl CreateApplicationCommandOption {
     }
 
     /// Application commands can optionally have a limited
-    /// number of integer or string choices.
+    /// number of integer, string or number (double) choices.
     ///
-    /// **Note**: There can be no more than 10 choices set.
+    /// **Note**: There can be no more than 25 choices set.
     pub fn add_int_choice<D: ToString>(&mut self, name: D, value: i32) -> &mut Self {
         let choice = json!({
             "name": name.to_string(),
