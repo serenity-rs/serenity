@@ -957,7 +957,9 @@ impl GuildChannel {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::SEND_MESSAGES;
 
-                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req).await? {
+                if utils::user_has_perms(&cache, self.id, Some(self.guild_id), req).await
+                    == Ok(false)
+                {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
