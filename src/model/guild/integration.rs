@@ -1,5 +1,6 @@
-use super::*;
 use chrono::{DateTime, Utc};
+
+use super::*;
 
 /// Various information about integrations.
 #[derive(Clone, Debug, Deserialize, Serialize)]
