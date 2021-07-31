@@ -193,6 +193,10 @@ impl Message {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
+    ///
+    /// # Errors
+    ///
+    /// Can return an error if the HTTP request fails.
     #[inline]
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
         self.channel_id.to_channel(cache_http).await
