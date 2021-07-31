@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+
 use super::*;
 
 /// Various information about integrations.
@@ -15,7 +17,7 @@ pub struct Integration {
     pub kind: String,
     pub name: String,
     pub role_id: Option<RoleId>,
-    pub synced_at: Option<u64>,
+    pub synced_at: Option<DateTime<Utc>>,
     pub syncing: Option<bool>,
     pub user: Option<User>,
     pub enable_emoticons: Option<bool>,
