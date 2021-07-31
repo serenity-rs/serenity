@@ -377,7 +377,9 @@ pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<
     deserializer.deserialize_any(U16Visitor)
 }
 
-pub fn deserialize_opt_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<Option<u16>, D::Error> {
+pub fn deserialize_opt_u16<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Option<u16>, D::Error> {
     deserializer.deserialize_option(OptU16Visitor)
 }
 
