@@ -402,6 +402,12 @@ pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<
     deserializer.deserialize_any(U16Visitor)
 }
 
+pub fn deserialize_opt_u16<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<Option<u16>, D::Error> {
+    deserializer.deserialize_option(OptU16Visitor)
+}
+
 pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
     deserializer.deserialize_any(U64Visitor)
 }
@@ -517,7 +523,7 @@ macro_rules! num_visitors {
                 type Value = $type;
 
                 fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
-                    formatter.write_str("identifier")
+                    formatter.write_str("number")
                 }
 
                 fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
@@ -569,3 +575,37 @@ macro_rules! num_visitors {
 }
 
 num_visitors!(U16Visitor: u16, U32Visitor: u32, U64Visitor: u64);
+
+macro_rules! num_opt_visitors {
+    ($($visitor:ident: $type:ty, $visitor_impl:ident),*) => {
+        $(
+            #[derive(Debug)]
+            pub struct $visitor;
+
+            impl<'de> Visitor<'de> for $visitor {
+                type Value = Option<$type>;
+
+                fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
+                    formatter.write_str("optional number")
+                }
+
+                fn visit_unit<E: DeError>(self) -> StdResult<Self::Value, E> {
+                    Ok(None)
+                }
+
+                fn visit_none<E: DeError>(self) -> StdResult<Self::Value, E> {
+                    Ok(None)
+                }
+
+                fn visit_some<D>(self, deserializer: D) -> StdResult<Self::Value, D::Error>
+                where
+                    D: Deserializer<'de>,
+                {
+                    deserializer.deserialize_any($visitor_impl).map(Some)
+                }
+            }
+        )*
+    }
+}
+
+num_opt_visitors!(OptU16Visitor: u16, U16Visitor);
