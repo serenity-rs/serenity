@@ -201,7 +201,6 @@ impl Message {
         self.channel_id.to_channel(cache_http).await
     }
 
-
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
