@@ -187,14 +187,19 @@ impl Message {
         self.channel_id.crosspost(cache_http.http(), self.id.0).await
     }
 
-    /// Retrieves the related channel located in the cache.
+    /// First attempts to find a [`Channel`] by its Id in the cache,
+    /// upon failure requests it via the REST API.
     ///
-    /// Returns [`None`] if the channel is not in the cache.
-    #[cfg(feature = "cache")]
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
+    /// owning the required permissions the HTTP-request will be issued.
+    ///
+    /// # Errors
+    ///
+    /// Can return an error if the HTTP request fails.
     #[inline]
-    pub fn channel(&self, cache: impl AsRef<Cache>) -> Option<Channel> {
-        cache.as_ref().channel(self.channel_id)
-    }
+    pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
+        self.channel_id.to_channel(cache_http).await
+
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
@@ -330,9 +335,9 @@ impl Message {
     /// [`EditMessage`]: crate::builder::EditMessage
     /// [`the limit`]: crate::builder::EditMessage::content
     #[cfg(feature = "utils")]
-    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
+    pub async fn edit<'a, F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
     where
-        F: for<'a, 'b> FnOnce(&'a mut EditMessage<'b>) -> &'a mut EditMessage<'b>,
+        F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
     {
         #[cfg(feature = "cache")]
         {
