@@ -2,7 +2,12 @@ use std::collections::HashMap;
 
 use serde_json::{json, Value};
 
-use crate::{model::interactions::application_command::ApplicationCommandOptionType, utils};
+use crate::internal::prelude::*;
+use crate::model::interactions::application_command::{
+    ApplicationCommandOptionType,
+    ApplicationCommandType,
+};
+use crate::utils;
 
 /// A builder for creating a new [`ApplicationCommandOption`].
 ///
@@ -140,6 +145,12 @@ impl CreateApplicationCommand {
     /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two global commands of the same app cannot have the same name. Two guild-specific commands of the same app cannot have the same name.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
+        self
+    }
+
+    /// Specifies the type of the application command.
+    pub fn kind(&mut self, kind: ApplicationCommandType) -> &mut Self {
+        self.0.insert("type", Value::Number(Number::from(kind as u8)));
         self
     }
 

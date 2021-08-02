@@ -109,6 +109,15 @@ pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
 }
 
 #[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+pub fn deserialize_messages_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<MessageId, Message>, D::Error> {
+    let map: HashMap<MessageId, Message> = Deserialize::deserialize(deserializer)?;
+
+    Ok(map)
+}
+
+#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
 pub fn deserialize_options<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
