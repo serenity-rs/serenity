@@ -199,6 +199,7 @@ impl Message {
     #[inline]
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
         self.channel_id.to_channel(cache_http).await
+    }
 
 
     /// A util function for determining whether this message was sent by someone else, or the
