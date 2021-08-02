@@ -24,7 +24,7 @@ impl CreateApplicationCommandOption {
 
     /// Sets the name of the option.
     ///
-    /// **Note**: The option name must be between 1 and 32 characters.
+    /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
         self
@@ -32,7 +32,7 @@ impl CreateApplicationCommandOption {
 
     /// Sets the description for the option.
     ///
-    /// **Note**: The description must be between 1 and 100 characters.
+    /// **Note**: Must be between 1 and 100 characters.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
         self.0.insert("description", Value::String(description.to_string()));
         self
@@ -54,10 +54,9 @@ impl CreateApplicationCommandOption {
         self
     }
 
-    /// Application commands can optionally have a limited
-    /// number of integer or string choices.
+    /// Adds an optional int-choice.
     ///
-    /// **Note**: There can be no more than 10 choices set.
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
     pub fn add_int_choice<D: ToString>(&mut self, name: D, value: i32) -> &mut Self {
         let choice = json!({
             "name": name.to_string(),
@@ -66,10 +65,24 @@ impl CreateApplicationCommandOption {
         self.add_choice(choice)
     }
 
+    /// Adds an optional string-choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
     pub fn add_string_choice<D: ToString, E: ToString>(&mut self, name: D, value: E) -> &mut Self {
         let choice = json!({
             "name": name.to_string(),
             "value": value.to_string()
+        });
+        self.add_choice(choice)
+    }
+
+    /// Adds an optional number-choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    pub fn add_number_choice<D: ToString>(&mut self, name: D, value: f64) -> &mut Self {
+        let choice = json!({
+            "name": name.to_string(),
+            "value" : value
         });
         self.add_choice(choice)
     }
@@ -82,10 +95,12 @@ impl CreateApplicationCommandOption {
         self
     }
 
-    /// If the option is a [`SubCommand`] or [`SubCommandGroup`] nested options are its parameters.
+    /// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
     ///
-    /// [`SubCommand`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommand
+    /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group can have up to 25 subcommands. A subcommand can have up to 25 options.
+    ///
     /// [`SubCommandGroup`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommand
     pub fn create_sub_option<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
@@ -95,6 +110,12 @@ impl CreateApplicationCommandOption {
         self.add_sub_option(data)
     }
 
+    /// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
+    ///
+    /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group can have up to 25 subcommands. A subcommand can have up to 25 options.
+    ///
+    /// [`SubCommandGroup`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommandGroup
+    /// [`SubCommand`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommand
     pub fn add_sub_option(&mut self, sub_option: CreateApplicationCommandOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(sub_option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
@@ -114,16 +135,15 @@ impl CreateApplicationCommandOption {
 pub struct CreateApplicationCommand(pub HashMap<&'static str, Value>);
 
 impl CreateApplicationCommand {
-    /// Specify the name of the application command.
+    /// Specifies the name of the application command.
     ///
-    /// **Note**: Must be between 1 and 32 characters long,
-    /// and cannot start with a space.
+    /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two global commands of the same app cannot have the same name. Two guild-specific commands of the same app cannot have the same name.
     pub fn name<D: ToString>(&mut self, name: D) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
         self
     }
 
-    /// Specify if the command should not be usable by default
+    /// Specifies if the command should not be usable by default
     ///
     /// **Note**: Setting it to false will disable it for anyone,
     /// including administrators and guild owners.
@@ -133,7 +153,7 @@ impl CreateApplicationCommand {
         self
     }
 
-    /// Specify the description of the application command.
+    /// Specifies the description of the application command.
     ///
     /// **Note**: Must be between 1 and 100 characters long.
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
@@ -141,9 +161,9 @@ impl CreateApplicationCommand {
         self
     }
 
-    /// Create an application command option for the application command.
+    /// Creates an application command option for the application command.
     ///
-    /// **Note**: Application commands can only have up to 10 options.
+    /// **Note**: Application commands can have up to 25 options.
     pub fn create_option<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateApplicationCommandOption) -> &mut CreateApplicationCommandOption,
@@ -153,9 +173,9 @@ impl CreateApplicationCommand {
         self.add_option(data)
     }
 
-    /// Add an application command option for the application command.
+    /// Adds an application command option for the application command.
     ///
-    /// **Note**: Application commands can only have up to 10 options.
+    /// **Note**: Application commands can have up to 25 options.
     pub fn add_option(&mut self, option: CreateApplicationCommandOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
@@ -167,7 +187,7 @@ impl CreateApplicationCommand {
 
     /// Sets all the application command options for the application command.
     ///
-    /// **Note**: Application commands can only have up to 10 options.
+    /// **Note**: Application commands can have up to 25 options.
     pub fn set_options(&mut self, options: Vec<CreateApplicationCommandOption>) -> &mut Self {
         let new_options = options
             .into_iter()

@@ -574,6 +574,7 @@ pub enum ApplicationCommandInteractionDataOptionValue {
     User(User, Option<PartialMember>),
     Channel(PartialChannel),
     Role(Role),
+    Number(f64),
 }
 
 fn default_permission_value() -> bool {
@@ -877,6 +878,7 @@ pub enum ApplicationCommandOptionType {
     Channel = 7,
     Role = 8,
     Mentionable = 9,
+    Number = 10,
     Unknown = !0,
 }
 
@@ -890,6 +892,7 @@ enum_number!(ApplicationCommandOptionType {
     Channel,
     Role,
     Mentionable,
+    Number
 });
 
 /// The type of an [`ApplicationCommandPermissionData`].
