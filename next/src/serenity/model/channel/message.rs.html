@@ -1307,6 +1307,11 @@
 <span id="1307">1307</span>
 <span id="1308">1308</span>
 <span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
+<span id="1314">1314</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1498,13 +1503,18 @@
         <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">crosspost</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Retrieves the related channel located in the cache.</span>
+    <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache,</span>
+    <span class="doccomment">/// upon failure requests it via the REST API.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns [`None`] if the channel is not in the cache.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="doccomment">/// **Note**: If the `cache`-feature is enabled permissions will be checked and upon</span>
+    <span class="doccomment">/// owning the required permissions the HTTP-request will be issued.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Can return an error if the HTTP request fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">channel</span>(<span class="self">self</span>.<span class="ident">channel_id</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">cache_http</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// A util function for determining whether this message was sent by someone else, or the</span>
