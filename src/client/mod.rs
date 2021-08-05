@@ -62,6 +62,8 @@ pub use self::{
 use super::gateway::GatewayError;
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use crate::cache::Settings as CacheSettings;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::http::Http;
@@ -86,6 +88,8 @@ pub struct ClientBuilder<'a> {
     application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
+    #[cfg(feature = "cache")]
+    cache_settings: Option<CacheSettings>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<Box<dyn Framework + Send + Sync + 'static>>>,
     #[cfg(feature = "voice")]
@@ -107,6 +111,8 @@ impl<'a> ClientBuilder<'a> {
             application_id: None,
             #[cfg(feature = "cache")]
             timeout: None,
+            #[cfg(feature = "cache")]
+            cache_settings: Some(CacheSettings::new()),
             #[cfg(feature = "framework")]
             framework: None,
             #[cfg(feature = "voice")]
@@ -204,6 +210,22 @@ impl<'a> ClientBuilder<'a> {
     #[cfg(feature = "cache")]
     pub fn cache_update_timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
+
+        self
+    }
+
+    /// Sets the settings of the cache.
+    /// Refer to [`Settings`] for more information.
+    ///
+    /// [`Settings`]: self::CacheSettings
+    #[cfg(feature = "cache")]
+    pub fn cache_settings<F>(mut self, f: F) -> Self
+    where
+        F: FnOnce(&mut CacheSettings) -> &mut CacheSettings,
+    {
+        if let Some(ref mut settings) = self.cache_settings {
+            f(settings);
+        }
 
         self
     }
@@ -347,7 +369,7 @@ impl<'a> Future for ClientBuilder<'a> {
 
             let cache_and_http = Arc::new(CacheAndHttp {
                 #[cfg(feature = "cache")]
-                cache: Arc::new(Cache::default()),
+                cache: Arc::new(Cache::new_with_settings(self.cache_settings.take().unwrap())),
                 #[cfg(feature = "cache")]
                 update_cache_timeout: self.timeout.take(),
                 http: Arc::clone(&http),
