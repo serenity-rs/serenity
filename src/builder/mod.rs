@@ -83,6 +83,7 @@ pub use self::{
         CreateApplicationCommandPermissions,
         CreateApplicationCommandPermissionsData,
         CreateApplicationCommandsPermissions,
+        CreateApplicationCommandPermissionData,
     },
     create_components::{
         CreateActionRow,
