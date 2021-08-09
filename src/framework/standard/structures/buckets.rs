@@ -71,7 +71,7 @@ impl Bucket {
             // category.
             #[cfg(feature = "cache")]
             Self::Category(counter) => {
-                if let Some(category_id) = msg.category_id(ctx).await {
+                if let Some(category_id) = msg.category_id(ctx) {
                     counter.take(ctx, msg, category_id.0).await
                 } else {
                     None
@@ -95,7 +95,7 @@ impl Bucket {
             // category.
             #[cfg(feature = "cache")]
             Self::Category(counter) => {
-                if let Some(category_id) = msg.category_id(ctx).await {
+                if let Some(category_id) = msg.category_id(ctx) {
                     counter.give(ctx, msg, category_id.0).await
                 }
             },

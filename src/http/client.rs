@@ -1414,6 +1414,7 @@ impl Http {
     ) -> Result<Message> {
         self.fire(Request {
             body: None,
+            multipart: None,
             headers: None,
             route: RouteInfo::GetFollowupMessage {
                 application_id: self.application_id,
