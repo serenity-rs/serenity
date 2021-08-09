@@ -151,6 +151,15 @@ version = "0.3.16"
 [dependencies.mime_guess]
 version = "2.0"
 
+[dependencies.dashmap]
+version = "4"
+features = ["serde"]
+optional = true
+
+[dependencies.parking_lot]
+version = "0.11"
+optional = true
+
 [dev-dependencies.http_crate]
 version = "0.2"
 package = "http"
@@ -182,7 +191,7 @@ default_no_backend = [
 ]
 
 builder = ["utils"]
-cache = []
+cache = ["dashmap", "parking_lot"]
 collector = ["gateway", "model"]
 client = ["http", "typemap_rev"]
 extras = []

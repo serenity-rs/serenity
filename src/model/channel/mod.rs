@@ -13,8 +13,6 @@ mod reaction;
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::de::{Error as DeError, Unexpected};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
@@ -78,7 +76,7 @@ impl Channel {
     /// # use std::sync::Arc;
     /// #
     /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.guild() {
     ///     Some(guild_channel) => {
@@ -113,7 +111,7 @@ impl Channel {
     /// # use std::sync::Arc;
     /// #
     /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.private() {
     ///     Some(private) => {
@@ -148,7 +146,7 @@ impl Channel {
     /// # use std::sync::Arc;
     /// #
     /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.category() {
     ///     Some(category) => {
@@ -564,16 +562,15 @@ mod test {
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-#[async_trait]
 impl FromStrAndCache for Channel {
     type Err = ChannelParseError;
 
-    async fn from_str<C>(cache: C, s: &str) -> StdResult<Self, Self::Err>
+    fn from_str<C>(cache: C, s: &str) -> StdResult<Self, Self::Err>
     where
         C: AsRef<Cache> + Send + Sync,
     {
         match parse_channel(s) {
-            Some(x) => match ChannelId(x).to_channel_cached(&cache).await {
+            Some(x) => match ChannelId(x).to_channel_cached(&cache) {
                 Some(channel) => Ok(channel),
                 _ => Err(ChannelParseError::NotPresentInCache),
             },

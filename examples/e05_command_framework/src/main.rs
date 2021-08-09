@@ -360,7 +360,7 @@ async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         ContentSafeOptions::default().clean_channel(false).clean_role(false)
     };
 
-    let content = content_safe(&ctx.cache, &args.rest(), &settings).await;
+    let content = content_safe(&ctx.cache, &args.rest(), &settings);
 
     msg.channel_id.say(&ctx.http, &content).await?;
 
@@ -413,7 +413,7 @@ async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandR
 async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let potential_role_name = args.rest();
 
-    if let Some(guild) = msg.guild(&ctx.cache).await {
+    if let Some(guild) = msg.guild(&ctx.cache) {
         // `role_by_name()` allows us to attempt attaining a reference to a role
         // via its name.
         if let Some(role) = guild.role_by_name(potential_role_name) {
@@ -544,7 +544,6 @@ async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult 
         for role in &member.roles {
             if role
                 .to_role_cached(&ctx.cache)
-                .await
                 .map_or(false, |r| r.has_permission(Permissions::ADMINISTRATOR))
             {
                 msg.channel_id.say(&ctx.http, "Yes, you are.").await?;
@@ -571,8 +570,7 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
         } else {
             format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
         }
-    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache).await
-    {
+    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache) {
         format!("Current slow mode rate is `{}` seconds.", channel.slow_mode_rate.unwrap_or(0))
     } else {
         "Failed to find channel in cache.".to_string()

@@ -67,7 +67,7 @@ impl ArgumentConvert for Message {
             .ok_or(MessageParseError::Malformed)?;
 
         #[cfg(feature = "cache")]
-        if let Some(msg) = ctx.cache.message(channel_id, message_id).await {
+        if let Some(msg) = ctx.cache.message(channel_id, message_id) {
             return Ok(msg);
         }
 

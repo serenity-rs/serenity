@@ -83,8 +83,7 @@ impl Invite {
                     channel_id,
                     None,
                     Permissions::CREATE_INVITE,
-                )
-                .await?;
+                )?;
             }
         }
 
@@ -118,8 +117,7 @@ impl Invite {
                     self.channel.id,
                     guild_id,
                     Permissions::MANAGE_GUILD,
-                )
-                .await?;
+                )?;
             }
         }
 
@@ -222,8 +220,8 @@ impl InviteGuild {
     /// total, consider using [`utils::shard_id`].
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub async fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
-        self.id.shard_id(&cache).await
+    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
+        self.id.shard_id(&cache)
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -318,8 +316,7 @@ impl RichInvite {
                     self.channel.id,
                     guild_id,
                     Permissions::MANAGE_GUILD,
-                )
-                .await?;
+                )?;
             }
         }
 

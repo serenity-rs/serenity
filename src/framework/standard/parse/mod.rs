@@ -26,15 +26,14 @@ use uwl::Stream;
 // the author does possess them. To avoid defaulting to permissions of everyone, we fetch
 // the member from HTTP if it is missing in the guild's members list.
 #[cfg(feature = "cache")]
-async fn permissions_in(
+fn permissions_in(
     ctx: &Context,
     guild_id: GuildId,
     channel_id: ChannelId,
     member: &Member,
     roles: &HashMap<RoleId, Role>,
 ) -> Permissions {
-    if ctx.cache.guild_field(guild_id, |guild| member.user.id == guild.owner_id).await == Some(true)
-    {
+    if ctx.cache.guild_field(guild_id, |guild| member.user.id == guild.owner_id) == Some(true) {
         return Permissions::all();
     }
 
@@ -62,7 +61,7 @@ async fn permissions_in(
     }
 
     if let Some(Some(Channel::Guild(channel))) =
-        ctx.cache.guild_field(guild_id, |guild| guild.channels.get(&channel_id).cloned()).await
+        ctx.cache.guild_field(guild_id, |guild| guild.channels.get(&channel_id).cloned())
     {
         if channel.kind == ChannelType::Text {
             permissions &= !(Permissions::CONNECT
@@ -265,7 +264,6 @@ async fn check_discrepancy(
             let member = match ctx
                 .cache
                 .guild_field(guild_id, |guild| guild.members.get(&msg.author.id).cloned())
-                .await
             {
                 Some(Some(member)) => member,
                 // Member not found.
@@ -277,8 +275,8 @@ async fn check_discrepancy(
                 None => return Ok(()),
             };
             #[allow(clippy::unwrap_used)] // Allowing unwrap because should always return Some()
-            let roles = ctx.cache.guild_field(guild_id, |guild| guild.roles.clone()).await.unwrap();
-            let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles).await;
+            let roles = ctx.cache.guild_field(guild_id, |guild| guild.roles.clone()).unwrap();
+            let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles);
 
             if !(perms.contains(*options.required_permissions())
                 || options.owner_privilege() && config.owners.contains(&msg.author.id))

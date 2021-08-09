@@ -40,26 +40,40 @@ impl ArgumentConvert for User {
         _channel_id: Option<ChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
-        let users = ctx.cache.users.read().await;
+        let users = &ctx.cache.users;
 
-        let lookup_by_id = || users.get(&UserId(s.parse().ok()?));
+        let lookup_by_id = || users.get(&UserId(s.parse().ok()?)).map(|u| u.clone());
 
-        let lookup_by_mention = || users.get(&UserId(crate::utils::parse_username(s)?));
+        let lookup_by_mention =
+            || users.get(&UserId(crate::utils::parse_username(s)?)).map(|u| u.clone());
 
         let lookup_by_name_and_discrim = || {
             let (name, discrim) = crate::utils::parse_user_tag(s)?;
-            users
-                .values()
-                .find(|user| user.discriminator == discrim && user.name.eq_ignore_ascii_case(name))
+            users.iter().find_map(|m| {
+                let user = m.value();
+                if user.discriminator == discrim && user.name.eq_ignore_ascii_case(name) {
+                    Some(user.clone())
+                } else {
+                    None
+                }
+            })
         };
 
-        let lookup_by_name = || users.values().find(|user| user.name == s);
+        let lookup_by_name = || {
+            users.iter().find_map(|m| {
+                let user = m.value();
+                if user.name == s {
+                    Some(user.clone())
+                } else {
+                    None
+                }
+            })
+        };
 
         lookup_by_id()
             .or_else(lookup_by_mention)
             .or_else(lookup_by_name_and_discrim)
             .or_else(lookup_by_name)
-            .cloned()
             .ok_or(UserParseError::NotFoundOrMalformed)
     }
 }

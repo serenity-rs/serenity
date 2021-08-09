@@ -387,8 +387,8 @@ impl ChannelId {
     /// Attempts to find a [`Channel`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn to_channel_cached(self, cache: impl AsRef<Cache>) -> Option<Channel> {
-        cache.as_ref().channel(self).await
+    pub fn to_channel_cached(self, cache: impl AsRef<Cache>) -> Option<Channel> {
+        cache.as_ref().channel(self)
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache,
@@ -402,7 +402,7 @@ impl ChannelId {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(channel) = cache.channel(self).await {
+                if let Some(channel) = cache.channel(self) {
                     return Ok(channel);
                 }
             }
@@ -529,7 +529,7 @@ impl ChannelId {
     /// Returns the name of whatever channel this id holds.
     #[cfg(feature = "cache")]
     pub async fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
-        let channel = self.to_channel_cached(cache).await?;
+        let channel = self.to_channel_cached(cache)?;
 
         Some(match channel {
             Channel::Guild(channel) => channel.name().to_string(),

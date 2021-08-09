@@ -426,13 +426,13 @@ pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
 /// the permissions are not in the cache.
 #[cfg(all(feature = "cache", feature = "model"))]
 #[inline]
-pub async fn user_has_perms_cache(
+pub fn user_has_perms_cache(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
     guild_id: Option<GuildId>,
     permissions: Permissions,
 ) -> Result<()> {
-    if match user_has_perms(cache, channel_id, guild_id, permissions).await {
+    if match user_has_perms(cache, channel_id, guild_id, permissions) {
         Err(Error::Model(err)) => err.is_cache_err(),
         result => result?,
     } {
@@ -443,7 +443,7 @@ pub async fn user_has_perms_cache(
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-pub async fn user_has_perms(
+pub fn user_has_perms(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
     guild_id: Option<GuildId>,
@@ -451,7 +451,7 @@ pub async fn user_has_perms(
 ) -> Result<bool> {
     let cache = cache.as_ref();
 
-    let channel = match cache.channel(channel_id).await {
+    let channel = match cache.channel(channel_id) {
         Some(channel) => channel,
         None => return Err(Error::Model(ModelError::ChannelNotFound)),
     };
@@ -474,12 +474,12 @@ pub async fn user_has_perms(
         },
     };
 
-    let guild = match cache.guild(guild_id).await {
+    let guild = match cache.guild(guild_id) {
         Some(guild) => guild,
         None => return Err(Error::Model(ModelError::GuildNotFound)),
     };
 
-    let member = match guild.members.get(&cache.current_user().await.id) {
+    let member = match guild.members.get(&cache.current_user().id) {
         Some(member) => member,
         None => return Err(Error::Model(ModelError::MemberNotFound)),
     };

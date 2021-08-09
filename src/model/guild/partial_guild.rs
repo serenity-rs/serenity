@@ -267,15 +267,17 @@ impl PartialGuild {
     }
 
     #[cfg(feature = "cache")]
-    pub async fn channel_id_from_name(
+    pub fn channel_id_from_name(
         &self,
         cache: impl AsRef<Cache>,
         name: impl AsRef<str>,
     ) -> Option<ChannelId> {
         let name = name.as_ref();
-        let guild_channels = cache.as_ref().guild_channels(&self.id).await?;
+        let guild_channels = cache.as_ref().guild_channels(&self.id)?;
 
-        for (id, channel) in guild_channels.iter() {
+        for channel_entry in guild_channels.iter() {
+            let (id, channel) = channel_entry.pair();
+
             if channel.name == name {
                 return Some(*id);
             }
@@ -953,21 +955,17 @@ impl PartialGuild {
 
         let lhs = cache
             .as_ref()
-            .guild(self.id)
-            .await?
+            .guild(self.id)?
             .members
             .get(&lhs_id)?
             .highest_role_info(&cache)
-            .await
             .unwrap_or((RoleId(0), 0));
         let rhs = cache
             .as_ref()
-            .guild(self.id)
-            .await?
+            .guild(self.id)?
             .members
             .get(&rhs_id)?
             .highest_role_info(&cache)
-            .await
             .unwrap_or((RoleId(0), 0));
 
         // If LHS and RHS both have no top position or have the same role ID,
@@ -1138,7 +1136,7 @@ impl PartialGuild {
     #[cfg(feature = "cache")]
     async fn has_perms(&self, cache_http: impl CacheHttp, mut permissions: Permissions) -> bool {
         if let Some(cache) = cache_http.cache() {
-            let user_id = cache.current_user().await.id;
+            let user_id = cache.current_user().id;
 
             if let Ok(perms) = self.member_permissions(&cache_http, user_id).await {
                 permissions.remove(perms);
@@ -1365,8 +1363,8 @@ impl PartialGuild {
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub async fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
-        self.id.shard_id(cache).await
+    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
+        self.id.shard_id(cache)
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -1488,7 +1486,7 @@ impl PartialGuild {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
-    ///             if let Some(guild) = guild_id.to_guild_cached(&context).await {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&context) {
     ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("Obtained role's reference: {:?}", role);
     ///                 }
