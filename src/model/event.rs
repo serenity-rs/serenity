@@ -1575,6 +1575,24 @@ pub struct ThreadCreateEvent {
     pub thread: GuildChannel,
 }
 
+#[cfg(feature = "cache")]
+impl CacheUpdate for ThreadCreateEvent {
+    type Output = GuildChannel;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let (guild_id, thread_id) = (self.thread.guild_id, self.thread.id);
+
+        cache.guilds.get_mut(&guild_id).and_then(|mut g| {
+            if let Some(i) = g.threads.iter().position(|e| e.id == thread_id) {
+                Some(std::mem::replace(&mut g.threads[i], self.thread.clone()))
+            } else {
+                g.threads.push(self.thread.clone());
+                None
+            }
+        })
+    }
+}
+
 impl<'de> Deserialize<'de> for ThreadCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let thread = GuildChannel::deserialize(deserializer)?;
@@ -1591,6 +1609,24 @@ pub struct ThreadUpdateEvent {
     pub thread: GuildChannel,
 }
 
+#[cfg(feature = "cache")]
+impl CacheUpdate for ThreadUpdateEvent {
+    type Output = GuildChannel;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let (guild_id, thread_id) = (self.thread.guild_id, self.thread.id);
+
+        cache.guilds.get_mut(&guild_id).and_then(|mut g| {
+            if let Some(i) = g.threads.iter().position(|e| e.id == thread_id) {
+                Some(std::mem::replace(&mut g.threads[i], self.thread.clone()))
+            } else {
+                g.threads.push(self.thread.clone());
+                None
+            }
+        })
+    }
+}
+
 impl<'de> Deserialize<'de> for ThreadUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let thread = GuildChannel::deserialize(deserializer)?;
@@ -1605,6 +1641,19 @@ impl<'de> Deserialize<'de> for ThreadUpdateEvent {
 #[non_exhaustive]
 pub struct ThreadDeleteEvent {
     pub thread: PartialGuildChannel,
+}
+
+#[cfg(feature = "cache")]
+impl CacheUpdate for ThreadDeleteEvent {
+    type Output = GuildChannel;
+
+    fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let (guild_id, thread_id) = (self.thread.guild_id, self.thread.id);
+
+        cache.guilds.get_mut(&guild_id).and_then(|mut g| {
+            g.threads.iter().position(|e| e.id == thread_id).and_then(|i| Some(g.threads.remove(i)))
+        })
+    }
 }
 
 impl<'de> Deserialize<'de> for ThreadDeleteEvent {
