@@ -39,23 +39,23 @@ impl ArgumentConvert for Emoji {
         _channel_id: Option<ChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
-        let guilds = ctx.cache.guilds.read().await;
+        let guilds = &ctx.cache.guilds;
 
         let direct_id = s.parse::<u64>().ok().map(EmojiId);
         let id_from_mention = crate::utils::parse_emoji(s).map(|e| e.id);
 
         if let Some(emoji_id) = direct_id.or(id_from_mention) {
-            if let Some(emoji) = guilds.values().find_map(|guild| guild.emojis.get(&emoji_id)) {
-                return Ok(emoji.clone());
+            if let Some(emoji) =
+                guilds.iter().find_map(|guild| guild.emojis.get(&emoji_id).cloned())
+            {
+                return Ok(emoji);
             }
         }
 
-        if let Some(emoji) = guilds
-            .values()
-            .flat_map(|guild| guild.emojis.values())
-            .find(|emoji| emoji.name.eq_ignore_ascii_case(s))
-        {
-            return Ok(emoji.clone());
+        if let Some(emoji) = guilds.iter().find_map(|guild| {
+            guild.emojis.values().find(|emoji| emoji.name.eq_ignore_ascii_case(s)).cloned()
+        }) {
+            return Ok(emoji);
         }
 
         Err(EmojiParseError::NotFoundOrMalformed)

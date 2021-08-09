@@ -44,7 +44,7 @@ impl<'a> Multipart<'a> {
                 } => {
                     let mut part =
                         Part::bytes(data.clone().into_owned()).file_name(filename.clone());
-                    part = part_add_mime_str(part, &filename)?;
+                    part = part_add_mime_str(part, filename)?;
 
                     multipart = multipart.part(file_name, part);
                 },
@@ -56,7 +56,7 @@ impl<'a> Multipart<'a> {
                     file.try_clone().await?.read_to_end(&mut buf).await?;
 
                     let mut part = Part::stream(buf).file_name(filename.clone());
-                    part = part_add_mime_str(part, &filename)?;
+                    part = part_add_mime_str(part, filename)?;
 
                     multipart = multipart.part(file_name, part);
                 },

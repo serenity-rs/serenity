@@ -43,10 +43,16 @@ async fn lookup_channel_global(ctx: &Context, s: &str) -> Result<Channel, Channe
         return ChannelId(channel_id).to_channel(ctx).await.map_err(ChannelParseError::Http);
     }
 
-    let channels = ctx.cache.channels.read().await;
-    if let Some(channel) =
-        channels.values().find(|channel| channel.name.eq_ignore_ascii_case(s)).cloned()
-    {
+    let channels = &ctx.cache.channels;
+
+    if let Some(channel) = channels.iter().find_map(|m| {
+        let channel = m.value();
+        if channel.name.eq_ignore_ascii_case(s) {
+            Some(channel.clone())
+        } else {
+            None
+        }
+    }) {
         return Ok(Channel::Guild(channel));
     }
 
