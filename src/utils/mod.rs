@@ -549,7 +549,7 @@ impl Default for ContentSafeOptions {
 
 #[cfg(feature = "cache")]
 #[inline]
-async fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
+fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@&") {
@@ -562,7 +562,7 @@ async fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
             if let Ok(id) = RoleId::from_str(&s[mention_start..mention_end]) {
                 let to_replace = format!("<@&{}>", &s[mention_start..mention_end]);
 
-                *s = if let Some(role) = id.to_role_cached(&cache).await {
+                *s = if let Some(role) = id.to_role_cached(&cache) {
                     s.replace(&to_replace, &format!("@{}", &role.name))
                 } else {
                     s.replace(&to_replace, "@deleted-role")
@@ -586,7 +586,7 @@ async fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-async fn clean_channels(cache: &impl AsRef<Cache>, s: &mut String) {
+fn clean_channels(cache: &impl AsRef<Cache>, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<#") {
@@ -599,7 +599,7 @@ async fn clean_channels(cache: &impl AsRef<Cache>, s: &mut String) {
             if let Ok(id) = ChannelId::from_str(&s[mention_start..mention_end]) {
                 let to_replace = format!("<#{}>", &s[mention_start..mention_end]);
 
-                *s = if let Some(Channel::Guild(channel)) = id.to_channel_cached(&cache).await {
+                *s = if let Some(Channel::Guild(channel)) = id.to_channel_cached(&cache) {
                     let replacement = format!("#{}", &channel.name);
                     s.replace(&to_replace, &replacement)
                 } else {
@@ -624,7 +624,7 @@ async fn clean_channels(cache: &impl AsRef<Cache>, s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-async fn clean_users(
+fn clean_users(
     cache: &impl AsRef<Cache>,
     s: &mut String,
     show_discriminator: bool,
@@ -651,7 +651,7 @@ async fn clean_users(
 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
                 let replacement = if let Some(guild_id) = guild {
-                    if let Some(guild) = cache.guild(&guild_id).await {
+                    if let Some(guild) = cache.guild(&guild_id) {
                         if let Some(member) = guild.members.get(&id) {
                             if show_discriminator {
                                 format!("@{}", member.distinct())
@@ -664,7 +664,7 @@ async fn clean_users(
                     } else {
                         "@invalid-user".to_string()
                     }
-                } else if let Some(user) = cache.user(id).await {
+                } else if let Some(user) = cache.user(id) {
                     if show_discriminator {
                         format!("@{}#{:04}", user.name, user.discriminator)
                     } else {
@@ -711,12 +711,12 @@ async fn clean_users(
 /// # use serenity::client::Cache;
 /// # use tokio::sync::RwLock;
 /// #
-/// # async fn run() {
+/// # fn run() {
 /// # let cache = Cache::default();
 /// use serenity::utils::{content_safe, ContentSafeOptions};
 ///
 /// let with_mention = "@everyone";
-/// let without_mention = content_safe(&cache, &with_mention, &ContentSafeOptions::default()).await;
+/// let without_mention = content_safe(&cache, &with_mention, &ContentSafeOptions::default());
 ///
 /// assert_eq!("@\u{200B}everyone".to_string(), without_mention);
 /// # }
@@ -724,7 +724,7 @@ async fn clean_users(
 ///
 /// [`Cache`]: crate::cache::Cache
 #[cfg(feature = "cache")]
-pub async fn content_safe(
+pub fn content_safe(
     cache: impl AsRef<Cache>,
     s: impl AsRef<str>,
     options: &ContentSafeOptions,
@@ -732,16 +732,15 @@ pub async fn content_safe(
     let mut content = s.as_ref().to_string();
 
     if options.clean_role {
-        clean_roles(&cache, &mut content).await;
+        clean_roles(&cache, &mut content);
     }
 
     if options.clean_channel {
-        clean_channels(&cache, &mut content).await;
+        clean_channels(&cache, &mut content);
     }
 
     if options.clean_user {
-        clean_users(&cache, &mut content, options.show_discriminator, options.guild_reference)
-            .await;
+        clean_users(&cache, &mut content, options.show_discriminator, options.guild_reference);
     }
 
     if options.clean_here {
@@ -803,9 +802,9 @@ mod test {
     }
 
     #[cfg(feature = "cache")]
-    #[tokio::test]
-    async fn test_content_safe() {
-        use std::{collections::HashMap, sync::Arc};
+    #[test]
+    fn test_content_safe() {
+        use std::sync::Arc;
 
         use chrono::{DateTime, Utc};
 
@@ -932,9 +931,9 @@ mod test {
 
         guild.members.insert(user.id, member.clone());
         guild.roles.insert(role.id, role.clone());
-        cache.users.write().await.insert(user.id, user.clone());
-        cache.guilds.write().await.insert(guild.id, guild.clone());
-        cache.channels.write().await.insert(channel.id, channel.clone());
+        cache.users.insert(user.id, user.clone());
+        cache.guilds.insert(guild.id, guild.clone());
+        cache.channels.insert(channel.id, channel.clone());
 
         let with_user_mentions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
         <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
@@ -950,40 +949,40 @@ mod test {
 
         // User mentions
         let options = ContentSafeOptions::default();
-        assert_eq!(without_user_mentions, content_safe(&cache, with_user_mentions, &options).await);
+        assert_eq!(without_user_mentions, content_safe(&cache, with_user_mentions, &options));
 
         let options = ContentSafeOptions::default();
         assert_eq!(
             format!("@{}#{:04}", user.name, user.discriminator),
-            content_safe(&cache, "<@!100000000000000000>", &options).await
+            content_safe(&cache, "<@!100000000000000000>", &options)
         );
 
         let options = ContentSafeOptions::default();
         assert_eq!(
             format!("@{}#{:04}", user.name, user.discriminator),
-            content_safe(&cache, "<@100000000000000000>", &options).await
+            content_safe(&cache, "<@100000000000000000>", &options)
         );
 
         let options = options.show_discriminator(false);
         assert_eq!(
             format!("@{}", user.name),
-            content_safe(&cache, "<@!100000000000000000>", &options).await
+            content_safe(&cache, "<@!100000000000000000>", &options)
         );
 
         let options = options.show_discriminator(false);
         assert_eq!(
             format!("@{}", user.name),
-            content_safe(&cache, "<@100000000000000000>", &options).await
+            content_safe(&cache, "<@100000000000000000>", &options)
         );
 
         let options = options.display_as_member_from(guild.id);
         assert_eq!(
             format!("@{}", member.nick.unwrap()),
-            content_safe(&cache, "<@!100000000000000000>", &options).await
+            content_safe(&cache, "<@!100000000000000000>", &options)
         );
 
         let options = options.clean_user(false);
-        assert_eq!(with_user_mentions, content_safe(&cache, with_user_mentions, &options).await);
+        assert_eq!(with_user_mentions, content_safe(&cache, with_user_mentions, &options));
 
         // Channel mentions
         let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#0> \
@@ -994,16 +993,10 @@ mod test {
         #deleted-channel #unsafe-club #general <#ferrisferrisferris> \
         #deleted-channel";
 
-        assert_eq!(
-            without_channel_mentions,
-            content_safe(&cache, with_channel_mentions, &options).await
-        );
+        assert_eq!(without_channel_mentions, content_safe(&cache, with_channel_mentions, &options));
 
         let options = options.clean_channel(false);
-        assert_eq!(
-            with_channel_mentions,
-            content_safe(&cache, with_channel_mentions, &options).await
-        );
+        assert_eq!(with_channel_mentions, content_safe(&cache, with_channel_mentions, &options));
 
         // Role mentions
         let with_role_mentions = "<@&> @deleted-role <@&9829> \
@@ -1012,35 +1005,29 @@ mod test {
         let without_role_mentions = "<@&> @deleted-role @deleted-role \
         @ferris-club-member @deleted-role";
 
-        assert_eq!(without_role_mentions, content_safe(&cache, with_role_mentions, &options).await);
+        assert_eq!(without_role_mentions, content_safe(&cache, with_role_mentions, &options));
 
         let options = options.clean_role(false);
-        assert_eq!(with_role_mentions, content_safe(&cache, with_role_mentions, &options).await);
+        assert_eq!(with_role_mentions, content_safe(&cache, with_role_mentions, &options));
 
         // Everyone mentions
         let with_everyone_mention = "@everyone";
 
         let without_everyone_mention = "@\u{200B}everyone";
 
-        assert_eq!(
-            without_everyone_mention,
-            content_safe(&cache, with_everyone_mention, &options).await
-        );
+        assert_eq!(without_everyone_mention, content_safe(&cache, with_everyone_mention, &options));
 
         let options = options.clean_everyone(false);
-        assert_eq!(
-            with_everyone_mention,
-            content_safe(&cache, with_everyone_mention, &options).await
-        );
+        assert_eq!(with_everyone_mention, content_safe(&cache, with_everyone_mention, &options));
 
         // Here mentions
         let with_here_mention = "@here";
 
         let without_here_mention = "@\u{200B}here";
 
-        assert_eq!(without_here_mention, content_safe(&cache, with_here_mention, &options).await);
+        assert_eq!(without_here_mention, content_safe(&cache, with_here_mention, &options));
 
         let options = options.clean_here(false);
-        assert_eq!(with_here_mention, content_safe(&cache, with_here_mention, &options).await);
+        assert_eq!(with_here_mention, content_safe(&cache, with_here_mention, &options));
     }
 }
