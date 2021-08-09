@@ -63,7 +63,6 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-<span id="66">66</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::prelude</span>::<span class="kw-2">*</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
@@ -115,7 +114,6 @@
         <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">ctx</span>
             .<span class="ident">cache</span>
             .<span class="ident">guild_roles</span>(<span class="ident">guild_id</span>.<span class="ident">ok_or</span>(<span class="ident">RoleParseError::NotInGuild</span>)<span class="question-mark">?</span>)
-            .<span class="kw">await</span>
             .<span class="ident">ok_or</span>(<span class="ident">RoleParseError::NotInCache</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role_id</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::utils::parse_role</span>(<span class="ident">s</span>)) {

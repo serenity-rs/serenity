@@ -207,6 +207,12 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::prelude</span>::<span class="kw-2">*</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
@@ -253,10 +259,16 @@
         <span class="kw">return</span> <span class="ident">ChannelId</span>(<span class="ident">channel_id</span>).<span class="ident">to_channel</span>(<span class="ident">ctx</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">ChannelParseError::Http</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">read</span>().<span class="kw">await</span>;
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span>
-        <span class="ident">channels</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">channel</span><span class="op">|</span> <span class="ident">channel</span>.<span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">s</span>)).<span class="ident">cloned</span>()
-    {
+    <span class="kw">let</span> <span class="ident">channels</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">channels</span>;
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">channels</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">value</span>();
+        <span class="kw">if</span> <span class="ident">channel</span>.<span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">s</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">channel</span>.<span class="ident">clone</span>())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>));
     }
 
