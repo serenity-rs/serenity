@@ -1603,7 +1603,6 @@
 <span id="1603">1603</span>
 <span id="1604">1604</span>
 <span id="1605">1605</span>
-<span id="1606">1606</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -1683,7 +1682,7 @@
     <span class="ident">HelpOptions</span>,
     <span class="ident">OnlyIn</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cache::Cache</span>,
@@ -1869,7 +1868,7 @@
 <span class="doccomment">/// Checks whether a user is member of required roles</span>
 <span class="doccomment">/// and given the required permissions.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">has_all_requirements</span>(
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_all_requirements</span>(
     <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">CommandOptions</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
@@ -1877,14 +1876,14 @@
     <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">guild_id</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>).<span class="kw">await</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">permissions</span>) <span class="op">=</span> <span class="ident">member</span>.<span class="ident">permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>).<span class="kw">await</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">guild_id</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">permissions</span>) <span class="op">=</span> <span class="ident">member</span>.<span class="ident">permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>) {
                 <span class="kw">return</span> <span class="kw">if</span> <span class="ident">cmd</span>.<span class="ident">allowed_roles</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">permissions</span>.<span class="ident">administrator</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="ident">msg</span>).<span class="kw">await</span>
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild_roles</span>(<span class="ident">guild_id</span>).<span class="kw">await</span> {
+                    <span class="ident">permissions</span>.<span class="ident">administrator</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="ident">msg</span>)
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild_roles</span>(<span class="ident">guild_id</span>) {
                     <span class="ident">permissions</span>.<span class="ident">administrator</span>()
                         <span class="op">|</span><span class="op">|</span> (<span class="ident">has_correct_roles</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="kw-2">&amp;</span><span class="ident">roles</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>)
-                            <span class="op">&amp;&amp;</span> <span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="ident">msg</span>).<span class="kw">await</span>)
+                            <span class="op">&amp;&amp;</span> <span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>, <span class="ident">msg</span>))
                 } <span class="kw">else</span> {
                     <span class="macro">warn!</span>(<span class="string">&quot;Failed to find the guild and its roles.&quot;</span>);
 
@@ -1908,7 +1907,7 @@
 
 <span class="comment">// Decides how a listed help entry shall be displayed.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_common_behaviour</span>(
+<span class="kw">fn</span> <span class="ident">check_common_behaviour</span>(
     <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
@@ -1933,7 +1932,7 @@
         <span class="kw">return</span> <span class="ident">HelpBehaviour::Nothing</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">options</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">options</span>, <span class="ident">msg</span>) {
         <span class="kw">return</span> <span class="ident">help_options</span>.<span class="ident">lacking_permissions</span>;
     }
 
@@ -1946,7 +1945,6 @@
 
         <span class="ident">HelpBehaviour::Nothing</span>
     })
-    .<span class="kw">await</span>
     .<span class="ident">unwrap_or</span>(<span class="ident">HelpBehaviour::Nothing</span>)
 }
 
@@ -1959,7 +1957,7 @@
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour</span> {
-    <span class="kw">let</span> <span class="ident">behaviour</span> <span class="op">=</span> <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
+    <span class="kw">let</span> <span class="ident">behaviour</span> <span class="op">=</span> <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>);
 
     <span class="kw">if</span> <span class="ident">behaviour</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour::Nothing</span>
         <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">options</span>.<span class="ident">owner_privilege</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>))
@@ -2141,7 +2139,7 @@
         <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
             <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">group</span>;
             <span class="kw">let</span> <span class="ident">group_behaviour</span> <span class="op">=</span>
-                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
+                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>);
 
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">group_behaviour</span> {
                 <span class="ident">HelpBehaviour::Nothing</span> <span class="op">=</span><span class="op">&gt;</span> (),
@@ -2306,7 +2304,7 @@
         } <span class="kw">else</span> {
             <span class="ident">std::cmp::max</span>(
                 <span class="kw-2">*</span><span class="ident">highest_formatter</span>,
-                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>,
+                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>),
             )
         }
     };
@@ -3131,7 +3129,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">levenshtein_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::levenshtein_distance</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::levenshtein_distance</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">reflexive</span>() {
@@ -3184,7 +3182,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">matrix_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::Matrix</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Matrix</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">index_mut</span>() {

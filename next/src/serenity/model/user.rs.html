@@ -1180,6 +1180,8 @@
 <span id="1180">1180</span>
 <span id="1181">1181</span>
 <span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
 </pre><pre class="rust">
 <span class="doccomment">//! User information-related models.</span>
 
@@ -1191,30 +1193,30 @@
 <span class="kw">use</span> <span class="ident">futures::future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::utils::deserialize_u16</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils::deserialize_u16</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateBotAuthParameters</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditProfile</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateBotAuthParameters</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditProfile</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
     <span class="ident">CollectReaction</span>,
     <span class="ident">CollectReply</span>,
     <span class="ident">MessageCollectorBuilder</span>,
     <span class="ident">ReactionCollectorBuilder</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::GuildPagination</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::GuildPagination</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::json</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::to_string</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::to_string</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">internal::prelude</span>::<span class="kw-2">*</span>, <span class="ident">model::misc::Mentionable</span>};
 
 <span class="doccomment">/// Information about the current user.</span>
@@ -1254,7 +1256,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // assuming the cache has been unlocked</span>
-    <span class="doccomment">/// let user = cache.current_user().await;</span>
+    <span class="doccomment">/// let user = cache.current_user();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// match user.avatar_url() {</span>
     <span class="doccomment">///     Some(url) =&gt; println!(&quot;{}&#39;s avatar can be found at {}&quot;, user.name, url),</span>
@@ -1842,7 +1844,7 @@
     <span class="doccomment">/// #   #[cfg(feature = &quot;cache&quot;)]</span>
     <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;~help&quot; {</span>
-    <span class="doccomment">///             let url = match ctx.cache.current_user().await.invite_url(&amp;ctx, Permissions::empty()).await {</span>
+    <span class="doccomment">///             let url = match ctx.cache.current_user().invite_url(&amp;ctx, Permissions::empty()).await {</span>
     <span class="doccomment">///                 Ok(v) =&gt; v,</span>
     <span class="doccomment">///                 Err(why) =&gt; {</span>
     <span class="doccomment">///                     println!(&quot;Error creating invite url: {:?}&quot;, why);</span>
@@ -1979,7 +1981,7 @@
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
                     {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">guild_id</span>, <span class="self">self</span>.<span class="ident">id</span>).<span class="kw">await</span> {
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">guild_id</span>, <span class="self">self</span>.<span class="ident">id</span>) {
                                 <span class="ident">has_role</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>.<span class="ident">roles</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">role</span>));
                             }
                         }
@@ -2081,7 +2083,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">guild_id</span>.<span class="ident">to_guild_cached</span>(<span class="ident">cache</span>).<span class="kw">await</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">guild_id</span>.<span class="ident">to_guild_cached</span>(<span class="ident">cache</span>) {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>) {
                         <span class="kw">return</span> <span class="ident">member</span>.<span class="ident">nick</span>.<span class="ident">clone</span>();
                     }
@@ -2162,7 +2164,9 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="ident">cache</span>.<span class="ident">private_channels</span>().<span class="kw">await</span>.<span class="ident">values</span>() {
+                <span class="kw">for</span> <span class="ident">channel_entry</span> <span class="kw">in</span> <span class="ident">cache</span>.<span class="ident">private_channels</span>().<span class="ident">iter</span>() {
+                    <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">channel_entry</span>.<span class="ident">value</span>();
+
                     <span class="kw">if</span> <span class="ident">channel</span>.<span class="ident">recipient</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span> {
                         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">channel</span>.<span class="ident">clone</span>());
                     }
@@ -2181,7 +2185,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_user_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">user</span>(<span class="self">self</span>).<span class="kw">await</span>
+        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">user</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// First attempts to find a [`User`] by its Id in the cache,</span>
@@ -2205,7 +2209,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="self">self</span>).<span class="kw">await</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="self">self</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">user</span>);
                 }
             }
@@ -2322,7 +2326,7 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">mod</span> <span class="ident">model</span> {
-        <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::user::User</span>;
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">test_core</span>() {

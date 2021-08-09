@@ -135,6 +135,7 @@
 <span id="135">135</span>
 <span id="136">136</span>
 <span id="137">137</span>
+<span id="138">138</span>
 </pre><pre class="rust">
 <span class="doccomment">//! Serenity is a Rust library for the Discord API.</span>
 <span class="doccomment">//!</span>
@@ -195,7 +196,8 @@
     <span class="ident">clippy::unwrap_used</span>,
     <span class="ident">clippy::non_ascii_literal</span>,
     <span class="ident">clippy::missing_errors_doc</span>,
-    <span class="ident">clippy::let_underscore_must_use</span>
+    <span class="ident">clippy::let_underscore_must_use</span>,
+    <span class="ident">clippy::unused_async</span>
 )]</span>
 <span class="attribute">#![<span class="ident">type_length_limit</span> <span class="op">=</span> <span class="string">&quot;3294819&quot;</span>]</span> <span class="comment">// needed so ShardRunner::run compiles with instrument.</span>
 
@@ -248,12 +250,12 @@
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::Client</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Client</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::Http</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>

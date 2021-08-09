@@ -1230,12 +1230,6 @@
 <span id="1230">1230</span>
 <span id="1231">1231</span>
 <span id="1232">1232</span>
-<span id="1233">1233</span>
-<span id="1234">1234</span>
-<span id="1235">1235</span>
-<span id="1236">1236</span>
-<span id="1237">1237</span>
-<span id="1238">1238</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -1269,54 +1263,61 @@
 <span class="doccomment">//! [`Shard`]: crate::gateway::Shard</span>
 <span class="doccomment">//! [`http`]: crate::http</span>
 
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">hash_map::Entry</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>, <span class="ident">VecDeque</span>};
+<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">hash_map::RandomState</span>, <span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std::default::Default</span>;
+<span class="kw">use</span> <span class="ident">std::hash::BuildHasher</span>;
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<span class="kw">use</span> <span class="ident">dashmap</span>::{
+    <span class="ident">iter::Iter</span>,
+    <span class="ident">mapref</span>::{<span class="ident">entry::Entry</span>, <span class="ident">multiple::RefMulti</span>},
+    <span class="ident">DashMap</span>,
+    <span class="ident">DashSet</span>,
+};
+<span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
+<span class="comment">// use tokio::sync::RwLock;</span>
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">mod</span> <span class="ident">cache_update</span>;
 <span class="kw">mod</span> <span class="ident">settings</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::cache_update::CacheUpdate</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::settings::Settings</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::cache_update::CacheUpdate</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::settings::Settings</span>;
 
-<span class="kw">type</span> <span class="ident">MessageCache</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">MessageCache</span> <span class="op">=</span> <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromStrAndCache</span>: <span class="ident">Sized</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">CRL</span><span class="op">&gt;</span>(<span class="ident">cache</span>: <span class="ident">CRL</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Err</span><span class="op">&gt;</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">CRL</span><span class="op">&gt;</span>(<span class="ident">cache</span>: <span class="ident">CRL</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">CRL</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>;
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StrExt</span>: <span class="ident">Sized</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_cached</span><span class="op">&lt;</span><span class="ident">CRL</span>, <span class="ident">F</span>: <span class="ident">FromStrAndCache</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="ident">CRL</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">F::Err</span><span class="op">&gt;</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">parse_cached</span><span class="op">&lt;</span><span class="ident">CRL</span>, <span class="ident">F</span>: <span class="ident">FromStrAndCache</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="ident">CRL</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">F::Err</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">CRL</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>;
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">StrExt</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_cached</span><span class="op">&lt;</span><span class="ident">CRL</span>, <span class="ident">F</span>: <span class="ident">FromStrAndCache</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="ident">CRL</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">F::Err</span><span class="op">&gt;</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">parse_cached</span><span class="op">&lt;</span><span class="ident">CRL</span>, <span class="ident">F</span>: <span class="ident">FromStrAndCache</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="ident">CRL</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">F::Err</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">CRL</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
     {
-        <span class="ident">F::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>).<span class="kw">await</span>
+        <span class="ident">F::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FromStr</span><span class="op">&gt;</span> <span class="ident">FromStrAndCache</span> <span class="kw">for</span> <span class="ident">F</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">F::Err</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">CRL</span><span class="op">&gt;</span>(<span class="ident">_cache</span>: <span class="ident">CRL</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Err</span><span class="op">&gt;</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="ident">CRL</span><span class="op">&gt;</span>(<span class="ident">_cache</span>: <span class="ident">CRL</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">CRL</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
     {
@@ -1326,13 +1327,18 @@
 
 <span class="doccomment">/// Iterator given to the selector closure in [`Cache::channel_messages_field`].</span>
 <span class="comment">// Wrapper around a specific iterator type to allow swapping out iterators on cache design changes</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">std::collections::hash_map::Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span>);
+<span class="comment">//</span>
+<span class="comment">// Clone impl waiting on this https://github.com/xacrimon/dashmap/pull/152</span>
+<span class="comment">//#[derive(Clone)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span>(
+    <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">MessageId</span>, <span class="ident">Message</span>, <span class="ident">S</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">MessageIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">MessageIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="comment">// type Item = &amp;&#39;a Message;</span>
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">RefMulti</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">MessageId</span>, <span class="ident">Message</span>, <span class="ident">S</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
     }
 
@@ -1359,20 +1365,20 @@
     <span class="doccomment">/// When a [`Event::GuildDelete`] or [`Event::GuildUnavailable`] is</span>
     <span class="doccomment">/// received and processed by the cache, the relevant channels are also</span>
     <span class="doccomment">/// removed from this map.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">channels</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of channel categories.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">categories</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">categories</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of guilds with full data available. This includes data like</span>
     <span class="doccomment">/// [`Role`]s and [`Emoji`]s that are not available through the REST API.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">guilds</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="ident">Guild</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">messages</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">MessageCache</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">guilds</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="ident">Guild</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">messages</span>: <span class="ident">MessageCache</span>,
     <span class="doccomment">/// A map of users&#39; presences. This is updated in real-time. Note that</span>
     <span class="doccomment">/// status updates are often &quot;eaten&quot; by the gateway, and this should not</span>
     <span class="doccomment">/// be treated as being entirely 100% accurate.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">presences</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">presences</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of direct message channels that the current user has open with</span>
     <span class="doccomment">/// other users.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_channels</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_channels</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The total number of shards being used by the bot.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shard_count</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A list of guilds which are &quot;unavailable&quot;. Refer to the documentation for</span>
@@ -1381,7 +1387,7 @@
     <span class="doccomment">/// Additionally, guilds are always unavailable for bot users when a Ready</span>
     <span class="doccomment">/// is received. Guilds are &quot;sent in&quot; over time through the receiving of</span>
     <span class="doccomment">/// [`Event::GuildCreate`]s.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">unavailable_guilds</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">unavailable_guilds</span>: <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The current user &quot;logged in&quot; and for which events are being received</span>
     <span class="doccomment">/// for.</span>
     <span class="doccomment">///</span>
@@ -1404,13 +1410,13 @@
     <span class="doccomment">/// Note, however, that users are _not_ removed from the map on removal</span>
     <span class="doccomment">/// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other</span>
     <span class="doccomment">/// structs such as members or recipients may still exist.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">users</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">users</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Queue of message IDs for each channel.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is simply a vecdeque so we can keep track of the order of messages</span>
     <span class="doccomment">/// inserted into the cache. When a maximum number of messages are in a</span>
     <span class="doccomment">/// channel&#39;s cache, we can pop the front and remove that ID from the cache.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">message_queue</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">message_queue</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The settings for the cache.</span>
     <span class="ident">settings</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Settings</span><span class="op">&gt;</span>,
 }
@@ -1419,7 +1425,7 @@
     <span class="doccomment">/// Creates a new cache.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::default</span>()
+        <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
     <span class="doccomment">/// Creates a new cache instance with settings applied.</span>
@@ -1476,7 +1482,7 @@
     <span class="doccomment">///         // seconds.</span>
     <span class="doccomment">///         tokio::time::sleep(Duration::from_secs(5)).await;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         println!(&quot;{} unknown members&quot;, ctx.cache.unknown_members().await);</span>
+    <span class="doccomment">///         println!(&quot;{} unknown members&quot;, ctx.cache.unknown_members());</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
@@ -1488,10 +1494,12 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Shard::chunk_guild`]: crate::gateway::Shard::chunk_guild</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">unknown_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unknown_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
 
-        <span class="kw">for</span> <span class="ident">guild</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">values</span>() {
+        <span class="kw">for</span> <span class="ident">guild_entry</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">iter</span>() {
+            <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">guild_entry</span>.<span class="ident">value</span>();
+
             <span class="kw">let</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
 
             <span class="kw">if</span> <span class="ident">guild</span>.<span class="ident">member_count</span> <span class="op">&gt;</span> <span class="ident">members</span> {
@@ -1517,15 +1525,15 @@
     <span class="doccomment">/// # use tokio::sync::RwLock;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() {</span>
+    <span class="doccomment">/// # fn run() {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
-    <span class="doccomment">/// let amount = cache.private_channels().await.len();</span>
+    <span class="doccomment">/// let amount = cache.private_channels().len();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// println!(&quot;There are {} private channels&quot;, amount);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">private_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Fetches a vector of all [`Guild`]s&#39; Ids that are stored in the cache.</span>
@@ -1547,7 +1555,7 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn ready(&amp;self, context: Context, _: Ready) {</span>
-    <span class="doccomment">///         let guilds = context.cache.guilds().await.len();</span>
+    <span class="doccomment">///         let guilds = context.cache.guilds().len();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         println!(&quot;Guilds in the Cache: {}&quot;, guilds);</span>
     <span class="doccomment">///     }</span>
@@ -1556,9 +1564,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Context`]: crate::client::Context</span>
     <span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">chain</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>();
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">chain</span>(<span class="ident">chain</span>).<span class="ident">collect</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">chain</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>();
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">i</span>.<span class="ident">key</span>()).<span class="ident">chain</span>(<span class="ident">chain</span>).<span class="ident">collect</span>()
     }
 
     <span class="doccomment">/// Retrieves a [`Channel`] from the cache based on the given Id.</span>
@@ -1571,18 +1579,18 @@
     <span class="doccomment">/// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::channels`]</span>
     <span class="doccomment">/// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
+    <span class="kw">fn</span> <span class="ident">_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
             <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">channel</span>.<span class="ident">clone</span>();
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">private_channel</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">cloned</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Private</span>(<span class="ident">private_channel</span>));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">private_channel</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Private</span>(<span class="ident">private_channel</span>.<span class="ident">clone</span>()));
         }
 
         <span class="prelude-val">None</span>
@@ -1596,16 +1604,16 @@
     <span class="doccomment">/// # let cache: serenity::cache::Cache = todo!();</span>
     <span class="doccomment">/// // Find all messages by user ID 8 in channel ID 7</span>
     <span class="doccomment">/// let messages_by_user = cache.channel_messages_field(7, |msgs| {</span>
-    <span class="doccomment">///     msgs.filter(|m| m.author.id == 8).cloned().collect::&lt;Vec&lt;_&gt;&gt;()</span>
+    <span class="doccomment">///     msgs.filter_map(|m| if m.author.id == 8 { Some(m.clone()) } else { None } ).collect::&lt;Vec&lt;_&gt;&gt;()</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel_messages_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_messages_field</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
-        <span class="ident">selector</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">MessageIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>,
+        <span class="ident">selector</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">MessageIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">RandomState</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">message_iter</span> <span class="op">=</span> <span class="ident">MessageIterator</span>(<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>.<span class="ident">into</span>())<span class="question-mark">?</span>.<span class="ident">values</span>());
+        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">message_iter</span> <span class="op">=</span> <span class="ident">MessageIterator</span>(<span class="ident">msg</span>.<span class="ident">iter</span>());
 
         <span class="prelude-val">Some</span>(<span class="ident">selector</span>(<span class="ident">message_iter</span>))
     }
@@ -1624,22 +1632,22 @@
     <span class="doccomment">/// # use tokio::sync::RwLock;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // assuming the cache is in scope, e.g. via `Context`</span>
-    <span class="doccomment">/// if let Some(guild) = cache.guild(7).await {</span>
+    <span class="doccomment">/// if let Some(guild) = cache.guild(7) {</span>
     <span class="doccomment">///     println!(&quot;Guild name: {}&quot;, guild.name);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #   Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_guild</span>(<span class="ident">id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_guild</span>(<span class="ident">id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">cloned</span>()
+    <span class="kw">fn</span> <span class="ident">_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// This method allows to select a field of the guild instead of</span>
@@ -1649,40 +1657,35 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // We clone only the `len()` returned `usize` instead of the entire guild or the channels.</span>
-    <span class="doccomment">/// if let Some(channel_len) = cache.guild_field(7, |guild| guild.channels.len()).await {</span>
+    <span class="doccomment">/// if let Some(channel_len) = cache.guild_field(7, |guild| guild.channels.len()) {</span>
     <span class="doccomment">///     println!(&quot;Guild channels count: {}&quot;, channel_len);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #   Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-        <span class="ident">field_selector</span>: <span class="ident">Fun</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>, <span class="ident">field_selector</span>: <span class="ident">Fun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Guild</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>,
     {
-        <span class="self">self</span>.<span class="ident">_guild_field</span>(<span class="ident">id</span>.<span class="ident">into</span>(), <span class="ident">field_selector</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">_guild_field</span>(<span class="ident">id</span>.<span class="ident">into</span>(), <span class="ident">field_selector</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">GuildId</span>, <span class="ident">field_accessor</span>: <span class="ident">Fun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">_guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">GuildId</span>, <span class="ident">field_accessor</span>: <span class="ident">Fun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Guild</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>,
     {
-        <span class="kw">let</span> <span class="ident">guilds</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="ident">field_accessor</span>(<span class="ident">guild</span>))
+        <span class="prelude-val">Some</span>(<span class="ident">field_accessor</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">guild</span>))
     }
 
     <span class="doccomment">/// Returns the number of cached guilds.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">len</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Retrieves a reference to a [`Guild`]&#39;s channel. Unlike [`Self::channel`],</span>
@@ -1706,7 +1709,7 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, message: Message) {</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         let channel = match context.cache.guild_channel(message.channel_id).await {</span>
+    <span class="doccomment">///         let channel = match context.cache.guild_channel(message.channel_id) {</span>
     <span class="doccomment">///             Some(channel) =&gt; channel,</span>
     <span class="doccomment">///             None =&gt; {</span>
     <span class="doccomment">///                 let result = message.channel_id.say(&amp;context, &quot;Could not find guild&#39;s channel data&quot;).await;</span>
@@ -1731,12 +1734,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_guild_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_guild_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">cloned</span>()
+    <span class="kw">fn</span> <span class="ident">_guild_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// This method allows to only clone a field of the guild channel instead of</span>
@@ -1746,17 +1749,17 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // We clone only the `name` instead of the entire channel.</span>
-    <span class="doccomment">/// if let Some(channel_name) = cache.guild_channel_field(7, |channel| channel.name.clone()).await {</span>
+    <span class="doccomment">/// if let Some(channel_name) = cache.guild_channel_field(7, |channel| channel.name.clone()) {</span>
     <span class="doccomment">///     println!(&quot;Guild channel name: {}&quot;, channel_name);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #   Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_channel_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channel_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
         <span class="ident">field_selector</span>: <span class="ident">Fun</span>,
@@ -1764,21 +1767,16 @@
     <span class="kw">where</span>
         <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">GuildChannel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>,
     {
-        <span class="self">self</span>.<span class="ident">_guild_channel_field</span>(<span class="ident">id</span>.<span class="ident">into</span>(), <span class="ident">field_selector</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">_guild_channel_field</span>(<span class="ident">id</span>.<span class="ident">into</span>(), <span class="ident">field_selector</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild_channel_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">id</span>: <span class="ident">ChannelId</span>,
-        <span class="ident">field_selector</span>: <span class="ident">Fun</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">_guild_channel_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ChannelId</span>, <span class="ident">field_selector</span>: <span class="ident">Fun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">GuildChannel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>,
     {
-        <span class="kw">let</span> <span class="ident">guild_channels</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">read</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">guild_channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="ident">field_selector</span>(<span class="ident">channel</span>))
+        <span class="prelude-val">Some</span>(<span class="ident">field_selector</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">channel</span>))
     }
 
     <span class="doccomment">/// Retrieves a [`Guild`]&#39;s member from the cache based on the guild&#39;s and</span>
@@ -1804,7 +1802,7 @@
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let member = {</span>
-    <span class="doccomment">///     let channel = match cache.guild_channel(message.channel_id).await {</span>
+    <span class="doccomment">///     let channel = match cache.guild_channel(message.channel_id) {</span>
     <span class="doccomment">///         Some(channel) =&gt; channel,</span>
     <span class="doccomment">///         None =&gt; {</span>
     <span class="doccomment">///             if let Err(why) = message.channel_id.say(http, &quot;Error finding channel data&quot;).await {</span>
@@ -1814,7 +1812,7 @@
     <span class="doccomment">///         },</span>
     <span class="doccomment">///     };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     match cache.member(channel.guild_id, message.author.id).await {</span>
+    <span class="doccomment">///     match cache.member(channel.guild_id, message.author.id) {</span>
     <span class="doccomment">///         Some(member) =&gt; member,</span>
     <span class="doccomment">///         None =&gt; {</span>
     <span class="doccomment">///             if let Err(why) = message.channel_id.say(&amp;http, &quot;Error finding member data&quot;).await {</span>
@@ -1836,16 +1834,16 @@
     <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
     <span class="doccomment">/// [`members`]: crate::model::guild::Guild::members</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">member</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">G</span>, <span class="ident">user_id</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">member</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">G</span>, <span class="ident">user_id</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
         <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">_member</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">_member</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_member</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
+    <span class="kw">fn</span> <span class="ident">_member</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">cloned</span>(),
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         }
@@ -1858,17 +1856,17 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // We clone only the `name` instead of the entire channel.</span>
-    <span class="doccomment">/// if let Some(Some(nick)) = cache.member_field(7, 8, |member| member.nick.clone()).await {</span>
+    <span class="doccomment">/// if let Some(Some(nick)) = cache.member_field(7, 8, |member| member.nick.clone()) {</span>
     <span class="doccomment">///     println!(&quot;Member&#39;s nick: {}&quot;, nick);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #   Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">member_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">member_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
         <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
@@ -1877,10 +1875,10 @@
     <span class="kw">where</span>
         <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Member</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>,
     {
-        <span class="self">self</span>.<span class="ident">_member_field</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>(), <span class="ident">field_selector</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">_member_field</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>(), <span class="ident">field_selector</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_member_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
+    <span class="kw">fn</span> <span class="ident">_member_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
         <span class="ident">user_id</span>: <span class="ident">UserId</span>,
@@ -1889,39 +1887,38 @@
     <span class="kw">where</span>
         <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Member</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>,
     {
-        <span class="kw">let</span> <span class="ident">guilds</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="ident">field_selector</span>(<span class="ident">member</span>))
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_guild_roles</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_guild_roles</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">roles</span>.<span class="ident">clone</span>())
+    <span class="kw">fn</span> <span class="ident">_guild_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">roles</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// This method clones and returns all unavailable guilds.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">unavailable_guilds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unavailable_guilds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// This method returns all channels from a guild of with the given `guild_id`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_channels</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channels</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_guild_channels</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_guild_channels</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
+    <span class="kw">fn</span> <span class="ident">_guild_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
             <span class="ident">g</span>.<span class="ident">channels</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="number">1</span> {
@@ -1933,24 +1930,21 @@
     }
 
     <span class="doccomment">/// Returns the number of guild channels in the cache.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_channel_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">len</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_channel_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// This method returns all categories from a guild of with the given `guild_id`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_categories</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_categories</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_guild_categories</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_guild_categories</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_guild_categories</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
+    <span class="kw">fn</span> <span class="ident">_guild_categories</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
             <span class="ident">g</span>.<span class="ident">channels</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span>.<span class="number">1</span> {
@@ -1963,8 +1957,8 @@
 
     <span class="doccomment">/// Returns the number of shards.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shard_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">shard_count</span>.<span class="ident">read</span>().<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">shard_count</span>.<span class="ident">read</span>()
     }
 
     <span class="doccomment">/// Retrieves a [`Channel`]&#39;s message from the cache based on the channel&#39;s and</span>
@@ -1989,7 +1983,7 @@
     <span class="doccomment">/// # let message = ChannelId(0).message(&amp;http, MessageId(1)).await?;</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// match cache.message(message.channel_id, message.id).await {</span>
+    <span class="doccomment">/// match cache.message(message.channel_id, message.id) {</span>
     <span class="doccomment">///     Some(m) =&gt; assert_eq!(message.content, m.content),</span>
     <span class="doccomment">///     None =&gt; println!(&quot;No message found in cache.&quot;),</span>
     <span class="doccomment">/// };</span>
@@ -1999,20 +1993,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">M</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">C</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">M</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">C</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
         <span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">_message</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>(), <span class="ident">message_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">_message</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>(), <span class="ident">message_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">message_id</span>: <span class="ident">MessageId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">message_id</span>: <span class="ident">MessageId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">messages</span>
-            .<span class="ident">read</span>()
-            .<span class="kw">await</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">messages</span><span class="op">|</span> <span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message_id</span>).<span class="ident">cloned</span>())
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">messages</span><span class="op">|</span> <span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>()))
     }
 
     <span class="doccomment">/// Retrieves a [`PrivateChannel`] from the cache&#39;s [`Self::private_channels`]</span>
@@ -2031,26 +2023,23 @@
     <span class="doccomment">/// # use tokio::sync::RwLock;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #   let cache = Cache::default();</span>
     <span class="doccomment">/// // assuming the cache has been unlocked</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// if let Some(channel) = cache.private_channel(7).await {</span>
+    <span class="doccomment">/// if let Some(channel) = cache.private_channel(7) {</span>
     <span class="doccomment">///     println!(&quot;The recipient is {}&quot;, channel.recipient);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">private_channel</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_private_channel</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_private_channel</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_private_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">cloned</span>()
+    <span class="kw">fn</span> <span class="ident">_private_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Retrieves a [`Guild`]&#39;s role by their Ids.</span>
@@ -2070,26 +2059,26 @@
     <span class="doccomment">/// # use tokio::sync::RwLock;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // assuming the cache is in scope, e.g. via `Context`</span>
-    <span class="doccomment">/// if let Some(role) = cache.role(7, 77).await {</span>
+    <span class="doccomment">/// if let Some(role) = cache.role(7, 77) {</span>
     <span class="doccomment">///     println!(&quot;Role with Id 77 is called {}&quot;, role.name);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">role</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">G</span>, <span class="ident">role_id</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">G</span>, <span class="ident">role_id</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
         <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">_role</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">role_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">_role</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>(), <span class="ident">role_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">role_id</span>: <span class="ident">RoleId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">role_id</span>)).<span class="ident">cloned</span>()
+    <span class="kw">fn</span> <span class="ident">_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">role_id</span>: <span class="ident">RoleId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">guilds</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">role_id</span>).<span class="ident">cloned</span>())
     }
 
     <span class="doccomment">/// Returns the settings.</span>
@@ -2101,20 +2090,20 @@
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// use serenity::cache::Cache;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn test() {</span>
+    <span class="doccomment">/// # fn test() {</span>
     <span class="doccomment">/// let mut cache = Cache::new();</span>
-    <span class="doccomment">/// println!(&quot;Max settings: {}&quot;, cache.settings().await.max_messages);</span>
+    <span class="doccomment">/// println!(&quot;Max settings: {}&quot;, cache.settings().max_messages);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Settings</span> {
-        <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Settings</span> {
+        <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">read</span>().<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Sets the maximum amount of messages per channel to cache.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// By default, no messages will be cached.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_max_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">max_messages</span> <span class="op">=</span> <span class="ident">max</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_messages</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) {
+        <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">write</span>().<span class="ident">max_messages</span> <span class="op">=</span> <span class="ident">max</span>;
     }
 
     <span class="doccomment">/// Retrieves a [`User`] from the cache&#39;s [`Self::users`] map, if it exists.</span>
@@ -2134,71 +2123,71 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn test(context: &amp;Context) -&gt; CommandResult {</span>
-    <span class="doccomment">/// if let Some(user) = context.cache.user(7).await {</span>
+    <span class="doccomment">/// if let Some(user) = context.cache.user(7) {</span>
     <span class="doccomment">///     println!(&quot;User with Id 7 is currently named {}&quot;, user.name);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_user</span>(<span class="ident">user_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_user</span>(<span class="ident">user_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">cloned</span>()
+    <span class="kw">fn</span> <span class="ident">_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Clones all users and returns them.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Returns the amount of cached users.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">len</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Clones a category matching the `channel_id` and returns it.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">category</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_category</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_category</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_category</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">cloned</span>()
+    <span class="kw">fn</span> <span class="ident">_category</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Clones all categories and returns them.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">categories</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">categories</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Returns the amount of cached categories.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">category_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">len</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">len</span>()
     }
 
     <span class="doccomment">/// Returns the optional category ID of a channel.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel_category_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">category</span><span class="op">|</span> <span class="ident">category</span>.<span class="ident">id</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_category_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">categories</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">category</span><span class="op">|</span> <span class="ident">category</span>.<span class="ident">id</span>)
     }
 
     <span class="doccomment">/// This method clones and returns the user used by the bot.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">current_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CurrentUser</span> {
-        <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CurrentUser</span> {
+        <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>().<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// This method returns the bot&#39;s ID.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">current_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">id</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
+        <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>().<span class="ident">id</span>
     }
 
     <span class="doccomment">/// This method allows to only clone a field of the current user instead of</span>
@@ -2208,20 +2197,20 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // We clone only the `name` instead of the entire channel.</span>
-    <span class="doccomment">/// let id = cache.current_user_field(|user| user.id).await;</span>
+    <span class="doccomment">/// let id = cache.current_user_field(|user| user.id);</span>
     <span class="doccomment">/// println!(&quot;Current user&#39;s ID: {}&quot;, id);</span>
     <span class="doccomment">/// #   Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">current_user_field</span><span class="op">&lt;</span><span class="ident">Ret</span>: <span class="ident">Clone</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_selector</span>: <span class="ident">Fun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_user_field</span><span class="op">&lt;</span><span class="ident">Ret</span>: <span class="ident">Clone</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_selector</span>: <span class="ident">Fun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>
     <span class="kw">where</span>
         <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">CurrentUser</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>,
     {
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">read</span>();
 
         <span class="ident">field_selector</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>)
     }
@@ -2238,12 +2227,12 @@
     <span class="doccomment">/// [`CacheUpdate`]: CacheUpdate</span>
     <span class="doccomment">/// [`CacheUpdate` examples]: CacheUpdate#examples</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">e</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">CacheUpdate</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span> {
-        <span class="ident">e</span>.<span class="ident">update</span>(<span class="self">self</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">CacheUpdate</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span> {
+        <span class="ident">e</span>.<span class="ident">update</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">entry</span>(<span class="ident">user</span>.<span class="ident">id</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>) {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">users</span>.<span class="ident">entry</span>(<span class="ident">user</span>.<span class="ident">id</span>) {
             <span class="ident">Entry::Vacant</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">e</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">clone</span>());
             },
@@ -2257,18 +2246,18 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Cache</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Cache</span> {
         <span class="ident">Cache</span> {
-            <span class="ident">channels</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::default</span>()),
-            <span class="ident">categories</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::default</span>()),
-            <span class="ident">guilds</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::default</span>()),
-            <span class="ident">messages</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::default</span>()),
-            <span class="ident">presences</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::default</span>()),
-            <span class="ident">private_channels</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::with_capacity</span>(<span class="number">128</span>)),
+            <span class="ident">channels</span>: <span class="ident">DashMap::default</span>(),
+            <span class="ident">categories</span>: <span class="ident">DashMap::default</span>(),
+            <span class="ident">guilds</span>: <span class="ident">DashMap::default</span>(),
+            <span class="ident">messages</span>: <span class="ident">DashMap::default</span>(),
+            <span class="ident">presences</span>: <span class="ident">DashMap::default</span>(),
+            <span class="ident">private_channels</span>: <span class="ident">DashMap::with_capacity</span>(<span class="number">128</span>),
             <span class="ident">settings</span>: <span class="ident">RwLock::new</span>(<span class="ident">Settings::default</span>()),
             <span class="ident">shard_count</span>: <span class="ident">RwLock::new</span>(<span class="number">1</span>),
-            <span class="ident">unavailable_guilds</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashSet::default</span>()),
+            <span class="ident">unavailable_guilds</span>: <span class="ident">DashSet::default</span>(),
             <span class="ident">user</span>: <span class="ident">RwLock::new</span>(<span class="ident">CurrentUser::default</span>()),
-            <span class="ident">users</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::default</span>()),
-            <span class="ident">message_queue</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::default</span>()),
+            <span class="ident">users</span>: <span class="ident">DashMap::default</span>(),
+            <span class="ident">message_queue</span>: <span class="ident">DashMap::default</span>(),
         }
     }
 }
@@ -2279,15 +2268,15 @@
 
     <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::from_number</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>, <span class="ident">Settings</span>},
         <span class="ident">model::prelude</span>::<span class="kw-2">*</span>,
     };
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_cache_messages</span>() {
+    <span class="kw">fn</span> <span class="ident">test_cache_messages</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">Settings::new</span>();
         <span class="ident">settings</span>.<span class="ident">max_messages</span>(<span class="number">2</span>);
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Cache::new_with_settings</span>(<span class="ident">settings</span>);
@@ -2340,26 +2329,25 @@
         };
 
         <span class="comment">// Check that the channel cache doesn&#39;t exist.</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>));
         <span class="comment">// Add first message, none because message ID 2 doesn&#39;t already exist.</span>
-        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="ident">is_none</span>());
         <span class="comment">// None, it only returns the oldest message if the cache was already full.</span>
-        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="ident">is_none</span>());
         <span class="comment">// Assert there&#39;s only 1 message in the channel&#39;s message cache.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">1</span>);
 
         <span class="comment">// Add a second message, assert that channel message cache length is 2.</span>
         <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">MessageId</span>(<span class="number">4</span>);
-        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">2</span>);
 
         <span class="comment">// Add a third message, the first should now be removed.</span>
         <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">MessageId</span>(<span class="number">5</span>);
-        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="ident">is_some</span>());
 
         {
-            <span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>;
-            <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">unwrap</span>();
 
             <span class="macro">assert_eq!</span>(<span class="ident">channel</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             <span class="comment">// Check that the first message is now removed.</span>
@@ -2395,14 +2383,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delete</span> <span class="op">=</span> <span class="ident">ChannelDeleteEvent</span> {
             <span class="ident">channel</span>: <span class="ident">channel</span>.<span class="ident">clone</span>(),
         };
-        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delete</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">delete</span>.<span class="ident">channel</span>.<span class="ident">id</span>()));
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delete</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">delete</span>.<span class="ident">channel</span>.<span class="ident">id</span>()));
 
         <span class="comment">// Test deletion of a guild channel&#39;s message cache when a GuildDeleteEvent</span>
         <span class="comment">// is received.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild_create</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">ChannelId</span>(<span class="number">2</span>), <span class="ident">channel</span>.<span class="ident">clone</span>());
+            <span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">ChannelId</span>(<span class="number">2</span>), <span class="ident">channel</span>);
 
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident">GuildCreateEvent</span> {
@@ -2457,8 +2445,8 @@
                 },
             }
         };
-        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_create</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_create</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild_delete</span> <span class="op">=</span> <span class="ident">GuildDeleteEvent</span> {
             <span class="ident">guild</span>: <span class="ident">GuildUnavailable</span> {
@@ -2469,10 +2457,10 @@
 
         <span class="comment">// The guild existed in the cache, so the cache&#39;s guild is returned by the</span>
         <span class="comment">// update.</span>
-        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_delete</span>).<span class="kw">await</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_delete</span>).<span class="ident">is_some</span>());
 
         <span class="comment">// Assert that the channel&#39;s message cache no longer exists.</span>
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">ChannelId</span>(<span class="number">2</span>)));
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">ChannelId</span>(<span class="number">2</span>)));
     }
 }
 </pre></div>

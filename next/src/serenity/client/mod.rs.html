@@ -1066,7 +1066,7 @@
 <span class="kw">use</span> <span class="ident">typemap_rev</span>::{<span class="ident">TypeMap</span>, <span class="ident">TypeMapKey</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="self">self</span><span class="ident">::bridge::gateway</span>::{
+<span class="kw">use</span> <span class="ident"><span class="self">self</span>::bridge::gateway</span>::{
     <span class="ident">GatewayIntents</span>,
     <span class="ident">ShardManager</span>,
     <span class="ident">ShardManagerError</span>,
@@ -1074,7 +1074,7 @@
     <span class="ident">ShardManagerOptions</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="self">self</span><span class="ident">::bridge::voice::VoiceGatewayManager</span>;
+<span class="kw">use</span> <span class="ident"><span class="self">self</span>::bridge::voice::VoiceGatewayManager</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">context::Context</span>, <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">ClientError</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
@@ -1082,17 +1082,17 @@
     <span class="ident">extras::Extras</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::gateway::GatewayError</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::gateway::GatewayError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::framework::Framework</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::Http</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id::ApplicationId</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id::UserId</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::CacheAndHttp</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ApplicationId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
 
 <span class="doccomment">/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
@@ -1147,7 +1147,7 @@
     <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
     <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::_new</span>().<span class="ident">token</span>(<span class="ident">token</span>)
+        <span class="ident"><span class="self">Self</span>::_new</span>().<span class="ident">token</span>(<span class="ident">token</span>)
     }
 
     <span class="doccomment">/// Construct a new builder with a [`Http`] instance to calls methods on</span>
@@ -1160,7 +1160,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Http`]: crate::http::Http</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_http</span>(<span class="ident">http</span>: <span class="ident">Http</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::_new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::_new</span>();
         <span class="ident">c</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>);
         <span class="ident">c</span>
     }
@@ -1348,7 +1348,7 @@
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span> <span class="comment">// Allowing unwrap because all should be Some() by this point</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()));
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>

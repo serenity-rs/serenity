@@ -1314,28 +1314,28 @@
 <span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">fs::File</span>, <span class="ident">io::AsyncReadExt</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateInvite</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditChannel</span>, <span class="ident">EditMessage</span>, <span class="ident">GetMessages</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateStageInstance</span>, <span class="ident">EditStageInstance</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateInvite</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditChannel</span>, <span class="ident">EditMessage</span>, <span class="ident">GetMessages</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateStageInstance</span>, <span class="ident">EditStageInstance</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
     <span class="ident">CollectReaction</span>,
     <span class="ident">CollectReply</span>,
     <span class="ident">MessageCollectorBuilder</span>,
     <span class="ident">ReactionCollectorBuilder</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::AttachmentType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>, <span class="ident">Typing</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>, <span class="ident">Typing</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::json</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">ChannelId</span> {
@@ -1689,8 +1689,8 @@
     <span class="doccomment">/// Attempts to find a [`Channel`] by its Id in the cache.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_channel_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">channel</span>(<span class="self">self</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_channel_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
+        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">channel</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// First attempts to find a [`Channel`] by its Id in the cache,</span>
@@ -1704,7 +1704,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">channel</span>(<span class="self">self</span>).<span class="kw">await</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">channel</span>(<span class="self">self</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">channel</span>);
                 }
             }
@@ -1831,7 +1831,7 @@
     <span class="doccomment">/// Returns the name of whatever channel this id holds.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_channel_cached</span>(<span class="ident">cache</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_channel_cached</span>(<span class="ident">cache</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">channel</span> {
             <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">channel</span>.<span class="ident">name</span>().<span class="ident">to_string</span>(),
@@ -2226,7 +2226,7 @@
             },
         };
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">crate</span><span class="macro">::json::json!</span>({
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">crate::json::json!</span>({
             <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>,
             <span class="string">&quot;avatar&quot;</span>: <span class="ident">avatar</span>
         });

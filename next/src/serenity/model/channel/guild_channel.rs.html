@@ -1279,12 +1279,6 @@
 <span id="1279">1279</span>
 <span id="1280">1280</span>
 <span id="1281">1281</span>
-<span id="1282">1282</span>
-<span id="1283">1283</span>
-<span id="1284">1284</span>
-<span id="1285">1285</span>
-<span id="1286">1286</span>
-<span id="1287">1287</span>
 </pre><pre class="rust">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
@@ -1296,29 +1290,29 @@
 <span class="kw">use</span> <span class="ident">futures::stream::StreamExt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder::EditChannel</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::EditChannel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateInvite</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>, <span class="ident">EditVoiceState</span>, <span class="ident">GetMessages</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateStageInstance</span>, <span class="ident">EditStageInstance</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateInvite</span>, <span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>, <span class="ident">EditVoiceState</span>, <span class="ident">GetMessages</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateStageInstance</span>, <span class="ident">EditStageInstance</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
     <span class="ident">CollectReaction</span>,
     <span class="ident">CollectReply</span>,
     <span class="ident">MessageCollectorBuilder</span>,
     <span class="ident">ReactionCollectorBuilder</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::AttachmentType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>, <span class="ident">Typing</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>, <span class="ident">Typing</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span> <span class="kw">as</span> <span class="ident">serenity_utils</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span> <span class="kw">as</span> <span class="ident">serenity_utils</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json::from_number</span>, <span class="ident">model::prelude</span>::<span class="kw-2">*</span>};
 
 <span class="doccomment">/// Represents a guild&#39;s text, news, or voice channel. Some methods are available</span>
@@ -1476,8 +1470,7 @@
                     <span class="self">self</span>.<span class="ident">id</span>,
                     <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">guild_id</span>),
                     <span class="ident">Permissions::CREATE_INVITE</span>,
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>;
+                )<span class="question-mark">?</span>;
             }
         }
 
@@ -1525,7 +1518,6 @@
     <span class="doccomment">/// // assuming the cache has been unlocked</span>
     <span class="doccomment">/// let channel = cache</span>
     <span class="doccomment">///     .guild_channel(channel_id)</span>
-    <span class="doccomment">///     .await</span>
     <span class="doccomment">///     .ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// channel.create_permission(&amp;http, &amp;overwrite).await?;</span>
@@ -1565,7 +1557,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let channel = cache</span>
     <span class="doccomment">///     .guild_channel(channel_id)</span>
-    <span class="doccomment">///     .await</span>
     <span class="doccomment">///     .ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// channel.create_permission(&amp;http, &amp;overwrite).await?;</span>
@@ -1612,8 +1603,7 @@
                     <span class="self">self</span>.<span class="ident">id</span>,
                     <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">guild_id</span>),
                     <span class="ident">Permissions::MANAGE_CHANNELS</span>,
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>;
+                )<span class="question-mark">?</span>;
             }
         }
 
@@ -1718,8 +1708,7 @@
                     <span class="self">self</span>.<span class="ident">id</span>,
                     <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">guild_id</span>),
                     <span class="ident">Permissions::MANAGE_CHANNELS</span>,
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>;
+                )<span class="question-mark">?</span>;
             }
         }
 
@@ -1792,7 +1781,7 @@
     <span class="doccomment">/// use serenity::model::ModelError;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming the cache has been unlocked</span>
-    <span class="doccomment">/// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;</span>
+    <span class="doccomment">/// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// channel.edit_voice_state(&amp;http, user_id, |v| v.suppress(false)).await?;</span>
     <span class="doccomment">/// #   Ok(())</span>
@@ -1842,7 +1831,7 @@
     <span class="doccomment">/// use serenity::model::ModelError;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming the cache has been unlocked</span>
-    <span class="doccomment">/// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;</span>
+    <span class="doccomment">/// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Send a request to speak</span>
     <span class="doccomment">/// channel.edit_own_voice_state(&amp;http, |v| v.request_to_speak(true)).await?;</span>
@@ -1897,8 +1886,8 @@
     <span class="doccomment">/// Attempts to find this channel&#39;s guild in the Cache.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
+        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span>)
     }
 
     <span class="doccomment">/// Gets all of the channel&#39;s invites.</span>
@@ -1989,12 +1978,12 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, msg: Message) {</span>
-    <span class="doccomment">///         let channel = match context.cache.guild_channel(msg.channel_id).await {</span>
+    <span class="doccomment">///         let channel = match context.cache.guild_channel(msg.channel_id) {</span>
     <span class="doccomment">///             Some(channel) =&gt; channel,</span>
     <span class="doccomment">///             None =&gt; return,</span>
     <span class="doccomment">///         };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, &amp;msg.author).await {</span>
+    <span class="doccomment">///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, &amp;msg.author) {</span>
     <span class="doccomment">///             println!(&quot;The user&#39;s permissions: {:?}&quot;, permissions);</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
@@ -2023,13 +2012,13 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, mut msg: Message) {</span>
-    <span class="doccomment">///         let channel = match context.cache.guild_channel(msg.channel_id).await {</span>
+    <span class="doccomment">///         let channel = match context.cache.guild_channel(msg.channel_id) {</span>
     <span class="doccomment">///             Some(channel) =&gt; channel,</span>
     <span class="doccomment">///             None =&gt; return,</span>
     <span class="doccomment">///         };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         let current_user_id = context.cache.current_user().await.id;</span>
-    <span class="doccomment">///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, current_user_id).await {</span>
+    <span class="doccomment">///         let current_user_id = context.cache.current_user_id();</span>
+    <span class="doccomment">///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, current_user_id) {</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {</span>
     <span class="doccomment">///                 return;</span>
@@ -2070,12 +2059,12 @@
     <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">permissions_for_user</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions_for_user</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
         <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::GuildNotFound</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="ident">ok_or</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::GuildNotFound</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span>
             <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>.<span class="ident">into</span>()).<span class="ident">ok_or</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::MemberNotFound</span>))<span class="question-mark">?</span>;
         <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="self">self</span>, <span class="ident">member</span>)
@@ -2095,12 +2084,12 @@
     <span class="doccomment">/// be found in the [`Cache`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">permissions_for_role</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions_for_role</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
         <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::GuildNotFound</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="ident">ok_or</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::GuildNotFound</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span>
             <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">role_id</span>.<span class="ident">into</span>()).<span class="ident">ok_or</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::RoleNotFound</span>))<span class="question-mark">?</span>;
         <span class="ident">guild</span>.<span class="ident">role_permissions_in</span>(<span class="self">self</span>, <span class="ident">role</span>)
@@ -2245,7 +2234,7 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions::SEND_MESSAGES</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">utils::user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">guild_id</span>), <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">utils::user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">guild_id</span>), <span class="ident">req</span>)<span class="question-mark">?</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -2285,7 +2274,7 @@
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// # let channel = cache</span>
     <span class="doccomment">/// #    .guild_channel(ChannelId(7))</span>
-    <span class="doccomment">/// #    .await.ok_or(ModelError::ItemMissing)?;</span>
+    <span class="doccomment">/// #    .ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">/// // Initiate typing (assuming http is `Arc&lt;Http&gt;` and `channel` is bound)</span>
     <span class="doccomment">/// let typing = channel.start_typing(&amp;http)?;</span>
     <span class="doccomment">///</span>
@@ -2351,7 +2340,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span>).<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">ModelError::GuildNotFound</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span>).<span class="ident">ok_or</span>(<span class="ident">ModelError::GuildNotFound</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
             <span class="ident">ChannelType::Voice</span> <span class="op">|</span> <span class="ident">ChannelType::Stage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">guild</span>
@@ -2372,7 +2361,6 @@
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
                         <span class="kw">if</span> <span class="self">self</span>
                             .<span class="ident">permissions_for_user</span>(<span class="ident">cache</span>, <span class="ident">e</span>.<span class="number">0</span>)
-                            .<span class="kw">await</span>
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">contains</span>(<span class="ident">Permissions::READ_MESSAGES</span>))
                             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
                         {

@@ -154,7 +154,7 @@
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">DeserializeOwned</span>};
 <span class="kw">use</span> <span class="ident">serde::ser::Serialize</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::Result</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Result</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">serde_json::Value</span>;

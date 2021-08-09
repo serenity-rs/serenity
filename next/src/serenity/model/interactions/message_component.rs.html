@@ -698,16 +698,16 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">simd_json::ValueAccess</span>;
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
     <span class="ident">CreateInteractionResponse</span>,
     <span class="ident">CreateInteractionResponseFollowup</span>,
     <span class="ident">EditInteractionResponse</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::Http</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions::InteractionType</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::InteractionType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// An interaction triggered by a message component.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>

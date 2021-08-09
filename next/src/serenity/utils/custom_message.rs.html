@@ -280,8 +280,8 @@
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::NULL</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::NULL</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A builder for constructing a personal [`Message`] instance.</span>
 <span class="doccomment">/// This can be useful for emitting a manual [`dispatch`] to the framework,</span>
@@ -299,7 +299,7 @@
     <span class="doccomment">/// of this message with valid data.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::default</span>()
+        <span class="ident"><span class="self">Self</span>::default</span>()
     }
 
     <span class="doccomment">/// Assign the dummy message a proper ID for identification.</span>

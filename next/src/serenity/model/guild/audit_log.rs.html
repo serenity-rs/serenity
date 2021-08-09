@@ -506,8 +506,8 @@
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="self">self</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">MapAccess</span>, <span class="ident">Visitor</span>};
 <span class="kw">use</span> <span class="ident">serde::ser::Serializer</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Determines to what entity an action was used on.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -543,7 +543,7 @@
 
 <span class="kw">impl</span> <span class="ident">Action</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
-        <span class="kw">use</span> <span class="self">self</span><span class="ident">::Action</span>::<span class="kw-2">*</span>;
+        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Action</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">GuildUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
@@ -847,11 +847,11 @@
             <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
                 <span class="self">self</span>,
                 <span class="ident">deserializer</span>: <span class="ident">D</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+            ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
                 <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="ident">OptionU64Visitor</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
             }
 
@@ -974,7 +974,7 @@
                                 <span class="comment">// using a proper Error num, the best we can do here is to check if the string contains</span>
                                 <span class="comment">// this error. This was added because Discord randomly started sending new fields.</span>
                                 <span class="comment">// But no JSON deserializer should ever error over this.</span>
-                                <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="kw">crate</span><span class="ident">::json::Value</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// Actually read the value to avoid syntax errors</span>
+                                <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::json::Value</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// Actually read the value to avoid syntax errors</span>
                             } <span class="kw">else</span> {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
                             }

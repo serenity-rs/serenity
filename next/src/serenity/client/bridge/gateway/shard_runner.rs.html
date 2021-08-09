@@ -685,25 +685,25 @@
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::event</span>::{<span class="ident">ClientEvent</span>, <span class="ident">ShardStageUpdateEvent</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::event</span>::{<span class="ident">ClientEvent</span>, <span class="ident">ShardStageUpdateEvent</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ShardClientMessage</span>, <span class="ident">ShardId</span>, <span class="ident">ShardManagerMessage</span>, <span class="ident">ShardRunnerMessage</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::voice::VoiceGatewayManager</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::dispatch</span>::{<span class="ident">dispatch</span>, <span class="ident">DispatchEvent</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::voice::VoiceGatewayManager</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::dispatch</span>::{<span class="ident">dispatch</span>, <span class="ident">DispatchEvent</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector::ComponentInteractionFilter</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::ComponentInteractionFilter</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">LazyArc</span>, <span class="ident">LazyReactionAction</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">LazyArc</span>, <span class="ident">LazyReactionAction</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::framework::Framework</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::ws_impl</span>::{<span class="ident">ReceiverExt</span>, <span class="ident">SenderExt</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl</span>::{<span class="ident">ReceiverExt</span>, <span class="ident">SenderExt</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions</span>::{<span class="ident">Interaction</span>, <span class="ident">InteractionType</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::CacheAndHttp</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{<span class="ident">Interaction</span>, <span class="ident">InteractionType</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
 
 <span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardRunner</span> {

@@ -305,7 +305,7 @@
     <span class="ident">Type</span>,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::structures::CommandFun</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::structures::CommandFun</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LitExt</span> {
     <span class="kw">fn</span> <span class="ident">to_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
@@ -364,7 +364,7 @@
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {{
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span><span class="macro-nonterminal">::util::into_stream</span>(<span class="ident">e</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::util::into_stream</span>(<span class="ident">e</span>),
         }
     }};
 }

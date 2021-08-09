@@ -1031,19 +1031,6 @@
 <span id="1031">1031</span>
 <span id="1032">1032</span>
 <span id="1033">1033</span>
-<span id="1034">1034</span>
-<span id="1035">1035</span>
-<span id="1036">1036</span>
-<span id="1037">1037</span>
-<span id="1038">1038</span>
-<span id="1039">1039</span>
-<span id="1040">1040</span>
-<span id="1041">1041</span>
-<span id="1042">1042</span>
-<span id="1043">1043</span>
-<span id="1044">1044</span>
-<span id="1045">1045</span>
-<span id="1046">1046</span>
 </pre><pre class="rust">
 <span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
@@ -1076,13 +1063,13 @@
 };
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::channel::Channel</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Channel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">id::EmojiId</span>, <span class="ident">misc::EmojiIdentifier</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">id::EmojiId</span>, <span class="ident">misc::EmojiIdentifier</span>};
 
 <span class="doccomment">/// Converts a HashMap into a final [`serde_json::Map`] representation.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hashmap_to_json_map</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Value</span>, <span class="ident">H</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">JsonMap</span>
@@ -1596,7 +1583,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_roles</span>(<span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) {
+<span class="kw">fn</span> <span class="ident">clean_roles</span>(<span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">progress</span> <span class="op">=</span> <span class="number">0</span>;
 
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">mention_start</span>) <span class="op">=</span> <span class="ident">s</span>[<span class="ident">progress</span>..].<span class="ident">find</span>(<span class="string">&quot;&lt;@&amp;&quot;</span>) {
@@ -1609,7 +1596,7 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">RoleId::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]) {
                 <span class="kw">let</span> <span class="ident">to_replace</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;&lt;@&amp;{}&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]);
 
-                <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span> {
+                <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
                     <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">role</span>.<span class="ident">name</span>))
                 } <span class="kw">else</span> {
                     <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="string">&quot;@deleted-role&quot;</span>)
@@ -1633,7 +1620,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_channels</span>(<span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) {
+<span class="kw">fn</span> <span class="ident">clean_channels</span>(<span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">progress</span> <span class="op">=</span> <span class="number">0</span>;
 
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">mention_start</span>) <span class="op">=</span> <span class="ident">s</span>[<span class="ident">progress</span>..].<span class="ident">find</span>(<span class="string">&quot;&lt;#&quot;</span>) {
@@ -1646,7 +1633,7 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">ChannelId::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]) {
                 <span class="kw">let</span> <span class="ident">to_replace</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;&lt;#{}&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]);
 
-                <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_channel_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span> {
+                <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_channel_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
                     <span class="kw">let</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;#{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">name</span>);
                     <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="kw-2">&amp;</span><span class="ident">replacement</span>)
                 } <span class="kw">else</span> {
@@ -1671,7 +1658,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_users</span>(
+<span class="kw">fn</span> <span class="ident">clean_users</span>(
     <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>,
     <span class="ident">show_discriminator</span>: <span class="ident">bool</span>,
@@ -1698,7 +1685,7 @@
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">UserId::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]) {
                 <span class="kw">let</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">guild</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>).<span class="kw">await</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
                             <span class="kw">if</span> <span class="ident">show_discriminator</span> {
                                 <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">member</span>.<span class="ident">distinct</span>())
@@ -1711,7 +1698,7 @@
                     } <span class="kw">else</span> {
                         <span class="string">&quot;@invalid-user&quot;</span>.<span class="ident">to_string</span>()
                     }
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">id</span>).<span class="kw">await</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">id</span>) {
                     <span class="kw">if</span> <span class="ident">show_discriminator</span> {
                         <span class="macro">format!</span>(<span class="string">&quot;@{}#{:04}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>, <span class="ident">user</span>.<span class="ident">discriminator</span>)
                     } <span class="kw">else</span> {
@@ -1758,12 +1745,12 @@
 <span class="doccomment">/// # use serenity::client::Cache;</span>
 <span class="doccomment">/// # use tokio::sync::RwLock;</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// # async fn run() {</span>
+<span class="doccomment">/// # fn run() {</span>
 <span class="doccomment">/// # let cache = Cache::default();</span>
 <span class="doccomment">/// use serenity::utils::{content_safe, ContentSafeOptions};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let with_mention = &quot;@everyone&quot;;</span>
-<span class="doccomment">/// let without_mention = content_safe(&amp;cache, &amp;with_mention, &amp;ContentSafeOptions::default()).await;</span>
+<span class="doccomment">/// let without_mention = content_safe(&amp;cache, &amp;with_mention, &amp;ContentSafeOptions::default());</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(&quot;@\u{200B}everyone&quot;.to_string(), without_mention);</span>
 <span class="doccomment">/// # }</span>
@@ -1771,7 +1758,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">content_safe</span>(
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content_safe</span>(
     <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ContentSafeOptions</span>,
@@ -1779,16 +1766,15 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>().<span class="ident">to_string</span>();
 
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_role</span> {
-        <span class="ident">clean_roles</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span>).<span class="kw">await</span>;
+        <span class="ident">clean_roles</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span>);
     }
 
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_channel</span> {
-        <span class="ident">clean_channels</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span>).<span class="kw">await</span>;
+        <span class="ident">clean_channels</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span>);
     }
 
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_user</span> {
-        <span class="ident">clean_users</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span>, <span class="ident">options</span>.<span class="ident">show_discriminator</span>, <span class="ident">options</span>.<span class="ident">guild_reference</span>)
-            .<span class="kw">await</span>;
+        <span class="ident">clean_users</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span>, <span class="ident">options</span>.<span class="ident">show_discriminator</span>, <span class="ident">options</span>.<span class="ident">guild_reference</span>);
     }
 
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_here</span> {
@@ -1807,7 +1793,7 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_invite_parser</span>() {
@@ -1850,13 +1836,13 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_content_safe</span>() {
-        <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_content_safe</span>() {
+        <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
         <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 
-        <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">user::User</span>, <span class="ident">Permissions</span>};
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">user::User</span>, <span class="ident">Permissions</span>};
 
         <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">User</span> {
             <span class="ident">id</span>: <span class="ident">UserId</span>(<span class="number">100000000000000000</span>),
@@ -1979,9 +1965,9 @@
 
         <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">member</span>.<span class="ident">clone</span>());
         <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">insert</span>(<span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">role</span>.<span class="ident">clone</span>());
-        <span class="ident">cache</span>.<span class="ident">users</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">user</span>.<span class="ident">clone</span>());
-        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">guild</span>.<span class="ident">id</span>, <span class="ident">guild</span>.<span class="ident">clone</span>());
-        <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">channel</span>.<span class="ident">id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>());
+        <span class="ident">cache</span>.<span class="ident">users</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">user</span>.<span class="ident">clone</span>());
+        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">insert</span>(<span class="ident">guild</span>.<span class="ident">id</span>, <span class="ident">guild</span>.<span class="ident">clone</span>());
+        <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel</span>.<span class="ident">id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>());
 
         <span class="kw">let</span> <span class="ident">with_user_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;@!100000000000000000&gt; &lt;@!000000000000000000&gt; &lt;@123&gt; &lt;@!123&gt; \
         &lt;@!123123123123123123123&gt; &lt;@123&gt; &lt;@123123123123123123&gt; &lt;@!invalid&gt; \
@@ -1997,40 +1983,40 @@
 
         <span class="comment">// User mentions</span>
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ContentSafeOptions::default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">without_user_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_user_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">without_user_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_user_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ContentSafeOptions::default</span>();
         <span class="macro">assert_eq!</span>(
             <span class="macro">format!</span>(<span class="string">&quot;@{}#{:04}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>, <span class="ident">user</span>.<span class="ident">discriminator</span>),
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@!100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
+            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@!100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>)
         );
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ContentSafeOptions::default</span>();
         <span class="macro">assert_eq!</span>(
             <span class="macro">format!</span>(<span class="string">&quot;@{}#{:04}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>, <span class="ident">user</span>.<span class="ident">discriminator</span>),
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
+            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>)
         );
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">show_discriminator</span>(<span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(
             <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>),
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@!100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
+            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@!100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>)
         );
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">show_discriminator</span>(<span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(
             <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>),
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
+            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>)
         );
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">display_as_member_from</span>(<span class="ident">guild</span>.<span class="ident">id</span>);
         <span class="macro">assert_eq!</span>(
             <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">member</span>.<span class="ident">nick</span>.<span class="ident">unwrap</span>()),
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@!100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
+            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="string">&quot;&lt;@!100000000000000000&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>)
         );
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">clean_user</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">with_user_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_user_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">with_user_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_user_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="comment">// Channel mentions</span>
         <span class="kw">let</span> <span class="ident">with_channel_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;#&gt; &lt;#deleted-channel&gt; #deleted-channel &lt;#0&gt; \
@@ -2041,16 +2027,10 @@
         #deleted-channel #unsafe-club #general &lt;#ferrisferrisferris&gt; \
         #deleted-channel&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">without_channel_mentions</span>,
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_channel_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
-        );
+        <span class="macro">assert_eq!</span>(<span class="ident">without_channel_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_channel_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">clean_channel</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">with_channel_mentions</span>,
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_channel_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
-        );
+        <span class="macro">assert_eq!</span>(<span class="ident">with_channel_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_channel_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="comment">// Role mentions</span>
         <span class="kw">let</span> <span class="ident">with_role_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;@&amp;&gt; @deleted-role &lt;@&amp;9829&gt; \
@@ -2059,36 +2039,30 @@
         <span class="kw">let</span> <span class="ident">without_role_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;@&amp;&gt; @deleted-role @deleted-role \
         @ferris-club-member @deleted-role&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">without_role_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_role_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">without_role_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_role_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">clean_role</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">with_role_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_role_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">with_role_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_role_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="comment">// Everyone mentions</span>
         <span class="kw">let</span> <span class="ident">with_everyone_mention</span> <span class="op">=</span> <span class="string">&quot;@everyone&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">without_everyone_mention</span> <span class="op">=</span> <span class="string">&quot;@\u{200B}everyone&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">without_everyone_mention</span>,
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_everyone_mention</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
-        );
+        <span class="macro">assert_eq!</span>(<span class="ident">without_everyone_mention</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_everyone_mention</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">clean_everyone</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">with_everyone_mention</span>,
-            <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_everyone_mention</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>
-        );
+        <span class="macro">assert_eq!</span>(<span class="ident">with_everyone_mention</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_everyone_mention</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="comment">// Here mentions</span>
         <span class="kw">let</span> <span class="ident">with_here_mention</span> <span class="op">=</span> <span class="string">&quot;@here&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">without_here_mention</span> <span class="op">=</span> <span class="string">&quot;@\u{200B}here&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">without_here_mention</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_here_mention</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">without_here_mention</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_here_mention</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
 
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">clean_here</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">with_here_mention</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_here_mention</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>).<span class="kw">await</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">with_here_mention</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_here_mention</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>));
     }
 }
 </pre></div>

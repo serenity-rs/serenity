@@ -1629,9 +1629,9 @@
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder::CreateChannel</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateChannel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
     <span class="ident">CreateSticker</span>,
     <span class="ident">EditGuild</span>,
     <span class="ident">EditGuildWelcomeScreen</span>,
@@ -1641,24 +1641,24 @@
     <span class="ident">EditSticker</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
     <span class="ident">CollectReaction</span>,
     <span class="ident">CollectReply</span>,
     <span class="ident">MessageCollectorBuilder</span>,
     <span class="ident">ReactionCollectorBuilder</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::json</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">builder</span>::{
@@ -2336,8 +2336,8 @@
     <span class="doccomment">/// Tries to find the [`Guild`] by its Id in the cache.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_guild_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
-        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild</span>(<span class="self">self</span>).<span class="kw">await</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_guild_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
+        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Requests [`PartialGuild`] over REST API.</span>
@@ -2522,7 +2522,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>).<span class="kw">await</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">member</span>);
                 }
             }
@@ -2617,8 +2617,8 @@
 
     <span class="doccomment">/// Returns the name of whatever guild this id holds.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_guild_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_guild_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(<span class="ident">guild</span>.<span class="ident">name</span>)
     }
 
@@ -2727,8 +2727,8 @@
     <span class="doccomment">/// total, consider using [`utils::shard_id`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">crate</span><span class="ident">::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">shard_count</span>().<span class="kw">await</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+        <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">shard_count</span>())
     }
 
     <span class="doccomment">/// Returns the Id of the shard associated with the guild.</span>
@@ -2757,7 +2757,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
-        <span class="kw">crate</span><span class="ident">::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">shard_count</span>)
+        <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">shard_count</span>)
     }
 
     <span class="doccomment">/// Starts an integration sync for the given integration Id.</span>

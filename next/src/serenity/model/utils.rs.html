@@ -594,14 +594,14 @@
 <span class="kw">use</span> <span class="ident">simd_json::ValueAccess</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::permissions::Permissions</span>;
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::permissions::Permissions</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions::application_command</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_true</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
     <span class="bool-val">true</span>
@@ -1010,13 +1010,13 @@
 <span class="doccomment">/// the permissions are not in the cache.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_has_perms_cache</span>(
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_has_perms_cache</span>(
     <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">match</span> <span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="ident">channel_id</span>, <span class="ident">guild_id</span>, <span class="ident">permissions</span>).<span class="kw">await</span> {
+    <span class="kw">if</span> <span class="kw">match</span> <span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="ident">channel_id</span>, <span class="ident">guild_id</span>, <span class="ident">permissions</span>) {
         <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>.<span class="ident">is_cache_err</span>(),
         <span class="ident">result</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">result</span><span class="question-mark">?</span>,
     } {
@@ -1027,7 +1027,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_has_perms</span>(
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_has_perms</span>(
     <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
@@ -1035,7 +1035,7 @@
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>();
 
-    <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">channel</span>(<span class="ident">channel_id</span>).<span class="kw">await</span> {
+    <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">channel</span>(<span class="ident">channel_id</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">channel</span>,
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::ChannelNotFound</span>)),
     };
@@ -1058,12 +1058,12 @@
         },
     };
 
-    <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>).<span class="kw">await</span> {
+    <span class="kw">let</span> <span class="ident">guild</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="ident">guild_id</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">guild</span>,
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::GuildNotFound</span>)),
     };
 
-    <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>) {
+    <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">id</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">member</span>,
         <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::MemberNotFound</span>)),
     };
@@ -1088,7 +1088,7 @@
                     <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;number&quot;</span>)
                 }
 
-                <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                     <span class="ident">v</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span>().<span class="macro-nonterminal">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">32</span>);
                         <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">&quot;Unknown &quot;</span>);
@@ -1100,12 +1100,12 @@
                     })
                 }
 
-                <span class="kw">fn</span> <span class="ident">visit_i64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> { <span class="prelude-val">Ok</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>) }
+                <span class="kw">fn</span> <span class="ident">visit_i64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> { <span class="prelude-val">Ok</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>) }
 
-                <span class="kw">fn</span> <span class="macro-nonterminal">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> { <span class="prelude-val">Ok</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>) }
+                <span class="kw">fn</span> <span class="macro-nonterminal">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> { <span class="prelude-val">Ok</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>) }
 
                 <span class="comment">// This is called when serde_json&#39;s `arbitrary_precision` feature is enabled.</span>
-                <span class="kw">fn</span> <span class="macro-nonterminal">visit_map</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="macro-nonterminal">visit_map</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span> {
                     <span class="kw">struct</span> <span class="ident">Id</span> {
                         <span class="ident">num</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span>,
                     }
@@ -1119,8 +1119,8 @@
                             <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;string&quot;</span>)
                         }
 
-                        <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> { <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="ident">E::custom</span>) }
-                        <span class="kw">fn</span> <span class="ident">visit_string</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> { <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="ident">E::custom</span>) }
+                        <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> { <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="ident">E::custom</span>) }
+                        <span class="kw">fn</span> <span class="ident">visit_string</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> { <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="ident">E::custom</span>) }
                     }
 
                     <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Id</span> {
@@ -1151,15 +1151,15 @@
                     <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;optional number&quot;</span>)
                 }
 
-                <span class="kw">fn</span> <span class="ident">visit_unit</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="ident">visit_unit</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                 }
 
-                <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">DeError</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                 }
 
-                <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+                <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
                 <span class="kw">where</span>
                     <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
                 {

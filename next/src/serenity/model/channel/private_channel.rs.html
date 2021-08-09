@@ -411,7 +411,6 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
-<span id="414">414</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -420,12 +419,12 @@
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>, <span class="ident">GetMessages</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>, <span class="ident">GetMessages</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::AttachmentType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http</span>::{<span class="ident">Http</span>, <span class="ident">Typing</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">Http</span>, <span class="ident">Typing</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A Direct Message text channel with another user.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -781,7 +780,6 @@
     <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// # let channel = cache.private_channel(ChannelId(7))</span>
-    <span class="doccomment">/// #    .await</span>
     <span class="doccomment">/// #    .ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">/// // Initiate typing (assuming http is `Arc&lt;Http&gt;` and `channel` is bound)</span>
     <span class="doccomment">/// let typing = channel.start_typing(&amp;http)?;</span>

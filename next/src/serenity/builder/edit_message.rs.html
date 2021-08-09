@@ -159,13 +159,13 @@
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::CreateEmbed</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateEmbed</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder::CreateComponents</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::AttachmentType</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::from_number</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// A builder to specify the fields to edit in an existing message.</span>
 <span class="doccomment">///</span>

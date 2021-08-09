@@ -621,12 +621,12 @@
 
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">TimeZone</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::Value</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::channel::Embed</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Embed</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils::Colour</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::Colour</span>;
 
 <span class="doccomment">/// A builder to create a fake [`Embed`] object, for use with the</span>
 <span class="doccomment">/// [`ChannelId::send_message`] and [`ExecuteWebhook::embeds`] methods.</span>
@@ -1112,9 +1112,9 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::CreateEmbed</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::json</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::json::Value</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateEmbed</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">model::channel</span>::{<span class="ident">Embed</span>, <span class="ident">EmbedField</span>, <span class="ident">EmbedFooter</span>, <span class="ident">EmbedImage</span>, <span class="ident">EmbedVideo</span>},
         <span class="ident">utils</span>::{<span class="self">self</span>, <span class="ident">Colour</span>},

@@ -534,9 +534,9 @@
 <span class="kw">use</span> <span class="ident">tokio::time::Duration</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">super</span><span class="ident">::routing::Route</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routing::Route</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">HttpError</span>, <span class="ident">Request</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Ratelimiter for requests to the Discord API.</span>
 <span class="doccomment">///</span>
@@ -583,7 +583,7 @@
     <span class="doccomment">/// The bot token must be prefixed with `&quot;Bot &quot;`. The ratelimiter does not</span>
     <span class="doccomment">/// prefix it.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>, <span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::_new</span>(<span class="ident">client</span>, <span class="ident">token</span>.<span class="ident">into</span>())
+        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">client</span>, <span class="ident">token</span>.<span class="ident">into</span>())
     }
 
     <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>, <span class="ident">token</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
@@ -886,7 +886,7 @@
 
     <span class="kw">use</span> <span class="ident">reqwest::header</span>::{<span class="ident">HeaderMap</span>, <span class="ident">HeaderName</span>, <span class="ident">HeaderValue</span>};
 
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::parse_header</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::parse_header</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::Error</span>, <span class="ident">http::HttpError</span>};
 
     <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span><span class="op">&gt;</span><span class="op">&gt;</span>;
