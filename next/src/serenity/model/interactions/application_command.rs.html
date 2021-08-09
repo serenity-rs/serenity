@@ -936,6 +936,9 @@
 <span id="936">936</span>
 <span id="937">937</span>
 <span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -1533,6 +1536,7 @@
     <span class="ident">User</span>(<span class="ident">User</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PartialMember</span><span class="op">&gt;</span>),
     <span class="ident">Channel</span>(<span class="ident">PartialChannel</span>),
     <span class="ident">Role</span>(<span class="ident">Role</span>),
+    <span class="ident">Number</span>(<span class="ident">f64</span>),
 }
 
 <span class="kw">fn</span> <span class="ident">default_permission_value</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -1836,6 +1840,7 @@
     <span class="ident">Channel</span> <span class="op">=</span> <span class="number">7</span>,
     <span class="ident">Role</span> <span class="op">=</span> <span class="number">8</span>,
     <span class="ident">Mentionable</span> <span class="op">=</span> <span class="number">9</span>,
+    <span class="ident">Number</span> <span class="op">=</span> <span class="number">10</span>,
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
@@ -1849,6 +1854,7 @@
     <span class="ident">Channel</span>,
     <span class="ident">Role</span>,
     <span class="ident">Mentionable</span>,
+    <span class="ident">Number</span>
 });
 
 <span class="doccomment">/// The type of an [`ApplicationCommandPermissionData`].</span>

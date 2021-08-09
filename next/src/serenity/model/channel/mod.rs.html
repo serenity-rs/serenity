@@ -660,10 +660,10 @@
     <span class="doccomment">/// #   let channel = ChannelId(0).to_channel_cached(&amp;cache).unwrap();</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// match channel.guild() {</span>
-    <span class="doccomment">///     Some(guild) =&gt; {</span>
-    <span class="doccomment">///         println!(&quot;It&#39;s a guild named {}!&quot;, guild.name);</span>
+    <span class="doccomment">///     Some(guild_channel) =&gt; {</span>
+    <span class="doccomment">///         println!(&quot;It&#39;s a guild channel named {}!&quot;, guild_channel.name);</span>
     <span class="doccomment">///     },</span>
-    <span class="doccomment">///     None =&gt; { println!(&quot;It&#39;s not a guild!&quot;); },</span>
+    <span class="doccomment">///     None =&gt; { println!(&quot;It&#39;s not in a guild!&quot;); },</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>

@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["component_interaction_collector",""],["message_collector",""],["reaction_collector",""]]});
+initSidebarItems({"enum":[["CollectorError","An error that occured while working with a collector."]],"mod":[["component_interaction_collector",""],["event_collector",""],["message_collector",""],["reaction_collector",""]]});
