@@ -77,7 +77,7 @@ impl CurrentUser {
     /// #
     /// # let cache = Cache::default();
     /// // assuming the cache has been unlocked
-    /// let user = cache.current_user().await;
+    /// let user = cache.current_user();
     ///
     /// match user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
@@ -705,20 +705,15 @@ impl User {
     /// #   #[cfg(feature = "cache")]
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url = match ctx
-    ///                 .cache
-    ///                 .current_user()
-    ///                 .await
-    ///                 .invite_url(&ctx, Permissions::empty())
-    ///                 .await
-    ///             {
-    ///                 Ok(v) => v,
-    ///                 Err(why) => {
-    ///                     println!("Error creating invite url: {:?}", why);
+    ///             let url =
+    ///                 match ctx.cache.current_user().invite_url(&ctx, Permissions::empty()).await {
+    ///                     Ok(v) => v,
+    ///                     Err(why) => {
+    ///                         println!("Error creating invite url: {:?}", why);
     ///
-    ///                     return;
-    ///                 },
-    ///             };
+    ///                         return;
+    ///                     },
+    ///                 };
     ///
     ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url,);
     ///
@@ -842,7 +837,7 @@ impl User {
                     #[cfg(feature = "cache")]
                     {
                         if let Some(cache) = cache_http.cache() {
-                            if let Some(member) = cache.member(guild_id, self.id).await {
+                            if let Some(member) = cache.member(guild_id, self.id) {
                                 has_role = Some(member.roles.contains(&role));
                             }
                         }
@@ -944,7 +939,7 @@ impl User {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = guild_id.to_guild_cached(cache).await {
+                if let Some(guild) = guild_id.to_guild_cached(cache) {
                     if let Some(member) = guild.members.get(&self.id) {
                         return member.nick.clone();
                     }
@@ -1021,7 +1016,9 @@ impl UserId {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                for channel in cache.private_channels().await.values() {
+                for channel_entry in cache.private_channels().iter() {
+                    let channel = channel_entry.value();
+
                     if channel.recipient.id == self {
                         return Ok(channel.clone());
                     }
@@ -1040,7 +1037,7 @@ impl UserId {
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn to_user_cached(self, cache: impl AsRef<Cache>) -> Option<User> {
-        cache.as_ref().user(self).await
+        cache.as_ref().user(self)
     }
 
     /// First attempts to find a [`User`] by its Id in the cache,
@@ -1064,7 +1061,7 @@ impl UserId {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(user) = cache.user(self).await {
+                if let Some(user) = cache.user(self) {
                     return Ok(user);
                 }
             }
