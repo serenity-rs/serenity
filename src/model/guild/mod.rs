@@ -267,10 +267,10 @@ pub struct Guild {
 #[cfg(feature = "model")]
 impl Guild {
     #[cfg(feature = "cache")]
-    async fn check_hierarchy(&self, cache: impl AsRef<Cache>, other_user: UserId) -> Result<()> {
-        let current_id = cache.as_ref().current_user().await.id;
+    fn check_hierarchy(&self, cache: impl AsRef<Cache>, other_user: UserId) -> Result<()> {
+        let current_id = cache.as_ref().current_user().id;
 
-        if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id).await {
+        if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id) {
             if higher != current_id {
                 return Err(Error::Model(ModelError::Hierarchy));
             }
@@ -301,7 +301,7 @@ impl Guild {
     ///
     /// **Note**: This is very costly if used in a server with lots of channels,
     /// members, or both.
-    pub async fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
+    pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
                 for member in self.members.values() {
@@ -318,7 +318,7 @@ impl Guild {
     #[cfg(feature = "cache")]
     async fn has_perms(&self, cache_http: impl CacheHttp, mut permissions: Permissions) -> bool {
         if let Some(cache) = cache_http.cache() {
-            let user_id = cache.current_user().await.id;
+            let user_id = cache.current_user().id;
 
             if let Ok(perms) = self.member_permissions(&cache_http, user_id).await {
                 permissions.remove(perms);
@@ -333,15 +333,17 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    pub async fn channel_id_from_name(
+    pub fn channel_id_from_name(
         &self,
         cache: impl AsRef<Cache>,
         name: impl AsRef<str>,
     ) -> Option<ChannelId> {
         let name = name.as_ref();
-        let guild_channels = cache.as_ref().guild_channels(&self.id).await?;
+        let guild_channels = cache.as_ref().guild_channels(&self.id)?;
 
-        for (id, channel) in guild_channels.iter() {
+        for channel_entry in guild_channels.iter() {
+            let (id, channel) = channel_entry.pair();
+
             if channel.name == name {
                 return Some(*id);
             }
@@ -422,7 +424,7 @@ impl Guild {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
 
-                self.check_hierarchy(cache, user).await?;
+                self.check_hierarchy(cache, user)?;
             }
         }
 
@@ -863,7 +865,7 @@ impl Guild {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.owner_id != cache.current_user().await.id {
+                if self.owner_id != cache.current_user().id {
                     let req = Permissions::MANAGE_GUILD;
 
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -1269,17 +1271,17 @@ impl Guild {
     /// [`position`]: Role::position
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn greater_member_hierarchy(
+    pub fn greater_member_hierarchy(
         &self,
         cache: impl AsRef<Cache>,
         lhs_id: impl Into<UserId>,
         rhs_id: impl Into<UserId>,
     ) -> Option<UserId> {
-        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into()).await
+        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into())
     }
 
     #[cfg(feature = "cache")]
-    async fn _greater_member_hierarchy(
+    fn _greater_member_hierarchy(
         &self,
         cache: impl AsRef<Cache>,
         lhs_id: UserId,
@@ -1297,10 +1299,8 @@ impl Guild {
             return Some(rhs_id);
         }
 
-        let lhs =
-            self.members.get(&lhs_id)?.highest_role_info(&cache).await.unwrap_or((RoleId(0), 0));
-        let rhs =
-            self.members.get(&rhs_id)?.highest_role_info(&cache).await.unwrap_or((RoleId(0), 0));
+        let lhs = self.members.get(&lhs_id)?.highest_role_info(&cache).unwrap_or((RoleId(0), 0));
+        let rhs = self.members.get(&rhs_id)?.highest_role_info(&cache).unwrap_or((RoleId(0), 0));
 
         // If LHS and RHS both have no top position or have the same role ID,
         // then no one wins.
@@ -2184,8 +2184,8 @@ impl Guild {
     /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub async fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
-        self.id.shard_id(&cache).await
+    pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
+        self.id.shard_id(&cache)
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -2368,7 +2368,7 @@ impl Guild {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
-    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx).await {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx) {
     ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("{:?}", role);
     ///                 }

@@ -630,6 +630,7 @@ impl PresenceUser {
         })
     }
 
+    #[cfg(feature = "cache")] // method is only used with the cache feature enabled
     pub(crate) fn update_with_user(&mut self, user: User) {
         self.id = user.id;
         if let Some(avatar) = user.avatar {

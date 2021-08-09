@@ -48,7 +48,6 @@ impl ArgumentConvert for Role {
         let roles = ctx
             .cache
             .guild_roles(guild_id.ok_or(RoleParseError::NotInGuild)?)
-            .await
             .ok_or(RoleParseError::NotInCache)?;
 
         if let Some(role_id) = s.parse::<u64>().ok().or_else(|| crate::utils::parse_role(s)) {

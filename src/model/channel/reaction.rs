@@ -152,7 +152,7 @@ impl Reaction {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.user_id.is_some() && self.user_id == Some(cache.current_user().await.id) {
+                if self.user_id.is_some() && self.user_id == Some(cache.current_user().id) {
                     user_id = None;
                 }
 
@@ -162,8 +162,7 @@ impl Reaction {
                         self.channel_id,
                         self.guild_id,
                         Permissions::MANAGE_MESSAGES,
-                    )
-                    .await?;
+                    )?;
                 }
             }
         }
@@ -197,8 +196,7 @@ impl Reaction {
                     self.channel_id,
                     self.guild_id,
                     Permissions::MANAGE_MESSAGES,
-                )
-                .await?;
+                )?;
             }
         }
         cache_http
@@ -246,7 +244,7 @@ impl Reaction {
                 #[cfg(feature = "cache")]
                 {
                     if let Some(cache) = cache_http.cache() {
-                        return Ok(User::from(&cache.current_user().await));
+                        return Ok(User::from(&cache.current_user()));
                     }
                 }
 
