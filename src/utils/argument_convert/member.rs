@@ -50,7 +50,6 @@ impl ArgumentConvert for Member {
         let guild = guild_id
             .ok_or(MemberParseError::OutsideGuild)?
             .to_guild_cached(ctx)
-            .await
             .ok_or(MemberParseError::GuildNotInCache)?;
 
         // DON'T use guild.members: it's only populated when guild presences intent is enabled!
