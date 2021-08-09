@@ -1694,7 +1694,7 @@
     <span class="ident">HelpOptions</span>,
     <span class="ident">OnlyIn</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cache::Cache</span>,
@@ -3153,7 +3153,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">levenshtein_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::levenshtein_distance</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::levenshtein_distance</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">reflexive</span>() {
@@ -3206,7 +3206,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">matrix_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::Matrix</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Matrix</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">index_mut</span>() {

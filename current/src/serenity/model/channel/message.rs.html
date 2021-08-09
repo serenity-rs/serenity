@@ -1301,22 +1301,22 @@
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::builder</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">EditMessage</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">EditMessage</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">CollectComponentInteraction</span>, <span class="ident">ComponentInteractionCollectorBuilder</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectComponentInteraction</span>, <span class="ident">ComponentInteractionCollectorBuilder</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::collector</span>::{<span class="ident">CollectReaction</span>, <span class="ident">ReactionCollectorBuilder</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectReaction</span>, <span class="ident">ReactionCollectorBuilder</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions</span>::{<span class="ident">message_component::ActionRow</span>, <span class="ident">MessageInteraction</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{<span class="ident">message_component::ActionRow</span>, <span class="ident">MessageInteraction</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::utils::U64Visitor</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::U64Visitor</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constants</span>,
@@ -1637,7 +1637,7 @@
 
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::utils::hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::utils::hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>);
 
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>
             .<span class="ident">http</span>()
@@ -2018,9 +2018,9 @@
                         <span class="ident">f</span>.<span class="ident">replied_user</span>(<span class="ident">ping_user</span>)
                             <span class="comment">// By providing allowed_mentions, Discord disabled _all_ pings by</span>
                             <span class="comment">// default so we need to re-enable them</span>
-                            .<span class="ident">parse</span>(<span class="kw">crate</span><span class="ident">::builder::ParseValue::Everyone</span>)
-                            .<span class="ident">parse</span>(<span class="kw">crate</span><span class="ident">::builder::ParseValue::Users</span>)
-                            .<span class="ident">parse</span>(<span class="kw">crate</span><span class="ident">::builder::ParseValue::Roles</span>)
+                            .<span class="ident">parse</span>(<span class="ident"><span class="kw">crate</span>::builder::ParseValue::Everyone</span>)
+                            .<span class="ident">parse</span>(<span class="ident"><span class="kw">crate</span>::builder::ParseValue::Users</span>)
+                            .<span class="ident">parse</span>(<span class="ident"><span class="kw">crate</span>::builder::ParseValue::Roles</span>)
                     });
                 }
 
@@ -2064,7 +2064,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">suppress</span> <span class="op">=</span> <span class="ident">EditMessage::default</span>();
         <span class="ident">suppress</span>.<span class="ident">suppress_embeds</span>(<span class="bool-val">true</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">crate</span><span class="ident">::utils::hashmap_to_json_map</span>(<span class="ident">suppress</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::utils::hashmap_to_json_map</span>(<span class="ident">suppress</span>.<span class="number">0</span>);
 
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>
             .<span class="ident">http</span>()

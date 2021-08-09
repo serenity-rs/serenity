@@ -222,7 +222,7 @@
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>},
 };
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::Permissions</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Permissions</span>;
 
 <span class="doccomment">/// An error returned from the [`model`] module.</span>
 <span class="doccomment">///</span>
@@ -391,11 +391,11 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cache_err</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
-            <span class="self">Self</span><span class="ident">::ItemMissing</span>
-                <span class="op">|</span> <span class="self">Self</span><span class="ident">::ChannelNotFound</span>
-                <span class="op">|</span> <span class="self">Self</span><span class="ident">::RoleNotFound</span>
-                <span class="op">|</span> <span class="self">Self</span><span class="ident">::GuildNotFound</span>
-                <span class="op">|</span> <span class="self">Self</span><span class="ident">::MemberNotFound</span>
+            <span class="ident"><span class="self">Self</span>::ItemMissing</span>
+                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::ChannelNotFound</span>
+                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::RoleNotFound</span>
+                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::GuildNotFound</span>
+                <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MemberNotFound</span>
         )
     }
 }

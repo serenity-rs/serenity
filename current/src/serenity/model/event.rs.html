@@ -3115,14 +3115,14 @@
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeSeq</span>, <span class="ident">Serializer</span>};
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::utils::deserialize_emojis</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils::deserialize_emojis</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::constants::OpCode</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::OpCode</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::interactions</span>::{<span class="ident">application_command::ApplicationCommand</span>, <span class="ident">Interaction</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{<span class="ident">application_command::ApplicationCommand</span>, <span class="ident">Interaction</span>};
 
 <span class="doccomment">/// Event data for the channel creation event.</span>
 <span class="doccomment">///</span>
@@ -3159,7 +3159,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelCreateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Channel</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
             <span class="ident">Channel::Guild</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">channel_id</span>) <span class="op">=</span> (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>.<span class="ident">id</span>);
@@ -3432,7 +3432,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildDeleteEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Guild</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">for</span> <span class="ident">channel_id</span> <span class="kw">in</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">keys</span>() {
@@ -3552,7 +3552,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMemberRemoveEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Member</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
             <span class="ident">guild</span>.<span class="ident">member_count</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             <span class="kw">return</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>);
@@ -3585,7 +3585,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMemberUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Member</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>).<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
@@ -3786,7 +3786,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildRoleDeleteEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Role</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">cache</span>
             .<span class="ident">guilds</span>
             .<span class="ident">write</span>()
@@ -3808,7 +3808,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildRoleUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Role</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">role</span>.<span class="ident">id</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="ident">role</span>, <span class="self">self</span>.<span class="ident">role</span>.<span class="ident">clone</span>()));
@@ -3971,7 +3971,7 @@
     <span class="doccomment">/// The oldest message, if the channel&#39;s message cache was already full.</span>
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Message</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">settings</span>().<span class="kw">await</span>.<span class="ident">max_messages</span>;
 
         <span class="kw">if</span> <span class="ident">max</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
@@ -4060,7 +4060,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">MessageUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Message</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">messages</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_id</span>) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">messages</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>) {
                 <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">clone</span>();
@@ -4386,7 +4386,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">UserUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">CurrentUser</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>.<span class="ident">write</span>().<span class="kw">await</span>;
         <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">user</span>, <span class="self">self</span>.<span class="ident">current_user</span>.<span class="ident">clone</span>()))
     }
@@ -5025,235 +5025,235 @@
 <span class="macro">macro_rules!</span> <span class="ident">with_related_ids_for_event_types</span> {
     (<span class="macro-nonterminal">$</span><span class="kw">macro</span>:<span class="macro-nonterminal">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="macro-nonterminal">$</span><span class="macro">macro!</span> {
-            <span class="self">Self</span><span class="macro-nonterminal">::ChannelCreate</span>, <span class="self">Self</span><span class="ident">::ChannelCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="macro-nonterminal">Self::ChannelCreate</span>, <span class="ident"><span class="self">Self</span>::ChannelCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">gid_from_channel</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">channel</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel</span>.<span class="ident">id</span>()),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ChannelDelete</span>, <span class="self">Self</span><span class="ident">::ChannelDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ChannelDelete</span>, <span class="ident"><span class="self">Self</span>::ChannelDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">gid_from_channel</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">channel</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel</span>.<span class="ident">id</span>()),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ChannelPinsUpdate</span>, <span class="self">Self</span><span class="ident">::ChannelPinsUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ChannelPinsUpdate</span>, <span class="ident"><span class="self">Self</span>::ChannelPinsUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ChannelUpdate</span>, <span class="self">Self</span><span class="ident">::ChannelUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ChannelUpdate</span>, <span class="ident"><span class="self">Self</span>::ChannelUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">gid_from_channel</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">channel</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel</span>.<span class="ident">id</span>()),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildBanAdd</span>, <span class="self">Self</span><span class="ident">::GuildBanAdd</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildBanAdd</span>, <span class="ident"><span class="self">Self</span>::GuildBanAdd</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildBanRemove</span>, <span class="self">Self</span><span class="ident">::GuildBanRemove</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildBanRemove</span>, <span class="ident"><span class="self">Self</span>::GuildBanRemove</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildCreate</span>, <span class="self">Self</span><span class="ident">::GuildCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildCreate</span>, <span class="ident"><span class="self">Self</span>::GuildCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild</span>.<span class="ident">id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildDelete</span>, <span class="self">Self</span><span class="ident">::GuildDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildDelete</span>, <span class="ident"><span class="self">Self</span>::GuildDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild</span>.<span class="ident">id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildEmojisUpdate</span>, <span class="self">Self</span><span class="ident">::GuildEmojisUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildEmojisUpdate</span>, <span class="ident"><span class="self">Self</span>::GuildEmojisUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildIntegrationsUpdate</span>, <span class="self">Self</span><span class="ident">::GuildIntegrationsUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildIntegrationsUpdate</span>, <span class="ident"><span class="self">Self</span>::GuildIntegrationsUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildMemberAdd</span>, <span class="self">Self</span><span class="ident">::GuildMemberAdd</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildMemberAdd</span>, <span class="ident"><span class="self">Self</span>::GuildMemberAdd</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildMemberRemove</span>, <span class="self">Self</span><span class="ident">::GuildMemberRemove</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildMemberRemove</span>, <span class="ident"><span class="self">Self</span>::GuildMemberRemove</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildMemberUpdate</span>, <span class="self">Self</span><span class="ident">::GuildMemberUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildMemberUpdate</span>, <span class="ident"><span class="self">Self</span>::GuildMemberUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildMembersChunk</span>, <span class="self">Self</span><span class="ident">::GuildMembersChunk</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildMembersChunk</span>, <span class="ident"><span class="self">Self</span>::GuildMembersChunk</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Multiple</span>(<span class="ident">e</span>.<span class="ident">members</span>.<span class="ident">keys</span>().<span class="ident">copied</span>().<span class="ident">collect</span>()),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildRoleCreate</span>, <span class="self">Self</span><span class="ident">::GuildRoleCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildRoleCreate</span>, <span class="ident"><span class="self">Self</span>::GuildRoleCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildRoleDelete</span>, <span class="self">Self</span><span class="ident">::GuildRoleDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildRoleDelete</span>, <span class="ident"><span class="self">Self</span>::GuildRoleDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildRoleUpdate</span>, <span class="self">Self</span><span class="ident">::GuildRoleUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildRoleUpdate</span>, <span class="ident"><span class="self">Self</span>::GuildRoleUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildUnavailable</span>, <span class="self">Self</span><span class="ident">::GuildUnavailable</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildUnavailable</span>, <span class="ident"><span class="self">Self</span>::GuildUnavailable</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::GuildUpdate</span>, <span class="self">Self</span><span class="ident">::GuildUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::GuildUpdate</span>, <span class="ident"><span class="self">Self</span>::GuildUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild</span>.<span class="ident">id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::InviteCreate</span>, <span class="self">Self</span><span class="ident">::InviteCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::InviteCreate</span>, <span class="ident"><span class="self">Self</span>::InviteCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">inviter</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span>).<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::InviteDelete</span>, <span class="self">Self</span><span class="ident">::InviteDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::InviteDelete</span>, <span class="ident"><span class="self">Self</span>::InviteDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::MessageCreate</span>, <span class="self">Self</span><span class="ident">::MessageCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::MessageCreate</span>, <span class="ident"><span class="self">Self</span>::MessageCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">id</span>),
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">message</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">message</span>.<span class="ident">id</span>),
             },
-            <span class="self">Self</span><span class="ident">::MessageDelete</span>, <span class="self">Self</span><span class="ident">::MessageDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::MessageDelete</span>, <span class="ident"><span class="self">Self</span>::MessageDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">message_id</span>),
             },
-            <span class="self">Self</span><span class="ident">::MessageDeleteBulk</span>, <span class="self">Self</span><span class="ident">::MessageDeleteBulk</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::MessageDeleteBulk</span>, <span class="ident"><span class="self">Self</span>::MessageDeleteBulk</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Multiple</span>(<span class="ident">e</span>.<span class="ident">ids</span>.<span class="ident">clone</span>()),
             },
-            <span class="self">Self</span><span class="ident">::MessageUpdate</span>, <span class="self">Self</span><span class="ident">::MessageUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::MessageUpdate</span>, <span class="ident"><span class="self">Self</span>::MessageUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">author</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span>).<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">id</span>),
             },
-            <span class="self">Self</span><span class="ident">::PresenceUpdate</span>, <span class="self">Self</span><span class="ident">::PresenceUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::PresenceUpdate</span>, <span class="ident"><span class="self">Self</span>::PresenceUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>),
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::PresencesReplace</span>, <span class="self">Self</span><span class="ident">::PresencesReplace</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::PresencesReplace</span>, <span class="ident"><span class="self">Self</span>::PresencesReplace</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Multiple</span>(<span class="ident">e</span>.<span class="ident">presences</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">user_id</span>).<span class="ident">collect</span>()),
                 <span class="ident">guild_id</span>: <span class="ident">Never</span>,
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ReactionAdd</span>, <span class="self">Self</span><span class="ident">::ReactionAdd</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ReactionAdd</span>, <span class="ident"><span class="self">Self</span>::ReactionAdd</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">reaction</span>.<span class="ident">user_id</span>.<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">reaction</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">reaction</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">reaction</span>.<span class="ident">message_id</span>),
             },
-            <span class="self">Self</span><span class="ident">::ReactionRemove</span>, <span class="self">Self</span><span class="ident">::ReactionRemove</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ReactionRemove</span>, <span class="ident"><span class="self">Self</span>::ReactionRemove</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">reaction</span>.<span class="ident">user_id</span>.<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">reaction</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">reaction</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">reaction</span>.<span class="ident">message_id</span>),
             },
-            <span class="self">Self</span><span class="ident">::ReactionRemoveAll</span>, <span class="self">Self</span><span class="ident">::ReactionRemoveAll</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ReactionRemoveAll</span>, <span class="ident"><span class="self">Self</span>::ReactionRemoveAll</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">message_id</span>),
             },
-            <span class="self">Self</span><span class="ident">::Ready</span>, <span class="self">Self</span><span class="ident">::Ready</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Ready</span>, <span class="ident"><span class="self">Self</span>::Ready</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">Never</span>,
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::Resumed</span>, <span class="self">Self</span><span class="ident">::Resumed</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::Resumed</span>, <span class="ident"><span class="self">Self</span>::Resumed</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">Never</span>,
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::StageInstanceCreate</span>, <span class="self">Self</span><span class="ident">::StageInstanceCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::StageInstanceCreate</span>, <span class="ident"><span class="self">Self</span>::StageInstanceCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">stage_instance</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">stage_instance</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::StageInstanceDelete</span>, <span class="self">Self</span><span class="ident">::StageInstanceDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::StageInstanceDelete</span>, <span class="ident"><span class="self">Self</span>::StageInstanceDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">stage_instance</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">stage_instance</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::StageInstanceUpdate</span>, <span class="self">Self</span><span class="ident">::StageInstanceUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::StageInstanceUpdate</span>, <span class="ident"><span class="self">Self</span>::StageInstanceUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">stage_instance</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">stage_instance</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ThreadCreate</span>, <span class="self">Self</span><span class="ident">::ThreadCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ThreadCreate</span>, <span class="ident"><span class="self">Self</span>::ThreadCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">thread</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">thread</span>.<span class="ident">id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ThreadDelete</span>, <span class="self">Self</span><span class="ident">::ThreadDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ThreadDelete</span>, <span class="ident"><span class="self">Self</span>::ThreadDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">thread</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">thread</span>.<span class="ident">id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ThreadListSync</span>, <span class="self">Self</span><span class="ident">::ThreadListSync</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ThreadListSync</span>, <span class="ident"><span class="self">Self</span>::ThreadListSync</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Multiple</span>(<span class="ident">e</span>.<span class="ident">threads</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">id</span>).<span class="ident">collect</span>()),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ThreadMembersUpdate</span>, <span class="self">Self</span><span class="ident">::ThreadMembersUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ThreadMembersUpdate</span>, <span class="ident"><span class="self">Self</span>::ThreadMembersUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Multiple</span>(<span class="ident">e</span>.<span class="ident">added_members</span>
                         .<span class="ident">iter</span>()
                         .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">user_id</span>.<span class="ident">as_ref</span>())
@@ -5265,50 +5265,50 @@
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ThreadMemberUpdate</span>, <span class="self">Self</span><span class="ident">::ThreadMemberUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ThreadMemberUpdate</span>, <span class="ident"><span class="self">Self</span>::ThreadMemberUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">member</span>.<span class="ident">user_id</span>.<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="ident">Never</span>,
                 <span class="ident">channel_id</span>: <span class="ident">e</span>.<span class="ident">member</span>.<span class="ident">id</span>.<span class="ident">into</span>(),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::ThreadUpdate</span>, <span class="self">Self</span><span class="ident">::ThreadUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ThreadUpdate</span>, <span class="ident"><span class="self">Self</span>::ThreadUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">thread</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">thread</span>.<span class="ident">id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::TypingStart</span>, <span class="self">Self</span><span class="ident">::TypingStart</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::TypingStart</span>, <span class="ident"><span class="self">Self</span>::TypingStart</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">user_id</span>),
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::UserUpdate</span>, <span class="self">Self</span><span class="ident">::UserUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::UserUpdate</span>, <span class="ident"><span class="self">Self</span>::UserUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">current_user</span>.<span class="ident">id</span>),
                 <span class="ident">guild_id</span>: <span class="ident">Never</span>,
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::VoiceServerUpdate</span>, <span class="self">Self</span><span class="ident">::VoiceServerUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::VoiceServerUpdate</span>, <span class="ident"><span class="self">Self</span>::VoiceServerUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="ident">e</span>.<span class="ident">channel_id</span>.<span class="ident">into</span>(),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::VoiceStateUpdate</span>, <span class="self">Self</span><span class="ident">::VoiceStateUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::VoiceStateUpdate</span>, <span class="ident"><span class="self">Self</span>::VoiceStateUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">voice_state</span>.<span class="ident">user_id</span>),
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="self">Self</span><span class="ident">::WebhookUpdate</span>, <span class="self">Self</span><span class="ident">::WebhookUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::WebhookUpdate</span>, <span class="ident"><span class="self">Self</span>::WebhookUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::InteractionCreate</span>, <span class="self">Self</span><span class="ident">::InteractionCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::InteractionCreate</span>, <span class="ident"><span class="self">Self</span>::InteractionCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">user</span>.<span class="ident">id</span>),
@@ -5331,42 +5331,42 @@
                 },
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationCreate</span>, <span class="self">Self</span><span class="ident">::IntegrationCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::IntegrationCreate</span>, <span class="ident"><span class="self">Self</span>::IntegrationCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">integration</span>.<span class="ident">user</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span>).<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">integration</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationUpdate</span>, <span class="self">Self</span><span class="ident">::IntegrationUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::IntegrationUpdate</span>, <span class="ident"><span class="self">Self</span>::IntegrationUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">integration</span>.<span class="ident">user</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span>).<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">integration</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationDelete</span>, <span class="self">Self</span><span class="ident">::IntegrationDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::IntegrationDelete</span>, <span class="ident"><span class="self">Self</span>::IntegrationDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandCreate</span>, <span class="self">Self</span><span class="ident">::ApplicationCommandCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandCreate</span>, <span class="ident"><span class="self">Self</span>::ApplicationCommandCreate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">application_command</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandUpdate</span>, <span class="self">Self</span><span class="ident">::ApplicationCommandUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandUpdate</span>, <span class="ident"><span class="self">Self</span>::ApplicationCommandUpdate</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">application_command</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandDelete</span>, <span class="self">Self</span><span class="ident">::ApplicationCommandDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandDelete</span>, <span class="ident"><span class="self">Self</span>::ApplicationCommandDelete</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="ident">e</span>.<span class="ident">application_command</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
@@ -5391,7 +5391,7 @@
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="self">Self</span><span class="ident">::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Never</span>,
+                <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Never</span>,
                 $(
                     $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="question-mark">?</span>
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">user_id</span>
@@ -5404,7 +5404,7 @@
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="self">Self</span><span class="ident">::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Never</span>,
+                <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Never</span>,
                 $(
                     $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="question-mark">?</span>
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">guild_id</span>
@@ -5417,7 +5417,7 @@
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="self">Self</span><span class="ident">::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Never</span>,
+                <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Never</span>,
                 $(
                     $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="question-mark">?</span>
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">channel_id</span>
@@ -5430,7 +5430,7 @@
             <span class="kw">use</span> <span class="ident">RelatedId</span>::<span class="kw-2">*</span>;
             <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="self">Self</span><span class="ident">::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Never</span>,
+                <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Never</span>,
                 $(
                     $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="question-mark">?</span>
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">message_id</span>
@@ -5444,67 +5444,67 @@
     <span class="doccomment">/// Return the type of this event.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EventType</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ChannelCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ChannelCreate</span>,
-            <span class="self">Self</span><span class="ident">::ChannelDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ChannelDelete</span>,
-            <span class="self">Self</span><span class="ident">::ChannelPinsUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ChannelPinsUpdate</span>,
-            <span class="self">Self</span><span class="ident">::ChannelUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ChannelUpdate</span>,
-            <span class="self">Self</span><span class="ident">::GuildBanAdd</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildBanAdd</span>,
-            <span class="self">Self</span><span class="ident">::GuildBanRemove</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildBanRemove</span>,
-            <span class="self">Self</span><span class="ident">::GuildCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildCreate</span>,
-            <span class="self">Self</span><span class="ident">::GuildDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildDelete</span>,
-            <span class="self">Self</span><span class="ident">::GuildEmojisUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildEmojisUpdate</span>,
-            <span class="self">Self</span><span class="ident">::GuildIntegrationsUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildIntegrationsUpdate</span>,
-            <span class="self">Self</span><span class="ident">::GuildMemberAdd</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildMemberAdd</span>,
-            <span class="self">Self</span><span class="ident">::GuildMemberRemove</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildMemberRemove</span>,
-            <span class="self">Self</span><span class="ident">::GuildMemberUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildMemberUpdate</span>,
-            <span class="self">Self</span><span class="ident">::GuildMembersChunk</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildMembersChunk</span>,
-            <span class="self">Self</span><span class="ident">::GuildRoleCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildRoleCreate</span>,
-            <span class="self">Self</span><span class="ident">::GuildRoleDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildRoleDelete</span>,
-            <span class="self">Self</span><span class="ident">::GuildRoleUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildRoleUpdate</span>,
-            <span class="self">Self</span><span class="ident">::GuildUnavailable</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildUnavailable</span>,
-            <span class="self">Self</span><span class="ident">::GuildUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildUpdate</span>,
-            <span class="self">Self</span><span class="ident">::InviteCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::InviteCreate</span>,
-            <span class="self">Self</span><span class="ident">::InviteDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::InviteDelete</span>,
-            <span class="self">Self</span><span class="ident">::MessageCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::MessageCreate</span>,
-            <span class="self">Self</span><span class="ident">::MessageDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::MessageDelete</span>,
-            <span class="self">Self</span><span class="ident">::MessageDeleteBulk</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::MessageDeleteBulk</span>,
-            <span class="self">Self</span><span class="ident">::MessageUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::MessageUpdate</span>,
-            <span class="self">Self</span><span class="ident">::PresenceUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::PresenceUpdate</span>,
-            <span class="self">Self</span><span class="ident">::PresencesReplace</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::PresencesReplace</span>,
-            <span class="self">Self</span><span class="ident">::ReactionAdd</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ReactionAdd</span>,
-            <span class="self">Self</span><span class="ident">::ReactionRemove</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ReactionRemove</span>,
-            <span class="self">Self</span><span class="ident">::ReactionRemoveAll</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ReactionRemoveAll</span>,
-            <span class="self">Self</span><span class="ident">::Ready</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Ready</span>,
-            <span class="self">Self</span><span class="ident">::Resumed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Resumed</span>,
-            <span class="self">Self</span><span class="ident">::TypingStart</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::TypingStart</span>,
-            <span class="self">Self</span><span class="ident">::UserUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::UserUpdate</span>,
-            <span class="self">Self</span><span class="ident">::VoiceStateUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::VoiceStateUpdate</span>,
-            <span class="self">Self</span><span class="ident">::VoiceServerUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::VoiceServerUpdate</span>,
-            <span class="self">Self</span><span class="ident">::WebhookUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::WebhookUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::ChannelCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ChannelCreate</span>,
+            <span class="ident"><span class="self">Self</span>::ChannelDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ChannelDelete</span>,
+            <span class="ident"><span class="self">Self</span>::ChannelPinsUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ChannelPinsUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::ChannelUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ChannelUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::GuildBanAdd</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildBanAdd</span>,
+            <span class="ident"><span class="self">Self</span>::GuildBanRemove</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildBanRemove</span>,
+            <span class="ident"><span class="self">Self</span>::GuildCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildCreate</span>,
+            <span class="ident"><span class="self">Self</span>::GuildDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildDelete</span>,
+            <span class="ident"><span class="self">Self</span>::GuildEmojisUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildEmojisUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::GuildIntegrationsUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildIntegrationsUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::GuildMemberAdd</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildMemberAdd</span>,
+            <span class="ident"><span class="self">Self</span>::GuildMemberRemove</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildMemberRemove</span>,
+            <span class="ident"><span class="self">Self</span>::GuildMemberUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildMemberUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::GuildMembersChunk</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildMembersChunk</span>,
+            <span class="ident"><span class="self">Self</span>::GuildRoleCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildRoleCreate</span>,
+            <span class="ident"><span class="self">Self</span>::GuildRoleDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildRoleDelete</span>,
+            <span class="ident"><span class="self">Self</span>::GuildRoleUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildRoleUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::GuildUnavailable</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildUnavailable</span>,
+            <span class="ident"><span class="self">Self</span>::GuildUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::GuildUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::InviteCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::InviteCreate</span>,
+            <span class="ident"><span class="self">Self</span>::InviteDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::InviteDelete</span>,
+            <span class="ident"><span class="self">Self</span>::MessageCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::MessageCreate</span>,
+            <span class="ident"><span class="self">Self</span>::MessageDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::MessageDelete</span>,
+            <span class="ident"><span class="self">Self</span>::MessageDeleteBulk</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::MessageDeleteBulk</span>,
+            <span class="ident"><span class="self">Self</span>::MessageUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::MessageUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::PresenceUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::PresenceUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::PresencesReplace</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::PresencesReplace</span>,
+            <span class="ident"><span class="self">Self</span>::ReactionAdd</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ReactionAdd</span>,
+            <span class="ident"><span class="self">Self</span>::ReactionRemove</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ReactionRemove</span>,
+            <span class="ident"><span class="self">Self</span>::ReactionRemoveAll</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ReactionRemoveAll</span>,
+            <span class="ident"><span class="self">Self</span>::Ready</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Ready</span>,
+            <span class="ident"><span class="self">Self</span>::Resumed</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Resumed</span>,
+            <span class="ident"><span class="self">Self</span>::TypingStart</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::TypingStart</span>,
+            <span class="ident"><span class="self">Self</span>::UserUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::UserUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::VoiceStateUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::VoiceStateUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::VoiceServerUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::VoiceServerUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::WebhookUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::WebhookUpdate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::InteractionCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::InteractionCreate</span>,
+            <span class="ident"><span class="self">Self</span>::InteractionCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::InteractionCreate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationCreate</span>,
+            <span class="ident"><span class="self">Self</span>::IntegrationCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationCreate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::IntegrationUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationUpdate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationDelete</span>,
+            <span class="ident"><span class="self">Self</span>::IntegrationDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::IntegrationDelete</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandCreate</span>,
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandCreate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandUpdate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandDelete</span>,
-            <span class="self">Self</span><span class="ident">::StageInstanceCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceCreate</span>,
-            <span class="self">Self</span><span class="ident">::StageInstanceUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceUpdate</span>,
-            <span class="self">Self</span><span class="ident">::StageInstanceDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceDelete</span>,
-            <span class="self">Self</span><span class="ident">::ThreadCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadCreate</span>,
-            <span class="self">Self</span><span class="ident">::ThreadUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadUpdate</span>,
-            <span class="self">Self</span><span class="ident">::ThreadDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadDelete</span>,
-            <span class="self">Self</span><span class="ident">::ThreadListSync</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadListSync</span>,
-            <span class="self">Self</span><span class="ident">::ThreadMemberUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadMemberUpdate</span>,
-            <span class="self">Self</span><span class="ident">::ThreadMembersUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadMembersUpdate</span>,
-            <span class="self">Self</span><span class="ident">::Unknown</span>(<span class="ident">unknown</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Other</span>(<span class="ident">unknown</span>.<span class="ident">kind</span>.<span class="ident">clone</span>()),
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ApplicationCommandDelete</span>,
+            <span class="ident"><span class="self">Self</span>::StageInstanceCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceCreate</span>,
+            <span class="ident"><span class="self">Self</span>::StageInstanceUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::StageInstanceDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::StageInstanceDelete</span>,
+            <span class="ident"><span class="self">Self</span>::ThreadCreate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadCreate</span>,
+            <span class="ident"><span class="self">Self</span>::ThreadUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::ThreadDelete</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadDelete</span>,
+            <span class="ident"><span class="self">Self</span>::ThreadListSync</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadListSync</span>,
+            <span class="ident"><span class="self">Self</span>::ThreadMemberUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadMemberUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::ThreadMembersUpdate</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::ThreadMembersUpdate</span>,
+            <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">unknown</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType::Other</span>(<span class="ident">unknown</span>.<span class="ident">kind</span>.<span class="ident">clone</span>()),
         }
     }
 
@@ -5549,7 +5549,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">RelatedId</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">RelatedId::Never</span> <span class="op">|</span> <span class="ident">RelatedId::None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             <span class="ident">RelatedId::Some</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">t</span>)),
@@ -5944,7 +5944,7 @@
     ) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RelatedIdsForEventType</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="self">Self</span><span class="ident">::Other</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Default::default</span>(),
+                <span class="ident"><span class="self">Self</span>::Other</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Default::default</span>(),
                 $(
                     $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="question-mark">?</span>
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="op">=</span><span class="op">&gt;</span>
@@ -6052,70 +6052,70 @@
     <span class="doccomment">/// case this method returns [`None`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ChannelCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::CHANNEL_CREATE</span>),
-            <span class="self">Self</span><span class="ident">::ChannelDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::CHANNEL_DELETE</span>),
-            <span class="self">Self</span><span class="ident">::ChannelPinsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::CHANNEL_PINS_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::ChannelUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::CHANNEL_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::GuildBanAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_BAN_ADD</span>),
-            <span class="self">Self</span><span class="ident">::GuildBanRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_BAN_REMOVE</span>),
-            <span class="self">Self</span><span class="ident">::GuildCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_CREATE</span>),
-            <span class="self">Self</span><span class="ident">::GuildDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_DELETE</span>),
-            <span class="self">Self</span><span class="ident">::GuildEmojisUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_EMOJIS_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::GuildIntegrationsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_INTEGRATIONS_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::GuildMemberAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_MEMBER_ADD</span>),
-            <span class="self">Self</span><span class="ident">::GuildMemberRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_MEMBER_REMOVE</span>),
-            <span class="self">Self</span><span class="ident">::GuildMemberUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_MEMBER_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::GuildMembersChunk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_MEMBERS_CHUNK</span>),
-            <span class="self">Self</span><span class="ident">::GuildRoleCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_ROLE_CREATE</span>),
-            <span class="self">Self</span><span class="ident">::GuildRoleDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_ROLE_DELETE</span>),
-            <span class="self">Self</span><span class="ident">::GuildRoleUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_ROLE_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::InviteCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::INVITE_CREATE</span>),
-            <span class="self">Self</span><span class="ident">::InviteDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::INVITE_DELETE</span>),
-            <span class="self">Self</span><span class="ident">::GuildUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::GUILD_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::MessageCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::MESSAGE_CREATE</span>),
-            <span class="self">Self</span><span class="ident">::MessageDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::MESSAGE_DELETE</span>),
-            <span class="self">Self</span><span class="ident">::MessageDeleteBulk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::MESSAGE_DELETE_BULK</span>),
-            <span class="self">Self</span><span class="ident">::ReactionAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::MESSAGE_REACTION_ADD</span>),
-            <span class="self">Self</span><span class="ident">::ReactionRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::MESSAGE_REACTION_REMOVE</span>),
-            <span class="self">Self</span><span class="ident">::ReactionRemoveAll</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::MESSAGE_REACTION_REMOVE_ALL</span>),
-            <span class="self">Self</span><span class="ident">::MessageUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::MESSAGE_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::PresenceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::PRESENCE_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::PresencesReplace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::PRESENCES_REPLACE</span>),
-            <span class="self">Self</span><span class="ident">::Ready</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::READY</span>),
-            <span class="self">Self</span><span class="ident">::Resumed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::RESUMED</span>),
-            <span class="self">Self</span><span class="ident">::TypingStart</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::TYPING_START</span>),
-            <span class="self">Self</span><span class="ident">::UserUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::USER_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::VoiceServerUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::VOICE_SERVER_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::VoiceStateUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::VOICE_STATE_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::WebhookUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::WEBHOOKS_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::ChannelCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::ChannelDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::ChannelPinsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_PINS_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::ChannelUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::CHANNEL_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildBanAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_BAN_ADD</span>),
+            <span class="ident"><span class="self">Self</span>::GuildBanRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_BAN_REMOVE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildEmojisUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_EMOJIS_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildIntegrationsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_INTEGRATIONS_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildMemberAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBER_ADD</span>),
+            <span class="ident"><span class="self">Self</span>::GuildMemberRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBER_REMOVE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildMemberUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBER_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildMembersChunk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBERS_CHUNK</span>),
+            <span class="ident"><span class="self">Self</span>::GuildRoleCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_ROLE_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildRoleDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_ROLE_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildRoleUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_ROLE_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::InviteCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INVITE_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::InviteDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INVITE_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::GuildUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::GUILD_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::MessageCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::MessageDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::MessageDeleteBulk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_DELETE_BULK</span>),
+            <span class="ident"><span class="self">Self</span>::ReactionAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_REACTION_ADD</span>),
+            <span class="ident"><span class="self">Self</span>::ReactionRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_REACTION_REMOVE</span>),
+            <span class="ident"><span class="self">Self</span>::ReactionRemoveAll</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_REACTION_REMOVE_ALL</span>),
+            <span class="ident"><span class="self">Self</span>::MessageUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::PresenceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::PRESENCE_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::PresencesReplace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::PRESENCES_REPLACE</span>),
+            <span class="ident"><span class="self">Self</span>::Ready</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::READY</span>),
+            <span class="ident"><span class="self">Self</span>::Resumed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::RESUMED</span>),
+            <span class="ident"><span class="self">Self</span>::TypingStart</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::TYPING_START</span>),
+            <span class="ident"><span class="self">Self</span>::UserUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::USER_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::VoiceServerUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::VOICE_SERVER_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::VoiceStateUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::VOICE_STATE_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::WebhookUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::WEBHOOKS_UPDATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::InteractionCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::INTERACTION_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::InteractionCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTERACTION_CREATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::INTEGRATION_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::IntegrationCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTEGRATION_CREATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::INTEGRATION_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::IntegrationUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTEGRATION_UPDATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::IntegrationDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::INTEGRATION_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::IntegrationDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTEGRATION_DELETE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::APPLICATION_COMMAND_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::APPLICATION_COMMAND_CREATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::APPLICATION_COMMAND_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::APPLICATION_COMMAND_UPDATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-            <span class="self">Self</span><span class="ident">::ApplicationCommandDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::APPLICATION_COMMAND_DELETE</span>),
-            <span class="self">Self</span><span class="ident">::StageInstanceCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::STAGE_INSTANCE_CREATE</span>),
-            <span class="self">Self</span><span class="ident">::StageInstanceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::STAGE_INSTANCE_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::StageInstanceDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::STAGE_INSTANCE_DELETE</span>),
-            <span class="self">Self</span><span class="ident">::ThreadCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::THREAD_CREATE</span>),
-            <span class="self">Self</span><span class="ident">::ThreadUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::THREAD_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::ThreadDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::THREAD_DELETE</span>),
-            <span class="self">Self</span><span class="ident">::ThreadListSync</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::THREAD_LIST_SYNC</span>),
-            <span class="self">Self</span><span class="ident">::ThreadMemberUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::THREAD_MEMBER_UPDATE</span>),
-            <span class="self">Self</span><span class="ident">::ThreadMembersUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="self">Self</span><span class="ident">::THREAD_MEMBERS_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::ApplicationCommandDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::APPLICATION_COMMAND_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::StageInstanceCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::STAGE_INSTANCE_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::StageInstanceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::STAGE_INSTANCE_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::StageInstanceDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::STAGE_INSTANCE_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::ThreadCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::THREAD_CREATE</span>),
+            <span class="ident"><span class="self">Self</span>::ThreadUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::THREAD_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::ThreadDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::THREAD_DELETE</span>),
+            <span class="ident"><span class="self">Self</span>::ThreadListSync</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::THREAD_LIST_SYNC</span>),
+            <span class="ident"><span class="self">Self</span>::ThreadMemberUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::THREAD_MEMBER_UPDATE</span>),
+            <span class="ident"><span class="self">Self</span>::ThreadMembersUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::THREAD_MEMBERS_UPDATE</span>),
             <span class="comment">// GuildUnavailable is a synthetic event type, corresponding to either</span>
             <span class="comment">// `GUILD_CREATE` or `GUILD_DELETE`, but we don&#39;t have enough information</span>
             <span class="comment">// to recover the name here, so we return `None` instead.</span>
-            <span class="self">Self</span><span class="ident">::GuildUnavailable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="self">Self</span><span class="ident">::Other</span>(<span class="ident">other</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>),
+            <span class="ident"><span class="self">Self</span>::GuildUnavailable</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident"><span class="self">Self</span>::Other</span>(<span class="ident">other</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>),
         }
     }
 
@@ -6136,7 +6136,7 @@
                 <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;event type str&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">E</span>: <span class="ident">DeError</span>,
             {

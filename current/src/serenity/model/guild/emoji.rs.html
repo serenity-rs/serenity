@@ -258,17 +258,17 @@
 <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::Http</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id::GuildId</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::id</span>::{<span class="ident">EmojiId</span>, <span class="ident">RoleId</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::user::User</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::utils::default_true</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">EmojiId</span>, <span class="ident">RoleId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::default_true</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::ModelError</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::ModelError</span>;
 
 <span class="doccomment">/// Represents a custom guild emoji, which can either be created using the API,</span>
 <span class="doccomment">/// or via an integration. Emojis created using the API only work within the</span>

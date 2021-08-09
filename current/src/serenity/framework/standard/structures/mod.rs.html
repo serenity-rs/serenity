@@ -280,15 +280,15 @@
 
 <span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::Args</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::Context</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">channel::Message</span>, <span class="ident">id::UserId</span>, <span class="ident">permissions::Permissions</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils::Colour</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Args</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">channel::Message</span>, <span class="ident">id::UserId</span>, <span class="ident">permissions::Permissions</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::Colour</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">buckets</span>;
 <span class="kw">mod</span> <span class="ident">check</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::check</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::check</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -300,7 +300,7 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">OnlyIn</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::None</span>
+        <span class="ident"><span class="self">Self</span>::None</span>
     }
 }
 
@@ -514,7 +514,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">levenshtein_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::HelpBehaviour</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::HelpBehaviour</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">help_behaviour_eq</span>() {

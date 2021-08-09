@@ -253,8 +253,8 @@
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">url::ParseError</span> <span class="kw">as</span> <span class="ident">UrlError</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::http::utils::deserialize_errors</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::internal::prelude</span>::{<span class="ident">JsonMap</span>, <span class="ident">StdResult</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::utils::deserialize_errors</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::{<span class="ident">JsonMap</span>, <span class="ident">StdResult</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -368,23 +368,23 @@
 
     <span class="doccomment">/// Returns true when the error is caused by an unsuccessful request</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsuccessful_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span><span class="ident">::UnsuccessfulRequest</span>(<span class="kw">_</span>))
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::UnsuccessfulRequest</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns true when the error is caused by the url containing invalid input</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_url_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span><span class="ident">::Url</span>(<span class="kw">_</span>))
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Url</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns true when the error is caused by an invalid header</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_invalid_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span><span class="ident">::InvalidHeader</span>(<span class="kw">_</span>))
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::InvalidHeader</span>(<span class="kw">_</span>))
     }
 
     <span class="doccomment">/// Returns the status code if the error is an unsuccessful request</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::UnsuccessfulRequest</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">status_code</span>),
+            <span class="ident"><span class="self">Self</span>::UnsuccessfulRequest</span>(<span class="ident">res</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">status_code</span>),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         }
     }

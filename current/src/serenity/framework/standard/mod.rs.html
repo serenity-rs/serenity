@@ -916,18 +916,18 @@
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 <span class="kw">use</span> <span class="ident">uwl::Stream</span>;
 
-<span class="kw">use</span> <span class="self">self</span><span class="ident">::buckets</span>::{<span class="ident">RateLimitInfo</span>, <span class="ident">RevertBucket</span>};
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::Framework</span>;
+<span class="kw">use</span> <span class="ident"><span class="self">self</span>::buckets</span>::{<span class="ident">RateLimitInfo</span>, <span class="ident">RevertBucket</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Framework</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cache::Cache</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::client::Context</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::channel::Channel</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Channel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::guild::Member</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">channel::Message</span>, <span class="ident">permissions::Permissions</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Member</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">channel::Message</span>, <span class="ident">permissions::Permissions</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{<span class="ident">guild::Role</span>, <span class="ident">id::RoleId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">guild::Role</span>, <span class="ident">id::RoleId</span>};
 
 <span class="doccomment">/// An enum representing all possible fail conditions under which a command won&#39;t</span>
 <span class="doccomment">/// be executed.</span>

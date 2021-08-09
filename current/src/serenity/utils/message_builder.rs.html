@@ -1564,7 +1564,7 @@
     <span class="ident">ops::Add</span>,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model</span>::{
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
     <span class="ident">guild::Emoji</span>,
     <span class="ident">id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>},
     <span class="ident">misc::Mentionable</span>,
@@ -2780,7 +2780,7 @@
 }
 
 <span class="doccomment">/// This trait exists for the purpose of bypassing the &quot;conflicting implementations&quot; error from the compiler.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">I</span>: <span class="self">self</span><span class="ident">::private::A</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">I</span>: <span class="ident"><span class="self">self</span>::private::A</span> {
     <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Content</span>;
 }
 
@@ -2838,7 +2838,7 @@
         <span class="ident">ContentModifier</span>::{<span class="ident">Bold</span>, <span class="ident">Code</span>, <span class="ident">Italic</span>, <span class="ident">Spoiler</span>},
         <span class="ident">MessageBuilder</span>,
     };
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::model::prelude</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">gen</span> {
         ($(<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span> <span class="op">=</span><span class="op">&gt;</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">text</span>:<span class="ident">expr</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>:<span class="ident">expr</span>),<span class="op">+</span>]),<span class="op">+</span>) <span class="op">=</span><span class="op">&gt;</span> ({
@@ -3102,19 +3102,19 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">normalize</span>() {
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;@everyone&quot;</span>), <span class="string">&quot;@\u{200B}everyone&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;@here&quot;</span>), <span class="string">&quot;@\u{200B}here&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;discord.gg&quot;</span>), <span class="string">&quot;discord\u{2024}gg&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;discord.me&quot;</span>), <span class="string">&quot;discord\u{2024}me&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;discordlist.net&quot;</span>), <span class="string">&quot;discordlist\u{2024}net&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;discordservers.com&quot;</span>), <span class="string">&quot;discordservers\u{2024}com&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;discord.com/invite&quot;</span>), <span class="string">&quot;discord\u{2024}com/invite&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;\u{202E}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;\u{200F}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;\u{202B}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;\u{200B}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;\u{200D}&quot;</span>), <span class="string">&quot; &quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw">super</span><span class="ident">::normalize</span>(<span class="string">&quot;\u{200C}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;@everyone&quot;</span>), <span class="string">&quot;@\u{200B}everyone&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;@here&quot;</span>), <span class="string">&quot;@\u{200B}here&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;discord.gg&quot;</span>), <span class="string">&quot;discord\u{2024}gg&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;discord.me&quot;</span>), <span class="string">&quot;discord\u{2024}me&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;discordlist.net&quot;</span>), <span class="string">&quot;discordlist\u{2024}net&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;discordservers.com&quot;</span>), <span class="string">&quot;discordservers\u{2024}com&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;discord.com/invite&quot;</span>), <span class="string">&quot;discord\u{2024}com/invite&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;\u{202E}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;\u{200F}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;\u{202B}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;\u{200B}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;\u{200D}&quot;</span>), <span class="string">&quot; &quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident"><span class="kw">super</span>::normalize</span>(<span class="string">&quot;\u{200C}&quot;</span>), <span class="string">&quot; &quot;</span>);
     }
 }
 </pre></div>
