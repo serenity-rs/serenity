@@ -1,5 +1,3 @@
-use async_trait::async_trait;
-
 use super::Cache;
 
 /// Trait used for updating the cache with a type.
@@ -105,7 +103,6 @@ use super::Cache;
 /// cache.update(&mut update_message).await;
 /// # }
 /// ```
-#[async_trait]
 pub trait CacheUpdate {
     /// The return type of an update.
     ///
@@ -113,5 +110,5 @@ pub trait CacheUpdate {
     type Output;
 
     /// Updates the cache with the implementation.
-    async fn update(&mut self, _: &Cache) -> Option<Self::Output>;
+    fn update(&mut self, _: &Cache) -> Option<Self::Output>;
 }
