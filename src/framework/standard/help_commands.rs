@@ -262,7 +262,7 @@ pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
 /// Checks whether a user is member of required roles
 /// and given the required permissions.
 #[cfg(feature = "cache")]
-pub async fn has_all_requirements(
+pub fn has_all_requirements(
     cache_http: impl CacheHttp + AsRef<Cache>,
     cmd: &CommandOptions,
     msg: &Message,
@@ -270,14 +270,14 @@ pub async fn has_all_requirements(
     let cache = cache_http.as_ref();
 
     if let Some(guild_id) = msg.guild_id {
-        if let Some(member) = cache.member(guild_id, &msg.author.id).await {
-            if let Ok(permissions) = member.permissions(&cache_http).await {
+        if let Some(member) = cache.member(guild_id, &msg.author.id) {
+            if let Ok(permissions) = member.permissions(&cache_http) {
                 return if cmd.allowed_roles.is_empty() {
-                    permissions.administrator() || has_correct_permissions(&cache, &cmd, msg).await
-                } else if let Some(roles) = cache.guild_roles(guild_id).await {
+                    permissions.administrator() || has_correct_permissions(&cache, &cmd, msg)
+                } else if let Some(roles) = cache.guild_roles(guild_id) {
                     permissions.administrator()
                         || (has_correct_roles(&cmd, &roles, &member)
-                            && has_correct_permissions(&cache, &cmd, msg).await)
+                            && has_correct_permissions(&cache, &cmd, msg))
                 } else {
                     warn!("Failed to find the guild and its roles.");
 
@@ -301,7 +301,7 @@ fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
 
 // Decides how a listed help entry shall be displayed.
 #[cfg(all(feature = "cache", feature = "http"))]
-async fn check_common_behaviour(
+fn check_common_behaviour(
     cache_http: impl CacheHttp + AsRef<Cache>,
     msg: &Message,
     options: &impl CommonOptions,
@@ -326,7 +326,7 @@ async fn check_common_behaviour(
         return HelpBehaviour::Nothing;
     }
 
-    if !has_correct_permissions(&cache_http, options, msg).await {
+    if !has_correct_permissions(&cache_http, options, msg) {
         return help_options.lacking_permissions;
     }
 
@@ -339,7 +339,6 @@ async fn check_common_behaviour(
 
         HelpBehaviour::Nothing
     })
-    .await
     .unwrap_or(HelpBehaviour::Nothing)
 }
 
@@ -352,7 +351,7 @@ async fn check_command_behaviour(
     owners: &HashSet<UserId>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
-    let behaviour = check_common_behaviour(&ctx, msg, &options, owners, help_options).await;
+    let behaviour = check_common_behaviour(&ctx, msg, &options, owners, help_options);
 
     if behaviour == HelpBehaviour::Nothing
         && (!options.owner_privilege || !owners.contains(&msg.author.id))
@@ -534,7 +533,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
         for group in groups {
             let group = *group;
             let group_behaviour =
-                check_common_behaviour(&ctx, msg, &group.options, owners, help_options).await;
+                check_common_behaviour(&ctx, msg, &group.options, owners, help_options);
 
             match &group_behaviour {
                 HelpBehaviour::Nothing => (),
@@ -699,7 +698,7 @@ async fn fill_eligible_commands<'a>(
         } else {
             std::cmp::max(
                 *highest_formatter,
-                check_common_behaviour(&ctx, msg, &group.options, owners, help_options).await,
+                check_common_behaviour(&ctx, msg, &group.options, owners, help_options),
             )
         }
     };

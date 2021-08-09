@@ -253,14 +253,14 @@ impl StandardFramework {
 
         #[cfg(feature = "cache")]
         {
-            if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx).await {
+            if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx) {
                 let guild_id = channel.guild_id;
 
                 if self.config.blocked_guilds.contains(&guild_id) {
                     return Some(DispatchError::BlockedGuild);
                 }
 
-                let owner_id_option = ctx.cache.guild_field(guild_id, |guild| guild.owner_id).await;
+                let owner_id_option = ctx.cache.guild_field(guild_id, |guild| guild.owner_id);
 
                 if let Some(owner_id) = owner_id_option {
                     if self.config.blocked_users.contains(&owner_id) {
@@ -839,7 +839,7 @@ impl CommonOptions for &CommandOptions {
 }
 
 #[cfg(feature = "cache")]
-pub(crate) async fn has_correct_permissions(
+pub(crate) fn has_correct_permissions(
     cache: impl AsRef<Cache>,
     options: &impl CommonOptions,
     message: &Message,
@@ -873,7 +873,6 @@ pub(crate) async fn has_correct_permissions(
                     },
                 }
             })
-            .await
             .unwrap_or(false)
     }
 }

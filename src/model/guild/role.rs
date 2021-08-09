@@ -1,7 +1,5 @@
 use std::cmp::Ordering;
 
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use async_trait::async_trait;
 #[cfg(feature = "model")]
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 
@@ -187,8 +185,10 @@ impl PartialOrd for Role {
 impl RoleId {
     /// Tries to find the [`Role`] by its Id in the cache.
     #[cfg(feature = "cache")]
-    pub async fn to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
-        for guild in cache.as_ref().guilds.read().await.values() {
+    pub fn to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
+        for guild_entry in cache.as_ref().guilds.iter() {
+            let guild = guild_entry.value();
+
             if !guild.roles.contains_key(&self) {
                 continue;
             }
@@ -217,16 +217,15 @@ impl<'a> From<&'a Role> for RoleId {
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-#[async_trait]
 impl FromStrAndCache for Role {
     type Err = RoleParseError;
 
-    async fn from_str<CRL>(cache: CRL, s: &str) -> StdResult<Self, Self::Err>
+    fn from_str<CRL>(cache: CRL, s: &str) -> StdResult<Self, Self::Err>
     where
         CRL: AsRef<Cache> + Send + Sync,
     {
         match parse_role(s) {
-            Some(x) => match RoleId(x).to_role_cached(&cache).await {
+            Some(x) => match RoleId(x).to_role_cached(&cache) {
                 Some(role) => Ok(role),
                 None => Err(RoleParseError::NotPresentInCache),
             },

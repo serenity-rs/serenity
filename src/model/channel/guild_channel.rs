@@ -195,8 +195,7 @@ impl GuildChannel {
                     self.id,
                     Some(self.guild_id),
                     Permissions::CREATE_INVITE,
-                )
-                .await?;
+                )?;
             }
         }
 
@@ -244,7 +243,6 @@ impl GuildChannel {
     /// // assuming the cache has been unlocked
     /// let channel = cache
     ///     .guild_channel(channel_id)
-    ///     .await
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, &overwrite).await?;
@@ -284,7 +282,6 @@ impl GuildChannel {
     ///
     /// let channel = cache
     ///     .guild_channel(channel_id)
-    ///     .await
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, &overwrite).await?;
@@ -331,8 +328,7 @@ impl GuildChannel {
                     self.id,
                     Some(self.guild_id),
                     Permissions::MANAGE_CHANNELS,
-                )
-                .await?;
+                )?;
             }
         }
 
@@ -437,8 +433,7 @@ impl GuildChannel {
                     self.id,
                     Some(self.guild_id),
                     Permissions::MANAGE_CHANNELS,
-                )
-                .await?;
+                )?;
             }
         }
 
@@ -511,7 +506,7 @@ impl GuildChannel {
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.edit_voice_state(&http, user_id, |v| v.suppress(false)).await?;
     /// #   Ok(())
@@ -561,7 +556,7 @@ impl GuildChannel {
     /// use serenity::model::ModelError;
     ///
     /// // assuming the cache has been unlocked
-    /// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.guild_channel(channel_id).ok_or(ModelError::ItemMissing)?;
     ///
     /// // Send a request to speak
     /// channel.edit_own_voice_state(&http, |v| v.request_to_speak(true)).await?;
@@ -616,8 +611,8 @@ impl GuildChannel {
     /// Attempts to find this channel's guild in the Cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
-        cache.as_ref().guild(self.guild_id).await
+    pub fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
+        cache.as_ref().guild(self.guild_id)
     }
 
     /// Gets all of the channel's invites.
@@ -708,12 +703,12 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
-    ///         let channel = match context.cache.guild_channel(msg.channel_id).await {
+    ///         let channel = match context.cache.guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author).await {
+    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author) {
     ///             println!("The user's permissions: {:?}", permissions);
     ///         }
     ///     }
@@ -742,13 +737,13 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
-    ///         let channel = match context.cache.guild_channel(msg.channel_id).await {
+    ///         let channel = match context.cache.guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = context.cache.current_user().await.id;
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id).await {
+    ///         let current_user_id = context.cache.current_user_id();
+    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id) {
     ///
     ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///                 return;
@@ -789,12 +784,12 @@ impl GuildChannel {
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn permissions_for_user(
+    pub fn permissions_for_user(
         &self,
         cache: impl AsRef<Cache>,
         user_id: impl Into<UserId>,
     ) -> Result<Permissions> {
-        let guild = self.guild(&cache).await.ok_or(Error::Model(ModelError::GuildNotFound))?;
+        let guild = self.guild(&cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
         let member =
             guild.members.get(&user_id.into()).ok_or(Error::Model(ModelError::MemberNotFound))?;
         guild.user_permissions_in(self, member)
@@ -814,12 +809,12 @@ impl GuildChannel {
     /// be found in the [`Cache`].
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn permissions_for_role(
+    pub fn permissions_for_role(
         &self,
         cache: impl AsRef<Cache>,
         role_id: impl Into<RoleId>,
     ) -> Result<Permissions> {
-        let guild = self.guild(&cache).await.ok_or(Error::Model(ModelError::GuildNotFound))?;
+        let guild = self.guild(&cache).ok_or(Error::Model(ModelError::GuildNotFound))?;
         let role =
             guild.roles.get(&role_id.into()).ok_or(Error::Model(ModelError::RoleNotFound))?;
         guild.role_permissions_in(self, role)
@@ -964,8 +959,7 @@ impl GuildChannel {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::SEND_MESSAGES;
 
-                if let Ok(false) =
-                    utils::user_has_perms(&cache, self.id, Some(self.guild_id), req).await
+                if let Ok(false) = utils::user_has_perms(&cache, self.id, Some(self.guild_id), req)
                 {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
@@ -1006,7 +1000,7 @@ impl GuildChannel {
     /// # let cache = Cache::default();
     /// # let channel = cache
     /// #    .guild_channel(ChannelId(7))
-    /// #    .await.ok_or(ModelError::ItemMissing)?;
+    /// #    .ok_or(ModelError::ItemMissing)?;
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
     /// let typing = channel.start_typing(&http)?;
     ///
@@ -1072,7 +1066,7 @@ impl GuildChannel {
     #[inline]
     pub async fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
         let cache = cache.as_ref();
-        let guild = cache.guild(self.guild_id).await.ok_or(ModelError::GuildNotFound)?;
+        let guild = cache.guild(self.guild_id).ok_or(ModelError::GuildNotFound)?;
 
         match self.kind {
             ChannelType::Voice | ChannelType::Stage => Ok(guild
@@ -1093,7 +1087,6 @@ impl GuildChannel {
                     .filter_map(|e| async move {
                         if self
                             .permissions_for_user(cache, e.0)
-                            .await
                             .map(|p| p.contains(Permissions::READ_MESSAGES))
                             .unwrap_or(false)
                         {

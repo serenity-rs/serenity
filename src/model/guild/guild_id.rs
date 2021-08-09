@@ -708,8 +708,8 @@ impl GuildId {
     /// Tries to find the [`Guild`] by its Id in the cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn to_guild_cached(self, cache: impl AsRef<Cache>) -> Option<Guild> {
-        cache.as_ref().guild(self).await
+    pub fn to_guild_cached(self, cache: impl AsRef<Cache>) -> Option<Guild> {
+        cache.as_ref().guild(self)
     }
 
     /// Requests [`PartialGuild`] over REST API.
@@ -894,7 +894,7 @@ impl GuildId {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(member) = cache.member(self.0, user_id).await {
+                if let Some(member) = cache.member(self.0, user_id) {
                     return Ok(member);
                 }
             }
@@ -989,8 +989,8 @@ impl GuildId {
 
     /// Returns the name of whatever guild this id holds.
     #[cfg(feature = "cache")]
-    pub async fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
-        let guild = self.to_guild_cached(&cache).await?;
+    pub fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
+        let guild = self.to_guild_cached(&cache)?;
         Some(guild.name)
     }
 
@@ -1099,8 +1099,8 @@ impl GuildId {
     /// total, consider using [`utils::shard_id`].
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub async fn shard_id(self, cache: impl AsRef<Cache>) -> u64 {
-        crate::utils::shard_id(self.0, cache.as_ref().shard_count().await)
+    pub fn shard_id(self, cache: impl AsRef<Cache>) -> u64 {
+        crate::utils::shard_id(self.0, cache.as_ref().shard_count())
     }
 
     /// Returns the Id of the shard associated with the guild.

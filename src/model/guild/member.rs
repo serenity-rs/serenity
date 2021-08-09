@@ -1,5 +1,6 @@
 #[cfg(feature = "model")]
 use std::borrow::Cow;
+#[cfg(feature = "cache")]
 use std::cmp::Reverse;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
@@ -166,8 +167,8 @@ impl Member {
 
     /// Determines the member's colour.
     #[cfg(feature = "cache")]
-    pub async fn colour(&self, cache: impl AsRef<Cache>) -> Option<Colour> {
-        let guild_roles = cache.as_ref().guild_field(self.guild_id, |g| g.roles.clone()).await?;
+    pub fn colour(&self, cache: impl AsRef<Cache>) -> Option<Colour> {
+        let guild_roles = cache.as_ref().guild_field(self.guild_id, |g| g.roles.clone())?;
 
         let mut roles = self
             .roles
@@ -186,8 +187,8 @@ impl Member {
     /// (This returns the first channel that can be read by the member, if there isn't
     /// one returns [`None`])
     #[cfg(feature = "cache")]
-    pub async fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
-        let guild = self.guild_id.to_guild_cached(cache).await?;
+    pub fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
+        let guild = self.guild_id.to_guild_cached(cache)?;
 
         let member = guild.members.get(&self.user.id)?;
 
@@ -251,8 +252,8 @@ impl Member {
     /// position. If two or more roles have the same highest position, then the
     /// role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
-    pub async fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, i64)> {
-        let guild_roles = cache.as_ref().guild_field(self.guild_id, |g| g.roles.clone()).await?;
+    pub fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, i64)> {
+        let guild_roles = cache.as_ref().guild_field(self.guild_id, |g| g.roles.clone())?;
 
         let mut highest = None;
 
@@ -344,14 +345,14 @@ impl Member {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if let Some(guild) = cache.guilds.read().await.get(&self.guild_id) {
+                if let Some(guild) = cache.guilds.get(&self.guild_id) {
                     let req = Permissions::KICK_MEMBERS;
 
                     if !guild.has_perms(&cache_http, req).await {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
 
-                    guild.check_hierarchy(cache, self.user.id).await?;
+                    guild.check_hierarchy(cache, self.user.id)?;
                 }
             }
         }
@@ -409,14 +410,10 @@ impl Member {
     /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not
     /// found.
     #[cfg(feature = "cache")]
-    pub async fn permissions(
-        &self,
-        cache_http: impl CacheHttp + AsRef<Cache>,
-    ) -> Result<Permissions> {
+    pub fn permissions(&self, cache_http: impl CacheHttp + AsRef<Cache>) -> Result<Permissions> {
         let perms_opt = cache_http
             .as_ref()
-            .guild_field(self.guild_id, |guild| guild._member_permission_from_member(self))
-            .await;
+            .guild_field(self.guild_id, |guild| guild._member_permission_from_member(self));
 
         match perms_opt {
             Some(perms) => Ok(perms),
@@ -498,12 +495,11 @@ impl Member {
     ///
     /// If role data can not be found for the member, then [`None`] is returned.
     #[cfg(feature = "cache")]
-    pub async fn roles(&self, cache: impl AsRef<Cache>) -> Option<Vec<Role>> {
+    pub fn roles(&self, cache: impl AsRef<Cache>) -> Option<Vec<Role>> {
         Some(
             cache
                 .as_ref()
-                .guild_field(self.guild_id, |g| g.roles.clone())
-                .await?
+                .guild_field(self.guild_id, |g| g.roles.clone())?
                 .into_iter()
                 .map(|(_, v)| v)
                 .filter(|role| self.roles.contains(&role.id))
