@@ -34,12 +34,21 @@ impl ArgumentConvert for Guild {
         _channel_id: Option<ChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
-        let guilds = ctx.cache.guilds.read().await;
+        let guilds = &ctx.cache.guilds;
 
-        let lookup_by_id = || guilds.get(&GuildId(s.parse().ok()?));
+        let lookup_by_id = || guilds.get(&GuildId(s.parse().ok()?)).map(|g| g.clone());
 
-        let lookup_by_name = || guilds.values().find(|guild| guild.name.eq_ignore_ascii_case(s));
+        let lookup_by_name = || {
+            guilds.iter().find_map(|m| {
+                let guild = m.value();
+                if guild.name.eq_ignore_ascii_case(s) {
+                    Some(guild.clone())
+                } else {
+                    None
+                }
+            })
+        };
 
-        lookup_by_id().or_else(lookup_by_name).cloned().ok_or(GuildParseError::NotFoundOrMalformed)
+        lookup_by_id().or_else(lookup_by_name).ok_or(GuildParseError::NotFoundOrMalformed)
     }
 }

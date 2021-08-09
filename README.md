@@ -90,7 +90,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 }
 ```
 
-### Full Examples
+## Full Examples
 
 Full examples, detailing and explaining usage of the basic functionality of the
 library, can be found in the [`examples`] directory.
@@ -201,7 +201,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 
 # Projects extending Serenity
 
-- [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
+- [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink] and [Andesite][repo:andesite], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 - [Songbird][project:songbird]: An async Rust library for the Discord voice API.
 - [Poise][project:poise]: Experimental command framework, with advanced features like edit tracking, single function slash and prefix commands and flexible argument parsing.
 
@@ -232,6 +232,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [project:songbird]: https://github.com/serenity-rs/songbird
 [project:poise]: https://github.com/kangalioo/poise
 [repo:lavalink]: https://github.com/freyacodes/Lavalink
+[repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
 [rust 1.51.0+ badge]: https://img.shields.io/badge/rust-1.51.0+-93450a.svg?style=flat-square

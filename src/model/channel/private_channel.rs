@@ -366,7 +366,6 @@ impl PrivateChannel {
     /// # let http = Arc::new(Http::default());
     /// # let cache = Cache::default();
     /// # let channel = cache.private_channel(ChannelId(7))
-    /// #    .await
     /// #    .ok_or(ModelError::ItemMissing)?;
     /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
     /// let typing = channel.start_typing(&http)?;
