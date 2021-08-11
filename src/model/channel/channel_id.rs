@@ -14,7 +14,14 @@ use serde_json::json;
 use tokio::{fs::File, io::AsyncReadExt};
 
 #[cfg(feature = "model")]
-use crate::builder::{CreateInvite, CreateMessage, EditChannel, EditMessage, GetMessages};
+use crate::builder::{
+    CreateInvite,
+    CreateMessage,
+    CreateThread,
+    EditChannel,
+    EditMessage,
+    GetMessages,
+};
 use crate::builder::{CreateStageInstance, EditStageInstance};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -1035,6 +1042,49 @@ impl ChannelId {
     /// or if there is no stage instance currently.
     pub async fn delete_stage_instance(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_stage_instance(self.0).await
+    }
+
+    /// Creates a public thread that is connected to a message.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn create_public_thread<F>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+        f: F,
+    ) -> Result<GuildChannel>
+    where
+        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
+    {
+        let mut instance = CreateThread::default();
+        f(&mut instance);
+
+        let map = utils::hashmap_to_json_map(instance.0);
+
+        http.as_ref().create_public_thread(self.0, message_id.into().0, &map).await
+    }
+
+    /// Creates a private thread.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn create_private_thread<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildChannel>
+    where
+        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
+    {
+        let mut instance = CreateThread::default();
+        f(&mut instance);
+
+        let map = utils::hashmap_to_json_map(instance.0);
+
+        http.as_ref().create_private_thread(self.0, &map).await
     }
 
     /// Gets the thread members, if this channel is a thread.
