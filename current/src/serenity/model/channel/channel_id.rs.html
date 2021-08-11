@@ -1299,6 +1299,7 @@
 <span id="1299">1299</span>
 <span id="1300">1300</span>
 <span id="1301">1301</span>
+<span id="1302">1302</span>
 </pre><pre class="rust">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span> <span class="kw">as</span> <span class="ident">FmtWrite</span>;
@@ -1860,8 +1861,9 @@
     <span class="doccomment">/// **Note**: Only available on announcements channels.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
-    <span class="comment">// Returns [`Error::Http`] if the current user lacks permission,</span>
-    <span class="comment">// and if the user is not the author of the message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// and if the user is not the author of the message.</span>
     <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">crosspost</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
