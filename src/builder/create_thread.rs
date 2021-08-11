@@ -27,9 +27,10 @@ impl CreateThread {
 
     /// The thread type, which can be [`ChannelType::PublicThread`] or [`ChannelType::PrivateThread`].
     ///
-    /// **Note**: It defaults to [`ChannelType::PrivateThread`] in order to match the behavior when thread documentation was first published.
-    /// This is a bit of a weird default though, and thus is highly likely to change in the future,
-    /// so it is recommended to always explicitly setting it to avoid any breaking change.
+    /// **Note**: This defaults to [`ChannelType::PrivateThread`] in order to match the behavior
+    /// when thread documentation was first published. This is a bit of a weird default though,
+    /// and thus is highly likely to change in the future, so it is recommended to always
+    /// explicitly setting it to avoid any breaking change.
     ///
     /// [`ChannelType::PublicThread`]: crate::model::channel::ChannelType::PublicThread
     /// [`ChannelType::PrivateThread`]: crate::model::channel::ChannelType::PrivateThread

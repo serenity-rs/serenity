@@ -10,7 +10,14 @@ use futures::stream::StreamExt;
 #[cfg(feature = "model")]
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
-use crate::builder::{CreateInvite, CreateMessage, EditMessage, EditVoiceState, GetMessages};
+use crate::builder::{
+    CreateInvite,
+    CreateMessage,
+    CreateThread,
+    EditMessage,
+    EditVoiceState,
+    GetMessages,
+};
 use crate::builder::{CreateStageInstance, EditStageInstance};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
@@ -1263,6 +1270,39 @@ impl GuildChannel {
         }
 
         self.id.delete_stage_instance(http).await
+    }
+
+    /// Creates a public thread that is connected to a message.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn create_public_thread<F>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+        f: F,
+    ) -> Result<GuildChannel>
+    where
+        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
+    {
+        self.id.create_public_thread(http, message_id, f).await
+    }
+
+    /// Creates a private thread.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn create_private_thread<F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<GuildChannel>
+    where
+        F: FnOnce(&mut CreateThread) -> &mut CreateThread,
+    {
+        self.id.create_private_thread(http, f).await
     }
 }
 
