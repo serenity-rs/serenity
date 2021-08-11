@@ -1080,6 +1080,7 @@ impl ChannelId {
         F: FnOnce(&mut CreateThread) -> &mut CreateThread,
     {
         let mut instance = CreateThread::default();
+        instance.kind(ChannelType::PrivateThread);
         f(&mut instance);
 
         let map = utils::hashmap_to_json_map(instance.0);
