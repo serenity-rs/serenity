@@ -144,6 +144,15 @@ impl DispatchEvent {
             Self::Model(Event::VoiceStateUpdate(ref mut event)) => {
                 update(cache_and_http, event);
             },
+            Self::Model(Event::ThreadCreate(ref mut event)) => {
+                update(cache_and_http, event);
+            },
+            Self::Model(Event::ThreadUpdate(ref mut event)) => {
+                update(cache_and_http, event);
+            },
+            Self::Model(Event::ThreadDelete(ref mut event)) => {
+                update(cache_and_http, event);
+            },
             _ => (),
         }
     }
