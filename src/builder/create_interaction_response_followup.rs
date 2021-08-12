@@ -142,8 +142,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         self
     }
 
-    /// Create components for this message.
-    #[cfg(feature = "unstable_discord_api")]
+    /// Creates components for this message.
     pub fn components<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
@@ -156,9 +155,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     }
 
     /// Sets the components of this message.
-    #[cfg(feature = "unstable_discord_api")]
-    pub fn set_components(&mut self, components: CreateComponents) -> &mut Self
-    {
+    pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
         self.0.insert("components", Value::Array(components.0));
         self
     }
