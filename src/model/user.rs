@@ -50,6 +50,8 @@ pub struct CurrentUser {
     pub name: String,
     pub verified: Option<bool>,
     pub public_flags: Option<UserPublicFlags>,
+    pub banner: Option<String>,
+    pub accent_color: Option<Colour>,
 }
 
 #[cfg(feature = "model")]
@@ -503,6 +505,9 @@ pub struct User {
     pub name: String,
     /// the public flags on a user's account
     pub public_flags: Option<UserPublicFlags>,
+    /// Optional banner hash.
+    pub banner: Option<String>,
+    pub accent_color: Option<Colour>,
 }
 
 /// User's public flags
@@ -578,6 +583,8 @@ impl Default for User {
             discriminator: 1432,
             name: "test".to_string(),
             public_flags: None,
+            banner: None,
+            accent_color: None,
         }
     }
 }
@@ -609,6 +616,14 @@ impl User {
     #[inline]
     pub fn avatar_url(&self) -> Option<String> {
         avatar_url(self.id, self.avatar.as_ref())
+    }
+
+    /// Returns the formatted URL of the user's banner, if one exists.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the user has a GIF banner.
+    #[inline]
+    pub fn banner_url(&self) -> Option<String> {
+        banner_url(self.id, self.banner.as_ref())
     }
 
     /// Creates a direct message channel between the [current user] and the
@@ -1044,6 +1059,8 @@ impl From<CurrentUser> for User {
             id: user.id,
             name: user.name,
             public_flags: user.public_flags,
+            banner: user.banner,
+            accent_color: user.accent_color,
         }
     }
 }
@@ -1057,6 +1074,8 @@ impl<'a> From<&'a CurrentUser> for User {
             id: user.id,
             name: user.name.clone(),
             public_flags: user.public_flags,
+            banner: user.banner.clone(),
+            accent_color: user.accent_color,
         }
     }
 }
@@ -1120,6 +1139,15 @@ fn default_avatar_url(discriminator: u16) -> String {
 #[cfg(feature = "model")]
 fn static_avatar_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
     hash.map(|hash| cdn!("/avatars/{}/{}.webp?size=1024", user_id, hash))
+}
+
+#[cfg(feature = "model")]
+fn banner_url(user_id: UserId, hash: Option<&String>) -> Option<String> {
+    hash.map(|hash| {
+        let ext = if hash.starts_with("a_") { "gif" } else { "webp" };
+
+        cdn!("/banners/{}/{}.{}?size=1024", user_id.0, hash, ext)
+    })
 }
 
 #[cfg(feature = "model")]
