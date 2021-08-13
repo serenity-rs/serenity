@@ -539,6 +539,8 @@ mod test {
                     discriminator: 1,
                     name: "ab".to_string(),
                     public_flags: None,
+                    banner: None,
+                    accent_color: None,
                 },
             }
         }

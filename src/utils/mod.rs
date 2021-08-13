@@ -856,6 +856,8 @@ mod test {
             discriminator: 0000,
             name: "Crab".to_string(),
             public_flags: None,
+            banner: None,
+            accent_color: None,
         };
 
         #[allow(deprecated)]
