@@ -52,7 +52,7 @@ Thanks to the following for their contributions:
 - [misc] Move workspace up to repo root, instead of under examples ([@sbrocket]) [c:46ace1f]
 - [model] Clarify slash commands implementation ([@HarmoGlace]) [c:ae09e57]
 - [builder] Improve implementations of embed methods on `Message` builders ([@kangalioo]) [c:0be7d1a]
-- [model] Guarantee the` Interaction::user` field ([@HarmoGlace]) [c:9d18334]
+- [model] Guarantee the `Interaction::user` field ([@HarmoGlace]) [c:9d18334]
 
 ### Fixed
 
