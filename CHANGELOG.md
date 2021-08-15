@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.10.9] - 2021-08-15
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@adumbidiot]
+- [@Dinnerbone]
+- [@drklee3]
+- [@HarmoGlace]
+- [@kangalioo]
+- [@KangarooCoder]
+- [@kotx]
+- [@MelonShooter]
+- [@rasm47]
+- [@sbrocket]
+- [@Splingush]
+- [@squili]
+- [@vicky5124]
+
+### Added
+
+- [model] Add model methods for creating public and private threads ([@acdenisSK]) [c:dbf4d68]
+- [client/cache] Add support for defining cache settings in the `Client` builder. ([@Splingush]) [c:ea8ec29]
+- [builder] Add 'number' type to `ApplicationCommandOption` ([@Splingush]) [c:312ae16]
+- [collector] Add a generic collector for events ([@sbrocket]) [c:3117f1d]
+- [model] Mention the type of event that failed to deserialise ([@acdenisSK]) [c:1d446fe]
+- [model] Add methods to `Event` to get related user, guild, channel, and message IDs ([@sbrocket]) [c:0aa1a6c]
+- [model] Derive `PartialEq`, `Eq`, `PartialOrd`, `Ord`, and `Hash` for `UserPublicFlags` ([@KangarooCoder]) [c:e7ba5bf]
+- [cache] Add method `Cache::channel_messages_field` ([@kangalioo]) [c:ca02662]
+- [http/builder/model] Add support for generation of invite links with custom OAuth2 scopes ([@vicky5124]) [c:50cd285]
+- [model] Switch to API v9 and add support for threads ([@HarmoGlace]) [c:4c53b48]
+- [model] Add field `Guild::stage_instances` ([@HarmoGlace]) [c:13cf056]
+- [model] Support stage instances ([@HarmoGlace]) [c:3e6d131]
+- [model] Add support for guild search members endpoint ([@drklee3]) [c:09b523d]
+- [model] Add avatar field to member update event ([@drklee3]) [c:4f488f8]
+- [http] Add support for fetching the current user's connections ([@Dinnerbone]) [c:6a400f9]
+- [http] Allow passing bearer tokens to `Http::new_with_token` ([@squili]) [c:537753b]
+- [model] Add support for per guild avatars ([@drklee3]) [c:eb09d13]
+- [builder] Support sending multiple embeds in a message ([@drklee3]) [c:e215c9d]
+- [model] Add support to (Partial)Guild::nsfw_level ([@HarmoGlace]) [c:59ab451]
+
+### Changed
+
+- [utils] Redesign the `Parse` trait and add support for most applicable model types ([@kangalioo]) [c:eb14984]
+- [http] Include Discord's error explanations in `http::Error`'s `Display` implementation  ([@kangalioo]) [c:ce97f9e]
+- [model] Separate interaction stuctures per kind ([@HarmoGlace]) [c:2b2006c]
+- [misc] Move workspace up to repo root, instead of under examples ([@sbrocket]) [c:46ace1f]
+- [model] Clarify slash commands implementation ([@HarmoGlace]) [c:ae09e57]
+- [builder] Improve implementations of embed methods on `Message` builders ([@kangalioo]) [c:0be7d1a]
+- [model] Guarantee the` Interaction::user` field ([@HarmoGlace]) [c:9d18334]
+
+### Fixed
+
+- [model] Make `GuildChannel::send_message` work in threads ([@kangalioo]) [c:fb203ae]
+- [model] Fix broken `GuildChannel` collector functionality ([@kotx]) [c:413e3ef]
+- [model] Handle flags in `MessageUpdateEvent` ([@sbrocket]) [c:6192107]
+- [builder] Clear the flag when passing `false` to `EditMessage::suppress_embeds` ([@sbrocket]) [c:47b9afb]
+- [builder] Fix `cliend_id` typo ([@vicky5124]) [c:5cb9cb9]
+- [misc] Apply automatic clippy fixes ([@sbrocket]) [c:988bfcf]
+- [model] Default certain select menu fields that might not be always present ([@HarmoGlace]) [c:87564a4]
+- [collector] Lazily clone structs only when collector filters are actually matched ([@sbrocket]) [c:695bbef]
+- [misc] Replace unnecessary guild cloning with cheaper alternatives ([@MelonShooter]) [c:fb83066]
+- [misc] Fix and/or remove broken links in documentation comments ([@rasm47]) [c:504f5a4]
+- [model] Skip serializating `Interaction`'s `Option` fields if they are `None` ([@sbrocket]) [c:c21f052]
+- [collector] Remove collectors that have closed receivers ([@drklee3]) [c:d3cf53a]
+- [model] Update all cached guild fields on guild update ([@drklee3]) [c:7a7e8cc]
+- [client/http] Fix validation error in the last step of `parse_token` ([@adumbidiot]) [c:3fba372]
+- [builder] Fix `CreateSelectMenuOption`'s `description` method ([@HarmoGlace]) [c:cb30408]
+- [builder] Re-export forgotten builder types for select menus ([@acdenisSK]) [c:5d50c56]
+
 ## [0.10.8] - 2021-06-12
 
 Thanks to the following for their contributions:
@@ -4223,6 +4293,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.10.9]: https://github.com/serenity-rs/serenity/compare/v0.10.8...v0.10.9
 [0.10.8]: https://github.com/serenity-rs/serenity/compare/v0.10.7...v0.10.8
 [0.10.7]: https://github.com/serenity-rs/serenity/compare/v0.10.6...v0.10.7
 [0.10.6]: https://github.com/serenity-rs/serenity/compare/v0.10.5...v0.10.6
@@ -4315,6 +4386,7 @@ Initial commit.
 [@AriusX7]: https://github.com/AriusX7
 [@abalabahaha]: https://github.com/abalabahaha
 [@acdenisSK]: https://github.com/acdenisSK
+[@adumbidiot]: https://github.com/adumbidiot
 [@andreasots]: https://github.com/andreasots
 [@aria-7553]: https://github.com/aria-7553
 [@asherkin]: https://github.com/asherkin
@@ -4339,6 +4411,7 @@ Initial commit.
 [@Deebster]: https://github.com/Deebster
 [@DeltaEvo]: https://github.com/DeltaEvo
 [@DimiDimit]: https://github.com/DimiDimit
+[@Dinnerbone]: https://github.com/Dinnerbone
 [@DoumanAsh]: https://github.com/DoumanAsh
 [@DrBluefall]: https://github.com/DrBluefall
 [@dapper-gh]: https://github.com/dapper-gh
@@ -4379,8 +4452,10 @@ Initial commit.
 [@johnchildren]: https://github.com/johnchildren
 [@KamranMackey]: https://github.com/KamranMackey
 [@kangalioo]: https://github.com/kangalioo
+[@KangarooCoder]: https://github.com/KangarooCoder
 [@khazhyk]: https://github.com/khazhyk
 [@Kroisse]: https://github.com/Kroisse
+[@kotx]: https://github.com/kotx
 [@ks129]: https://github.com/ks129
 [@kyranet]: https://github.com/kyranet
 [@Lakelezz]: https://github.com/Lakelezz
@@ -4395,6 +4470,7 @@ Initial commit.
 [@lolzballs]: https://github.com/lolzballs
 [@Max2408]: https://github.com/Max2408
 [@MaxOhn]: https://github.com/MaxOhn
+[@MelonShooter]: https://github.com/MelonShooter
 [@Mendess2526]: https://github.com/Mendess2526
 [@Mishio595]: https://github.com/Mishio595
 [@MonliH]: https://github.com/MonliH
@@ -4424,6 +4500,7 @@ Initial commit.
 [@perryprog]: https://github.com/perryprog
 [@PvdBerg1998]: https://github.com/PvdBerg1998
 [@Roughsketch]: https://github.com/Roughsketch
+[@rasm47]: https://github.com/rasm47
 [@rsaihe]: https://github.com/rsaihe
 [@Qeenon]: https://github.com/Qeenon
 [@qm3ster]: https://github.com/qm3ster
@@ -4432,13 +4509,16 @@ Initial commit.
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@Scetch]: https://github.com/Scetch
 [@SinsofSloth]: https://github.com/SinsofSloth
+[@Splingush]: https://github.com/Splingush
 [@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
 [@SunDwarf]: https://github.com/SunDwarf
 [@s0lst1ce]: https://github.com/s0lst1ce
 [@sam-kirby]: https://github.com/sam-kirby
+[@sbrocket]: https://github.com/sbrocket
 [@shnarazk]: https://github.com/shnarazk
 [@sschroe]: https://github.com/sschroe
 [@sudomann]: https://github.com/sudomann
+[@squili]: https://github.com/squili
 [@tahahawa]: https://github.com/tahahawa
 [@TehPers]: https://github.com/TehPers
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
@@ -4469,6 +4549,49 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:dbf4d68]: https://github.com/serenity-rs/serenity/commit/dbf4d685a94f6b7f6f4a2f7f21e12c4e1425c231
+[c:ea8ec29]: https://github.com/serenity-rs/serenity/commit/ea8ec292711eefe285eab9ad47322c7d96ff43f1
+[c:312ae16]: https://github.com/serenity-rs/serenity/commit/312ae16b9bd9ab5b92e0bcfae6730315cc5116aa
+[c:3117f1d]: https://github.com/serenity-rs/serenity/commit/3117f1da55436cd972ef0928d905e34e77692f13
+[c:1d446fe]: https://github.com/serenity-rs/serenity/commit/1d446fe825ce5453b47ce31686e25a882b637c2d
+[c:0aa1a6c]: https://github.com/serenity-rs/serenity/commit/0aa1a6c232728cb216e7013f2aafe3ed73326a24
+[c:e7ba5bf]: https://github.com/serenity-rs/serenity/commit/e7ba5bf211d20ff3b37613973e9553c5682b0894
+[c:ca02662]: https://github.com/serenity-rs/serenity/commit/ca026624d07a5913c5b68a05030e187aa2672299
+[c:50cd285]: https://github.com/serenity-rs/serenity/commit/50cd28595b007c3501771ae32b6c6f25c08cb834
+[c:4c53b48]: https://github.com/serenity-rs/serenity/commit/4c53b48534010c65810da2932d71d889b8bab0b2
+[c:13cf056]: https://github.com/serenity-rs/serenity/commit/13cf056a4e9e1b8d4557aaa79dc48a0ed7cfdf2c
+[c:3e6d131]: https://github.com/serenity-rs/serenity/commit/3e6d131f1bac92abf367917f487605976e0b22bf
+[c:09b523d]: https://github.com/serenity-rs/serenity/commit/09b523d218d62059016013da20a15db8f0b0585b
+[c:4f488f8]: https://github.com/serenity-rs/serenity/commit/4f488f86ff38b59a9f38cc8b22711a081260add3
+[c:6a400f9]: https://github.com/serenity-rs/serenity/commit/6a400f96721d44b18828ef56025ae3388874f1d6
+[c:537753b]: https://github.com/serenity-rs/serenity/commit/537753bbcf2a96a148a0d4f5975967bd3bd4c8c2
+[c:eb09d13]: https://github.com/serenity-rs/serenity/commit/eb09d13a371b8c3bcc6287c1162a958c0806c014
+[c:e215c9d]: https://github.com/serenity-rs/serenity/commit/e215c9d331681010f98f34242375ba2224328748
+[c:59ab451]: https://github.com/serenity-rs/serenity/commit/59ab451f282fa936162cd1c7528a35ca5b6ae659
+[c:eb14984]: https://github.com/serenity-rs/serenity/commit/eb14984ad02f1e2cdca4251a957e3e6f59d13358
+[c:ce97f9e]: https://github.com/serenity-rs/serenity/commit/ce97f9e72fa81c9c7aa5969051619b28bd8e755b
+[c:2b2006c]: https://github.com/serenity-rs/serenity/commit/2b2006c73e6143dd91901e938c6e6a2bb4fe8d2d
+[c:46ace1f]: https://github.com/serenity-rs/serenity/commit/46ace1f7dcaca9c993dacc8e920f65728e3e191b
+[c:ae09e57]: https://github.com/serenity-rs/serenity/commit/ae09e5704b609807de1fccb723c3d90b591a7e93
+[c:0be7d1a]: https://github.com/serenity-rs/serenity/commit/0be7d1a9dab2decf411297ba5621d79b30213bd4
+[c:9d18334]: https://github.com/serenity-rs/serenity/commit/9d18334020daff68cd14470b5b496b50b8ca10ac
+[c:fb203ae]: https://github.com/serenity-rs/serenity/commit/fb203ae3e71c898aaef9a4805b489fbfbcecbc05
+[c:413e3ef]: https://github.com/serenity-rs/serenity/commit/413e3eff769c773e9f000d91a1ad9d502232ba40
+[c:6192107]: https://github.com/serenity-rs/serenity/commit/6192107f0b03e5bad5b9d9166fa74e5c782621d4
+[c:47b9afb]: https://github.com/serenity-rs/serenity/commit/47b9afb6ac827a699e9af1d7411b78087d5c47cb
+[c:5cb9cb9]: https://github.com/serenity-rs/serenity/commit/5cb9cb917fc5b75aa74b33f8416a10b2ad21c0f8
+[c:988bfcf]: https://github.com/serenity-rs/serenity/commit/988bfcfadaf3478c3ef478da049598e9c24b26f0
+[c:87564a4]: https://github.com/serenity-rs/serenity/commit/87564a4ddbe6b1fc826c9b52b4e03679cca642fe
+[c:695bbef]: https://github.com/serenity-rs/serenity/commit/695bbef18e06696b9b9d1f46225099e94001b6c8
+[c:fb83066]: https://github.com/serenity-rs/serenity/commit/fb83066eb765a62613780fd831d6672eed7a152d
+[c:504f5a4]: https://github.com/serenity-rs/serenity/commit/504f5a4410cd3bc4ea396d5d6eec2bfef2f7fa53
+[c:c21f052]: https://github.com/serenity-rs/serenity/commit/c21f0525d42b5bc6ff2b96599aea2f1ff7e3c8a6
+[c:d3cf53a]: https://github.com/serenity-rs/serenity/commit/d3cf53a7e026f872f693de055a66760cff4d54d0
+[c:7a7e8cc]: https://github.com/serenity-rs/serenity/commit/7a7e8cce663b004b289077e628bca10ddf4e6d52
+[c:3fba372]: https://github.com/serenity-rs/serenity/commit/3fba3726b2726c83c0e2a8a4e9862a214e7751da
+[c:cb30408]: https://github.com/serenity-rs/serenity/commit/cb304082cbe7340958062def52c8426343e8a072
+[c:5d50c56]: https://github.com/serenity-rs/serenity/commit/5d50c560dc8dcf2833b9453b2a72697eb4f57e64
 
 [c:1c7e98b]: https://github.com/serenity-rs/serenity/commit/1c7e98b70d8eedc94ce731276ec76d3ef7505588
 [c:5c9c194]: https://github.com/serenity-rs/serenity/commit/5c9c194c82bef5fda93143c12e30173737a12429
