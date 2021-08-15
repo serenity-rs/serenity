@@ -454,12 +454,10 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
 
         let target = match target_id {
             Some(id) => {
-                let message_id = id.to_message_id();
-
-                if resolved.messages.contains_key(&message_id) {
+                if kind == ApplicationCommandType::Message {
                     let resolved = resolved
                         .messages
-                        .get(&message_id)
+                        .get(&id.to_message_id())
                         .expect("expected message object")
                         .to_owned();
 
