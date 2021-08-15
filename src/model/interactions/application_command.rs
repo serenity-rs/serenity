@@ -377,6 +377,9 @@ pub struct ApplicationCommandInteractionData {
     pub id: CommandId,
     /// The name of the invoked command.
     pub name: String,
+    /// The application command type of the triggered application command.
+    #[serde(rename = "type")]
+    pub kind: ApplicationCommandType,
     /// The parameters and the given values.
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
@@ -433,7 +436,13 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             false => vec![],
         };
 
-        let target_id = match map.contains_key("target_id") {
+        let kind = map
+            .remove("type")
+            .ok_or_else(|| DeError::custom("expected type"))
+            .and_then(ApplicationCommandType::deserialize)
+            .map_err(DeError::custom)?;
+
+        let target_id = match kind != ApplicationCommandType::ChatInput {
             true => Some(
                 map.remove("target_id")
                     .ok_or_else(|| DeError::custom("expected resolved"))
@@ -470,6 +479,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
         Ok(Self {
             name,
             id,
+            kind,
             options,
             resolved,
             target_id,
