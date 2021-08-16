@@ -1104,8 +1104,8 @@ enum_number!(MessageType {
     InlineReply,
     ApplicationCommand,
     ThreadStarterMessage,
+    GuildInviteReminder,
     ContextMenuCommand,
-    GuildInviteReminder
 });
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
