@@ -1104,6 +1104,7 @@ enum_number!(MessageType {
     InlineReply,
     ApplicationCommand,
     ThreadStarterMessage,
+    ContextMenuCommand,
     GuildInviteReminder
 });
 
