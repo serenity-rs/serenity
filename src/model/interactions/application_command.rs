@@ -554,7 +554,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
 
         let messages = match map.contains_key("messages") {
             true => map
-                .remove("channels")
+                .remove("messages")
                 .ok_or_else(|| DeError::custom("expected messages"))
                 .and_then(deserialize_messages_map)
                 .map_err(DeError::custom)?,
