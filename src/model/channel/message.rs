@@ -1092,7 +1092,7 @@ pub enum MessageType {
     /// A message reply.
     InlineReply = 19,
     /// A slash command.
-    SlashCommand = 20,
+    ChatInputCommand = 20,
     /// A thread start message.
     ThreadStarterMessage = 21,
     /// Server setup tips.
@@ -1123,7 +1123,7 @@ enum_number!(MessageType {
     GuildDiscoveryGracePeriodFinalWarning
     ThreadCreated,
     InlineReply,
-    SlashCommand,
+    ChatInputCommand,
     ThreadStarterMessage,
     GuildInviteReminder,
     ContextMenuCommand,
