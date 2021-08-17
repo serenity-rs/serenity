@@ -1070,7 +1070,7 @@ pub enum MessageType {
     /// A message reply.
     InlineReply = 19,
     /// A slash command.
-    // TODO: Rename to slash command in next
+    // TODO: Rename to chat input command in next
     ApplicationCommand = 20,
     /// A thread start message.
     ThreadStarterMessage = 21,
