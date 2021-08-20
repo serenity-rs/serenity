@@ -1,11 +1,11 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The Client is the way to be able to start sending authenticated requests over the REST API, as well as initializing a WebSocket connection through `Shard`s. Refer to the documentation on using sharding for more information."><meta name="keywords" content="rust, rustlang, rust-lang, Client"><title>Client in serenity::client - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc struct"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><h2 class="location">Struct Client</h2><div class="sidebar-elems"><div class="block items"><h3 class="sidebar-title"><a href="#fields">Fields</a></h3><div class="sidebar-links"><a href="#structfield.cache_and_http">cache_and_http</a><a href="#structfield.data">data</a><a href="#structfield.shard_manager">shard_manager</a><a href="#structfield.voice_manager">voice_manager</a><a href="#structfield.ws_uri">ws_uri</a></div><h3 class="sidebar-title"><a href="#implementations">Methods</a></h3><div class="sidebar-links"><a href="#method.builder">builder</a><a href="#method.start">start</a><a href="#method.start_autosharded">start_autosharded</a><a href="#method.start_shard">start_shard</a><a href="#method.start_shard_range">start_shard_range</a><a href="#method.start_shards">start_shards</a></div><h3 class="sidebar-title"><a href="#synthetic-implementations">Auto Trait Implementations</a></h3><div class="sidebar-links"><a href="#impl-RefUnwindSafe">!RefUnwindSafe</a><a href="#impl-Send">Send</a><a href="#impl-Sync">Sync</a><a href="#impl-Unpin">Unpin</a><a href="#impl-UnwindSafe">!UnwindSafe</a></div><h3 class="sidebar-title"><a href="#blanket-implementations">Blanket Implementations</a></h3><div class="sidebar-links"><a href="#impl-Any">Any</a><a href="#impl-Borrow%3CT%3E">Borrow&lt;T&gt;</a><a href="#impl-BorrowMut%3CT%3E">BorrowMut&lt;T&gt;</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Instrument">Instrument</a><a href="#impl-Into%3CU%3E">Into&lt;U&gt;</a><a href="#impl-Same%3CT%3E">Same&lt;T&gt;</a><a href="#impl-TryFrom%3CU%3E">TryFrom&lt;U&gt;</a><a href="#impl-TryInto%3CU%3E">TryInto&lt;U&gt;</a><a href="#impl-VZip%3CV%3E">VZip&lt;V&gt;</a></div></div><h2 class="location">Other items in<br><a href="../index.html">serenity</a>::<wbr><a href="index.html">client</a></h2><div id="sidebar-vars" data-name="Client" data-ty="struct" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Struct <a href="../index.html">serenity</a>::<wbr><a href="index.html">client</a>::<wbr><a class="struct" href="#">Client</a><button id="copy-path" onclick="copy_path(this)" title="copy path"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item import" title="Copy item import to clipboard"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/serenity/client/mod.rs.html#463-644" title="goto source code">[src]</a></span></h1><div class="docblock type-decl"><pre class="rust struct">pub struct Client {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The Client is the way to be able to start sending authenticated requests over the REST API, as well as initializing a WebSocket connection through `Shard`s. Refer to the documentation on using sharding for more information."><meta name="keywords" content="rust, rustlang, rust-lang, Client"><title>Client in serenity::client - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc struct"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><h2 class="location">Struct Client</h2><div class="sidebar-elems"><div class="block items"><h3 class="sidebar-title"><a href="#fields">Fields</a></h3><div class="sidebar-links"><a href="#structfield.cache_and_http">cache_and_http</a><a href="#structfield.data">data</a><a href="#structfield.shard_manager">shard_manager</a><a href="#structfield.voice_manager">voice_manager</a><a href="#structfield.ws_uri">ws_uri</a></div><h3 class="sidebar-title"><a href="#implementations">Methods</a></h3><div class="sidebar-links"><a href="#method.builder">builder</a><a href="#method.start">start</a><a href="#method.start_autosharded">start_autosharded</a><a href="#method.start_shard">start_shard</a><a href="#method.start_shard_range">start_shard_range</a><a href="#method.start_shards">start_shards</a></div><h3 class="sidebar-title"><a href="#synthetic-implementations">Auto Trait Implementations</a></h3><div class="sidebar-links"><a href="#impl-RefUnwindSafe">!RefUnwindSafe</a><a href="#impl-Send">Send</a><a href="#impl-Sync">Sync</a><a href="#impl-Unpin">Unpin</a><a href="#impl-UnwindSafe">!UnwindSafe</a></div><h3 class="sidebar-title"><a href="#blanket-implementations">Blanket Implementations</a></h3><div class="sidebar-links"><a href="#impl-Any">Any</a><a href="#impl-Borrow%3CT%3E">Borrow&lt;T&gt;</a><a href="#impl-BorrowMut%3CT%3E">BorrowMut&lt;T&gt;</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Instrument">Instrument</a><a href="#impl-Into%3CU%3E">Into&lt;U&gt;</a><a href="#impl-Same%3CT%3E">Same&lt;T&gt;</a><a href="#impl-TryFrom%3CU%3E">TryFrom&lt;U&gt;</a><a href="#impl-TryInto%3CU%3E">TryInto&lt;U&gt;</a><a href="#impl-VZip%3CV%3E">VZip&lt;V&gt;</a></div></div><h2 class="location">Other items in<br><a href="../index.html">serenity</a>::<wbr><a href="index.html">client</a></h2><div id="sidebar-vars" data-name="Client" data-ty="struct" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Struct <a href="../index.html">serenity</a>::<wbr><a href="index.html">client</a>::<wbr><a class="struct" href="#">Client</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/serenity/client/mod.rs.html#463-644" title="goto source code">[src]</a></span></h1><div class="docblock type-decl"><pre class="rust struct"><code>pub struct Client {
     pub data: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../prelude/struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;<a class="struct" href="../prelude/struct.TypeMap.html" title="struct serenity::prelude::TypeMap">TypeMap</a>&gt;&gt;,
     pub shard_manager: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../prelude/struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;<a class="struct" href="bridge/gateway/struct.ShardManager.html" title="struct serenity::client::bridge::gateway::ShardManager">ShardManager</a>&gt;&gt;,
     pub voice_manager: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;dyn <a class="trait" href="bridge/voice/trait.VoiceGatewayManager.html" title="trait serenity::client::bridge::voice::VoiceGatewayManager">VoiceGatewayManager</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + 'static&gt;&gt;,
     pub ws_uri: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../prelude/struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;&gt;,
     pub cache_and_http: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../struct.CacheAndHttp.html" title="struct serenity::CacheAndHttp">CacheAndHttp</a>&gt;,
     // some fields omitted
-}</pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The Client is the way to be able to start sending authenticated requests
+}</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The Client is the way to be able to start sending authenticated requests
 over the REST API, as well as initializing a WebSocket connection through
 <a href="../gateway/struct.Shard.html"><code>Shard</code></a>s. Refer to the <a href="../gateway/index.html#sharding">documentation on using sharding</a>
 for more information.</p>
@@ -19,8 +19,7 @@ internally and then dispatched to your event handlers.</p>
 <p>Creating a Client instance and adding a handler on every message
 receive, acting as a “ping-pong” bot is simple:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity::model::prelude</span>::<span class="kw-2">*</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serenity::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serenity::Client</span>;
 
@@ -37,7 +36,7 @@ receive, acting as a “ping-pong” bot is simple:</p>
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::builder</span>(<span class="string">&quot;my token here&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-<span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
+<span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><h2 id="fields" class="fields small-section-header">Fields<a href="#fields" class="anchor"></a></h2><span id="structfield.data" class="structfield small-section-header"><a href="#structfield.data" class="anchor field"></a><code>data: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../prelude/struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;<a class="struct" href="../prelude/struct.TypeMap.html" title="struct serenity::prelude::TypeMap">TypeMap</a>&gt;&gt;</code></span><div class="docblock"><p>A TypeMap which requires types to be Send + Sync. This is a map that
 can be safely shared across contexts.</p>
 <p>The purpose of the data field is to be accessible and persistent across
@@ -56,8 +55,7 @@ database connections, custom user caches, etc.</p>
 <li><a href="../model/event/enum.Event.html#variant.MessageUpdate"><code>Event::MessageUpdate</code></a></li>
 </ul>
 
-<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
-<span class="kw">use</span> <span class="ident">serenity::prelude</span>::<span class="kw-2">*</span>;
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="kw">use</span> <span class="ident">serenity::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serenity::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::env</span>;
@@ -107,7 +105,7 @@ database connections, custom user caches, etc.</p>
     <span class="ident">data</span>.<span class="ident">insert</span>::<span class="op">&lt;</span><span class="ident">MessageEventCounter</span><span class="op">&gt;</span>(<span class="ident">HashMap::default</span>());
 }
 
-<span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
+<span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 <p>Refer to <a href="https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework">example 05</a> for an example on using the <a href="struct.Client.html#structfield.data" title="Self::data"><code>Self::data</code></a> field.</p>
 </div><span id="structfield.shard_manager" class="structfield small-section-header"><a href="#structfield.shard_manager" class="anchor field"></a><code>shard_manager: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../prelude/struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;<a class="struct" href="bridge/gateway/struct.ShardManager.html" title="struct serenity::client::bridge::gateway::ShardManager">ShardManager</a>&gt;&gt;</code></span><div class="docblock"><p>A HashMap of all shards instantiated by the Client.</p>
 <p>The key is the shard ID and the value is the shard itself.</p>
@@ -121,8 +119,7 @@ client.</p>
 <p>Printing the number of shards currently instantiated by the client every
 5 seconds:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">struct</span> <span class="ident">Handler</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">struct</span> <span class="ident">Handler</span>;
 
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> { }
 
@@ -139,11 +136,10 @@ client.</p>
 
         <span class="ident">tokio::time::sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">5000</span>)).<span class="kw">await</span>;
     }
-});</pre></div>
+});</code></pre></div>
 <p>Shutting down all connections after one minute of operation:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity::client</span>::{<span class="ident">Client</span>, <span class="ident">EventHandler</span>};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::client</span>::{<span class="ident">Client</span>, <span class="ident">EventHandler</span>};
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
@@ -166,7 +162,7 @@ client.</p>
     <span class="macro">println!</span>(<span class="string">&quot;Shutdown shard manager!&quot;</span>);
 });
 
-<span class="macro">println!</span>(<span class="string">&quot;Client shutdown: {:?}&quot;</span>, <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span>);</pre></div>
+<span class="macro">println!</span>(<span class="string">&quot;Client shutdown: {:?}&quot;</span>, <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span>);</code></pre></div>
 </div><span id="structfield.voice_manager" class="structfield small-section-header"><a href="#structfield.voice_manager" class="anchor field"></a><code>voice_manager: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;dyn <a class="trait" href="bridge/voice/trait.VoiceGatewayManager.html" title="trait serenity::client::bridge::voice::VoiceGatewayManager">VoiceGatewayManager</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + 'static&gt;&gt;</code></span><div class="docblock"><p>The voice manager for the client.</p>
 <p>This is an ergonomic structure for interfacing over shards’ voice
 connections.</p>
@@ -188,8 +184,7 @@ on effectively using sharding.</p>
 <h1 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h1>
 <p>Starting a Client with only 1 shard, out of 1 total:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity::Client</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
@@ -200,7 +195,7 @@ on effectively using sharding.</p>
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.start_autosharded" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/client/mod.rs.html#735" title="goto source code">[src]</a></div><a href="#method.start_autosharded" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.start_autosharded" class="fnname">start_autosharded</a>(&amp;mut self) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></div></summary><div class="docblock"><p>Establish the connection(s) and start listening for events.</p>
 <p>This will start receiving events in a loop and start dispatching the
 events to your registered handlers.</p>
@@ -212,8 +207,7 @@ on effectively using sharding.</p>
 <h1 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h1>
 <p>Start as many shards as needed using autosharding:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity::Client</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
@@ -224,7 +218,7 @@ on effectively using sharding.</p>
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_autosharded</span>().<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
-}</pre></div>
+}</code></pre></div>
 <h1 id="errors" class="section-header"><a href="#errors">Errors</a></h1>
 <p>Returns a <a href="../prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
 an error.</p>
@@ -239,8 +233,7 @@ on effectively using sharding.</p>
 <h1 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h1>
 <p>Start shard 3 of 5:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity::Client</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
@@ -251,12 +244,11 @@ on effectively using sharding.</p>
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shard</span>(<span class="number">3</span>, <span class="number">5</span>).<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
-}</pre></div>
+}</code></pre></div>
 <p>Start shard 0 of 1 (you may also be interested in <a href="struct.Client.html#method.start" title="Self::start"><code>Self::start</code></a> or
 <a href="struct.Client.html#method.start_autosharded" title="Self::start_autosharded"><code>Self::start_autosharded</code></a>):</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity::Client</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
@@ -267,7 +259,7 @@ on effectively using sharding.</p>
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shard</span>(<span class="number">0</span>, <span class="number">1</span>).<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
-}</pre></div>
+}</code></pre></div>
 <h1 id="errors-1" class="section-header"><a href="#errors-1">Errors</a></h1>
 <p>Returns a <a href="../prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
 an error.</p>
@@ -282,8 +274,7 @@ on effectively using sharding.</p>
 <h1 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h1>
 <p>Start all of 8 shards:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity::Client</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
@@ -294,7 +285,7 @@ on effectively using sharding.</p>
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shards</span>(<span class="number">8</span>).<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
-}</pre></div>
+}</code></pre></div>
 <h1 id="errors-2" class="section-header"><a href="#errors-2">Errors</a></h1>
 <p>Returns a <a href="../prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
 an error.</p>
@@ -310,8 +301,7 @@ information on effectively using sharding.</p>
 <h1 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h1>
 <p>For a bot using a total of 10 shards, initialize shards 4 through 7:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">serenity::Client</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
 
 <span class="kw">struct</span> <span class="ident">Handler</span>;
 
@@ -322,7 +312,7 @@ information on effectively using sharding.</p>
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shard_range</span>([<span class="number">4</span>, <span class="number">7</span>], <span class="number">10</span>).<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
-}</pre></div>
+}</code></pre></div>
 <h1 id="errors-3" class="section-header"><a href="#errors-3">Errors</a></h1>
 <p>Returns a <a href="../prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
 an error.</p>
