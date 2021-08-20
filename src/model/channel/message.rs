@@ -1087,8 +1087,7 @@ pub enum MessageType {
     /// A message reply.
     InlineReply = 19,
     /// A slash command.
-    // TODO: Rename to chat input command in next
-    ApplicationCommand = 20,
+    ChatInputCommand = 20,
     /// A thread start message.
     ThreadStarterMessage = 21,
     /// Server setup tips.
@@ -1119,7 +1118,7 @@ enum_number!(MessageType {
     GuildDiscoveryGracePeriodFinalWarning
     ThreadCreated,
     InlineReply,
-    ApplicationCommand,
+    ChatInputCommand,
     ThreadStarterMessage,
     GuildInviteReminder,
     ContextMenuCommand,
