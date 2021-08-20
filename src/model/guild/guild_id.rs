@@ -1343,6 +1343,16 @@ impl GuildId {
     pub fn widget_image_url(&self, style: GuildWidgetStyle) -> String {
         format!(api!("/guilds/{}/widget.png?style={}"), self.0.to_string(), style.to_string())
     }
+
+    /// Gets the guild active threads.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if there is an error in the deserialization, or
+    /// if the bot issuing the request is not in the guild.
+    pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
+        http.as_ref().get_guild_active_threads(self.0).await
+    }
 }
 
 impl From<PartialGuild> for GuildId {

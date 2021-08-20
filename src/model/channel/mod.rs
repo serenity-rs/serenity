@@ -483,6 +483,7 @@ pub struct ThreadsData {
     /// A thread member for each returned thread the current user has joined.
     pub members: Vec<ThreadMember>,
     /// Whether there are potentially additional threads that could be returned on a subsequent call.
+    #[serde(default)]
     pub has_more: bool,
 }
 
