@@ -612,81 +612,6 @@
 <span id="612">612</span>
 <span id="613">613</span>
 <span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-<span id="644">644</span>
-<span id="645">645</span>
-<span id="646">646</span>
-<span id="647">647</span>
-<span id="648">648</span>
-<span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
-<span id="653">653</span>
-<span id="654">654</span>
-<span id="655">655</span>
-<span id="656">656</span>
-<span id="657">657</span>
-<span id="658">658</span>
-<span id="659">659</span>
-<span id="660">660</span>
-<span id="661">661</span>
-<span id="662">662</span>
-<span id="663">663</span>
-<span id="664">664</span>
-<span id="665">665</span>
-<span id="666">666</span>
-<span id="667">667</span>
-<span id="668">668</span>
-<span id="669">669</span>
-<span id="670">670</span>
-<span id="671">671</span>
-<span id="672">672</span>
-<span id="673">673</span>
-<span id="674">674</span>
-<span id="675">675</span>
-<span id="676">676</span>
-<span id="677">677</span>
-<span id="678">678</span>
-<span id="679">679</span>
-<span id="680">680</span>
-<span id="681">681</span>
-<span id="682">682</span>
-<span id="683">683</span>
-<span id="684">684</span>
-<span id="685">685</span>
-<span id="686">686</span>
-<span id="687">687</span>
-<span id="688">688</span>
-<span id="689">689</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -717,7 +642,7 @@
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">MessageComponentInteractionData</span>,
     <span class="doccomment">/// The message this interaction was triggered by, if</span>
     <span class="doccomment">/// it is a component.</span>
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">InteractionMessage</span>,
+    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">Message</span>,
     <span class="doccomment">/// The guild Id this interaction was sent from, if there is one.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
@@ -1010,25 +935,11 @@
             <span class="bool-val">false</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">member</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;expected user or member&quot;</span>).<span class="ident">user</span>.<span class="ident">clone</span>(),
         };
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">map</span>
-                .<span class="ident">remove</span>(<span class="string">&quot;message&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected message&quot;</span>))
-                .<span class="ident">and_then</span>(<span class="ident">JsonMap::deserialize</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">partial</span> <span class="op">=</span> <span class="op">!</span><span class="ident">message</span>.<span class="ident">contains_key</span>(<span class="string">&quot;author&quot;</span>);
-
-            <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">into</span>();
-
-            <span class="kw">if</span> <span class="ident">partial</span> {
-                <span class="ident">InteractionMessage::Ephemeral</span>(
-                    <span class="ident">EphemeralMessage::deserialize</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-                )
-            } <span class="kw">else</span> {
-                <span class="ident">InteractionMessage::Regular</span>(<span class="ident">Message::deserialize</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>)
-            }
-        };
+        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;message&quot;</span>)
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected message&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="ident">Message::deserialize</span>)
+            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">remove</span>(<span class="string">&quot;token&quot;</span>)
@@ -1314,67 +1225,6 @@
     <span class="doccomment">/// Render this option as the default selection.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">default</span>: <span class="ident">bool</span>,
-}
-
-<span class="doccomment">/// The [`MessageComponentInteraction::message`] field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InteractionMessage</span> {
-    <span class="ident">Regular</span>(<span class="ident">Message</span>),
-    <span class="ident">Ephemeral</span>(<span class="ident">EphemeralMessage</span>),
-}
-
-<span class="kw">impl</span> <span class="ident">InteractionMessage</span> {
-    <span class="doccomment">/// Whether the message is ephemeral.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ephemeral</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">InteractionMessage::Ephemeral</span>(<span class="kw">_</span>))
-    }
-
-    <span class="doccomment">/// Gets the message Id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageId</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">InteractionMessage::Regular</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>.<span class="ident">id</span>,
-            <span class="ident">InteractionMessage::Ephemeral</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>.<span class="ident">id</span>,
-        }
-    }
-
-    <span class="doccomment">/// Converts this to a regular message,</span>
-    <span class="doccomment">/// if it is one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">regular</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">InteractionMessage::Regular</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>),
-            <span class="ident">InteractionMessage::Ephemeral</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="doccomment">/// Converts this to an ephemeral message,</span>
-    <span class="doccomment">/// if it is one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ephemeral</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EphemeralMessage</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">InteractionMessage::Regular</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">InteractionMessage::Ephemeral</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">InteractionMessage</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
-    {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">InteractionMessage::Regular</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Message::serialize</span>(<span class="ident">c</span>, <span class="ident">serializer</span>),
-            <span class="ident">InteractionMessage::Ephemeral</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EphemeralMessage::serialize</span>(<span class="ident">c</span>, <span class="ident">serializer</span>),
-        }
-    }
-}
-
-<span class="doccomment">/// An ephemeral message given in an interaction.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EphemeralMessage</span> {
-    <span class="doccomment">/// The message flags.</span>
-    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">MessageFlags</span>,
-    <span class="doccomment">/// The message Id.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">MessageId</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
