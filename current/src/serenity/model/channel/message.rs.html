@@ -1281,8 +1281,11 @@
 <span id="1281">1281</span>
 <span id="1282">1282</span>
 <span id="1283">1283</span>
-</pre><pre class="rust">
-<span class="doccomment">//! Models relating to Discord channels.</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
@@ -2354,11 +2357,14 @@
     <span class="doccomment">/// A message reply.</span>
     <span class="ident">InlineReply</span> <span class="op">=</span> <span class="number">19</span>,
     <span class="doccomment">/// A slash command.</span>
+    <span class="comment">// TODO: Rename to chat input command in next</span>
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">20</span>,
     <span class="doccomment">/// A thread start message.</span>
     <span class="ident">ThreadStarterMessage</span> <span class="op">=</span> <span class="number">21</span>,
     <span class="doccomment">/// Server setup tips.</span>
     <span class="ident">GuildInviteReminder</span> <span class="op">=</span> <span class="number">22</span>,
+    <span class="doccomment">/// A context menu command.</span>
+    <span class="ident">ContextMenuCommand</span> <span class="op">=</span> <span class="number">23</span>,
     <span class="doccomment">/// An indicator that the message is of unknown type.</span>
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
@@ -2385,7 +2391,8 @@
     <span class="ident">InlineReply</span>,
     <span class="ident">ApplicationCommand</span>,
     <span class="ident">ThreadStarterMessage</span>,
-    <span class="ident">GuildInviteReminder</span>
+    <span class="ident">GuildInviteReminder</span>,
+    <span class="ident">ContextMenuCommand</span>,
 });
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -2565,7 +2572,7 @@
         <span class="self">self</span>.<span class="ident">link</span>(<span class="ident">channel_id</span>, <span class="ident">guild_id</span>)
     }
 }
-</pre></div>
+</code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
     <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

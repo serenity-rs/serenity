@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="An asynchronous reader-writer lock."><meta name="keywords" content="rust, rustlang, rust-lang, RwLock"><title>RwLock in serenity::prelude - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc struct"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><h2 class="location">Struct RwLock</h2><div class="sidebar-elems"><div class="block items"><h3 class="sidebar-title"><a href="#implementations">Methods</a></h3><div class="sidebar-links"><a href="#method.get_mut">get_mut</a><a href="#method.into_inner">into_inner</a><a href="#method.new">new</a><a href="#method.read">read</a><a href="#method.read_owned">read_owned</a><a href="#method.try_read">try_read</a><a href="#method.try_read_owned">try_read_owned</a><a href="#method.try_write">try_write</a><a href="#method.try_write_owned">try_write_owned</a><a href="#method.with_max_readers">with_max_readers</a><a href="#method.write">write</a><a href="#method.write_owned">write_owned</a></div><h3 class="sidebar-title"><a href="#trait-implementations">Trait Implementations</a></h3><div class="sidebar-links"><a href="#impl-Debug">Debug</a><a href="#impl-Default">Default</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Send">Send</a><a href="#impl-Sync">Sync</a></div><h3 class="sidebar-title"><a href="#synthetic-implementations">Auto Trait Implementations</a></h3><div class="sidebar-links"><a href="#impl-RefUnwindSafe">!RefUnwindSafe</a><a href="#impl-Unpin">Unpin</a><a href="#impl-UnwindSafe">UnwindSafe</a></div><h3 class="sidebar-title"><a href="#blanket-implementations">Blanket Implementations</a></h3><div class="sidebar-links"><a href="#impl-Any">Any</a><a href="#impl-Borrow%3CT%3E">Borrow&lt;T&gt;</a><a href="#impl-BorrowMut%3CT%3E">BorrowMut&lt;T&gt;</a><a href="#impl-From%3C!%3E">From&lt;!&gt;</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Instrument">Instrument</a><a href="#impl-Into%3CU%3E">Into&lt;U&gt;</a><a href="#impl-Same%3CT%3E">Same&lt;T&gt;</a><a href="#impl-TryFrom%3CU%3E">TryFrom&lt;U&gt;</a><a href="#impl-TryInto%3CU%3E">TryInto&lt;U&gt;</a><a href="#impl-VZip%3CV%3E">VZip&lt;V&gt;</a></div></div><h2 class="location">Other items in<br><a href="../index.html">serenity</a>::<wbr><a href="index.html">prelude</a></h2><div id="sidebar-vars" data-name="RwLock" data-ty="struct" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Struct <a href="../index.html">serenity</a>::<wbr><a href="index.html">prelude</a>::<wbr><a class="struct" href="#">RwLock</a><button id="copy-path" onclick="copy_path(this)" title="copy path"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item import" title="Copy item import to clipboard"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></span></h1><div class="docblock type-decl"><pre class="rust struct">pub struct RwLock&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span> { /* fields omitted */ }</pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An asynchronous reader-writer lock.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="An asynchronous reader-writer lock."><meta name="keywords" content="rust, rustlang, rust-lang, RwLock"><title>RwLock in serenity::prelude - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc struct"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><h2 class="location">Struct RwLock</h2><div class="sidebar-elems"><div class="block items"><h3 class="sidebar-title"><a href="#implementations">Methods</a></h3><div class="sidebar-links"><a href="#method.get_mut">get_mut</a><a href="#method.into_inner">into_inner</a><a href="#method.new">new</a><a href="#method.read">read</a><a href="#method.read_owned">read_owned</a><a href="#method.try_read">try_read</a><a href="#method.try_read_owned">try_read_owned</a><a href="#method.try_write">try_write</a><a href="#method.try_write_owned">try_write_owned</a><a href="#method.with_max_readers">with_max_readers</a><a href="#method.write">write</a><a href="#method.write_owned">write_owned</a></div><h3 class="sidebar-title"><a href="#trait-implementations">Trait Implementations</a></h3><div class="sidebar-links"><a href="#impl-Debug">Debug</a><a href="#impl-Default">Default</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Send">Send</a><a href="#impl-Sync">Sync</a></div><h3 class="sidebar-title"><a href="#synthetic-implementations">Auto Trait Implementations</a></h3><div class="sidebar-links"><a href="#impl-RefUnwindSafe">!RefUnwindSafe</a><a href="#impl-Unpin">Unpin</a><a href="#impl-UnwindSafe">UnwindSafe</a></div><h3 class="sidebar-title"><a href="#blanket-implementations">Blanket Implementations</a></h3><div class="sidebar-links"><a href="#impl-Any">Any</a><a href="#impl-Borrow%3CT%3E">Borrow&lt;T&gt;</a><a href="#impl-BorrowMut%3CT%3E">BorrowMut&lt;T&gt;</a><a href="#impl-From%3C!%3E">From&lt;!&gt;</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Instrument">Instrument</a><a href="#impl-Into%3CU%3E">Into&lt;U&gt;</a><a href="#impl-Same%3CT%3E">Same&lt;T&gt;</a><a href="#impl-TryFrom%3CU%3E">TryFrom&lt;U&gt;</a><a href="#impl-TryInto%3CU%3E">TryInto&lt;U&gt;</a><a href="#impl-VZip%3CV%3E">VZip&lt;V&gt;</a></div></div><h2 class="location">Other items in<br><a href="../index.html">serenity</a>::<wbr><a href="index.html">prelude</a></h2><div id="sidebar-vars" data-name="RwLock" data-ty="struct" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Struct <a href="../index.html">serenity</a>::<wbr><a href="index.html">prelude</a>::<wbr><a class="struct" href="#">RwLock</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></span></h1><div class="docblock type-decl"><pre class="rust struct"><code>pub struct RwLock&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span> { /* fields omitted */ }</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An asynchronous reader-writer lock.</p>
 <p>This type of lock allows a number of readers or at most one writer at any
 point in time. The write portion of this lock typically allows modification
 of the underlying data (exclusive access) and the read portion of this lock
@@ -21,8 +21,7 @@ returned from the locking methods implement <a href="https://doc.rust-lang.org/n
 (and <a href="https://doc.rust-lang.org/nightly/core/ops/deref/trait.DerefMut.html"><code>DerefMut</code></a>
 for the <code>write</code> methods) to allow access to the content of the lock.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -42,20 +41,18 @@ for the <code>write</code> methods) to allow access to the content of the lock.<
         <span class="kw-2">*</span><span class="ident">w</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">w</span>, <span class="number">6</span>);
     } <span class="comment">// write lock is dropped here</span>
-}</pre></div>
+}</code></pre></div>
 </div></details><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><div id="impl" class="impl has-srclink"><div class="rightside"></div><a href="#impl" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h3></div></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><div id="method.new" class="method has-srclink"><div class="rightside"></div><a href="#method.new" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new" class="fnname">new</a>(value: T) -&gt; <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;</h4></div></summary><div class="docblock"><p>Creates a new instance of an <code>RwLock&lt;T&gt;</code> which is unlocked.</p>
 <h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
-<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="number">5</span>);</pre></div>
+<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="number">5</span>);</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.with_max_readers" class="method has-srclink"><div class="rightside"></div><a href="#method.with_max_readers" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.with_max_readers" class="fnname">with_max_readers</a>(value: T, max_reads: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>) -&gt; <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;</h4></div></summary><div class="docblock"><p>Creates a new instance of an <code>RwLock&lt;T&gt;</code> which is unlocked
 and allows a maximum of <code>max_reads</code> concurrent readers.</p>
 <h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
-<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::with_max_readers</span>(<span class="number">5</span>, <span class="number">1024</span>);</pre></div>
+<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::with_max_readers</span>(<span class="number">5</span>, <span class="number">1024</span>);</code></pre></div>
 <h1 id="panics" class="section-header"><a href="#panics">Panics</a></h1>
 <p>Panics if <code>max_reads</code> is more than <code>u32::MAX &gt;&gt; 3</code>.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.read" class="method has-srclink"><div class="rightside"></div><a href="#method.read" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.read" class="fnname">read</a>(&amp;'_ self) -&gt; RwLockReadGuard&lt;'_, T&gt;</h4></div></summary><div class="docblock"><p>Locks this <code>RwLock</code> with shared read access, causing the current task
@@ -74,8 +71,7 @@ when dropped.</p>
 were requested. Cancelling a call to <code>read</code> makes you lose your place in
 the queue.</p>
 <h1 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -94,7 +90,7 @@ the queue.</p>
 
     <span class="comment">// Drop the guard after the spawned task finishes.</span>
     <span class="ident">drop</span>(<span class="ident">n</span>);
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.read_owned" class="method has-srclink"><div class="rightside"></div><a href="#method.read_owned" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.read_owned" class="fnname">read_owned</a>(self: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;&gt;) -&gt; OwnedRwLockReadGuard&lt;T, T&gt;</h4></div></summary><div class="docblock"><p>Locks this <code>RwLock</code> with shared read access, causing the current task
 to yield until the lock has been acquired.</p>
 <p>The calling task will yield until there are no writers which hold the
@@ -116,8 +112,7 @@ when dropped.</p>
 were requested. Cancelling a call to <code>read_owned</code> makes you lose your
 place in the queue.</p>
 <h1 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -136,14 +131,13 @@ place in the queue.</p>
 
     <span class="comment">// Drop the guard after the spawned task finishes.</span>
     <span class="ident">drop</span>(<span class="ident">n</span>);
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.try_read" class="method has-srclink"><div class="rightside"></div><a href="#method.try_read" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.try_read" class="fnname">try_read</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;RwLockReadGuard&lt;'_, T&gt;, TryLockError&gt;</h4></div></summary><div class="docblock"><p>Attempts to acquire this <code>RwLock</code> with shared read access.</p>
 <p>If the access couldn’t be acquired immediately, returns <a href="TryLockError"><code>TryLockError</code></a>.
 Otherwise, an RAII guard is returned which will release read access
 when dropped.</p>
 <h1 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -162,7 +156,7 @@ when dropped.</p>
 
     <span class="comment">// Drop the guard when spawned task finishes.</span>
     <span class="ident">drop</span>(<span class="ident">v</span>);
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.try_read_owned" class="method has-srclink"><div class="rightside"></div><a href="#method.try_read_owned" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.try_read_owned" class="fnname">try_read_owned</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;self: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;&gt;<br>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;OwnedRwLockReadGuard&lt;T, T&gt;, TryLockError&gt;</h4></div></summary><div class="docblock"><p>Attempts to acquire this <code>RwLock</code> with shared read access.</p>
 <p>If the access couldn’t be acquired immediately, returns <a href="TryLockError"><code>TryLockError</code></a>.
 Otherwise, an RAII guard is returned which will release read access
@@ -173,8 +167,7 @@ borrowing it. Therefore, the <code>RwLock</code> must be wrapped in an <code>Arc
 call this method, and the guard will live for the <code>'static</code> lifetime,
 as it keeps the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
 <h1 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -193,7 +186,7 @@ as it keeps the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
 
     <span class="comment">// Drop the guard when spawned task finishes.</span>
     <span class="ident">drop</span>(<span class="ident">v</span>);
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.write" class="method has-srclink"><div class="rightside"></div><a href="#method.write" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.write" class="fnname">write</a>(&amp;'_ self) -&gt; RwLockWriteGuard&lt;'_, T&gt;</h4></div></summary><div class="docblock"><p>Locks this <code>RwLock</code> with exclusive write access, causing the current
 task to yield until the lock has been acquired.</p>
 <p>The calling task will yield while other writers or readers currently
@@ -205,8 +198,7 @@ when dropped.</p>
 were requested. Cancelling a call to <code>write</code> makes you lose your place
 in the queue.</p>
 <h1 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -214,7 +206,7 @@ in the queue.</p>
 
   <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>;
   <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">2</span>;
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.write_owned" class="method has-srclink"><div class="rightside"></div><a href="#method.write_owned" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.write_owned" class="fnname">write_owned</a>(self: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;&gt;) -&gt; OwnedRwLockWriteGuard&lt;T&gt;</h4></div></summary><div class="docblock"><p>Locks this <code>RwLock</code> with exclusive write access, causing the current
 task to yield until the lock has been acquired.</p>
 <p>The calling task will yield while other writers or readers currently
@@ -231,8 +223,7 @@ when dropped.</p>
 were requested. Cancelling a call to <code>write_owned</code> makes you lose your
 place in the queue.</p>
 <h1 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -241,14 +232,13 @@ place in the queue.</p>
 
   <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write_owned</span>().<span class="kw">await</span>;
   <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">2</span>;
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.try_write" class="method has-srclink"><div class="rightside"></div><a href="#method.try_write" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.try_write" class="fnname">try_write</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;RwLockWriteGuard&lt;'_, T&gt;, TryLockError&gt;</h4></div></summary><div class="docblock"><p>Attempts to acquire this <code>RwLock</code> with exclusive write access.</p>
 <p>If the access couldn’t be acquired immediately, returns <a href="TryLockError"><code>TryLockError</code></a>.
 Otherwise, an RAII guard is returned which will release write access
 when dropped.</p>
 <h1 id="examples-9" class="section-header"><a href="#examples-9">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -258,7 +248,7 @@ when dropped.</p>
     <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">v</span>, <span class="number">1</span>);
 
     <span class="macro">assert!</span>(<span class="ident">rw</span>.<span class="ident">try_write</span>().<span class="ident">is_err</span>());
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.try_write_owned" class="method has-srclink"><div class="rightside"></div><a href="#method.try_write_owned" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.try_write_owned" class="fnname">try_write_owned</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;self: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;&gt;<br>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;OwnedRwLockWriteGuard&lt;T&gt;, TryLockError&gt;</h4></div></summary><div class="docblock"><p>Attempts to acquire this <code>RwLock</code> with exclusive write access.</p>
 <p>If the access couldn’t be acquired immediately, returns <a href="TryLockError"><code>TryLockError</code></a>.
 Otherwise, an RAII guard is returned which will release write access
@@ -269,8 +259,7 @@ borrowing it. Therefore, the <code>RwLock</code> must be wrapped in an <code>Arc
 call this method, and the guard will live for the <code>'static</code> lifetime,
 as it keeps the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
 <h1 id="examples-10" class="section-header"><a href="#examples-10">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -281,20 +270,19 @@ as it keeps the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
     <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">v</span>, <span class="number">1</span>);
 
     <span class="macro">assert!</span>(<span class="ident">rw</span>.<span class="ident">try_write_owned</span>().<span class="ident">is_err</span>());
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.get_mut" class="method has-srclink"><div class="rightside"></div><a href="#method.get_mut" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.get_mut" class="fnname">get_mut</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>T</h4></div></summary><div class="docblock"><p>Returns a mutable reference to the underlying data.</p>
 <p>Since this call borrows the <code>RwLock</code> mutably, no actual locking needs to
 take place – the mutable borrow statically guarantees no locks exist.</p>
 <h1 id="examples-11" class="section-header"><a href="#examples-11">Examples</a></h1>
-<div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="number">1</span>);
 
     <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">get_mut</span>();
     <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">2</span>;
-}</pre></div>
+}</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.into_inner" class="method has-srclink"><div class="rightside"></div><a href="#method.into_inner" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.into_inner" class="fnname">into_inner</a>(self) -&gt; T</h4></div></summary><div class="docblock"><p>Consumes the lock, returning the underlying data.</p>
 </div></details></div></details><h2 id="trait-implementations" class="small-section-header">Trait Implementations<a href="#trait-implementations" class="anchor"></a></h2><div id="trait-implementations-list"><details class="rustdoc-toggle implementors-toggle" open><summary><div id="impl-Debug" class="impl has-srclink"><div class="rightside"></div><a href="#impl-Debug" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h3></div></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><div id="method.fmt" class="method trait-impl has-srclink"><div class="rightside"></div><a href="#method.fmt" class="anchor"></a><h4 class="code-header">pub fn <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt" class="fnname">fmt</a>(&amp;self, f: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>, <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Error.html" title="struct core::fmt::Error">Error</a>&gt;</h4></div></summary><div class='docblock'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>
 </div></details></div></details><details class="rustdoc-toggle implementors-toggle" open><summary><div id="impl-Default" class="impl has-srclink"><div class="rightside"></div><a href="#impl-Default" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="trait" href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html" title="trait core::default::Default">Default</a> for <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html" title="trait core::default::Default">Default</a> + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h3></div></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><div id="method.default" class="method trait-impl has-srclink"><div class="rightside"></div><a href="#method.default" class="anchor"></a><h4 class="code-header">pub fn <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default" class="fnname">default</a>() -&gt; <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;</h4></div></summary><div class='docblock'><p>Returns the “default value” for a type. <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">Read more</a></p>
