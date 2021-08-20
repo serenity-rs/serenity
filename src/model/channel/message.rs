@@ -1092,11 +1092,13 @@ pub enum MessageType {
     /// A message reply.
     InlineReply = 19,
     /// A slash command.
-    ApplicationCommand = 20,
+    ChatInputCommand = 20,
     /// A thread start message.
     ThreadStarterMessage = 21,
     /// Server setup tips.
     GuildInviteReminder = 22,
+    /// A context menu command.
+    ContextMenuCommand = 23,
     /// An indicator that the message is of unknown type.
     Unknown = !0,
 }
@@ -1121,9 +1123,10 @@ enum_number!(MessageType {
     GuildDiscoveryGracePeriodFinalWarning
     ThreadCreated,
     InlineReply,
-    ApplicationCommand,
+    ChatInputCommand,
     ThreadStarterMessage,
-    GuildInviteReminder
+    GuildInviteReminder,
+    ContextMenuCommand,
 });
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
