@@ -154,6 +154,11 @@ pub struct CommandId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct CommandPermissionId(pub u64);
 
+/// An identifier for a slash command target Id. Can contain
+/// a [`UserId`] or [`MessageId`].
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct TargetId(pub u64);
+
 /// An identifier for a stage channel instance.
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct StageInstanceId(pub u64);
@@ -175,5 +180,6 @@ id_u64! {
     InteractionId;
     CommandId;
     CommandPermissionId;
+    TargetId;
     StageInstanceId;
 }

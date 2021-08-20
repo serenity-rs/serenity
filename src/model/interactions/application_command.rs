@@ -28,6 +28,7 @@ use crate::model::interactions::InteractionType;
 use crate::model::prelude::User;
 use crate::model::utils::{
     deserialize_channels_map,
+    deserialize_messages_map,
     deserialize_options,
     deserialize_options_with_resolved,
     deserialize_partial_members_map,
@@ -376,12 +377,29 @@ pub struct ApplicationCommandInteractionData {
     pub id: CommandId,
     /// The name of the invoked command.
     pub name: String,
+    /// The application command type of the triggered application command.
+    #[serde(rename = "type")]
+    pub kind: ApplicationCommandType,
     /// The parameters and the given values.
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
     /// The converted objects from the given options.
     #[serde(default)]
     pub resolved: ApplicationCommandInteractionDataResolved,
+    /// The targeted user or message, if the triggered application command type
+    /// is [`User`] or [`Message`].
+    ///
+    /// Its object data can be found in the [`resolved`] field.
+    ///
+    /// [`resolved`]: Self::resolved
+    /// [`User`]: ApplicationCommandType::User
+    /// [`Message`]: ApplicationCommandType::Message
+    pub target_id: Option<TargetId>,
+    /// The target resolved data of [`target_id`]
+    ///
+    /// [`target_id`]: Self::target_id
+    #[serde(skip_serializing)]
+    pub target: Option<ResolvedTarget>,
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
@@ -418,13 +436,63 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             false => vec![],
         };
 
+        let kind = map
+            .remove("type")
+            .ok_or_else(|| DeError::custom("expected type"))
+            .and_then(ApplicationCommandType::deserialize)
+            .map_err(DeError::custom)?;
+
+        let target_id = match kind != ApplicationCommandType::ChatInput {
+            true => Some(
+                map.remove("target_id")
+                    .ok_or_else(|| DeError::custom("expected resolved"))
+                    .and_then(TargetId::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let target = match target_id {
+            Some(id) => {
+                if kind == ApplicationCommandType::Message {
+                    let resolved = resolved
+                        .messages
+                        .get(&id.to_message_id())
+                        .expect("expected message object")
+                        .to_owned();
+
+                    Some(ResolvedTarget::Message(resolved))
+                } else {
+                    let user_id = id.to_user_id();
+
+                    let user = resolved.users.get(&user_id).expect("expected user").to_owned();
+                    let member = resolved.members.get(&user_id).map(|m| m.to_owned());
+
+                    Some(ResolvedTarget::User(user, member))
+                }
+            },
+            None => None,
+        };
+
         Ok(Self {
             name,
             id,
+            kind,
             options,
             resolved,
+            target_id,
+            target,
         })
     }
+}
+
+/// The resolved value of a [`ApplicationCommandInteractionData::target_id`].
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ResolvedTarget {
+    User(User, Option<PartialMember>),
+    Message(Message),
 }
 
 /// The resolved data of a command data interaction payload.
@@ -440,6 +508,8 @@ pub struct ApplicationCommandInteractionDataResolved {
     pub roles: HashMap<RoleId, Role>,
     /// The resolved partial channels.
     pub channels: HashMap<ChannelId, PartialChannel>,
+    /// The resolved messages.
+    pub messages: HashMap<MessageId, Message>,
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
@@ -476,8 +546,17 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
         let channels = match map.contains_key("channels") {
             true => map
                 .remove("channels")
-                .ok_or_else(|| DeError::custom("expected chanels"))
+                .ok_or_else(|| DeError::custom("expected channels"))
                 .and_then(deserialize_channels_map)
+                .map_err(DeError::custom)?,
+            false => HashMap::new(),
+        };
+
+        let messages = match map.contains_key("messages") {
+            true => map
+                .remove("messages")
+                .ok_or_else(|| DeError::custom("expected messages"))
+                .and_then(deserialize_messages_map)
                 .map_err(DeError::custom)?,
             false => HashMap::new(),
         };
@@ -487,6 +566,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
             members,
             roles,
             channels,
+            messages,
         })
     }
 }
@@ -587,6 +667,9 @@ fn default_permission_value() -> bool {
 pub struct ApplicationCommand {
     /// The command Id.
     pub id: CommandId,
+    /// The application command kind.
+    #[serde(rename = "type")]
+    pub kind: ApplicationCommandType,
     /// The parent application Id.
     pub application_id: ApplicationId,
     /// The command guild Id, if it is a guild command.
@@ -754,6 +837,23 @@ impl ApplicationCommand {
     }
 }
 
+/// The type of an application command.
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ApplicationCommandType {
+    ChatInput = 1,
+    User = 2,
+    Message = 3,
+    Unknown = !0,
+}
+
+enum_number!(ApplicationCommandType {
+    ChatInput,
+    User,
+    Message
+});
+
 /// The parameters for an [`ApplicationCommand`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -819,12 +919,12 @@ pub struct ApplicationCommandPermissionData {
 impl CommandPermissionId {
     /// Converts this [`CommandPermissionId`] to [`UserId`].
     pub fn to_user_id(self) -> UserId {
-        UserId(self.0)
+        self.0.into()
     }
 
     /// Converts this [`CommandPermissionId`] to [`RoleId`].
     pub fn to_role_id(self) -> RoleId {
-        RoleId(self.0)
+        self.0.into()
     }
 }
 
@@ -860,6 +960,54 @@ impl From<CommandPermissionId> for RoleId {
 
 impl From<CommandPermissionId> for UserId {
     fn from(id: CommandPermissionId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl TargetId {
+    /// Converts this [`CommandPermissionId`] to [`UserId`].
+    pub fn to_user_id(self) -> UserId {
+        self.0.into()
+    }
+
+    /// Converts this [`CommandPermissionId`] to [`MessageId`].
+    pub fn to_message_id(self) -> MessageId {
+        self.0.into()
+    }
+}
+
+impl From<MessageId> for TargetId {
+    fn from(id: MessageId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl<'a> From<&'a MessageId> for TargetId {
+    fn from(id: &MessageId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl From<UserId> for TargetId {
+    fn from(id: UserId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl<'a> From<&'a UserId> for TargetId {
+    fn from(id: &UserId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl From<TargetId> for MessageId {
+    fn from(id: TargetId) -> Self {
+        Self(id.0)
+    }
+}
+
+impl From<TargetId> for UserId {
+    fn from(id: TargetId) -> Self {
         Self(id.0)
     }
 }
