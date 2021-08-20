@@ -28,7 +28,7 @@ pub struct MessageComponentInteraction {
     pub data: MessageComponentInteractionData,
     /// The message this interaction was triggered by, if
     /// it is a component.
-    pub message: InteractionMessage,
+    pub message: Message,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
@@ -321,25 +321,11 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             false => member.as_ref().expect("expected user or member").user.clone(),
         };
 
-        let message = {
-            let message = map
-                .remove("message")
-                .ok_or_else(|| DeError::custom("expected message"))
-                .and_then(JsonMap::deserialize)
-                .map_err(DeError::custom)?;
-
-            let partial = !message.contains_key("author");
-
-            let value: Value = message.into();
-
-            if partial {
-                InteractionMessage::Ephemeral(
-                    EphemeralMessage::deserialize(value).map_err(DeError::custom)?,
-                )
-            } else {
-                InteractionMessage::Regular(Message::deserialize(value).map_err(DeError::custom)?)
-            }
-        };
+        let message = map
+            .remove("message")
+            .ok_or_else(|| DeError::custom("expected message"))
+            .and_then(Message::deserialize)
+            .map_err(DeError::custom)?;
 
         let token = map
             .remove("token")
@@ -625,65 +611,4 @@ pub struct SelectMenuOption {
     /// Render this option as the default selection.
     #[serde(default)]
     pub default: bool,
-}
-
-/// The [`MessageComponentInteraction::message`] field.
-#[derive(Clone, Debug, Deserialize)]
-pub enum InteractionMessage {
-    Regular(Message),
-    Ephemeral(EphemeralMessage),
-}
-
-impl InteractionMessage {
-    /// Whether the message is ephemeral.
-    pub fn is_ephemeral(&self) -> bool {
-        matches!(self, InteractionMessage::Ephemeral(_))
-    }
-
-    /// Gets the message Id.
-    pub fn id(&self) -> MessageId {
-        match self {
-            InteractionMessage::Regular(m) => m.id,
-            InteractionMessage::Ephemeral(m) => m.id,
-        }
-    }
-
-    /// Converts this to a regular message,
-    /// if it is one.
-    pub fn regular(self) -> Option<Message> {
-        match self {
-            InteractionMessage::Regular(m) => Some(m),
-            InteractionMessage::Ephemeral(_) => None,
-        }
-    }
-
-    /// Converts this to an ephemeral message,
-    /// if it is one.
-    pub fn ephemeral(self) -> Option<EphemeralMessage> {
-        match self {
-            InteractionMessage::Regular(_) => None,
-            InteractionMessage::Ephemeral(m) => Some(m),
-        }
-    }
-}
-
-impl Serialize for InteractionMessage {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match self {
-            InteractionMessage::Regular(c) => Message::serialize(c, serializer),
-            InteractionMessage::Ephemeral(c) => EphemeralMessage::serialize(c, serializer),
-        }
-    }
-}
-
-/// An ephemeral message given in an interaction.
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct EphemeralMessage {
-    /// The message flags.
-    pub flags: MessageFlags,
-    /// The message Id.
-    pub id: MessageId,
 }

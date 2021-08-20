@@ -2223,7 +2223,7 @@ macro_rules! with_related_ids_for_event_types {
                 message_id: match &e.interaction {
                     Interaction::Ping(_) => None,
                     Interaction::ApplicationCommand(_) => None,
-                    Interaction::MessageComponent(i) => Some(i.message.id()),
+                    Interaction::MessageComponent(i) => Some(i.message.id),
                 },
             },
             #[cfg(feature = "unstable_discord_api")]
