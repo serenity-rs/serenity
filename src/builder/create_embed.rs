@@ -494,6 +494,17 @@ impl<'a> From<&'a str> for Timestamp {
     }
 }
 
+impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp
+where
+    Tz::Offset: Display,
+{
+    fn from(dt: DateTime<Tz>) -> Self {
+        Self {
+            ts: dt.to_rfc3339(),
+        }
+    }
+}
+
 impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
 where
     Tz::Offset: Display,

@@ -36,6 +36,10 @@ impl EventHandler for Handler {
                             f
                         });
 
+                        // Add a timestamp for the current time
+                        // This also accepts a rfc3339 Timestamp
+                        e.timestamp(chrono::Utc::now());
+
                         e
                     });
                     m.add_file(AttachmentType::Path(Path::new("./ferris_eyes.png")));
