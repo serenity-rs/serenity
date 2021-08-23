@@ -286,3 +286,41 @@ args = ["make", "run_example", "e13_parallel_loops"]
 [tasks.dev_build_13]
 command = "cargo"
 args = ["make", "build_example", "e13_parallel_loops"]
+
+[tasks.14]
+alias = "run_14"
+
+[tasks.run_14]
+command = "cargo"
+args = ["make", "run_example_release", "e14_slash_commands"]
+
+[tasks.build_14]
+command = "cargo"
+args = ["make", "build_example_release", "e14_slash_commands"]
+
+[tasks.dev_run_14]
+command = "cargo"
+args = ["make", "run_example", "e14_slash_commands"]
+
+[tasks.dev_build_14]
+command = "cargo"
+args = ["make", "build_example", "e14_slash_commands"]
+
+[tasks.15]
+alias = "run_15"
+
+[tasks.run_15]
+command = "cargo"
+args = ["make", "run_example_release", "e15_simple_dashboard"]
+
+[tasks.build_15]
+command = "cargo"
+args = ["make", "build_example_release", "e15_simple_dashboard"]
+
+[tasks.dev_run_15]
+command = "cargo"
+args = ["make", "run_example", "e15_simple_dashboard"]
+
+[tasks.dev_build_15]
+command = "cargo"
+args = ["make", "build_example", "e15_simple_dashboard"]
