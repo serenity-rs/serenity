@@ -11,31 +11,32 @@
 #[macro_use]
 extern crate tracing;
 
+use std::collections::HashMap;
 use std::env;
 use std::error::Error;
 use std::sync::{atomic::*, Arc};
 use std::time::Instant;
-use std::collections::HashMap;
 
+use rillrate::pulse::PulseSpec;
+use rillrate::range::{Label, Range};
+use rillrate::table::{Col, Row};
+use rillrate::*;
 use serenity::async_trait;
 use serenity::client::{
     bridge::gateway::{ShardId, ShardManager},
-    Client, Context, EventHandler,
+    Client,
+    Context,
+    EventHandler,
 };
 use serenity::framework::standard::{
     macros::{command, group, hook},
-    CommandResult, StandardFramework,
+    CommandResult,
+    StandardFramework,
 };
 use serenity::model::prelude::*;
 use serenity::prelude::*;
-
 use tokio::sync::Mutex;
 use tokio::time::{sleep, Duration};
-
-use rillrate::pulse::PulseSpec;
-use rillrate::table::{Row, Col};
-use rillrate::range::{Label, Range};
-use rillrate::*;
 
 // Name used to group dashboards.
 // You could have multiple packages for different applications, such as a package for the bot
@@ -262,9 +263,7 @@ impl EventHandler for Handler {
                 #[cfg(feature = "post-ping")]
                 let post_latency = {
                     let now = Instant::now();
-                    let _ = ChannelId(381926291785383946)
-                        .say(&ctx_clone, "Latency Test")
-                        .await;
+                    let _ = ChannelId(381926291785383946).say(&ctx_clone, "Latency Test").await;
                     now.elapsed().as_millis() as f64
                 };
 
@@ -312,7 +311,11 @@ async fn before_hook(ctx: &Context, _: &Message, cmd_name: &str) -> bool {
         command_count_value.clone()
     };
 
-    components.command_usage_table.set_cell(Row(command_count_value.index as u64), Col(1), command_count_value.use_count);
+    components.command_usage_table.set_cell(
+        Row(command_count_value.index as u64),
+        Col(1),
+        command_count_value.use_count,
+    );
 
     info!("Running command {}", cmd_name);
 
@@ -355,10 +358,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let token = env::var("DISCORD_TOKEN")?;
 
-    let mut client = Client::builder(token)
-        .event_handler(Handler)
-        .framework(framework)
-        .await?;
+    let mut client = Client::builder(token).event_handler(Handler).framework(framework).await?;
 
     {
         let mut data = client.data.write().await;
@@ -384,9 +384,8 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             },
         );
 
-        let get_ping_tracer = Pulse::new(
-            [PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "GET Ping Time"],
-            PulseSpec {
+        let get_ping_tracer =
+            Pulse::new([PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "GET Ping Time"], PulseSpec {
                 retain: 1800,
                 range: Range {
                     min: Some(0.0),
@@ -396,13 +395,11 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                     caption: "ms".to_string(),
                     divisor: 1.0,
                 },
-            },
-        );
+            });
 
         #[cfg(feature = "post-ping")]
-        let post_ping_tracer = Pulse::new(
-            [PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "POST Ping Time"],
-            PulseSpec {
+        let post_ping_tracer =
+            Pulse::new([PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "POST Ping Time"], PulseSpec {
                 retain: 1800,
                 range: Range {
                     min: Some(0.0),
@@ -412,13 +409,13 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
                     caption: "ms".to_string(),
                     divisor: 1.0,
                 },
-            },
-        );
+            });
 
-        let command_usage_table = Table::new(
-            [PACKAGE, DASHBOARD_STATS, GROUP_COMMAND_COUNT, "Command Usage"],
-            vec![(Col(0), "Command Name"), (Col(1), "Number of Uses")],
-        );
+        let command_usage_table =
+            Table::new([PACKAGE, DASHBOARD_STATS, GROUP_COMMAND_COUNT, "Command Usage"], vec![
+                (Col(0), "Command Name"),
+                (Col(1), "Number of Uses"),
+            ]);
 
         let mut command_usage_values = HashMap::new();
 
@@ -462,15 +459,11 @@ async fn switch(ctx: &Context, msg: &Message) -> CommandResult {
         ctx,
         format!(
             "The switch is {} and the current value is {}",
-            if components.data_switch.load(Ordering::Relaxed) {
-                "ON"
-            } else {
-                "OFF"
-            },
+            if components.data_switch.load(Ordering::Relaxed) { "ON" } else { "OFF" },
             components.double_link_value.load(Ordering::Relaxed),
         ),
     )
-        .await?;
+    .await?;
 
     Ok(())
 }
@@ -494,8 +487,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
         }
     };
 
-    msg.reply(ctx, &format!("The shard latency is {}", latency))
-        .await?;
+    msg.reply(ctx, &format!("The shard latency is {}", latency)).await?;
 
     Ok(())
 }
