@@ -222,4 +222,4 @@ jobs:
       - name: 'Build example 14'
         run: cargo build -p e14_slash_commands
       - name: 'Build example 15'
-        run: cargo build -p e14_simple_dashboard
+        run: cargo build -p e15_simple_dashboard
