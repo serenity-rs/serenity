@@ -902,11 +902,23 @@ impl Route {
         format!(api!("/webhooks/{}/{}"), webhook_id, token)
     }
 
-    pub fn webhook_with_token_optioned<D>(webhook_id: u64, token: D, wait: bool) -> String
+    pub fn webhook_with_token_optioned<D>(
+        webhook_id: u64,
+        token: D,
+        wait: bool,
+        thread_id: Option<u64>,
+    ) -> String
     where
         D: Display,
     {
-        format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait)
+        if let Some(thread_id) = thread_id {
+            format!(
+                api!("/webhooks/{}/{}?wait={}&thread_id={}"),
+                webhook_id, token, wait, thread_id
+            )
+        } else {
+            format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait)
+        }
     }
 
     pub fn webhook_message<D>(webhook_id: u64, token: D, message_id: u64) -> String
@@ -1302,6 +1314,7 @@ pub enum RouteInfo<'a> {
         token: &'a str,
         wait: bool,
         webhook_id: u64,
+        thread_id: Option<u64>,
     },
     JoinThread {
         channel_id: u64,
@@ -2116,10 +2129,11 @@ impl<'a> RouteInfo<'a> {
                 token,
                 wait,
                 webhook_id,
+                thread_id,
             } => (
                 LightMethod::Post,
                 Route::WebhooksId(webhook_id),
-                Cow::from(Route::webhook_with_token_optioned(webhook_id, token, wait)),
+                Cow::from(Route::webhook_with_token_optioned(webhook_id, token, wait, thread_id)),
             ),
             RouteInfo::GetActiveMaintenance => {
                 (LightMethod::Get, Route::None, Cow::from(Route::status_maintenances_active()))

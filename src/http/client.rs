@@ -1795,6 +1795,7 @@ impl Http {
         token: &str,
         wait: bool,
         map: &JsonMap,
+        thread_id: Option<u64>,
     ) -> Result<Option<Message>> {
         let body = serde_json::to_vec(map)?;
 
@@ -1809,6 +1810,7 @@ impl Http {
                     token,
                     wait,
                     webhook_id,
+                    thread_id,
                 },
             })
             .await?;
@@ -1834,6 +1836,7 @@ impl Http {
         wait: bool,
         files: It,
         map: JsonMap,
+        thread_id: Option<u64>,
     ) -> Result<Option<Message>>
     where
         T: Into<AttachmentType<'a>>,
@@ -1897,7 +1900,7 @@ impl Http {
 
         let response = self
             .client
-            .post(&Route::webhook_with_token_optioned(webhook_id, token, wait))
+            .post(&Route::webhook_with_token_optioned(webhook_id, token, wait, thread_id))
             .multipart(multipart)
             .header(CONTENT_TYPE, HeaderValue::from_static("multipart/form-data"))
             .send()

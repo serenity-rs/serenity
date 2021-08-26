@@ -301,14 +301,23 @@ impl Webhook {
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
 
-        let map = utils::hashmap_to_json_map(execute_webhook.0);
+        let map = utils::hashmap_to_json_map(execute_webhook.params);
 
-        if !execute_webhook.1.is_empty() {
+        if !execute_webhook.attachments.is_empty() {
             http.as_ref()
-                .execute_webhook_with_files(self.id.0, token, wait, execute_webhook.1.clone(), map)
+                .execute_webhook_with_files(
+                    self.id.0,
+                    token,
+                    wait,
+                    execute_webhook.attachments.clone(),
+                    map,
+                    execute_webhook.thread_id,
+                )
                 .await
         } else {
-            http.as_ref().execute_webhook(self.id.0, token, wait, &map).await
+            http.as_ref()
+                .execute_webhook(self.id.0, token, wait, &map, execute_webhook.thread_id)
+                .await
         }
     }
 

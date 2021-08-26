@@ -53,7 +53,11 @@ use crate::http::AttachmentType;
 /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
 /// [`execute_webhook`]: crate::http::client::Http::execute_webhook
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
+pub struct ExecuteWebhook<'a> {
+    pub params: HashMap<&'static str, Value>,
+    pub attachments: Vec<AttachmentType<'a>>,
+    pub thread_id: Option<u64>,
+}
 
 impl<'a> ExecuteWebhook<'a> {
     /// Override the default avatar of the webhook with an image URL.
@@ -79,7 +83,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn avatar_url<S: ToString>(&mut self, avatar_url: S) -> &mut Self {
-        self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
+        self.params.insert("avatar_url", Value::String(avatar_url.to_string()));
         self
     }
 
@@ -111,13 +115,13 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
-        self.0.insert("content", Value::String(content.to_string()));
+        self.params.insert("content", Value::String(content.to_string()));
         self
     }
 
     /// Appends a file to the webhook message.
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
-        self.1.push(file.into());
+        self.attachments.push(file.into());
         self
     }
 
@@ -126,7 +130,7 @@ impl<'a> ExecuteWebhook<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1.extend(files.into_iter().map(|f| f.into()));
+        self.attachments.extend(files.into_iter().map(|f| f.into()));
         self
     }
 
@@ -138,7 +142,7 @@ impl<'a> ExecuteWebhook<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1 = files.into_iter().map(|f| f.into()).collect();
+        self.attachments = files.into_iter().map(|f| f.into()).collect();
         self
     }
 
@@ -156,7 +160,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
     /// [struct-level documentation]: #examples
     pub fn embeds(&mut self, embeds: Vec<Value>) -> &mut Self {
-        self.0.insert("embeds", Value::Array(embeds));
+        self.params.insert("embeds", Value::Array(embeds));
         self
     }
 
@@ -185,7 +189,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::Bool(tts));
+        self.params.insert("tts", Value::Bool(tts));
         self
     }
 
@@ -214,7 +218,14 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
-        self.0.insert("username", Value::String(username.to_string()));
+        self.params.insert("username", Value::String(username.to_string()));
+        self
+    }
+
+    /// Set a thread id to post the webhook message to.
+    /// Must be an existing thread that exists inside of the webhook's text channel.
+    pub fn thread_id(&mut self, thread_id: u64) -> &mut Self {
+        self.thread_id = Some(thread_id);
         self
     }
 }
@@ -239,6 +250,10 @@ impl<'a> Default for ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
-        ExecuteWebhook(map, vec![])
+        ExecuteWebhook {
+            params: map,
+            attachments: vec![],
+            thread_id: None,
+        }
     }
 }
