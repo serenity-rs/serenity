@@ -17,10 +17,10 @@ use std::error::Error;
 use std::sync::{atomic::*, Arc};
 use std::time::Instant;
 
-use rillrate::pulse::PulseSpec;
-use rillrate::range::{Label, Range};
-use rillrate::table::{Col, Row};
-use rillrate::*;
+use rillrate::prime::{
+    table::{Col, Row},
+    *,
+};
 use serenity::async_trait;
 use serenity::client::{
     bridge::gateway::{ShardId, ShardManager},
@@ -108,7 +108,7 @@ impl EventHandler for Handler {
 
         let switch = Switch::new(
             [PACKAGE, DASHBOARD_CONFIG, GROUP_CONF, "Toggle Switch"],
-            "Switch Me and run the `~switch` command!",
+            SwitchOpts::default().label("Switch Me and run the `~switch` command!"),
         );
         let switch_instance = switch.clone();
 
@@ -159,17 +159,19 @@ impl EventHandler for Handler {
         // grain control of the value.
         let selector = Selector::new(
             [PACKAGE, DASHBOARD_CONFIG, GROUP_CONF, "Value Selector"],
-            "Select from a preset of values!",
-            default_values,
+            SelectorOpts::default()
+                .label("Select from a preset of values!")
+                .options(default_values),
         );
         let selector_instance = selector.clone();
 
         let slider = Slider::new(
             [PACKAGE, DASHBOARD_CONFIG, GROUP_CONF, "Value Slider"],
-            "Or slide me for more fine grain control!",
-            u8::MIN as f64,
-            u8::MAX as f64,
-            2.0,
+            SliderOpts::default()
+                .label("Or slide me for more fine grain control!")
+                .min(u8::MIN as f64)
+                .max(u8::MAX as f64)
+                .step(2),
         );
         let slider_instance = slider.clone();
 
@@ -368,54 +370,50 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         // These 3 Pulse are the graphs used to plot the latency overtime.
         let ws_ping_tracer = Pulse::new(
             [PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "Websocket Ping Time"],
-            PulseSpec {
-                // The seconds of data to retain, this is 30 minutes.
-                retain: 1800,
-                // Column value range
-                range: Range {
-                    min: Some(0.0),
-                    max: Some(200.0),
-                },
-                // Label used along the values on the column.
-                label: Label {
-                    caption: "ms".to_string(),
-                    divisor: 1.0,
-                },
-            },
+            Default::default(),
+            PulseOpts::default()
+            // The seconds of data to retain, this is 30 minutes.
+            .retain(1800_u32)
+
+            // Column value range
+            .min(0)
+            .max(200)
+
+            // Label used along the values on the column.
+            .suffix("ms".to_string())
+            .divisor(1.0),
         );
 
-        let get_ping_tracer =
-            Pulse::new([PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "GET Ping Time"], PulseSpec {
-                retain: 1800,
-                range: Range {
-                    min: Some(0.0),
-                    max: Some(200.0),
-                },
-                label: Label {
-                    caption: "ms".to_string(),
-                    divisor: 1.0,
-                },
-            });
+        let get_ping_tracer = Pulse::new(
+            [PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "Rest GET Ping Time"],
+            Default::default(),
+            PulseOpts::default()
+                .retain(1800_u32)
+                .min(0)
+                .max(200)
+                .suffix("ms".to_string())
+                .divisor(1.0),
+        );
 
         #[cfg(feature = "post-ping")]
-        let post_ping_tracer =
-            Pulse::new([PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "POST Ping Time"], PulseSpec {
-                retain: 1800,
-                range: Range {
-                    min: Some(0.0),
-                    max: Some(500.0),
-                },
-                label: Label {
-                    caption: "ms".to_string(),
-                    divisor: 1.0,
-                },
-            });
+        let post_ping_tracer = Pulse::new(
+            [PACKAGE, DASHBOARD_STATS, GROUP_LATENCY, "Rest POST Ping Time"],
+            Default::default(),
+            PulseOpts::default()
+            .retain(1800_u32)
+            .min(0)
+            // Post latency is on average higher, so we increase the max value on the graph.
+            .max(500)
+            .suffix("ms".to_string())
+            .divisor(1.0),
+        );
 
-        let command_usage_table =
-            Table::new([PACKAGE, DASHBOARD_STATS, GROUP_COMMAND_COUNT, "Command Usage"], vec![
-                (Col(0), "Command Name"),
-                (Col(1), "Number of Uses"),
-            ]);
+        let command_usage_table = Table::new(
+            [PACKAGE, DASHBOARD_STATS, GROUP_COMMAND_COUNT, "Command Usage"],
+            Default::default(),
+            TableOpts::default()
+                .columns(vec![(0, "Command Name".to_string()), (1, "Number of Uses".to_string())]),
+        );
 
         let mut command_usage_values = HashMap::new();
 
