@@ -50,6 +50,7 @@ pub struct GuildChannel {
     /// The unique Id of the channel.
     ///
     /// The default channel Id shares the Id of the guild and the default role.
+    /// When this channel is a thread, this Id corresponds to the thread's parent text channel instead.
     pub id: ChannelId,
     /// The bitrate of the channel.
     ///
