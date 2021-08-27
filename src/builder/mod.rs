@@ -80,10 +80,10 @@ pub use self::{
         CreateApplicationCommands,
     },
     create_application_command_permission::{
+        CreateApplicationCommandPermissionData,
         CreateApplicationCommandPermissions,
         CreateApplicationCommandPermissionsData,
         CreateApplicationCommandsPermissions,
-        CreateApplicationCommandPermissionData,
     },
     create_components::{
         CreateActionRow,
