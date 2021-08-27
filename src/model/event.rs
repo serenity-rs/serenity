@@ -473,7 +473,7 @@ pub struct GuildMemberUpdateEvent {
     pub deaf: bool,
     #[serde(default)]
     pub mute: bool,
-    pub avatar: Option<String>,
+    pub avatar: Option<String>, /* TODO: Remove this on next. Avatar is not directly in this payload, but as part of the user. GuildMemberUpdateEvent is public, removing would be breaking change. */
 }
 
 #[cfg(feature = "cache")]
@@ -496,7 +496,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                 member.premium_since.clone_from(&self.premium_since);
                 member.deaf.clone_from(&self.deaf);
                 member.mute.clone_from(&self.mute);
-                member.avatar.clone_from(&self.avatar);
+                member.avatar.clone_from(&self.user.avatar);
 
                 item
             } else {
@@ -516,7 +516,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     premium_since: self.premium_since,
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
-                    avatar: self.avatar.clone(),
+                    avatar: self.user.avatar.clone(),
                 });
             }
 
