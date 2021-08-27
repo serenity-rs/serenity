@@ -868,6 +868,43 @@ impl CacheUpdate for MessageCreateEvent {
     type Output = Message;
 
     async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        cache.update_user_entry(&self.message.author).await;
+        // Caches the member if all necessary fields are available
+        if let Some(guild_id) = self.message.guild_id {
+            if let Some(message_partial_member) = &self.message.member {
+                if let Some(guild) = cache.guilds.write().await.get_mut(&guild_id) {
+                    let user = &self.message.author;
+
+                    if let Some(member) = guild.members.get_mut(&user.id) {
+                        member.joined_at.clone_from(&message_partial_member.joined_at);
+                        member.nick.clone_from(&message_partial_member.nick);
+                        member.roles.clone_from(&message_partial_member.roles);
+                        member.user.clone_from(user);
+                        member.pending.clone_from(&message_partial_member.pending);
+                        member.premium_since.clone_from(&message_partial_member.premium_since);
+                        member.deaf.clone_from(&message_partial_member.deaf);
+                        member.mute.clone_from(&message_partial_member.mute);
+                        member.avatar.clone_from(&user.avatar);
+                    } else {
+                        guild.members.insert(user.id, Member {
+                            deaf: message_partial_member.deaf,
+                            guild_id,
+                            joined_at: message_partial_member.joined_at,
+                            mute: message_partial_member.mute,
+                            nick: message_partial_member.nick.clone(),
+                            roles: message_partial_member.roles.clone(),
+                            user: user.clone(),
+                            pending: message_partial_member.pending,
+                            premium_since: message_partial_member.premium_since,
+                            #[cfg(feature = "unstable_discord_api")]
+                            permissions: None,
+                            avatar: user.avatar.clone(),
+                        });
+                    };
+                }
+            }
+        }
+
         let max = cache.settings().await.max_messages;
 
         if max == 0 {
@@ -949,6 +986,7 @@ pub struct MessageUpdateEvent {
     pub attachments: Option<Vec<Attachment>>,
     pub embeds: Option<Vec<Embed>>,
     pub flags: Option<MessageFlags>,
+    pub member: Option<PartialMember>,
 }
 
 #[cfg(feature = "cache")]
@@ -957,6 +995,43 @@ impl CacheUpdate for MessageUpdateEvent {
     type Output = Message;
 
     async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        // Caches the member if all necessary fields are available
+        if let Some(user) = &self.author {
+            cache.update_user_entry(user).await;
+            if let Some(guild_id) = self.guild_id {
+                if let Some(message_partial_member) = &self.member {
+                    if let Some(guild) = cache.guilds.write().await.get_mut(&guild_id) {
+                        if let Some(member) = guild.members.get_mut(&user.id) {
+                            member.joined_at.clone_from(&message_partial_member.joined_at);
+                            member.nick.clone_from(&message_partial_member.nick);
+                            member.roles.clone_from(&message_partial_member.roles);
+                            member.user.clone_from(user);
+                            member.pending.clone_from(&message_partial_member.pending);
+                            member.premium_since.clone_from(&message_partial_member.premium_since);
+                            member.deaf.clone_from(&message_partial_member.deaf);
+                            member.mute.clone_from(&message_partial_member.mute);
+                            member.avatar.clone_from(&user.avatar);
+                        } else {
+                            guild.members.insert(user.id, Member {
+                                deaf: message_partial_member.deaf,
+                                guild_id,
+                                joined_at: message_partial_member.joined_at,
+                                mute: message_partial_member.mute,
+                                nick: message_partial_member.nick.clone(),
+                                roles: message_partial_member.roles.clone(),
+                                user: user.clone(),
+                                pending: message_partial_member.pending,
+                                premium_since: message_partial_member.premium_since,
+                                #[cfg(feature = "unstable_discord_api")]
+                                permissions: None,
+                                avatar: user.avatar.clone(),
+                            });
+                        };
+                    }
+                }
+            }
+        }
+
         if let Some(messages) = cache.messages.write().await.get_mut(&self.channel_id) {
             if let Some(message) = messages.get_mut(&self.id) {
                 let item = message.clone();
