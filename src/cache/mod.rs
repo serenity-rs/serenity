@@ -1124,7 +1124,7 @@ mod test {
         let channel = Channel::Guild(GuildChannel {
             id: event.message.channel_id,
             bitrate: None,
-            category_id: None,
+            parent_id: None,
             guild_id: event.message.guild_id.unwrap(),
             kind: ChannelType::Text,
             last_message_id: None,

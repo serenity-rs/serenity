@@ -136,7 +136,7 @@ impl Display for Mention {
             MentionableImpl::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
             MentionableImpl::Emoji(id, animated) => {
                 f.write_fmt(format_args!("<{}:_:{}>", if animated { "a" } else { "" }, id.0,))
-            },
+            }
         }
     }
 }
@@ -309,9 +309,8 @@ impl FromStr for EmojiIdentifier {
     type Err = EmojiIdentifierParseError;
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        utils::parse_emoji(s).ok_or_else(|| EmojiIdentifierParseError {
-            parsed_string: s.to_owned(),
-        })
+        utils::parse_emoji(s)
+            .ok_or_else(|| EmojiIdentifierParseError { parsed_string: s.to_owned() })
     }
 }
 
@@ -407,7 +406,7 @@ mod test {
         async fn test_mention() {
             let channel = Channel::Guild(GuildChannel {
                 bitrate: None,
-                category_id: None,
+                parent_id: None,
                 guild_id: GuildId(1),
                 kind: ChannelType::Text,
                 id: ChannelId(4),

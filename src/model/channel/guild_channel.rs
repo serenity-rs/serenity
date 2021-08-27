@@ -18,10 +18,7 @@ use crate::cache::Cache;
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReaction,
-    CollectReply,
-    MessageCollectorBuilder,
-    ReactionCollectorBuilder,
+    CollectReaction, CollectReply, MessageCollectorBuilder, ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
@@ -48,7 +45,7 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for voice and stage channels.
     pub bitrate: Option<u64>,
-    /// The Id of the parent category for a channel, or of the parent text channel for a thread. 
+    /// The Id of the parent category for a channel, or of the parent text channel for a thread.
     ///
     /// **Note**: This is only available for channels in a category and thread channels.
     pub parent_id: Option<ChannelId>,
@@ -1091,7 +1088,7 @@ impl GuildChannel {
                     })
                     .collect::<Vec<Member>>()
                     .await)
-            },
+            }
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
     }
@@ -1274,9 +1271,8 @@ pub struct PartialGuildChannel {
     pub id: ChannelId,
     /// The channel guild Id.
     pub guild_id: GuildId,
-    /// The channel category Id.
-    #[serde(rename = "parent_id")]
-    pub category_id: ChannelId,
+    /// The channel category Id,  or the parent text channel Id for a thread.
+    pub parent_id: ChannelId,
     /// The channel type.
     #[serde(rename = "type")]
     pub kind: ChannelType,
