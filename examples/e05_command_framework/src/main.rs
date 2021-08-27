@@ -18,7 +18,7 @@ use std::{
 use serenity::prelude::*;
 use serenity::{
     async_trait,
-    client::bridge::gateway::{ShardId, ShardManager},
+    client::bridge::gateway::{ShardId, ShardManager, GatewayIntents},
     framework::standard::{
         buckets::{LimitedFor, RevertBucket},
         help_commands,
@@ -307,6 +307,13 @@ async fn main() {
     let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
+        // For this example to run properly, the "Presence Intent" and "Server Members Intent" 
+        // options need to be enabled.
+        // These are needed so the `required_permissions` macro works on the commands that need to
+        // use it.
+        // You will need to enable this 2 options on the bot application, and possibly wait up to 5
+        // minutes.
+        .intents(GatewayIntents::all())
         .await
         .expect("Err creating client");
 
