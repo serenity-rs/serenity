@@ -9,7 +9,7 @@ pub struct Sticker {
     /// The unique ID given to this sticker.
     pub id: StickerId,
     /// The unique ID of the pack the sticker is from.
-    pub pack_id: StickerPackId,
+    pub pack_id: Option<StickerPackId>,
     /// The name of the sticker.
     pub name: String,
     /// Description of the sticker
