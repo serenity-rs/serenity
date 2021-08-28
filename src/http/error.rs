@@ -174,13 +174,17 @@ impl Display for Error {
             Error::UnsuccessfulRequest(e) => {
                 f.write_str(&e.error.message)?;
 
-                // Put Discord's human readable error explanations in parantheses
+                // Put Discord's human readable error explanations in parentheses
                 let mut errors_iter = e.error.errors.iter();
                 if let Some(error) = errors_iter.next() {
                     f.write_str(" (")?;
+                    f.write_str(&error.path)?;
+                    f.write_str(": ")?;
                     f.write_str(&error.message)?;
                     for error in errors_iter {
                         f.write_str(", ")?;
+                        f.write_str(&error.path)?;
+                        f.write_str(": ")?;
                         f.write_str(&error.message)?;
                     }
                     f.write_str(")")?;
