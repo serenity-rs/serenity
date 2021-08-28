@@ -311,7 +311,7 @@ async fn main() {
         // options need to be enabled.
         // These are needed so the `required_permissions` macro works on the commands that need to
         // use it.
-        // You will need to enable this 2 options on the bot application, and possibly wait up to 5
+        // You will need to enable these 2 options on the bot application, and possibly wait up to 5
         // minutes.
         .intents(GatewayIntents::all())
         .await
