@@ -76,7 +76,7 @@ struct Components {
 struct RillRateComponents;
 
 impl TypeMapKey for RillRateComponents {
-    // RillRate component types have internal mutability, so we don't need RwLock nor Mutex!
+    // RillRate element types have internal mutability, so we don't need RwLock nor Mutex!
     // We do still want to Arc the type so it can be cloned out of `ctx.data`.
     // If you wanna bind data between RillRate and the bot that doesn't have Atomics, use fields
     // that use RwLock or Mutex, rather than making the enirety of Components one of them, like
@@ -119,7 +119,7 @@ impl EventHandler for Handler {
             // so we use our own external method of storage, in this case since a switch is
             // essentially just a boolean, we use an AtomicBool, stored on the same
             // Components structure.
-            let components = {
+            let elements = {
                 let data_read = ctx_clone.data.read().await;
                 data_read.get::<RillRateComponents>().unwrap().clone()
             };
@@ -129,7 +129,7 @@ impl EventHandler for Handler {
                     debug!("Switch action: {:?}", action);
 
                     // Here we toggle our internal state for the switch.
-                    components.data_switch.swap(action, Ordering::Relaxed);
+                    elements.data_switch.swap(action, Ordering::Relaxed);
 
                     // If you click the switch, it won't turn on by itself, it will just send an
                     // event about it's new status.
@@ -153,7 +153,7 @@ impl EventHandler for Handler {
             values
         };
 
-        // You are also able to have different actions in different components interact with
+        // You are also able to have different actions in different elements interact with
         // the same data.
         // In this example, we have a Selector with preset data, and a Slider for more fine
         // grain control of the value.
@@ -178,7 +178,7 @@ impl EventHandler for Handler {
         let ctx_clone = ctx.clone();
 
         tokio::spawn(async move {
-            let components = {
+            let elements = {
                 let data_read = ctx_clone.data.read().await;
                 data_read.get::<RillRateComponents>().unwrap().clone()
             };
@@ -192,7 +192,7 @@ impl EventHandler for Handler {
                 }
 
                 if let Some(val) = value {
-                    components.double_link_value.swap(val, Ordering::Relaxed);
+                    elements.double_link_value.swap(val, Ordering::Relaxed);
 
                     // This is the selector callback, yet we are switching the data from the
                     // slider, this is to make sure both fields share the same look in the
@@ -208,12 +208,12 @@ impl EventHandler for Handler {
         let ctx_clone = ctx.clone();
 
         tokio::spawn(async move {
-            let components = {
+            let elements = {
                 let data_read = ctx_clone.data.read().await;
                 data_read.get::<RillRateComponents>().unwrap().clone()
             };
 
-            // Because sync_callback() waits for an action to happen to it's component,
+            // Because sync_callback() waits for an action to happen to it's element,
             // we cannot have both in the same thread, rather we need to listen to them in
             // parallel, but still have both modify the same value in the end.
             slider.sync_callback(move |envelope| {
@@ -225,7 +225,7 @@ impl EventHandler for Handler {
                 }
 
                 if let Some(val) = value {
-                    components.double_link_value.swap(val, Ordering::Relaxed);
+                    elements.double_link_value.swap(val, Ordering::Relaxed);
 
                     selector_instance.apply(Some(val.to_string()));
                 }
@@ -237,7 +237,7 @@ impl EventHandler for Handler {
         let ctx_clone = ctx.clone();
 
         tokio::spawn(async move {
-            let components = {
+            let elements = {
                 let data_read = ctx_clone.data.read().await;
                 data_read.get::<RillRateComponents>().unwrap().clone()
             };
@@ -287,10 +287,10 @@ impl EventHandler for Handler {
                     }
                 };
 
-                components.ws_ping_history.push(ws_latency);
-                components.get_ping_history.push(get_latency);
+                elements.ws_ping_history.push(ws_latency);
+                elements.get_ping_history.push(get_latency);
                 #[cfg(feature = "post-ping")]
-                components.post_ping_history.push(post_latency);
+                elements.post_ping_history.push(post_latency);
 
                 // Update every heartbeat, when the ws latency also updates.
                 sleep(Duration::from_millis(42500)).await;
@@ -301,19 +301,19 @@ impl EventHandler for Handler {
 
 #[hook]
 async fn before_hook(ctx: &Context, _: &Message, cmd_name: &str) -> bool {
-    let components = {
+    let elements = {
         let data_read = ctx.data.read().await;
         data_read.get::<RillRateComponents>().unwrap().clone()
     };
 
     let command_count_value = {
-        let mut count_write = components.command_usage_values.lock().await;
+        let mut count_write = elements.command_usage_values.lock().await;
         let mut command_count_value = count_write.get_mut(cmd_name).unwrap();
         command_count_value.use_count += 1;
         command_count_value.clone()
     };
 
-    components.command_usage_table.set_cell(
+    elements.command_usage_table.set_cell(
         Row(command_count_value.index as u64),
         Col(1),
         command_count_value.use_count,
@@ -448,7 +448,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 /// You can use this command to read the current value of the Switch, Slider and Selector.
 #[command]
 async fn switch(ctx: &Context, msg: &Message) -> CommandResult {
-    let components = {
+    let elements = {
         let data_read = ctx.data.read().await;
         data_read.get::<RillRateComponents>().unwrap().clone()
     };
@@ -457,8 +457,8 @@ async fn switch(ctx: &Context, msg: &Message) -> CommandResult {
         ctx,
         format!(
             "The switch is {} and the current value is {}",
-            if components.data_switch.load(Ordering::Relaxed) { "ON" } else { "OFF" },
-            components.double_link_value.load(Ordering::Relaxed),
+            if elements.data_switch.load(Ordering::Relaxed) { "ON" } else { "OFF" },
+            elements.double_link_value.load(Ordering::Relaxed),
         ),
     )
     .await?;
