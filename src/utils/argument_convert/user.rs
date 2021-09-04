@@ -36,8 +36,8 @@ impl ArgumentConvert for User {
 
     async fn convert(
         ctx: &Context,
-        _guild_id: Option<GuildId>,
-        _channel_id: Option<ChannelId>,
+        guild_id: Option<GuildId>,
+        channel_id: Option<ChannelId>,
         s: &str,
     ) -> Result<Self, Self::Err> {
         let users = ctx.cache.users.read().await;
@@ -55,11 +55,20 @@ impl ArgumentConvert for User {
 
         let lookup_by_name = || users.values().find(|user| user.name == s);
 
-        lookup_by_id()
+        // Try to look up in global user cache via a variety of methods
+        if let Some(user) = lookup_by_id()
             .or_else(lookup_by_mention)
             .or_else(lookup_by_name_and_discrim)
             .or_else(lookup_by_name)
-            .cloned()
-            .ok_or(UserParseError::NotFoundOrMalformed)
+        {
+            return Ok(user.clone());
+        }
+
+        // If not successful, convert as a Member which uses HTTP endpoints instead of cache
+        if let Ok(member) = Member::convert(ctx, guild_id, channel_id, s).await {
+            return Ok(member.user);
+        }
+
+        Err(UserParseError::NotFoundOrMalformed)
     }
 }
