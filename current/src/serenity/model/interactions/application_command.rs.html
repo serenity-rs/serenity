@@ -1067,6 +1067,8 @@
 <span id="1067">1067</span>
 <span id="1068">1068</span>
 <span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1756,6 +1758,8 @@
     <span class="doccomment">/// the application is added to a guild.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::default_permission_value&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">default_permission</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// An autoincremented version identifier updated during substantial record changes.</span>
+    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">CommandVersionId</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ApplicationCommand</span> {
