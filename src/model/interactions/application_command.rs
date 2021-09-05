@@ -687,6 +687,8 @@ pub struct ApplicationCommand {
     /// the application is added to a guild.
     #[serde(default = "self::default_permission_value")]
     pub default_permission: bool,
+    /// An autoincremented version identifier updated during substantial record changes.
+    pub version: CommandVersionId,
 }
 
 impl ApplicationCommand {
