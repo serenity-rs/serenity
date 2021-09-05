@@ -2334,6 +2334,16 @@ impl Guild {
     ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
     }
+
+    /// Gets the guild active threads.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if there is an error in the deserialization, or
+    /// if the bot issuing the request is not in the guild.
+    pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
+        self.id.get_active_threads(http).await
+    }
 }
 
 impl<'de> Deserialize<'de> for Guild {

@@ -2040,7 +2040,20 @@ impl Http {
         .await
     }
 
+    /// Gets all active threads from a guild.
+    pub async fn get_guild_active_threads(&self, guild_id: u64) -> Result<ThreadsData> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildActiveThreads {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Gets all active threads from a channel.
+    #[deprecated(note = "Use get_guild_active_threads instead")]
     pub async fn get_channel_active_threads(&self, channel_id: u64) -> Result<ThreadsData> {
         self.fire(Request {
             body: None,

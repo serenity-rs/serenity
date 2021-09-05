@@ -338,6 +338,12 @@ pub enum Route {
     ///
     /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdWelcomeScreen(u64),
+    /// Route for the `/guilds/:guild_id/threads/active` path.
+    ///
+    /// The data is the relevant [`GuildId`].
+    ///
+    /// [`GuildId`]: crate::model::id::GuildId
+    GuildsIdThreadsActive,
     /// Route for the `/invites/:code` path.
     InvitesCode,
     /// Route for the `/users/:user_id` path.
@@ -811,6 +817,10 @@ impl Route {
 
     pub fn guild_welcome_screen(guild_id: u64) -> String {
         format!(api!("/guilds/{}/welcome-screen"), guild_id)
+    }
+
+    pub fn guild_threads_active(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/threads/active"), guild_id)
     }
 
     pub fn guilds() -> &'static str {
@@ -1419,6 +1429,9 @@ pub enum RouteInfo<'a> {
         command_id: u64,
     },
     GetGuildWidget {
+        guild_id: u64,
+    },
+    GetGuildActiveThreads {
         guild_id: u64,
     },
     GetGuildPreview {
@@ -2220,6 +2233,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::ChannelsIdMeJoindedArchivedPrivateThreads(channel_id),
                 Cow::from(Route::channel_joined_private_threads(channel_id, before, limit)),
+            ),
+            RouteInfo::GetGuildActiveThreads {
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::GuildsIdThreadsActive,
+                Cow::from(Route::guild_threads_active(guild_id)),
             ),
             RouteInfo::JoinThread {
                 channel_id,

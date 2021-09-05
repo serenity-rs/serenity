@@ -1143,6 +1143,7 @@ impl ChannelId {
     ///
     /// It may return an [`Error::Http`] if the bot doesn't have the
     /// permission to get it.
+    #[deprecated(note = "Use GuildId::get_active_threads instead")]
     pub async fn get_active_threads(&self, http: impl AsRef<Http>) -> Result<ThreadsData> {
         http.as_ref().get_channel_active_threads(self.0).await
     }
