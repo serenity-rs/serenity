@@ -439,7 +439,6 @@ pub struct InviteStageInstance {
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
-#[cfg(feature = "model")]
 pub enum InviteTargetType {
     Normal = 0,
     Stream = 1,
