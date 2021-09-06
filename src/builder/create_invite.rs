@@ -210,7 +210,6 @@ impl CreateInvite {
     }
 
     /// The type of target for this voice channel invite.
-    #[cfg(feature = "model")]
     pub fn target_type(&mut self, target_type: InviteTargetType) -> &mut Self {
         self.0.insert("target_type", Value::Number(Number::from(target_type as u8)));
         self
