@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use crate::internal::prelude::*;
+use crate::model::id::{UserId, ApplicationId};
+use crate::model::invite::InviteTargetType;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -60,7 +62,7 @@ use crate::internal::prelude::*;
 ///     }
 /// }
 ///
-/// let mut client =Client::builder("token").event_handler(Handler).await?;
+/// let mut client = Client::builder("token").event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// #     Ok(())
@@ -204,6 +206,40 @@ impl CreateInvite {
     /// ```
     pub fn unique(&mut self, unique: bool) -> &mut Self {
         self.0.insert("unique", Value::Bool(unique));
+        self
+    }
+
+    /// The type of target for this voice channel invite.
+    #[cfg(feature = "model")]
+    pub fn target_type(&mut self, target_type: InviteTargetType) -> &mut Self {
+        self.0.insert("target_type", Value::Number(Number::from(target_type as u8)));
+        self
+    }
+
+    /// The ID of the user whose stream to display for this invite, required if `target_type` is
+    /// `Stream`
+    /// The user must be streaming in the channel.
+    pub fn target_user_id(&mut self, target_user_id: UserId) -> &mut Self {
+        self.0.insert("target_user_id", Value::Number(Number::from(target_user_id.0)));
+        self
+    }
+
+    /// The ID of the embedded application to open for this invite, required if `target_type` is
+    /// `EmmbeddedApplication`
+    /// The application must have the `EMBEDDED` flag.
+    ///
+    /// When sending an invite with this value, the first user to use the invite will have to click
+    /// on the URL, that will enable the buttons in the embed.
+    ///
+    /// These are some of the known applications which have the flag:
+    ///
+    /// betrayal: `773336526917861400`
+    /// youtube: `755600276941176913`
+    /// fishing: `814288819477020702`
+    /// poker: `755827207812677713`
+    /// chess: `832012774040141894`
+    pub fn target_application_id(&mut self, target_application_id: ApplicationId) -> &mut Self {
+        self.0.insert("target_application_id", Value::Number(Number::from(target_application_id.0)));
         self
     }
 }
