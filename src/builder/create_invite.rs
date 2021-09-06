@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use crate::internal::prelude::*;
-use crate::model::id::{UserId, ApplicationId};
+use crate::model::id::{ApplicationId, UserId};
 use crate::model::invite::InviteTargetType;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
@@ -239,7 +239,8 @@ impl CreateInvite {
     /// poker: `755827207812677713`
     /// chess: `832012774040141894`
     pub fn target_application_id(&mut self, target_application_id: ApplicationId) -> &mut Self {
-        self.0.insert("target_application_id", Value::Number(Number::from(target_application_id.0)));
+        self.0
+            .insert("target_application_id", Value::Number(Number::from(target_application_id.0)));
         self
     }
 }

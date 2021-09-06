@@ -54,7 +54,7 @@ pub struct Invite {
     /// Only shows up if `target_type` is `Stream`.
     pub target_user: Option<UserId>,
     /// The embedded application to open for this voice channel embedded application invite.
-    /// 
+    ///
     /// Only shows up if `target_type` is `EmmbeddedApplication`.
     pub target_application: Option<ApplicationId>,
 
@@ -63,7 +63,7 @@ pub struct Invite {
     // pub expires_at: Option<DateTime<Utc>>,
     /// The Stage instance data if there is a public Stage instance in the Stage
     /// channel this invite is for.
-    pub stage_instance: Option<InviteStageInstance>
+    pub stage_instance: Option<InviteStageInstance>,
 }
 
 #[cfg(feature = "model")]
