@@ -424,7 +424,6 @@ impl RichInvite {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[cfg(feature = "model")]
 #[non_exhaustive]
 pub struct InviteStageInstance {
     /// The members speaking in the Stage
