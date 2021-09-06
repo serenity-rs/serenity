@@ -46,6 +46,24 @@ pub struct Invite {
     /// This can be [`None`] for invites created by Discord such as invite-widgets
     /// or vanity invite links.
     pub inviter: Option<InviteUser>,
+
+    /// The type of target for this voice channel invite.
+    pub target_type: Option<InviteTargetType>,
+    /// The user whose stream to display for this voice channel stream invite.
+    ///
+    /// Only shows up if `target_type` is `Stream`.
+    pub target_user: Option<UserId>,
+    /// The embedded application to open for this voice channel embedded application invite.
+    ///
+    /// Only shows up if `target_type` is `EmmbeddedApplication`.
+    pub target_application: Option<ApplicationId>,
+
+    // /// The expiration date of this invite, returned from `Http::get_invite` when
+    // /// `with_expiration` is true.
+    // pub expires_at: Option<DateTime<Utc>>,
+    /// The Stage instance data if there is a public Stage instance in the Stage
+    /// channel this invite is for.
+    pub stage_instance: Option<InviteStageInstance>,
 }
 
 #[cfg(feature = "model")]
@@ -404,3 +422,31 @@ impl RichInvite {
         format!("https://discord.gg/{}", self.code)
     }
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct InviteStageInstance {
+    /// The members speaking in the Stage
+    members: Vec<PartialMember>,
+    /// The number of users in the Stage
+    participant_count: u64,
+    /// The number of users speaking in the Stage
+    speaker_count: u64,
+    /// The topic of the Stage instance (1-120 characters)
+    topic: String,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+pub enum InviteTargetType {
+    Normal = 0,
+    Stream = 1,
+    EmmbeddedApplication = 2,
+    Unknown = !0,
+}
+
+enum_number!(InviteTargetType {
+    Normal,
+    Stream,
+    EmmbeddedApplication,
+});
