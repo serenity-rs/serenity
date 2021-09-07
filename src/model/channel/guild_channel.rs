@@ -18,7 +18,10 @@ use crate::cache::Cache;
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReaction, CollectReply, MessageCollectorBuilder, ReactionCollectorBuilder,
+    CollectReaction,
+    CollectReply,
+    MessageCollectorBuilder,
+    ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
@@ -1088,7 +1091,7 @@ impl GuildChannel {
                     })
                     .collect::<Vec<Member>>()
                     .await)
-            }
+            },
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
     }
