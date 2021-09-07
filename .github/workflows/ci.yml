@@ -221,3 +221,5 @@ jobs:
         run: cargo build -p e13_parallel_loops
       - name: 'Build example 14'
         run: cargo build -p e14_slash_commands
+      - name: 'Build example 14'
+        run: cargo build -p e15_sqlite_database

@@ -27,7 +27,8 @@ members = [
     "examples/e11_gateway_intents",
     "examples/e12_global_data",
     "examples/e13_parallel_loops",
-    "examples/e14_slash_commands"
+    "examples/e14_slash_commands",
+    "examples/e15_sqlite_database"
 ]
 
 [dependencies]
