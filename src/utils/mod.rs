@@ -906,7 +906,7 @@ mod test {
         let channel = GuildChannel {
             id: ChannelId(111880193700067777),
             bitrate: None,
-            category_id: None,
+            parent_id: None,
             guild_id: guild.id,
             kind: ChannelType::Text,
             last_message_id: None,
