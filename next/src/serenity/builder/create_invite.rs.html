@@ -225,9 +225,46 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>, <span class="ident">NULL</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::invite::InviteTargetType</span>;
 
 <span class="doccomment">/// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].</span>
 <span class="doccomment">///</span>
@@ -285,7 +322,7 @@
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let mut client =Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+<span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// client.start().await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
@@ -429,6 +466,39 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">unique</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;unique&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">unique</span>));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// The type of target for this voice channel invite.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target_type</span>: <span class="ident">InviteTargetType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_type</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// The ID of the user whose stream to display for this invite, required if `target_type` is</span>
+    <span class="doccomment">/// `Stream`</span>
+    <span class="doccomment">/// The user must be streaming in the channel.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_user_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target_user_id</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_user_id&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_user_id</span>.<span class="number">0</span>));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// The ID of the embedded application to open for this invite, required if `target_type` is</span>
+    <span class="doccomment">/// `EmmbeddedApplication`</span>
+    <span class="doccomment">/// The application must have the `EMBEDDED` flag.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When sending an invite with this value, the first user to use the invite will have to click</span>
+    <span class="doccomment">/// on the URL, that will enable the buttons in the embed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// These are some of the known applications which have the flag:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// betrayal: `773336526917861400`</span>
+    <span class="doccomment">/// youtube: `755600276941176913`</span>
+    <span class="doccomment">/// fishing: `814288819477020702`</span>
+    <span class="doccomment">/// poker: `755827207812677713`</span>
+    <span class="doccomment">/// chess: `832012774040141894`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_application_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">target_application_id</span>: <span class="ident">ApplicationId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;target_application_id&quot;</span>, <span class="ident">from_number</span>(<span class="ident">target_application_id</span>.<span class="number">0</span>));
         <span class="self">self</span>
     }
 }

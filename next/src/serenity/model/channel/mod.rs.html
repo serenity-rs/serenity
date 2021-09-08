@@ -578,6 +578,7 @@
 <span id="578">578</span>
 <span id="579">579</span>
 <span id="580">580</span>
+<span id="581">581</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -1057,6 +1058,7 @@
     <span class="doccomment">/// A thread member for each returned thread the current user has joined.</span>
     <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ThreadMember</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Whether there are potentially additional threads that could be returned on a subsequent call.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">has_more</span>: <span class="ident">bool</span>,
 }
 

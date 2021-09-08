@@ -2718,6 +2718,26 @@
 <span id="2718">2718</span>
 <span id="2719">2719</span>
 <span id="2720">2720</span>
+<span id="2721">2721</span>
+<span id="2722">2722</span>
+<span id="2723">2723</span>
+<span id="2724">2724</span>
+<span id="2725">2725</span>
+<span id="2726">2726</span>
+<span id="2727">2727</span>
+<span id="2728">2728</span>
+<span id="2729">2729</span>
+<span id="2730">2730</span>
+<span id="2731">2731</span>
+<span id="2732">2732</span>
+<span id="2733">2733</span>
+<span id="2734">2734</span>
+<span id="2735">2735</span>
+<span id="2736">2736</span>
+<span id="2737">2737</span>
+<span id="2738">2738</span>
+<span id="2739">2739</span>
+<span id="2740">2740</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -3070,6 +3090,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdWelcomeScreen</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// Route for the `/guilds/:guild_id/threads/active` path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
+    <span class="ident">GuildsIdThreadsActive</span>,
     <span class="doccomment">/// Route for the `/invites/:code` path.</span>
     <span class="ident">InvitesCode</span>,
     <span class="doccomment">/// Route for the `/sticker-packs` path.</span>
@@ -3555,6 +3581,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_welcome_screen</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/welcome-screen&quot;</span>), <span class="ident">guild_id</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_threads_active</span>(<span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/threads/active&quot;</span>), <span class="ident">guild_id</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guilds</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
@@ -4187,6 +4217,9 @@
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetGuildWidget</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+    },
+    <span class="ident">GetGuildActiveThreads</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">GetGuildPreview</span> {
@@ -5022,6 +5055,13 @@
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::ChannelsIdMeJoindedArchivedPrivateThreads</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_joined_private_threads</span>(<span class="ident">channel_id</span>, <span class="ident">before</span>, <span class="ident">limit</span>)),
+            ),
+            <span class="ident">RouteInfo::GetGuildActiveThreads</span> {
+                <span class="ident">guild_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::GuildsIdThreadsActive</span>,
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_threads_active</span>(<span class="ident">guild_id</span>)),
             ),
             <span class="ident">RouteInfo::JoinThread</span> {
                 <span class="ident">channel_id</span>,

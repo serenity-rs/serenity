@@ -244,13 +244,29 @@
 <span id="244">244</span>
 <span id="245">245</span>
 <span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">simd_json::Mutable</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::interactions::application_command::ApplicationCommandOptionType</span>, <span class="ident">utils</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command</span>::{
+    <span class="ident">ApplicationCommandOptionType</span>,
+    <span class="ident">ApplicationCommandType</span>,
+};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommandOption`].</span>
 <span class="doccomment">///</span>
@@ -388,6 +404,12 @@
     <span class="doccomment">/// **Note**: Must be between 1 and 32 lowercase characters, matching `r&quot;^[\w-]{1,32}$&quot;`. Two global commands of the same app cannot have the same name. Two guild-specific commands of the same app cannot have the same name.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Specifies the type of the application command.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ApplicationCommandType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>
     }
 

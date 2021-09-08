@@ -77,6 +77,16 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::prelude</span>::<span class="kw-2">*</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 
@@ -115,8 +125,8 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">convert</span>(
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
-        <span class="ident">_guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-        <span class="ident">_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+        <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+        <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
         <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">users</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">users</span>;
@@ -149,11 +159,21 @@
             })
         };
 
-        <span class="ident">lookup_by_id</span>()
+        <span class="comment">// Try to look up in global user cache via a variety of methods</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">lookup_by_id</span>()
             .<span class="ident">or_else</span>(<span class="ident">lookup_by_mention</span>)
             .<span class="ident">or_else</span>(<span class="ident">lookup_by_name_and_discrim</span>)
             .<span class="ident">or_else</span>(<span class="ident">lookup_by_name</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">UserParseError::NotFoundOrMalformed</span>)
+        {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">user</span>.<span class="ident">clone</span>());
+        }
+
+        <span class="comment">// If not successful, convert as a Member which uses HTTP endpoints instead of cache</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">Member::convert</span>(<span class="ident">ctx</span>, <span class="ident">guild_id</span>, <span class="ident">channel_id</span>, <span class="ident">s</span>).<span class="kw">await</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">member</span>.<span class="ident">user</span>);
+        }
+
+        <span class="prelude-val">Err</span>(<span class="ident">UserParseError::NotFoundOrMalformed</span>)
     }
 }
 </code></pre></div>

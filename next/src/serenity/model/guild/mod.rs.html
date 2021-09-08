@@ -3351,6 +3351,16 @@
 <span id="3351">3351</span>
 <span id="3352">3352</span>
 <span id="3353">3353</span>
+<span id="3354">3354</span>
+<span id="3355">3355</span>
+<span id="3356">3356</span>
+<span id="3357">3357</span>
+<span id="3358">3358</span>
+<span id="3359">3359</span>
+<span id="3360">3360</span>
+<span id="3361">3361</span>
+<span id="3362">3362</span>
+<span id="3363">3363</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.</span>
@@ -5778,6 +5788,16 @@
         <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReactionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">ReactionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">guild_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Gets the guild active threads.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if there is an error in the deserialization, or</span>
+    <span class="doccomment">/// if the bot issuing the request is not in the guild.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_active_threads</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ThreadsData</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">get_active_threads</span>(<span class="ident">http</span>).<span class="kw">await</span>
     }
 }
 

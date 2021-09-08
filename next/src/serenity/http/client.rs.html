@@ -3795,6 +3795,20 @@
 <span id="3795">3795</span>
 <span id="3796">3796</span>
 <span id="3797">3797</span>
+<span id="3798">3798</span>
+<span id="3799">3799</span>
+<span id="3800">3800</span>
+<span id="3801">3801</span>
+<span id="3802">3802</span>
+<span id="3803">3803</span>
+<span id="3804">3804</span>
+<span id="3805">3805</span>
+<span id="3806">3806</span>
+<span id="3807">3807</span>
+<span id="3808">3808</span>
+<span id="3809">3809</span>
+<span id="3810">3810</span>
+<span id="3811">3811</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
@@ -6126,7 +6140,21 @@
         .<span class="kw">await</span>
     }
 
+    <span class="doccomment">/// Gets all active threads from a guild.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_active_threads</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ThreadsData</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildActiveThreads</span> {
+                <span class="ident">guild_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Gets all active threads from a channel.</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use get_guild_active_threads instead&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_channel_active_threads</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ThreadsData</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,

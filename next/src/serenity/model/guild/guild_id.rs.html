@@ -1625,6 +1625,16 @@
 <span id="1625">1625</span>
 <span id="1626">1626</span>
 <span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -3078,6 +3088,16 @@
     <span class="doccomment">/// Get the widget image URL.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">widget_image_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">style</span>: <span class="ident">GuildWidgetStyle</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget.png?style={}&quot;</span>), <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_string</span>(), <span class="ident">style</span>.<span class="ident">to_string</span>())
+    }
+
+    <span class="doccomment">/// Gets the guild active threads.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if there is an error in the deserialization, or</span>
+    <span class="doccomment">/// if the bot issuing the request is not in the guild.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_active_threads</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ThreadsData</span><span class="op">&gt;</span> {
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_active_threads</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="kw">await</span>
     }
 }
 

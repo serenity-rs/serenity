@@ -397,7 +397,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// All fields are required.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::ApplicationCommandPermissionData</span>
+<span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
 <span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionData</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
@@ -405,7 +405,7 @@
 <span class="kw">impl</span> <span class="ident">CreateApplicationCommandPermissionData</span> {
     <span class="doccomment">/// Sets the `ApplicationCommandPermissionType` for the [`ApplicationCommandPermissionData`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interaction::ApplicationCommandPermissionData</span>
+    <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ApplicationCommandPermissionType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>));
         <span class="self">self</span>
@@ -413,7 +413,7 @@
 
     <span class="doccomment">/// Sets the CommandPermissionId for the [`ApplicationCommandPermissionData`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interaction::ApplicationCommandPermissionData</span>
+    <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
@@ -424,7 +424,7 @@
     <span class="doccomment">/// **Note**: Setting it to `false` will only grey the application command in the</span>
     <span class="doccomment">/// list, it will not fully hide it to the user.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interaction::ApplicationCommandPermissionData</span>
+    <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permission</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permission</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permission&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">permission</span>));
         <span class="self">self</span>
