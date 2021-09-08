@@ -168,7 +168,6 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-<span id="171">171</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::EditChannel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -187,8 +186,7 @@
     <span class="doccomment">/// Guild Id this category belongs to.</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="doccomment">/// If this category belongs to another category.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;parent_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">category_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">parent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The position of this category.</span>
     <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
     <span class="doccomment">/// Indicator of the type of channel this is.</span>
@@ -308,7 +306,7 @@
             <span class="kw">let</span> <span class="ident">GuildChannel</span> {
                 <span class="ident">id</span>,
                 <span class="ident">guild_id</span>,
-                <span class="ident">category_id</span>,
+                <span class="ident">parent_id</span>,
                 <span class="ident">position</span>,
                 <span class="ident">kind</span>,
                 <span class="ident">name</span>,
@@ -320,7 +318,7 @@
             <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">ChannelCategory</span> {
                 <span class="ident">id</span>,
                 <span class="ident">guild_id</span>,
-                <span class="ident">category_id</span>,
+                <span class="ident">parent_id</span>,
                 <span class="ident">position</span>,
                 <span class="ident">kind</span>,
                 <span class="ident">name</span>,

@@ -1330,9 +1330,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available for voice and stage channels.</span>
     <span class="kw">pub</span> <span class="ident">bitrate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether this guild channel belongs in a category.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;parent_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">category_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The Id of the parent category for a channel, or of the parent text channel for a thread.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This is only available for channels in a category and thread channels.</span>
+    <span class="kw">pub</span> <span class="ident">parent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the guild the channel is located in.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this matches with the [`id`], then this is the default text channel.</span>
@@ -2555,9 +2556,8 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ChannelId</span>,
     <span class="doccomment">/// The channel guild Id.</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="doccomment">/// The channel category Id.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;parent_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">category_id</span>: <span class="ident">ChannelId</span>,
+    <span class="doccomment">/// The channel category Id,  or the parent text channel Id for a thread.</span>
+    <span class="kw">pub</span> <span class="ident">parent_id</span>: <span class="ident">ChannelId</span>,
     <span class="doccomment">/// The channel type.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
