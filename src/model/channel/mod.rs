@@ -498,7 +498,7 @@ mod test {
             GuildChannel {
                 id: ChannelId(1),
                 bitrate: None,
-                category_id: None,
+                parent_id: None,
                 guild_id: GuildId(2),
                 kind: ChannelType::Text,
                 last_message_id: None,
