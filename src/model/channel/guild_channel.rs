@@ -57,9 +57,10 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for voice and stage channels.
     pub bitrate: Option<u64>,
-    /// Whether this guild channel belongs in a category.
-    #[serde(rename = "parent_id")]
-    pub category_id: Option<ChannelId>,
+    /// The Id of the parent category for a channel, or of the parent text channel for a thread.
+    ///
+    /// **Note**: This is only available for channels in a category and thread channels.
+    pub parent_id: Option<ChannelId>,
     /// The Id of the guild the channel is located in.
     ///
     /// If this matches with the [`id`], then this is the default text channel.
@@ -1314,9 +1315,8 @@ pub struct PartialGuildChannel {
     pub id: ChannelId,
     /// The channel guild Id.
     pub guild_id: GuildId,
-    /// The channel category Id.
-    #[serde(rename = "parent_id")]
-    pub category_id: ChannelId,
+    /// The channel category Id,  or the parent text channel Id for a thread.
+    pub parent_id: ChannelId,
     /// The channel type.
     #[serde(rename = "type")]
     pub kind: ChannelType,
