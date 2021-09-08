@@ -407,7 +407,7 @@ mod test {
         async fn test_mention() {
             let channel = Channel::Guild(GuildChannel {
                 bitrate: None,
-                category_id: None,
+                parent_id: None,
                 guild_id: GuildId(1),
                 kind: ChannelType::Text,
                 id: ChannelId(4),

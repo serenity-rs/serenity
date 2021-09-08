@@ -16,8 +16,7 @@ pub struct ChannelCategory {
     /// Guild Id this category belongs to.
     pub guild_id: GuildId,
     /// If this category belongs to another category.
-    #[serde(rename = "parent_id")]
-    pub category_id: Option<ChannelId>,
+    pub parent_id: Option<ChannelId>,
     /// The position of this category.
     pub position: i64,
     /// Indicator of the type of channel this is.
@@ -137,7 +136,7 @@ impl ChannelCategory {
             let GuildChannel {
                 id,
                 guild_id,
-                category_id,
+                parent_id,
                 position,
                 kind,
                 name,
@@ -149,7 +148,7 @@ impl ChannelCategory {
             *self = ChannelCategory {
                 id,
                 guild_id,
-                category_id,
+                parent_id,
                 position,
                 kind,
                 name,
