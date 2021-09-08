@@ -52,5 +52,5 @@ hook.
 SQLx's GitHub repository explains a lot about SQLx, like the difference between `query!` and
 `query_as!`. Please follow the links to learn more:
 
-SQLx: https://github.com/launchbadge/sqlx
-SQLx CLI: https://github.com/launchbadge/sqlx/tree/master/sqlx-cli
+- SQLx: https://github.com/launchbadge/sqlx
+- SQLx CLI: https://github.com/launchbadge/sqlx/tree/master/sqlx-cli
