@@ -286,3 +286,22 @@ args = ["make", "run_example", "e13_parallel_loops"]
 [tasks.dev_build_13]
 command = "cargo"
 args = ["make", "build_example", "e13_parallel_loops"]
+
+[tasks.16]
+alias = "run_16"
+
+[tasks.run_16]
+command = "cargo"
+args = ["make", "run_example_release", "e16_sqlite_database"]
+
+[tasks.build_16]
+command = "cargo"
+args = ["make", "build_example_release", "e16_sqlite_database"]
+
+[tasks.dev_run_16]
+command = "cargo"
+args = ["make", "run_example", "e16_sqlite_database"]
+
+[tasks.dev_build_16]
+command = "cargo"
+args = ["make", "build_example", "e16_sqlite_database"]

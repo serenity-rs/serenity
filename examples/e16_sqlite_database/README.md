@@ -21,7 +21,7 @@ DATABASE_URL=sqlite:database.sqlite
 ```sh
 # Note: due to a bug in SQLx, you have to provide the full path to DATABASE_URL when compiling
 # Once the bug is fixed, you can omit `DATABASE_URL=...` and let SQLx read the `.env` file
-DATABASE_URL=sqlite:examples/e15_sqlite_database/database.sqlite DISCORD_TOKEN=... cargo run
+DATABASE_URL=sqlite:examples/e16_sqlite_database/database.sqlite DISCORD_TOKEN=... cargo run
 ```
 
 Interact with the bot via `~todo list`, `~todo add` and `~todo remove`.
@@ -46,3 +46,11 @@ Note that users still have to set `SQLX_OFFLINE` to `true` even if `sqlx-data.js
 Tip: create a git pre-commit hook which executes `cargo sqlx prepare` for you before every commit.
 See the `pre-commit` file for an example. Copy the file into `.git/hooks` to install the pre-commit
 hook.
+
+# Using SQLx
+
+SQLx's GitHub repository explains a lot about SQLx, like the difference between `query!` and
+`query_as!`. Please follow the links to learn more:
+
+SQLx: https://github.com/launchbadge/sqlx
+SQLx CLI: https://github.com/launchbadge/sqlx/tree/master/sqlx-cli

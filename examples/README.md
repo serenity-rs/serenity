@@ -37,6 +37,7 @@ To run an example, you have various options:
 12 => Global Data: How to use the client data to share data between commands and events safely.
 13 => Parallel Loops: How to run tasks in a loop with context access.
       Additionally, show how to send a message to a specific channel.
+16 => SQLite Database: How to run an embedded SQLite database along the bot using SQLx
 ```
 
 2. Manually running:
