@@ -141,6 +141,16 @@ impl DispatchEvent {
             Self::Model(Event::VoiceStateUpdate(ref mut event)) => {
                 update(cache_and_http, event).await;
             },
+            Self::Model(Event::ReactionAdd(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::ReactionRemove(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::ReactionRemoveAll(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            // TODO: ADD CACHE_UPDATE FOR typing_start
             _ => (),
         }
     }
@@ -662,21 +672,27 @@ async fn handle_event(
                 event_handler.presence_update(context, event).await;
             });
         },
-        DispatchEvent::Model(Event::ReactionAdd(event)) => {
+        DispatchEvent::Model(Event::ReactionAdd(mut event)) => {
+            update(&cache_and_http, &mut event).await;
+
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
                 event_handler.reaction_add(context, event.reaction).await;
             });
         },
-        DispatchEvent::Model(Event::ReactionRemove(event)) => {
+        DispatchEvent::Model(Event::ReactionRemove(mut event)) => {
+            update(&cache_and_http, &mut event).await;
+
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
                 event_handler.reaction_remove(context, event.reaction).await;
             });
         },
-        DispatchEvent::Model(Event::ReactionRemoveAll(event)) => {
+        DispatchEvent::Model(Event::ReactionRemoveAll(mut event)) => {
+            update(&cache_and_http, &mut event).await;
+
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {

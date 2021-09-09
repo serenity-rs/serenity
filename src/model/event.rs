@@ -1210,6 +1210,76 @@ pub struct ReactionAddEvent {
     pub reaction: Reaction,
 }
 
+#[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for ReactionAddEvent {
+    type Output = ();
+
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        let r = &self.reaction;
+
+        // Cache the member if all necessary fields are available
+        if let Some(partial_member) = &r.member {
+            if let Some(user) = &partial_member.user {
+                cache.update_user_entry(user).await;
+                if let Some(guild_id) = r.guild_id {
+                    if let Some(guild) = cache.guilds.write().await.get_mut(&guild_id) {
+                        if let Some(member) = guild.members.get_mut(&user.id) {
+                            member.joined_at.clone_from(&partial_member.joined_at);
+                            member.nick.clone_from(&partial_member.nick);
+                            member.roles.clone_from(&partial_member.roles);
+                            member.user.clone_from(user);
+                            member.pending.clone_from(&partial_member.pending);
+                            member.premium_since.clone_from(&partial_member.premium_since);
+                            member.deaf.clone_from(&partial_member.deaf);
+                            member.mute.clone_from(&partial_member.mute);
+                            member.avatar.clone_from(&user.avatar);
+                        } else {
+                            guild.members.insert(user.id, Member {
+                                deaf: partial_member.deaf,
+                                guild_id,
+                                joined_at: partial_member.joined_at,
+                                mute: partial_member.mute,
+                                nick: partial_member.nick.clone(),
+                                roles: partial_member.roles.clone(),
+                                user: user.clone(),
+                                pending: partial_member.pending,
+                                premium_since: partial_member.premium_since,
+                                #[cfg(feature = "unstable_discord_api")]
+                                permissions: None,
+                                avatar: user.avatar.clone(),
+                            });
+                        };
+                    }
+                }
+            }
+        }
+
+        // Find the message, and update the cached reactions
+        if let Some(messages) = cache.messages.write().await.get_mut(&r.channel_id) {
+            if let Some(message) = messages.get_mut(&r.message_id) {
+                if let Some(mut reaction) =
+                    message.reactions.iter_mut().find(|reaction| reaction.reaction_type == r.emoji)
+                {
+                    reaction.count += 1;
+                    if let Some(user_id) = r.user_id {
+                        reaction.me = reaction.me || user_id == cache.current_user_id().await
+                    }
+                } else if let Some(user_id) = r.user_id {
+                    let message_reaction = MessageReaction {
+                        count: 1,
+                        me: user_id == cache.current_user_id().await,
+                        reaction_type: r.emoji.clone(),
+                    };
+                    message.reactions.push(message_reaction);
+                }
+            }
+        }
+
+        None
+    }
+}
+
 impl<'de> Deserialize<'de> for ReactionAddEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
@@ -1230,7 +1300,38 @@ impl Serialize for ReactionAddEvent {
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct ReactionRemoveEvent {
-    pub reaction: Reaction,
+    pub reaction: Reaction, // the member is always None in this payload
+}
+
+#[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for ReactionRemoveEvent {
+    type Output = ();
+
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        let r = &self.reaction;
+
+        // Find the message, and update the cached reactions
+        if let Some(messages) = cache.messages.write().await.get_mut(&r.channel_id) {
+            if let Some(message) = messages.get_mut(&r.message_id) {
+                if let Some(idx) =
+                    message.reactions.iter().position(|reaction| reaction.reaction_type == r.emoji)
+                {
+                    if let Some(reaction) = message.reactions.get_mut(idx) {
+                        reaction.count -= 1;
+                        if reaction.count == 0 {
+                            message.reactions.remove(idx);
+                        } else if let Some(user_id) = r.user_id {
+                            if user_id == cache.current_user_id().await {
+                                reaction.me = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
 }
 
 impl<'de> Deserialize<'de> for ReactionRemoveEvent {
@@ -1256,6 +1357,23 @@ pub struct ReactionRemoveAllEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
     pub message_id: MessageId,
+}
+
+#[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for ReactionRemoveAllEvent {
+    type Output = ();
+
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        // Find the message, and update the cached reactions
+        if let Some(messages) = cache.messages.write().await.get_mut(&self.channel_id) {
+            if let Some(message) = messages.get_mut(&self.message_id) {
+                message.reactions.clear();
+                message.reactions.shrink_to_fit();
+            }
+        }
+        None
+    }
 }
 
 /// The "Ready" event, containing initial ready cache
