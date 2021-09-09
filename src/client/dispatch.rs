@@ -150,7 +150,9 @@ impl DispatchEvent {
             Self::Model(Event::ReactionRemoveAll(ref mut event)) => {
                 update(cache_and_http, event).await;
             },
-            // TODO: ADD CACHE_UPDATE FOR typing_start
+            Self::Model(Event::TypingStart(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
             _ => (),
         }
     }
@@ -716,7 +718,9 @@ async fn handle_event(
                 event_handler.resume(context, event).await;
             });
         },
-        DispatchEvent::Model(Event::TypingStart(event)) => {
+        DispatchEvent::Model(Event::TypingStart(mut event)) => {
+            update(&cache_and_http, &mut event).await;
+
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {

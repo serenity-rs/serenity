@@ -1455,6 +1455,54 @@ pub struct TypingStartEvent {
     pub channel_id: ChannelId,
     pub timestamp: u64,
     pub user_id: UserId,
+    pub member: Option<PartialMember>,
+}
+
+#[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for TypingStartEvent {
+    type Output = ();
+
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        // Cache the member if all necessary fields are available
+        if let Some(partial_member) = &self.member {
+            if let Some(user) = &partial_member.user {
+                cache.update_user_entry(user).await;
+                if let Some(guild_id) = self.guild_id {
+                    if let Some(guild) = cache.guilds.write().await.get_mut(&guild_id) {
+                        if let Some(member) = guild.members.get_mut(&user.id) {
+                            member.joined_at.clone_from(&partial_member.joined_at);
+                            member.nick.clone_from(&partial_member.nick);
+                            member.roles.clone_from(&partial_member.roles);
+                            member.user.clone_from(user);
+                            member.pending.clone_from(&partial_member.pending);
+                            member.premium_since.clone_from(&partial_member.premium_since);
+                            member.deaf.clone_from(&partial_member.deaf);
+                            member.mute.clone_from(&partial_member.mute);
+                            member.avatar.clone_from(&user.avatar);
+                        } else {
+                            guild.members.insert(user.id, Member {
+                                deaf: partial_member.deaf,
+                                guild_id,
+                                joined_at: partial_member.joined_at,
+                                mute: partial_member.mute,
+                                nick: partial_member.nick.clone(),
+                                roles: partial_member.roles.clone(),
+                                user: user.clone(),
+                                pending: partial_member.pending,
+                                premium_since: partial_member.premium_since,
+                                #[cfg(feature = "unstable_discord_api")]
+                                permissions: None,
+                                avatar: user.avatar.clone(),
+                            });
+                        };
+                    }
+                }
+            }
+        }
+
+        None
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
