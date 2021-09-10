@@ -1651,7 +1651,7 @@ impl CacheUpdate for ThreadDeleteEvent {
         let (guild_id, thread_id) = (self.thread.guild_id, self.thread.id);
 
         cache.guilds.get_mut(&guild_id).and_then(|mut g| {
-            g.threads.iter().position(|e| e.id == thread_id).and_then(|i| Some(g.threads.remove(i)))
+            g.threads.iter().position(|e| e.id == thread_id).map(|i| g.threads.remove(i))
         })
     }
 }

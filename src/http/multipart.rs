@@ -27,7 +27,7 @@ pub struct Multipart<'a> {
 }
 
 impl<'a> Multipart<'a> {
-    pub(crate) async fn to_multipart_form(&mut self, client: &Client) -> Result<Form> {
+    pub(crate) async fn build_form(&mut self, client: &Client) -> Result<Form> {
         let mut multipart = Form::new();
 
         for (file_num, file) in self.files.iter_mut().enumerate() {
@@ -130,7 +130,7 @@ fn part_add_mime_str(part: Part, filename: &str) -> Result<Part> {
     // using Part::file(), but it is not done for any of the other methods we
     // use.
     // https://datatracker.ietf.org/doc/html/rfc7578#section-4.4
-    let mime_type = mime_guess::from_path(&filename).first_or_octet_stream();
+    let mime_type = mime_guess::from_path(filename).first_or_octet_stream();
 
     part.mime_str(mime_type.essence_str()).map_err(Into::into)
 }
