@@ -434,6 +434,10 @@
 <span id="434">434</span>
 <span id="435">435</span>
 <span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -470,13 +474,16 @@
     <span class="doccomment">/// An indicator that the webhook is managed by Discord for posting new</span>
     <span class="doccomment">/// messages to channels without a token.</span>
     <span class="ident">ChannelFollower</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// Application webhooks are webhooks used with Interactions.</span>
+    <span class="ident">Application</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="doccomment">/// An indicator that the webhook is of unknown type.</span>
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">WebhookType</span> {
     <span class="ident">Incoming</span>,
-    <span class="ident">ChannelFollower</span>
+    <span class="ident">ChannelFollower</span>,
+    <span class="ident">Application</span>,
 });
 
 <span class="kw">impl</span> <span class="ident">WebhookType</span> {
@@ -485,6 +492,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">WebhookType::Incoming</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;incoming&quot;</span>,
             <span class="ident">WebhookType::ChannelFollower</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;channel follower&quot;</span>,
+            <span class="ident">WebhookType::Application</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;application&quot;</span>,
             <span class="ident">WebhookType::Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;unknown&quot;</span>,
         }
     }
@@ -508,7 +516,7 @@
     <span class="doccomment">/// This can be modified via [`ExecuteWebhook::avatar_url`].</span>
     <span class="kw">pub</span> <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the channel that owns the webhook.</span>
-    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
+    <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the guild that owns the webhook.</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The default name of the webhook.</span>
