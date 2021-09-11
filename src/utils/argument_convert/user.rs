@@ -76,7 +76,7 @@ impl ArgumentConvert for User {
             .or_else(lookup_by_name_and_discrim)
             .or_else(lookup_by_name)
         {
-            return Ok(user.clone());
+            return Ok(user);
         }
 
         // If not successful, convert as a Member which uses HTTP endpoints instead of cache
