@@ -329,7 +329,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     env::set_var(
         "RUST_LOG",
         // TODO: If you are going to copy this to your crate, update the crate name in the string
-        // with the name of the create you are using it with.
+        // with the name of the crate you are using it with.
         // This are the recommended log settings for rillrate, otherwise be prepared to be spammed
         // with a ton of events.
         "info,e15_simple_dashboard=trace,meio=warn,rate_core=warn,rill_engine=warn",
