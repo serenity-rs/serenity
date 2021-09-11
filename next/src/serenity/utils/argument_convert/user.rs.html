@@ -165,7 +165,7 @@
             .<span class="ident">or_else</span>(<span class="ident">lookup_by_name_and_discrim</span>)
             .<span class="ident">or_else</span>(<span class="ident">lookup_by_name</span>)
         {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">user</span>.<span class="ident">clone</span>());
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">user</span>);
         }
 
         <span class="comment">// If not successful, convert as a Member which uses HTTP endpoints instead of cache</span>
