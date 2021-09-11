@@ -34,13 +34,16 @@ pub enum WebhookType {
     /// An indicator that the webhook is managed by Discord for posting new
     /// messages to channels without a token.
     ChannelFollower = 2,
+    /// Application webhooks are webhooks used with Interactions.
+    Application = 3,
     /// An indicator that the webhook is of unknown type.
     Unknown = !0,
 }
 
 enum_number!(WebhookType {
     Incoming,
-    ChannelFollower
+    ChannelFollower,
+    Application,
 });
 
 impl WebhookType {
@@ -49,6 +52,7 @@ impl WebhookType {
         match self {
             WebhookType::Incoming => "incoming",
             WebhookType::ChannelFollower => "channel follower",
+            WebhookType::Application => "application",
             WebhookType::Unknown => "unknown",
         }
     }
@@ -72,7 +76,7 @@ pub struct Webhook {
     /// This can be modified via [`ExecuteWebhook::avatar_url`].
     pub avatar: Option<String>,
     /// The Id of the channel that owns the webhook.
-    pub channel_id: ChannelId,
+    pub channel_id: Option<ChannelId>,
     /// The Id of the guild that owns the webhook.
     pub guild_id: Option<GuildId>,
     /// The default name of the webhook.
