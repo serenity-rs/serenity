@@ -473,7 +473,8 @@ pub struct GuildMemberUpdateEvent {
     pub deaf: bool,
     #[serde(default)]
     pub mute: bool,
-    pub avatar: Option<String>, /* TODO: Remove this on next. Avatar is not directly in this payload, but as part of the user. GuildMemberUpdateEvent is public, removing would be breaking change. */
+    #[deprecated(note = "This field is always `None`, use `self.user.avatar` instead")]
+    pub avatar: Option<String>,
 }
 
 #[cfg(feature = "cache")]
