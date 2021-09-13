@@ -9,6 +9,7 @@ use tokio::{
     time::Duration,
 };
 
+use crate::internal::tokio::spawn_named;
 use crate::{error::Result, http::Http};
 
 /// A struct to start typing in a [`Channel`] for an indefinite period of time.
@@ -68,7 +69,7 @@ impl Typing {
     pub fn start(http: Arc<Http>, channel_id: u64) -> Result<Self> {
         let (sx, mut rx) = oneshot::channel();
 
-        tokio::spawn(async move {
+        spawn_named("typing::start", async move {
             loop {
                 match rx.try_recv() {
                     Ok(_) | Err(TryRecvError::Closed) => break,

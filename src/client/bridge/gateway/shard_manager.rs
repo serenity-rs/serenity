@@ -25,6 +25,7 @@ use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::internal::prelude::*;
+use crate::internal::tokio::spawn_named;
 use crate::CacheAndHttp;
 
 /// A manager for handling the status of shards by starting them, restarting
@@ -140,7 +141,7 @@ impl ShardManager {
             intents: opt.intents,
         };
 
-        tokio::spawn(async move {
+        spawn_named("shard_queuer::run", async move {
             shard_queuer.run().await;
         });
 
