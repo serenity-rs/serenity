@@ -39,7 +39,7 @@ the invocation would be <code>!foo bar</code>.</p>
 <span class="kw">struct</span> <span class="ident">Foo</span>;</code></pre></div>
 <h2 id="options" class="section-header"><a href="#options">Options</a></h2>
 <p>These appear after <code>#[group]</code> as a series of attributes:</p>
-<table><thead><tr><th>Syntax</th><th>Description</th><th>Argument explanation</th></tr></thead><tbody>
+<div><table><thead><tr><th>Syntax</th><th>Description</th><th>Argument explanation</th></tr></thead><tbody>
 <tr><td><code>#[commands(commands)]</code></td><td>Set of commands belonging to this group.</td><td><code>commands</code> is a comma separated list of identifiers referencing functions marked by the <code>#[command]</code> macro</td></tr>
 <tr><td><code>#[sub_groups(subs)]</code></td><td>Set of sub groups belonging to this group.</td><td><code>subs</code> is a comma separated list of identifiers referencing structs marked by the <code>#[group]</code> macro</td></tr>
 <tr><td><code>#[prefixes(prefs)]</code></td><td>Text that must appear   before an invocation of a command of this group may occur.</td><td><code>prefs</code> is a comma separated list of strings</td></tr>
@@ -55,6 +55,7 @@ the invocation would be <code>!foo bar</code>.</p>
 <tr><td><code>#[description(desc)]</code> </br> <code>#[description = desc]</code></td><td>The group’s description or summary.</td><td><code>desc</code> is a string describing the group.</td></tr>
 <tr><td><code>#[summary(desc)]</code> </br> <code>#[summary = desc]</code></td><td>A summary group description displayed when shown multiple groups.</td><td><code>desc</code> is a string summaryly describing the group.</td></tr>
 </tbody></table>
+</div>
 <p>Documentation comments (<code>///</code>) applied onto the struct are interpreted as sugar for the
 <code>#[description]</code> option. When more than one application of the option is performed,
 the text is delimited by newlines. This mimics the behaviour of regular doc-comments,

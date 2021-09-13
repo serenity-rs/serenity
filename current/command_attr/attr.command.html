@@ -9,7 +9,7 @@ If an option doesn’t require for any data to be supplied, then it’s simply a
 <p>If the input to the option is malformed, the macro will give you can error, describing
 the correct method for passing data, and what it should be.</p>
 <p>The list of available options, is, as follows:</p>
-<table><thead><tr><th>Syntax</th><th>Description</th><th>Argument explanation</th></tr></thead><tbody>
+<div><table><thead><tr><th>Syntax</th><th>Description</th><th>Argument explanation</th></tr></thead><tbody>
 <tr><td><code>#[checks(identifiers)]</code></td><td>Preconditions that must met before the command’s execution.</td><td><code>identifiers</code> is a comma separated list of identifiers referencing functions marked by the <code>#[check]</code> macro</td></tr>
 <tr><td><code>#[aliases(names)]</code></td><td>Alternative names to refer to this command.</td><td><code>names</code> is a comma separated list of desired aliases.</td></tr>
 <tr><td><code>#[description(desc)]</code> </br> <code>#[description = desc]</code></td><td>The command’s description or summary.</td><td><code>desc</code> is a string describing the command.</td></tr>
@@ -26,6 +26,7 @@ the correct method for passing data, and what it should be.</p>
 <tr><td><code>#[owner_privilege]</code> </br> <code>#[owner_privilege(b)]</code></td><td>If owners can bypass certain options.</td><td><code>b</code> is a boolean. If no boolean is provided, the value is assumed to be <code>true</code>.</td></tr>
 <tr><td><code>#[sub_commands(commands)]</code></td><td>The sub or children commands of this command. They are executed in the form: <code>this-command sub-command</code>.</td><td><code>commands</code> is a comma separated list of identifiers referencing functions marked by the <code>#[command]</code> macro.</td></tr>
 </tbody></table>
+</div>
 <p>Documentation comments (<code>///</code>) applied onto the function are interpreted as sugar for the
 <code>#[description]</code> option. When more than one application of the option is performed,
 the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
