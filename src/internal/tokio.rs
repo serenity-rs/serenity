@@ -6,7 +6,7 @@ where
     T: Send + 'static,
 {
     #[cfg(tokio_unstable)]
-    return tokio::task::Builder::new().name(format!("serenity::{}", name)).spawn(future);
+    return tokio::task::Builder::new().name(&*format!("serenity::{}", name)).spawn(future);
 
     #[cfg(not(tokio_unstable))]
     tokio::spawn(future)
