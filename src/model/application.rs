@@ -10,7 +10,7 @@ use super::{
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PartialCurrentApplicationInfo {
     /// The unique Id of the user.
-    pub id: UserId,
+    pub id: ApplicationId,
     /// The flags associated with the application.
     ///
     /// These flags are unknown and are not yet documented in the Discord API
@@ -24,7 +24,7 @@ pub struct PartialCurrentApplicationInfo {
 pub struct CurrentApplicationInfo {
     pub description: String,
     pub icon: Option<String>,
-    pub id: UserId,
+    pub id: ApplicationId,
     pub name: String,
     pub owner: User,
     #[serde(default)]
