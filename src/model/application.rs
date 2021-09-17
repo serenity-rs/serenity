@@ -6,7 +6,8 @@ use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 
-use super::{id::UserId, user::User, utils::*};
+use super::id::{ApplicationId, UserId};
+use super::{user::User, utils::*};
 use crate::model::StdResult;
 
 /// Information about a user's application. An application does not necessarily
@@ -39,7 +40,7 @@ pub struct ApplicationInfo {
     /// This is not necessarily equivalent to the bot user's avatar.
     pub icon: Option<String>,
     /// The unique numeric Id of the application.
-    pub id: UserId,
+    pub id: ApplicationId,
     /// The name assigned to the application by the application owner.
     pub name: String,
     /// A list of redirect URIs assigned to the application.
@@ -115,7 +116,7 @@ impl fmt::Debug for BotApplication {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct PartialCurrentApplicationInfo {
     /// The unique Id of the user.
-    pub id: UserId,
+    pub id: ApplicationId,
     /// The flags associated with the application.
     ///
     /// You can get a usable value from this by using [`ApplicationFlags::from_u64`]
@@ -128,7 +129,7 @@ pub struct PartialCurrentApplicationInfo {
 pub struct CurrentApplicationInfo {
     pub description: String,
     pub icon: Option<String>,
-    pub id: UserId,
+    pub id: ApplicationId,
     pub name: String,
     pub owner: User,
     #[serde(default)]
