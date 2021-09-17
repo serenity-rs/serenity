@@ -7,7 +7,7 @@ use crate::model::prelude::*;
 /// A builder for constructing an invite link with custom OAuth2 scopes.
 #[derive(Debug, Clone, Default)]
 pub struct CreateBotAuthParameters {
-    client_id: UserId,
+    client_id: ApplicationId,
     scopes: Vec<OAuth2Scope>,
     permissions: Permissions,
     guild_id: GuildId,
@@ -50,7 +50,7 @@ impl CreateBotAuthParameters {
     }
 
     /// Specify the client Id of your application.
-    pub fn client_id<U: Into<UserId>>(&mut self, client_id: U) -> &mut Self {
+    pub fn client_id<U: Into<ApplicationId>>(&mut self, client_id: U) -> &mut Self {
         self.client_id = client_id.into();
         self
     }
