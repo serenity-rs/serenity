@@ -57,9 +57,9 @@ async fn main() {
     let http = Http::new_with_token(&token);
 
     // We will fetch your bot's id.
-    let bot_id = match http.get_current_application_info().await {
+    let bot_id = match http.get_current_user().await {
         Ok(info) => info.id,
-        Err(why) => panic!("Could not access application info: {:?}", why),
+        Err(why) => panic!("Could not access user info: {:?}", why),
     };
 
     let framework = StandardFramework::new()
