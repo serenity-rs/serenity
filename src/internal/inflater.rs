@@ -26,7 +26,7 @@ impl Inflater {
     }
 
     pub fn extend(&mut self, slice: &[u8]) {
-        self.compressed.extend_from_slice(&slice);
+        self.compressed.extend_from_slice(slice);
     }
 
     pub fn msg(&mut self) -> Result<Option<&[u8]>, DecompressError> {

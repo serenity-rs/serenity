@@ -79,7 +79,7 @@ pub(crate) fn convert_ws_message(
             inflater.extend(&bytes);
             match inflater.msg()? {
                 Some(msg) => {
-                    let ret = serde_json::from_slice(&msg[..]).map(Some).map_err(|why| {
+                    let ret = serde_json::from_slice(msg).map(Some).map_err(|why| {
                         warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
 
                         why
