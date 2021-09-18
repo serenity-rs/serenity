@@ -7,16 +7,17 @@ use std::{
 
 use async_trait::async_trait;
 use async_tungstenite::tungstenite::Message;
-use flate2::read::ZlibDecoder;
-use futures::stream::SplitSink;
+use async_tungstenite::{tokio::ConnectStream, WebSocketStream};
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use tokio::time::timeout;
 use tracing::{instrument, warn};
 use url::Url;
 
-use crate::gateway::{GatewayError, WsStream};
+use crate::gateway::{GatewayError, WsClient};
 use crate::internal::prelude::*;
-use crate::json::{from_reader, from_str, to_string};
+#[cfg(feature = "transport_compression")]
+use crate::internal::Inflater;
+use crate::json::{from_str, to_string};
 
 #[async_trait]
 pub trait ReceiverExt {
@@ -30,47 +31,64 @@ pub trait SenderExt {
 }
 
 #[async_trait]
-impl ReceiverExt for WsStream {
+impl ReceiverExt for WsClient {
     async fn recv_json(&mut self) -> Result<Option<Value>> {
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_millis(500);
 
-        let ws_message = match timeout(TIMEOUT, self.next()).await {
+        let ws_message = match timeout(TIMEOUT, self.stream.next()).await {
             Ok(Some(Ok(v))) => Some(v),
             Ok(Some(Err(e))) => return Err(e.into()),
             Ok(None) | Err(_) => None,
         };
 
-        convert_ws_message(ws_message)
+        convert_ws_message(
+            #[cfg(feature = "transport_compression")]
+            &mut self.inflater,
+            ws_message,
+        )
     }
 
     async fn try_recv_json(&mut self) -> Result<Option<Value>> {
-        convert_ws_message(self.try_next().await.ok().flatten())
+        convert_ws_message(
+            #[cfg(feature = "transport_compression")]
+            &mut self.inflater,
+            self.stream.try_next().await.ok().flatten(),
+        )
     }
 }
 
 #[async_trait]
-impl SenderExt for SplitSink<WsStream, Message> {
+impl SenderExt for WsClient {
     async fn send_json(&mut self, value: &Value) -> Result<()> {
-        Ok(to_string(value).map(Message::Text).map_err(Error::from).map(|m| self.send(m))?.await?)
-    }
-}
-
-#[async_trait]
-impl SenderExt for WsStream {
-    async fn send_json(&mut self, value: &Value) -> Result<()> {
-        Ok(to_string(value).map(Message::Text).map_err(Error::from).map(|m| self.send(m))?.await?)
+        Ok(to_string(value)
+            .map(Message::Text)
+            .map_err(Error::from)
+            .map(|m| self.stream.send(m))?
+            .await?)
     }
 }
 
 #[inline]
-pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>> {
+pub(crate) fn convert_ws_message(
+    #[cfg(feature = "transport_compression")] inflater: &mut Inflater,
+    message: Option<Message>,
+) -> Result<Option<Value>> {
     Ok(match message {
+        #[cfg(feature = "transport_compression")]
         Some(Message::Binary(bytes)) => {
-            from_reader(ZlibDecoder::new(&bytes[..])).map(Some).map_err(|why| {
-                warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
+            inflater.extend(&bytes);
+            match inflater.msg()? {
+                Some(msg) => {
+                    let ret = serde_json::from_slice(&msg[..]).map(Some).map_err(|why| {
+                        warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
 
-                why
-            })?
+                        why
+                    })?;
+                    inflater.clear();
+                    ret
+                },
+                None => None,
+            }
         },
         Some(Message::Text(mut payload)) => from_str(&mut payload).map(Some).map_err(|why| {
             warn!("Err deserializing text: {:?}; text: {}", why, payload,);
@@ -152,7 +170,7 @@ fn websocket_config() -> async_tungstenite::tungstenite::protocol::WebSocketConf
 
 #[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
 #[instrument]
-pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
+pub(crate) async fn create_rustls_client(url: Url) -> Result<WebSocketStream<ConnectStream>> {
     let (stream, _) =
         async_tungstenite::tokio::connect_async_with_config::<Url>(url, Some(websocket_config()))
             .await
@@ -163,7 +181,7 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
 
 #[cfg(feature = "native_tls_backend_marker")]
 #[instrument]
-pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
+pub(crate) async fn create_native_tls_client(url: Url) -> Result<WebSocketStream<ConnectStream>> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url.into(),
         Some(websocket_config()),
