@@ -816,7 +816,7 @@ async fn connect(base_url: &str) -> Result<WebSocketStream<ConnectStream>> {
 }
 
 #[cfg(feature = "native_tls_backend_marker")]
-async fn connect(base_url: &str) -> Result<WsClient> {
+async fn connect(base_url: &str) -> Result<WebSocketStream<ConnectStream>> {
     let url = build_gateway_url(base_url)?;
 
     Ok(create_native_tls_client(url).await?)
@@ -827,6 +827,7 @@ fn build_gateway_url(base: &str) -> Result<Url> {
     const COMPRESSION: &str = "?compress=zlib-stream";
     #[cfg(not(feature = "transport_compression"))]
     const COMPRESSION: &str = "";
+
     Url::parse(&format!("{}?v={}&encoding=json{}", base, constants::GATEWAY_VERSION, COMPRESSION)).map_err(|why| {
         warn!("Error building gateway URL with base `{}`: {:?}", base, why);
 
