@@ -828,9 +828,10 @@ fn build_gateway_url(base: &str) -> Result<Url> {
     #[cfg(not(feature = "transport_compression"))]
     const COMPRESSION: &str = "";
 
-    Url::parse(&format!("{}?v={}&encoding=json{}", base, constants::GATEWAY_VERSION, COMPRESSION)).map_err(|why| {
-        warn!("Error building gateway URL with base `{}`: {:?}", base, why);
+    Url::parse(&format!("{}?v={}&encoding=json{}", base, constants::GATEWAY_VERSION, COMPRESSION))
+        .map_err(|why| {
+            warn!("Error building gateway URL with base `{}`: {:?}", base, why);
 
-        Error::Gateway(GatewayError::BuildingUrl)
-    })
+            Error::Gateway(GatewayError::BuildingUrl)
+        })
 }
