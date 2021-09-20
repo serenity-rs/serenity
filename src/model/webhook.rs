@@ -43,7 +43,7 @@ pub enum WebhookType {
 enum_number!(WebhookType {
     Incoming,
     ChannelFollower,
-    Application,
+    Application
 });
 
 impl WebhookType {
