@@ -297,6 +297,7 @@ impl ShardRunner {
         let _ = self
             .shard
             .client
+            .stream
             .close(Some(CloseFrame {
                 code: close_code.into(),
                 reason: Cow::from(""),
@@ -306,7 +307,7 @@ impl ShardRunner {
         // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
         // disconnected from Discord.
         loop {
-            match self.shard.client.next().await {
+            match self.shard.client.stream.next().await {
                 Some(Ok(tungstenite::Message::Close(_))) => break,
                 Some(Err(_)) => {
                     warn!(
@@ -409,10 +410,10 @@ impl ShardRunner {
                         code: code.into(),
                         reason: Cow::from(reason),
                     };
-                    self.shard.client.close(Some(close)).await.is_ok()
+                    self.shard.client.stream.close(Some(close)).await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::Message(msg)) => {
-                    self.shard.client.send(msg).await.is_ok()
+                    self.shard.client.stream.send(msg).await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::SetActivity(activity)) => {
                     // To avoid a clone of `activity`, we do a little bit of
