@@ -172,6 +172,24 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
@@ -181,16 +199,17 @@
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
-<span class="kw">use</span> <span class="ident">flate2::read::ZlibDecoder</span>;
-<span class="kw">use</span> <span class="ident">futures::stream::SplitSink</span>;
+<span class="kw">use</span> <span class="ident">async_tungstenite</span>::{<span class="ident">tokio::ConnectStream</span>, <span class="ident">WebSocketStream</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">SinkExt</span>, <span class="ident">StreamExt</span>, <span class="ident">TryStreamExt</span>};
 <span class="kw">use</span> <span class="ident">tokio::time::timeout</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">instrument</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">WsStream</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">WsClient</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_reader</span>, <span class="ident">from_str</span>, <span class="ident">to_string</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::Inflater</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_str</span>, <span class="ident">to_string</span>};
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ReceiverExt</span> {
@@ -204,47 +223,64 @@
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">ReceiverExt</span> <span class="kw">for</span> <span class="ident">WsStream</span> {
+<span class="kw">impl</span> <span class="ident">ReceiverExt</span> <span class="kw">for</span> <span class="ident">WsClient</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv_json</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">tokio::time::Duration</span> <span class="op">=</span> <span class="ident">tokio::time::Duration::from_millis</span>(<span class="number">500</span>);
 
-        <span class="kw">let</span> <span class="ident">ws_message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
+        <span class="kw">let</span> <span class="ident">ws_message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">v</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>),
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>.<span class="ident">into</span>()),
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
 
-        <span class="ident">convert_ws_message</span>(<span class="ident">ws_message</span>)
+        <span class="ident">convert_ws_message</span>(
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span>
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inflater</span>,
+            <span class="ident">ws_message</span>,
+        )
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">try_recv_json</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">convert_ws_message</span>(<span class="self">self</span>.<span class="ident">try_next</span>().<span class="kw">await</span>.<span class="ident">ok</span>().<span class="ident">flatten</span>())
+        <span class="ident">convert_ws_message</span>(
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span>
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inflater</span>,
+            <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span>.<span class="ident">ok</span>().<span class="ident">flatten</span>(),
+        )
     }
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">SenderExt</span> <span class="kw">for</span> <span class="ident">SplitSink</span><span class="op">&lt;</span><span class="ident">WsStream</span>, <span class="ident">Message</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">SenderExt</span> <span class="kw">for</span> <span class="ident">WsClient</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">to_string</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Message::Text</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">m</span>))<span class="question-mark">?</span>.<span class="kw">await</span><span class="question-mark">?</span>)
-    }
-}
-
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">SenderExt</span> <span class="kw">for</span> <span class="ident">WsStream</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">to_string</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="ident">Message::Text</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">m</span>))<span class="question-mark">?</span>.<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">to_string</span>(<span class="ident">value</span>)
+            .<span class="ident">map</span>(<span class="ident">Message::Text</span>)
+            .<span class="ident">map_err</span>(<span class="ident">Error::from</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">send</span>(<span class="ident">m</span>))<span class="question-mark">?</span>
+            .<span class="kw">await</span><span class="question-mark">?</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_ws_message</span>(<span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_ws_message</span>(
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span> <span class="ident">inflater</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Inflater</span>,
+    <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">message</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span>
         <span class="prelude-val">Some</span>(<span class="ident">Message::Binary</span>(<span class="ident">bytes</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">from_reader</span>(<span class="ident">ZlibDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..])).<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
-                <span class="macro">warn!</span>(<span class="string">&quot;Err deserializing bytes: {:?}; bytes: {:?}&quot;</span>, <span class="ident">why</span>, <span class="ident">bytes</span>);
+            <span class="ident">inflater</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
+            <span class="kw">match</span> <span class="ident">inflater</span>.<span class="ident">msg</span>()<span class="question-mark">?</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">msg</span>).<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
+                        <span class="macro">warn!</span>(<span class="string">&quot;Err deserializing bytes: {:?}; bytes: {:?}&quot;</span>, <span class="ident">why</span>, <span class="ident">bytes</span>);
 
-                <span class="ident">why</span>
-            })<span class="question-mark">?</span>
+                        <span class="ident">why</span>
+                    })<span class="question-mark">?</span>;
+                    <span class="ident">inflater</span>.<span class="ident">clear</span>();
+                    <span class="ident">ret</span>
+                },
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            }
         },
         <span class="prelude-val">Some</span>(<span class="ident">Message::Text</span>(<span class="kw-2">mut</span> <span class="ident">payload</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">payload</span>).<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
             <span class="macro">warn!</span>(<span class="string">&quot;Err deserializing text: {:?}; text: {}&quot;</span>, <span class="ident">why</span>, <span class="ident">payload</span>,);
@@ -326,7 +362,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
 <span class="attribute">#[<span class="ident">instrument</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_rustls_client</span>(<span class="ident">url</span>: <span class="ident">Url</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WsStream</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_rustls_client</span>(<span class="ident">url</span>: <span class="ident">Url</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WebSocketStream</span><span class="op">&lt;</span><span class="ident">ConnectStream</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">stream</span>, <span class="kw">_</span>) <span class="op">=</span>
         <span class="ident">async_tungstenite::tokio::connect_async_with_config</span>::<span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>(<span class="ident">url</span>, <span class="prelude-val">Some</span>(<span class="ident">websocket_config</span>()))
             .<span class="kw">await</span>
@@ -337,7 +373,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">instrument</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_native_tls_client</span>(<span class="ident">url</span>: <span class="ident">Url</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WsStream</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_native_tls_client</span>(<span class="ident">url</span>: <span class="ident">Url</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WebSocketStream</span><span class="op">&lt;</span><span class="ident">ConnectStream</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">stream</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">async_tungstenite::tokio::connect_async_with_config</span>::<span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>(
         <span class="ident">url</span>.<span class="ident">into</span>(),
         <span class="prelude-val">Some</span>(<span class="ident">websocket_config</span>()),

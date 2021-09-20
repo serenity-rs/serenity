@@ -817,6 +817,24 @@
 <span id="817">817</span>
 <span id="818">818</span>
 <span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync::Arc</span>,
     <span class="ident">time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>},
@@ -826,6 +844,7 @@
     <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>,
     <span class="ident">protocol::frame::CloseFrame</span>,
 };
+<span class="kw">use</span> <span class="ident">async_tungstenite</span>::{<span class="ident">tokio::ConnectStream</span>, <span class="ident">WebSocketStream</span>};
 <span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -837,7 +856,7 @@
     <span class="ident">ReconnectType</span>,
     <span class="ident">ShardAction</span>,
     <span class="ident">WebSocketGatewayClientExt</span>,
-    <span class="ident">WsStream</span>,
+    <span class="ident">WsClient</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">GatewayIntents</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
@@ -846,6 +865,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl::create_native_tls_client</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl::create_rustls_client</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::Inflater</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
     <span class="ident">event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>},
     <span class="ident">gateway::Activity</span>,
@@ -886,7 +907,7 @@
 <span class="doccomment">/// [docs]: https://discord.com/developers/docs/topics/gateway#sharding</span>
 <span class="doccomment">/// [module docs]: crate::gateway#sharding</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Shard</span> {
-    <span class="kw">pub</span> <span class="ident">client</span>: <span class="ident">WsStream</span>,
+    <span class="kw">pub</span> <span class="ident">client</span>: <span class="ident">WsClient</span>,
     <span class="ident">current_presence</span>: <span class="ident">CurrentPresence</span>,
     <span class="doccomment">/// A tuple of:</span>
     <span class="doccomment">///</span>
@@ -959,7 +980,12 @@
         <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Shard</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">WsClient</span> {
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span>
+            <span class="ident">inflater</span>: <span class="ident">Inflater::new</span>(),
+            <span class="ident">stream</span>,
+        };
 
         <span class="kw">let</span> <span class="ident">current_presence</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="ident">OnlineStatus::Online</span>);
         <span class="kw">let</span> <span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
@@ -1554,7 +1580,7 @@
     <span class="doccomment">/// This will set the stage of the shard before and after instantiation of</span>
     <span class="doccomment">/// the client.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WsStream</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Initializing.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
         <span class="comment">// We need to do two, sort of three things here:</span>
@@ -1568,10 +1594,14 @@
         <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connecting</span>;
         <span class="self">self</span>.<span class="ident">started</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// Reset inflater</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span>
+        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">inflater</span>.<span class="ident">reset</span>();
+        <span class="comment">// Make new websocket stream</span>
+        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">stream</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Handshake</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">client</span>)
+        <span class="prelude-val">Ok</span>(())
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
@@ -1588,7 +1618,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">resume</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Attempting to resume&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
-        <span class="self">self</span>.<span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">initialize</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">initialize</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Resuming</span>;
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">session_id</span>.<span class="ident">as_ref</span>() {
@@ -1604,7 +1634,7 @@
         <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Attempting to reconnect&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>());
 
         <span class="self">self</span>.<span class="ident">reset</span>().<span class="kw">await</span>;
-        <span class="self">self</span>.<span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">initialize</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">initialize</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1616,25 +1646,31 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">base_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WsStream</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">base_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WebSocketStream</span><span class="op">&lt;</span><span class="ident">ConnectStream</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">build_gateway_url</span>(<span class="ident">base_url</span>)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">create_rustls_client</span>(<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">base_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WsStream</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">base_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WebSocketStream</span><span class="op">&lt;</span><span class="ident">ConnectStream</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">build_gateway_url</span>(<span class="ident">base_url</span>)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">create_native_tls_client</span>(<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 
 <span class="kw">fn</span> <span class="ident">build_gateway_url</span>(<span class="ident">base</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span> {
-    <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}?v={}&quot;</span>, <span class="ident">base</span>, <span class="ident">constants::GATEWAY_VERSION</span>)).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
-        <span class="macro">warn!</span>(<span class="string">&quot;Error building gateway URL with base `{}`: {:?}&quot;</span>, <span class="ident">base</span>, <span class="ident">why</span>);
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>)]</span>
+    <span class="kw">const</span> <span class="ident">COMPRESSION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;?compress=zlib-stream&quot;</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport_compression&quot;</span>))]</span>
+    <span class="kw">const</span> <span class="ident">COMPRESSION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>;
 
-        <span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::BuildingUrl</span>)
-    })
+    <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}?v={}&amp;encoding=json{}&quot;</span>, <span class="ident">base</span>, <span class="ident">constants::GATEWAY_VERSION</span>, <span class="ident">COMPRESSION</span>))
+        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">why</span><span class="op">|</span> {
+            <span class="macro">warn!</span>(<span class="string">&quot;Error building gateway URL with base `{}`: {:?}&quot;</span>, <span class="ident">base</span>, <span class="ident">why</span>);
+
+            <span class="ident">Error::Gateway</span>(<span class="ident">GatewayError::BuildingUrl</span>)
+        })
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

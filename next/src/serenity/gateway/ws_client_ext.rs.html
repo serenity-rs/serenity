@@ -180,7 +180,7 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">GatewayIntents</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">OpCode</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">CurrentPresence</span>, <span class="ident">WsStream</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">CurrentPresence</span>, <span class="ident">WsClient</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl::SenderExt</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
@@ -222,7 +222,7 @@
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">WebSocketGatewayClientExt</span> <span class="kw">for</span> <span class="ident">WsStream</span> {
+<span class="kw">impl</span> <span class="ident">WebSocketGatewayClientExt</span> <span class="kw">for</span> <span class="ident">WsClient</span> {
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_chunk_guild</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,

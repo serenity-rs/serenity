@@ -683,6 +683,7 @@
 <span id="683">683</span>
 <span id="684">684</span>
 <span id="685">685</span>
+<span id="686">686</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>::{
@@ -982,6 +983,7 @@
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">shard</span>
             .<span class="ident">client</span>
+            .<span class="ident">stream</span>
             .<span class="ident">close</span>(<span class="prelude-val">Some</span>(<span class="ident">CloseFrame</span> {
                 <span class="ident">code</span>: <span class="ident">close_code</span>.<span class="ident">into</span>(),
                 <span class="ident">reason</span>: <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
@@ -991,7 +993,7 @@
         <span class="comment">// In return, we wait for either a Close Frame response, or an error, after which this WS is deemed</span>
         <span class="comment">// disconnected from Discord.</span>
         <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">next</span>().<span class="kw">await</span> {
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">stream</span>.<span class="ident">next</span>().<span class="kw">await</span> {
                 <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">tungstenite::Message::Close</span>(<span class="kw">_</span>))) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
                 <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="macro">warn!</span>(
@@ -1094,10 +1096,10 @@
                         <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">into</span>(),
                         <span class="ident">reason</span>: <span class="ident">Cow::from</span>(<span class="ident">reason</span>),
                     };
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">close</span>(<span class="prelude-val">Some</span>(<span class="ident">close</span>)).<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">stream</span>.<span class="ident">close</span>(<span class="prelude-val">Some</span>(<span class="ident">close</span>)).<span class="kw">await</span>.<span class="ident">is_ok</span>()
                 },
                 <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::Message</span>(<span class="ident">msg</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">msg</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>()
+                    <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">client</span>.<span class="ident">stream</span>.<span class="ident">send</span>(<span class="ident">msg</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>()
                 },
                 <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::SetActivity</span>(<span class="ident">activity</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="comment">// To avoid a clone of `activity`, we do a little bit of</span>
