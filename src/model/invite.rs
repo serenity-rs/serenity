@@ -414,5 +414,5 @@ pub enum InviteTargetType {
 enum_number!(InviteTargetType {
     Normal,
     Stream,
-    EmmbeddedApplication,
+    EmmbeddedApplication
 });
