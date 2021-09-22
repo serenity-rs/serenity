@@ -52,8 +52,6 @@ version = "0.4.10"
 
 [dependencies.flate2]
 optional = true
-default-features = false
-features = ["zlib"]
 version = "1.0.13"
 
 [dependencies.reqwest]
@@ -162,13 +160,12 @@ version = "0.4"
 
 [features]
 # Defaults with different backends
-default = ["default_no_backend", "rustls_backend", "transport_compression"]
-default_native_tls = ["default_no_backend", "native_tls_backend", "transport_compression"]
-default_tokio_0_2 = ["default_no_backend", "rustls_tokio_0_2_backend", "transport_compression"]
+default = ["default_no_backend", "rustls_backend"]
+default_native_tls = ["default_no_backend", "native_tls_backend"]
+default_tokio_0_2 = ["default_no_backend", "rustls_tokio_0_2_backend"]
 default_native_tls_tokio_0_2 = [
     "default_no_backend",
     "native_tls_tokio_0_2_backend",
-    "transport_compression",
 ]
 
 # Serenity requires a backend, this picks all default features without a backend.
@@ -200,7 +197,6 @@ unstable_discord_api = []
 utils = ["base64"]
 voice = ["client", "model"]
 tokio_task_builder = ["tokio/tracing"]
-transport_compression = ["gateway", "flate2"]
 
 # Enables simd accelerated parsing
 simdjson = ["simd-json"]

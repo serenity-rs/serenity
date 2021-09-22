@@ -76,7 +76,6 @@ where
     Ok(simd_json::from_str(s)?)
 }
 
-#[allow(dead_code)]
 #[cfg(not(feature = "simd-json"))]
 pub(crate) fn from_reader<R, T>(r: R) -> Result<T>
 where
@@ -85,8 +84,6 @@ where
 {
     Ok(serde_json::from_reader(r)?)
 }
-
-#[allow(dead_code)]
 #[cfg(feature = "simd-json")]
 pub(crate) fn from_reader<R, T>(r: R) -> Result<T>
 where
