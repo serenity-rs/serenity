@@ -59,8 +59,6 @@ pub use self::{
 };
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
-#[cfg(feature = "transport_compression")]
-use crate::internal::Inflater;
 use crate::json::Value;
 use crate::model::{gateway::Activity, user::OnlineStatus};
 
@@ -68,11 +66,7 @@ pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 
 use async_tungstenite::{tokio::ConnectStream, WebSocketStream};
 
-pub struct WsClient {
-    #[cfg(feature = "transport_compression")]
-    pub(crate) inflater: Inflater,
-    pub(crate) stream: WebSocketStream<ConnectStream>,
-}
+pub type WsStream = WebSocketStream<ConnectStream>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///
