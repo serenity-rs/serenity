@@ -7,8 +7,6 @@ use std::{
 
 #[cfg(feature = "gateway")]
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;
-#[cfg(feature = "transport_compression")]
-use flate2::DecompressError;
 #[cfg(feature = "http")]
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
 use serde_json::Error as JsonError;
@@ -95,9 +93,6 @@ pub enum Error {
     /// [client]: crate::client
     #[cfg(feature = "client")]
     Client(ClientError),
-    /// Error when decompressing a payload.
-    #[cfg(feature = "transport_compression")]
-    Flate2(DecompressError),
     /// A [collector] error.
     ///
     /// [collector]: crate::collector
@@ -180,13 +175,6 @@ impl From<RustlsError> for Error {
     }
 }
 
-#[cfg(feature = "transport_compression")]
-impl From<DecompressError> for Error {
-    fn from(e: DecompressError) -> Error {
-        Error::Flate2(e)
-    }
-}
-
 #[cfg(feature = "gateway")]
 impl From<TungsteniteError> for Error {
     fn from(e: TungsteniteError) -> Error {
@@ -239,8 +227,6 @@ impl Display for Error {
             Error::Http(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(all(feature = "gateway", not(feature = "native_tls_backend_marker")))]
             Error::Rustls(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(feature = "transport_compression")]
-            Error::Flate2(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
         }
