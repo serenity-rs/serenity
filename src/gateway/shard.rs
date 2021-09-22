@@ -7,7 +7,6 @@ use async_tungstenite::tungstenite::{
     error::Error as TungsteniteError,
     protocol::frame::CloseFrame,
 };
-use async_tungstenite::{tokio::ConnectStream, WebSocketStream};
 use tokio::sync::Mutex;
 use tracing::{debug, error, info, instrument, trace, warn};
 use url::Url;
@@ -19,7 +18,7 @@ use super::{
     ReconnectType,
     ShardAction,
     WebSocketGatewayClientExt,
-    WsClient,
+    WsStream,
 };
 use crate::client::bridge::gateway::{ChunkGuildFilter, GatewayIntents};
 use crate::constants::{self, close_codes};
@@ -28,8 +27,6 @@ use crate::internal::prelude::*;
 use crate::internal::ws_impl::create_native_tls_client;
 #[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
 use crate::internal::ws_impl::create_rustls_client;
-#[cfg(feature = "transport_compression")]
-use crate::internal::Inflater;
 use crate::model::{
     event::{Event, GatewayEvent},
     gateway::Activity,
@@ -70,7 +67,7 @@ use crate::model::{
 /// [docs]: https://discord.com/developers/docs/topics/gateway#sharding
 /// [module docs]: crate::gateway#sharding
 pub struct Shard {
-    pub client: WsClient,
+    pub client: WsStream,
     current_presence: CurrentPresence,
     /// A tuple of:
     ///
@@ -144,12 +141,7 @@ impl Shard {
         intents: GatewayIntents,
     ) -> Result<Shard> {
         let url = ws_url.lock().await.clone();
-        let stream = connect(&url).await?;
-        let client = WsClient {
-            #[cfg(feature = "transport_compression")]
-            inflater: Inflater::new(),
-            stream,
-        };
+        let client = connect(&url).await?;
 
         let current_presence = (None, OnlineStatus::Online);
         let heartbeat_instants = (None, None);
@@ -751,7 +743,7 @@ impl Shard {
     /// This will set the stage of the shard before and after instantiation of
     /// the client.
     #[instrument(skip(self))]
-    pub async fn initialize(&mut self) -> Result<()> {
+    pub async fn initialize(&mut self) -> Result<WsStream> {
         debug!("[Shard {:?}] Initializing.", self.shard_info);
 
         // We need to do two, sort of three things here:
@@ -765,14 +757,10 @@ impl Shard {
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
         let url = &self.ws_url.lock().await.clone();
-        // Reset inflater
-        #[cfg(feature = "transport_compression")]
-        self.client.inflater.reset();
-        // Make new websocket stream
-        self.client.stream = connect(url).await?;
+        let client = connect(url).await?;
         self.stage = ConnectionStage::Handshake;
 
-        Ok(())
+        Ok(client)
     }
 
     #[instrument(skip(self))]
@@ -789,7 +777,7 @@ impl Shard {
     pub async fn resume(&mut self) -> Result<()> {
         debug!("[Shard {:?}] Attempting to resume", self.shard_info);
 
-        self.initialize().await?;
+        self.client = self.initialize().await?;
         self.stage = ConnectionStage::Resuming;
 
         match self.session_id.as_ref() {
@@ -805,7 +793,7 @@ impl Shard {
         info!("[Shard {:?}] Attempting to reconnect", self.shard_info());
 
         self.reset().await;
-        self.initialize().await?;
+        self.client = self.initialize().await?;
 
         Ok(())
     }
@@ -817,29 +805,23 @@ impl Shard {
 }
 
 #[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
-async fn connect(base_url: &str) -> Result<WebSocketStream<ConnectStream>> {
+async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
     Ok(create_rustls_client(url).await?)
 }
 
 #[cfg(feature = "native_tls_backend_marker")]
-async fn connect(base_url: &str) -> Result<WebSocketStream<ConnectStream>> {
+async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
     Ok(create_native_tls_client(url).await?)
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {
-    #[cfg(feature = "transport_compression")]
-    const COMPRESSION: &str = "?compress=zlib-stream";
-    #[cfg(not(feature = "transport_compression"))]
-    const COMPRESSION: &str = "";
+    Url::parse(&format!("{}?v={}", base, constants::GATEWAY_VERSION)).map_err(|why| {
+        warn!("Error building gateway URL with base `{}`: {:?}", base, why);
 
-    Url::parse(&format!("{}?v={}&encoding=json{}", base, constants::GATEWAY_VERSION, COMPRESSION))
-        .map_err(|why| {
-            warn!("Error building gateway URL with base `{}`: {:?}", base, why);
-
-            Error::Gateway(GatewayError::BuildingUrl)
-        })
+        Error::Gateway(GatewayError::BuildingUrl)
+    })
 }

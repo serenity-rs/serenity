@@ -7,7 +7,7 @@ use tracing::{debug, trace};
 
 use crate::client::bridge::gateway::{ChunkGuildFilter, GatewayIntents};
 use crate::constants::{self, OpCode};
-use crate::gateway::{CurrentPresence, WsClient};
+use crate::gateway::{CurrentPresence, WsStream};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
 use crate::json::json;
@@ -49,7 +49,7 @@ pub trait WebSocketGatewayClientExt {
 }
 
 #[async_trait]
-impl WebSocketGatewayClientExt for WsClient {
+impl WebSocketGatewayClientExt for WsStream {
     #[instrument(skip(self))]
     async fn send_chunk_guild(
         &mut self,
