@@ -28,14 +28,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopus-dev
 
-      - name: Setup cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target/debug
-          key: ${{ runner.os }}-gh-pages-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
 
       - name: Build docs
         env:
