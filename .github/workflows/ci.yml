@@ -88,6 +88,17 @@ jobs:
       - name: Check minimal versions
         if: matrix.toolchain == 'nightly'
         run: cargo clean; cargo update -Z minimal-versions; cargo check
+      - name: Lint
+        if: matrix.toolchain == 'nightly'
+        uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # TODO(https://github.com/serenity-rs/serenity/issues/1423): Clippy currently fails with
+          # all features enabled. Re-add `--workspace` here once that's fixed.
+          args: --tests
+      - name: FMT
+        if: matrix.toolchain == 'nightly'
+        run: cargo fmt --all -- --check
 
   MSRV:
     runs-on: ubuntu-latest
