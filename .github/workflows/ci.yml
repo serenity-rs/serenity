@@ -95,7 +95,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --locked --all-targets --all-features --tests
+          args: --tests
       - name: Format
         if: matrix.toolchain == 'nightly'
         run: cargo fmt --all -- --check
