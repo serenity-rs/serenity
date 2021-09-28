@@ -2635,6 +2635,16 @@
 <span id="2635">2635</span>
 <span id="2636">2636</span>
 <span id="2637">2637</span>
+<span id="2638">2638</span>
+<span id="2639">2639</span>
+<span id="2640">2640</span>
+<span id="2641">2641</span>
+<span id="2642">2642</span>
+<span id="2643">2643</span>
+<span id="2644">2644</span>
+<span id="2645">2645</span>
+<span id="2646">2646</span>
+<span id="2647">2647</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -3926,6 +3936,9 @@
     <span class="ident">EditRolePosition</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">EditThread</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">EditVoiceState</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
@@ -4722,6 +4735,13 @@
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::GuildsIdRolesId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_roles</span>(<span class="ident">guild_id</span>)),
+            ),
+            <span class="ident">RouteInfo::EditThread</span> {
+                <span class="ident">channel_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
             ),
             <span class="ident">RouteInfo::EditVoiceState</span> {
                 <span class="ident">guild_id</span>,
