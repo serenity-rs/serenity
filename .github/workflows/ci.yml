@@ -66,15 +66,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopus-dev
 
-      - name: Setup cache
-        if: runner.os != 'macOS'
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-test-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
 
       - name: Build all features
         if: matrix.features == ''
@@ -116,14 +109,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopus-dev
 
-      - name: Setup cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-msrv-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
 
       - run: cargo check --all-features
 
@@ -148,13 +135,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopus-dev
 
-      - name: Setup cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-docs-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
 
       - name: Build docs
         env:
@@ -184,14 +166,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libopus-dev
 
-      - name: Setup cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-examples-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
 
       - name: 'Build example 1'
         run: cargo build -p e01_basic_ping_bot
