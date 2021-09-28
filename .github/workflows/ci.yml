@@ -90,12 +90,10 @@ jobs:
         run: cargo clean; cargo update -Z minimal-versions; cargo check
       - name: Lint
         if: matrix.toolchain == 'nightly'
-        uses: actions-rs/clippy-check@v1
+        uses: actions-rs/cargo@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          # TODO(https://github.com/serenity-rs/serenity/issues/1423): Clippy currently fails with
-          # all features enabled. Re-add `--workspace` here once that's fixed.
-          args: --tests
+          command: clippy
+          args: --locked --all-targets --all-features --tests
       - name: FMT
         if: matrix.toolchain == 'nightly'
         run: cargo fmt --all -- --check
