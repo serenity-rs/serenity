@@ -89,6 +89,7 @@ jobs:
         if: matrix.toolchain == 'nightly'
         run: cargo clean; cargo update -Z minimal-versions; cargo check
       - run: rustup component add clippy --toolchain nightly-x86_64-unknown-linux-gnu
+        if: matrix.toolchain == 'nightly'
       - name: Lint
         if: matrix.toolchain == 'nightly'
         uses: actions-rs/cargo@v1
