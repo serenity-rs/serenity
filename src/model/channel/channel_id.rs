@@ -20,6 +20,7 @@ use crate::builder::{
     CreateThread,
     EditChannel,
     EditMessage,
+    EditThread,
     GetMessages,
 };
 use crate::builder::{CreateStageInstance, EditStageInstance};
@@ -1032,6 +1033,23 @@ impl ChannelId {
         let map = utils::hashmap_to_json_map(instance.0);
 
         http.as_ref().edit_stage_instance(self.0, &Value::Object(map)).await
+    }
+
+    /// Edits a thread.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn edit_thread<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
+    where
+        F: FnOnce(&mut EditThread) -> &mut EditThread,
+    {
+        let mut instance = EditThread::default();
+        f(&mut instance);
+
+        let map = utils::hashmap_to_json_map(instance.0);
+
+        http.as_ref().edit_thread(self.0, &map).await
     }
 
     /// Deletes a stage instance.

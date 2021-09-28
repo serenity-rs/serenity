@@ -1289,6 +1289,9 @@ pub enum RouteInfo<'a> {
     EditRolePosition {
         guild_id: u64,
     },
+    EditThread {
+        channel_id: u64,
+    },
     EditVoiceState {
         guild_id: u64,
         user_id: u64,
@@ -2085,6 +2088,13 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::GuildsIdRolesId(guild_id),
                 Cow::from(Route::guild_roles(guild_id)),
+            ),
+            RouteInfo::EditThread {
+                channel_id,
+            } => (
+                LightMethod::Patch,
+                Route::ChannelsId(channel_id),
+                Cow::from(Route::channel(channel_id)),
             ),
             RouteInfo::EditVoiceState {
                 guild_id,

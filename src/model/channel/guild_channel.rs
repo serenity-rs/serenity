@@ -15,6 +15,7 @@ use crate::builder::{
     CreateMessage,
     CreateThread,
     EditMessage,
+    EditThread,
     EditVoiceState,
     GetMessages,
 };
@@ -483,6 +484,18 @@ impl GuildChannel {
         F: FnOnce(&mut EditMessage) -> &mut EditMessage,
     {
         self.id.edit_message(&http, message_id, f).await
+    }
+
+    /// Edits a thread.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    pub async fn edit_thread<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
+    where
+        F: FnOnce(&mut EditThread) -> &mut EditThread,
+    {
+        self.id.edit_thread(http, f).await
     }
 
     /// Edits a voice state in a stage channel. Pass [`None`] for `user_id` to
