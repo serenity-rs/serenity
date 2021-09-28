@@ -95,7 +95,7 @@ jobs:
         with:
           command: clippy
           args: --locked --all-targets --all-features --tests
-      - name: FMT
+      - name: Format
         if: matrix.toolchain == 'nightly'
         run: cargo fmt --all -- --check
 
