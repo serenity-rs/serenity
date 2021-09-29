@@ -258,7 +258,7 @@ impl ApplicationCommandInteraction {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
         self.create_interaction_response(http, |f| {
-            f.kind(InteractionResponseType::DeferredUpdateMessage)
+            f.kind(InteractionResponseType::DeferredChannelMessageWithSource)
         })
         .await
     }
