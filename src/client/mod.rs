@@ -660,6 +660,10 @@ impl Client {
     /// Refer to the [Gateway documentation][gateway docs] for more information
     /// on effectively using sharding.
     ///
+    /// If the `unstable_discord_api` feature is enabled, this method will automatically
+    /// try to extract the application id from the token. This only happens if the application id
+    /// is not provided manually. This will not work on old bots, where the client id is not the same as the application id
+    ///
     /// # Examples
     ///
     /// Starting a Client with only 1 shard, out of 1 total:
