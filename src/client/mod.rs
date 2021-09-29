@@ -358,6 +358,15 @@ impl<'a> Future for ClientBuilder<'a> {
             let raw_event_handler = self.raw_event_handler.take();
             let intents = self.intents;
             let http = Arc::new(self.http.take().unwrap());
+            #[cfg(feature = "unstable_discord_api")]
+            {
+                if &self.application_id.is_none() {
+                    let application_id = parse_token(&self.token)
+                        .expect("Couldn't parse token correctly")
+                        .bot_user_id;
+                    self.application_id(application_id);
+                }
+            }
 
             #[cfg(feature = "unstable_discord_api")]
             if http.application_id == 0 {
@@ -660,10 +669,6 @@ impl Client {
     /// Refer to the [Gateway documentation][gateway docs] for more information
     /// on effectively using sharding.
     ///
-    /// If the `unstable_discord_api` feature is enabled, this method will automatically
-    /// try to extract the application id from the token. This only happens if the application id
-    /// is not provided manually. This will not work on old bots, where the client id is not the same as the application id
-    ///
     /// # Examples
     ///
     /// Starting a Client with only 1 shard, out of 1 total:
@@ -691,14 +696,6 @@ impl Client {
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start(&mut self) -> Result<()> {
-        #[cfg(feature = "unstable_discord_api")]
-        {
-            if &self.application_id.is_none() {
-                let application_id =
-                    parse_token(&self.token).expect("Couldn't parse token correctly").bot_user_id;
-                self.application_id(application_id);
-            }
-        }
         self.start_connection([0, 0, 1]).await
     }
 
