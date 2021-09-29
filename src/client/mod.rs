@@ -364,7 +364,7 @@ impl<'a> Future for ClientBuilder<'a> {
                     let application_id = parse_token(&self.token)
                         .expect("Couldn't parse token correctly")
                         .bot_user_id;
-                    self.application_id(application_id.as_u64());
+                    self.application_id(*application_id.as_u64());
                 }
             }
 
