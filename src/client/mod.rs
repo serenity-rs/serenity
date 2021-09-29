@@ -687,6 +687,14 @@ impl Client {
     /// [gateway docs]: crate::gateway#sharding
     #[instrument(skip(self))]
     pub async fn start(&mut self) -> Result<()> {
+        #[cfg(feature = "unstable_discord_api")]
+        {
+            if &self.application_id.is_none() {
+                let application_id =
+                    parse_token(&self.token).expect("Couldn't parse token correctly").bot_user_id;
+                self.application_id(application_id);
+            }
+        }
         self.start_connection([0, 0, 1]).await
     }
 
