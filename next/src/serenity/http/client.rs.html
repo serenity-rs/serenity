@@ -3809,6 +3809,21 @@
 <span id="3809">3809</span>
 <span id="3810">3810</span>
 <span id="3811">3811</span>
+<span id="3812">3812</span>
+<span id="3813">3813</span>
+<span id="3814">3814</span>
+<span id="3815">3815</span>
+<span id="3816">3816</span>
+<span id="3817">3817</span>
+<span id="3818">3818</span>
+<span id="3819">3819</span>
+<span id="3820">3820</span>
+<span id="3821">3821</span>
+<span id="3822">3822</span>
+<span id="3823">3823</span>
+<span id="3824">3824</span>
+<span id="3825">3825</span>
+<span id="3826">3826</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
@@ -5687,6 +5702,21 @@
         }
 
         <span class="ident">from_value</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
+    }
+
+    <span class="doccomment">/// Edits a thread channel in the [`GuildChannel`] given its Id.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_thread</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
+
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>),
+            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::EditThread</span> {
+                <span class="ident">channel_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Changes another user&#39;s voice state in a stage channel.</span>

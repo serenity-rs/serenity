@@ -2738,6 +2738,16 @@
 <span id="2738">2738</span>
 <span id="2739">2739</span>
 <span id="2740">2740</span>
+<span id="2741">2741</span>
+<span id="2742">2742</span>
+<span id="2743">2743</span>
+<span id="2744">2744</span>
+<span id="2745">2745</span>
+<span id="2746">2746</span>
+<span id="2747">2747</span>
+<span id="2748">2748</span>
+<span id="2749">2749</span>
+<span id="2750">2750</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -4077,6 +4087,9 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">sticker_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">EditThread</span> {
+        <span class="ident">channel_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">EditVoiceState</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
@@ -4907,6 +4920,13 @@
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::GuildsIdStickersId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_sticker</span>(<span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)),
+            ),
+            <span class="ident">RouteInfo::EditThread</span> {
+                <span class="ident">channel_id</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">LightMethod::Patch</span>,
+                <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
             ),
             <span class="ident">RouteInfo::EditVoiceState</span> {
                 <span class="ident">guild_id</span>,
