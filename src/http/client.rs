@@ -1876,7 +1876,6 @@ impl Http {
         }
 
         from_value(value).map_err(From::from)
-
     }
 
     /// Edits a thread channel in the [`GuildChannel`] given its Id.

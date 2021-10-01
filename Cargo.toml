@@ -98,7 +98,6 @@ features = ["tokio-runtime"]
 optional = true
 version = "0.15"
 
-
 # Tokio v0.2
 [dependencies.async-tungstenite_compat]
 package = "async-tungstenite"

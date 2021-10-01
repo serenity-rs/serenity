@@ -192,7 +192,6 @@ pub(crate) fn dispatch<'rec>(
                     let framework = Arc::clone(framework);
 
                     spawn_named("dispatch::framework::message", async move {
-
                         framework.dispatch(context, event.message).await;
                     });
                 }
