@@ -939,12 +939,6 @@ impl Cache {
         self.categories.len()
     }
 
-    /// Returns the optional category ID of a channel.
-    #[inline]
-    pub fn channel_category_id(&self, channel_id: ChannelId) -> Option<ChannelId> {
-        self.categories.get(&channel_id).map(|category| category.id)
-    }
-
     /// This method clones and returns the user used by the bot.
     #[inline]
     pub fn current_user(&self) -> CurrentUser {

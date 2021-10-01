@@ -920,9 +920,20 @@ impl Message {
     }
 
     /// Retrieves the message channel's category ID if the channel has one.
-    #[cfg(feature = "cache")]
-    pub fn category_id(&self, cache: impl AsRef<Cache>) -> Option<ChannelId> {
-        cache.as_ref().channel_category_id(self.channel_id)
+    /// Will traverse threads while doing so.
+    ///
+    /// Returns `Ok(None)` if the channel doesn't belong to a category.
+    #[inline]
+    pub async fn category_id(&self, cache_http: impl CacheHttp) -> Result<Option<ChannelId>> {
+        let mut channel_id = self.channel_id;
+        while let Some(channel) = channel_id.to_channel(&cache_http).await?.guild() {
+            match channel.parent_id {
+                Some(parent_channel_id) => channel_id = parent_channel_id,
+                None => return Ok(None),
+            }
+        }
+
+        Ok(Some(channel_id))
     }
 
     pub(crate) fn check_lengths(map: &JsonMap) -> Result<()> {
