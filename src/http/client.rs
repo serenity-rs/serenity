@@ -1876,6 +1876,22 @@ impl Http {
         }
 
         from_value(value).map_err(From::from)
+
+    }
+
+    /// Edits a thread channel in the [`GuildChannel`] given its Id.
+    pub async fn edit_thread(&self, channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
+        let body = serde_json::to_vec(map)?;
+
+        self.fire(Request {
+            body: Some(&body),
+            multipart: None,
+            headers: None,
+            route: RouteInfo::EditThread {
+                channel_id,
+            },
+        })
+        .await
     }
 
     /// Changes another user's voice state in a stage channel.

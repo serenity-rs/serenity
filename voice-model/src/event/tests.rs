@@ -30,10 +30,7 @@ fn deserialize_identify_json() {
         user_id: UserId(104694319306248192),
     };
 
-    assert!(match event {
-        Ok(Event::Identify(i)) if i == ident => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::Identify(i)) if i == ident));
 }
 
 #[test]
@@ -61,10 +58,7 @@ fn deserialize_select_protocol_json() {
         },
     };
 
-    assert!(match event {
-        Ok(Event::SelectProtocol(i)) if i == proto => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::SelectProtocol(i)) if i == proto));
 }
 
 #[test]
@@ -95,10 +89,7 @@ fn deserialize_ready_json() {
         ],
     };
 
-    assert!(match event {
-        Ok(Event::Ready(i)) if i == ready => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::Ready(i)) if i == ready));
 }
 
 #[test]
@@ -114,10 +105,7 @@ fn deserialize_heartbeat_json() {
         nonce: 1501184119561,
     };
 
-    assert!(match event {
-        Ok(Event::Heartbeat(i)) if i == hb => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::Heartbeat(i)) if i == hb));
 }
 
 #[test]
@@ -136,10 +124,7 @@ fn deserialize_session_description_json() {
         secret_key: vec![251, 100, 11],
     };
 
-    assert!(match event {
-        Ok(Event::SessionDescription(i)) if i == sd => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::SessionDescription(i)) if i == sd));
 }
 
 #[test]
@@ -161,10 +146,7 @@ fn deserialize_speaking_json() {
         user_id: None,
     };
 
-    assert!(match event {
-        Ok(Event::Speaking(i)) if i == speak => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::Speaking(i)) if i == speak));
 }
 
 #[test]
@@ -180,10 +162,7 @@ fn deserialize_heartbeat_ack_json() {
         nonce: 1501184119561,
     };
 
-    assert!(match event {
-        Ok(Event::HeartbeatAck(i)) if i == hb => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::HeartbeatAck(i)) if i == hb));
 }
 
 #[test]
@@ -205,10 +184,7 @@ fn deserialize_resume_json() {
         token: "my_token".into(),
     };
 
-    assert!(match event {
-        Ok(Event::Resume(i)) if i == resume => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::Resume(i)) if i == resume));
 }
 
 #[test]
@@ -242,10 +218,7 @@ fn deserialize_resumed_json() {
 
     let event = serde_json::from_str(json_data);
 
-    assert!(match event {
-        Ok(Event::Resumed) => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::Resumed)));
 }
 
 #[test]
@@ -267,10 +240,7 @@ fn deserialize_client_connect_json() {
         video_ssrc: 9012,
     };
 
-    assert!(match event {
-        Ok(Event::ClientConnect(i)) if i == conn => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::ClientConnect(i)) if i == conn));
 }
 
 #[test]
@@ -288,10 +258,7 @@ fn deserialize_client_disconnect_json() {
         user_id: UserId(1234),
     };
 
-    assert!(match event {
-        Ok(Event::ClientDisconnect(i)) if i == conn => true,
-        _ => false,
-    });
+    assert!(matches!(event, Ok(Event::ClientDisconnect(i)) if i == conn));
 }
 
 #[test]

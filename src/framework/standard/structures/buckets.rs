@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 use futures::future::BoxFuture;
 
 use crate::client::Context;
+use crate::internal::tokio::spawn_named;
 use crate::model::channel::Message;
 
 type Check = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, bool>;
@@ -205,7 +206,7 @@ impl TicketCounter {
                             let ctx = ctx.clone();
                             let msg = msg.clone();
 
-                            tokio::spawn(async move {
+                            spawn_named("buckets::delay_action", async move {
                                 delay_action(&ctx, &msg).await;
                             });
                         }
@@ -253,7 +254,7 @@ impl TicketCounter {
                     let ctx = ctx.clone();
                     let msg = msg.clone();
 
-                    tokio::spawn(async move {
+                    spawn_named("buckets::delay_action", async move {
                         delay_action(&ctx, &msg).await;
                     });
                 }

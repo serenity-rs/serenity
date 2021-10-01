@@ -27,7 +27,8 @@ members = [
     "examples/e11_gateway_intents",
     "examples/e12_global_data",
     "examples/e13_parallel_loops",
-    "examples/e14_slash_commands"
+    "examples/e14_slash_commands",
+    "examples/e15_simple_dashboard"
 ]
 
 [dependencies]
@@ -96,6 +97,7 @@ default-features = false
 features = ["tokio-runtime"]
 optional = true
 version = "0.15"
+
 
 # Tokio v0.2
 [dependencies.async-tungstenite_compat]

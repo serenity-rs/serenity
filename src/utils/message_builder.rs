@@ -43,7 +43,7 @@ use crate::model::{
 ///     .push("You sent a message, ")
 ///     .mention(&user)
 ///     .push("! ")
-///     .mention(&emoji)
+///     .emoji(&emoji)
 ///     .build();
 /// # }
 /// ```

@@ -1337,6 +1337,10 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         sticker_id: u64,
     },
+    EditThread {
+        channel_id: u64,
+    },
+
     EditVoiceState {
         guild_id: u64,
         user_id: u64,
@@ -2168,6 +2172,14 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdStickersId(guild_id),
                 Cow::from(Route::guild_sticker(guild_id, sticker_id)),
             ),
+            RouteInfo::EditThread {
+                channel_id,
+            } => (
+                LightMethod::Patch,
+                Route::ChannelsId(channel_id),
+                Cow::from(Route::channel(channel_id)),
+            ),
+
             RouteInfo::EditVoiceState {
                 guild_id,
                 user_id,

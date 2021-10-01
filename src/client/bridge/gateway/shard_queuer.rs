@@ -35,6 +35,7 @@ use crate::framework::Framework;
 use crate::gateway::ConnectionStage;
 use crate::gateway::{InterMessage, Shard};
 use crate::internal::prelude::*;
+use crate::internal::tokio::spawn_named;
 use crate::CacheAndHttp;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
@@ -208,7 +209,7 @@ impl ShardQueuer {
             stage: ConnectionStage::Disconnected,
         };
 
-        tokio::spawn(async move {
+        spawn_named("shard_queuer::stop", async move {
             #[allow(clippy::let_underscore_must_use)]
             let _ = runner.run().await;
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
