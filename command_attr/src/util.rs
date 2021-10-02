@@ -54,19 +54,27 @@ impl LitExt for Lit {
 }
 
 pub trait IdentExt2: Sized {
+    fn to_string_non_raw(&self) -> String;
     fn to_uppercase(&self) -> Self;
     fn with_suffix(&self, suf: &str) -> Ident;
 }
 
 impl IdentExt2 for Ident {
     #[inline]
+    fn to_string_non_raw(&self) -> String {
+        let ident_string = self.to_string();
+        ident_string.trim_start_matches("r#").into()
+    }
+
+    #[inline]
     fn to_uppercase(&self) -> Self {
-        format_ident!("{}", self.to_string().to_uppercase())
+        // This should be valid because keywords are lowercase.
+        format_ident!("{}", self.to_string_non_raw().to_uppercase())
     }
 
     #[inline]
     fn with_suffix(&self, suffix: &str) -> Ident {
-        format_ident!("{}_{}", self.to_string().to_uppercase(), suffix)
+        format_ident!("{}_{}", self.to_uppercase(), suffix)
     }
 }
 
