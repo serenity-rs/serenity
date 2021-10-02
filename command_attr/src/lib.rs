@@ -104,7 +104,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let _name = if !attr.is_empty() {
         parse_macro_input!(attr as Lit).to_str()
     } else {
-        fun.name.to_string()
+        fun.name.to_string_non_raw()
     };
 
     let mut options = Options::new();
@@ -622,7 +622,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     let name = if !attr.is_empty() {
         parse_macro_input!(attr as Lit).to_str()
     } else {
-        group.name.to_string()
+        group.name.to_string_non_raw()
     };
 
     let mut options = GroupOptions::new();
