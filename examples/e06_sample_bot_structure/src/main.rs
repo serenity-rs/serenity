@@ -22,7 +22,6 @@ use serenity::{
     prelude::*,
 };
 use tracing::{error, info};
-use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 pub struct ShardManagerContainer;
 
@@ -56,11 +55,8 @@ async fn main() {
     // Initialize the logger to use environment variables.
     //
     // In this case, a good default is setting the environment variable
-    // `RUST_LOG` to debug`.
-    let subscriber =
-        FmtSubscriber::builder().with_env_filter(EnvFilter::from_default_env()).finish();
-
-    tracing::subscriber::set_global_default(subscriber).expect("Failed to start the logger");
+    // `RUST_LOG` to `debug`.
+    tracing_subscriber::fmt::init();
 
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
