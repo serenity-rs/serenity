@@ -335,15 +335,11 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         "info,e15_simple_dashboard=trace,meio=warn,rate_core=warn,rill_engine=warn",
     );
 
-    // Increase compatibility with tracing and the log crate macros used by RillRate.
-    // Some weird things get logged without this if you use tracing.
-    tracing_log::LogTracer::init()?;
-    // Since we use tracing_log, we need to use a different way of subscribing to tracing events
-    // than shown in example 7.
-    let subscriber = tracing_subscriber::FmtSubscriber::builder()
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
-        .finish();
-    tracing::subscriber::set_global_default(subscriber)?;
+    // Initialize the logger to use environment variables.
+    //
+    // In this case, a good default is setting the environment variable
+    // `RUST_LOG` to debug`.
+    tracing_subscriber::fmt::init();
 
     // Start a server on `http://0.0.0.0:6361/`
     // Currently the port is not configurable, but it will be soon enough; thankfully it's not a

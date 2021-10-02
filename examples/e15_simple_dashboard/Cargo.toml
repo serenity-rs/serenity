@@ -10,7 +10,6 @@ rillrate = "0.39"
 
 tracing = "0.1"
 tracing-subscriber = "0.2"
-tracing-log = "0.1"
 
 webbrowser = "0.5"
 
