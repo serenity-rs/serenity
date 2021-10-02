@@ -55,7 +55,7 @@ async fn main() {
     // Initialize the logger to use environment variables.
     //
     // In this case, a good default is setting the environment variable
-    // `RUST_LOG` to debug`.
+    // `RUST_LOG` to `debug`.
     tracing_subscriber::fmt::init();
 
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");

@@ -338,7 +338,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     // Initialize the logger to use environment variables.
     //
     // In this case, a good default is setting the environment variable
-    // `RUST_LOG` to debug`.
+    // `RUST_LOG` to `debug`, but for production, use the variable defined above.
     tracing_subscriber::fmt::init();
 
     // Start a server on `http://0.0.0.0:6361/`
