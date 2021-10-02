@@ -1,0 +1,65 @@
+{
+  "db": "SQLite",
+  "597707a72d1ed8eab0cb48a3bef8cdb981362e089a462fa6d156b27b57468678": {
+    "query": "SELECT rowid, task FROM todo WHERE user_id = ? ORDER BY rowid LIMIT 1 OFFSET ?",
+    "describe": {
+      "columns": [
+        {
+          "name": "rowid",
+          "ordinal": 0,
+          "type_info": "Int64"
+        },
+        {
+          "name": "task",
+          "ordinal": 1,
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
+  "7636fc64c882305305814ffb66676ef09a92d3f1d46021b94ded4e9c073775d1": {
+    "query": "INSERT INTO todo (task, user_id) VALUES (?, ?)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "8a7bb6fe3b960d1d10bc8442bb1494f2c758dd890293c313811a8c4acb8edaeb": {
+    "query": "SELECT task FROM todo WHERE user_id = ? ORDER BY rowid",
+    "describe": {
+      "columns": [
+        {
+          "name": "task",
+          "ordinal": 0,
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "90153b8cd85a905a1d5557ad4eb190e9be4cf55d7308973d74cb180cd2323f8a": {
+    "query": "DELETE FROM todo WHERE rowid = ?",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": []
+    }
+  }
+}

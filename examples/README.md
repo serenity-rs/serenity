@@ -43,6 +43,7 @@ To run an example, you have various options:
     Additionally, show how to send a message to a specific channel.
     14 => Slash Commands: How to use the low level slash command API.
     15 => Simple Dashboard: A simple dashboard to control and monitor the bot with `rillrate`.
+    16 => SQLite Database: How to run an embedded SQLite database alongside the bot using SQLx
     ```
 
 2. Manually running:
