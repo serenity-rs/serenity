@@ -390,17 +390,6 @@
 </pre><pre class="rust"><code><span class="comment">// Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::unreadable_literal</span>)]</span>
 
-<span class="macro">macro_rules!</span> <span class="ident">colour</span> {
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">constname</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">impl</span> <span class="ident">Colour</span> {
-            $(
-                <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>
-                <span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">constname</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>);
-            )<span class="op">*</span>
-        }
-    }
-}
-
 <span class="doccomment">/// A utility struct to help with working with the basic representation of a</span>
 <span class="doccomment">/// colour. This is particularly useful when working with a [`Role`]&#39;s colour,</span>
 <span class="doccomment">/// as the API works with an integer value instead of an RGB value.</span>
@@ -658,63 +647,74 @@
     }
 }
 
+<span class="macro">macro_rules!</span> <span class="ident">colour</span> {
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">constname</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="kw">impl</span> <span class="ident">Colour</span> {
+            $(
+                <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>
+                <span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">constname</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">Colour</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>);
+            )<span class="op">*</span>
+        }
+    }
+}
+
 <span class="macro">colour!</span> {
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(111, 198, 226)`.</span>
-    <span class="ident">BLITZ_BLUE</span>, <span class="ident">blitz_blue</span>, <span class="number">0x6FC6E2</span>;
+    <span class="ident">BLITZ_BLUE</span>, <span class="number">0x6FC6E2</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(52, 152, 219)`.</span>
-    <span class="ident">BLUE</span>, <span class="ident">blue</span>, <span class="number">0x3498DB</span>;
+    <span class="ident">BLUE</span>, <span class="number">0x3498DB</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(114, 137, 218)`.</span>
-    <span class="ident">BLURPLE</span>, <span class="ident">blurple</span>, <span class="number">0x7289DA</span>;
+    <span class="ident">BLURPLE</span>, <span class="number">0x7289DA</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(32, 102, 148)`.</span>
-    <span class="ident">DARK_BLUE</span>, <span class="ident">dark_blue</span>, <span class="number">0x206694</span>;
+    <span class="ident">DARK_BLUE</span>, <span class="number">0x206694</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(194, 124, 14)`.</span>
-    <span class="ident">DARK_GOLD</span>, <span class="ident">dark_gold</span>, <span class="number">0xC27C0E</span>;
+    <span class="ident">DARK_GOLD</span>, <span class="number">0xC27C0E</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(31, 139, 76)`.</span>
-    <span class="ident">DARK_GREEN</span>, <span class="ident">dark_green</span>, <span class="number">0x1F8B4C</span>;
+    <span class="ident">DARK_GREEN</span>, <span class="number">0x1F8B4C</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(96, 125, 139)`.</span>
-    <span class="ident">DARK_GREY</span>, <span class="ident">dark_grey</span>, <span class="number">0x607D8B</span>;
+    <span class="ident">DARK_GREY</span>, <span class="number">0x607D8B</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(173, 20, 87)`.</span>
-    <span class="ident">DARK_MAGENTA</span>, <span class="ident">dark_magenta</span>, <span class="number">0xAD1457</span>;
+    <span class="ident">DARK_MAGENTA</span>, <span class="number">0xAD1457</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(168, 67, 0)`.</span>
-    <span class="ident">DARK_ORANGE</span>, <span class="ident">dark_orange</span>, <span class="number">0xA84300</span>;
+    <span class="ident">DARK_ORANGE</span>, <span class="number">0xA84300</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(113, 54, 138)`.</span>
-    <span class="ident">DARK_PURPLE</span>, <span class="ident">dark_purple</span>, <span class="number">0x71368A</span>;
+    <span class="ident">DARK_PURPLE</span>, <span class="number">0x71368A</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(153, 45, 34)`.</span>
-    <span class="ident">DARK_RED</span>, <span class="ident">dark_red</span>, <span class="number">0x992D22</span>;
+    <span class="ident">DARK_RED</span>, <span class="number">0x992D22</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(17, 128, 106)`.</span>
-    <span class="ident">DARK_TEAL</span>, <span class="ident">dark_teal</span>, <span class="number">0x11806A</span>;
+    <span class="ident">DARK_TEAL</span>, <span class="number">0x11806A</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(84, 110, 122)`.</span>
-    <span class="ident">DARKER_GREY</span>, <span class="ident">darker_grey</span>, <span class="number">0x546E7A</span>;
+    <span class="ident">DARKER_GREY</span>, <span class="number">0x546E7A</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(250, 177, 237)`.</span>
-    <span class="ident">FABLED_PINK</span>, <span class="ident">fabled_pink</span>, <span class="number">0xFAB1ED</span>;
+    <span class="ident">FABLED_PINK</span>, <span class="number">0xFAB1ED</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(136, 130, 196)`.</span>
-    <span class="ident">FADED_PURPLE</span>, <span class="ident">faded_purple</span>, <span class="number">0x8882C4</span>;
+    <span class="ident">FADED_PURPLE</span>, <span class="number">0x8882C4</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(17, 202, 128)`.</span>
-    <span class="ident">FOOYOO</span>, <span class="ident">fooyoo</span>, <span class="number">0x11CA80</span>;
+    <span class="ident">FOOYOO</span>, <span class="number">0x11CA80</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(241, 196, 15)`.</span>
-    <span class="ident">GOLD</span>, <span class="ident">gold</span>, <span class="number">0xF1C40F</span>;
+    <span class="ident">GOLD</span>, <span class="number">0xF1C40F</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(186, 218, 85)`.</span>
-    <span class="ident">KERBAL</span>, <span class="ident">kerbal</span>, <span class="number">0xBADA55</span>;
+    <span class="ident">KERBAL</span>, <span class="number">0xBADA55</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(151, 156, 159)`.</span>
-    <span class="ident">LIGHT_GREY</span>, <span class="ident">light_grey</span>, <span class="number">0x979C9F</span>;
+    <span class="ident">LIGHT_GREY</span>, <span class="number">0x979C9F</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(149, 165, 166)`.</span>
-    <span class="ident">LIGHTER_GREY</span>, <span class="ident">lighter_grey</span>, <span class="number">0x95A5A6</span>;
+    <span class="ident">LIGHTER_GREY</span>, <span class="number">0x95A5A6</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(233, 30, 99)`.</span>
-    <span class="ident">MAGENTA</span>, <span class="ident">magenta</span>, <span class="number">0xE91E63</span>;
+    <span class="ident">MAGENTA</span>, <span class="number">0xE91E63</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(230, 131, 151)`.</span>
-    <span class="ident">MEIBE_PINK</span>, <span class="ident">meibe_pink</span>, <span class="number">0xE68397</span>;
+    <span class="ident">MEIBE_PINK</span>, <span class="number">0xE68397</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(230, 126, 34)`.</span>
-    <span class="ident">ORANGE</span>, <span class="ident">orange</span>, <span class="number">0xE67E22</span>;
+    <span class="ident">ORANGE</span>, <span class="number">0xE67E22</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(155, 89, 182)`.</span>
-    <span class="ident">PURPLE</span>, <span class="ident">purple</span>, <span class="number">0x9B59B6</span>;
+    <span class="ident">PURPLE</span>, <span class="number">0x9B59B6</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(231, 76, 60)`.</span>
-    <span class="ident">RED</span>, <span class="ident">red</span>, <span class="number">0xE74C3C</span>;
+    <span class="ident">RED</span>, <span class="number">0xE74C3C</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(117, 150, 255)`.</span>
-    <span class="ident">ROHRKATZE_BLUE</span>, <span class="ident">rohrkatze_blue</span>, <span class="number">0x7596FF</span>;
+    <span class="ident">ROHRKATZE_BLUE</span>, <span class="number">0x7596FF</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(246, 219, 216)`.</span>
-    <span class="ident">ROSEWATER</span>, <span class="ident">rosewater</span>, <span class="number">0xF6DBD8</span>;
+    <span class="ident">ROSEWATER</span>, <span class="number">0xF6DBD8</span>;
     <span class="doccomment">/// Creates a new [`Colour`], setting its RGB value to `(26, 188, 156)`.</span>
-    <span class="ident">TEAL</span>, <span class="ident">teal</span>, <span class="number">0x1ABC9C</span>;
+    <span class="ident">TEAL</span>, <span class="number">0x1ABC9C</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Colour</span> {
