@@ -168,8 +168,10 @@ impl<'a> ClientBuilder<'a> {
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(ApplicationId(application_id));
 
-        self.http =
-            Some(Http::new_with_token_application_id(&self.token.clone().unwrap(), application_id));
+        self.http = Some(Http::new_with_token_application_id(
+            &self.token.clone().expect("no token"),
+            application_id,
+        ));
 
         self
     }

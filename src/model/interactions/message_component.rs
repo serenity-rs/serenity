@@ -258,10 +258,13 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
                     if let Some(roles) = resolved.get_mut("roles") {
                         if let Some(values) = roles.as_object_mut() {
                             for value in values.values_mut() {
-                                value.as_object_mut().unwrap().insert(
-                                    "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
-                                );
+                                value
+                                    .as_object_mut()
+                                    .expect("couldn't deserialize message component")
+                                    .insert(
+                                        "guild_id".to_string(),
+                                        Value::String(guild_id.to_string()),
+                                    );
                             }
                         }
                     }
@@ -269,10 +272,15 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
                     if let Some(channels) = resolved.get_mut("channels") {
                         if let Some(values) = channels.as_object_mut() {
                             for value in values.values_mut() {
-                                value.as_object_mut().unwrap().insert(
-                                    "guild_id".to_string(),
-                                    Value::String(guild_id.to_string()),
-                                );
+                                value
+                                    .as_object_mut()
+                                    .expect(
+                                        "couldn't deserialize the message component interaction",
+                                    )
+                                    .insert(
+                                        "guild_id".to_string(),
+                                        Value::String(guild_id.to_string()),
+                                    );
                             }
                         }
                     }

@@ -171,7 +171,7 @@ impl ComponentInteractionFilter {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
@@ -191,20 +191,6 @@ impl std::fmt::Debug for FilterOptions {
             .field("guild_id", &self.guild_id)
             .field("author_id", &self.author_id)
             .finish()
-    }
-}
-
-impl Default for FilterOptions {
-    fn default() -> Self {
-        Self {
-            filter_limit: None,
-            collect_limit: None,
-            filter: None,
-            channel_id: None,
-            guild_id: None,
-            author_id: None,
-            message_id: None,
-        }
     }
 }
 
