@@ -630,6 +630,14 @@
 <span id="630">630</span>
 <span id="631">631</span>
 <span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -890,10 +898,13 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">get_mut</span>(<span class="string">&quot;roles&quot;</span>) {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">as_object_mut</span>() {
                             <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">values_mut</span>() {
-                                <span class="ident">value</span>.<span class="ident">as_object_mut</span>().<span class="ident">unwrap</span>().<span class="ident">insert</span>(
-                                    <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
-                                    <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
-                                );
+                                <span class="ident">value</span>
+                                    .<span class="ident">as_object_mut</span>()
+                                    .<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t deserialize message component&quot;</span>)
+                                    .<span class="ident">insert</span>(
+                                        <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
+                                        <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
+                                    );
                             }
                         }
                     }
@@ -901,10 +912,15 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channels</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">get_mut</span>(<span class="string">&quot;channels&quot;</span>) {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>) <span class="op">=</span> <span class="ident">channels</span>.<span class="ident">as_object_mut</span>() {
                             <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">values_mut</span>() {
-                                <span class="ident">value</span>.<span class="ident">as_object_mut</span>().<span class="ident">unwrap</span>().<span class="ident">insert</span>(
-                                    <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
-                                    <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
-                                );
+                                <span class="ident">value</span>
+                                    .<span class="ident">as_object_mut</span>()
+                                    .<span class="ident">expect</span>(
+                                        <span class="string">&quot;couldn&#39;t deserialize the message component interaction&quot;</span>,
+                                    )
+                                    .<span class="ident">insert</span>(
+                                        <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
+                                        <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
+                                    );
                             }
                         }
                     }

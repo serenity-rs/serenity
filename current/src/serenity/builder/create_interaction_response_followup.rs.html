@@ -266,7 +266,7 @@
             .<span class="ident">entry</span>(<span class="string">&quot;embeds&quot;</span>)
             .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::Array</span>(<span class="ident">Vec::new</span>()))
             .<span class="ident">as_array_mut</span>()
-            .<span class="ident">unwrap</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t add embed&quot;</span>)
             .<span class="ident">push</span>(<span class="ident">embed</span>);
 
         <span class="self">self</span>

@@ -1088,6 +1088,9 @@
 <span id="1088">1088</span>
 <span id="1089">1089</span>
 <span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1370,7 +1373,7 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">roles</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">get_mut</span>(<span class="string">&quot;roles&quot;</span>) {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">as_object_mut</span>() {
                             <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">values_mut</span>() {
-                                <span class="ident">value</span>.<span class="ident">as_object_mut</span>().<span class="ident">unwrap</span>().<span class="ident">insert</span>(
+                                <span class="ident">value</span>.<span class="ident">as_object_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t deserialize&quot;</span>).<span class="ident">insert</span>(
                                     <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
                                     <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
                                 );
@@ -1381,10 +1384,13 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channels</span>) <span class="op">=</span> <span class="ident">resolved</span>.<span class="ident">get_mut</span>(<span class="string">&quot;channels&quot;</span>) {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>) <span class="op">=</span> <span class="ident">channels</span>.<span class="ident">as_object_mut</span>() {
                             <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">values_mut</span>() {
-                                <span class="ident">value</span>.<span class="ident">as_object_mut</span>().<span class="ident">unwrap</span>().<span class="ident">insert</span>(
-                                    <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
-                                    <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
-                                );
+                                <span class="ident">value</span>
+                                    .<span class="ident">as_object_mut</span>()
+                                    .<span class="ident">expect</span>(<span class="string">&quot;couldn&#39;t deserialize application command&quot;</span>)
+                                    .<span class="ident">insert</span>(
+                                        <span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(),
+                                        <span class="ident">Value::String</span>(<span class="ident">guild_id</span>.<span class="ident">to_string</span>()),
+                                    );
                             }
                         }
                     }

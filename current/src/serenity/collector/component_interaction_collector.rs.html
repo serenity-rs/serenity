@@ -324,20 +324,6 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">boxed::Box</span>,
     <span class="ident">future::Future</span>,
@@ -511,7 +497,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">struct</span> <span class="ident">FilterOptions</span> {
     <span class="ident">filter_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">collect_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
@@ -531,20 +517,6 @@
             .<span class="ident">field</span>(<span class="string">&quot;guild_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>)
             .<span class="ident">field</span>(<span class="string">&quot;author_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">author_id</span>)
             .<span class="ident">finish</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">FilterOptions</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">filter_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">collect_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">filter</span>: <span class="prelude-val">None</span>,
-            <span class="ident">channel_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">guild_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">author_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">message_id</span>: <span class="prelude-val">None</span>,
-        }
     }
 }
 

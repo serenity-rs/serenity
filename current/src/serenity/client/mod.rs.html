@@ -1042,6 +1042,8 @@
 <span id="1042">1042</span>
 <span id="1043">1043</span>
 <span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1212,8 +1214,10 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ApplicationId</span>(<span class="ident">application_id</span>));
 
-        <span class="self">self</span>.<span class="ident">http</span> <span class="op">=</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Http::new_with_token_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>(), <span class="ident">application_id</span>));
+        <span class="self">self</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Http::new_with_token_application_id</span>(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>.<span class="ident">clone</span>().<span class="ident">expect</span>(<span class="string">&quot;no token&quot;</span>),
+            <span class="ident">application_id</span>,
+        ));
 
         <span class="self">self</span>
     }
