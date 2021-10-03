@@ -104,7 +104,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
             .entry("embeds")
             .or_insert_with(|| Value::Array(Vec::new()))
             .as_array_mut()
-            .unwrap()
+            .expect("couldn't add embed")
             .push(embed);
 
         self
