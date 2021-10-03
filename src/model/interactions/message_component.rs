@@ -222,6 +222,24 @@ impl MessageComponentInteraction {
     ) -> Result<()> {
         http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
     }
+    /// Helper function to defer an interaction
+    ///
+    /// # Errors
+    ///
+    /// May also return an [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error in deserializing the
+    /// API response.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
+        self.create_interaction_response(http, |f| {
+            f.kind(InteractionResponseType::DeferredUpdateMessage)
+        })
+        .await
+    }
 }
 
 impl<'de> Deserialize<'de> for MessageComponentInteraction {
