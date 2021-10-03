@@ -136,6 +136,9 @@ async fn main() {
     // All of this means that we have to keep locks open for the least time possible, so we put
     // them inside a block, so they get closed automatically when droped.
     // If we don't do this, we would never be able to open the data lock anywhere else.
+    //
+    // Alternatively, you can also use `ClientBuilder::type_map_insert` or
+    // `ClientBuilder::type_map` to populate the global TypeMap without dealing with the RwLock.
     {
         // Open the data lock in write mode, so keys can be inserted to it.
         let mut data = client.data.write().await;

@@ -314,12 +314,12 @@ async fn main() {
         // You will need to enable these 2 options on the bot application, and possibly wait up to 5
         // minutes.
         .intents(GatewayIntents::all())
+        .type_map_insert::<CommandCounter>(HashMap::default())
         .await
         .expect("Err creating client");
 
     {
         let mut data = client.data.write().await;
-        data.insert::<CommandCounter>(HashMap::default());
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
 
