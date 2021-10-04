@@ -360,8 +360,8 @@ impl<'a> Future for ClientBuilder<'a> {
             let http = Arc::new(self.http.take().unwrap());
             #[cfg(feature = "unstable_discord_api")]
             {
-                if &self.application_id.is_none() {
-                    let application_id = parse_token(&self.token)
+                if self.application_id.is_none() {
+                    let application_id = parse_token(&*self.token.as_ref().unwrap())
                         .expect("Couldn't parse token correctly")
                         .bot_user_id;
                     self.application_id(*application_id.as_u64());
