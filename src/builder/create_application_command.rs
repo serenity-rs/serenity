@@ -3,7 +3,6 @@ use std::collections::HashMap;
 #[cfg(feature = "simd-json")]
 use simd_json::Mutable;
 
-use crate::internal::prelude::*;
 use crate::json::{from_number, json, Value};
 use crate::model::channel::ChannelType;
 use crate::model::interactions::application_command::{
