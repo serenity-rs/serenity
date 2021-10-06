@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::json::{Value, from_number};
+use crate::json::{from_number, Value};
 
 #[derive(Debug, Clone, Default)]
 pub struct EditThread(pub HashMap<&'static str, Value>);
