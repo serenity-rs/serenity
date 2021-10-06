@@ -258,74 +258,63 @@ impl From<(u8, u8, u8)> for Colour {
     }
 }
 
-macro_rules! colour {
-    ($(#[$attr:meta] $constname:ident, $val:expr;)*) => {
-        impl Colour {
-            $(
-                #[$attr]
-                pub const $constname: Colour = Colour($val);
-            )*
-        }
-    }
-}
-
-colour! {
+impl Colour {
     /// Creates a new [`Colour`], setting its RGB value to `(111, 198, 226)`.
-    BLITZ_BLUE, 0x6FC6E2;
+    pub const BLITZ_BLUE: Colour = Colour(0x6FC6E2);
     /// Creates a new [`Colour`], setting its RGB value to `(52, 152, 219)`.
-    BLUE, 0x3498DB;
+    pub const BLUE: Colour = Colour(0x3498DB);
     /// Creates a new [`Colour`], setting its RGB value to `(114, 137, 218)`.
-    BLURPLE, 0x7289DA;
+    pub const BLURPLE: Colour = Colour(0x7289DA);
     /// Creates a new [`Colour`], setting its RGB value to `(32, 102, 148)`.
-    DARK_BLUE, 0x206694;
+    pub const DARK_BLUE: Colour = Colour(0x206694);
     /// Creates a new [`Colour`], setting its RGB value to `(194, 124, 14)`.
-    DARK_GOLD, 0xC27C0E;
+    pub const DARK_GOLD: Colour = Colour(0xC27C0E);
     /// Creates a new [`Colour`], setting its RGB value to `(31, 139, 76)`.
-    DARK_GREEN, 0x1F8B4C;
+    pub const DARK_GREEN: Colour = Colour(0x1F8B4C);
     /// Creates a new [`Colour`], setting its RGB value to `(96, 125, 139)`.
-    DARK_GREY, 0x607D8B;
+    pub const DARK_GREY: Colour = Colour(0x607D8B);
     /// Creates a new [`Colour`], setting its RGB value to `(173, 20, 87)`.
-    DARK_MAGENTA, 0xAD1457;
+    pub const DARK_MAGENTA: Colour = Colour(0xAD1457);
     /// Creates a new [`Colour`], setting its RGB value to `(168, 67, 0)`.
-    DARK_ORANGE, 0xA84300;
+    pub const DARK_ORANGE: Colour = Colour(0xA84300);
     /// Creates a new [`Colour`], setting its RGB value to `(113, 54, 138)`.
-    DARK_PURPLE, 0x71368A;
+    pub const DARK_PURPLE: Colour = Colour(0x71368A);
     /// Creates a new [`Colour`], setting its RGB value to `(153, 45, 34)`.
-    DARK_RED, 0x992D22;
+    pub const DARK_RED: Colour = Colour(0x992D22);
     /// Creates a new [`Colour`], setting its RGB value to `(17, 128, 106)`.
-    DARK_TEAL, 0x11806A;
+    pub const DARK_TEAL: Colour = Colour(0x11806A);
     /// Creates a new [`Colour`], setting its RGB value to `(84, 110, 122)`.
-    DARKER_GREY, 0x546E7A;
+    pub const DARKER_GREY: Colour = Colour(0x546E7A);
     /// Creates a new [`Colour`], setting its RGB value to `(250, 177, 237)`.
-    FABLED_PINK, 0xFAB1ED;
+    pub const FABLED_PINK: Colour = Colour(0xFAB1ED);
     /// Creates a new [`Colour`], setting its RGB value to `(136, 130, 196)`.
-    FADED_PURPLE, 0x8882C4;
+    pub const FADED_PURPLE: Colour = Colour(0x8882C4);
     /// Creates a new [`Colour`], setting its RGB value to `(17, 202, 128)`.
-    FOOYOO, 0x11CA80;
+    pub const FOOYOO: Colour = Colour(0x11CA80);
     /// Creates a new [`Colour`], setting its RGB value to `(241, 196, 15)`.
-    GOLD, 0xF1C40F;
+    pub const GOLD: Colour = Colour(0xF1C40F);
     /// Creates a new [`Colour`], setting its RGB value to `(186, 218, 85)`.
-    KERBAL, 0xBADA55;
+    pub const KERBAL: Colour = Colour(0xBADA55);
     /// Creates a new [`Colour`], setting its RGB value to `(151, 156, 159)`.
-    LIGHT_GREY, 0x979C9F;
+    pub const LIGHT_GREY: Colour = Colour(0x979C9F);
     /// Creates a new [`Colour`], setting its RGB value to `(149, 165, 166)`.
-    LIGHTER_GREY, 0x95A5A6;
+    pub const LIGHTER_GREY: Colour = Colour(0x95A5A6);
     /// Creates a new [`Colour`], setting its RGB value to `(233, 30, 99)`.
-    MAGENTA, 0xE91E63;
+    pub const MAGENTA: Colour = Colour(0xE91E63);
     /// Creates a new [`Colour`], setting its RGB value to `(230, 131, 151)`.
-    MEIBE_PINK, 0xE68397;
+    pub const MEIBE_PINK: Colour = Colour(0xE68397);
     /// Creates a new [`Colour`], setting its RGB value to `(230, 126, 34)`.
-    ORANGE, 0xE67E22;
+    pub const ORANGE: Colour = Colour(0xE67E22);
     /// Creates a new [`Colour`], setting its RGB value to `(155, 89, 182)`.
-    PURPLE, 0x9B59B6;
+    pub const PURPLE: Colour = Colour(0x9B59B6);
     /// Creates a new [`Colour`], setting its RGB value to `(231, 76, 60)`.
-    RED, 0xE74C3C;
+    pub const RED: Colour = Colour(0xE74C3C);
     /// Creates a new [`Colour`], setting its RGB value to `(117, 150, 255)`.
-    ROHRKATZE_BLUE, 0x7596FF;
+    pub const ROHRKATZE_BLUE: Colour = Colour(0x7596FF);
     /// Creates a new [`Colour`], setting its RGB value to `(246, 219, 216)`.
-    ROSEWATER, 0xF6DBD8;
+    pub const ROSEWATER: Colour = Colour(0xF6DBD8);
     /// Creates a new [`Colour`], setting its RGB value to `(26, 188, 156)`.
-    TEAL, 0x1ABC9C;
+    pub const TEAL: Colour = Colour(0x1ABC9C);
 }
 
 impl Default for Colour {
