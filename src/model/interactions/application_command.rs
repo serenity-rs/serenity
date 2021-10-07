@@ -13,7 +13,7 @@ use crate::builder::{
 };
 use crate::http::Http;
 use crate::internal::prelude::{JsonMap, StdResult, Value};
-use crate::model::channel::PartialChannel;
+use crate::model::channel::{ChannelType, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
     ApplicationId,
@@ -908,6 +908,9 @@ pub struct ApplicationCommandOption {
     /// [`SubCommandGroup`]: ApplicationCommandOptionType::SubCommandGroup
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
+    /// If an option is a Channel type, it will only be able to show these types.
+    #[serde(default)]
+    pub channel_types: Vec<ChannelType>,
 }
 
 /// An [`ApplicationCommand`] permission.

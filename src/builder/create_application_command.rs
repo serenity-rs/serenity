@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use serde_json::{json, Value};
 
 use crate::internal::prelude::*;
+use crate::model::channel::ChannelType;
 use crate::model::interactions::application_command::{
     ApplicationCommandOptionType,
     ApplicationCommandType,
@@ -126,6 +127,21 @@ impl CreateApplicationCommandOption {
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
         let opt_arr = options.as_array_mut().expect("Must be an array");
         opt_arr.push(Value::Object(new_option));
+
+        self
+    }
+
+    /// If an option is a Channel type, it will only be able to show these types.
+    pub fn add_channel_types(&mut self, channel_types: Vec<ChannelType>) -> &mut Self {
+        self.0.insert(
+            "channel_types",
+            Value::Array(
+                channel_types
+                    .iter()
+                    .map(|i| Value::Number(Number::from(*i as u8)))
+                    .collect::<Vec<_>>(),
+            ),
+        );
 
         self
     }

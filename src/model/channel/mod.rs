@@ -295,6 +295,7 @@ impl Display for Channel {
 /// A representation of a type of channel.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
+#[repr(u8)]
 pub enum ChannelType {
     /// An indicator that the channel is a text [`GuildChannel`].
     Text = 0,
