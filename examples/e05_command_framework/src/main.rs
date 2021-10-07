@@ -18,7 +18,7 @@ use std::{
 use serenity::prelude::*;
 use serenity::{
     async_trait,
-    client::bridge::gateway::{ShardId, ShardManager, GatewayIntents},
+    client::bridge::gateway::{GatewayIntents, ShardId, ShardManager},
     framework::standard::{
         buckets::{LimitedFor, RevertBucket},
         help_commands,

@@ -492,21 +492,21 @@ impl<'de> Deserialize<'de> for AuditLogs {
                             }
 
                             audit_log_entries = Some(map.next_value::<Vec<AuditLogEntry>>()?);
-                        }
+                        },
                         Ok(Some(Field::Webhooks)) => {
                             if webhooks.is_some() {
                                 return Err(de::Error::duplicate_field("webhooks"));
                             }
 
                             webhooks = Some(map.next_value::<Vec<Webhook>>()?);
-                        }
+                        },
                         Ok(Some(Field::Users)) => {
                             if users.is_some() {
                                 return Err(de::Error::duplicate_field("users"));
                             }
 
                             users = Some(map.next_value::<Vec<User>>()?);
-                        }
+                        },
                         Ok(None) => break, // No more keys
                         Err(e) => {
                             if e.to_string().contains("unknown field") {
@@ -519,7 +519,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
                             } else {
                                 return Err(e);
                             }
-                        }
+                        },
                     }
                 }
 
@@ -532,7 +532,11 @@ impl<'de> Deserialize<'de> for AuditLogs {
                 let webhooks = webhooks.ok_or_else(|| de::Error::missing_field("webhooks"))?;
                 let users = users.ok_or_else(|| de::Error::missing_field("users"))?;
 
-                Ok(AuditLogs { entries, webhooks, users })
+                Ok(AuditLogs {
+                    entries,
+                    webhooks,
+                    users,
+                })
             }
         }
 
