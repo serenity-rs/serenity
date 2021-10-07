@@ -106,7 +106,7 @@
 <span class="doccomment">/// A builder for constructing an invite link with custom OAuth2 scopes.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateBotAuthParameters</span> {
-    <span class="ident">client_id</span>: <span class="ident">UserId</span>,
+    <span class="ident">client_id</span>: <span class="ident">ApplicationId</span>,
     <span class="ident">scopes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OAuth2Scope</span><span class="op">&gt;</span>,
     <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
     <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
@@ -149,7 +149,7 @@
     }
 
     <span class="doccomment">/// Specify the client Id of your application.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_id</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">client_id</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_id</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">client_id</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">client_id</span> <span class="op">=</span> <span class="ident">client_id</span>.<span class="ident">into</span>();
         <span class="self">self</span>
     }
