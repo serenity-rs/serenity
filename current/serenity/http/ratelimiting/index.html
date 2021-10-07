@@ -14,7 +14,7 @@ only current major parameters are <code>channel_id</code>, <code>guild_id</code>
 two URIs of <code>GET /channels/10/messages/11</code> and
 <code>GET /channels/10/messages/12</code> will count towards the “same ratelimit”, as
 the major parameter - <code>10</code> is equivalent in both URIs’ format.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>First: taking the first two URIs - <code>GET /channels/4/messages/7</code> and
 <code>GET /channels/5/messages/8</code> - and assuming both buckets have a <code>limit</code> of
 <code>10</code>, requesting the first URI will result in the response containing a
@@ -32,11 +32,11 @@ requests (<code>10</code>).</p>
 variants) have an associated u64 as data. This is the Id of the parameter,
 differentiating between different ratelimits.</p>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<div class="item-table"><div class="item-left import-item"><code>pub use super::routing::<a class="enum" href="../routing/enum.Route.html" title="enum serenity::http::routing::Route">Route</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="struct" href="struct.Ratelimit.html" title="serenity::http::ratelimiting::Ratelimit struct">Ratelimit</a></div><div class="item-right docblock-short"><p>A set of data containing information about the ratelimits for a particular
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use super::routing::<a class="enum" href="../routing/enum.Route.html" title="enum serenity::http::routing::Route">Route</a>;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Ratelimit.html" title="serenity::http::ratelimiting::Ratelimit struct">Ratelimit</a></div><div class="item-right docblock-short"><p>A set of data containing information about the ratelimits for a particular
 <a href="../routing/enum.Route.html" title="Route"><code>Route</code></a>, which is stored in <a href="../client/struct.Http.html"><code>Http</code></a>.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.RatelimitedRequest.html" title="serenity::http::ratelimiting::RatelimitedRequest struct">RatelimitedRequest</a></div><div class="item-right docblock-short"><p>Information about a request for the ratelimiter to perform.</p>
-</div><div class="item-left module-item"><a class="struct" href="struct.Ratelimiter.html" title="serenity::http::ratelimiting::Ratelimiter struct">Ratelimiter</a></div><div class="item-right docblock-short"><p>Ratelimiter for requests to the Discord API.</p>
-</div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.RatelimitedRequest.html" title="serenity::http::ratelimiting::RatelimitedRequest struct">RatelimitedRequest</a></div><div class="item-right docblock-short"><p>Information about a request for the ratelimiter to perform.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Ratelimiter.html" title="serenity::http::ratelimiting::Ratelimiter struct">Ratelimiter</a></div><div class="item-right docblock-short"><p>Ratelimiter for requests to the Discord API.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script>
 </body></html>
