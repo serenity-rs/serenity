@@ -2,26 +2,26 @@
 <p>This is made available for user use if one wishes to be lower-level or avoid
 the higher functionality of the <a href="../../index.html"><code>Client</code></a>.</p>
 <p>Of interest are three pieces:</p>
-<h3 id="shardmanager" class="section-header"><a href="#shardmanager"><code>ShardManager</code></a></h3>
+<h4 id="shardmanager" class="section-header"><a href="#shardmanager"><code>ShardManager</code></a></h4>
 <p>The shard manager is responsible for being a clean interface between the
 user and the shard runners, providing essential functions such as
 <a href="struct.ShardManager.html#method.shutdown" title="ShardManager::shutdown"><code>ShardManager::shutdown</code></a> to shutdown a shard and <a href="struct.ShardManager.html#method.restart" title="ShardManager::restart"><code>ShardManager::restart</code></a>
 to restart a shard.</p>
 <p>If you are using the <code>Client</code>, this is likely the only piece of interest to
 you. Refer to <a href="struct.ShardManager.html" title="ShardManager">its documentation</a> for more information.</p>
-<h3 id="shardqueuer" class="section-header"><a href="#shardqueuer"><code>ShardQueuer</code></a></h3>
+<h4 id="shardqueuer" class="section-header"><a href="#shardqueuer"><code>ShardQueuer</code></a></h4>
 <p>The shard queuer is a light wrapper around an mpsc receiver that receives
 <a href="enum.ShardManagerMessage.html" title="ShardManagerMessage"><code>ShardManagerMessage</code></a>s. It should be run in its own thread so it can
 receive messages to start shards in a queue.</p>
 <p>Refer to <a href="struct.ShardQueuer.html" title="ShardQueuer">its documentation</a> for more information.</p>
-<h3 id="shardrunner" class="section-header"><a href="#shardrunner"><code>ShardRunner</code></a></h3>
+<h4 id="shardrunner" class="section-header"><a href="#shardrunner"><code>ShardRunner</code></a></h4>
 <p>The shard runner is responsible for actually running a shard and
 communicating with its respective WebSocket client.</p>
 <p>It is performs all actions such as sending a presence update over the client
 and, with the help of the <a href="../../../gateway/struct.Shard.html"><code>Shard</code></a>, will be able to determine what to do.
 This is, for example, whether to reconnect, resume, or identify with the
 gateway.</p>
-<h3 id="in-conclusion" class="section-header"><a href="#in-conclusion">In Conclusion</a></h3>
+<h4 id="in-conclusion" class="section-header"><a href="#in-conclusion">In Conclusion</a></h4>
 <p>For almost every - if not every - use case, you only need to <em>possibly</em> be
 concerned about the <a href="struct.ShardManager.html" title="ShardManager"><code>ShardManager</code></a> in this module.</p>
 </div></details><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>

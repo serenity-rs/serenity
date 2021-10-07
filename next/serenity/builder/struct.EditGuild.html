@@ -10,7 +10,7 @@ valid.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.afk_timeout" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/builder/edit_guild.rs.html#43-46" title="goto source code">[src]</a></div><a href="#method.afk_timeout" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.afk_timeout" class="fnname">afk_timeout</a>(&amp;mut self, timeout: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</h4></div></summary><div class="docblock"><p>Set the amount of time a user is to be moved to the AFK channel -
 configured via <a href="struct.EditGuild.html#method.afk_channel" title="Self::afk_channel"><code>Self::afk_channel</code></a> - after being AFK.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.icon" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/builder/edit_guild.rs.html#76-79" title="goto source code">[src]</a></div><a href="#method.icon" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.icon" class="fnname">icon</a>(&amp;mut self, icon: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</h4></div></summary><div class="docblock"><p>Set the icon of the guild. Pass <a href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html#variant.None" title="None"><code>None</code></a> to remove the icon.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
 <p>Using the utility function - <a href="../utils/fn.read_image.html"><code>utils::read_image</code></a> - to read an image
 from the cwd and encode it in base64 to send to Discord.</p>
 
@@ -36,7 +36,7 @@ You can check this through a guild’s <a href="../model/guild/struct.Guild.html
 <p><strong>Note</strong>: The current user must be the owner of the guild.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.region" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/builder/edit_guild.rs.html#155-158" title="goto source code">[src]</a></div><a href="#method.region" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.region" class="fnname">region</a>(&amp;mut self, region: <a class="enum" href="../model/guild/enum.Region.html" title="enum serenity::model::guild::Region">Region</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</h4></div><div class="item-info"><div class="stab deprecated"><span class="emoji">👎</span> Deprecated: <p>Regions are now set per voice channel instead of globally.</p>
 </div></div></summary><div class="docblock"><p>Set the voice region of the server.</p>
-<h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
+<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
 <p>Setting the region to <a href="../model/guild/enum.Region.html#variant.UsWest" title="Region::UsWest"><code>Region::UsWest</code></a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::guild::Region</span>;
@@ -79,7 +79,7 @@ This feature is for Community guilds only.</p>
 user must have prior to being able to send messages in a guild.</p>
 <p>Refer to the documentation for <a href="../model/guild/enum.VerificationLevel.html" title="VerificationLevel"><code>VerificationLevel</code></a> for more
 information on each variant.</p>
-<h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
+<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
 <p>Setting the verification level to <a href="../model/guild/enum.VerificationLevel.html#variant.High" title="VerificationLevel::High"><code>High</code></a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::guild::VerificationLevel</span>;

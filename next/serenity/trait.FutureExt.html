@@ -41,7 +41,7 @@ chain along a computation once a future has been resolved.</p>
 <p>Note that this function consumes the receiving future and returns a
 wrapped version of it, similar to the existing <code>map</code> methods in the
 standard library.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 
 <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="kw">async</span> { <span class="number">1</span> };
@@ -60,7 +60,7 @@ is finished.</p>
 future.</p>
 <p>Note that this function consumes the receiving future and returns a
 wrapped version of it.</p>
-<h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
+<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 
 <span class="kw">let</span> <span class="ident">future_of_1</span> <span class="op">=</span> <span class="kw">async</span> { <span class="number">1</span> };
@@ -70,7 +70,7 @@ wrapped version of it.</p>
 of that <code>Either</code>.</p>
 <p>This can be used in combination with the <code>right_future</code> method to write <code>if</code>
 statements that evaluate to different futures in different branches.</p>
-<h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
+<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 
 <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">6</span>;
@@ -85,7 +85,7 @@ statements that evaluate to different futures in different branches.</p>
 of that <code>Either</code>.</p>
 <p>This can be used in combination with the <code>left_future</code> method to write <code>if</code>
 statements that evaluate to different futures in different branches.</p>
-<h1 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h1>
+<h5 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 
 <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">6</span>;
@@ -99,7 +99,7 @@ statements that evaluate to different futures in different branches.</p>
 </div></details><details class="rustdoc-toggle" open><summary><div id="method.into_stream" class="method has-srclink"><div class="rightside"></div><h4 class="code-header">fn <a href="#method.into_stream" class="fnname">into_stream</a>(self) -&gt; IntoStream&lt;Self&gt;</h4></div></summary><div class="docblock"><p>Convert this future into a single element stream.</p>
 <p>The returned stream contains single success if this future resolves to
 success or single error if this future resolves into error.</p>
-<h1 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h1>
+<h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 <span class="kw">use</span> <span class="ident">futures::stream::StreamExt</span>;
 
@@ -114,7 +114,7 @@ computation out the final result.</p>
 <p>This method is roughly equivalent to <code>self.then(|x| x)</code>.</p>
 <p>Note that this function consumes the receiving future and returns a
 wrapped version of it.</p>
-<h1 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h1>
+<h5 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 
 <span class="kw">let</span> <span class="ident">nested_future</span> <span class="op">=</span> <span class="kw">async</span> { <span class="kw">async</span> { <span class="number">1</span> } };
@@ -127,7 +127,7 @@ convenient to work with that stream as if stream was available at the
 call site.</p>
 <p>Note that this function consumes this future and returns a wrapped
 version of it.</p>
-<h1 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h1>
+<h5 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 <span class="kw">use</span> <span class="ident">futures::stream</span>::{<span class="self">self</span>, <span class="ident">StreamExt</span>};
 
@@ -155,7 +155,7 @@ completed to ensure resources are reclaimed as soon as possible.</p>
 working on such code, you might want to check out what’s happening at
 various parts in the pipeline, without consuming the intermediate
 value. To do that, insert a call to <code>inspect</code>.</p>
-<h1 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h1>
+<h5 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 
 <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="kw">async</span> { <span class="number">1</span> };
@@ -173,7 +173,7 @@ after-the fact. To assist using this method, the <code>Future</code> trait is al
 implemented for <code>AssertUnwindSafe&lt;F&gt;</code> where <code>F</code> implements <code>Future</code>.</p>
 <p>This method is only available when the <code>std</code> feature of this
 library is activated, and it is activated by default.</p>
-<h1 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h1>
+<h5 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future</span>::{<span class="self">self</span>, <span class="ident">FutureExt</span>, <span class="ident">Ready</span>};
 
 <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">future::ready</span>(<span class="number">2</span>);
@@ -190,7 +190,7 @@ into a cloneable future. It enables a future to be polled by multiple
 threads.</p>
 <p>This method is only available when the <code>std</code> feature of this
 library is activated, and it is activated by default.</p>
-<h1 id="examples-9" class="section-header"><a href="#examples-9">Examples</a></h1>
+<h5 id="examples-9" class="section-header"><a href="#examples-9">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
 
 <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="kw">async</span> { <span class="number">6</span> };
@@ -240,7 +240,7 @@ the future is ready after the first call to <code>Future::poll</code>.</p>
 <p>This method is useful in cases where immediacy is more important than
 waiting for a result. It is also convenient for quickly obtaining
 the value of a future that is known to always resolve immediately.</p>
-<h1 id="examples-10" class="section-header"><a href="#examples-10">Examples</a></h1>
+<h5 id="examples-10" class="section-header"><a href="#examples-10">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">future::ready</span>, <span class="ident">future::pending</span>};
 <span class="kw">let</span> <span class="ident">future_ready</span> <span class="op">=</span> <span class="ident">ready</span>(<span class="string">&quot;foobar&quot;</span>);
 <span class="kw">let</span> <span class="ident">future_pending</span> <span class="op">=</span> <span class="ident">pending</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>();

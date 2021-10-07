@@ -52,13 +52,13 @@ You can provide a clone and keep the original to manually dispatch.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.intents" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/client/mod.rs.html#322-326" title="goto source code">[src]</a></div><a href="#method.intents" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.intents" class="fnname">intents</a>(self, intents: <a class="struct" href="bridge/gateway/struct.GatewayIntents.html" title="struct serenity::client::bridge::gateway::GatewayIntents">GatewayIntents</a>) -&gt; Self</h4></div></summary><div class="docblock"><p>Sets all intents directly, replacing already set intents.
 Intents are a bitflag, you can combine them by performing the
 <code>|</code>-operator.</p>
-<h1 id="what-are-intents" class="section-header"><a href="#what-are-intents">What are Intents</a></h1>
+<h5 id="what-are-intents" class="section-header"><a href="#what-are-intents">What are Intents</a></h5>
 <p>A <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents">gateway intent</a> sets the types of gateway events
 (e.g. member joins, guild integrations, guild emoji updates, …) the
 bot shall receive. Carefully picking the needed intents greatly helps
 the bot to scale, as less intents will result in less events to be
 received hence less processed by the bot.</p>
-<h1 id="privileged-intents" class="section-header"><a href="#privileged-intents">Privileged Intents</a></h1>
+<h5 id="privileged-intents" class="section-header"><a href="#privileged-intents">Privileged Intents</a></h5>
 <p>The intents <a href="bridge/gateway/struct.GatewayIntents.html#associatedconstant.GUILD_PRESENCES"><code>GatewayIntents::GUILD_PRESENCES</code></a> and <a href="bridge/gateway/struct.GatewayIntents.html#associatedconstant.GUILD_MEMBERS"><code>GatewayIntents::GUILD_MEMBERS</code></a>
 are <em>privileged</em>.
 <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents">Privileged intents</a> need to be enabled in the <em>developer portal</em>.

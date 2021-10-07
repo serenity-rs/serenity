@@ -4,7 +4,7 @@
 <a href="../channel/struct.PermissionOverwrite.html"><code>PermissionOverwrite</code></a>s, roles globally in a <a href="../guild/struct.Guild.html"><code>Guild</code></a>, and to
 <a href="../channel/struct.GuildChannel.html"><code>GuildChannel</code></a>s.</p>
 </div></details><h2 id="fields" class="fields small-section-header">Fields<a href="#fields" class="anchor"></a></h2><span id="structfield.bits" class="structfield small-section-header"><a href="#structfield.bits" class="anchor field"></a><code>bits: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a></code></span><div class="docblock"><p>The flags making up the permissions.</p>
-<h1 id="note" class="section-header"><a href="#note">Note</a></h1>
+<h2 id="note" class="section-header"><a href="#note">Note</a></h2>
 <p>Do not modify this yourself; use the provided methods.
 Do the same when creating, unless you’re absolutely certain that you’re giving valid permission flags.</p>
 </div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><div id="impl" class="impl has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/permissions.rs.html#217-331" title="goto source code">[src]</a></div><a href="#impl" class="anchor"></a><h3 class="code-header in-band">impl <a class="struct" href="struct.Permissions.html" title="struct serenity::model::permissions::Permissions">Permissions</a></h3></div></summary><div class="impl-items"><details class="rustdoc-toggle" open><summary><div id="associatedconstant.CREATE_INVITE" class="associatedconstant has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/permissions.rs.html#217-331" title="goto source code">[src]</a></div><a href="#associatedconstant.CREATE_INVITE" class="anchor"></a><h4 class="code-header">pub const <a href="#associatedconstant.CREATE_INVITE" class="constant">CREATE_INVITE</a>: Self</h4></div></summary><div class="docblock"><p>Allows for the creation of <a href="../invite/struct.RichInvite.html"><code>RichInvite</code></a>s.</p>
@@ -63,7 +63,7 @@ representation contains bits that do not correspond to a flag.</p>
 that do not correspond to flags.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.from_bits_unchecked" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/permissions.rs.html#217-331" title="goto source code">[src]</a></div><a href="#method.from_bits_unchecked" class="anchor"></a><h4 class="code-header">pub const unsafe fn <a href="#method.from_bits_unchecked" class="fnname">from_bits_unchecked</a>(bits: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; Self</h4></div></summary><div class="docblock"><p>Convert from underlying bit representation, preserving all
 bits (even those not corresponding to a defined flag).</p>
-<h1 id="safety" class="section-header"><a href="#safety">Safety</a></h1>
+<h5 id="safety" class="section-header"><a href="#safety">Safety</a></h5>
 <p>The caller of the <code>bitflags!</code> macro can chose to allow or
 disallow extra bits for their bitflags type.</p>
 <p>The caller of <code>from_bits_unchecked()</code> has to ensure that

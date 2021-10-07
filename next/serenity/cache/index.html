@@ -3,7 +3,7 @@
 where possible. Issuing too many requests will lead to ratelimits.</p>
 <p>Following a policy to never hand out locks, the cache will clone all values
 when calling its methods.</p>
-<h1 id="use-by-models" class="section-header"><a href="#use-by-models">Use by Models</a></h1>
+<h2 id="use-by-models" class="section-header"><a href="#use-by-models">Use by Models</a></h2>
 <p>Most models of Discord objects, such as the <a href="../model/channel/struct.Message.html" title="Message"><code>Message</code></a>, <a href="../model/channel/struct.GuildChannel.html" title="GuildChannel"><code>GuildChannel</code></a>,
 or <a href="../model/guild/struct.Emoji.html" title="Emoji"><code>Emoji</code></a>, have methods for interacting with that single instance. This
 feature is only compiled if the <code>methods</code> feature is enabled. An example of
@@ -13,7 +13,7 @@ request. The cache is involved due to the function’s use of unlocking the
 cache and retrieving the Id of the current user, and comparing it to the Id
 of the user that owns the guild. This is an inexpensive method of being able
 to access data required by these sugary methods.</p>
-<h1 id="do-i-need-the-cache" class="section-header"><a href="#do-i-need-the-cache">Do I need the Cache?</a></h1>
+<h2 id="do-i-need-the-cache" class="section-header"><a href="#do-i-need-the-cache">Do I need the Cache?</a></h2>
 <p>If you’re asking this, the answer is likely “definitely yes” or
 “definitely no”; any in-between tends to be “yes”. If you are low on RAM,
 and need to run on only a couple MB, then the answer is “definitely no”. If

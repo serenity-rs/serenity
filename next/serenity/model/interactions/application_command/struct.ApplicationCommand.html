@@ -27,7 +27,7 @@ overriding an existing one with the same name if it exists.</p>
 list. If an outdated command data is sent by a user, discord will consider it as an error
 and then will instantly update that command.</p>
 <p>As such, it is recommended that guild application commands be used for testing purposes.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
 <p>Create a simple ping command:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model</span>::{<span class="ident">interactions::application_command::ApplicationCommand</span>, <span class="ident">id::ApplicationId</span>};
@@ -55,7 +55,7 @@ and then will instantly update that command.</p>
     })
 })
 .<span class="kw">await</span>;</code></pre></div>
-<h1 id="errors" class="section-header"><a href="#errors">Errors</a></h1>
+<h5 id="errors" class="section-header"><a href="#errors">Errors</a></h5>
 <p>May return an <a href="../../../prelude/enum.SerenityError.html#variant.Http"><code>Error::Http</code></a> if the <a href="struct.ApplicationCommand.html"><code>ApplicationCommand</code></a> is illformed,
 such as if more than 10 <a href="struct.ApplicationCommandOption.html#structfield.choices"><code>choices</code></a> are set. See the <a href="https://discord.com/developers/docs/interactions/slash-commands">API Docs</a> for further details.</p>
 <p>Can also return an <a href="../../../prelude/enum.SerenityError.html#variant.Json"><code>Error::Json</code></a> if there is an error in deserializing

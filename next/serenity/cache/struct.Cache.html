@@ -4,7 +4,7 @@ where possible. Issuing too many requests will lead to ratelimits.</p>
 <p>The cache will clone all values when calling its methods.</p>
 </div></details><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><div id="impl" class="impl has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#191-1011" title="goto source code">[src]</a></div><a href="#impl" class="anchor"></a><h3 class="code-header in-band">impl <a class="struct" href="struct.Cache.html" title="struct serenity::cache::Cache">Cache</a></h3></div></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><div id="method.new" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#194-196" title="goto source code">[src]</a></div><a href="#method.new" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new" class="fnname">new</a>() -&gt; Self</h4></div></summary><div class="docblock"><p>Creates a new cache.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.new_with_settings" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#210" title="goto source code">[src]</a></div><a href="#method.new_with_settings" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new_with_settings" class="fnname">new_with_settings</a>(settings: <a class="struct" href="struct.Settings.html" title="struct serenity::cache::Settings">Settings</a>) -&gt; Self</h4></div></summary><div class="docblock"><p>Creates a new cache instance with settings applied.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::cache</span>::{<span class="ident">Cache</span>, <span class="ident">Settings</span>};
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">Settings::new</span>();
@@ -46,7 +46,7 @@ used to determine how many members have not yet been received.</p>
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.private_channels" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#302-304" title="goto source code">[src]</a></div><a href="#method.private_channels" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.private_channels" class="fnname">private_channels</a>(&amp;self) -&gt; DashMap&lt;<a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>, <a class="struct" href="../model/channel/struct.PrivateChannel.html" title="struct serenity::model::channel::PrivateChannel">PrivateChannel</a>&gt;</h4></div></summary><div class="docblock"><p>Fetches a vector of all <a href="../model/channel/struct.PrivateChannel.html" title="PrivateChannel"><code>PrivateChannel</code></a> Ids that are
 stored in the cache.</p>
-<h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
+<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
 <p>If there are 6 private channels and 2 groups in the cache, then <code>8</code> Ids
 will be returned.</p>
 <p>Printing the count of all private channels and groups:</p>
@@ -58,7 +58,7 @@ will be returned.</p>
 <p>Note that if you are utilizing multiple <a href="../gateway/struct.Shard.html"><code>Shard</code></a>s, then the guilds
 retrieved over all shards are included in this count – not just the
 current <a href="../prelude/struct.Context.html"><code>Context</code></a>’s shard, if accessing from one.</p>
-<h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
+<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
 <p>Print all of the Ids of guilds in the Cache:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">struct</span> <span class="ident">Handler</span>;
@@ -89,7 +89,7 @@ iterator of a given channel.</p>
 });</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.guild" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#412-414" title="goto source code">[src]</a></div><a href="#method.guild" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.guild" class="fnname">guild</a>&lt;G:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>&gt;&gt;(&amp;self, id: G) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/guild/struct.Guild.html" title="struct serenity::model::guild::Guild">Guild</a>&gt;</h4></div></summary><div class="docblock"><p>Clones an entire guild from the cache based on the given <code>id</code>.</p>
 <p>In order to clone only a field of the guild, use <a href="struct.Cache.html#method.guild_field" title="Self::guild_field"><code>Self::guild_field</code></a>.</p>
-<h1 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h1>
+<h5 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h5>
 <p>Retrieve a guild from the cache and print its name:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// assuming the cache is in scope, e.g. via `Context`</span>
@@ -109,7 +109,7 @@ you want to clone.</p>
 this will only search guilds for the given channel.</p>
 <p>The only advantage of this method is that you can pass in anything that
 is indirectly a <a href="../model/id/struct.ChannelId.html" title="ChannelId"><code>ChannelId</code></a>.</p>
-<h1 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h1>
+<h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>
 <p>Getting a guild’s channel via the Id of the message received through a
 <a href="../prelude/trait.EventHandler.html#method.message"><code>EventHandler::message</code></a> event dispatch:</p>
 
@@ -148,7 +148,7 @@ you want to clone.</p>
 user’s given Ids.</p>
 <p><strong>Note</strong>: This will clone the entire member. Instead, retrieve the guild
 and retrieve from the guild’s <a href="../model/guild/struct.Guild.html#method.members"><code>members</code></a> map to avoid this.</p>
-<h1 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h1>
+<h5 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h5>
 <p>Retrieving the member object of the user that posted a message, in a
 <a href="../prelude/trait.EventHandler.html#method.message"><code>EventHandler::message</code></a> context:</p>
 
@@ -195,7 +195,7 @@ you want to clone.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.message" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#763-769" title="goto source code">[src]</a></div><a href="#method.message" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.message" class="fnname">message</a>&lt;C, M&gt;(&amp;self, channel_id: C, message_id: M) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;C: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;M: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../model/id/struct.MessageId.html" title="struct serenity::model::id::MessageId">MessageId</a>&gt;,&nbsp;</span></h4></div></summary><div class="docblock"><p>Retrieves a <a href="../model/channel/enum.Channel.html" title="Channel"><code>Channel</code></a>’s message from the cache based on the channel’s and
 message’s given Ids.</p>
 <p><strong>Note</strong>: This will clone the entire message.</p>
-<h1 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h1>
+<h5 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h5>
 <p>Retrieving the message object from a channel, in a
 <a href="../prelude/trait.EventHandler.html#method.message"><code>EventHandler::message</code></a> context:</p>
 
@@ -207,7 +207,7 @@ message’s given Ids.</p>
 map, if it exists.</p>
 <p>The only advantage of this method is that you can pass in anything that
 is indirectly a <a href="../model/id/struct.ChannelId.html" title="ChannelId"><code>ChannelId</code></a>.</p>
-<h1 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h1>
+<h5 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h5>
 <p>Retrieve a private channel from the cache and print its recipient’s
 name:</p>
 
@@ -219,7 +219,7 @@ name:</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.role" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#839-845" title="goto source code">[src]</a></div><a href="#method.role" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.role" class="fnname">role</a>&lt;G, R&gt;(&amp;self, guild_id: G, role_id: R) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/guild/struct.Role.html" title="struct serenity::model::guild::Role">Role</a>&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;G: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../model/id/struct.GuildId.html" title="struct serenity::model::id::GuildId">GuildId</a>&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../model/id/struct.RoleId.html" title="struct serenity::model::id::RoleId">RoleId</a>&gt;,&nbsp;</span></h4></div></summary><div class="docblock"><p>Retrieves a <a href="../model/guild/struct.Guild.html"><code>Guild</code></a>’s role by their Ids.</p>
 <p><strong>Note</strong>: This will clone the entire role. Instead, retrieve the guild
 and retrieve from the guild’s <a href="../model/guild/struct.Guild.html#structfield.roles"><code>roles</code></a> map to avoid this.</p>
-<h1 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h1>
+<h5 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h5>
 <p>Retrieve a role from the cache and print its name:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// assuming the cache is in scope, e.g. via `Context`</span>
@@ -227,7 +227,7 @@ and retrieve from the guild’s <a href="../model/guild/struct.Guild.html#struct
     <span class="macro">println!</span>(<span class="string">&quot;Role with Id 77 is called {}&quot;</span>, <span class="ident">role</span>.<span class="ident">name</span>);
 }</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.settings" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#865-867" title="goto source code">[src]</a></div><a href="#method.settings" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.settings" class="fnname">settings</a>(&amp;self) -&gt; <a class="struct" href="struct.Settings.html" title="struct serenity::cache::Settings">Settings</a></h4></div></summary><div class="docblock"><p>Returns the settings.</p>
-<h1 id="examples-9" class="section-header"><a href="#examples-9">Examples</a></h1>
+<h5 id="examples-9" class="section-header"><a href="#examples-9">Examples</a></h5>
 <p>Printing the maximum number of messages in a channel to be cached:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::cache::Cache</span>;
@@ -239,7 +239,7 @@ and retrieve from the guild’s <a href="../model/guild/struct.Guild.html#struct
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.user" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#900-902" title="goto source code">[src]</a></div><a href="#method.user" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.user" class="fnname">user</a>&lt;U:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../model/id/struct.UserId.html" title="struct serenity::model::id::UserId">UserId</a>&gt;&gt;(&amp;self, user_id: U) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/user/struct.User.html" title="struct serenity::model::user::User">User</a>&gt;</h4></div></summary><div class="docblock"><p>Retrieves a <a href="../model/user/struct.User.html" title="User"><code>User</code></a> from the cache’s <a href="struct.Cache.html#method.users" title="Self::users"><code>Self::users</code></a> map, if it exists.</p>
 <p>The only advantage of this method is that you can pass in anything that
 is indirectly a <a href="../model/id/struct.UserId.html"><code>UserId</code></a>.</p>
-<h1 id="examples-10" class="section-header"><a href="#examples-10">Examples</a></h1>
+<h5 id="examples-10" class="section-header"><a href="#examples-10">Examples</a></h5>
 <p>Retrieve a user from the cache and print their name:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">context</span>.<span class="ident">cache</span>.<span class="ident">user</span>(<span class="number">7</span>) {
@@ -263,7 +263,7 @@ you want to clone.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.update" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/cache/mod.rs.html#996" title="goto source code">[src]</a></div><a href="#method.update" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.update" class="fnname">update</a>&lt;E:&nbsp;<a class="trait" href="trait.CacheUpdate.html" title="trait serenity::cache::CacheUpdate">CacheUpdate</a>&gt;(&amp;self, e: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>E) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;E::<a class="type" href="trait.CacheUpdate.html#associatedtype.Output" title="type serenity::cache::CacheUpdate::Output">Output</a>&gt;</h4></div></summary><div class="docblock"><p>Updates the cache with the update implementation for an event or other
 custom update implementation.</p>
 <p>Refer to the documentation for <a href="trait.CacheUpdate.html"><code>CacheUpdate</code></a> for more information.</p>
-<h1 id="examples-11" class="section-header"><a href="#examples-11">Examples</a></h1>
+<h5 id="examples-11" class="section-header"><a href="#examples-11">Examples</a></h5>
 <p>Refer to the <a href="trait.CacheUpdate.html#examples"><code>CacheUpdate</code> examples</a>.</p>
 </div></details></div></details><h2 id="trait-implementations" class="small-section-header">Trait Implementations<a href="#trait-implementations" class="anchor"></a></h2><div id="trait-implementations-list"><details class="rustdoc-toggle implementors-toggle" open><summary><div id="impl-AsRef%3CCache%3E" class="impl has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#435-439" title="goto source code">[src]</a></div><a href="#impl-AsRef%3CCache%3E" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="struct.Cache.html" title="struct serenity::cache::Cache">Cache</a>&gt; for <a class="struct" href="../prelude/struct.Context.html" title="struct serenity::prelude::Context">Context</a></h3></div></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><div id="method.as_ref" class="method trait-impl has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#436-438" title="goto source code">[src]</a></div><a href="#method.as_ref" class="anchor"></a><h4 class="code-header">fn <a href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html#tymethod.as_ref" class="fnname">as_ref</a>(&amp;self) -&gt; &amp;<a class="struct" href="struct.Cache.html" title="struct serenity::cache::Cache">Cache</a></h4></div></summary><div class='docblock'><p>Performs the conversion.</p>
 </div></details></div></details><details class="rustdoc-toggle implementors-toggle" open><summary><div id="impl-AsRef%3CCache%3E-1" class="impl has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#442-446" title="goto source code">[src]</a></div><a href="#impl-AsRef%3CCache%3E-1" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="struct.Cache.html" title="struct serenity::cache::Cache">Cache</a>&gt; for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../prelude/struct.Context.html" title="struct serenity::prelude::Context">Context</a>&gt;</h3></div></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><div id="method.as_ref-1" class="method trait-impl has-srclink"><div class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#443-445" title="goto source code">[src]</a></div><a href="#method.as_ref-1" class="anchor"></a><h4 class="code-header">fn <a href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html#tymethod.as_ref" class="fnname">as_ref</a>(&amp;self) -&gt; &amp;<a class="struct" href="struct.Cache.html" title="struct serenity::cache::Cache">Cache</a></h4></div></summary><div class='docblock'><p>Performs the conversion.</p>

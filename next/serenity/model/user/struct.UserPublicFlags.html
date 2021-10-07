@@ -24,7 +24,7 @@ representation contains bits that do not correspond to a flag.</p>
 that do not correspond to flags.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.from_bits_unchecked" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/user.rs.html#507-538" title="goto source code">[src]</a></div><a href="#method.from_bits_unchecked" class="anchor"></a><h4 class="code-header">pub const unsafe fn <a href="#method.from_bits_unchecked" class="fnname">from_bits_unchecked</a>(bits: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>) -&gt; Self</h4></div></summary><div class="docblock"><p>Convert from underlying bit representation, preserving all
 bits (even those not corresponding to a defined flag).</p>
-<h1 id="safety" class="section-header"><a href="#safety">Safety</a></h1>
+<h5 id="safety" class="section-header"><a href="#safety">Safety</a></h5>
 <p>The caller of the <code>bitflags!</code> macro can chose to allow or
 disallow extra bits for their bitflags type.</p>
 <p>The caller of <code>from_bits_unchecked()</code> has to ensure that

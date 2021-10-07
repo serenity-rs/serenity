@@ -5,7 +5,7 @@
 them, and stopping them when required.</p>
 <p><strong>Note</strong>: The <a href="../../struct.Client.html"><code>Client</code></a> internally uses a shard manager. If you are using a
 Client, then you do not need to make one of these.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Initialize a shard manager with a framework responsible for shards 0 through
 2, of 5 total shards:</p>
 
@@ -65,7 +65,7 @@ are properly queued.</p>
 <p>This sends a shutdown signal to a shard’s associated <a href="struct.ShardRunner.html"><code>ShardRunner</code></a>,
 and then queues a initialization of a shard runner for the same shard
 via the <a href="struct.ShardQueuer.html" title="ShardQueuer"><code>ShardQueuer</code></a>.</p>
-<h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
+<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
 <p>Creating a client and then restarting a shard by ID:</p>
 <p><em>(note: in reality this precise code doesn’t have an effect since the
 shard would not yet have been initialized via <a href="struct.ShardManager.html#method.initialize" title="Self::initialize"><code>Self::initialize</code></a>, but the

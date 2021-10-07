@@ -19,14 +19,14 @@ change if the username+discriminator pair becomes non-unique.</p>
 <p>This will produce a WEBP image URL, or GIF if the user has a GIF avatar.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.create_dm_channel" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/user.rs.html#618-624" title="goto source code">[src]</a></div><a href="#method.create_dm_channel" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.create_dm_channel" class="fnname">create_dm_channel</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../channel/struct.PrivateChannel.html" title="struct serenity::model::channel::PrivateChannel">PrivateChannel</a>&gt;</h4></div></summary><div class="docblock"><p>Creates a direct message channel between the <a href="struct.CurrentUser.html">current user</a> and the
 user. This can also retrieve the channel if one already exists.</p>
-<h1 id="errors" class="section-header"><a href="#errors">Errors</a></h1>
+<h5 id="errors" class="section-header"><a href="#errors">Errors</a></h5>
 <p>See <a href="../id/struct.UserId.html#method.create_dm_channel"><code>UserId::create_dm_channel</code></a> for what errors may be returned.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.created_at" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/user.rs.html#628-630" title="goto source code">[src]</a></div><a href="#method.created_at" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.created_at" class="fnname">created_at</a>(&amp;self) -&gt; <a class="struct" href="https://docs.rs/chrono/latest/chrono/datetime/struct.DateTime.html" title="struct chrono::datetime::DateTime">DateTime</a>&lt;<a class="struct" href="https://docs.rs/chrono/latest/chrono/offset/utc/struct.Utc.html" title="struct chrono::offset::utc::Utc">Utc</a>&gt;</h4></div></summary><div class="docblock"><p>Retrieves the time that this user was created at.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.default_avatar_url" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/user.rs.html#636-638" title="goto source code">[src]</a></div><a href="#method.default_avatar_url" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.default_avatar_url" class="fnname">default_avatar_url</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></h4></div></summary><div class="docblock"><p>Returns the formatted URL to the user’s default avatar URL.</p>
 <p>This will produce a PNG URL.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.direct_message" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/user.rs.html#715-720" title="goto source code">[src]</a></div><a href="#method.direct_message" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.direct_message" class="fnname">direct_message</a>&lt;F&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;f: F<br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;for&lt;'a, 'b&gt; F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>(&amp;'b mut <a class="struct" href="../../builder/struct.CreateMessage.html" title="struct serenity::builder::CreateMessage">CreateMessage</a>&lt;'a&gt;) -&gt; &amp;'b mut <a class="struct" href="../../builder/struct.CreateMessage.html" title="struct serenity::builder::CreateMessage">CreateMessage</a>&lt;'a&gt;,&nbsp;</span></h4></div></summary><div class="docblock"><p>Sends a message to a user through a direct message channel. This is a
 channel that can only be accessed by you and the recipient.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
 <p>When a user sends a message with a content of <code>&quot;~help&quot;</code>, DM the author a
 help message, and then react with <code>'👌'</code> to verify message sending:</p>
 
@@ -72,7 +72,7 @@ help message, and then react with <code>'👌'</code> to verify message sending:
 }
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span><span class="ident">Client::builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
-<h1 id="errors-1" class="section-header"><a href="#errors-1">Errors</a></h1>
+<h5 id="errors-1" class="section-header"><a href="#errors-1">Errors</a></h5>
 <p>Returns a <a href="../error/enum.Error.html#variant.MessagingBot" title="ModelError::MessagingBot"><code>ModelError::MessagingBot</code></a> if the user being direct messaged
 is a bot user.</p>
 <p>May also return an <a href="../../prelude/enum.SerenityError.html#variant.Http"><code>Error::Http</code></a> if the message was illformed, or if the
@@ -89,12 +89,12 @@ the <a href="../../cache/struct.Cache.html"><code>Cache</code></a> if it is avai
 given <a href="../guild/struct.Role.html" title="Role"><code>Role</code></a>.</p>
 <p>Three forms of data may be passed in to the guild parameter: either a
 <a href="../guild/struct.PartialGuild.html" title="PartialGuild"><code>PartialGuild</code></a>, a <a href="../id/struct.GuildId.html" title="GuildId"><code>GuildId</code></a>, or a <code>u64</code>.</p>
-<h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
+<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
 <p>Check if a guild has a <a href="../guild/struct.Role.html" title="Role"><code>Role</code></a> by Id:</p>
 
 <div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="comment">// Assumes a &#39;guild_id&#39; and `role_id` have already been bound</span>
 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">has_role</span>(<span class="ident">guild_id</span>, <span class="ident">role_id</span>);</code></pre></div>
-<h1 id="errors-2" class="section-header"><a href="#errors-2">Errors</a></h1>
+<h5 id="errors-2" class="section-header"><a href="#errors-2">Errors</a></h5>
 <p>Returns an <a href="../../prelude/enum.SerenityError.html#variant.Http"><code>Error::Http</code></a> if the given <a href="../guild/struct.Guild.html" title="Guild"><code>Guild</code></a> is unavailable,
 if that <a href="../guild/struct.Role.html" title="Role"><code>Role</code></a> does not exist in the given <a href="../guild/struct.Guild.html" title="Guild"><code>Guild</code></a>, or if the
 given <a href="struct.User.html" title="User"><code>User</code></a> is not in that <a href="../guild/struct.Guild.html" title="Guild"><code>Guild</code></a>.</p>
@@ -102,13 +102,13 @@ given <a href="struct.User.html" title="User"><code>User</code></a> is not in th
 deserializing the API response.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.refresh" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/user.rs.html#830-834" title="goto source code">[src]</a></div><a href="#method.refresh" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.refresh" class="fnname">refresh</a>(&amp;mut self, cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></div></summary><div class="docblock"><p>Refreshes the information about the user.</p>
 <p>Replaces the instance with the data retrieved over the REST API.</p>
-<h1 id="errors-3" class="section-header"><a href="#errors-3">Errors</a></h1>
+<h5 id="errors-3" class="section-header"><a href="#errors-3">Errors</a></h5>
 <p>See <a href="../id/struct.UserId.html#method.to_user"><code>UserId::to_user</code></a> for what errors may be returned.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.static_avatar_url" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/user.rs.html#840-842" title="goto source code">[src]</a></div><a href="#method.static_avatar_url" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.static_avatar_url" class="fnname">static_avatar_url</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</h4></div></summary><div class="docblock"><p>Returns a static formatted URL of the user’s icon, if one exists.</p>
 <p>This will always produce a WEBP image URL.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.tag" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/user.rs.html#883-885" title="goto source code">[src]</a></div><a href="#method.tag" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.tag" class="fnname">tag</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></h4></div></summary><div class="docblock"><p>Returns the “tag” for the user.</p>
 <p>The “tag” is defined as “username#discriminator”, such as “zeyla#5479”.</p>
-<h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
+<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
 <p>Make a command to tell the user what their tag is:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::utils::MessageBuilder</span>;

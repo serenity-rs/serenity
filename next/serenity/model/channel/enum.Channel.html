@@ -12,7 +12,7 @@ channel. For multi-user “private channels”, use a group.</p>
 <p>Converts <code>self</code> into an <code>Option&lt;GuildChannel&gt;</code>, consuming
 <code>self</code>, and discarding a <a href="struct.PrivateChannel.html" title="PrivateChannel"><code>PrivateChannel</code></a>, or
 <a href="struct.ChannelCategory.html" title="ChannelCategory"><code>ChannelCategory</code></a>, if any.</p>
-<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">guild</span>() {
@@ -25,7 +25,7 @@ channel. For multi-user “private channels”, use a group.</p>
 <p>Converts <code>self</code> into an <code>Option&lt;PrivateChannel&gt;</code>, consuming
 <code>self</code>, and discarding a <a href="struct.GuildChannel.html" title="GuildChannel"><code>GuildChannel</code></a>, or <a href="struct.ChannelCategory.html" title="ChannelCategory"><code>ChannelCategory</code></a>,
 if any.</p>
-<h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
+<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">private</span>() {
@@ -38,7 +38,7 @@ if any.</p>
 <p>Converts <code>self</code> into an <code>Option&lt;ChannelCategory&gt;</code>,
 consuming <code>self</code>, and discarding a <a href="struct.GuildChannel.html" title="GuildChannel"><code>GuildChannel</code></a>, or
 <a href="struct.PrivateChannel.html" title="PrivateChannel"><code>PrivateChannel</code></a>, if any.</p>
-<h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
+<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">category</span>() {
@@ -48,7 +48,7 @@ consuming <code>self</code>, and discarding a <a href="struct.GuildChannel.html"
     <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">println!</span>(<span class="string">&quot;It&#39;s not a category!&quot;</span>); },
 }</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.delete" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/channel/mod.rs.html#176-190" title="goto source code">[src]</a></div><a href="#method.delete" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.delete" class="fnname">delete</a>(&amp;self, cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></div></summary><div class="docblock"><p>Deletes the inner channel.</p>
-<h1 id="errors" class="section-header"><a href="#errors">Errors</a></h1>
+<h5 id="errors" class="section-header"><a href="#errors">Errors</a></h5>
 <p>If the <code>cache</code> is enabled, returns <a href="../error/enum.Error.html#variant.InvalidPermissions" title="ModelError::InvalidPermissions"><code>ModelError::InvalidPermissions</code></a>,
 if the current user lacks permission.</p>
 <p>Otherwise will return <a href="../../prelude/enum.SerenityError.html#variant.Http" title="Error::Http"><code>Error::Http</code></a> if the current user does not
