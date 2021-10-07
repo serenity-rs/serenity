@@ -908,7 +908,9 @@ pub struct ApplicationCommandOption {
     /// [`SubCommandGroup`]: ApplicationCommandOptionType::SubCommandGroup
     #[serde(default)]
     pub options: Vec<ApplicationCommandOption>,
-    /// If an option is a Channel type, it will only be able to show these types.
+    /// If the option is a [`Channel`], it will only be able to show these types.
+    ///
+    /// [`Channel`]: ApplicationCommandOptionType::Channel
     #[serde(default)]
     pub channel_types: Vec<ChannelType>,
 }
