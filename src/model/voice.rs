@@ -27,8 +27,6 @@ pub struct VoiceRegion {
     pub name: String,
     /// Whether the voice region is optimal for use by the current user.
     pub optimal: bool,
-    /// Indicator of whether the voice region is only for VIP guilds.
-    pub vip: bool,
 }
 
 /// A user's state within a voice channel.
