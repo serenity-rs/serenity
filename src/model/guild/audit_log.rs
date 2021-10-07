@@ -35,6 +35,9 @@ pub enum Action {
     Emoji(ActionEmoji),
     Message(ActionMessage),
     Integration(ActionIntegration),
+    StageInstance(ActionStageInstance),
+    Sticker(ActionSticker),
+    Thread(ActionThread),
 }
 
 impl Action {
@@ -52,6 +55,9 @@ impl Action {
             Action::Emoji(ref x) => x.num(),
             Action::Message(ref x) => x.num(),
             Action::Integration(ref x) => x.num(),
+            Action::StageInstance(ref x) => x.num(),
+            Action::Sticker(ref x) => x.num(),
+            Action::Thread(ref x) => x.num(),
         }
     }
 }
@@ -241,6 +247,63 @@ impl ActionIntegration {
     }
 }
 
+#[derive(Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ActionStageInstance {
+    Create = 83,
+    Update = 84,
+    Delete = 85,
+}
+
+impl ActionStageInstance {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionStageInstance::Create => 83,
+            ActionStageInstance::Update => 84,
+            ActionStageInstance::Delete => 85,
+        }
+    }
+}
+
+#[derive(Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ActionSticker {
+    Create = 90,
+    Update = 91,
+    Delete = 92,
+}
+
+impl ActionSticker {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionSticker::Create => 90,
+            ActionSticker::Update => 91,
+            ActionSticker::Delete => 92,
+        }
+    }
+}
+
+#[derive(Debug)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum ActionThread {
+    Create = 110,
+    Update = 111,
+    Delete = 112,
+}
+
+impl ActionThread {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionThread::Create => 110,
+            ActionThread::Update => 111,
+            ActionThread::Delete => 112,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Change {
     #[serde(rename = "key")]
@@ -378,6 +441,9 @@ mod action_handler {
                     60..=62 => Action::Emoji(unsafe { transmute(value) }),
                     72..=75 => Action::Message(unsafe { transmute(value) }),
                     80..=82 => Action::Integration(unsafe { transmute(value) }),
+                    83..=85 => Action::StageInstance(unsafe { transmute(value) }),
+                    90..=92 => Action::Sticker(unsafe { transmute(value) }),
+                    110..=112 => Action::Thread(unsafe { transmute(value) }),
                     _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
                 })
             }
