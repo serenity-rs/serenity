@@ -1091,6 +1091,11 @@
 <span id="1091">1091</span>
 <span id="1092">1092</span>
 <span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1106,7 +1111,7 @@
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::{<span class="ident">JsonMap</span>, <span class="ident">StdResult</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::PartialChannel</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">ChannelType</span>, <span class="ident">PartialChannel</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild</span>::{<span class="ident">Member</span>, <span class="ident">PartialMember</span>, <span class="ident">Role</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{
     <span class="ident">ApplicationId</span>,
@@ -2001,6 +2006,11 @@
     <span class="doccomment">/// [`SubCommandGroup`]: ApplicationCommandOptionType::SubCommandGroup</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommandOption</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the option is a [`Channel`], it will only be able to show these types.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Channel`]: ApplicationCommandOptionType::Channel</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">channel_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelType</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// An [`ApplicationCommand`] permission.</span>
