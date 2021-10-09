@@ -134,7 +134,7 @@ impl CreateApplicationCommandOption {
     /// If the option is a [`Channel`], it will only be able to show these types.
     ///
     /// [`Channel`]: crate::model::interactions::application_command::ApplicationCommandOptionType::Channel
-    pub fn channel_types(&mut self, channel_types: Vec<ChannelType>) -> &mut Self {
+    pub fn channel_types(&mut self, channel_types: &[ChannelType]) -> &mut Self {
         self.0.insert(
             "channel_types",
             Value::Array(
