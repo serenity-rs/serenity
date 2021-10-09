@@ -324,6 +324,85 @@ impl Default for Colour {
     }
 }
 
+/// Colour constants used by Discord for their branding, role colour palette, etc.
+#[allow(dead_code)]
+pub mod colours {
+    pub mod branding {
+        use crate::utils::Colour;
+
+        /// Creates a new [`Colour`], setting its value to `rgb(88, 101, 242)`.
+        pub const BLURPLE: Colour = Colour(0x5865F2);
+        /// Creates a new [`Colour`], setting its value to `rgb(87, 242, 135)`.
+        pub const GREEN: Colour = Colour(0x57F287);
+        /// Creates a new [`Colour`], setting its value to `rgb(254, 231, 92)`.
+        pub const YELLOW: Colour = Colour(0xFEE75C);
+        /// Creates a new [`Colour`], setting its value to `rgb(235, 69, 158)`.
+        pub const FUCHSIA: Colour = Colour(0xEB459E);
+        /// Creates a new [`Colour`], setting its value to `rgb(237, 66, 69)`.
+        pub const RED: Colour = Colour(0xED4245);
+        /// Creates a new [`Colour`], setting its value to `rgb(255, 255, 255)`.
+        pub const WHITE: Colour = Colour(0xFFFFFF);
+        /// Creates a new [`Colour`], setting its value to `rgb(35, 39, 42)`.
+        pub const BLACK: Colour = Colour(0x23272A);
+    }
+    pub mod css {
+        use crate::utils::Colour;
+
+        /// Creates a new [`Colour`], setting its value to `hsl(139, 47.3%, 43.9%)`.
+        pub const POSITIVE: Colour = Colour(0x3BA55D);
+        /// Creates a new [`Colour`], setting its value to `hsl(38, 95.7%, 54.1%)`.
+        pub const WARNING: Colour = Colour(0xFAA81A);
+        /// Creates a new [`Colour`], setting its value to `hsl(359, 82.6%, 59.4%)`.
+        pub const DANGER: Colour = Colour(0xED4245);
+    }
+    pub mod roles {
+        use crate::utils::Colour;
+
+        /// Creates a new [`Colour`], setting its value to `rgb(153, 170, 181)`.
+        pub const DEFAULT: Colour = Colour(0x99AAB5);
+        /// Creates a new [`Colour`], setting its value to `rgb(26, 188, 156)`.
+        pub const TEAL: Colour = Colour(0x1ABC9C);
+        /// Creates a new [`Colour`], setting its value to `rgb(17, 128, 106)`.
+        pub const DARK_TEAL: Colour = Colour(0x11806A);
+        /// Creates a new [`Colour`], setting its value to `rgb(46, 204, 113)`.
+        pub const GREEN: Colour = Colour(0x2ECC71);
+        /// Creates a new [`Colour`], setting its value to `rgb(31, 139, 76)`.
+        pub const DARK_GREEN: Colour = Colour(0x1F8B4C);
+        /// Creates a new [`Colour`], setting its value to `rgb(52, 152, 219)`.
+        pub const BLUE: Colour = Colour(0x3498DB);
+        /// Creates a new [`Colour`], setting its value to `rgb(32, 102, 148)`.
+        pub const DARK_BLUE: Colour = Colour(0x206694);
+        /// Creates a new [`Colour`], setting its value to `rgb(155, 89, 182)`.
+        pub const PURPLE: Colour = Colour(0x9B59B6);
+        /// Creates a new [`Colour`], setting its value to `rgb(113, 54, 138)`.
+        pub const DARK_PURPLE: Colour = Colour(0x71368A);
+        /// Creates a new [`Colour`], setting its value to `rgb(233, 30, 99)`.
+        pub const MAGENTA: Colour = Colour(0xE91E63);
+        /// Creates a new [`Colour`], setting its value to `rgb(173, 20, 87)`.
+        pub const DARK_MAGENTA: Colour = Colour(0xAD1457);
+        /// Creates a new [`Colour`], setting its value to `rgb(241, 196, 15)`.
+        pub const GOLD: Colour = Colour(0xF1C40F);
+        /// Creates a new [`Colour`], setting its value to `rgb(194, 124, 14)`.
+        pub const DARK_GOLD: Colour = Colour(0xC27C0E);
+        /// Creates a new [`Colour`], setting its value to `rgb(230, 126, 34)`.
+        pub const ORANGE: Colour = Colour(0xE67E22);
+        /// Creates a new [`Colour`], setting its value to `rgb(168, 67, 0)`.
+        pub const DARK_ORANGE: Colour = Colour(0xA84300);
+        /// Creates a new [`Colour`], setting its value to `rgb(231, 76, 60)`.
+        pub const RED: Colour = Colour(0xE74C3C);
+        /// Creates a new [`Colour`], setting its value to `rgb(153, 45, 34)`.
+        pub const DARK_RED: Colour = Colour(0x992D22);
+        /// Creates a new [`Colour`], setting its value to `rgb(149, 165, 166)`.
+        pub const LIGHTER_GREY: Colour = Colour(0x95A5A6);
+        /// Creates a new [`Colour`], setting its value to `rgb(151, 156, 159)`.
+        pub const LIGHT_GREY: Colour = Colour(0x979C9F);
+        /// Creates a new [`Colour`], setting its value to `rgb(96, 125, 139)`.
+        pub const DARK_GREY: Colour = Colour(0x607D8B);
+        /// Creates a new [`Colour`], setting its value to `rgb(84, 110, 122)`.
+        pub const DARKER_GREY: Colour = Colour(0x546E7A);
+    }
+}
+
 #[cfg(test)]
 mod test {
     use std::u32;
