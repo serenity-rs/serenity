@@ -39,8 +39,8 @@ use crate::model::interactions::application_command::{
 };
 use crate::model::prelude::*;
 
-/// A builder implementing [`Future`] building a [`Http`] client to perform
-/// requests to Discord's HTTP API. If you do not need to use a proxy or do not
+/// A builder for the underlying [`Http`] client that performs requests
+/// to Discord's HTTP API. If you do not need to use a proxy or do not
 /// need to disable the rate limiter, you can use [`Http::new`] or
 /// [`Http::new_with_token`] instead.
 ///
@@ -50,13 +50,12 @@ use crate::model::prelude::*;
 ///
 /// ```rust
 /// # use serenity::http::HttpBuilder;
-/// # async fn run() {
+/// # fn run() {
 /// let http = HttpBuilder::new("token")
 ///     .proxy("http://127.0.0.1:3000")
 ///     .expect("Invalid proxy URL")
 ///     .ratelimiter_disabled(true)
-///     .await
-///     .expect("Error creating Http");
+///     .build();
 /// # }
 /// ```
 pub struct HttpBuilder {
