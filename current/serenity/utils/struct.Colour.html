@@ -49,8 +49,8 @@ representation.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::utils::Colour</span>;
 
-<span class="macro">assert!</span>(<span class="ident">Colour::from_rgb</span>(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xFF0000</span>);
-<span class="macro">assert!</span>(<span class="ident">Colour::from_rgb</span>(<span class="number">217</span>, <span class="number">23</span>, <span class="number">211</span>).<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">0xD917D3</span>);</code></pre></div>
+<span class="macro">assert!</span>(<span class="ident">Colour::from_rgb</span>(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>).<span class="number">0</span> <span class="op">==</span> <span class="number">0xFF0000</span>);
+<span class="macro">assert!</span>(<span class="ident">Colour::from_rgb</span>(<span class="number">217</span>, <span class="number">23</span>, <span class="number">211</span>).<span class="number">0</span> <span class="op">==</span> <span class="number">0xD917D3</span>);</code></pre></div>
 <p>And you can then retrieve those same RGB values via its methods:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::utils::Colour</span>;

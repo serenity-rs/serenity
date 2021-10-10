@@ -16,10 +16,10 @@ channel. For multi-user “private channels”, use a group.</p>
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">guild</span>() {
-    <span class="prelude-val">Some</span>(<span class="ident">guild_channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="prelude-val">Some</span>(<span class="ident">guild_channel</span>) =&gt; {
         <span class="macro">println!</span>(<span class="string">&quot;It&#39;s a guild channel named {}!&quot;</span>, <span class="ident">guild_channel</span>.<span class="ident">name</span>);
     },
-    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">println!</span>(<span class="string">&quot;It&#39;s not in a guild!&quot;</span>); },
+    <span class="prelude-val">None</span> =&gt; { <span class="macro">println!</span>(<span class="string">&quot;It&#39;s not in a guild!&quot;</span>); },
 }</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.private" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/channel/mod.rs.html#128-133" title="goto source code">[src]</a></div><a href="#method.private" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.private" class="fnname">private</a>(self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.PrivateChannel.html" title="struct serenity::model::channel::PrivateChannel">PrivateChannel</a>&gt;</h4></div><div class="item-info"><div class="stab portability">This is supported on <strong>crate feature <code>model</code></strong> only.</div></div></summary><div class="docblock"><p>Converts from <a href="enum.Channel.html" title="Channel"><code>Channel</code></a> to <code>Option&lt;PrivateChannel&gt;</code>.</p>
 <p>Converts <code>self</code> into an <code>Option&lt;PrivateChannel&gt;</code>, consuming
@@ -29,10 +29,10 @@ if any.</p>
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">private</span>() {
-    <span class="prelude-val">Some</span>(<span class="ident">private</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="prelude-val">Some</span>(<span class="ident">private</span>) =&gt; {
         <span class="macro">println!</span>(<span class="string">&quot;It&#39;s a private channel with {}!&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">private</span>.<span class="ident">recipient</span>);
     },
-    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">println!</span>(<span class="string">&quot;It&#39;s not a private channel!&quot;</span>); },
+    <span class="prelude-val">None</span> =&gt; { <span class="macro">println!</span>(<span class="string">&quot;It&#39;s not a private channel!&quot;</span>); },
 }</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.category" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/channel/mod.rs.html#164-169" title="goto source code">[src]</a></div><a href="#method.category" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.category" class="fnname">category</a>(self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.ChannelCategory.html" title="struct serenity::model::channel::ChannelCategory">ChannelCategory</a>&gt;</h4></div><div class="item-info"><div class="stab portability">This is supported on <strong>crate feature <code>model</code></strong> only.</div></div></summary><div class="docblock"><p>Converts from <a href="enum.Channel.html" title="Channel"><code>Channel</code></a> to <code>Option&lt;ChannelCategory&gt;</code>.</p>
 <p>Converts <code>self</code> into an <code>Option&lt;ChannelCategory&gt;</code>,
@@ -42,10 +42,10 @@ consuming <code>self</code>, and discarding a <a href="struct.GuildChannel.html"
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">category</span>() {
-    <span class="prelude-val">Some</span>(<span class="ident">category</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    <span class="prelude-val">Some</span>(<span class="ident">category</span>) =&gt; {
         <span class="macro">println!</span>(<span class="string">&quot;It&#39;s a category named {}!&quot;</span>, <span class="ident">category</span>.<span class="ident">name</span>);
     },
-    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="macro">println!</span>(<span class="string">&quot;It&#39;s not a category!&quot;</span>); },
+    <span class="prelude-val">None</span> =&gt; { <span class="macro">println!</span>(<span class="string">&quot;It&#39;s not a category!&quot;</span>); },
 }</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.delete" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/model/channel/mod.rs.html#180-194" title="goto source code">[src]</a></div><a href="#method.delete" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.delete" class="fnname">delete</a>(&amp;self, cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></div><div class="item-info"><div class="stab portability">This is supported on <strong>crate feature <code>model</code></strong> only.</div></div></summary><div class="docblock"><p>Deletes the inner channel.</p>
 <h5 id="errors" class="section-header"><a href="#errors">Errors</a></h5>

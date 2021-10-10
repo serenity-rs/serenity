@@ -41,18 +41,18 @@ re-ban all members with an odd discriminator:</p>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_ban_removal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">user</span>: <span class="ident">User</span>) {
         <span class="comment">// If the user has an even discriminator, don&#39;t re-ban them.</span>
-        <span class="kw">if</span> <span class="ident">user</span>.<span class="ident">discriminator</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">user</span>.<span class="ident">discriminator</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span>;
         }
 
         <span class="kw">match</span> <span class="ident">guild_id</span>.<span class="ident">ban</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="ident">user</span>, <span class="number">8</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="comment">// Ban successful.</span>
             },
-            <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::DeleteMessageDaysAmount</span>(<span class="ident">amount</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::DeleteMessageDaysAmount</span>(<span class="ident">amount</span>))) =&gt; {
                 <span class="macro">println!</span>(<span class="string">&quot;Failed deleting {} days&#39; worth of messages&quot;</span>, <span class="ident">amount</span>);
             },
-            <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; {
                 <span class="macro">println!</span>(<span class="string">&quot;Unexpected error: {:?}&quot;</span>, <span class="ident">why</span>);
             },
         }

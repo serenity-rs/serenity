@@ -179,7 +179,7 @@ library is activated, and it is activated by default.</p>
 <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">future::ready</span>(<span class="number">2</span>);
 <span class="macro">assert!</span>(<span class="ident">future</span>.<span class="ident">catch_unwind</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>());
 
-<span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">future::lazy</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ready</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
+<span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">future::lazy</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> -&gt; <span class="ident">Ready</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
     <span class="macro">unimplemented!</span>()
 });
 <span class="macro">assert!</span>(<span class="ident">future</span>.<span class="ident">catch_unwind</span>().<span class="kw">await</span>.<span class="ident">is_err</span>());</code></pre></div>

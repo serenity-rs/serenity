@@ -587,23 +587,23 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Action</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Action</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">GuildUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">1</span>,
-            <span class="ident">Action::Channel</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::ChannelOverwrite</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Member</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Role</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Invite</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Webhook</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Emoji</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Message</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Integration</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::StageInstance</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Sticker</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
-            <span class="ident">Action::Thread</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">GuildUpdate</span> =&gt; <span class="number">1</span>,
+            <span class="ident">Action::Channel</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::ChannelOverwrite</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Member</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Role</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Invite</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Webhook</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Emoji</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Message</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Integration</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::StageInstance</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Sticker</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
+            <span class="ident">Action::Thread</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">num</span>(),
         }
     }
 }
@@ -618,11 +618,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionChannel</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionChannel::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">10</span>,
-            <span class="ident">ActionChannel::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">11</span>,
-            <span class="ident">ActionChannel::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">12</span>,
+            <span class="ident">ActionChannel::Create</span> =&gt; <span class="number">10</span>,
+            <span class="ident">ActionChannel::Update</span> =&gt; <span class="number">11</span>,
+            <span class="ident">ActionChannel::Delete</span> =&gt; <span class="number">12</span>,
         }
     }
 }
@@ -637,11 +637,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionChannelOverwrite</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionChannelOverwrite::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">13</span>,
-            <span class="ident">ActionChannelOverwrite::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">14</span>,
-            <span class="ident">ActionChannelOverwrite::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">15</span>,
+            <span class="ident">ActionChannelOverwrite::Create</span> =&gt; <span class="number">13</span>,
+            <span class="ident">ActionChannelOverwrite::Update</span> =&gt; <span class="number">14</span>,
+            <span class="ident">ActionChannelOverwrite::Delete</span> =&gt; <span class="number">15</span>,
         }
     }
 }
@@ -662,17 +662,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionMember</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionMember::Kick</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
-            <span class="ident">ActionMember::Prune</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">21</span>,
-            <span class="ident">ActionMember::BanAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">22</span>,
-            <span class="ident">ActionMember::BanRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">23</span>,
-            <span class="ident">ActionMember::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">24</span>,
-            <span class="ident">ActionMember::RoleUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">25</span>,
-            <span class="ident">ActionMember::MemberMove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">26</span>,
-            <span class="ident">ActionMember::MemberDisconnect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">27</span>,
-            <span class="ident">ActionMember::BotAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">28</span>,
+            <span class="ident">ActionMember::Kick</span> =&gt; <span class="number">20</span>,
+            <span class="ident">ActionMember::Prune</span> =&gt; <span class="number">21</span>,
+            <span class="ident">ActionMember::BanAdd</span> =&gt; <span class="number">22</span>,
+            <span class="ident">ActionMember::BanRemove</span> =&gt; <span class="number">23</span>,
+            <span class="ident">ActionMember::Update</span> =&gt; <span class="number">24</span>,
+            <span class="ident">ActionMember::RoleUpdate</span> =&gt; <span class="number">25</span>,
+            <span class="ident">ActionMember::MemberMove</span> =&gt; <span class="number">26</span>,
+            <span class="ident">ActionMember::MemberDisconnect</span> =&gt; <span class="number">27</span>,
+            <span class="ident">ActionMember::BotAdd</span> =&gt; <span class="number">28</span>,
         }
     }
 }
@@ -687,11 +687,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionRole</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionRole::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">30</span>,
-            <span class="ident">ActionRole::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">31</span>,
-            <span class="ident">ActionRole::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">32</span>,
+            <span class="ident">ActionRole::Create</span> =&gt; <span class="number">30</span>,
+            <span class="ident">ActionRole::Update</span> =&gt; <span class="number">31</span>,
+            <span class="ident">ActionRole::Delete</span> =&gt; <span class="number">32</span>,
         }
     }
 }
@@ -706,11 +706,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionInvite</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionInvite::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">40</span>,
-            <span class="ident">ActionInvite::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">41</span>,
-            <span class="ident">ActionInvite::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">42</span>,
+            <span class="ident">ActionInvite::Create</span> =&gt; <span class="number">40</span>,
+            <span class="ident">ActionInvite::Update</span> =&gt; <span class="number">41</span>,
+            <span class="ident">ActionInvite::Delete</span> =&gt; <span class="number">42</span>,
         }
     }
 }
@@ -725,11 +725,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionWebhook</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionWebhook::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">50</span>,
-            <span class="ident">ActionWebhook::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">51</span>,
-            <span class="ident">ActionWebhook::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">52</span>,
+            <span class="ident">ActionWebhook::Create</span> =&gt; <span class="number">50</span>,
+            <span class="ident">ActionWebhook::Update</span> =&gt; <span class="number">51</span>,
+            <span class="ident">ActionWebhook::Delete</span> =&gt; <span class="number">52</span>,
         }
     }
 }
@@ -744,11 +744,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionEmoji</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionEmoji::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">60</span>,
-            <span class="ident">ActionEmoji::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">61</span>,
-            <span class="ident">ActionEmoji::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">62</span>,
+            <span class="ident">ActionEmoji::Create</span> =&gt; <span class="number">60</span>,
+            <span class="ident">ActionEmoji::Update</span> =&gt; <span class="number">61</span>,
+            <span class="ident">ActionEmoji::Delete</span> =&gt; <span class="number">62</span>,
         }
     }
 }
@@ -764,12 +764,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionMessage</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionMessage::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">72</span>,
-            <span class="ident">ActionMessage::BulkDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">73</span>,
-            <span class="ident">ActionMessage::Pin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">74</span>,
-            <span class="ident">ActionMessage::Unpin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">75</span>,
+            <span class="ident">ActionMessage::Delete</span> =&gt; <span class="number">72</span>,
+            <span class="ident">ActionMessage::BulkDelete</span> =&gt; <span class="number">73</span>,
+            <span class="ident">ActionMessage::Pin</span> =&gt; <span class="number">74</span>,
+            <span class="ident">ActionMessage::Unpin</span> =&gt; <span class="number">75</span>,
         }
     }
 }
@@ -784,11 +784,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionIntegration</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionIntegration::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">80</span>,
-            <span class="ident">ActionIntegration::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">81</span>,
-            <span class="ident">ActionIntegration::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">82</span>,
+            <span class="ident">ActionIntegration::Create</span> =&gt; <span class="number">80</span>,
+            <span class="ident">ActionIntegration::Update</span> =&gt; <span class="number">81</span>,
+            <span class="ident">ActionIntegration::Delete</span> =&gt; <span class="number">82</span>,
         }
     }
 }
@@ -803,11 +803,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionStageInstance</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionStageInstance::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">83</span>,
-            <span class="ident">ActionStageInstance::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">84</span>,
-            <span class="ident">ActionStageInstance::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">85</span>,
+            <span class="ident">ActionStageInstance::Create</span> =&gt; <span class="number">83</span>,
+            <span class="ident">ActionStageInstance::Update</span> =&gt; <span class="number">84</span>,
+            <span class="ident">ActionStageInstance::Delete</span> =&gt; <span class="number">85</span>,
         }
     }
 }
@@ -822,11 +822,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionSticker</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionSticker::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">90</span>,
-            <span class="ident">ActionSticker::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">91</span>,
-            <span class="ident">ActionSticker::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">92</span>,
+            <span class="ident">ActionSticker::Create</span> =&gt; <span class="number">90</span>,
+            <span class="ident">ActionSticker::Update</span> =&gt; <span class="number">91</span>,
+            <span class="ident">ActionSticker::Delete</span> =&gt; <span class="number">92</span>,
         }
     }
 }
@@ -841,11 +841,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ActionThread</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u8</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ActionThread::Create</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">110</span>,
-            <span class="ident">ActionThread::Update</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">111</span>,
-            <span class="ident">ActionThread::Delete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">112</span>,
+            <span class="ident">ActionThread::Create</span> =&gt; <span class="number">110</span>,
+            <span class="ident">ActionThread::Update</span> =&gt; <span class="number">111</span>,
+            <span class="ident">ActionThread::Delete</span> =&gt; <span class="number">112</span>,
         }
     }
 }
@@ -919,32 +919,32 @@
 <span class="kw">mod</span> <span class="ident">option_u64_handler</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">des</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">des</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">struct</span> <span class="ident">OptionU64Visitor</span>;
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OptionU64Visitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
                 <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;an optional integer or a string with a valid number inside&quot;</span>)
             }
 
             <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
                 <span class="self">self</span>,
                 <span class="ident">deserializer</span>: <span class="ident">D</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+            ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
                 <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="ident">OptionU64Visitor</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u64</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                 <span class="ident">string</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">map_err</span>(<span class="ident">de::Error::custom</span>)
             }
         }
@@ -952,7 +952,7 @@
         <span class="ident">des</span>.<span class="ident">deserialize_option</span>(<span class="ident">OptionU64Visitor</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">num</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">num</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
         <span class="ident">Option::serialize</span>(<span class="ident">num</span>, <span class="ident">s</span>)
@@ -962,35 +962,35 @@
 <span class="kw">mod</span> <span class="ident">action_handler</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">de</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">Action</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">de</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">Action</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">struct</span> <span class="ident">ActionVisitor</span>;
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ActionVisitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Action</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
                 <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;an integer between 1 to 72&quot;</span>)
             }
 
             <span class="comment">// NOTE: Serde internally delegates number types below `u64` to it.</span>
-            <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">Action</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">de::Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">Action</span>, <span class="ident">E</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u8</span>;
 
                 <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::GuildUpdate</span>,
-                    <span class="number">10</span>..<span class="op">=</span><span class="number">12</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Channel</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">13</span>..<span class="op">=</span><span class="number">15</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::ChannelOverwrite</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">20</span>..<span class="op">=</span><span class="number">28</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Member</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">30</span>..<span class="op">=</span><span class="number">32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Role</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">40</span>..<span class="op">=</span><span class="number">42</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Invite</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">50</span>..<span class="op">=</span><span class="number">52</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Webhook</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">60</span>..<span class="op">=</span><span class="number">62</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Emoji</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">72</span>..<span class="op">=</span><span class="number">75</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Message</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">80</span>..<span class="op">=</span><span class="number">82</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Integration</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">83</span>..<span class="op">=</span><span class="number">85</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::StageInstance</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">90</span>..<span class="op">=</span><span class="number">92</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Sticker</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="number">110</span>..<span class="op">=</span><span class="number">112</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Action::Thread</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">E::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;Unexpected action number: {}&quot;</span>, <span class="ident">value</span>))),
+                    <span class="number">1</span> =&gt; <span class="ident">Action::GuildUpdate</span>,
+                    <span class="number">10</span>..<span class="op">=</span><span class="number">12</span> =&gt; <span class="ident">Action::Channel</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">13</span>..<span class="op">=</span><span class="number">15</span> =&gt; <span class="ident">Action::ChannelOverwrite</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">20</span>..<span class="op">=</span><span class="number">28</span> =&gt; <span class="ident">Action::Member</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">30</span>..<span class="op">=</span><span class="number">32</span> =&gt; <span class="ident">Action::Role</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">40</span>..<span class="op">=</span><span class="number">42</span> =&gt; <span class="ident">Action::Invite</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">50</span>..<span class="op">=</span><span class="number">52</span> =&gt; <span class="ident">Action::Webhook</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">60</span>..<span class="op">=</span><span class="number">62</span> =&gt; <span class="ident">Action::Emoji</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">72</span>..<span class="op">=</span><span class="number">75</span> =&gt; <span class="ident">Action::Message</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">80</span>..<span class="op">=</span><span class="number">82</span> =&gt; <span class="ident">Action::Integration</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">83</span>..<span class="op">=</span><span class="number">85</span> =&gt; <span class="ident">Action::StageInstance</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">90</span>..<span class="op">=</span><span class="number">92</span> =&gt; <span class="ident">Action::Sticker</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="number">110</span>..<span class="op">=</span><span class="number">112</span> =&gt; <span class="ident">Action::Thread</span>(<span class="kw">unsafe</span> { <span class="ident">transmute</span>(<span class="ident">value</span>) }),
+                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">E::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;Unexpected action number: {}&quot;</span>, <span class="ident">value</span>))),
                 })
             }
         }
@@ -998,12 +998,12 @@
         <span class="ident">de</span>.<span class="ident">deserialize_any</span>(<span class="ident">ActionVisitor</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">action</span>: <span class="kw-2">&amp;</span><span class="ident">Action</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">action</span>: <span class="kw-2">&amp;</span><span class="ident">Action</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
         <span class="ident">serializer</span>.<span class="ident">serialize_u8</span>(<span class="ident">action</span>.<span class="ident">num</span>())
     }
 }
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AuditLogs</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">de</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">de</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
         <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">field_identifier</span>)]</span>
         <span class="kw">enum</span> <span class="ident">Field</span> {
@@ -1021,40 +1021,40 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EntriesVisitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">AuditLogs</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
                 <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;audit log entries&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">V</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">AuditLogs</span>, <span class="ident">V::Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">V</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">V</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">AuditLogs</span>, <span class="ident">V::Error</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">audit_log_entries</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">users</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">webhooks</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
                 <span class="kw">loop</span> {
                     <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">next_key</span>() {
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field::Entries</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field::Entries</span>)) =&gt; {
                             <span class="kw">if</span> <span class="ident">audit_log_entries</span>.<span class="ident">is_some</span>() {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">de::Error::duplicate_field</span>(<span class="string">&quot;entries&quot;</span>));
                             }
 
                             <span class="ident">audit_log_entries</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuditLogEntry</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
                         },
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field::Webhooks</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field::Webhooks</span>)) =&gt; {
                             <span class="kw">if</span> <span class="ident">webhooks</span>.<span class="ident">is_some</span>() {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">de::Error::duplicate_field</span>(<span class="string">&quot;webhooks&quot;</span>));
                             }
 
                             <span class="ident">webhooks</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
                         },
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field::Users</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field::Users</span>)) =&gt; {
                             <span class="kw">if</span> <span class="ident">users</span>.<span class="ident">is_some</span>() {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">de::Error::duplicate_field</span>(<span class="string">&quot;users&quot;</span>));
                             }
 
                             <span class="ident">users</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
                         },
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>, <span class="comment">// No more keys</span>
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">break</span>, <span class="comment">// No more keys</span>
+                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                             <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">to_string</span>().<span class="ident">contains</span>(<span class="string">&quot;unknown field&quot;</span>) {
                                 <span class="comment">// e is of type &lt;V as MapAccess&gt;::Error, which is a macro-defined trait, ultimately</span>
                                 <span class="comment">// implemented by serde::de::value::Error. Seeing as every error is a simple string and not</span>

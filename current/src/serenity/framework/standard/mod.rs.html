@@ -964,18 +964,18 @@
 }
 
 <span class="kw">type</span> <span class="ident">DispatchHook</span> <span class="op">=</span>
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">DispatchError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">BeforeHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">bool</span><span class="op">&gt;</span>;
+    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">DispatchError</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">BeforeHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">bool</span><span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">AfterHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>,
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>,
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>,
     <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandError</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">UnrecognisedHook</span> <span class="op">=</span>
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">NormalMessageHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">PrefixOnlyHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">NormalMessageHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">PrefixOnlyHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
 
 <span class="doccomment">/// A utility for easily managing dispatches to commands.</span>
 <span class="doccomment">///</span>
@@ -1014,7 +1014,7 @@
 
 <span class="kw">impl</span> <span class="ident">StandardFramework</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">StandardFramework::default</span>()
     }
 
@@ -1048,9 +1048,9 @@
     <span class="doccomment">/// [`Client`]: crate::Client</span>
     <span class="doccomment">/// [`prefix`]: Configuration::prefix</span>
     <span class="doccomment">/// [allowing whitespace between prefixes]: Configuration::with_whitespace</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Configuration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Configuration</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Configuration</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Configuration</span>,
     {
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">config</span>);
 
@@ -1083,9 +1083,9 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bucket</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bucket</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">BucketBuilder::default</span>();
 
@@ -1097,7 +1097,7 @@
     }
 
     <span class="doccomment">/// Whether the message should be ignored because it is from a bot or webhook.</span>
-    <span class="kw">fn</span> <span class="ident">should_ignore</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">should_ignore</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">bool</span> {
         (<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_bots</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">bot</span>)
             <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_webhooks</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">webhook_id</span>.<span class="ident">is_some</span>())
     }
@@ -1109,7 +1109,7 @@
         <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Args</span>,
         <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandOptions</span>,
         <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">GroupOptions</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DispatchError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DispatchError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">min</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">min_args</span> {
             <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">min</span> <span class="kw">as</span> <span class="ident">usize</span> {
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::NotEnoughArguments</span> {
@@ -1178,18 +1178,18 @@
                 {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>) <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
                         <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rate_limit_info</span>.<span class="ident">action</span> {
-                            <span class="ident">RateLimitAction::Cancelled</span> <span class="op">|</span> <span class="ident">RateLimitAction::FailedDelay</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">RateLimitAction::Cancelled</span> <span class="op">|</span> <span class="ident">RateLimitAction::FailedDelay</span> =&gt; {
                                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError::Ratelimited</span>(<span class="ident">rate_limit_info</span>))
                             },
-                            <span class="ident">RateLimitAction::Delayed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>.<span class="ident">rate_limit</span>),
+                            <span class="ident">RateLimitAction::Delayed</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>.<span class="ident">rate_limit</span>),
                         };
                     }
                 }
             }
 
             <span class="kw">match</span> <span class="ident">duration</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sleep</span>(<span class="ident">duration</span>).<span class="kw">await</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">duration</span>) =&gt; <span class="ident">sleep</span>(<span class="ident">duration</span>).<span class="kw">await</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
             }
         }
 
@@ -1252,7 +1252,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`serenity::framework::standard::help_commands`]: crate::framework::standard::help_commands</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">group_add</span>(<span class="ident">group</span>);
         <span class="self">self</span>.<span class="ident">initialized</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
@@ -1324,14 +1324,14 @@
     <span class="doccomment">/// let framework = StandardFramework::new()</span>
     <span class="doccomment">///     .on_dispatch_error(dispatch_error_hook);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_dispatch_error</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">DispatchHook</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_dispatch_error</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">DispatchHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">dispatch</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Specify the function to be called on messages comprised of only the prefix.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix_only</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">PrefixOnlyHook</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix_only</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">PrefixOnlyHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">prefix_only</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
 
         <span class="self">self</span>
@@ -1384,7 +1384,7 @@
     <span class="doccomment">/// let framework = StandardFramework::new()</span>
     <span class="doccomment">///     .before(before_hook);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">before</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">BeforeHook</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">before</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">BeforeHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">before</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
 
         <span class="self">self</span>
@@ -1415,7 +1415,7 @@
     <span class="doccomment">/// let framework = StandardFramework::new()</span>
     <span class="doccomment">///     .after(after_hook);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">AfterHook</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">AfterHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">after</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
 
         <span class="self">self</span>
@@ -1443,7 +1443,7 @@
     <span class="doccomment">/// let framework = StandardFramework::new()</span>
     <span class="doccomment">///     .unrecognised_command(unrecognised_command_hook);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unrecognised_command</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">UnrecognisedHook</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unrecognised_command</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">UnrecognisedHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">unrecognised_command</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
 
         <span class="self">self</span>
@@ -1469,7 +1469,7 @@
     <span class="doccomment">/// let framework = StandardFramework::new()</span>
     <span class="doccomment">///     .normal_message(normal_message_hook);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal_message</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">NormalMessageHook</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal_message</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">NormalMessageHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">normal_message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
 
         <span class="self">self</span>
@@ -1478,7 +1478,7 @@
     <span class="doccomment">/// Sets what code should be executed when a user sends `(prefix)help`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If a command named `help` in a group was set, then this takes precedence first.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">help</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">HelpCommand</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">help</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">HelpCommand</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">help</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">h</span>);
 
         <span class="self">self</span>
@@ -1526,8 +1526,8 @@
         .<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">invoke</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">invocation</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="ident">unreg</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="ident">unreg</span>)) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">unreg</span>) <span class="op">=</span> <span class="ident">unreg</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">unrecognised_command</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">unrecognised_command</span> {
                         <span class="ident">unrecognised_command</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">unreg</span>).<span class="kw">await</span>;
@@ -1540,7 +1540,7 @@
 
                 <span class="kw">return</span>;
             },
-            <span class="prelude-val">Err</span>(<span class="ident">ParseError::Dispatch</span>(<span class="ident">error</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">ParseError::Dispatch</span>(<span class="ident">error</span>)) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dispatch</span> {
                     <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>).<span class="kw">await</span>;
                 }
@@ -1550,7 +1550,7 @@
         };
 
         <span class="kw">match</span> <span class="ident">invoke</span> {
-            <span class="ident">Invoke::Help</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Invoke::Help</span>(<span class="ident">name</span>) =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allow_dm</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>() {
                     <span class="kw">return</span>;
                 }
@@ -1579,7 +1579,7 @@
             <span class="ident">Invoke::Command</span> {
                 <span class="ident">command</span>,
                 <span class="ident">group</span>,
-            } <span class="op">=</span><span class="op">&gt;</span> {
+            } =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> {
                     <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
@@ -1591,7 +1591,7 @@
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">delimiters</span>.<span class="ident">len</span>());
 
                         <span class="kw">for</span> <span class="ident">delim</span> <span class="kw">in</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">delimiters</span> {
-                            <span class="kw">if</span> <span class="ident">delim</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+                            <span class="kw">if</span> <span class="ident">delim</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
                                 <span class="comment">// Should always be Some() in this case</span>
                                 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
                                 <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Delimiter::Single</span>(<span class="ident">delim</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()));
@@ -1647,71 +1647,71 @@
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CommonOptions</span> {
-    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Permissions</span>;
-    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>];
-    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>];
-    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnlyIn</span>;
-    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Permissions</span>;
+    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>];
+    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>];
+    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OnlyIn</span>;
+    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">CommonOptions</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">GroupOptions</span> {
-    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Permissions</span> {
+    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Permissions</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">required_permissions</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
+    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
         <span class="self">self</span>.<span class="ident">allowed_roles</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>] {
+    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>] {
         <span class="self">self</span>.<span class="ident">checks</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnlyIn</span> {
+    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OnlyIn</span> {
         <span class="self">self</span>.<span class="ident">only_in</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">help_available</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">owners_only</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">owner_privilege</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">CommonOptions</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">CommandOptions</span> {
-    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Permissions</span> {
+    <span class="kw">fn</span> <span class="ident">required_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Permissions</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">required_permissions</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
+    <span class="kw">fn</span> <span class="ident">allowed_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>] {
         <span class="self">self</span>.<span class="ident">allowed_roles</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>] {
+    <span class="kw">fn</span> <span class="ident">checks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Check</span>] {
         <span class="self">self</span>.<span class="ident">checks</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnlyIn</span> {
+    <span class="kw">fn</span> <span class="ident">only_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OnlyIn</span> {
         <span class="self">self</span>.<span class="ident">only_in</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">help_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">help_available</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">owners_only</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">owners_only</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">owner_privilege</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">owner_privilege</span>
     }
 }
@@ -1721,25 +1721,25 @@
     <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
     <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+) -&gt; <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">required_permissions</span>().<span class="ident">is_empty</span>() {
         <span class="bool-val">true</span>
     } <span class="kw">else</span> {
         <span class="ident">message</span>
             .<span class="ident">guild_field</span>(<span class="ident">cache</span>, <span class="op">|</span><span class="ident">guild</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">channel_id</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">channel</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
                 };
 
                 <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">member</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">member</span>) =&gt; <span class="ident">member</span>,
+                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
                 };
 
                 <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">perms</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">perms</span>.<span class="ident">contains</span>(<span class="kw-2">*</span><span class="ident">options</span>.<span class="ident">required_permissions</span>()),
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">perms</span>) =&gt; <span class="ident">perms</span>.<span class="ident">contains</span>(<span class="kw-2">*</span><span class="ident">options</span>.<span class="ident">required_permissions</span>()),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">tracing::error!</span>(
                             <span class="string">&quot;Error getting permissions for user {} in channel {}: {}&quot;</span>,
                             <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>,
@@ -1761,14 +1761,14 @@
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
     <span class="ident">roles</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
     <span class="ident">member</span>: <span class="kw-2">&amp;</span><span class="ident">Member</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+) -&gt; <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">allowed_roles</span>().<span class="ident">is_empty</span>() {
         <span class="bool-val">true</span>
     } <span class="kw">else</span> {
         <span class="ident">options</span>
             .<span class="ident">allowed_roles</span>()
             .<span class="ident">iter</span>()
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">roles</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">r</span> <span class="op">=</span><span class="op">=</span> <span class="ident">role</span>.<span class="ident">name</span>))
+            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">roles</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">r</span> <span class="op">==</span> <span class="ident">role</span>.<span class="ident">name</span>))
             .<span class="ident">any</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">roles</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>.<span class="ident">id</span>))
     }
 }

@@ -27,7 +27,7 @@ activity.</p>
 <span class="attribute">#[<span class="ident">serenity::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
-        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">content</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;!online&quot;</span> {
+        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">content</span> <span class="op">==</span> <span class="string">&quot;!online&quot;</span> {
             <span class="ident">ctx</span>.<span class="ident">online</span>().<span class="kw">await</span>;
         }
     }
@@ -46,7 +46,7 @@ activity.</p>
 <span class="attribute">#[<span class="ident">serenity::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
-        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">content</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;!idle&quot;</span> {
+        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">content</span> <span class="op">==</span> <span class="string">&quot;!idle&quot;</span> {
             <span class="ident">ctx</span>.<span class="ident">idle</span>().<span class="kw">await</span>;
         }
     }
@@ -65,7 +65,7 @@ current activity.</p>
 <span class="attribute">#[<span class="ident">serenity::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
-        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">content</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;!dnd&quot;</span> {
+        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">content</span> <span class="op">==</span> <span class="string">&quot;!dnd&quot;</span> {
             <span class="ident">ctx</span>.<span class="ident">dnd</span>().<span class="kw">await</span>;
         }
     }

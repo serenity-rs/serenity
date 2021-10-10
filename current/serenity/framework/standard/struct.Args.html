@@ -197,7 +197,7 @@ any available arguments until there are none.</p>
 <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">args</span>.<span class="ident">iter</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>() {
     <span class="comment">// Zero troubles, zero worries.</span>
     <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">arg</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-    <span class="macro">assert!</span>(<span class="ident">arg</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
+    <span class="macro">assert!</span>(<span class="ident">arg</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span>);
 }
 
 <span class="macro">assert!</span>(<span class="ident">args</span>.<span class="ident">is_empty</span>());</code></pre></div>
