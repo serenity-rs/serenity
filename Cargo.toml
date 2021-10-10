@@ -51,7 +51,7 @@ version = "0.3.7"
 optional = true
 
 [dependencies.serde]
-version = "1.0.103"
+version = "1.0.130"
 features = ["derive"]
 
 [dependencies.uwl]
@@ -154,7 +154,7 @@ version = "0.3.16"
 version = "2.0"
 
 [dependencies.dashmap]
-version = "4"
+version = "4.0.2"
 features = ["serde"]
 optional = true
 
