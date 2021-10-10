@@ -1,11 +1,5 @@
 #![allow(clippy::missing_errors_doc)]
-use std::{
-    borrow::Cow,
-    collections::BTreeMap,
-    fmt,
-    str::FromStr,
-    sync::Arc,
-};
+use std::{borrow::Cow, collections::BTreeMap, fmt, str::FromStr, sync::Arc};
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::{
