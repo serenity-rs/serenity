@@ -163,6 +163,7 @@ impl HttpBuilder {
     }
 
     /// Use the given configuration to build the `Http` client.
+    #[allow(clippy::unwrap_used)]
     pub fn build(self) -> Http {
         let token = self.token.unwrap();
 
