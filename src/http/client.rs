@@ -3,14 +3,10 @@ use std::{
     borrow::Cow,
     collections::BTreeMap,
     fmt,
-    future::Future,
-    pin::Pin,
     str::FromStr,
     sync::Arc,
-    task::{Context as FutContext, Poll},
 };
 
-use futures::future::BoxFuture;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::{
     header::{HeaderMap as Headers, HeaderValue, CONTENT_TYPE},
