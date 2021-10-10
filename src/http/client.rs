@@ -1,16 +1,6 @@
 #![allow(clippy::missing_errors_doc)]
-use std::{
-    borrow::Cow,
-    collections::BTreeMap,
-    fmt,
-    future::Future,
-    pin::Pin,
-    str::FromStr,
-    sync::Arc,
-    task::{Context as FutContext, Poll},
-};
+use std::{borrow::Cow, collections::BTreeMap, fmt, str::FromStr, sync::Arc};
 
-use futures::future::BoxFuture;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::{
     header::{HeaderMap as Headers, HeaderValue, CONTENT_TYPE},
@@ -44,8 +34,8 @@ use crate::model::interactions::application_command::{
 use crate::model::prelude::*;
 use crate::utils;
 
-/// A builder implementing [`Future`] building a [`Http`] client to perform
-/// requests to Discord's HTTP API. If you do not need to use a proxy or do not
+/// A builder for the underlying [`Http`] client that performs requests
+/// to Discord's HTTP API. If you do not need to use a proxy or do not
 /// need to disable the rate limiter, you can use [`Http::new`] or
 /// [`Http::new_with_token`] instead.
 ///
@@ -55,27 +45,25 @@ use crate::utils;
 ///
 /// ```rust
 /// # use serenity::http::HttpBuilder;
-/// # async fn run() {
+/// # fn run() {
 /// let http = HttpBuilder::new("token")
 ///     .proxy("http://127.0.0.1:3000")
 ///     .expect("Invalid proxy URL")
 ///     .ratelimiter_disabled(true)
-///     .await
-///     .expect("Error creating Http");
+///     .build();
 /// # }
 /// ```
-pub struct HttpBuilder<'a> {
+pub struct HttpBuilder {
     client: Option<Arc<Client>>,
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: Option<bool>,
     token: Option<String>,
     proxy: Option<Url>,
-    fut: Option<BoxFuture<'a, Result<Http>>>,
     #[cfg(feature = "unstable_discord_api")]
     application_id: Option<u64>,
 }
 
-impl<'a> HttpBuilder<'a> {
+impl HttpBuilder {
     fn _new() -> Self {
         Self {
             client: None,
@@ -83,7 +71,6 @@ impl<'a> HttpBuilder<'a> {
             ratelimiter_disabled: Some(false),
             token: None,
             proxy: None,
-            fut: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: None,
         }
@@ -168,49 +155,38 @@ impl<'a> HttpBuilder<'a> {
 
         Ok(self)
     }
-}
 
-impl<'a> Future for HttpBuilder<'a> {
-    type Output = Result<Http>;
-
+    /// Use the given configuration to build the `Http` client.
     #[allow(clippy::unwrap_used)]
-    #[instrument(skip(self))]
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let token = self.token.take().unwrap();
+    pub fn build(self) -> Http {
+        let token = self.token.unwrap();
 
+        #[cfg(feature = "unstable_discord_api")]
+        let application_id = self
+            .application_id
+            .expect("Expected application Id in order to use interacions features");
+
+        let client = self.client.unwrap_or_else(|| {
+            let builder = configure_client_backend(Client::builder());
+            Arc::new(builder.build().expect("Cannot build reqwest::Client"))
+        });
+
+        let ratelimiter = self.ratelimiter.unwrap_or_else(|| {
+            let client = Arc::clone(&client);
+            Ratelimiter::new(client, token.to_string())
+        });
+
+        let ratelimiter_disabled = self.ratelimiter_disabled.unwrap();
+
+        Http {
+            client,
+            ratelimiter,
+            ratelimiter_disabled,
+            proxy: self.proxy,
+            token,
             #[cfg(feature = "unstable_discord_api")]
-            let application_id = self
-                .application_id
-                .expect("Expected application Id in order to use interacions features");
-
-            let client = self.client.take().unwrap_or_else(|| {
-                let builder = configure_client_backend(Client::builder());
-                Arc::new(builder.build().expect("Cannot build reqwest::Client"))
-            });
-
-            let ratelimiter = self.ratelimiter.take().unwrap_or_else(|| {
-                let client = Arc::clone(&client);
-                Ratelimiter::new(client, token.to_string())
-            });
-
-            let ratelimiter_disabled = self.ratelimiter_disabled.take().unwrap();
-            let proxy = self.proxy.take();
-
-            self.fut = Some(Box::pin(async move {
-                Ok(Http {
-                    client,
-                    ratelimiter,
-                    ratelimiter_disabled,
-                    proxy,
-                    token,
-                    #[cfg(feature = "unstable_discord_api")]
-                    application_id,
-                })
-            }))
+            application_id,
         }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
     }
 }
 
