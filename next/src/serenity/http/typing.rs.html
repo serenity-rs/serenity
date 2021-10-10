@@ -167,14 +167,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">sx</span>, <span class="kw-2">mut</span> <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
 
         <span class="ident">spawn_named</span>(<span class="string">&quot;typing::start&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">loop</span> {
                 <span class="kw">match</span> <span class="ident">rx</span>.<span class="ident">try_recv</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Closed</span>) =&gt; <span class="kw">break</span>,
+                    <span class="kw">_</span> =&gt; (),
                 }
 
                 <span class="ident">http</span>.<span class="ident">broadcast_typing</span>(<span class="ident">channel_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -196,7 +196,7 @@
     <span class="doccomment">/// Typing may persist for a few seconds on some clients after this is called.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stop</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">send</span>(()).<span class="ident">ok</span>()
     }
 }

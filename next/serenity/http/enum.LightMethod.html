@@ -4,8 +4,8 @@
     Patch,
     Post,
     Put,
-}</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An method used for ratelimiting special routes.</p>
-<p>This is needed because <a href="https://docs.rs/reqwest/0.11.4/reqwest/index.html" title="reqwest"><code>reqwest</code></a>’s <a href="https://docs.rs/http/0.2.5/http/method/struct.Method.html" title="Method"><code>Method</code></a> enum does not derive Copy.</p>
+}</code></pre></div><div class="item-info"><div class="stab portability">This is supported on <strong>crate feature <code>http</code></strong> only.</div></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>An method used for ratelimiting special routes.</p>
+<p>This is needed because <a href="https://docs.rs/reqwest/0.11.5/reqwest/index.html" title="reqwest"><code>reqwest</code></a>’s <a href="https://docs.rs/http/0.2.5/http/method/struct.Method.html" title="Method"><code>Method</code></a> enum does not derive Copy.</p>
 </div></details><h2 id="variants" class="variants small-section-header">Variants<a href="#variants" class="anchor"></a></h2><div id="variant.Delete" class="variant small-section-header"><a href="#variant.Delete" class="anchor field"></a><code>Delete</code></div><div class="docblock"><p>Indicates that a route is for the <code>DELETE</code> method only.</p>
 </div><div id="variant.Get" class="variant small-section-header"><a href="#variant.Get" class="anchor field"></a><code>Get</code></div><div class="docblock"><p>Indicates that a route is for the <code>GET</code> method only.</p>
 </div><div id="variant.Patch" class="variant small-section-header"><a href="#variant.Patch" class="anchor field"></a><code>Patch</code></div><div class="docblock"><p>Indicates that a route is for the <code>PATCH</code> method only.</p>

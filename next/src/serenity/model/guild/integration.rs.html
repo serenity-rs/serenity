@@ -112,7 +112,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Integration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntegrationId</span> {
     <span class="doccomment">/// Gets the Id of integration.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">integration</span>: <span class="ident">Integration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntegrationId</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">integration</span>: <span class="ident">Integration</span>) -&gt; <span class="ident">IntegrationId</span> {
         <span class="ident">integration</span>.<span class="ident">id</span>
     }
 }

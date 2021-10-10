@@ -384,22 +384,22 @@
 
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>)) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown.&quot;</span>);
                     <span class="self">self</span>.<span class="ident">shutdown_runners</span>().<span class="kw">await</span>;
 
                     <span class="kw">break</span>;
                 },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard</span>, <span class="ident">code</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard</span>, <span class="ident">code</span>))) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to shutdown shard {} with {}.&quot;</span>, <span class="ident">shard</span>.<span class="number">0</span>, <span class="ident">code</span>);
                     <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">shard</span>, <span class="ident">code</span>).<span class="kw">await</span>;
                 },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::Start</span>(<span class="ident">id</span>, <span class="ident">total</span>))) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardQueuerMessage::Start</span>(<span class="ident">id</span>, <span class="ident">total</span>))) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;[Shard Queuer] Received to start shard {} of {}.&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>, <span class="ident">total</span>.<span class="number">0</span>);
                     <span class="self">self</span>.<span class="ident">checked_start</span>(<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">total</span>.<span class="number">0</span>).<span class="kw">await</span>;
                 },
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">id</span>, <span class="ident">total</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">pop_front</span>() {
                         <span class="self">self</span>.<span class="ident">checked_start</span>(<span class="ident">id</span>, <span class="ident">total</span>).<span class="kw">await</span>;
                     }
@@ -411,8 +411,8 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_last_start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">instant</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">last_start</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">instant</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">instant</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">instant</span>) =&gt; <span class="ident">instant</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
         };
 
         <span class="comment">// We must wait 5 seconds between IDENTIFYs to avoid session</span>
@@ -445,7 +445,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u64</span>, <span class="ident">shard_total</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u64</span>, <span class="ident">shard_total</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">shard_info</span> <span class="op">=</span> [<span class="ident">shard_id</span>, <span class="ident">shard_total</span>];
 
         <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="ident">Shard::new</span>(

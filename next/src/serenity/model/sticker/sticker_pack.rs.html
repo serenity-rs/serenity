@@ -71,17 +71,17 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">StickerPack</span> {
     <span class="doccomment">/// Returns the sticker that is shown as the pack&#39;s icon</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cover_sticker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Sticker</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cover_sticker_id</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">stickers</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">id</span>))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cover_sticker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Sticker</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">cover_sticker_id</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">stickers</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">id</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">banner_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">banner_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="ident">banner_url</span>(<span class="self">self</span>.<span class="ident">banner_asset_id</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">banner_url</span>(<span class="ident">banner_asset_id</span>: <span class="ident">StickerPackBannerId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">banner_url</span>(<span class="ident">banner_asset_id</span>: <span class="ident">StickerPackBannerId</span>) -&gt; <span class="ident">String</span> {
     <span class="macro">cdn!</span>(<span class="string">&quot;/app-assets/710982414301790216/store/{}.webp?size=1024&quot;</span>, <span class="ident">banner_asset_id</span>.<span class="number">0</span>)
 }
 </code></pre></div>

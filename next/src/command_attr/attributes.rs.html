@@ -344,17 +344,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ValueKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ValueKind::Name</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;]`&quot;</span>),
-            <span class="ident">ValueKind::Equals</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt; = &lt;value&gt;]`&quot;</span>),
-            <span class="ident">ValueKind::List</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;([&lt;value&gt;, &lt;value&gt;, &lt;value&gt;, ...])]`&quot;</span>),
-            <span class="ident">ValueKind::SingleList</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;(&lt;value&gt;)]`&quot;</span>),
+            <span class="ident">ValueKind::Name</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;]`&quot;</span>),
+            <span class="ident">ValueKind::Equals</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt; = &lt;value&gt;]`&quot;</span>),
+            <span class="ident">ValueKind::List</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;([&lt;value&gt;, &lt;value&gt;, &lt;value&gt;, ...])]`&quot;</span>),
+            <span class="ident">ValueKind::SingleList</span> =&gt; <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;`#[&lt;name&gt;(&lt;value&gt;)]`&quot;</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">to_ident</span>(<span class="ident">p</span>: <span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">to_ident</span>(<span class="ident">p</span>: <span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">p</span>.<span class="ident">span</span>(), <span class="string">&quot;cannot convert an empty path to an identifier&quot;</span>));
     }
@@ -380,7 +380,7 @@
 
 <span class="kw">impl</span> <span class="ident">Values</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">Ident</span>, <span class="ident">kind</span>: <span class="ident">ValueKind</span>, <span class="ident">literals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Lit</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="ident">Span</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">Ident</span>, <span class="ident">kind</span>: <span class="ident">ValueKind</span>, <span class="ident">literals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Lit</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">Values</span> {
             <span class="ident">name</span>,
             <span class="ident">literals</span>,
@@ -390,16 +390,16 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_values</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Attribute</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Values</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_values</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">Attribute</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Values</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">parse_meta</span>()<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">meta</span> {
-        <span class="ident">Meta::Path</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Meta::Path</span>(<span class="ident">path</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">Values::new</span>(<span class="ident">name</span>, <span class="ident">ValueKind::Name</span>, <span class="ident">Vec::new</span>(), <span class="ident">attr</span>.<span class="ident">span</span>()))
         },
-        <span class="ident">Meta::List</span>(<span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Meta::List</span>(<span class="ident">meta</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">meta</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">nested</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">nested</span>;
 
@@ -411,24 +411,24 @@
 
             <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">nested</span> {
                 <span class="kw">match</span> <span class="ident">meta</span> {
-                    <span class="ident">NestedMeta::Lit</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">lits</span>.<span class="ident">push</span>(<span class="ident">l</span>),
-                    <span class="ident">NestedMeta::Meta</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">m</span> {
-                        <span class="ident">Meta::Path</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">NestedMeta::Lit</span>(<span class="ident">l</span>) =&gt; <span class="ident">lits</span>.<span class="ident">push</span>(<span class="ident">l</span>),
+                    <span class="ident">NestedMeta::Meta</span>(<span class="ident">m</span>) =&gt; <span class="kw">match</span> <span class="ident">m</span> {
+                        <span class="ident">Meta::Path</span>(<span class="ident">path</span>) =&gt; {
                             <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
                             <span class="ident">lits</span>.<span class="ident">push</span>(<span class="ident">Lit::Str</span>(<span class="ident">LitStr::new</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_string</span>(), <span class="ident">i</span>.<span class="ident">span</span>())))
                         }
-                        <span class="ident">Meta::List</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Meta::NameValue</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Meta::List</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Meta::NameValue</span>(<span class="kw">_</span>) =&gt; {
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">attr</span>.<span class="ident">span</span>(), <span class="string">&quot;cannot nest a list; only accept literals and identifiers at this level&quot;</span>))
                         }
                     },
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">lits</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> { <span class="ident">ValueKind::SingleList</span> } <span class="kw">else</span> { <span class="ident">ValueKind::List</span> };
+            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">lits</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> { <span class="ident">ValueKind::SingleList</span> } <span class="kw">else</span> { <span class="ident">ValueKind::List</span> };
 
             <span class="prelude-val">Ok</span>(<span class="ident">Values::new</span>(<span class="ident">name</span>, <span class="ident">kind</span>, <span class="ident">lits</span>, <span class="ident">attr</span>.<span class="ident">span</span>()))
         },
-        <span class="ident">Meta::NameValue</span>(<span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">Meta::NameValue</span>(<span class="ident">meta</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">meta</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">lit</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">lit</span>;
 
@@ -441,12 +441,12 @@
 <span class="kw">struct</span> <span class="ident">DisplaySlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DisplaySlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>();
 
         <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;nothing&quot;</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">Some</span>((<span class="ident">idx</span>, <span class="ident">elem</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;nothing&quot;</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">Some</span>((<span class="ident">idx</span>, <span class="ident">elem</span>)) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}: {}&quot;</span>, <span class="ident">idx</span>, <span class="ident">elem</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="ident">iter</span> {
@@ -461,8 +461,8 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">is_form_acceptable</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span>[<span class="ident">ValueKind</span>], <span class="ident">kind</span>: <span class="ident">ValueKind</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="ident">expect</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ValueKind::List</span>) <span class="op">&amp;&amp;</span> <span class="ident">kind</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ValueKind::SingleList</span> {
+<span class="kw">fn</span> <span class="ident">is_form_acceptable</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span>[<span class="ident">ValueKind</span>], <span class="ident">kind</span>: <span class="ident">ValueKind</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">if</span> <span class="ident">expect</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ValueKind::List</span>) <span class="op">&amp;&amp;</span> <span class="ident">kind</span> <span class="op">==</span> <span class="ident">ValueKind::SingleList</span> {
         <span class="bool-val">true</span>
     } <span class="kw">else</span> {
         <span class="ident">expect</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">kind</span>)
@@ -470,7 +470,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">Values</span>, <span class="ident">forms</span>: <span class="kw-2">&amp;</span>[<span class="ident">ValueKind</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">Values</span>, <span class="ident">forms</span>: <span class="kw-2">&amp;</span>[<span class="ident">ValueKind</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">is_form_acceptable</span>(<span class="ident">forms</span>, <span class="ident">values</span>.<span class="ident">kind</span>) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
             <span class="ident">values</span>.<span class="ident">span</span>,
@@ -483,16 +483,16 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AttributeOption</span><span class="op">&gt;</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AttributeOption</span><span class="op">&gt;</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">T::parse</span>(<span class="ident">values</span>)
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AttributeOption</span>: <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::List</span>])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">lit</span><span class="op">|</span> <span class="ident">lit</span>.<span class="ident">to_str</span>()).<span class="ident">collect</span>())
@@ -501,7 +501,7 @@
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">String</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::Equals</span>, <span class="ident">ValueKind::SingleList</span>])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>[<span class="number">0</span>].<span class="ident">to_str</span>())
@@ -510,7 +510,7 @@
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">bool</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::Name</span>, <span class="ident">ValueKind::SingleList</span>])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">to_bool</span>()))
@@ -519,7 +519,7 @@
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">Ident</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::SingleList</span>])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>[<span class="number">0</span>].<span class="ident">to_ident</span>())
@@ -528,7 +528,7 @@
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::List</span>])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">to_ident</span>()).<span class="ident">collect</span>())
@@ -536,7 +536,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::Name</span>, <span class="ident">ValueKind::Equals</span>, <span class="ident">ValueKind::SingleList</span>])<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">to_str</span>()))
@@ -544,7 +544,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">OnlyIn</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::SingleList</span>])<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">lit</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">values</span>.<span class="ident">literals</span>[<span class="number">0</span>];
@@ -554,7 +554,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">Colour</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">span</span>;
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">String::parse</span>(<span class="ident">values</span>)<span class="question-mark">?</span>;
 
@@ -564,7 +564,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">HelpBehaviour</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">span</span>;
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">String::parse</span>(<span class="ident">values</span>)<span class="question-mark">?</span>;
 
@@ -575,20 +575,20 @@
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">Checks</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">AttributeOption</span><span class="op">&gt;</span><span class="ident">::parse</span>(<span class="ident">values</span>).<span class="ident">map</span>(<span class="ident">Checks</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">Permissions</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">perms</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">AttributeOption</span><span class="op">&gt;</span><span class="ident">::parse</span>(<span class="ident">values</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="ident">Permissions::default</span>();
         <span class="kw">for</span> <span class="ident">permission</span> <span class="kw">in</span> <span class="ident">perms</span> {
             <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Permissions::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">permission</span>.<span class="ident">to_string</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">p</span>,
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">permission</span>.<span class="ident">span</span>(), <span class="string">&quot;invalid permission&quot;</span>)),
+                <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">permission</span>.<span class="ident">span</span>(), <span class="string">&quot;invalid permission&quot;</span>)),
             };
 
             <span class="ident">permissions</span>.<span class="number">0</span> <span class="op">|</span><span class="op">=</span> <span class="ident">p</span>.<span class="number">0</span>;
@@ -600,27 +600,27 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AttributeOption</span><span class="op">&gt;</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="ident">AsOption</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">T::parse</span>(<span class="ident">values</span>)<span class="question-mark">?</span>)))
     }
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">attr_option_num</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ty</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">ty</span>),<span class="kw-2">*</span>) =&gt; {
         $(
             <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> {
-                <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
                     <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind::SingleList</span>])<span class="question-mark">?</span>;
 
                     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">values</span>.<span class="ident">literals</span>[<span class="number">0</span>] {
-                        <span class="ident">Lit::Int</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">l</span>.<span class="ident">base10_parse</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-                        <span class="ident">l</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">Lit::Int</span>(<span class="ident">l</span>) =&gt; <span class="ident">l</span>.<span class="ident">base10_parse</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+                        <span class="ident">l</span> =&gt; {
                             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">to_str</span>();
                             <span class="comment">// Use `as_str` to guide the compiler to use `&amp;str`&#39;s parse method.</span>
                             <span class="comment">// We don&#39;t want to use our `parse` method here (`impl AttributeOption for String`).</span>
                             <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span>() {
-                                <span class="prelude-val">Ok</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">n</span>,
-                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">l</span>.<span class="ident">span</span>(), <span class="string">&quot;invalid integer&quot;</span>)),
+                                <span class="prelude-val">Ok</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
+                                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">l</span>.<span class="ident">span</span>(), <span class="string">&quot;invalid integer&quot;</span>)),
                             }
                         }
                     })
@@ -629,7 +629,7 @@
 
             <span class="kw">impl</span> <span class="ident">AttributeOption</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span><span class="op">&gt;</span> {
                 <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+                <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
                     <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span> <span class="kw">as</span> <span class="ident">AttributeOption</span><span class="op">&gt;</span><span class="ident">::parse</span>(<span class="ident">values</span>).<span class="ident">map</span>(<span class="prelude-val">Some</span>)
                 }
             }

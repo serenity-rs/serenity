@@ -1071,7 +1071,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">id::EmojiId</span>, <span class="ident">misc::EmojiIdentifier</span>};
 
 <span class="doccomment">/// Converts a HashMap into a final [`serde_json::Map`] representation.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hashmap_to_json_map</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Value</span>, <span class="ident">H</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">JsonMap</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hashmap_to_json_map</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Value</span>, <span class="ident">H</span><span class="op">&gt;</span>) -&gt; <span class="ident">JsonMap</span>
 <span class="kw">where</span>
     <span class="ident">H</span>: <span class="ident">BuildHasher</span>,
     <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">ToString</span>,
@@ -1113,7 +1113,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`RichInvite`]: crate::model::invite::RichInvite</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_invite</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_invite</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
     <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">trim_start_matches</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">trim_start_matches</span>(<span class="string">&quot;https://&quot;</span>);
     <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">code</span>.<span class="ident">to_lowercase</span>();
     <span class="kw">if</span> <span class="ident">lower</span>.<span class="ident">starts_with</span>(<span class="string">&quot;discord.gg/&quot;</span>) {
@@ -1153,7 +1153,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`User`]: crate::model::user::User</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_username</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_username</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
@@ -1194,7 +1194,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Role`]: crate::model::guild::Role</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_role</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_role</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
@@ -1233,7 +1233,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Channel`]: crate::model::channel::Channel</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_channel</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_channel</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
@@ -1261,7 +1261,7 @@
 <span class="doccomment">/// assert_eq!(parse_mention(&quot;&lt;@&amp;137235212097683456&gt;&quot;), Some(137235212097683456));</span>
 <span class="doccomment">/// assert_eq!(parse_mention(&quot;&lt;#137234234728251392&gt;&quot;), Some(137234234728251392));</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_mention</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_mention</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;@&amp;&quot;</span>) {
@@ -1307,7 +1307,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Emoji`]: crate::model::guild::Emoji</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_emoji</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmojiIdentifier</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_emoji</span>(<span class="ident">mention</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmojiIdentifier</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">mention</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">mention</span>.<span class="ident">len</span>();
@@ -1319,16 +1319,16 @@
     <span class="kw">if</span> (<span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;:&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">mention</span>.<span class="ident">starts_with</span>(<span class="string">&quot;&lt;a:&quot;</span>)) <span class="op">&amp;&amp;</span> <span class="ident">mention</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&gt;&#39;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">String::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">String::default</span>();
-        <span class="kw">let</span> <span class="ident">animated</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">mention</span>[<span class="number">1</span>..<span class="number">3</span>] <span class="op">=</span><span class="op">=</span> <span class="string">&quot;a:&quot;</span>;
+        <span class="kw">let</span> <span class="ident">animated</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">mention</span>[<span class="number">1</span>..<span class="number">3</span>] <span class="op">==</span> <span class="string">&quot;a:&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">animated</span> { <span class="number">3</span> } <span class="kw">else</span> { <span class="number">2</span> };
 
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">x</span>) <span class="kw">in</span> <span class="ident">mention</span>[<span class="ident">start</span>..].<span class="ident">chars</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;:&#39;</span> {
+            <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39;:&#39;</span> {
                 <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">i</span> <span class="op">+</span> <span class="ident">start</span> <span class="op">+</span> <span class="number">1</span>;
 
                 <span class="kw">for</span> <span class="ident">y</span> <span class="kw">in</span> <span class="ident">mention</span>[<span class="ident">from</span>..].<span class="ident">chars</span>() {
-                    <span class="kw">if</span> <span class="ident">y</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;&gt;&#39;</span> {
+                    <span class="kw">if</span> <span class="ident">y</span> <span class="op">==</span> <span class="string">&#39;&gt;&#39;</span> {
                         <span class="kw">break</span>;
                     } <span class="kw">else</span> {
                         <span class="ident">id</span>.<span class="ident">push</span>(<span class="ident">y</span>);
@@ -1342,12 +1342,12 @@
         }
 
         <span class="kw">match</span> <span class="ident">id</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">EmojiIdentifier</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">EmojiIdentifier</span> {
                 <span class="ident">animated</span>,
                 <span class="ident">name</span>,
                 <span class="ident">id</span>: <span class="ident">EmojiId</span>(<span class="ident">x</span>),
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     } <span class="kw">else</span> {
         <span class="prelude-val">None</span>
@@ -1375,11 +1375,11 @@
 <span class="doccomment">/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar</span>
 <span class="doccomment">/// [`Error::Io`]: crate::error::Error::Io</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_image</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_image</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">_read_image</span>(<span class="ident">path</span>.<span class="ident">as_ref</span>())
 }
 
-<span class="kw">fn</span> <span class="ident">_read_image</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">_read_image</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::default</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
 
@@ -1388,7 +1388,7 @@
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
 
     <span class="kw">let</span> <span class="ident">b64</span> <span class="op">=</span> <span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>);
-    <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">extension</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr::new</span>(<span class="string">&quot;png&quot;</span>)) { <span class="string">&quot;png&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;jpg&quot;</span> };
+    <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">extension</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr::new</span>(<span class="string">&quot;png&quot;</span>)) { <span class="string">&quot;png&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;jpg&quot;</span> };
 
     <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;data:image/{};base64,{}&quot;</span>, <span class="ident">ext</span>, <span class="ident">b64</span>))
 }
@@ -1418,7 +1418,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(parse_quotes(command), expected);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_quotes</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_quotes</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">in_string</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -1427,9 +1427,9 @@
 
     <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">chars</span>() {
         <span class="kw">if</span> <span class="ident">in_string</span> {
-            <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;\\&#39;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">escaping</span> {
+            <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39;\\&#39;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">escaping</span> {
                 <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;&quot;&#39;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">escaping</span> {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">escaping</span> {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">current_str</span>.<span class="ident">is_empty</span>() {
                     <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">current_str</span>);
                 }
@@ -1440,13 +1440,13 @@
                 <span class="ident">current_str</span>.<span class="ident">push</span>(<span class="ident">x</span>);
                 <span class="ident">escaping</span> <span class="op">=</span> <span class="bool-val">false</span>;
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39; &#39;</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">current_str</span>.<span class="ident">is_empty</span>() {
                 <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">current_str</span>.<span class="ident">clone</span>());
             }
 
             <span class="ident">current_str</span> <span class="op">=</span> <span class="ident">String::default</span>();
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">=</span><span class="op">=</span> <span class="string">&#39;&quot;&#39;</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">current_str</span>.<span class="ident">is_empty</span>() {
                 <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">current_str</span>.<span class="ident">clone</span>());
             }
@@ -1479,7 +1479,7 @@
 <span class="doccomment">/// assert_eq!(utils::shard_id(81384788765712384 as u64, 17), 7);</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
     (<span class="ident">guild_id</span>.<span class="ident">into</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>) <span class="op">%</span> <span class="ident">shard_count</span>
 }
 
@@ -1498,14 +1498,14 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">ContentSafeOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ContentSafeOptions::default</span>()
     }
 
     <span class="doccomment">/// [`content_safe`] will replace role mentions (`&lt;@&amp;{id}&gt;`) with its name</span>
     <span class="doccomment">/// prefixed with `@` (`@rolename`) or with `@deleted-role` if the</span>
     <span class="doccomment">/// identifier is invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_role</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_role</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">clean_role</span> <span class="op">=</span> <span class="ident">b</span>;
 
         <span class="self">self</span>
@@ -1514,7 +1514,7 @@
     <span class="doccomment">/// If set to true, [`content_safe`] will replace user mentions</span>
     <span class="doccomment">/// (`&lt;@!{id}&gt;` or `&lt;@{id}&gt;`) with the user&#39;s name prefixed with `@`</span>
     <span class="doccomment">/// (`@username`) or with `@invalid-user` if the identifier is invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_user</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_user</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">clean_user</span> <span class="op">=</span> <span class="ident">b</span>;
 
         <span class="self">self</span>
@@ -1524,7 +1524,7 @@
     <span class="doccomment">/// (`&lt;#{id}&gt;`) with the channel&#39;s name prefixed with `#`</span>
     <span class="doccomment">/// (`#channelname`) or with `#deleted-channel` if the identifier is</span>
     <span class="doccomment">/// invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_channel</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_channel</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">clean_channel</span> <span class="op">=</span> <span class="ident">b</span>;
 
         <span class="self">self</span>
@@ -1533,7 +1533,7 @@
     <span class="doccomment">/// If set to true, if [`content_safe`] replaces a user mention it will</span>
     <span class="doccomment">/// add their four digit discriminator with a preceeding `#`,</span>
     <span class="doccomment">/// turning `@username` to `@username#discriminator`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">show_discriminator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">show_discriminator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">show_discriminator</span> <span class="op">=</span> <span class="ident">b</span>;
 
         <span class="self">self</span>
@@ -1541,7 +1541,7 @@
 
     <span class="doccomment">/// If set, [`content_safe`] will replace a user mention with the user&#39;s</span>
     <span class="doccomment">/// display name in passed `guild`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_as_member_from</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guild</span>: <span class="ident">G</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_as_member_from</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guild</span>: <span class="ident">G</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">guild_reference</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
@@ -1549,7 +1549,7 @@
 
     <span class="doccomment">/// If set, [`content_safe`] will replace `@here` with a non-pinging</span>
     <span class="doccomment">/// alternative.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_here</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_here</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">clean_here</span> <span class="op">=</span> <span class="ident">b</span>;
 
         <span class="self">self</span>
@@ -1557,7 +1557,7 @@
 
     <span class="doccomment">/// If set, [`content_safe`] will replace `@everyone` with a non-pinging</span>
     <span class="doccomment">/// alternative.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_everyone</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_everyone</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">clean_everyone</span> <span class="op">=</span> <span class="ident">b</span>;
 
         <span class="self">self</span>
@@ -1567,7 +1567,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ContentSafeOptions</span> {
     <span class="doccomment">/// Instantiates with all options set to `true`.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ContentSafeOptions</span> {
             <span class="ident">clean_role</span>: <span class="bool-val">true</span>,
             <span class="ident">clean_user</span>: <span class="bool-val">true</span>,
@@ -1674,7 +1674,7 @@
             <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;&lt;@&quot;</span>.<span class="ident">len</span>();
 
             <span class="kw">let</span> <span class="ident">has_exclamation</span> <span class="op">=</span>
-                <span class="kw">if</span> <span class="ident">s</span>[<span class="ident">mention_start</span>..].<span class="ident">as_bytes</span>().<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">=</span><span class="op">=</span> <span class="string">b&#39;!&#39;</span>) {
+                <span class="kw">if</span> <span class="ident">s</span>[<span class="ident">mention_start</span>..].<span class="ident">as_bytes</span>().<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">==</span> <span class="string">b&#39;!&#39;</span>) {
                     <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;!&quot;</span>.<span class="ident">len</span>();
 
                     <span class="bool-val">true</span>
@@ -1761,7 +1761,7 @@
     <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ContentSafeOptions</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>().<span class="ident">to_string</span>();
 
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_role</span> {

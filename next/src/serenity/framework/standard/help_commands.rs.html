@@ -1699,11 +1699,11 @@
 <span class="doccomment">/// continue to the next command-name upon hiding.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="macro">macro_rules!</span> <span class="ident">format_command_name</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">behaviour</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command_name</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">behaviour</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command_name</span>:<span class="ident">expr</span>) =&gt; {
         <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">behaviour</span> {
-            <span class="ident">HelpBehaviour::Strike</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;~~`{}`~~&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command_name</span>),
-            <span class="ident">HelpBehaviour::Nothing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command_name</span>),
-            <span class="ident">HelpBehaviour::Hide</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
+            <span class="ident">HelpBehaviour::Strike</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;~~`{}`~~&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command_name</span>),
+            <span class="ident">HelpBehaviour::Nothing</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">command_name</span>),
+            <span class="ident">HelpBehaviour::Hide</span> =&gt; <span class="kw">continue</span>,
         }
     };
 }
@@ -1752,17 +1752,17 @@
 <span class="kw">impl</span> <span class="ident">Suggestions</span> {
     <span class="doccomment">/// Immutably borrow inner [`Vec`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_vec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_vec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 
     <span class="doccomment">/// Concats names of suggestions with a given `separator`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">separator</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">separator</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_vec</span>().<span class="ident">iter</span>();
 
         <span class="kw">let</span> <span class="ident">first_iter_element</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">first_iter_element</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">first_iter_element</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">String::new</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">first_iter_element</span>) =&gt; <span class="ident">first_iter_element</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">String::new</span>(),
         };
 
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_vec</span>().<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">total_size</span>, <span class="ident">size</span><span class="op">|</span> <span class="ident">total_size</span> <span class="op">+</span> <span class="ident">size</span>.<span class="ident">name</span>.<span class="ident">len</span>());
@@ -1806,7 +1806,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">Matrix</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">columns</span>: <span class="ident">usize</span>, <span class="ident">rows</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Matrix</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">columns</span>: <span class="ident">usize</span>, <span class="ident">rows</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Matrix</span> {
         <span class="ident">Matrix</span> {
             <span class="ident">vec</span>: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">columns</span> <span class="op">*</span> <span class="ident">rows</span>],
             <span class="ident">width</span>: <span class="ident">rows</span>,
@@ -1818,14 +1818,14 @@
 <span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Matrix</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">usize</span>;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">matrix_entry</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">matrix_entry</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>)) -&gt; <span class="kw-2">&amp;</span><span class="ident">usize</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">vec</span>[<span class="ident">matrix_entry</span>.<span class="number">1</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">width</span> <span class="op">+</span> <span class="ident">matrix_entry</span>.<span class="number">0</span>]
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">IndexMut</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Matrix</span> {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">matrix_entry</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">matrix_entry</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>)) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">vec</span>[<span class="ident">matrix_entry</span>.<span class="number">1</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">width</span> <span class="op">+</span> <span class="ident">matrix_entry</span>.<span class="number">0</span>]
     }
 }
@@ -1833,13 +1833,13 @@
 <span class="doccomment">/// Calculates and returns levenshtein distance between</span>
 <span class="doccomment">/// two passed words.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">word_b</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">levenshtein_distance</span>(<span class="ident">word_a</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">word_b</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">let</span> <span class="ident">len_a</span> <span class="op">=</span> <span class="ident">word_a</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
     <span class="kw">let</span> <span class="ident">len_b</span> <span class="op">=</span> <span class="ident">word_b</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
 
-    <span class="kw">if</span> <span class="ident">len_a</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">len_a</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="ident">len_b</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">len_b</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">len_b</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="kw">return</span> <span class="ident">len_a</span>;
     }
 
@@ -1857,7 +1857,7 @@
         <span class="kw">for</span> (<span class="ident">y</span>, <span class="ident">char_b</span>) <span class="kw">in</span> <span class="ident">word_b</span>.<span class="ident">chars</span>().<span class="ident">enumerate</span>() {
             <span class="ident">matrix</span>[(<span class="ident">x</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">y</span> <span class="op">+</span> <span class="number">1</span>)] <span class="op">=</span> (<span class="ident">matrix</span>[(<span class="ident">x</span>, <span class="ident">y</span> <span class="op">+</span> <span class="number">1</span>)] <span class="op">+</span> <span class="number">1</span>)
                 .<span class="ident">min</span>(<span class="ident">matrix</span>[(<span class="ident">x</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">y</span>)] <span class="op">+</span> <span class="number">1</span>)
-                .<span class="ident">min</span>(<span class="ident">matrix</span>[(<span class="ident">x</span>, <span class="ident">y</span>)] <span class="op">+</span> <span class="kw">if</span> <span class="ident">char_a</span> <span class="op">=</span><span class="op">=</span> <span class="ident">char_b</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="number">1</span> });
+                .<span class="ident">min</span>(<span class="ident">matrix</span>[(<span class="ident">x</span>, <span class="ident">y</span>)] <span class="op">+</span> <span class="kw">if</span> <span class="ident">char_a</span> <span class="op">==</span> <span class="ident">char_b</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="number">1</span> });
         }
     }
 
@@ -1871,7 +1871,7 @@
     <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">CommandOptions</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+) -&gt; <span class="ident">bool</span> {
     <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">as_ref</span>();
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
@@ -1899,9 +1899,9 @@
 <span class="doccomment">/// `&quot; &quot;`.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">starts_with_whole_word</span>(<span class="ident">search_on</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">starts_with_whole_word</span>(<span class="ident">search_on</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">word</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">search_on</span>.<span class="ident">starts_with</span>(<span class="ident">word</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">search_on</span>.<span class="ident">get</span>(<span class="ident">word</span>.<span class="ident">len</span>()..<span class="op">=</span><span class="ident">word</span>.<span class="ident">len</span>()).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">slice</span><span class="op">|</span> <span class="ident">slice</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot; &quot;</span>)
+        <span class="op">&amp;&amp;</span> <span class="ident">search_on</span>.<span class="ident">get</span>(<span class="ident">word</span>.<span class="ident">len</span>()..<span class="op">=</span><span class="ident">word</span>.<span class="ident">len</span>()).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">slice</span><span class="op">|</span> <span class="ident">slice</span> <span class="op">==</span> <span class="string">&quot; &quot;</span>)
 }
 
 <span class="comment">// Decides how a listed help entry shall be displayed.</span>
@@ -1912,13 +1912,13 @@
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour</span> {
+) -&gt; <span class="ident">HelpBehaviour</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">options</span>.<span class="ident">help_available</span>() {
         <span class="kw">return</span> <span class="ident">HelpBehaviour::Hide</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">OnlyIn::Dm</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">msg</span>.<span class="ident">is_private</span>()
-        <span class="op">|</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">only_in</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">OnlyIn::Guild</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>()
+    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span>() <span class="op">==</span> <span class="ident">OnlyIn::Dm</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">msg</span>.<span class="ident">is_private</span>()
+        <span class="op">|</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">only_in</span>() <span class="op">==</span> <span class="ident">OnlyIn::Guild</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>()
     {
         <span class="kw">return</span> <span class="ident">help_options</span>.<span class="ident">wrong_channel</span>;
     }
@@ -1955,10 +1955,10 @@
     <span class="ident">group_checks</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">Check</span>],
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour</span> {
+) -&gt; <span class="ident">HelpBehaviour</span> {
     <span class="kw">let</span> <span class="ident">behaviour</span> <span class="op">=</span> <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>);
 
-    <span class="kw">if</span> <span class="ident">behaviour</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour::Nothing</span>
+    <span class="kw">if</span> <span class="ident">behaviour</span> <span class="op">==</span> <span class="ident">HelpBehaviour::Nothing</span>
         <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">options</span>.<span class="ident">owner_privilege</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>))
     {
         <span class="kw">for</span> <span class="ident">check</span> <span class="kw">in</span> <span class="ident">group_checks</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">options</span>.<span class="ident">checks</span>) {
@@ -1992,7 +1992,7 @@
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
     <span class="ident">similar_commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span>,
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">InternalCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">InternalCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">for</span> <span class="ident">command</span> <span class="kw">in</span> <span class="ident">commands</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">command</span>;
@@ -2001,7 +2001,7 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command_found</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
                 <span class="kw">for</span> <span class="ident">command_name</span> <span class="kw">in</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span> {
-                    <span class="kw">if</span> <span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">command_name</span> {
+                    <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">command_name</span> {
                         <span class="ident">command_found</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">command_name</span>);
 
                         <span class="kw">break</span>;
@@ -2026,7 +2026,7 @@
 
                             <span class="kw">if</span> <span class="ident">levenshtein_distance</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">help_options</span>.<span class="ident">max_levenshtein_distance</span>
                                 <span class="op">&amp;&amp;</span> <span class="ident">HelpBehaviour::Nothing</span>
-                                    <span class="op">=</span><span class="op">=</span> <span class="ident">check_command_behaviour</span>(
+                                    <span class="op">==</span> <span class="ident">check_command_behaviour</span>(
                                         <span class="ident">ctx</span>,
                                         <span class="ident">msg</span>,
                                         <span class="ident">command</span>.<span class="ident">options</span>,
@@ -2061,7 +2061,7 @@
                         <span class="comment">// Check parent command&#39;s behaviour and permission first</span>
                         <span class="comment">// before we consider the sub-command overwrite it.</span>
                         <span class="kw">if</span> <span class="ident">HelpBehaviour::Nothing</span>
-                            <span class="op">=</span><span class="op">=</span> <span class="ident">check_command_behaviour</span>(
+                            <span class="op">==</span> <span class="ident">check_command_behaviour</span>(
                                 <span class="ident">ctx</span>,
                                 <span class="ident">msg</span>,
                                 <span class="ident">command</span>.<span class="ident">options</span>,
@@ -2090,8 +2090,8 @@
                         )
                         .<span class="kw">await</span>
                         {
-                            <span class="prelude-val">Some</span>(<span class="ident">found</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">found</span>),
-                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                            <span class="prelude-val">Some</span>(<span class="ident">found</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">found</span>),
+                            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
                         }
                     }
                 }
@@ -2099,7 +2099,7 @@
 
             <span class="kw">if</span> <span class="ident">search_command_name_matched</span>.<span class="ident">is_some</span>() {
                 <span class="kw">if</span> <span class="ident">HelpBehaviour::Nothing</span>
-                    <span class="op">=</span><span class="op">=</span> <span class="ident">check_command_behaviour</span>(
+                    <span class="op">==</span> <span class="ident">check_command_behaviour</span>(
                         <span class="ident">ctx</span>,
                         <span class="ident">msg</span>,
                         <span class="ident">command</span>.<span class="ident">options</span>,
@@ -2133,7 +2133,7 @@
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
     <span class="ident">similar_commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span>,
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
             <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">group</span>;
@@ -2141,8 +2141,8 @@
                 <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>);
 
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">group_behaviour</span> {
-                <span class="ident">HelpBehaviour::Nothing</span> <span class="op">=</span><span class="op">&gt;</span> (),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">HelpBehaviour::Nothing</span> =&gt; (),
+                <span class="kw">_</span> =&gt; {
                     <span class="kw">continue</span>;
                 },
             }
@@ -2176,7 +2176,7 @@
                     });
                 }
 
-                <span class="kw">let</span> <span class="ident">is_only</span> <span class="op">=</span> <span class="op">|</span><span class="ident">only</span><span class="op">|</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">only</span> <span class="op">|</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">only</span>;
+                <span class="kw">let</span> <span class="ident">is_only</span> <span class="op">=</span> <span class="op">|</span><span class="ident">only</span><span class="op">|</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">==</span> <span class="ident">only</span> <span class="op">|</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">==</span> <span class="ident">only</span>;
 
                 <span class="kw">let</span> <span class="ident">available_text</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_only</span>(<span class="ident">OnlyIn::Dm</span>) {
                     <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">dm_only_text</span>
@@ -2242,8 +2242,8 @@
             )
             .<span class="kw">await</span>
             {
-                <span class="prelude-val">Ok</span>(<span class="ident">found</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">found</span>),
-                <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> (),
+                <span class="prelude-val">Ok</span>(<span class="ident">found</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">found</span>),
+                <span class="prelude-val">Err</span>(()) =&gt; (),
             }
         }
 
@@ -2262,7 +2262,7 @@
     <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">similar_commands</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>();
 
@@ -2277,8 +2277,8 @@
     )
     .<span class="kw">await</span>
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">found</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">found</span>),
-        <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">similar_commands</span>),
+        <span class="prelude-val">Ok</span>(<span class="ident">found</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">found</span>),
+        <span class="prelude-val">Err</span>(()) =&gt; <span class="prelude-val">Err</span>(<span class="ident">similar_commands</span>),
     }
 }
 
@@ -2316,8 +2316,8 @@
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>];
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">group_behaviour</span> {
-            <span class="ident">HelpBehaviour::Nothing</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">HelpBehaviour::Nothing</span> =&gt; (),
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format_command_name!</span>(<span class="kw-2">&amp;</span><span class="ident">group_behaviour</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>);
                 <span class="ident">to_fill</span>.<span class="ident">command_names</span>.<span class="ident">push</span>(<span class="ident">name</span>);
 
@@ -2352,7 +2352,7 @@
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CommandGroup</span>,
     <span class="ident">highest_formatter</span>: <span class="ident">HelpBehaviour</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="ident">GroupCommandsPair</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="ident">GroupCommandsPair</span><span class="op">&gt;</span> {
     <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group_with_cmds</span> <span class="op">=</span> <span class="ident">GroupCommandsPair::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">highest_formatter</span> <span class="op">=</span> <span class="ident">highest_formatter</span>;
@@ -2370,7 +2370,7 @@
         .<span class="kw">await</span>;
 
         <span class="kw">for</span> <span class="ident">sub_group</span> <span class="kw">in</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span> {
-            <span class="kw">if</span> <span class="ident">HelpBehaviour::Hide</span> <span class="op">=</span><span class="op">=</span> <span class="ident">highest_formatter</span> {
+            <span class="kw">if</span> <span class="ident">HelpBehaviour::Hide</span> <span class="op">==</span> <span class="ident">highest_formatter</span> {
                 <span class="kw">break</span>;
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">sub_group</span>.<span class="ident">options</span>.<span class="ident">commands</span>.<span class="ident">is_empty</span>()
                 <span class="op">&amp;&amp;</span> <span class="ident">sub_group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>.<span class="ident">is_empty</span>()
@@ -2405,7 +2405,7 @@
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GroupCommandsPair</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GroupCommandsPair</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">listed_groups</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GroupCommandsPair</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::default</span>();
 
     <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
@@ -2429,7 +2429,7 @@
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">CommandGroup</span>,
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GroupCommandsPair</span> {
+) -&gt; <span class="ident">GroupCommandsPair</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group_with_cmds</span> <span class="op">=</span> <span class="ident">fetch_all_eligible_commands_in_group</span>(
         <span class="ident">ctx</span>,
         <span class="ident">msg</span>,
@@ -2455,8 +2455,8 @@
 <span class="doccomment">/// If a group has no prefixes, it is not required to be part of</span>
 <span class="doccomment">/// `searched_group` to reach a sub-group of `group_name`.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">trim_prefixless_group</span>(<span class="ident">group_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">searched_group</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="ident">group_name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">searched_group</span>.<span class="ident">as_str</span>() {
+<span class="kw">fn</span> <span class="ident">trim_prefixless_group</span>(<span class="ident">group_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">searched_group</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">if</span> <span class="ident">group_name</span> <span class="op">==</span> <span class="ident">searched_group</span>.<span class="ident">as_str</span>() {
         <span class="kw">return</span> <span class="bool-val">true</span>;
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="ident">searched_group</span>, <span class="ident">group_name</span>) {
         <span class="ident">searched_group</span>.<span class="ident">drain</span>(..<span class="op">=</span><span class="ident">group_name</span>.<span class="ident">len</span>());
@@ -2475,7 +2475,7 @@
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
     <span class="ident">searched_named_lowercase</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">String</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">let</span> <span class="ident">is_prefixless_group</span> <span class="op">=</span> {
             <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>()
@@ -2488,7 +2488,7 @@
                 <span class="ident">progressed</span> <span class="op">=</span> <span class="bool-val">true</span>;
             }
 
-            <span class="ident">prefix</span> <span class="op">=</span><span class="op">=</span> <span class="ident">searched_named_lowercase</span>
+            <span class="ident">prefix</span> <span class="op">==</span> <span class="ident">searched_named_lowercase</span>
         });
 
         <span class="kw">if</span> <span class="ident">is_prefixless_group</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_word_prefix</span> {
@@ -2539,13 +2539,13 @@
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">args</span>.<span class="ident">is_empty</span>() {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">message</span>();
 
         <span class="kw">return</span> <span class="kw">match</span> <span class="ident">fetch_single_command</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">groups</span>, <span class="ident">name</span>, <span class="ident">help_options</span>, <span class="ident">owners</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">single_command</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">single_command</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">suggestions</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">single_command</span>) =&gt; <span class="ident">single_command</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">suggestions</span>) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">searched_named_lowercase</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_lowercase</span>();
 
                 <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
@@ -2614,7 +2614,7 @@
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">GroupCommandsPair</span>,
     <span class="ident">nest_level</span>: <span class="ident">usize</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">repeated_indent_str</span> <span class="op">=</span> <span class="ident">help_options</span>.<span class="ident">indention_prefix</span>.<span class="ident">repeat</span>(<span class="ident">nest_level</span>);
 
     <span class="kw">if</span> <span class="ident">nest_level</span> <span class="op">&gt;</span> <span class="number">0</span> {
@@ -2714,7 +2714,7 @@
     <span class="ident">help_description</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="ident">GroupCommandsPair</span>],
     <span class="ident">colour</span>: <span class="ident">Colour</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="comment">// creating embed outside message builder since flatten_group_to_string</span>
     <span class="comment">// may return an error.</span>
 
@@ -2740,7 +2740,7 @@
     <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">colour</span>: <span class="ident">Colour</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="ident">channel_id</span>
         .<span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
             <span class="ident">m</span>.<span class="ident">embed</span>(<span class="op">|</span><span class="ident">embed</span><span class="op">|</span> {
@@ -2821,7 +2821,7 @@
     <span class="ident">help_description</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">suggestions</span>: <span class="kw-2">&amp;</span><span class="ident">Suggestions</span>,
     <span class="ident">colour</span>: <span class="ident">Colour</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">help_description</span>.<span class="ident">replace</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">suggestions</span>.<span class="ident">join</span>(<span class="string">&quot;`, `&quot;</span>));
 
     <span class="ident">channel_id</span>
@@ -2843,7 +2843,7 @@
     <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">colour</span>: <span class="ident">Colour</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="ident">channel_id</span>
         .<span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
             <span class="ident">m</span>.<span class="ident">embed</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -2902,7 +2902,7 @@
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
     <span class="ident">owners</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">formatted_help</span> <span class="op">=</span>
         <span class="ident">create_customised_help_data</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
@@ -2910,7 +2910,7 @@
         <span class="ident">CustomisedHelpData::SuggestedCommands</span> {
             <span class="kw-2">ref</span> <span class="ident">help_description</span>,
             <span class="kw-2">ref</span> <span class="ident">suggestions</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> {
+        } =&gt; {
             <span class="ident">send_suggestion_embed</span>(
                 <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>,
                 <span class="ident">msg</span>.<span class="ident">channel_id</span>,
@@ -2922,7 +2922,7 @@
         },
         <span class="ident">CustomisedHelpData::NoCommandFound</span> {
             <span class="ident">help_error_message</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> {
+        } =&gt; {
             <span class="ident">send_error_embed</span>(
                 <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>,
                 <span class="ident">msg</span>.<span class="ident">channel_id</span>,
@@ -2934,7 +2934,7 @@
         <span class="ident">CustomisedHelpData::GroupedCommands</span> {
             <span class="kw-2">ref</span> <span class="ident">help_description</span>,
             <span class="kw-2">ref</span> <span class="ident">groups</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> {
+        } =&gt; {
             <span class="ident">send_grouped_commands_embed</span>(
                 <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>,
                 <span class="ident">help_options</span>,
@@ -2947,7 +2947,7 @@
         },
         <span class="ident">CustomisedHelpData::SingleCommand</span> {
             <span class="kw-2">ref</span> <span class="ident">command</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> {
+        } =&gt; {
             <span class="ident">send_single_command_embed</span>(
                 <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>,
                 <span class="ident">help_options</span>,
@@ -2969,7 +2969,7 @@
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
     <span class="ident">help_description</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="ident">GroupCommandsPair</span>],
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="string">&quot;__**Commands**__\n&quot;</span>.<span class="ident">to_string</span>();
 
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln!</span>(<span class="ident">result</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">help_description</span>);
@@ -2986,7 +2986,7 @@
 <span class="doccomment">/// Turns a single command into a [`String`] taking plain help format into account.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-<span class="kw">fn</span> <span class="ident">single_command_to_plain_string</span>(<span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>, <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">single_command_to_plain_string</span>(<span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>, <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String::default</span>();
 
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln!</span>(<span class="ident">result</span>, <span class="string">&quot;__**{}**__&quot;</span>, <span class="ident">command</span>.<span class="ident">name</span>);
@@ -3101,7 +3101,7 @@
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
     <span class="ident">owners</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">formatted_help</span> <span class="op">=</span>
         <span class="ident">create_customised_help_data</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">groups</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
@@ -3109,17 +3109,17 @@
         <span class="ident">CustomisedHelpData::SuggestedCommands</span> {
             <span class="kw-2">ref</span> <span class="ident">help_description</span>,
             <span class="kw-2">ref</span> <span class="ident">suggestions</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">help_description</span>.<span class="ident">replace</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">suggestions</span>.<span class="ident">join</span>(<span class="string">&quot;`, `&quot;</span>)),
+        } =&gt; <span class="ident">help_description</span>.<span class="ident">replace</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">suggestions</span>.<span class="ident">join</span>(<span class="string">&quot;`, `&quot;</span>)),
         <span class="ident">CustomisedHelpData::NoCommandFound</span> {
             <span class="kw-2">ref</span> <span class="ident">help_error_message</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">help_error_message</span>.<span class="ident">to_string</span>(),
+        } =&gt; <span class="ident">help_error_message</span>.<span class="ident">to_string</span>(),
         <span class="ident">CustomisedHelpData::GroupedCommands</span> {
             <span class="kw-2">ref</span> <span class="ident">help_description</span>,
             <span class="kw-2">ref</span> <span class="ident">groups</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">grouped_commands_to_plain_string</span>(<span class="ident">help_options</span>, <span class="ident">help_description</span>, <span class="ident">groups</span>),
+        } =&gt; <span class="ident">grouped_commands_to_plain_string</span>(<span class="ident">help_options</span>, <span class="ident">help_description</span>, <span class="ident">groups</span>),
         <span class="ident">CustomisedHelpData::SingleCommand</span> {
             <span class="kw-2">ref</span> <span class="ident">command</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">single_command_to_plain_string</span>(<span class="ident">help_options</span>, <span class="ident">command</span>),
+        } =&gt; <span class="ident">single_command_to_plain_string</span>(<span class="ident">help_options</span>, <span class="ident">command</span>),
     };
 
     <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">result</span>).<span class="kw">await</span>

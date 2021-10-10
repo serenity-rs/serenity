@@ -228,32 +228,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">ChannelParseError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">ChannelParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to request channel via HTTP&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel not found or unknown format&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to request channel via HTTP&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel not found or unknown format&quot;</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">channel_belongs_to_guild</span>(<span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="ident">Channel</span>, <span class="ident">guild</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">channel_belongs_to_guild</span>(<span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="ident">Channel</span>, <span class="ident">guild</span>: <span class="ident">GuildId</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">match</span> <span class="ident">channel</span> {
-        <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">channel</span>.<span class="ident">guild_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">guild</span>,
-        <span class="ident">Channel::Category</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">channel</span>.<span class="ident">guild_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">guild</span>,
-        <span class="ident">Channel::Private</span>(<span class="ident">_channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+        <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">guild_id</span> <span class="op">==</span> <span class="ident">guild</span>,
+        <span class="ident">Channel::Category</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">guild_id</span> <span class="op">==</span> <span class="ident">guild</span>,
+        <span class="ident">Channel::Private</span>(<span class="ident">_channel</span>) =&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">lookup_channel_global</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span>, <span class="ident">ChannelParseError</span><span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">lookup_channel_global</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span>, <span class="ident">ChannelParseError</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel_id</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::utils::parse_channel</span>(<span class="ident">s</span>)) {
         <span class="kw">return</span> <span class="ident">ChannelId</span>(<span class="ident">channel_id</span>).<span class="ident">to_channel</span>(<span class="ident">ctx</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">ChannelParseError::Http</span>);
     }
@@ -294,7 +294,7 @@
         <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
         <span class="ident">_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
         <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">lookup_channel_global</span>(<span class="ident">ctx</span>, <span class="ident">s</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// Don&#39;t yield for other guilds&#39; channels</span>
@@ -322,21 +322,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">GuildChannelParseError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::NotAGuildChannel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident"><span class="self">Self</span>::NotAGuildChannel</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">GuildChannelParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to request channel via HTTP&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel not found or unknown format&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NotAGuildChannel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel is not a guild channel&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to request channel via HTTP&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel not found or unknown format&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::NotAGuildChannel</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel is not a guild channel&quot;</span>),
         }
     }
 }
@@ -356,12 +356,12 @@
         <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
         <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
         <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">Channel::convert</span>(<span class="ident">ctx</span>, <span class="ident">guild_id</span>, <span class="ident">channel_id</span>, <span class="ident">s</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">channel</span>),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">GuildChannelParseError::NotAGuildChannel</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::Http</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">GuildChannelParseError::Http</span>(<span class="ident">e</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::NotFoundOrMalformed</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">channel</span>),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">GuildChannelParseError::NotAGuildChannel</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::Http</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">GuildChannelParseError::Http</span>(<span class="ident">e</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::NotFoundOrMalformed</span>) =&gt; {
                 <span class="prelude-val">Err</span>(<span class="ident">GuildChannelParseError::NotFoundOrMalformed</span>)
             },
         }
@@ -382,21 +382,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">ChannelCategoryParseError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::NotAChannelCategory</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident"><span class="self">Self</span>::NotAChannelCategory</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">ChannelCategoryParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to request channel via HTTP&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel not found or unknown format&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::NotAChannelCategory</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel is not a channel category&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Failed to request channel via HTTP&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel not found or unknown format&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::NotAChannelCategory</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Channel is not a channel category&quot;</span>),
         }
     }
 }
@@ -416,13 +416,13 @@
         <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
         <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
         <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">Channel::convert</span>(<span class="ident">ctx</span>, <span class="ident">guild_id</span>, <span class="ident">channel_id</span>, <span class="ident">s</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Channel::Category</span>(<span class="ident">channel</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">channel</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">Channel::Category</span>(<span class="ident">channel</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">channel</span>),
             <span class="comment">// TODO: accomodate issue #1352 somehow</span>
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ChannelCategoryParseError::NotAChannelCategory</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::Http</span>(<span class="ident">e</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">ChannelCategoryParseError::Http</span>(<span class="ident">e</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::NotFoundOrMalformed</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ChannelCategoryParseError::NotAChannelCategory</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::Http</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ChannelCategoryParseError::Http</span>(<span class="ident">e</span>)),
+            <span class="prelude-val">Err</span>(<span class="ident">ChannelParseError::NotFoundOrMalformed</span>) =&gt; {
                 <span class="prelude-val">Err</span>(<span class="ident">ChannelCategoryParseError::NotFoundOrMalformed</span>)
             },
         }

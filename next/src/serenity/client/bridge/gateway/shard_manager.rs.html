@@ -481,7 +481,7 @@
 <span class="kw">impl</span> <span class="ident">ShardManager</span> {
     <span class="doccomment">/// Creates a new shard manager, returning both the manager and a monitor</span>
     <span class="doccomment">/// for usage in a separate thread.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">opt</span>: <span class="ident">ShardManagerOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ShardManagerMonitor</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">opt</span>: <span class="ident">ShardManagerOptions</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ShardManagerMonitor</span>) {
         <span class="kw">let</span> (<span class="ident">thread_tx</span>, <span class="ident">thread_rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
         <span class="kw">let</span> (<span class="ident">shard_queue_tx</span>, <span class="ident">shard_queue_rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded</span>();
 
@@ -532,7 +532,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If a shard has been queued but has not yet been initiated, then this</span>
     <span class="doccomment">/// will return `false`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">has</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">has</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">shard_id</span>)
     }
 
@@ -541,7 +541,7 @@
     <span class="doccomment">/// This will communicate shard boots with the [`ShardQueuer`] so that they</span>
     <span class="doccomment">/// are properly queued.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">shard_to</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_index</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">shard_init</span>;
 
         <span class="kw">for</span> <span class="ident">shard_id</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">shard_index</span>..<span class="ident">shard_to</span> {
@@ -616,7 +616,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ShardRunner`]: super::ShardRunner</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shards_instantiated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ShardId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shards_instantiated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ShardId</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
     }
 
@@ -639,7 +639,7 @@
 
         <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">tokio::time::Duration</span> <span class="op">=</span> <span class="ident">tokio::time::Duration::from_secs</span>(<span class="number">5</span>);
         <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">shard_shutdown</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">shutdown_shard_id</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">shutdown_shard_id</span>)) =&gt; {
                 <span class="kw">if</span> <span class="ident">shutdown_shard_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">shard_id</span> {
                     <span class="macro">warn!</span>(
                         <span class="string">&quot;Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID&quot;</span>,
@@ -647,8 +647,8 @@
                     );
                 }
             },
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; (),
+            <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; {
                 <span class="macro">warn!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, <span class="ident">shard_id</span>, <span class="ident">why</span>,)
             },
         }
