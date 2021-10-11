@@ -17,13 +17,14 @@ use tokio::{fs::File, io::AsyncReadExt};
 use crate::builder::{
     CreateInvite,
     CreateMessage,
+    CreateStageInstance,
     CreateThread,
     EditChannel,
     EditMessage,
+    EditStageInstance,
     EditThread,
     GetMessages,
 };
-use crate::builder::{CreateStageInstance, EditStageInstance};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
