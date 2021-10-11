@@ -3,7 +3,6 @@ use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-#[cfg(feature = "model")]
 use bitflags::__impl_bitflags;
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Serializer};
