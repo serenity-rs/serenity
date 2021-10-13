@@ -846,21 +846,24 @@ async fn handle_event(
                 event_handler.stage_instance_delete(context, event.stage_instance).await;
             });
         },
-        DispatchEvent::Model(Event::ThreadCreate(event)) => {
+        DispatchEvent::Model(Event::ThreadCreate(mut event)) => {
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::thread_create", async move {
                 event_handler.thread_create(context, event.thread).await;
             });
         },
-        DispatchEvent::Model(Event::ThreadUpdate(event)) => {
+        DispatchEvent::Model(Event::ThreadUpdate(mut event)) => {
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::thread_update", async move {
                 event_handler.thread_update(context, event.thread).await;
             });
         },
-        DispatchEvent::Model(Event::ThreadDelete(event)) => {
+        DispatchEvent::Model(Event::ThreadDelete(mut event)) => {
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::thread_delete", async move {
