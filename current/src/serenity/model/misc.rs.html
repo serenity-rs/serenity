@@ -478,6 +478,11 @@
 <span id="478">478</span>
 <span id="479">479</span>
 <span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
@@ -590,9 +595,11 @@
     )<span class="kw-2">*</span>};
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="macro">mention!</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">Channel</span>, <span class="ident">value</span>.<span class="ident">id</span>(););
+
 <span class="macro">mention!</span>(<span class="ident">value</span>:
     <span class="ident">MentionableImpl</span>, <span class="ident">Mention</span>(<span class="ident">value</span>);
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">Channel</span>, <span class="ident">value</span>.<span class="ident">id</span>();
     <span class="ident">ChannelId</span>, <span class="ident">MentionableImpl::Channel</span>(<span class="ident">value</span>);
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">ChannelCategory</span>, <span class="ident">value</span>.<span class="ident">id</span>;
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">GuildChannel</span>, <span class="ident">value</span>.<span class="ident">id</span>;
@@ -639,8 +646,11 @@
     <span class="ident">UserId</span>;
     <span class="ident">Mention</span>;
 );
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="macro">mentionable!</span>(<span class="ident">v</span> <span class="op">=</span> <span class="ident">v</span>, <span class="ident">Channel</span>;);
+
 <span class="macro">mentionable!</span>(<span class="ident">v</span> <span class="op">=</span> <span class="ident">v</span>,
-    <span class="ident">Channel</span>;
     <span class="ident">ChannelCategory</span>;
     <span class="ident">CurrentUser</span>;
     <span class="ident">Emoji</span>;

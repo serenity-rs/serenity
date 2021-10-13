@@ -30,6 +30,7 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
+<span id="33">33</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of exports which can be helpful to use.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Note that the `SerenityError` re-export is equivalent to</span>
@@ -46,6 +47,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [`serenity::Error`]: crate::Error</span>
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">typemap_rev</span>::{<span class="ident">TypeMap</span>, <span class="ident">TypeMapKey</span>};
