@@ -5,6 +5,7 @@ use serde_json::json;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
+#[cfg(all(feature = "cache", feature = "model"))]
 use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;

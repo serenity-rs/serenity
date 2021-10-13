@@ -1910,6 +1910,7 @@ pub enum Event {
     Unknown(UnknownEvent),
 }
 
+#[cfg(feature = "model")]
 fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
     use RelatedId::*;
     match c {
@@ -2272,6 +2273,7 @@ macro_rules! with_related_ids_for_event_types {
     };
 }
 
+#[cfg(feature = "model")]
 macro_rules! define_event_related_id_methods {
     ($(
         $(#[$attr:meta])?
@@ -2404,6 +2406,7 @@ impl Event {
         }
     }
 
+    #[cfg(feature = "model")]
     with_related_ids_for_event_types!(define_event_related_id_methods);
 }
 

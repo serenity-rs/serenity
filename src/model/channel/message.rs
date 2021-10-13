@@ -1,5 +1,6 @@
 //! Models relating to Discord channels.
 
+#[cfg(feature = "model")]
 use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;

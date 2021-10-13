@@ -1,5 +1,6 @@
 #[cfg(feature = "model")]
 use std::borrow::Cow;
+#[cfg(all(feature = "cache", feature = "model"))]
 use std::cmp::Reverse;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 

@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "model")]
 use bytes::buf::Buf;
+#[cfg(feature = "model")]
 use futures::stream::Stream;
 #[cfg(feature = "model")]
 use reqwest::Url;
@@ -1214,6 +1215,7 @@ impl ChannelId {
     }
 }
 
+#[cfg(feature = "model")]
 impl From<Channel> for ChannelId {
     /// Gets the Id of a [`Channel`].
     fn from(channel: Channel) -> ChannelId {
@@ -1221,6 +1223,7 @@ impl From<Channel> for ChannelId {
     }
 }
 
+#[cfg(feature = "model")]
 impl<'a> From<&'a Channel> for ChannelId {
     /// Gets the Id of a [`Channel`].
     fn from(channel: &Channel) -> ChannelId {

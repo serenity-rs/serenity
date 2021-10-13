@@ -1,7 +1,8 @@
+#[cfg(feature = "model")]
+use std::cmp::Ordering;
 use std::convert::TryFrom;
 use std::str::FromStr;
 use std::{
-    cmp::Ordering,
     error::Error as StdError,
     fmt::{self, Display, Formatter, Result as FmtResult, Write as FmtWrite},
 };

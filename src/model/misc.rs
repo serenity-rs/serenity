@@ -110,9 +110,11 @@ macro_rules! mention {
     )*};
 }
 
+#[cfg(feature = "model")]
+mention!(value: &'_ Channel, value.id(););
+
 mention!(value:
     MentionableImpl, Mention(value);
-    &'_ Channel, value.id();
     ChannelId, MentionableImpl::Channel(value);
     &'_ ChannelCategory, value.id;
     &'_ GuildChannel, value.id;
@@ -159,8 +161,11 @@ mentionable!(v = *v,
     UserId;
     Mention;
 );
+
+#[cfg(feature = "model")]
+mentionable!(v = v, Channel;);
+
 mentionable!(v = v,
-    Channel;
     ChannelCategory;
     CurrentUser;
     Emoji;

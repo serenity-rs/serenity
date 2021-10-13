@@ -15,6 +15,7 @@ mod role;
 mod system_channel;
 
 use chrono::{DateTime, Utc};
+#[cfg(feature = "model")]
 use futures::stream::StreamExt;
 use serde::de::Error as DeError;
 use serde::{Serialize, Serializer};
