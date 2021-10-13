@@ -890,6 +890,9 @@
 <span id="890">890</span>
 <span id="891">891</span>
 <span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -1738,21 +1741,24 @@
                 <span class="ident">event_handler</span>.<span class="ident">stage_instance_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">stage_instance</span>).<span class="kw">await</span>;
             });
         },
-        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadCreate</span>(<span class="ident">event</span>)) =&gt; {
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadCreate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) =&gt; {
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>);
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::thread_create&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="ident">event_handler</span>.<span class="ident">thread_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">thread</span>).<span class="kw">await</span>;
             });
         },
-        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadUpdate</span>(<span class="ident">event</span>)) =&gt; {
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) =&gt; {
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>);
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::thread_update&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="ident">event_handler</span>.<span class="ident">thread_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">thread</span>).<span class="kw">await</span>;
             });
         },
-        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadDelete</span>(<span class="ident">event</span>)) =&gt; {
+        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ThreadDelete</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) =&gt; {
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>);
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::thread_delete&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
