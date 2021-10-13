@@ -76,12 +76,8 @@ pub use crate::CacheAndHttp;
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
 pub struct ClientBuilder<'a> {
-    // FIXME: Remove this allow attribute once `application_id` is no longer feature-gated
-    // under `unstable_discord_api`.
-    #[allow(dead_code)]
-    token: Option<String>,
     data: Option<TypeMap>,
-    http: Option<Http>,
+    http: Http,
     fut: Option<BoxFuture<'a, Result<Client>>>,
     intents: GatewayIntents,
     #[cfg(feature = "unstable_discord_api")]
@@ -100,11 +96,10 @@ pub struct ClientBuilder<'a> {
 
 #[cfg(feature = "gateway")]
 impl<'a> ClientBuilder<'a> {
-    fn _new() -> Self {
+    fn _new(http: Http) -> Self {
         Self {
-            token: None,
             data: Some(TypeMap::new()),
-            http: None,
+            http,
             fut: None,
             intents: GatewayIntents::non_privileged(),
             #[cfg(feature = "unstable_discord_api")]
@@ -130,7 +125,7 @@ impl<'a> ClientBuilder<'a> {
     /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
     pub fn new(token: impl AsRef<str>) -> Self {
-        Self::_new().token(token)
+        Self::_new(Http::new_with_token(token.as_ref()))
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on
@@ -143,24 +138,19 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// [`Http`]: crate::http::Http
     pub fn new_with_http(http: Http) -> Self {
-        let mut c = Self::_new();
-        c.http = Some(http);
-        c
+        Self::_new(http)
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ",
     /// this method will automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        let token = token.as_ref().trim();
-
-        let token =
-            if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
-
-        self.token = Some(token.clone());
-
-        self.http = Some(Http::new_with_token(&token));
+        self.http = Http::new_with_token(token.as_ref());
 
         self
+    }
+
+    pub fn get_token(&self) -> &str {
+        &self.http.token
     }
 
     /// Sets the application id.
@@ -168,10 +158,7 @@ impl<'a> ClientBuilder<'a> {
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(ApplicationId(application_id));
 
-        self.http = Some(Http::new_with_token_application_id(
-            &self.token.clone().expect("no token"),
-            application_id,
-        ));
+        self.http = Http::new_with_token_application_id(self.get_token(), application_id);
 
         self
     }
@@ -359,7 +346,7 @@ impl<'a> Future for ClientBuilder<'a> {
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
             let intents = self.intents;
-            let http = Arc::new(self.http.take().unwrap());
+            let http = Arc::new(std::mem::replace(&mut self.http, Default::default()));
 
             #[cfg(feature = "unstable_discord_api")]
             if http.application_id == 0 {
