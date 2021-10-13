@@ -19,6 +19,7 @@ jobs:
           - nightly
           - macOS
           - Windows
+          - no default features
           - no cache
           - no gateway
           - unstable Discord API features
@@ -34,6 +35,8 @@ jobs:
             os: macOS-latest
           - name: Windows
             os: windows-latest
+          - name: no default features
+            features: " "
           - name: no cache
             features: builder client framework gateway model http standard_framework utils rustls_backend
           - name: no gateway

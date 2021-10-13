@@ -13,13 +13,14 @@ use crate::builder::EditChannel;
 use crate::builder::{
     CreateInvite,
     CreateMessage,
+    CreateStageInstance,
     CreateThread,
     EditMessage,
+    EditStageInstance,
     EditThread,
     EditVoiceState,
     GetMessages,
 };
-use crate::builder::{CreateStageInstance, EditStageInstance};
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]

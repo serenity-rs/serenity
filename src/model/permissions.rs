@@ -41,6 +41,7 @@
 //! [Manage Roles]: Permissions::MANAGE_ROLES
 //! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
 
+#[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 use bitflags::__impl_bitflags;
@@ -81,6 +82,7 @@ use serde::ser::{Serialize, Serializer};
 ///     }
 /// }
 /// ```
+#[cfg(feature = "model")]
 macro_rules! generate_get_permission_names {
     {$ ($perm:ident: $name:expr),*} => {
         impl Permissions {
@@ -328,6 +330,7 @@ __impl_bitflags! {
     }
 }
 
+#[cfg(feature = "model")]
 generate_get_permission_names! {
     add_reactions: "Add Reactions",
     administrator: "Administrator",
@@ -653,6 +656,7 @@ impl Serialize for Permissions {
     }
 }
 
+#[cfg(feature = "model")]
 impl Display for Permissions {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         let names = self.get_permission_names();

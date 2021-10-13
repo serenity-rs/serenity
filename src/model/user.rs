@@ -5,6 +5,7 @@ use std::fmt;
 use std::fmt::Write;
 
 use bitflags::__impl_bitflags;
+#[cfg(feature = "model")]
 use futures::future::{BoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 #[cfg(feature = "model")]

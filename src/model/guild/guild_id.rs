@@ -1,3 +1,4 @@
+#[cfg(feature = "model")]
 use futures::stream::Stream;
 #[cfg(feature = "model")]
 use serde_json::json;

@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "model")]
 use bytes::buf::Buf;
+#[cfg(feature = "model")]
 use futures::stream::Stream;
 #[cfg(feature = "model")]
 use reqwest::Url;
@@ -17,13 +18,14 @@ use tokio::{fs::File, io::AsyncReadExt};
 use crate::builder::{
     CreateInvite,
     CreateMessage,
+    CreateStageInstance,
     CreateThread,
     EditChannel,
     EditMessage,
+    EditStageInstance,
     EditThread,
     GetMessages,
 };
-use crate::builder::{CreateStageInstance, EditStageInstance};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -1213,6 +1215,7 @@ impl ChannelId {
     }
 }
 
+#[cfg(feature = "model")]
 impl From<Channel> for ChannelId {
     /// Gets the Id of a [`Channel`].
     fn from(channel: Channel) -> ChannelId {
@@ -1220,6 +1223,7 @@ impl From<Channel> for ChannelId {
     }
 }
 
+#[cfg(feature = "model")]
 impl<'a> From<&'a Channel> for ChannelId {
     /// Gets the Id of a [`Channel`].
     fn from(channel: &Channel) -> ChannelId {
