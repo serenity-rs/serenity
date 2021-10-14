@@ -325,7 +325,6 @@ impl Default for Colour {
 }
 
 /// Colour constants used by Discord for their branding, role colour palette, etc.
-#[allow(dead_code)]
 pub mod colours {
     pub mod branding {
         use crate::utils::Colour;
