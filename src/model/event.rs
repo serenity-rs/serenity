@@ -1221,7 +1221,7 @@ impl CacheUpdate for ReadyEvent {
         // We may be removed from some guilds between disconnect and ready, so we should handle that.
         let mut guilds_to_remove = vec![];
         let ready_guilds_hashset =
-            HashSet::from_iter(self.ready.guilds.iter().map(|status| status.id()));
+            HashSet::<GuildId>::from_iter(self.ready.guilds.iter().map(|status| status.id()));
         let shard_data = self.ready.shard.unwrap_or_else(|| [1, 1]);
         for guild in cache.guilds.read().await.keys() {
             // Only handle data for our shard.
@@ -1231,7 +1231,7 @@ impl CacheUpdate for ReadyEvent {
                 guilds_to_remove.push(*guild);
             }
         }
-        if guilds_to_remove.len() > 0 {
+        if !guilds_to_remove.is_empty() {
             let mut handle = cache.guilds.write().await;
             for guild in guilds_to_remove {
                 handle.remove(&guild);
