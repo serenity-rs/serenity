@@ -349,7 +349,7 @@ impl<'a> Future for ClientBuilder<'a> {
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
             let intents = self.intents;
-            let http = Arc::new(std::mem::replace(&mut self.http, Default::default()));
+            let http = Arc::new(std::mem::take(&mut self.http));
 
             #[cfg(feature = "unstable_discord_api")]
             if http.application_id == 0 {
