@@ -180,7 +180,7 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
     Some(Token::new(TokenKind::Argument, start, end))
 }
 
-fn is_quoted(s: &str) -> Option<&str> {
+fn remove_quotes_only_if_present(s: &str) -> Option<&str> {
     // A quoted argument must have both quote characters. It cannot only contain a single quote, or
     // be empty.
     if s.len() < 2 {
@@ -199,7 +199,7 @@ fn is_quoted(s: &str) -> Option<&str> {
 }
 
 fn remove_quotes(s: &str) -> &str {
-    match is_quoted(s) {
+    match remove_quotes_only_if_present(s) {
         Some(unquoted) => unquoted,
         None => s,
     }
@@ -346,7 +346,7 @@ impl Args {
             .collect::<Vec<_>>();
 
         let args = if delims.is_empty() && !message.is_empty() {
-            let kind = if is_quoted(message).is_some() {
+            let kind = if remove_quotes_only_if_present(message).is_some() {
                 TokenKind::QuotedArgument
             } else {
                 TokenKind::Argument
