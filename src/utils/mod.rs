@@ -11,7 +11,7 @@ mod message_builder;
 pub use argument_convert::*;
 
 pub use self::{
-    colour::Colour,
+    colour::{colours, Colour},
     custom_message::CustomMessage,
     message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder},
 };
