@@ -1,6 +1,10 @@
 //! All the events this library handles.
 
+#[cfg(feature = "cache")]
+use std::collections::HashSet;
 use std::convert::TryFrom;
+#[cfg(feature = "cache")]
+use std::iter::FromIterator;
 #[cfg(feature = "cache")]
 use std::mem;
 use std::{collections::HashMap, fmt};
@@ -1216,11 +1220,13 @@ impl CacheUpdate for ReadyEvent {
 
         // We may be removed from some guilds between disconnect and ready, so we should handle that.
         let mut guilds_to_remove = vec![];
+        let ready_guilds_hashset =
+            HashSet::from_iter(self.ready.guilds.iter().map(|status| status.id()));
         let shard_data = self.ready.shard.unwrap_or_else(|| [1, 1]);
         for guild in cache.guilds.read().await.keys() {
             // Only handle data for our shard.
-            if shard_id(guild.0, shard_data[1]) == shard_data[0] &&
-                !self.ready.guilds.iter().any(|status| &status.id() == guild)
+            if shard_id(guild.0, shard_data[1]) == shard_data[0]
+                && !ready_guilds_hashset.contains(guild)
             {
                 guilds_to_remove.push(*guild);
             }
