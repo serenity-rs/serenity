@@ -191,6 +191,7 @@ fn remove_quotes_only_if_present(s: &str) -> Option<&str> {
         return s.strip_suffix('"');
     }
 
+    // Refer to `QuoteKind` why we check for Unicode quote characters.
     if let Some(s) = s.strip_prefix('\u{201C}') {
         return s.strip_suffix('\u{201D}');
     }
