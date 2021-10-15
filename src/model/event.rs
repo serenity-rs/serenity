@@ -1214,13 +1214,15 @@ impl CacheUpdate for ReadyEvent {
             }
         }
 
-        // we may be removed from some guilds between disconnect and ready; we should handle that
+        // We may be removed from some guilds between disconnect and ready, so we should handle that.
         let mut guilds_to_remove = vec![];
         let shard_data = self.ready.shard.unwrap_or_else(|| [1, 1]);
         for guild in cache.guilds.read().await.keys() {
-            if shard_id(guild.0, shard_data[1]) == shard_data[0] && // only handle data for our shard
-                !self.ready.guilds.iter().any(|status| &status.id() == guild) {
-                guilds_to_remove.push(*guild); // copying is fine because this code path will rarely be taken
+            // Only handle data for our shard.
+            if shard_id(guild.0, shard_data[1]) == shard_data[0] &&
+                !self.ready.guilds.iter().any(|status| &status.id() == guild)
+            {
+                guilds_to_remove.push(*guild);
             }
         }
         if guilds_to_remove.len() > 0 {
