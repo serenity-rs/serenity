@@ -103,19 +103,49 @@ impl Token {
     }
 }
 
+// A utility enum to handle an edge case with Apple OSs.
+//
+// By default, a feature called "Smart Quotes" is enabled on MacOS and iOS devices. This feature
+// automatically substitutes the lame, but simple `"` ASCII character for quotation with the cool
+// `”` Unicode character. It can be disabled, but users may not want to do that as it is a global
+// setting (i.e. they might not want to disable it just for properly invoking commands of bots on
+// Discord).
+#[derive(Clone, Copy)]
+enum QuoteKind {
+    Ascii,
+    Apple,
+}
+
+impl QuoteKind {
+    fn new(c: char) -> Option<Self> {
+        match c {
+            '"' => Some(QuoteKind::Ascii),
+            '\u{201C}' => Some(QuoteKind::Apple),
+            _ => None,
+        }
+    }
+
+    fn is_ending_quote(self, c: char) -> bool {
+        match self {
+            QuoteKind::Ascii => c == '"',
+            QuoteKind::Apple => c == '\u{201D}',
+        }
+    }
+}
+
 fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
     if stream.is_empty() {
         return None;
     }
 
     let start = stream.offset();
-    if stream.current()? == b'"' {
-        stream.next();
+    if let Some(kind) = QuoteKind::new(stream.current_char()?) {
+        stream.next_char();
 
-        stream.take_until(|b| b == b'"');
+        stream.take_until_char(|c| kind.is_ending_quote(c));
 
-        let is_quote = stream.current().map_or(false, |b| b == b'"');
-        stream.next();
+        let is_quote = stream.current_char().map_or(false, |c| kind.is_ending_quote(c));
+        stream.next_char();
 
         let end = stream.offset();
 
