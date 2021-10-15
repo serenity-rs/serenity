@@ -19,6 +19,8 @@ use crate::constants::OpCode;
 use crate::internal::prelude::*;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::{application_command::ApplicationCommand, Interaction};
+#[cfg(feature = "cache")]
+use crate::utils::shard_id;
 
 /// Event data for the channel creation event.
 ///
@@ -1209,6 +1211,22 @@ impl CacheUpdate for ReadyEvent {
                     cache.guilds.write().await.insert(guild.id, guild);
                 },
                 GuildStatus::OnlinePartialGuild(_) => {},
+            }
+        }
+
+        // we may be removed from some guilds between disconnect and ready; we should handle that
+        let mut guilds_to_remove = vec![];
+        let shard_data = self.ready.shard.unwrap_or_else(|| [1, 1]);
+        for guild in cache.guilds.read().await.keys() {
+            if shard_id(guild.0, shard_data[1]) == shard_data[0] && // only handle data for our shard
+                !self.ready.guilds.iter().any(|status| &status.id() == guild) {
+                guilds_to_remove.push(*guild); // copying is fine because this code path will rarely be taken
+            }
+        }
+        if guilds_to_remove.len() > 0 {
+            let mut handle = cache.guilds.write().await;
+            for guild in guilds_to_remove {
+                handle.remove(&guild);
             }
         }
 
