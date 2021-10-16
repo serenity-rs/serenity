@@ -389,7 +389,6 @@ impl Context {
     /// sent back to `filter`'s paired receiver.
     #[inline]
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub async fn set_message_filter(&self, filter: MessageFilter) {
         self.shard.set_message_filter(filter);
     }
@@ -398,7 +397,6 @@ impl Context {
     /// sent back to `filter`'s paired receiver.
     #[inline]
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
         self.shard.set_reaction_filter(filter);
     }
@@ -407,7 +405,6 @@ impl Context {
     /// sent back to `filter`'s paired receiver.
     #[inline]
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-    #[cfg_attr(docsrs, doc(cfg(all(feature = "unstable_discord_api", feature = "collector"))))]
     pub async fn set_component_interaction_filter(&self, filter: ComponentInteractionFilter) {
         self.shard.set_component_interaction_filter(filter);
     }
