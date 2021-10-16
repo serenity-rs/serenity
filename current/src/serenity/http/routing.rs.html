@@ -2604,47 +2604,6 @@
 <span id="2604">2604</span>
 <span id="2605">2605</span>
 <span id="2606">2606</span>
-<span id="2607">2607</span>
-<span id="2608">2608</span>
-<span id="2609">2609</span>
-<span id="2610">2610</span>
-<span id="2611">2611</span>
-<span id="2612">2612</span>
-<span id="2613">2613</span>
-<span id="2614">2614</span>
-<span id="2615">2615</span>
-<span id="2616">2616</span>
-<span id="2617">2617</span>
-<span id="2618">2618</span>
-<span id="2619">2619</span>
-<span id="2620">2620</span>
-<span id="2621">2621</span>
-<span id="2622">2622</span>
-<span id="2623">2623</span>
-<span id="2624">2624</span>
-<span id="2625">2625</span>
-<span id="2626">2626</span>
-<span id="2627">2627</span>
-<span id="2628">2628</span>
-<span id="2629">2629</span>
-<span id="2630">2630</span>
-<span id="2631">2631</span>
-<span id="2632">2632</span>
-<span id="2633">2633</span>
-<span id="2634">2634</span>
-<span id="2635">2635</span>
-<span id="2636">2636</span>
-<span id="2637">2637</span>
-<span id="2638">2638</span>
-<span id="2639">2639</span>
-<span id="2640">2640</span>
-<span id="2641">2641</span>
-<span id="2642">2642</span>
-<span id="2643">2643</span>
-<span id="2644">2644</span>
-<span id="2645">2645</span>
-<span id="2646">2646</span>
-<span id="2647">2647</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -3021,7 +2980,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">WebhooksApplicationId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/interactions/:interaction_id` path.</span>
     <span class="doccomment">///</span>
@@ -3029,7 +2987,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`InteractionId`]: crate::model::id::InteractionId</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">InteractionsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id` path.</span>
     <span class="doccomment">///</span>
@@ -3037,7 +2994,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationsIdCommands</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/commands/:command_id` path.</span>
     <span class="doccomment">///</span>
@@ -3045,7 +3001,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationsIdCommandsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/guilds/:guild_id` path.</span>
     <span class="doccomment">///</span>
@@ -3053,7 +3008,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationsIdGuildsIdCommands</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/guilds/:guild_id/commands/permissions` path.</span>
     <span class="doccomment">///</span>
@@ -3061,7 +3015,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationsIdGuildsIdCommandsPermissions</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/guilds/:guild_id/commands/:command_id/permissions` path.</span>
     <span class="doccomment">///</span>
@@ -3069,7 +3022,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationsIdGuildsIdCommandIdPermissions</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/applications/:application_id/guilds/:guild_id` path.</span>
     <span class="doccomment">///</span>
@@ -3077,7 +3029,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationId`]: crate::model::id::ApplicationId</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">ApplicationsIdGuildsIdCommandsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/stage-instances` path.</span>
     <span class="doccomment">///</span>
@@ -3574,7 +3525,6 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_original_interaction_response</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">token</span>: <span class="ident">D</span>,
@@ -3583,7 +3533,6 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_followup_message</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">token</span>: <span class="ident">D</span>,
@@ -3593,31 +3542,26 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">webhook_followup_messages</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/webhooks/{}/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">token</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interaction_response</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="ident">D</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/interactions/{}/{}/callback&quot;</span>), <span class="ident">application_id</span>, <span class="ident">token</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_command</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">command_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/commands/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">command_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_commands</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/commands&quot;</span>), <span class="ident">application_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_command</span>(
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3630,7 +3574,6 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_command_permissions</span>(
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3643,13 +3586,11 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_commands</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_guild_commands_permissions</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/permissions&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
     }
@@ -3695,30 +3636,25 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">CreateFollowupMessage</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">CreateGlobalApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">CreateGlobalApplicationCommands</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
     },
     <span class="ident">CreateGuild</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">CreateGuildApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">CreateGuildApplicationCommands</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3728,7 +3664,6 @@
         <span class="ident">integration_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">CreateInteractionResponse</span> {
         <span class="ident">interaction_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -3766,14 +3701,12 @@
         <span class="ident">emoji_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">DeleteFollowupMessage</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">DeleteGlobalApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
@@ -3782,7 +3715,6 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">DeleteGuildApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3812,7 +3744,6 @@
         <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">DeleteOriginalInteractionResponse</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -3854,14 +3785,12 @@
         <span class="ident">emoji_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">EditFollowupMessage</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">message_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">EditGlobalApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
@@ -3870,21 +3799,18 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">EditGuildApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">EditGuildApplicationCommandPermission</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">EditGuildApplicationCommandsPermissions</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -3917,13 +3843,11 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">GetOriginalInteractionResponse</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">EditOriginalInteractionResponse</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -4036,12 +3960,10 @@
     },
     <span class="ident">GetGateway</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">GetGlobalApplicationCommands</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">GetGlobalApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
@@ -4053,26 +3975,22 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">GetGuildApplicationCommands</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">GetGuildApplicationCommand</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">GetGuildApplicationCommandsPermissions</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     },
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="ident">GetGuildApplicationCommandPermissions</span> {
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
