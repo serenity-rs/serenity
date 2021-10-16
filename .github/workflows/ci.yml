@@ -63,12 +63,6 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Install dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopus-dev
-
       - name: Cache
         uses: Swatinem/rust-cache@v1
 
@@ -107,11 +101,6 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopus-dev
-
       - name: Cache
         uses: Swatinem/rust-cache@v1
 
@@ -132,11 +121,6 @@ jobs:
           toolchain: nightly
           profile: minimal
           override: true
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopus-dev
 
       - name: Cache
         uses: Swatinem/rust-cache@v1
@@ -163,11 +147,6 @@ jobs:
           toolchain: stable
           profile: minimal
           override: true
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libopus-dev
 
       - name: Cache
         uses: Swatinem/rust-cache@v1
