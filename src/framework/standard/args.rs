@@ -200,10 +200,7 @@ fn remove_quotes_only_if_present(s: &str) -> Option<&str> {
 }
 
 fn remove_quotes(s: &str) -> &str {
-    match remove_quotes_only_if_present(s) {
-        Some(unquoted) => unquoted,
-        None => s,
-    }
+    remove_quotes_only_if_present(s).unwrap_or(s)
 }
 
 #[derive(Debug, Clone, Copy)]
