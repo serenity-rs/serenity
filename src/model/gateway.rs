@@ -58,13 +58,11 @@ pub struct Activity {
     /// The sync ID of the activity. Mainly used by the Spotify activity
     /// type which uses this parameter to store the track ID.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub sync_id: Option<String>,
     /// The session ID of the activity. Reserved for specific activity
     /// types, such as the Activity that is transmitted when a user is
     /// listening to Spotify.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub session_id: Option<String>,
     /// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].
     pub url: Option<String>,

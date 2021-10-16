@@ -630,7 +630,6 @@ impl Guild {
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn create_application_command<F>(
@@ -648,7 +647,6 @@ impl Guild {
     ///
     /// [`create_application_command`]: Self::create_application_command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn set_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
@@ -666,7 +664,6 @@ impl Guild {
     ///
     /// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_application_command_permission<F>(
         &self,
         http: impl AsRef<Http>,
@@ -683,7 +680,6 @@ impl Guild {
 
     /// Overrides all application commands permissions.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
@@ -699,7 +695,6 @@ impl Guild {
 
     /// Get all guild application commands.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_application_commands(
         &self,
         http: impl AsRef<Http>,
@@ -709,7 +704,6 @@ impl Guild {
 
     /// Get a specific guild application command by its Id.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_application_command(
         &self,
         http: impl AsRef<Http>,
@@ -720,7 +714,6 @@ impl Guild {
 
     /// Edit guild application command by its Id.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_application_command<F>(
         &self,
         http: impl AsRef<Http>,
@@ -735,7 +728,6 @@ impl Guild {
 
     /// Delete guild application command by its Id.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_application_command(
         &self,
         http: impl AsRef<Http>,
@@ -746,7 +738,6 @@ impl Guild {
 
     /// Get all guild application commands permissions only.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_application_commands_permissions(
         &self,
         http: impl AsRef<Http>,
@@ -756,7 +747,6 @@ impl Guild {
 
     /// Get permissions for specific guild application command by its Id.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_application_command_permissions(
         &self,
         http: impl AsRef<Http>,
@@ -2298,7 +2288,6 @@ impl Guild {
 
     /// Returns a future that will await one message sent in this guild.
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reply<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -2308,7 +2297,6 @@ impl Guild {
 
     /// Returns a stream builder which can be awaited to obtain a stream of messages in this guild.
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_replies<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -2318,7 +2306,6 @@ impl Guild {
 
     /// Await a single reaction in this guild.
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reaction<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,
@@ -2328,7 +2315,6 @@ impl Guild {
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions sent in this guild.
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn await_reactions<'a>(
         &self,
         shard_messenger: &'a impl AsRef<ShardMessenger>,

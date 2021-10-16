@@ -248,7 +248,6 @@ impl ShardMessenger {
     /// Sets a new filter for an event collector.
     #[inline]
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn set_event_filter(&self, collector: EventFilter) {
         #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetEventFilter(collector));
@@ -257,7 +256,6 @@ impl ShardMessenger {
     /// Sets a new filter for a message collector.
     #[inline]
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn set_message_filter(&self, collector: MessageFilter) {
         #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector));
@@ -265,7 +263,6 @@ impl ShardMessenger {
 
     /// Sets a new filter for a reaction collector.
     #[cfg(feature = "collector")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
     pub fn set_reaction_filter(&self, collector: ReactionFilter) {
         #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector));
@@ -273,7 +270,6 @@ impl ShardMessenger {
 
     /// Sets a new filter for a component interaction collector.
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-    #[cfg_attr(docsrs, doc(cfg(all(feature = "unstable_discord_api", feature = "collector"))))]
     pub fn set_component_interaction_filter(&self, collector: ComponentInteractionFilter) {
         #[allow(clippy::let_underscore_must_use)]
         let _ = self.send_to_shard(ShardRunnerMessage::SetComponentInteractionFilter(collector));

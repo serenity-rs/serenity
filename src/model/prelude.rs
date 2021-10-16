@@ -18,7 +18,6 @@ pub use super::gateway::*;
 pub use super::guild::*;
 pub use super::id::*;
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 pub use super::interactions::*;
 pub use super::invite::*;
 pub use super::misc::*;

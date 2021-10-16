@@ -31,7 +31,6 @@ pub mod gateway;
 pub mod guild;
 pub mod id;
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 pub mod interactions;
 pub mod invite;
 pub mod misc;

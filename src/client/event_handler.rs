@@ -428,28 +428,24 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the created interaction.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn interaction_create(&self, _ctx: Context, _interaction: Interaction) {}
 
     /// Dispatched when a guild integration is created.
     ///
     /// Provides the created integration.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn integration_create(&self, _ctx: Context, _integration: Integration) {}
 
     /// Dispatched when a guild integration is updated.
     ///
     /// Provides the updated integration.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn integration_update(&self, _ctx: Context, _integration: Integration) {}
 
     /// Dispatched when a guild integration is deleted.
     ///
     /// Provides the integration's id, the id of the guild it belongs to, and its associated application id
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn integration_delete(
         &self,
         _ctx: Context,
@@ -463,7 +459,6 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the created application command.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn application_command_create(
         &self,
         _ctx: Context,
@@ -475,7 +470,6 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the updated application command.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn application_command_update(
         &self,
         _ctx: Context,
@@ -487,7 +481,6 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the deleted application command.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn application_command_delete(
         &self,
         _ctx: Context,

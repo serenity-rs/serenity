@@ -447,7 +447,6 @@ impl Http {
     ///
     /// Functions the same as [`Self::execute_webhook`]
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_followup_message(
         &self,
         interaction_token: &str,
@@ -476,7 +475,6 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_global_application_command(
         &self,
         map: &Value,
@@ -493,7 +491,6 @@ impl Http {
 
     /// Creates new global application commands.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_global_application_commands(
         &self,
         map: &Value,
@@ -510,7 +507,6 @@ impl Http {
 
     /// Creates new guild application commands.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_guild_application_commands(
         &self,
         guild_id: u64,
@@ -579,7 +575,6 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_guild_application_command(
         &self,
         guild_id: u64,
@@ -627,7 +622,6 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_interaction_response(
         &self,
         interaction_id: u64,
@@ -823,7 +817,6 @@ impl Http {
 
     /// Deletes a follow-up message for an interaction.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_followup_message(
         &self,
         interaction_token: &str,
@@ -843,7 +836,6 @@ impl Http {
 
     /// Deletes a global command.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_global_application_command(&self, command_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -870,7 +862,6 @@ impl Http {
 
     /// Deletes a guild command.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_guild_application_command(
         &self,
         guild_id: u64,
@@ -990,7 +981,6 @@ impl Http {
 
     /// Deletes the initial interaction response.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -1168,7 +1158,6 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_followup_message(
         &self,
         interaction_token: &str,
@@ -1195,7 +1184,6 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_global_application_command(
         &self,
         command_id: u64,
@@ -1234,7 +1222,6 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_command(
         &self,
         guild_id: u64,
@@ -1261,7 +1248,6 @@ impl Http {
     ///
     /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_command_permissions(
         &self,
         guild_id: u64,
@@ -1288,7 +1274,6 @@ impl Http {
     ///
     /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_commands_permissions(
         &self,
         guild_id: u64,
@@ -1445,7 +1430,6 @@ impl Http {
 
     /// Gets the initial interaction response.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -1467,7 +1451,6 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -2311,7 +2294,6 @@ impl Http {
 
     /// Fetches all of the global commands for your application.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_global_application_commands(&self) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: None,
@@ -2325,7 +2307,6 @@ impl Http {
 
     /// Fetches a global commands for your application by its Id.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_global_application_command(
         &self,
         command_id: u64,
@@ -2367,7 +2348,6 @@ impl Http {
 
     /// Fetches all of the guild commands for your application for a specific guild.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_commands(
         &self,
         guild_id: u64,
@@ -2385,7 +2365,6 @@ impl Http {
 
     /// Fetches a guild command by its Id.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_command(
         &self,
         guild_id: u64,
@@ -2405,7 +2384,6 @@ impl Http {
 
     /// Fetches all of the guild commands permissions for your application for a specific guild.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_commands_permissions(
         &self,
         guild_id: u64,
@@ -2423,7 +2401,6 @@ impl Http {
 
     /// Gives the guild command permission for your application for a specific guild.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_command_permissions(
         &self,
         guild_id: u64,

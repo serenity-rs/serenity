@@ -91,7 +91,6 @@ pub mod cache;
 #[cfg(feature = "client")]
 pub mod client;
 #[cfg(feature = "collector")]
-#[cfg_attr(docsrs, doc(cfg(feature = "collector")))]
 pub mod collector;
 #[cfg(feature = "framework")]
 pub mod framework;
