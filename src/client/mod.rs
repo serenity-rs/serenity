@@ -151,7 +151,7 @@ impl<'a> ClientBuilder<'a> {
 
     /// Gets the current token used for the [`Http`] client.
     ///
-    /// [`Http`]: crate::http::Http 
+    /// [`Http`]: crate::http::Http
     pub fn get_token(&self) -> &str {
         &self.http.token
     }
