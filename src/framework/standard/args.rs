@@ -180,27 +180,35 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
     Some(Token::new(TokenKind::Argument, start, end))
 }
 
-fn remove_quotes_only_if_present(s: &str) -> Option<&str> {
-    // A quoted argument must have both quote characters. It cannot only contain a single quote, or
-    // be empty.
-    if s.len() < 2 {
-        return None;
-    }
+fn is_surrounded_with(s: &str, begin: char, end: char) -> bool {
+    s.starts_with(begin) && s.ends_with(end)
+}
 
-    if let Some(s) = s.strip_prefix('"') {
-        return s.strip_suffix('"');
+fn is_quoted(s: &str) -> bool {
+    if s.len() < 2 {
+        return false;
     }
 
     // Refer to `QuoteKind` why we check for Unicode quote characters.
-    if let Some(s) = s.strip_prefix('\u{201C}') {
-        return s.strip_suffix('\u{201D}');
-    }
+    is_surrounded_with(s, '"', '"') || is_surrounded_with(s, '\u{201C}', '\u{201D}')
+}
 
-    None
+fn strip(s: &str, begin: char, end: char) -> Option<&str> {
+    let s = s.strip_prefix(begin)?;
+    s.strip_suffix(end)
 }
 
 fn remove_quotes(s: &str) -> &str {
-    remove_quotes_only_if_present(s).unwrap_or(s)
+    if s.len() < 2 {
+        return s;
+    }
+
+    if let Some(s) = strip(s, '"', '"') {
+        return s;
+    }
+
+    // Refer to `QuoteKind` why we check for Unicode quote characters.
+    strip(s, '\u{201C}', '\u{201D}').unwrap_or(s)
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -344,11 +352,8 @@ impl Args {
             .collect::<Vec<_>>();
 
         let args = if delims.is_empty() && !message.is_empty() {
-            let kind = if remove_quotes_only_if_present(message).is_some() {
-                TokenKind::QuotedArgument
-            } else {
-                TokenKind::Argument
-            };
+            let kind =
+                if is_quoted(message) { TokenKind::QuotedArgument } else { TokenKind::Argument };
 
             // If there are no delimiters, then the only possible argument is the whole message.
             vec![Token::new(kind, 0, message.len())]
