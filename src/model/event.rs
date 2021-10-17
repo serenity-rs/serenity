@@ -1222,7 +1222,7 @@ impl CacheUpdate for ReadyEvent {
         let mut guilds_to_remove = vec![];
         let ready_guilds_hashset =
             HashSet::<GuildId>::from_iter(self.ready.guilds.iter().map(|status| status.id()));
-        let shard_data = self.ready.shard.unwrap_or_else(|| [1, 1]);
+        let shard_data = self.ready.shard.unwrap_or([1, 1]);
         for guild in cache.guilds.read().await.keys() {
             // Only handle data for our shard.
             if shard_id(guild.0, shard_data[1]) == shard_data[0]
