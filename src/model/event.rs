@@ -1,6 +1,10 @@
 //! All the events this library handles.
 
+#[cfg(feature = "cache")]
+use std::collections::HashSet;
 use std::convert::TryFrom;
+#[cfg(feature = "cache")]
+use std::iter::FromIterator;
 #[cfg(feature = "cache")]
 use std::mem;
 use std::{collections::HashMap, fmt};
@@ -19,6 +23,8 @@ use crate::constants::OpCode;
 use crate::internal::prelude::*;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::{application_command::ApplicationCommand, Interaction};
+#[cfg(feature = "cache")]
+use crate::utils::shard_id;
 
 /// Event data for the channel creation event.
 ///
@@ -1209,6 +1215,26 @@ impl CacheUpdate for ReadyEvent {
                     cache.guilds.write().await.insert(guild.id, guild);
                 },
                 GuildStatus::OnlinePartialGuild(_) => {},
+            }
+        }
+
+        // We may be removed from some guilds between disconnect and ready, so we should handle that.
+        let mut guilds_to_remove = vec![];
+        let ready_guilds_hashset =
+            HashSet::<GuildId>::from_iter(self.ready.guilds.iter().map(|status| status.id()));
+        let shard_data = self.ready.shard.unwrap_or([1, 1]);
+        for guild in cache.guilds.read().await.keys() {
+            // Only handle data for our shard.
+            if shard_id(guild.0, shard_data[1]) == shard_data[0]
+                && !ready_guilds_hashset.contains(guild)
+            {
+                guilds_to_remove.push(*guild);
+            }
+        }
+        if !guilds_to_remove.is_empty() {
+            let mut handle = cache.guilds.write().await;
+            for guild in guilds_to_remove {
+                handle.remove(&guild);
             }
         }
 
