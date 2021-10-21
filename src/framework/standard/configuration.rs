@@ -458,8 +458,9 @@ impl Configuration {
     /// let framework = StandardFramework::new().configure(|c| c
     ///     .prefix("!"));
     /// ```
-    pub fn prefix(&mut self, prefix: &str) -> &mut Self {
-        self.prefixes = if prefix.is_empty() { vec![] } else { vec![prefix.to_string()] };
+    pub fn prefix(&mut self, prefix: impl ToString) -> &mut Self {
+        let p = prefix.to_string();
+        self.prefixes = if p.is_empty() { vec![] } else { vec![p] };
 
         self
     }
@@ -488,7 +489,8 @@ impl Configuration {
         T: ToString,
         It: IntoIterator<Item = T>,
     {
-        self.prefixes = prefixes.into_iter().map(|p| p.to_string()).collect();
+        self.prefixes =
+            prefixes.into_iter().map(|p| p.to_string()).filter(|p| !p.is_empty()).collect();
 
         self
     }
