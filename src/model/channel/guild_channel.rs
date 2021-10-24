@@ -231,23 +231,17 @@ impl GuildChannel {
     /// #     let cache = Cache::default();
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::channel::{
-    ///     PermissionOverwrite,
-    ///     PermissionOverwriteType,
-    /// };
+    /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::{ModelError, Permissions};
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
     /// let overwrite = PermissionOverwrite {
-    ///     allow: allow,
-    ///     deny: deny,
+    ///     allow,
+    ///     deny,
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     /// // assuming the cache has been unlocked
-    /// let channel = cache
-    ///     .guild_channel(channel_id)
-    ///     .await
-    ///     .ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, &overwrite).await?;
     /// #   Ok(())
@@ -270,24 +264,18 @@ impl GuildChannel {
     /// #   let cache = Cache::default();
     /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::channel::{
-    ///     PermissionOverwrite,
-    ///     PermissionOverwriteType,
-    /// };
-    /// use serenity::model::{ModelError, Permissions, channel::Channel};
+    /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
+    /// use serenity::model::{channel::Channel, ModelError, Permissions};
     ///
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
     /// let overwrite = PermissionOverwrite {
-    ///     allow: allow,
-    ///     deny: deny,
+    ///     allow,
+    ///     deny,
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let channel = cache
-    ///     .guild_channel(channel_id)
-    ///     .await
-    ///     .ok_or(ModelError::ItemMissing)?;
+    /// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.create_permission(&http, &overwrite).await?;
     /// #     Ok(())
@@ -715,8 +703,8 @@ impl GuildChannel {
     /// channel:
     ///
     /// ```rust,no_run
-    /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
+    /// use serenity::prelude::*;
     /// struct Handler;
     ///
     /// #[serenity::async_trait]
@@ -727,14 +715,15 @@ impl GuildChannel {
     ///             None => return,
     ///         };
     ///
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author).await {
+    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author).await
+    ///         {
     ///             println!("The user's permissions: {:?}", permissions);
     ///         }
     ///     }
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -746,9 +735,9 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::prelude::*;
-    /// use serenity::model::prelude::*;
     /// use serenity::model::channel::Channel;
+    /// use serenity::model::prelude::*;
+    /// use serenity::prelude::*;
     /// use tokio::fs::File;
     ///
     /// struct Handler;
@@ -762,8 +751,9 @@ impl GuildChannel {
     ///         };
     ///
     ///         let current_user_id = context.cache.current_user().await.id;
-    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id).await {
-    ///
+    ///         if let Ok(permissions) =
+    ///             channel.permissions_for_user(&context.cache, current_user_id).await
+    ///         {
     ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///                 return;
     ///             }
@@ -777,17 +767,19 @@ impl GuildChannel {
     ///                 },
     ///             };
     ///
-    ///             let _ = msg.channel_id.send_files(&context.http, vec![(&file, "cat.png")], |mut m| {
-    ///                 m.content("here's a cat");
-    ///                 m
-    ///             })
-    ///             .await;
+    ///             let _ = msg
+    ///                 .channel_id
+    ///                 .send_files(&context.http, vec![(&file, "cat.png")], |mut m| {
+    ///                     m.content("here's a cat");
+    ///                     m
+    ///                 })
+    ///                 .await;
     ///         }
     ///     }
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())

@@ -563,7 +563,7 @@ pub struct Client {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// struct Handler;
     ///
-    /// impl EventHandler for Handler { }
+    /// impl EventHandler for Handler {}
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&token).event_handler(Handler).await?;
@@ -587,12 +587,13 @@ pub struct Client {
     ///
     /// ```rust,no_run
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::client::{Client, EventHandler};
     /// use std::time::Duration;
+    ///
+    /// use serenity::client::{Client, EventHandler};
     ///
     /// struct Handler;
     ///
-    /// impl EventHandler for Handler { }
+    /// impl EventHandler for Handler {}
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
     /// let mut client = Client::builder(&token).event_handler(Handler).await?;

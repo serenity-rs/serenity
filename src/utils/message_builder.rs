@@ -1020,8 +1020,8 @@ impl EmbedMessageBuilding for MessageBuilder {
 /// Create a new Content type which describes a bold-italic "text":
 ///
 /// ```rust,no_run
-/// use serenity::utils::ContentModifier::{Bold, Italic};
 /// use serenity::utils::Content;
+/// use serenity::utils::ContentModifier::{Bold, Italic};
 /// let content: Content = Bold + Italic + "text";
 /// ```
 #[non_exhaustive]

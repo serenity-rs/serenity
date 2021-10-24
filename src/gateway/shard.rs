@@ -110,9 +110,10 @@ impl Shard {
     /// then listening for events:
     ///
     /// ```rust,no_run
+    /// use std::sync::Arc;
+    ///
     /// use serenity::gateway::Shard;
     /// use tokio::sync::Mutex;
-    /// use std::sync::Arc;
     /// #
     /// # use serenity::http::Http;
     /// # use serenity::client::bridge::gateway::GatewayIntents;
@@ -704,7 +705,14 @@ impl Shard {
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// shard.chunk_guild(GuildId(81384788765712384), Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request")).await?;
+    /// shard
+    ///     .chunk_guild(
+    ///         GuildId(81384788765712384),
+    ///         Some(20),
+    ///         ChunkGuildFilter::Query("do".to_owned()),
+    ///         Some("request"),
+    ///     )
+    ///     .await?;
     /// #     Ok(())
     /// # }
     /// ```

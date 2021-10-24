@@ -1065,7 +1065,7 @@ impl Http {
     /// let http = Http::default();
     ///
     /// http.delete_webhook(245037420704169985).await?;
-    ///       Ok(())
+    /// Ok(())
     /// # }
     /// ```
     pub async fn delete_webhook(&self, webhook_id: u64) -> Result<()> {

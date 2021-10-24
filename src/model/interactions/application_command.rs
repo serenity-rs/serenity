@@ -735,11 +735,13 @@ impl ApplicationCommand {
     /// #
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
-    /// use serenity::model::{interactions::application_command::ApplicationCommand, id::ApplicationId};
+    /// use serenity::model::{
+    ///     id::ApplicationId,
+    ///     interactions::application_command::ApplicationCommand,
+    /// };
     ///
     /// let _ = ApplicationCommand::create_global_application_command(&http, |command| {
-    ///    command.name("ping")
-    ///     .description("A simple ping command")
+    ///     command.name("ping").description("A simple ping command")
     /// })
     /// .await;
     /// # }
@@ -754,18 +756,17 @@ impl ApplicationCommand {
     /// # async fn run() {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::{
+    ///     id::ApplicationId,
     ///     interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},
-    ///     id::ApplicationId
     /// };
     ///
     /// let _ = ApplicationCommand::create_global_application_command(&http, |command| {
-    ///    command.name("echo")
-    ///     .description("Makes the bot send a message")
-    ///     .create_option(|option| {
-    ///         option.name("message")
-    ///          .description("The message to send")
-    ///          .kind(ApplicationCommandOptionType::String)
-    ///          .required(true)
+    ///     command.name("echo").description("Makes the bot send a message").create_option(|option| {
+    ///         option
+    ///             .name("message")
+    ///             .description("The message to send")
+    ///             .kind(ApplicationCommandOptionType::String)
+    ///             .required(true)
     ///     })
     /// })
     /// .await;

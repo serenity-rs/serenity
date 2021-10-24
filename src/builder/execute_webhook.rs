@@ -37,14 +37,16 @@ use crate::http::AttachmentType;
 /// let resources = Embed::fake(|e| {
 ///     e.title("Rust Resources")
 ///         .description("A few resources to help with learning Rust")
-///         .colour(0xDEA584).field("The Rust Book", "A comprehensive resource for Rust.", false)
+///         .colour(0xDEA584)
+///         .field("The Rust Book", "A comprehensive resource for Rust.", false)
 ///         .field("Rust by Example", "A collection of Rust examples", false)
 /// });
 ///
-/// webhook.execute(&http, false, |w| {
-///     w.content("Here's some information on Rust:").embeds(vec![website, resources])
-/// })
-/// .await?;
+/// webhook
+///     .execute(&http, false, |w| {
+///         w.content("Here's some information on Rust:").embeds(vec![website, resources])
+///     })
+///     .await?;
 /// #     Ok(())
 /// # }
 /// ```
@@ -71,10 +73,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
     ///
-    /// webhook.execute(&http, false, |w| {
-    ///     w.avatar_url(avatar_url).content("Here's a webhook")
-    /// })
-    /// .await?;
+    /// webhook.execute(&http, false, |w| w.avatar_url(avatar_url).content("Here's a webhook")).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -99,10 +98,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::default();
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
-    /// let execution = webhook.execute(&http, false, |w| {
-    ///     w.content("foo")
-    /// })
-    /// .await;
+    /// let execution = webhook.execute(&http, false, |w| w.content("foo")).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
@@ -173,10 +169,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::default();
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
-    /// let execution = webhook.execute(&http, false, |w| {
-    ///     w.content("hello").tts(true)
-    /// })
-    /// .await;
+    /// let execution = webhook.execute(&http, false, |w| w.content("hello").tts(true)).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
@@ -202,10 +195,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::default();
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
-    /// let execution = webhook.execute(&http, false, |w| {
-    ///     w.content("hello").username("hakase")
-    /// })
-    /// .await;
+    /// let execution = webhook.execute(&http, false, |w| w.content("hello").username("hakase")).await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);

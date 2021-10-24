@@ -232,11 +232,12 @@ impl Webhook {
     ///
     /// let mut webhook = http.get_webhook_with_token(id, token).await?;
     ///
-    /// webhook.execute(&http, false, |mut w| {
-    ///     w.content("test");
-    ///     w
-    /// })
-    /// .await?;
+    /// webhook
+    ///     .execute(&http, false, |mut w| {
+    ///         w.content("test");
+    ///         w
+    ///     })
+    ///     .await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -258,20 +259,23 @@ impl Webhook {
     ///
     /// let embed = Embed::fake(|mut e| {
     ///     e.title("Rust's website");
-    ///     e.description("Rust is a systems programming language that runs
+    ///     e.description(
+    ///         "Rust is a systems programming language that runs
     ///                    blazingly fast, prevents segfaults, and guarantees
-    ///                    thread safety.");
+    ///                    thread safety.",
+    ///     );
     ///     e.url("https://rust-lang.org");
     ///     e
     /// });
     ///
-    /// webhook.execute(&http, false, |mut w| {
-    ///     w.content("test");
-    ///     w.username("serenity");
-    ///     w.embeds(vec![embed]);
-    ///     w
-    /// })
-    /// .await?;
+    /// webhook
+    ///     .execute(&http, false, |mut w| {
+    ///         w.content("test");
+    ///         w.username("serenity");
+    ///         w.embeds(vec![embed]);
+    ///         w
+    ///     })
+    ///     .await?;
     /// #     Ok(())
     /// # }
     /// ```

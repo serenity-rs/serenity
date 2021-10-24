@@ -467,11 +467,13 @@ impl Cache {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, message: Message) {
-    ///
     ///         let channel = match context.cache.guild_channel(message.channel_id).await {
     ///             Some(channel) => channel,
     ///             None => {
-    ///                 let result = message.channel_id.say(&context, "Could not find guild's channel data").await;
+    ///                 let result = message
+    ///                     .channel_id
+    ///                     .say(&context, "Could not find guild's channel data")
+    ///                     .await;
     ///                 if let Err(why) = result {
     ///                     println!("Error sending message: {:?}", why);
     ///                 }

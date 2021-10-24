@@ -49,12 +49,13 @@ impl Attachment {
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// use std::io::Write;
+    /// use std::path::Path;
+    ///
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     /// use tokio::fs::File;
     /// use tokio::io::AsyncWriteExt;
-    /// use std::io::Write;
-    /// use std::path::Path;
     ///
     /// struct Handler;
     ///
@@ -66,7 +67,8 @@ impl Attachment {
     ///                 Ok(content) => content,
     ///                 Err(why) => {
     ///                     println!("Error downloading attachment: {:?}", why);
-    ///                     let _ = message.channel_id.say(&context, "Error downloading attachment").await;
+    ///                     let _ =
+    ///                         message.channel_id.say(&context, "Error downloading attachment").await;
     ///
     ///                     return;
     ///                 },
@@ -88,7 +90,10 @@ impl Attachment {
     ///                 return;
     ///             }
     ///
-    ///             let _ = message.channel_id.say(&context, &format!("Saved {:?}", attachment.filename)).await;
+    ///             let _ = message
+    ///                 .channel_id
+    ///                 .say(&context, &format!("Saved {:?}", attachment.filename))
+    ///                 .await;
     ///         }
     ///     }
     ///

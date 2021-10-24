@@ -26,7 +26,7 @@ use crate::model::invite::InviteTargetType;
 ///
 /// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///    async fn message(&self, context: Context, msg: Message) {
+///     async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
 ///             let channel = match context.cache.guild_channel(msg.channel_id).await {
 ///                 Some(channel) => channel,
@@ -36,19 +36,16 @@ use crate::model::invite::InviteTargetType;
 ///                 },
 ///             };
 ///
-///             let creation = channel.create_invite(&context, |i| {
-///                 i.max_age(3600).max_uses(10)
-///             })
-///             .await;
+///             let creation =
+///                 channel.create_invite(&context, |i| i.max_age(3600).max_uses(10)).await;
 ///
 ///             let invite = match creation {
 ///                 Ok(invite) => invite,
 ///                 Err(why) => {
 ///                     println!("Err creating invite: {:?}", why);
-///                     if let Err(why) = msg
-///                         .channel_id
-///                         .say(&context, "Error creating invite")
-///                         .await {
+///                     if let Err(why) =
+///                         msg.channel_id.say(&context, "Error creating invite").await
+///                     {
 ///                         println!("Err sending err msg: {:?}", why);
 ///                     }
 ///
