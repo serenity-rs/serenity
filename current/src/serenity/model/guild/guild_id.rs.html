@@ -1513,6 +1513,68 @@
 <span id="1513">1513</span>
 <span id="1514">1514</span>
 <span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2681,6 +2743,12 @@
     }
 
     <span class="doccomment">/// Overrides all guild application commands.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns the same possible errors as [`set_global_application_commands`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`set_global_application_commands`]: crate::model::interactions::application_command::ApplicationCommand::set_global_application_commands</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2702,6 +2770,13 @@
     <span class="doccomment">/// **Note**: It will update instantly.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command_permission</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2727,6 +2802,13 @@
     }
 
     <span class="doccomment">/// Overrides all application commands permissions.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2747,6 +2829,13 @@
     }
 
     <span class="doccomment">/// Get all guild application commands.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2756,6 +2845,13 @@
     }
 
     <span class="doccomment">/// Get a specific guild application command by its Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2766,6 +2862,13 @@
     }
 
     <span class="doccomment">/// Edit guild application command by its Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2783,6 +2886,13 @@
     }
 
     <span class="doccomment">/// Delete guild application command by its Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2793,6 +2903,13 @@
     }
 
     <span class="doccomment">/// Get all guild application commands permissions only.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2802,6 +2919,13 @@
     }
 
     <span class="doccomment">/// Get permissions for specific guild application command by its Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_command_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,

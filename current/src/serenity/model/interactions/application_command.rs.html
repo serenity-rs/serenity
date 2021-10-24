@@ -1096,6 +1096,41 @@
 <span id="1096">1096</span>
 <span id="1097">1097</span>
 <span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
+<span id="1118">1118</span>
+<span id="1119">1119</span>
+<span id="1120">1120</span>
+<span id="1121">1121</span>
+<span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
+<span id="1128">1128</span>
+<span id="1129">1129</span>
+<span id="1130">1130</span>
+<span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1898,6 +1933,13 @@
     <span class="doccomment">/// Overrides all global application commands.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`create_global_application_command`]: Self::create_global_application_command</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_global_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">f</span>: <span class="ident">F</span>,
@@ -1913,6 +1955,13 @@
     }
 
     <span class="doccomment">/// Edits a global command by its Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_global_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
@@ -1926,6 +1975,13 @@
     }
 
     <span class="doccomment">/// Gets all global commands.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_global_application_commands</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1933,6 +1989,13 @@
     }
 
     <span class="doccomment">/// Gets a global command by its Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_global_application_command</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
@@ -1941,6 +2004,13 @@
     }
 
     <span class="doccomment">/// Deletes a global command by its Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_global_application_command</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">command_id</span>: <span class="ident">CommandId</span>,
