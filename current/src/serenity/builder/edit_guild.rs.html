@@ -324,11 +324,6 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
@@ -392,10 +387,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let base64_icon = utils::read_image(&quot;./guild_icon.png&quot;)?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// guild.edit(&amp;http, |mut g| {</span>
-    <span class="doccomment">///     g.icon(Some(&amp;base64_icon))</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// guild.edit(&amp;http, |mut g| g.icon(Some(&amp;base64_icon))).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -472,10 +464,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// guild.edit(&amp;http, |g| {</span>
-    <span class="doccomment">///     g.region(Region::UsWest)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// guild.edit(&amp;http, |g| g.region(Region::UsWest)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -607,10 +596,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let edit = guild.edit(&amp;http, |g| {</span>
-    <span class="doccomment">///     g.verification_level(VerificationLevel::High)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let edit = guild.edit(&amp;http, |g| g.verification_level(VerificationLevel::High)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = edit {</span>
     <span class="doccomment">///     println!(&quot;Error setting verification level: {:?}&quot;, why);</span>
@@ -644,10 +630,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `guild` has already been bound</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let edit = guild.edit(&amp;http, |g| {</span>
-    <span class="doccomment">///     g.system_channel_flags(SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let edit = guild</span>
+    <span class="doccomment">///     .edit(&amp;http, |g| {</span>
+    <span class="doccomment">///         g.system_channel_flags(</span>
+    <span class="doccomment">///             SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS</span>
+    <span class="doccomment">///                 | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS,</span>
+    <span class="doccomment">///         )</span>
+    <span class="doccomment">///     })</span>
+    <span class="doccomment">///     .await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = edit {</span>
     <span class="doccomment">///     println!(&quot;Error setting verification level: {:?}&quot;, why);</span>

@@ -958,16 +958,6 @@
 <span id="958">958</span>
 <span id="959">959</span>
 <span id="960">960</span>
-<span id="961">961</span>
-<span id="962">962</span>
-<span id="963">963</span>
-<span id="964">964</span>
-<span id="965">965</span>
-<span id="966">966</span>
-<span id="967">967</span>
-<span id="968">968</span>
-<span id="969">969</span>
-<span id="970">970</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
 
@@ -1802,9 +1792,7 @@
 <span class="doccomment">/// use std::pin::Pin;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// fn foo(n: i32) -&gt; Pin&lt;Box&lt;dyn std::future::Future&lt;Output = i32&gt;&gt;&gt; {</span>
-<span class="doccomment">///     Box::pin(async move {</span>
-<span class="doccomment">///         n + 4</span>
-<span class="doccomment">///     })</span>
+<span class="doccomment">///     Box::pin(async move { n + 4 })</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
@@ -1814,20 +1802,14 @@
 <span class="doccomment">/// ```rust,no_run</span>
 <span class="doccomment">/// # #![feature(async_closure)]</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// async move |x: i32| {</span>
-<span class="doccomment">///     x * 2 + 4</span>
-<span class="doccomment">/// }</span>
+<span class="doccomment">/// async move |x: i32| x * 2 + 4</span>
 <span class="doccomment">/// # ;</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// is changed to:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// |x: i32| {</span>
-<span class="doccomment">///     Box::pin(async move {</span>
-<span class="doccomment">///         x * 2 + 4</span>
-<span class="doccomment">///     })</span>
-<span class="doccomment">/// }</span>
+<span class="doccomment">/// |x: i32| Box::pin(async move { x * 2 + 4 })</span>
 <span class="doccomment">/// # ;</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
@@ -1842,9 +1824,7 @@
 <span class="doccomment">/// use std::pin::Pin;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// fn foo&lt;&#39;fut&gt;(n: &amp;&#39;fut i32) -&gt; Pin&lt;Box&lt;dyn std::future::Future&lt;Output = i32&gt; + &#39;fut&gt;&gt; {</span>
-<span class="doccomment">///     Box::pin(async move {</span>
-<span class="doccomment">///         *n + 4</span>
-<span class="doccomment">///     })</span>
+<span class="doccomment">///     Box::pin(async move { *n + 4 })</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>

@@ -1174,6 +1174,15 @@
 <span id="1174">1174</span>
 <span id="1175">1175</span>
 <span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1251,7 +1260,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// match user.avatar_url() {</span>
     <span class="doccomment">///     Some(url) =&gt; println!(&quot;{}&#39;s avatar can be found at {}&quot;, user.name, url),</span>
-    <span class="doccomment">///     None =&gt; println!(&quot;{} does not have an avatar set.&quot;, user.name)</span>
+    <span class="doccomment">///     None =&gt; println!(&quot;{} does not have an avatar set.&quot;, user.name),</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1414,8 +1423,11 @@
     <span class="doccomment">///     },</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(url, &quot;https://discordapp.com/api/oauth2/authorize? \</span>
-    <span class="doccomment">///                  client_id=249608697955745802&amp;scope=bot&quot;);</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     url,</span>
+    <span class="doccomment">///     &quot;https://discordapp.com/api/oauth2/authorize? \</span>
+    <span class="doccomment">///                  client_id=249608697955745802&amp;scope=bot&quot;</span>
+    <span class="doccomment">/// );</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -1431,7 +1443,8 @@
     <span class="doccomment">/// use serenity::model::Permissions;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming the user has been bound</span>
-    <span class="doccomment">/// let permissions = Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;</span>
+    <span class="doccomment">/// let permissions =</span>
+    <span class="doccomment">///     Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;</span>
     <span class="doccomment">/// let url = match user.invite_url(&amp;http, permissions).await {</span>
     <span class="doccomment">///     Ok(v) =&gt; v,</span>
     <span class="doccomment">///     Err(why) =&gt; {</span>
@@ -1441,9 +1454,11 @@
     <span class="doccomment">///     },</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(url,</span>
-    <span class="doccomment">/// &quot;https://discordapp.</span>
-    <span class="doccomment">/// com/api/oauth2/authorize?client_id=249608697955745802&amp;scope=bot&amp;permissions=19456&quot;);</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     url,</span>
+    <span class="doccomment">///     &quot;https://discordapp.</span>
+    <span class="doccomment">/// com/api/oauth2/authorize?client_id=249608697955745802&amp;scope=bot&amp;permissions=19456&quot;</span>
+    <span class="doccomment">/// );</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -1477,8 +1492,8 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     let user = CurrentUser::default();</span>
     <span class="doccomment">/// #     let http = Http::default();</span>
-    <span class="doccomment">/// use serenity::model::Permissions;</span>
     <span class="doccomment">/// use serenity::model::oauth2::OAuth2Scope;</span>
+    <span class="doccomment">/// use serenity::model::Permissions;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let scopes = vec![OAuth2Scope::Bot, OAuth2Scope::ApplicationsCommands];</span>
     <span class="doccomment">///</span>
@@ -1492,8 +1507,11 @@
     <span class="doccomment">///     },</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(url, &quot;https://discordapp.com/api/oauth2/authorize? \</span>
-    <span class="doccomment">///                  client_id=249608697955745802&amp;scope=bot%20applications.commands&quot;);</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     url,</span>
+    <span class="doccomment">///     &quot;https://discordapp.com/api/oauth2/authorize? \</span>
+    <span class="doccomment">///                  client_id=249608697955745802&amp;scope=bot%20applications.commands&quot;</span>
+    <span class="doccomment">/// );</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # Errors</span>
@@ -1537,7 +1555,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// match user.static_avatar_url() {</span>
     <span class="doccomment">///     Some(url) =&gt; println!(&quot;{}&#39;s static avatar can be found at {}&quot;, user.name, url),</span>
-    <span class="doccomment">///     None =&gt; println!(&quot;Could not get static avatar for {}.&quot;, user.name)</span>
+    <span class="doccomment">///     None =&gt; println!(&quot;Could not get static avatar for {}.&quot;, user.name),</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1833,7 +1851,13 @@
     <span class="doccomment">/// #   #[cfg(feature = &quot;cache&quot;)]</span>
     <span class="doccomment">///     async fn message(&amp;self, ctx: Context, msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;~help&quot; {</span>
-    <span class="doccomment">///             let url = match ctx.cache.current_user().await.invite_url(&amp;ctx, Permissions::empty()).await {</span>
+    <span class="doccomment">///             let url = match ctx</span>
+    <span class="doccomment">///                 .cache</span>
+    <span class="doccomment">///                 .current_user()</span>
+    <span class="doccomment">///                 .await</span>
+    <span class="doccomment">///                 .invite_url(&amp;ctx, Permissions::empty())</span>
+    <span class="doccomment">///                 .await</span>
+    <span class="doccomment">///             {</span>
     <span class="doccomment">///                 Ok(v) =&gt; v,</span>
     <span class="doccomment">///                 Err(why) =&gt; {</span>
     <span class="doccomment">///                     println!(&quot;Error creating invite url: {:?}&quot;, why);</span>
@@ -1842,15 +1866,9 @@
     <span class="doccomment">///                 },</span>
     <span class="doccomment">///             };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///             let help = format!(</span>
-    <span class="doccomment">///                 &quot;Helpful info here. Invite me with this link: &lt;{}&gt;&quot;,</span>
-    <span class="doccomment">///                 url,</span>
-    <span class="doccomment">///             );</span>
+    <span class="doccomment">///             let help = format!(&quot;Helpful info here. Invite me with this link: &lt;{}&gt;&quot;, url,);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///             let dm = msg.author.direct_message(&amp;ctx, |m| {</span>
-    <span class="doccomment">///                 m.content(&amp;help)</span>
-    <span class="doccomment">///             })</span>
-    <span class="doccomment">///             .await;</span>
+    <span class="doccomment">///             let dm = msg.author.direct_message(&amp;ctx, |m| m.content(&amp;help)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             match dm {</span>
     <span class="doccomment">///                 Ok(_) =&gt; {</span>
@@ -1867,7 +1885,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// # }</span>
@@ -2029,8 +2047,8 @@
     <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// # use serenity::model::prelude::*;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use serenity::utils::MessageBuilder;</span>
     <span class="doccomment">/// use serenity::utils::ContentModifier::Bold;</span>
+    <span class="doccomment">/// use serenity::utils::MessageBuilder;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
@@ -2047,7 +2065,7 @@
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// let mut client =Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>

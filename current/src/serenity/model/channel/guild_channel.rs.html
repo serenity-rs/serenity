@@ -1329,14 +1329,6 @@
 <span id="1329">1329</span>
 <span id="1330">1330</span>
 <span id="1331">1331</span>
-<span id="1332">1332</span>
-<span id="1333">1333</span>
-<span id="1334">1334</span>
-<span id="1335">1335</span>
-<span id="1336">1336</span>
-<span id="1337">1337</span>
-<span id="1338">1338</span>
-<span id="1339">1339</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1570,23 +1562,17 @@
     <span class="doccomment">/// #     let cache = Cache::default();</span>
     <span class="doccomment">/// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use serenity::model::channel::{</span>
-    <span class="doccomment">///     PermissionOverwrite,</span>
-    <span class="doccomment">///     PermissionOverwriteType,</span>
-    <span class="doccomment">/// };</span>
+    <span class="doccomment">/// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};</span>
     <span class="doccomment">/// use serenity::model::{ModelError, Permissions};</span>
     <span class="doccomment">/// let allow = Permissions::SEND_MESSAGES;</span>
     <span class="doccomment">/// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;</span>
     <span class="doccomment">/// let overwrite = PermissionOverwrite {</span>
-    <span class="doccomment">///     allow: allow,</span>
-    <span class="doccomment">///     deny: deny,</span>
+    <span class="doccomment">///     allow,</span>
+    <span class="doccomment">///     deny,</span>
     <span class="doccomment">///     kind: PermissionOverwriteType::Member(user_id),</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// // assuming the cache has been unlocked</span>
-    <span class="doccomment">/// let channel = cache</span>
-    <span class="doccomment">///     .guild_channel(channel_id)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .ok_or(ModelError::ItemMissing)?;</span>
+    <span class="doccomment">/// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// channel.create_permission(&amp;http, &amp;overwrite).await?;</span>
     <span class="doccomment">/// #   Ok(())</span>
@@ -1609,24 +1595,18 @@
     <span class="doccomment">/// #   let cache = Cache::default();</span>
     <span class="doccomment">/// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// use serenity::model::channel::{</span>
-    <span class="doccomment">///     PermissionOverwrite,</span>
-    <span class="doccomment">///     PermissionOverwriteType,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">/// use serenity::model::{ModelError, Permissions, channel::Channel};</span>
+    <span class="doccomment">/// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};</span>
+    <span class="doccomment">/// use serenity::model::{channel::Channel, ModelError, Permissions};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let allow = Permissions::SEND_MESSAGES;</span>
     <span class="doccomment">/// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;</span>
     <span class="doccomment">/// let overwrite = PermissionOverwrite {</span>
-    <span class="doccomment">///     allow: allow,</span>
-    <span class="doccomment">///     deny: deny,</span>
+    <span class="doccomment">///     allow,</span>
+    <span class="doccomment">///     deny,</span>
     <span class="doccomment">///     kind: PermissionOverwriteType::Member(user_id),</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let channel = cache</span>
-    <span class="doccomment">///     .guild_channel(channel_id)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .ok_or(ModelError::ItemMissing)?;</span>
+    <span class="doccomment">/// let channel = cache.guild_channel(channel_id).await.ok_or(ModelError::ItemMissing)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// channel.create_permission(&amp;http, &amp;overwrite).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -2054,8 +2034,8 @@
     <span class="doccomment">/// channel:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::model::prelude::*;</span>
+    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// #[serenity::async_trait]</span>
@@ -2066,14 +2046,15 @@
     <span class="doccomment">///             None =&gt; return,</span>
     <span class="doccomment">///         };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, &amp;msg.author).await {</span>
+    <span class="doccomment">///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, &amp;msg.author).await</span>
+    <span class="doccomment">///         {</span>
     <span class="doccomment">///             println!(&quot;The user&#39;s permissions: {:?}&quot;, permissions);</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -2085,9 +2066,9 @@
     <span class="doccomment">/// for demonstrative purposes):</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::model::prelude::*;</span>
     <span class="doccomment">/// use serenity::model::channel::Channel;</span>
+    <span class="doccomment">/// use serenity::model::prelude::*;</span>
+    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">/// use tokio::fs::File;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
@@ -2101,8 +2082,9 @@
     <span class="doccomment">///         };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         let current_user_id = context.cache.current_user().await.id;</span>
-    <span class="doccomment">///         if let Ok(permissions) = channel.permissions_for_user(&amp;context.cache, current_user_id).await {</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">///         if let Ok(permissions) =</span>
+    <span class="doccomment">///             channel.permissions_for_user(&amp;context.cache, current_user_id).await</span>
+    <span class="doccomment">///         {</span>
     <span class="doccomment">///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {</span>
     <span class="doccomment">///                 return;</span>
     <span class="doccomment">///             }</span>
@@ -2116,17 +2098,19 @@
     <span class="doccomment">///                 },</span>
     <span class="doccomment">///             };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///             let _ = msg.channel_id.send_files(&amp;context.http, vec![(&amp;file, &quot;cat.png&quot;)], |mut m| {</span>
-    <span class="doccomment">///                 m.content(&quot;here&#39;s a cat&quot;);</span>
-    <span class="doccomment">///                 m</span>
-    <span class="doccomment">///             })</span>
-    <span class="doccomment">///             .await;</span>
+    <span class="doccomment">///             let _ = msg</span>
+    <span class="doccomment">///                 .channel_id</span>
+    <span class="doccomment">///                 .send_files(&amp;context.http, vec![(&amp;file, &quot;cat.png&quot;)], |mut m| {</span>
+    <span class="doccomment">///                     m.content(&quot;here&#39;s a cat&quot;);</span>
+    <span class="doccomment">///                     m</span>
+    <span class="doccomment">///                 })</span>
+    <span class="doccomment">///                 .await;</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// let mut client =Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>

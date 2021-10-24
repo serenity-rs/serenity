@@ -1131,6 +1131,7 @@
 <span id="1131">1131</span>
 <span id="1132">1132</span>
 <span id="1133">1133</span>
+<span id="1134">1134</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1868,11 +1869,13 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
-    <span class="doccomment">/// use serenity::model::{interactions::application_command::ApplicationCommand, id::ApplicationId};</span>
+    <span class="doccomment">/// use serenity::model::{</span>
+    <span class="doccomment">///     id::ApplicationId,</span>
+    <span class="doccomment">///     interactions::application_command::ApplicationCommand,</span>
+    <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let _ = ApplicationCommand::create_global_application_command(&amp;http, |command| {</span>
-    <span class="doccomment">///    command.name(&quot;ping&quot;)</span>
-    <span class="doccomment">///     .description(&quot;A simple ping command&quot;)</span>
+    <span class="doccomment">///     command.name(&quot;ping&quot;).description(&quot;A simple ping command&quot;)</span>
     <span class="doccomment">/// })</span>
     <span class="doccomment">/// .await;</span>
     <span class="doccomment">/// # }</span>
@@ -1887,18 +1890,17 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
     <span class="doccomment">/// use serenity::model::{</span>
+    <span class="doccomment">///     id::ApplicationId,</span>
     <span class="doccomment">///     interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},</span>
-    <span class="doccomment">///     id::ApplicationId</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let _ = ApplicationCommand::create_global_application_command(&amp;http, |command| {</span>
-    <span class="doccomment">///    command.name(&quot;echo&quot;)</span>
-    <span class="doccomment">///     .description(&quot;Makes the bot send a message&quot;)</span>
-    <span class="doccomment">///     .create_option(|option| {</span>
-    <span class="doccomment">///         option.name(&quot;message&quot;)</span>
-    <span class="doccomment">///          .description(&quot;The message to send&quot;)</span>
-    <span class="doccomment">///          .kind(ApplicationCommandOptionType::String)</span>
-    <span class="doccomment">///          .required(true)</span>
+    <span class="doccomment">///     command.name(&quot;echo&quot;).description(&quot;Makes the bot send a message&quot;).create_option(|option| {</span>
+    <span class="doccomment">///         option</span>
+    <span class="doccomment">///             .name(&quot;message&quot;)</span>
+    <span class="doccomment">///             .description(&quot;The message to send&quot;)</span>
+    <span class="doccomment">///             .kind(ApplicationCommandOptionType::String)</span>
+    <span class="doccomment">///             .required(true)</span>
     <span class="doccomment">///     })</span>
     <span class="doccomment">/// })</span>
     <span class="doccomment">/// .await;</span>

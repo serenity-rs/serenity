@@ -164,10 +164,6 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
@@ -284,11 +280,7 @@
     <span class="doccomment">///     kind: PermissionOverwriteType::Member(UserId(1234)),</span>
     <span class="doccomment">/// }];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// guild.create_channel(http, |c| {</span>
-    <span class="doccomment">///     c.name(&quot;my_new_cool_channel&quot;)</span>
-    <span class="doccomment">///     .permissions(permissions)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// guild.create_channel(http, |c| c.name(&quot;my_new_cool_channel&quot;).permissions(permissions)).await?;</span>
     <span class="doccomment">/// #    Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>

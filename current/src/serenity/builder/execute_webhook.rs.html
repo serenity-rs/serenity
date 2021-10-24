@@ -232,16 +232,6 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
@@ -281,14 +271,16 @@
 <span class="doccomment">/// let resources = Embed::fake(|e| {</span>
 <span class="doccomment">///     e.title(&quot;Rust Resources&quot;)</span>
 <span class="doccomment">///         .description(&quot;A few resources to help with learning Rust&quot;)</span>
-<span class="doccomment">///         .colour(0xDEA584).field(&quot;The Rust Book&quot;, &quot;A comprehensive resource for Rust.&quot;, false)</span>
+<span class="doccomment">///         .colour(0xDEA584)</span>
+<span class="doccomment">///         .field(&quot;The Rust Book&quot;, &quot;A comprehensive resource for Rust.&quot;, false)</span>
 <span class="doccomment">///         .field(&quot;Rust by Example&quot;, &quot;A collection of Rust examples&quot;, false)</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// webhook.execute(&amp;http, false, |w| {</span>
-<span class="doccomment">///     w.content(&quot;Here&#39;s some information on Rust:&quot;).embeds(vec![website, resources])</span>
-<span class="doccomment">/// })</span>
-<span class="doccomment">/// .await?;</span>
+<span class="doccomment">/// webhook</span>
+<span class="doccomment">///     .execute(&amp;http, false, |w| {</span>
+<span class="doccomment">///         w.content(&quot;Here&#39;s some information on Rust:&quot;).embeds(vec![website, resources])</span>
+<span class="doccomment">///     })</span>
+<span class="doccomment">///     .await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
@@ -315,10 +307,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let avatar_url = &quot;https://i.imgur.com/KTs6whd.jpg&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// webhook.execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///     w.avatar_url(avatar_url).content(&quot;Here&#39;s a webhook&quot;)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// webhook.execute(&amp;http, false, |w| w.avatar_url(avatar_url).content(&quot;Here&#39;s a webhook&quot;)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -343,10 +332,7 @@
     <span class="doccomment">/// # let http = Http::default();</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///     w.content(&quot;foo&quot;)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;foo&quot;)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -417,10 +403,7 @@
     <span class="doccomment">/// # let http = Http::default();</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///     w.content(&quot;hello&quot;).tts(true)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).tts(true)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -446,10 +429,7 @@
     <span class="doccomment">/// # let http = Http::default();</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///     w.content(&quot;hello&quot;).username(&quot;hakase&quot;)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).username(&quot;hakase&quot;)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>

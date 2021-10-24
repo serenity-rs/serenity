@@ -99,9 +99,6 @@
 <span id="99"> 99</span>
 <span id="100">100</span>
 <span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
@@ -139,13 +136,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming a `context` has been bound</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let base64 = utils::read_image(&quot;./my_image.jpg&quot;)</span>
-    <span class="doccomment">///     .expect(&quot;Failed to read image&quot;);</span>
+    <span class="doccomment">/// let base64 = utils::read_image(&quot;./my_image.jpg&quot;).expect(&quot;Failed to read image&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut user = context.cache.current_user().await;</span>
-    <span class="doccomment">/// let _ = user.edit(&amp;context, |p| {</span>
-    <span class="doccomment">///     p.avatar(Some(&amp;base64))</span>
-    <span class="doccomment">/// }).await;</span>
+    <span class="doccomment">/// let _ = user.edit(&amp;context, |p| p.avatar(Some(&amp;base64))).await;</span>
     <span class="doccomment">/// #     }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// # }</span>

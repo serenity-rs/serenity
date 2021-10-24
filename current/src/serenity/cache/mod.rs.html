@@ -1204,6 +1204,8 @@
 <span id="1204">1204</span>
 <span id="1205">1205</span>
 <span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1673,11 +1675,13 @@
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, message: Message) {</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">///         let channel = match context.cache.guild_channel(message.channel_id).await {</span>
     <span class="doccomment">///             Some(channel) =&gt; channel,</span>
     <span class="doccomment">///             None =&gt; {</span>
-    <span class="doccomment">///                 let result = message.channel_id.say(&amp;context, &quot;Could not find guild&#39;s channel data&quot;).await;</span>
+    <span class="doccomment">///                 let result = message</span>
+    <span class="doccomment">///                     .channel_id</span>
+    <span class="doccomment">///                     .say(&amp;context, &quot;Could not find guild&#39;s channel data&quot;)</span>
+    <span class="doccomment">///                     .await;</span>
     <span class="doccomment">///                 if let Err(why) = result {</span>
     <span class="doccomment">///                     println!(&quot;Error sending message: {:?}&quot;, why);</span>
     <span class="doccomment">///                 }</span>

@@ -95,7 +95,6 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-<span id="98">98</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::MessageId</span>;
@@ -133,10 +132,9 @@
 <span class="doccomment">/// // you can then pass it into a function which retrieves messages:</span>
 <span class="doccomment">/// let channel_id = ChannelId(81384788765712384);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let _messages = channel_id.messages(&amp;http, |retriever| {</span>
-<span class="doccomment">///     retriever.after(MessageId(158339864557912064)).limit(25)</span>
-<span class="doccomment">/// })</span>
-<span class="doccomment">/// .await?;</span>
+<span class="doccomment">/// let _messages = channel_id</span>
+<span class="doccomment">///     .messages(&amp;http, |retriever| retriever.after(MessageId(158339864557912064)).limit(25))</span>
+<span class="doccomment">///     .await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>

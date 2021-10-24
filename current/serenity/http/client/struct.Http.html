@@ -134,7 +134,7 @@ does not.</p>
 <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">Http::default</span>();
 
 <span class="ident">http</span>.<span class="ident">delete_webhook</span>(<span class="number">245037420704169985</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-      <span class="prelude-val">Ok</span>(())</code></pre></div>
+<span class="prelude-val">Ok</span>(())</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.delete_webhook_with_token" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#1102-1112" title="goto source code">[src]</a></div><a href="#method.delete_webhook_with_token" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.delete_webhook_with_token" class="fnname">delete_webhook_with_token</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;webhook_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></div></summary><div class="docblock"><p>Deletes a <a href="../../model/webhook/struct.Webhook.html" title="Webhook"><code>Webhook</code></a> given its Id and unique token.</p>
 <p>This method does <em>not</em> require authentication.</p>
 <h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>

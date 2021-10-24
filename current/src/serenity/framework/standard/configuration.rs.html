@@ -609,11 +609,6 @@
 <span id="609">609</span>
 <span id="610">610</span>
 <span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
 <span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
@@ -699,14 +694,14 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl EventHandler for Handler {}</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// use serenity::Client;</span>
 <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
 <span class="doccomment">/// use serenity::model::id::UserId;</span>
+<span class="doccomment">/// use serenity::Client;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
 <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;</span>
-<span class="doccomment">/// let framework = StandardFramework::new()</span>
-<span class="doccomment">///     .configure(|c| c.on_mention(Some(UserId(5))).prefix(&quot;~&quot;));</span>
+<span class="doccomment">/// let framework =</span>
+<span class="doccomment">///     StandardFramework::new().configure(|c| c.on_mention(Some(UserId(5))).prefix(&quot;~&quot;));</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).framework(framework).await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
@@ -809,11 +804,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
+    <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
-    <span class="doccomment">///     .allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect()));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new()</span>
+    <span class="doccomment">///     .configure(|c| c.allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect()));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_channels</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channels</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">allowed_channels</span> <span class="op">=</span> <span class="ident">channels</span>;
@@ -831,11 +826,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
+    <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
-    <span class="doccomment">///     .blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect()));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new()</span>
+    <span class="doccomment">///     .configure(|c| c.blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect()));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocked_guilds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guilds</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">blocked_guilds</span> <span class="op">=</span> <span class="ident">guilds</span>;
@@ -855,11 +850,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::prelude::*;</span>
-    <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
+    <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
-    <span class="doccomment">///     .blocked_users(vec![UserId(7), UserId(77)].into_iter().collect()));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new()</span>
+    <span class="doccomment">///     .configure(|c| c.blocked_users(vec![UserId(7), UserId(77)].into_iter().collect()));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocked_users</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">users</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">blocked_users</span> <span class="op">=</span> <span class="ident">users</span>;
@@ -876,11 +871,11 @@
     <span class="doccomment">/// Ignore a set of commands, assuming they exist:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">/// use serenity::client::Context;</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::framework::standard::macros::{command, group};</span>
     <span class="doccomment">/// use serenity::framework::standard::CommandResult;</span>
-    <span class="doccomment">/// use serenity::framework::standard::macros::{group, command};</span>
+    <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
+    <span class="doccomment">/// use serenity::model::channel::Message;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// #[command]</span>
     <span class="doccomment">/// async fn ping(ctx: &amp;Context, msg: &amp;Message) -&gt; CommandResult {</span>
@@ -894,9 +889,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let disabled = vec![&quot;ping&quot;].into_iter().map(|x| x.to_string()).collect();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .group(&amp;PENG_GROUP)</span>
-    <span class="doccomment">///     .configure(|c| c.disabled_commands(disabled));</span>
+    <span class="doccomment">/// let framework =</span>
+    <span class="doccomment">///     StandardFramework::new().group(&amp;PENG_GROUP).configure(|c| c.disabled_commands(disabled));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_commands</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">commands</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -933,14 +927,13 @@
     <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .configure(|c| c.dynamic_prefix(|_, msg| Box::pin(async move {</span>
-    <span class="doccomment">///         Some(if msg.channel_id.0 % 5 == 0 {</span>
-    <span class="doccomment">///             &quot;!&quot;</span>
-    <span class="doccomment">///         } else {</span>
-    <span class="doccomment">///             &quot;*&quot;</span>
-    <span class="doccomment">///         }.to_string())</span>
-    <span class="doccomment">///     })));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| {</span>
+    <span class="doccomment">///     c.dynamic_prefix(|_, msg| {</span>
+    <span class="doccomment">///         Box::pin(</span>
+    <span class="doccomment">///             async move { Some(if msg.channel_id.0 % 5 == 0 { &quot;!&quot; } else { &quot;*&quot; }.to_string()) },</span>
+    <span class="doccomment">///         )</span>
+    <span class="doccomment">///     })</span>
+    <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will only use the prefix `&quot;!&quot;` or `&quot;*&quot;` depending on channel ID,</span>
@@ -950,8 +943,8 @@
     <span class="doccomment">/// # use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .configure(|c| c</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| {</span>
+    <span class="doccomment">///     c</span>
     <span class="doccomment">///        .dynamic_prefix(|_, msg| Box::pin(async move {</span>
     <span class="doccomment">///             Some(if msg.channel_id.0 % 5 == 0 {</span>
     <span class="doccomment">///                 &quot;!&quot;</span>
@@ -961,7 +954,7 @@
     <span class="doccomment">///         }))</span>
     <span class="doccomment">///         // This disables the default prefix &quot;~&quot;</span>
     <span class="doccomment">///         .prefix(&quot;&quot;)</span>
-    <span class="doccomment">///     );</span>
+    <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Context::data`]: crate::client::Context::data</span>
@@ -1028,19 +1021,20 @@
     <span class="doccomment">/// Create a HashSet in-place:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
+    <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
-    <span class="doccomment">///     .owners(vec![UserId(7), UserId(77)].into_iter().collect()));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new()</span>
+    <span class="doccomment">///     .configure(|c| c.owners(vec![UserId(7), UserId(77)].into_iter().collect()));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Create a HashSet beforehand:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">/// use std::collections::HashSet;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
+    <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut set = HashSet::new();</span>
     <span class="doccomment">/// set.insert(UserId(7));</span>
@@ -1071,8 +1065,7 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
-    <span class="doccomment">///     .prefix(&quot;!&quot;));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.prefix(&quot;!&quot;));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">to_string</span>();
@@ -1096,8 +1089,7 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
-    <span class="doccomment">///     .prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefixes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefixes</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
@@ -1136,8 +1128,7 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
-    <span class="doccomment">///     .delimiter(&quot;, &quot;));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.delimiter(&quot;, &quot;));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delimiter</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">clear</span>();
@@ -1158,8 +1149,7 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c</span>
-    <span class="doccomment">///     .delimiters(vec![&quot;, &quot;, &quot; &quot;]));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.delimiters(vec![&quot;, &quot;, &quot; &quot;]));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiters</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delimiters</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>

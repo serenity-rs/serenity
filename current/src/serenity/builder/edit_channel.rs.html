@@ -199,10 +199,6 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
@@ -374,11 +370,7 @@
     <span class="doccomment">///     kind: PermissionOverwriteType::Member(UserId(1234)),</span>
     <span class="doccomment">/// }];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// channel.edit(http, |c| {</span>
-    <span class="doccomment">///     c.name(&quot;my_edited_cool_channel&quot;)</span>
-    <span class="doccomment">///     .permissions(permissions)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// channel.edit(http, |c| c.name(&quot;my_edited_cool_channel&quot;).permissions(permissions)).await?;</span>
     <span class="doccomment">/// #    Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>

@@ -1568,13 +1568,6 @@
 <span id="1568">1568</span>
 <span id="1569">1569</span>
 <span id="1570">1570</span>
-<span id="1571">1571</span>
-<span id="1572">1572</span>
-<span id="1573">1573</span>
-<span id="1574">1574</span>
-<span id="1575">1575</span>
-<span id="1576">1576</span>
-<span id="1577">1577</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1627,8 +1620,8 @@
     <span class="doccomment">/// Ban a member and remove all messages they&#39;ve sent in the last 4 days:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
+    <span class="doccomment">/// use serenity::model::id::UserId;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
@@ -1761,13 +1754,14 @@
     <span class="doccomment">/// Create a voice channel in a guild with the name `test`:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">/// use serenity::model::channel::ChannelType;</span>
+    <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # let http = Http::default();</span>
-    <span class="doccomment">/// let _channel = GuildId(7).create_channel(&amp;http, |c| c.name(&quot;test&quot;).kind(ChannelType::Voice)).await;</span>
+    <span class="doccomment">/// let _channel =</span>
+    <span class="doccomment">///     GuildId(7).create_channel(&amp;http, |c| c.name(&quot;test&quot;).kind(ChannelType::Voice)).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -2405,17 +2399,13 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let guild_id = GuildId::default();</span>
     <span class="doccomment">/// # let ctx = Http::default();</span>
-    <span class="doccomment">/// use serenity::model::guild::MembersIter;</span>
     <span class="doccomment">/// use serenity::futures::StreamExt;</span>
+    <span class="doccomment">/// use serenity::model::guild::MembersIter;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut members = guild_id.members_iter(&amp;ctx).boxed();</span>
     <span class="doccomment">/// while let Some(member_result) = members.next().await {</span>
     <span class="doccomment">///     match member_result {</span>
-    <span class="doccomment">///         Ok(member) =&gt; println!(</span>
-    <span class="doccomment">///             &quot;{} is {}&quot;,</span>
-    <span class="doccomment">///             member,</span>
-    <span class="doccomment">///             member.display_name(),</span>
-    <span class="doccomment">///         ),</span>
+    <span class="doccomment">///         Ok(member) =&gt; println!(&quot;{} is {}&quot;, member, member.display_name(),),</span>
     <span class="doccomment">///         Err(error) =&gt; eprintln!(&quot;Uh oh!  Error: {}&quot;, error),</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -3100,17 +3090,13 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let guild_id = GuildId::default();</span>
     <span class="doccomment">/// # let ctx = Http::default();</span>
-    <span class="doccomment">/// use serenity::model::guild::MembersIter;</span>
     <span class="doccomment">/// use serenity::futures::StreamExt;</span>
+    <span class="doccomment">/// use serenity::model::guild::MembersIter;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut members = MembersIter::&lt;Http&gt;::stream(&amp;ctx, guild_id).boxed();</span>
     <span class="doccomment">/// while let Some(member_result) = members.next().await {</span>
     <span class="doccomment">///     match member_result {</span>
-    <span class="doccomment">///         Ok(member) =&gt; println!(</span>
-    <span class="doccomment">///             &quot;{} is {}&quot;,</span>
-    <span class="doccomment">///             member,</span>
-    <span class="doccomment">///             member.display_name(),</span>
-    <span class="doccomment">///         ),</span>
+    <span class="doccomment">///         Ok(member) =&gt; println!(&quot;{} is {}&quot;, member, member.display_name(),),</span>
     <span class="doccomment">///         Err(error) =&gt; eprintln!(&quot;Uh oh!  Error: {}&quot;, error),</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>

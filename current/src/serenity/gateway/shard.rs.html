@@ -826,6 +826,14 @@
 <span id="826">826</span>
 <span id="827">827</span>
 <span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync::Arc</span>,
     <span class="ident">time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>},
@@ -938,9 +946,10 @@
     <span class="doccomment">/// then listening for events:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// use std::sync::Arc;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// use serenity::gateway::Shard;</span>
     <span class="doccomment">/// use tokio::sync::Mutex;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::client::bridge::gateway::GatewayIntents;</span>
@@ -1532,7 +1541,14 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// shard.chunk_guild(GuildId(81384788765712384), Some(20), ChunkGuildFilter::Query(&quot;do&quot;.to_owned()), Some(&quot;request&quot;)).await?;</span>
+    <span class="doccomment">/// shard</span>
+    <span class="doccomment">///     .chunk_guild(</span>
+    <span class="doccomment">///         GuildId(81384788765712384),</span>
+    <span class="doccomment">///         Some(20),</span>
+    <span class="doccomment">///         ChunkGuildFilter::Query(&quot;do&quot;.to_owned()),</span>
+    <span class="doccomment">///         Some(&quot;request&quot;),</span>
+    <span class="doccomment">///     )</span>
+    <span class="doccomment">///     .await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>

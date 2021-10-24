@@ -1034,6 +1034,7 @@
 <span id="1034">1034</span>
 <span id="1035">1035</span>
 <span id="1036">1036</span>
+<span id="1037">1037</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1599,7 +1600,7 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler { }</span>
+    <span class="doccomment">/// impl EventHandler for Handler {}</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
     <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>
@@ -1623,12 +1624,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::client::{Client, EventHandler};</span>
     <span class="doccomment">/// use std::time::Duration;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// use serenity::client::{Client, EventHandler};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler { }</span>
+    <span class="doccomment">/// impl EventHandler for Handler {}</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
     <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).await?;</span>

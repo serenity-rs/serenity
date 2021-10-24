@@ -23,9 +23,9 @@ two previous commands:</p>
 ping and about command:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::client</span>::{<span class="ident">Client</span>, <span class="ident">Context</span>, <span class="ident">EventHandler</span>};
-<span class="kw">use</span> <span class="ident">serenity::model::channel::Message</span>;
 <span class="kw">use</span> <span class="ident">serenity::framework::standard::macros</span>::{<span class="ident">command</span>, <span class="ident">group</span>};
-<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">StandardFramework</span>, <span class="ident">CommandResult</span>};
+<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">CommandResult</span>, <span class="ident">StandardFramework</span>};
+<span class="kw">use</span> <span class="ident">serenity::model::channel::Message</span>;
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">about</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="ident">CommandResult</span> {

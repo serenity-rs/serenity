@@ -603,10 +603,6 @@
 <span id="603">603</span>
 <span id="604">604</span>
 <span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is a set of embed builders for rich embeds.</span>
@@ -831,8 +827,8 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
@@ -840,14 +836,14 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, mut msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;~embed&quot; {</span>
-    <span class="doccomment">///             let _ = msg.channel_id.send_message(&amp;context.http, |m| {</span>
-    <span class="doccomment">///                 m.embed(|e| {</span>
-    <span class="doccomment">///                     e.title(&quot;hello&quot;).timestamp(&quot;2004-06-08T16:04:23&quot;)</span>
-    <span class="doccomment">///                 });</span>
+    <span class="doccomment">///             let _ = msg</span>
+    <span class="doccomment">///                 .channel_id</span>
+    <span class="doccomment">///                 .send_message(&amp;context.http, |m| {</span>
+    <span class="doccomment">///                     m.embed(|e| e.title(&quot;hello&quot;).timestamp(&quot;2004-06-08T16:04:23&quot;));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                 m</span>
-    <span class="doccomment">///             })</span>
-    <span class="doccomment">///             .await;</span>
+    <span class="doccomment">///                     m</span>
+    <span class="doccomment">///                 })</span>
+    <span class="doccomment">///                 .await;</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -866,9 +862,9 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::model::guild::Member;</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
+    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
@@ -876,31 +872,27 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn guild_member_addition(&amp;self, context: Context, guild_id: GuildId, member: Member) {</span>
     <span class="doccomment">///         if let Ok(guild) = guild_id.to_partial_guild(&amp;context).await {</span>
-    <span class="doccomment">///             let channels = guild.channels(&amp;context)</span>
-    <span class="doccomment">///                 .await</span>
-    <span class="doccomment">///                 .unwrap();</span>
+    <span class="doccomment">///             let channels = guild.channels(&amp;context).await.unwrap();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///             let channel_search = channels.values()</span>
-    <span class="doccomment">///                 .find(|c| c.name == &quot;join-log&quot;);</span>
+    <span class="doccomment">///             let channel_search = channels.values().find(|c| c.name == &quot;join-log&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             if let Some(channel) = channel_search {</span>
     <span class="doccomment">///                 let user = &amp;member.user;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                 let _ = channel.send_message(&amp;context, |m| {</span>
-    <span class="doccomment">///                     m.embed(|e| {</span>
-    <span class="doccomment">///                         e.author(|a| {</span>
-    <span class="doccomment">///                             a.icon_url(&amp;user.face()).name(&amp;user.name)</span>
-    <span class="doccomment">///                         });</span>
-    <span class="doccomment">///                         e.title(&quot;Member Join&quot;);</span>
+    <span class="doccomment">///                 let _ = channel</span>
+    <span class="doccomment">///                     .send_message(&amp;context, |m| {</span>
+    <span class="doccomment">///                         m.embed(|e| {</span>
+    <span class="doccomment">///                             e.author(|a| a.icon_url(&amp;user.face()).name(&amp;user.name));</span>
+    <span class="doccomment">///                             e.title(&quot;Member Join&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                         if let Some(ref joined_at) = member.joined_at {</span>
-    <span class="doccomment">///                             e.timestamp(joined_at);</span>
-    <span class="doccomment">///                         }</span>
+    <span class="doccomment">///                             if let Some(ref joined_at) = member.joined_at {</span>
+    <span class="doccomment">///                                 e.timestamp(joined_at);</span>
+    <span class="doccomment">///                             }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                         e</span>
+    <span class="doccomment">///                             e</span>
+    <span class="doccomment">///                         })</span>
     <span class="doccomment">///                     })</span>
-    <span class="doccomment">///                 })</span>
-    <span class="doccomment">///                 .await;</span>
+    <span class="doccomment">///                     .await;</span>
     <span class="doccomment">///             }</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>

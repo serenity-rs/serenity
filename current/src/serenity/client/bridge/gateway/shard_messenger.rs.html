@@ -281,6 +281,11 @@
 <span id="281">281</span>
 <span id="282">282</span>
 <span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
 <span class="kw">use</span> <span class="ident">futures::channel::mpsc</span>::{<span class="ident">TrySendError</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
 
@@ -371,7 +376,12 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// shard.chunk_guild(GuildId(81384788765712384), Some(20), ChunkGuildFilter::Query(&quot;do&quot;.to_owned()), Some(&quot;request&quot;));</span>
+    <span class="doccomment">/// shard.chunk_guild(</span>
+    <span class="doccomment">///     GuildId(81384788765712384),</span>
+    <span class="doccomment">///     Some(20),</span>
+    <span class="doccomment">///     ChunkGuildFilter::Query(&quot;do&quot;.to_owned()),</span>
+    <span class="doccomment">///     Some(&quot;request&quot;),</span>
+    <span class="doccomment">/// );</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>

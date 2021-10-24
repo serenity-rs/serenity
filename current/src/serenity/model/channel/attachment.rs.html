@@ -121,6 +121,11 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">reqwest::Client</span> <span class="kw">as</span> <span class="ident">ReqwestClient</span>;
 
@@ -172,12 +177,13 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// use std::io::Write;</span>
+    <span class="doccomment">/// use std::path::Path;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// use serenity::model::prelude::*;</span>
     <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">/// use tokio::fs::File;</span>
     <span class="doccomment">/// use tokio::io::AsyncWriteExt;</span>
-    <span class="doccomment">/// use std::io::Write;</span>
-    <span class="doccomment">/// use std::path::Path;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
@@ -189,7 +195,8 @@
     <span class="doccomment">///                 Ok(content) =&gt; content,</span>
     <span class="doccomment">///                 Err(why) =&gt; {</span>
     <span class="doccomment">///                     println!(&quot;Error downloading attachment: {:?}&quot;, why);</span>
-    <span class="doccomment">///                     let _ = message.channel_id.say(&amp;context, &quot;Error downloading attachment&quot;).await;</span>
+    <span class="doccomment">///                     let _ =</span>
+    <span class="doccomment">///                         message.channel_id.say(&amp;context, &quot;Error downloading attachment&quot;).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///                     return;</span>
     <span class="doccomment">///                 },</span>
@@ -211,7 +218,10 @@
     <span class="doccomment">///                 return;</span>
     <span class="doccomment">///             }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///             let _ = message.channel_id.say(&amp;context, &amp;format!(&quot;Saved {:?}&quot;, attachment.filename)).await;</span>
+    <span class="doccomment">///             let _ = message</span>
+    <span class="doccomment">///                 .channel_id</span>
+    <span class="doccomment">///                 .say(&amp;context, &amp;format!(&quot;Saved {:?}&quot;, attachment.filename))</span>
+    <span class="doccomment">///                 .await;</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">///</span>

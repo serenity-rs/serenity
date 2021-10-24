@@ -260,9 +260,6 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
@@ -291,7 +288,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[serenity::async_trait]</span>
 <span class="doccomment">/// impl EventHandler for Handler {</span>
-<span class="doccomment">///    async fn message(&amp;self, context: Context, msg: Message) {</span>
+<span class="doccomment">///     async fn message(&amp;self, context: Context, msg: Message) {</span>
 <span class="doccomment">///         if msg.content == &quot;!createinvite&quot; {</span>
 <span class="doccomment">///             let channel = match context.cache.guild_channel(msg.channel_id).await {</span>
 <span class="doccomment">///                 Some(channel) =&gt; channel,</span>
@@ -301,19 +298,16 @@
 <span class="doccomment">///                 },</span>
 <span class="doccomment">///             };</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///             let creation = channel.create_invite(&amp;context, |i| {</span>
-<span class="doccomment">///                 i.max_age(3600).max_uses(10)</span>
-<span class="doccomment">///             })</span>
-<span class="doccomment">///             .await;</span>
+<span class="doccomment">///             let creation =</span>
+<span class="doccomment">///                 channel.create_invite(&amp;context, |i| i.max_age(3600).max_uses(10)).await;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///             let invite = match creation {</span>
 <span class="doccomment">///                 Ok(invite) =&gt; invite,</span>
 <span class="doccomment">///                 Err(why) =&gt; {</span>
 <span class="doccomment">///                     println!(&quot;Err creating invite: {:?}&quot;, why);</span>
-<span class="doccomment">///                     if let Err(why) = msg</span>
-<span class="doccomment">///                         .channel_id</span>
-<span class="doccomment">///                         .say(&amp;context, &quot;Error creating invite&quot;)</span>
-<span class="doccomment">///                         .await {</span>
+<span class="doccomment">///                     if let Err(why) =</span>
+<span class="doccomment">///                         msg.channel_id.say(&amp;context, &quot;Error creating invite&quot;).await</span>
+<span class="doccomment">///                     {</span>
 <span class="doccomment">///                         println!(&quot;Err sending err msg: {:?}&quot;, why);</span>
 <span class="doccomment">///                     }</span>
 <span class="doccomment">///</span>

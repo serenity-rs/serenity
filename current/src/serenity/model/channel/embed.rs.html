@@ -221,6 +221,8 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateEmbed</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -305,9 +307,11 @@
     <span class="doccomment">/// use serenity::model::channel::Embed;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let embed = Embed::fake(|e| {</span>
-    <span class="doccomment">///     e.title(&quot;Embed title&quot;)</span>
-    <span class="doccomment">///         .description(&quot;Making a basic embed&quot;)</span>
-    <span class="doccomment">///         .field(&quot;A field&quot;, &quot;Has some content.&quot;, false)</span>
+    <span class="doccomment">///     e.title(&quot;Embed title&quot;).description(&quot;Making a basic embed&quot;).field(</span>
+    <span class="doccomment">///         &quot;A field&quot;,</span>
+    <span class="doccomment">///         &quot;Has some content.&quot;,</span>
+    <span class="doccomment">///         false,</span>
+    <span class="doccomment">///     )</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>

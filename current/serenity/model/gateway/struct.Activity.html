@@ -41,10 +41,10 @@ listening to Spotify.</p>
 <h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
 <p>Create a command that sets the current activity:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">macros::command</span>, <span class="ident">Args</span>, <span class="ident">CommandResult</span>};
 <span class="kw">use</span> <span class="ident">serenity::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">Args</span>, <span class="ident">CommandResult</span>, <span class="ident">macros::command</span>};
-<span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">activity</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">_msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">args</span>: <span class="ident">Args</span>) -&gt; <span class="ident">CommandResult</span> {
@@ -59,10 +59,10 @@ status.</p>
 <h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
 <p>Create a command that sets the current streaming status:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">macros::command</span>, <span class="ident">Args</span>, <span class="ident">CommandResult</span>};
 <span class="kw">use</span> <span class="ident">serenity::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">Args</span>, <span class="ident">CommandResult</span>, <span class="ident">macros::command</span>};
-<span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">stream</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">_msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">args</span>: <span class="ident">Args</span>) -&gt; <span class="ident">CommandResult</span> {
@@ -78,10 +78,10 @@ status.</p>
 <h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
 <p>Create a command that sets the current listening status:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">macros::command</span>, <span class="ident">Args</span>, <span class="ident">CommandResult</span>};
 <span class="kw">use</span> <span class="ident">serenity::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">Args</span>, <span class="ident">CommandResult</span>, <span class="ident">macros::command</span>};
-<span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">_msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">args</span>: <span class="ident">Args</span>) -&gt; <span class="ident">CommandResult</span> {
@@ -95,10 +95,10 @@ status.</p>
 <h5 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h5>
 <p>Create a command that sets the current cometing status:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">macros::command</span>, <span class="ident">Args</span>, <span class="ident">CommandResult</span>};
 <span class="kw">use</span> <span class="ident">serenity::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">Args</span>, <span class="ident">CommandResult</span>, <span class="ident">macros::command</span>};
-<span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">watch</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">_msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">args</span>: <span class="ident">Args</span>) -&gt; <span class="ident">CommandResult</span> {
@@ -112,10 +112,10 @@ status.</p>
 <h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>
 <p>Create a command that sets the current cometing status:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">macros::command</span>, <span class="ident">Args</span>, <span class="ident">CommandResult</span>};
 <span class="kw">use</span> <span class="ident">serenity::model::channel::Message</span>;
-<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{<span class="ident">Args</span>, <span class="ident">CommandResult</span>, <span class="ident">macros::command</span>};
-<span class="kw">use</span> <span class="ident">serenity::client::Context</span>;
+<span class="kw">use</span> <span class="ident">serenity::model::gateway::Activity</span>;
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">compete</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">_msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">args</span>: <span class="ident">Args</span>) -&gt; <span class="ident">CommandResult</span> {

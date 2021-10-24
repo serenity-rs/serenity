@@ -359,6 +359,9 @@
 <span id="359">359</span>
 <span id="360">360</span>
 <span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
     <span class="ident">sync::Arc</span>,
@@ -411,27 +414,29 @@
 <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// use tokio::sync::{Mutex, RwLock};</span>
-<span class="doccomment">/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions, GatewayIntents};</span>
-<span class="doccomment">/// use serenity::client::{EventHandler, RawEventHandler};</span>
-<span class="doccomment">/// use serenity::http::Http;</span>
-<span class="doccomment">/// use serenity::CacheAndHttp;</span>
-<span class="doccomment">/// use serenity::prelude::*;</span>
-<span class="doccomment">/// use serenity::framework::{Framework, StandardFramework};</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
 <span class="doccomment">/// use std::env;</span>
+<span class="doccomment">/// use std::sync::Arc;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// use serenity::client::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerOptions};</span>
+<span class="doccomment">/// use serenity::client::{EventHandler, RawEventHandler};</span>
+<span class="doccomment">/// use serenity::framework::{Framework, StandardFramework};</span>
+<span class="doccomment">/// use serenity::http::Http;</span>
+<span class="doccomment">/// use serenity::prelude::*;</span>
+<span class="doccomment">/// use serenity::CacheAndHttp;</span>
+<span class="doccomment">/// use tokio::sync::{Mutex, RwLock};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// struct Handler;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// impl EventHandler for Handler { }</span>
-<span class="doccomment">/// impl RawEventHandler for Handler { }</span>
+<span class="doccomment">/// impl EventHandler for Handler {}</span>
+<span class="doccomment">/// impl RawEventHandler for Handler {}</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # let cache_and_http = Arc::new(CacheAndHttp::default());</span>
 <span class="doccomment">/// # let http = &amp;cache_and_http.http;</span>
 <span class="doccomment">/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
 <span class="doccomment">/// let data = Arc::new(RwLock::new(TypeMap::new()));</span>
 <span class="doccomment">/// let event_handler = Arc::new(Handler) as Arc&lt;dyn EventHandler&gt;;</span>
-<span class="doccomment">/// let framework = Arc::new(Box::new(StandardFramework::new()) as Box&lt;dyn Framework + &#39;static + Send + Sync&gt;);</span>
+<span class="doccomment">/// let framework =</span>
+<span class="doccomment">///     Arc::new(Box::new(StandardFramework::new()) as Box&lt;dyn Framework + &#39;static + Send + Sync&gt;);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ShardManager::new(ShardManagerOptions {</span>
 <span class="doccomment">///     data: &amp;data,</span>
@@ -578,13 +583,14 @@
     <span class="doccomment">/// concept is the same)_</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// use std::env;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// use serenity::client::bridge::gateway::ShardId;</span>
     <span class="doccomment">/// use serenity::client::{Client, EventHandler};</span>
-    <span class="doccomment">/// use std::env;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// impl EventHandler for Handler { }</span>
+    <span class="doccomment">/// impl EventHandler for Handler {}</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>

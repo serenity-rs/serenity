@@ -885,6 +885,7 @@
 <span id="885">885</span>
 <span id="886">886</span>
 <span id="887">887</span>
+<span id="888">888</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">check</span>, <span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">hook</span>};
@@ -1030,15 +1031,12 @@
     <span class="doccomment">/// # use serenity::prelude::EventHandler;</span>
     <span class="doccomment">/// # struct Handler;</span>
     <span class="doccomment">/// # impl EventHandler for Handler {}</span>
-    <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
+    <span class="doccomment">/// use serenity::Client;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_TOKEN&quot;)?;</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .configure(|c| c</span>
-    <span class="doccomment">///         .with_whitespace(true)</span>
-    <span class="doccomment">///         .prefix(&quot;~&quot;));</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.with_whitespace(true).prefix(&quot;~&quot;));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut client = Client::builder(&amp;token).event_handler(Handler).framework(framework).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -1067,7 +1065,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// use serenity::framework::standard::macros::command;</span>
-    <span class="doccomment">/// use serenity::framework::standard::{StandardFramework, CommandResult};</span>
+    <span class="doccomment">/// use serenity::framework::standard::{CommandResult, StandardFramework};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// #[command]</span>
     <span class="doccomment">/// // Registers the bucket `basic` to this command.</span>
@@ -1077,9 +1075,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .bucket(&quot;basic&quot;, |b| b.delay(2).time_span(10).limit(3))</span>
-    <span class="doccomment">///     .await;</span>
+    <span class="doccomment">/// let framework =</span>
+    <span class="doccomment">///     StandardFramework::new().bucket(&quot;basic&quot;, |b| b.delay(2).time_span(10).limit(3)).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -1307,12 +1304,18 @@
     <span class="doccomment">/// #[hook]</span>
     <span class="doccomment">/// async fn dispatch_error_hook(context: &amp;Context, msg: &amp;Message, error: DispatchError) {</span>
     <span class="doccomment">///     match error {</span>
-    <span class="doccomment">///         DispatchError::NotEnoughArguments { min, given } =&gt; {</span>
+    <span class="doccomment">///         DispatchError::NotEnoughArguments {</span>
+    <span class="doccomment">///             min,</span>
+    <span class="doccomment">///             given,</span>
+    <span class="doccomment">///         } =&gt; {</span>
     <span class="doccomment">///             let s = format!(&quot;Need {} arguments, but only got {}.&quot;, min, given);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             let _ = msg.channel_id.say(&amp;context, &amp;s).await;</span>
     <span class="doccomment">///         },</span>
-    <span class="doccomment">///         DispatchError::TooManyArguments { max, given } =&gt; {</span>
+    <span class="doccomment">///         DispatchError::TooManyArguments {</span>
+    <span class="doccomment">///             max,</span>
+    <span class="doccomment">///             given,</span>
+    <span class="doccomment">///         } =&gt; {</span>
     <span class="doccomment">///             let s = format!(&quot;Max arguments allowed is {}, but got {}.&quot;, max, given);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             let _ = msg.channel_id.say(&amp;context, &amp;s).await;</span>
@@ -1321,8 +1324,7 @@
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .on_dispatch_error(dispatch_error_hook);</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().on_dispatch_error(dispatch_error_hook);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_dispatch_error</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">DispatchHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">dispatch</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
@@ -1355,8 +1357,7 @@
     <span class="doccomment">///     println!(&quot;Running command {}&quot;, cmd_name);</span>
     <span class="doccomment">///     true</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .before(before_hook);</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().before(before_hook);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Using before to prevent command usage:</span>
@@ -1381,8 +1382,7 @@
     <span class="doccomment">///     true</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .before(before_hook);</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().before(before_hook);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">before</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">BeforeHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">before</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
@@ -1412,8 +1412,7 @@
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .after(after_hook);</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().after(after_hook);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">AfterHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">after</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
@@ -1434,14 +1433,18 @@
     <span class="doccomment">/// use serenity::framework::StandardFramework;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// #[hook]</span>
-    <span class="doccomment">/// async fn unrecognised_command_hook(_: &amp;Context, msg: &amp;Message, unrecognised_command_name: &amp;str) {</span>
-    <span class="doccomment">///     println!(&quot;A user named {:?} tried to executute an unknown command: {}&quot;,</span>
+    <span class="doccomment">/// async fn unrecognised_command_hook(</span>
+    <span class="doccomment">///     _: &amp;Context,</span>
+    <span class="doccomment">///     msg: &amp;Message,</span>
+    <span class="doccomment">///     unrecognised_command_name: &amp;str,</span>
+    <span class="doccomment">/// ) {</span>
+    <span class="doccomment">///     println!(</span>
+    <span class="doccomment">///         &quot;A user named {:?} tried to executute an unknown command: {}&quot;,</span>
     <span class="doccomment">///         msg.author.name, unrecognised_command_name</span>
     <span class="doccomment">///     );</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .unrecognised_command(unrecognised_command_hook);</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().unrecognised_command(unrecognised_command_hook);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unrecognised_command</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">UnrecognisedHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">unrecognised_command</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
@@ -1466,8 +1469,7 @@
     <span class="doccomment">///     println!(&quot;Received a generic message: {:?}&quot;, msg.content);</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let framework = StandardFramework::new()</span>
-    <span class="doccomment">///     .normal_message(normal_message_hook);</span>
+    <span class="doccomment">/// let framework = StandardFramework::new().normal_message(normal_message_hook);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal_message</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">NormalMessageHook</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">normal_message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);

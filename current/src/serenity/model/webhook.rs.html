@@ -433,6 +433,10 @@
 <span id="433">433</span>
 <span id="434">434</span>
 <span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -667,11 +671,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut webhook = http.get_webhook_with_token(id, token).await?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// webhook.execute(&amp;http, false, |mut w| {</span>
-    <span class="doccomment">///     w.content(&quot;test&quot;);</span>
-    <span class="doccomment">///     w</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// webhook</span>
+    <span class="doccomment">///     .execute(&amp;http, false, |mut w| {</span>
+    <span class="doccomment">///         w.content(&quot;test&quot;);</span>
+    <span class="doccomment">///         w</span>
+    <span class="doccomment">///     })</span>
+    <span class="doccomment">///     .await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -693,20 +698,23 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let embed = Embed::fake(|mut e| {</span>
     <span class="doccomment">///     e.title(&quot;Rust&#39;s website&quot;);</span>
-    <span class="doccomment">///     e.description(&quot;Rust is a systems programming language that runs</span>
+    <span class="doccomment">///     e.description(</span>
+    <span class="doccomment">///         &quot;Rust is a systems programming language that runs</span>
     <span class="doccomment">///                    blazingly fast, prevents segfaults, and guarantees</span>
-    <span class="doccomment">///                    thread safety.&quot;);</span>
+    <span class="doccomment">///                    thread safety.&quot;,</span>
+    <span class="doccomment">///     );</span>
     <span class="doccomment">///     e.url(&quot;https://rust-lang.org&quot;);</span>
     <span class="doccomment">///     e</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// webhook.execute(&amp;http, false, |mut w| {</span>
-    <span class="doccomment">///     w.content(&quot;test&quot;);</span>
-    <span class="doccomment">///     w.username(&quot;serenity&quot;);</span>
-    <span class="doccomment">///     w.embeds(vec![embed]);</span>
-    <span class="doccomment">///     w</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// webhook</span>
+    <span class="doccomment">///     .execute(&amp;http, false, |mut w| {</span>
+    <span class="doccomment">///         w.content(&quot;test&quot;);</span>
+    <span class="doccomment">///         w.username(&quot;serenity&quot;);</span>
+    <span class="doccomment">///         w.embeds(vec![embed]);</span>
+    <span class="doccomment">///         w</span>
+    <span class="doccomment">///     })</span>
+    <span class="doccomment">///     .await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>

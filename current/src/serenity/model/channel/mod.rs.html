@@ -587,6 +587,12 @@
 <span id="587">587</span>
 <span id="588">588</span>
 <span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -675,7 +681,9 @@
     <span class="doccomment">///     Some(guild_channel) =&gt; {</span>
     <span class="doccomment">///         println!(&quot;It&#39;s a guild channel named {}!&quot;, guild_channel.name);</span>
     <span class="doccomment">///     },</span>
-    <span class="doccomment">///     None =&gt; { println!(&quot;It&#39;s not in a guild!&quot;); },</span>
+    <span class="doccomment">///     None =&gt; {</span>
+    <span class="doccomment">///         println!(&quot;It&#39;s not in a guild!&quot;);</span>
+    <span class="doccomment">///     },</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -710,7 +718,9 @@
     <span class="doccomment">///     Some(private) =&gt; {</span>
     <span class="doccomment">///         println!(&quot;It&#39;s a private channel with {}!&quot;, &amp;private.recipient);</span>
     <span class="doccomment">///     },</span>
-    <span class="doccomment">///     None =&gt; { println!(&quot;It&#39;s not a private channel!&quot;); },</span>
+    <span class="doccomment">///     None =&gt; {</span>
+    <span class="doccomment">///         println!(&quot;It&#39;s not a private channel!&quot;);</span>
+    <span class="doccomment">///     },</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -745,7 +755,9 @@
     <span class="doccomment">///     Some(category) =&gt; {</span>
     <span class="doccomment">///         println!(&quot;It&#39;s a category named {}!&quot;, category.name);</span>
     <span class="doccomment">///     },</span>
-    <span class="doccomment">///     None =&gt; { println!(&quot;It&#39;s not a category!&quot;); },</span>
+    <span class="doccomment">///     None =&gt; {</span>
+    <span class="doccomment">///         println!(&quot;It&#39;s not a category!&quot;);</span>
+    <span class="doccomment">///     },</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # }</span>
