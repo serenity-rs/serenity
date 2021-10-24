@@ -33,9 +33,9 @@
 //!
 //! ```rust,no_run
 //! use serenity::client::{Client, Context, EventHandler};
-//! use serenity::model::channel::Message;
 //! use serenity::framework::standard::macros::{command, group};
-//! use serenity::framework::standard::{StandardFramework, CommandResult};
+//! use serenity::framework::standard::{CommandResult, StandardFramework};
+//! use serenity::model::channel::Message;
 //!
 //! #[command]
 //! async fn about(ctx: &Context, msg: &Message) -> CommandResult {

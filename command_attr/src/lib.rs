@@ -832,9 +832,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 /// use std::pin::Pin;
 ///
 /// fn foo(n: i32) -> Pin<Box<dyn std::future::Future<Output = i32>>> {
-///     Box::pin(async move {
-///         n + 4
-///     })
+///     Box::pin(async move { n + 4 })
 /// }
 /// ```
 ///
@@ -844,20 +842,14 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 /// ```rust,no_run
 /// # #![feature(async_closure)]
 /// #
-/// async move |x: i32| {
-///     x * 2 + 4
-/// }
+/// async move |x: i32| x * 2 + 4
 /// # ;
 /// ```
 ///
 /// is changed to:
 ///
 /// ```rust,no_run
-/// |x: i32| {
-///     Box::pin(async move {
-///         x * 2 + 4
-///     })
-/// }
+/// |x: i32| Box::pin(async move { x * 2 + 4 })
 /// # ;
 /// ```
 ///
@@ -872,9 +864,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 /// use std::pin::Pin;
 ///
 /// fn foo<'fut>(n: &'fut i32) -> Pin<Box<dyn std::future::Future<Output = i32> + 'fut>> {
-///     Box::pin(async move {
-///         *n + 4
-///     })
+///     Box::pin(async move { *n + 4 })
 /// }
 /// ```
 ///

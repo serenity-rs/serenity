@@ -61,10 +61,7 @@ impl EditGuild {
     ///
     /// let base64_icon = utils::read_image("./guild_icon.png")?;
     ///
-    /// guild.edit(&http, |mut g| {
-    ///     g.icon(Some(&base64_icon))
-    /// })
-    /// .await?;
+    /// guild.edit(&http, |mut g| g.icon(Some(&base64_icon))).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -141,10 +138,7 @@ impl EditGuild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// guild.edit(&http, |g| {
-    ///     g.region(Region::UsWest)
-    /// })
-    /// .await?;
+    /// guild.edit(&http, |g| g.region(Region::UsWest)).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -276,10 +270,7 @@ impl EditGuild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let edit = guild.edit(&http, |g| {
-    ///     g.verification_level(VerificationLevel::High)
-    /// })
-    /// .await;
+    /// let edit = guild.edit(&http, |g| g.verification_level(VerificationLevel::High)).await;
     ///
     /// if let Err(why) = edit {
     ///     println!("Error setting verification level: {:?}", why);
@@ -313,10 +304,14 @@ impl EditGuild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let edit = guild.edit(&http, |g| {
-    ///     g.system_channel_flags(SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS)
-    /// })
-    /// .await;
+    /// let edit = guild
+    ///     .edit(&http, |g| {
+    ///         g.system_channel_flags(
+    ///             SystemChannelFlags::SUPPRESS_JOIN_NOTIFICATIONS
+    ///                 | SystemChannelFlags::SUPPRESS_GUILD_REMINDER_NOTIFICATIONS,
+    ///         )
+    ///     })
+    ///     .await;
     ///
     /// if let Err(why) = edit {
     ///     println!("Error setting verification level: {:?}", why);

@@ -75,7 +75,7 @@ impl CurrentUser {
     ///
     /// match user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
-    ///     None => println!("{} does not have an avatar set.", user.name)
+    ///     None => println!("{} does not have an avatar set.", user.name),
     /// }
     /// # }
     /// ```
@@ -238,8 +238,11 @@ impl CurrentUser {
     ///     },
     /// };
     ///
-    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&scope=bot");
+    /// assert_eq!(
+    ///     url,
+    ///     "https://discordapp.com/api/oauth2/authorize? \
+    ///                  client_id=249608697955745802&scope=bot"
+    /// );
     /// # }
     /// ```
     ///
@@ -255,7 +258,8 @@ impl CurrentUser {
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
-    /// let permissions = Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
+    /// let permissions =
+    ///     Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
     /// let url = match user.invite_url(&http, permissions).await {
     ///     Ok(v) => v,
     ///     Err(why) => {
@@ -265,9 +269,11 @@ impl CurrentUser {
     ///     },
     /// };
     ///
-    /// assert_eq!(url,
-    /// "https://discordapp.
-    /// com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
+    /// assert_eq!(
+    ///     url,
+    ///     "https://discordapp.
+    /// com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456"
+    /// );
     /// # }
     /// ```
     ///
@@ -301,8 +307,8 @@ impl CurrentUser {
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
     /// #     let http = Http::default();
-    /// use serenity::model::Permissions;
     /// use serenity::model::oauth2::OAuth2Scope;
+    /// use serenity::model::Permissions;
     ///
     /// let scopes = vec![OAuth2Scope::Bot, OAuth2Scope::ApplicationsCommands];
     ///
@@ -316,8 +322,11 @@ impl CurrentUser {
     ///     },
     /// };
     ///
-    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
-    ///                  client_id=249608697955745802&scope=bot%20applications.commands");
+    /// assert_eq!(
+    ///     url,
+    ///     "https://discordapp.com/api/oauth2/authorize? \
+    ///                  client_id=249608697955745802&scope=bot%20applications.commands"
+    /// );
     /// # }
     /// ```
     /// # Errors
@@ -361,7 +370,7 @@ impl CurrentUser {
     ///
     /// match user.static_avatar_url() {
     ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
-    ///     None => println!("Could not get static avatar for {}.", user.name)
+    ///     None => println!("Could not get static avatar for {}.", user.name),
     /// }
     /// # }
     /// ```
@@ -657,7 +666,13 @@ impl User {
     /// #   #[cfg(feature = "cache")]
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url = match ctx.cache.current_user().await.invite_url(&ctx, Permissions::empty()).await {
+    ///             let url = match ctx
+    ///                 .cache
+    ///                 .current_user()
+    ///                 .await
+    ///                 .invite_url(&ctx, Permissions::empty())
+    ///                 .await
+    ///             {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
@@ -666,15 +681,9 @@ impl User {
     ///                 },
     ///             };
     ///
-    ///             let help = format!(
-    ///                 "Helpful info here. Invite me with this link: <{}>",
-    ///                 url,
-    ///             );
+    ///             let help = format!("Helpful info here. Invite me with this link: <{}>", url,);
     ///
-    ///             let dm = msg.author.direct_message(&ctx, |m| {
-    ///                 m.content(&help)
-    ///             })
-    ///             .await;
+    ///             let dm = msg.author.direct_message(&ctx, |m| m.content(&help)).await;
     ///
     ///             match dm {
     ///                 Ok(_) => {
@@ -691,7 +700,7 @@ impl User {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     /// #     Ok(())
     /// # }
     /// # }
@@ -853,8 +862,8 @@ impl User {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
-    /// use serenity::utils::MessageBuilder;
     /// use serenity::utils::ContentModifier::Bold;
+    /// use serenity::utils::MessageBuilder;
     ///
     /// struct Handler;
     ///
@@ -871,7 +880,7 @@ impl User {
     ///         }
     ///     }
     /// }
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())

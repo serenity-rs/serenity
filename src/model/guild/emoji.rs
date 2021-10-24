@@ -86,7 +86,7 @@ impl Emoji {
     /// // assuming emoji has been set already
     /// match emoji.delete(&ctx).await {
     ///     Ok(()) => println!("Emoji deleted."),
-    ///     Err(_) => println!("Could not delete emoji.")
+    ///     Err(_) => println!("Could not delete emoji."),
     /// }
     /// #    Ok(())
     /// # }

@@ -143,15 +143,12 @@ impl StandardFramework {
     /// # use serenity::prelude::EventHandler;
     /// # struct Handler;
     /// # impl EventHandler for Handler {}
-    /// use serenity::Client;
     /// use serenity::framework::StandardFramework;
+    /// use serenity::Client;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let framework = StandardFramework::new()
-    ///     .configure(|c| c
-    ///         .with_whitespace(true)
-    ///         .prefix("~"));
+    /// let framework = StandardFramework::new().configure(|c| c.with_whitespace(true).prefix("~"));
     ///
     /// let mut client = Client::builder(&token).event_handler(Handler).framework(framework).await?;
     /// #     Ok(())
@@ -180,7 +177,7 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// use serenity::framework::standard::macros::command;
-    /// use serenity::framework::standard::{StandardFramework, CommandResult};
+    /// use serenity::framework::standard::{CommandResult, StandardFramework};
     ///
     /// #[command]
     /// // Registers the bucket `basic` to this command.
@@ -190,9 +187,8 @@ impl StandardFramework {
     /// }
     ///
     /// # async fn run() {
-    /// let framework = StandardFramework::new()
-    ///     .bucket("basic", |b| b.delay(2).time_span(10).limit(3))
-    ///     .await;
+    /// let framework =
+    ///     StandardFramework::new().bucket("basic", |b| b.delay(2).time_span(10).limit(3)).await;
     /// # }
     /// ```
     #[inline]
@@ -420,12 +416,18 @@ impl StandardFramework {
     /// #[hook]
     /// async fn dispatch_error_hook(context: &Context, msg: &Message, error: DispatchError) {
     ///     match error {
-    ///         DispatchError::NotEnoughArguments { min, given } => {
+    ///         DispatchError::NotEnoughArguments {
+    ///             min,
+    ///             given,
+    ///         } => {
     ///             let s = format!("Need {} arguments, but only got {}.", min, given);
     ///
     ///             let _ = msg.channel_id.say(&context, &s).await;
     ///         },
-    ///         DispatchError::TooManyArguments { max, given } => {
+    ///         DispatchError::TooManyArguments {
+    ///             max,
+    ///             given,
+    ///         } => {
     ///             let s = format!("Max arguments allowed is {}, but got {}.", max, given);
     ///
     ///             let _ = msg.channel_id.say(&context, &s).await;
@@ -434,8 +436,7 @@ impl StandardFramework {
     ///     }
     /// }
     ///
-    /// let framework = StandardFramework::new()
-    ///     .on_dispatch_error(dispatch_error_hook);
+    /// let framework = StandardFramework::new().on_dispatch_error(dispatch_error_hook);
     /// ```
     pub fn on_dispatch_error(mut self, f: DispatchHook) -> Self {
         self.dispatch = Some(f);
@@ -468,8 +469,7 @@ impl StandardFramework {
     ///     println!("Running command {}", cmd_name);
     ///     true
     /// }
-    /// let framework = StandardFramework::new()
-    ///     .before(before_hook);
+    /// let framework = StandardFramework::new().before(before_hook);
     /// ```
     ///
     /// Using before to prevent command usage:
@@ -494,8 +494,7 @@ impl StandardFramework {
     ///     true
     /// }
     ///
-    /// let framework = StandardFramework::new()
-    ///     .before(before_hook);
+    /// let framework = StandardFramework::new().before(before_hook);
     /// ```
     pub fn before(mut self, f: BeforeHook) -> Self {
         self.before = Some(f);
@@ -525,8 +524,7 @@ impl StandardFramework {
     ///     }
     /// }
     ///
-    /// let framework = StandardFramework::new()
-    ///     .after(after_hook);
+    /// let framework = StandardFramework::new().after(after_hook);
     /// ```
     pub fn after(mut self, f: AfterHook) -> Self {
         self.after = Some(f);
@@ -547,14 +545,18 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     ///
     /// #[hook]
-    /// async fn unrecognised_command_hook(_: &Context, msg: &Message, unrecognised_command_name: &str) {
-    ///     println!("A user named {:?} tried to executute an unknown command: {}",
+    /// async fn unrecognised_command_hook(
+    ///     _: &Context,
+    ///     msg: &Message,
+    ///     unrecognised_command_name: &str,
+    /// ) {
+    ///     println!(
+    ///         "A user named {:?} tried to executute an unknown command: {}",
     ///         msg.author.name, unrecognised_command_name
     ///     );
     /// }
     ///
-    /// let framework = StandardFramework::new()
-    ///     .unrecognised_command(unrecognised_command_hook);
+    /// let framework = StandardFramework::new().unrecognised_command(unrecognised_command_hook);
     /// ```
     pub fn unrecognised_command(mut self, f: UnrecognisedHook) -> Self {
         self.unrecognised_command = Some(f);
@@ -579,8 +581,7 @@ impl StandardFramework {
     ///     println!("Received a generic message: {:?}", msg.content);
     /// }
     ///
-    /// let framework = StandardFramework::new()
-    ///     .normal_message(normal_message_hook);
+    /// let framework = StandardFramework::new().normal_message(normal_message_hook);
     /// ```
     pub fn normal_message(mut self, f: NormalMessageHook) -> Self {
         self.normal_message = Some(f);

@@ -82,9 +82,11 @@ impl Embed {
     /// use serenity::model::channel::Embed;
     ///
     /// let embed = Embed::fake(|e| {
-    ///     e.title("Embed title")
-    ///         .description("Making a basic embed")
-    ///         .field("A field", "Has some content.", false)
+    ///     e.title("Embed title").description("Making a basic embed").field(
+    ///         "A field",
+    ///         "Has some content.",
+    ///         false,
+    ///     )
     /// });
     /// ```
     #[inline]

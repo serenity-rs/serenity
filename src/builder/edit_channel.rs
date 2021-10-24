@@ -169,11 +169,7 @@ impl EditChannel {
     ///     kind: PermissionOverwriteType::Member(UserId(1234)),
     /// }];
     ///
-    /// channel.edit(http, |c| {
-    ///     c.name("my_edited_cool_channel")
-    ///     .permissions(permissions)
-    /// })
-    /// .await?;
+    /// channel.edit(http, |c| c.name("my_edited_cool_channel").permissions(permissions)).await?;
     /// #    Ok(())
     /// # }
     /// ```

@@ -514,17 +514,13 @@ impl ChannelId {
     /// # async fn run() {
     /// # let channel_id = ChannelId::default();
     /// # let ctx = Http::default();
-    /// use serenity::model::channel::MessagesIter;
     /// use serenity::futures::StreamExt;
+    /// use serenity::model::channel::MessagesIter;
     ///
     /// let mut messages = channel_id.messages_iter(&ctx).boxed();
     /// while let Some(message_result) = messages.next().await {
     ///     match message_result {
-    ///         Ok(message) => println!(
-    ///             "{} said \"{}\".",
-    ///             message.author.name,
-    ///             message.content,
-    ///         ),
+    ///         Ok(message) => println!("{} said \"{}\".", message.author.name, message.content,),
     ///         Err(error) => eprintln!("Uh oh! Error: {}", error),
     ///     }
     /// }
@@ -677,10 +673,7 @@ impl ChannelId {
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
-    /// let _ = channel_id.send_files(&http, paths, |m| {
-    ///     m.content("a file")
-    /// })
-    /// .await;
+    /// let _ = channel_id.send_files(&http, paths, |m| m.content("a file")).await;
     /// # }
     /// ```
     ///
@@ -702,10 +695,7 @@ impl ChannelId {
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
-    /// let _ = channel_id.send_files(&http, files, |m| {
-    ///     m.content("a file")
-    /// })
-    /// .await;
+    /// let _ = channel_id.send_files(&http, files, |m| m.content("a file")).await;
     /// #    Ok(())
     /// # }
     /// ```
@@ -1337,17 +1327,13 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// # async fn run() {
     /// # let channel_id = ChannelId::default();
     /// # let ctx = Http::default();
-    /// use serenity::model::channel::MessagesIter;
     /// use serenity::futures::StreamExt;
+    /// use serenity::model::channel::MessagesIter;
     ///
     /// let mut messages = MessagesIter::<Http>::stream(&ctx, channel_id).boxed();
     /// while let Some(message_result) = messages.next().await {
     ///     match message_result {
-    ///         Ok(message) => println!(
-    ///             "{} said \"{}\"",
-    ///             message.author.name,
-    ///             message.content,
-    ///         ),
+    ///         Ok(message) => println!("{} said \"{}\"", message.author.name, message.content,),
     ///         Err(error) => eprintln!("Uh oh! Error: {}", error),
     ///     }
     /// }

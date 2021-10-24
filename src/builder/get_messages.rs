@@ -35,10 +35,9 @@ use crate::model::id::MessageId;
 /// // you can then pass it into a function which retrieves messages:
 /// let channel_id = ChannelId(81384788765712384);
 ///
-/// let _messages = channel_id.messages(&http, |retriever| {
-///     retriever.after(MessageId(158339864557912064)).limit(25)
-/// })
-/// .await?;
+/// let _messages = channel_id
+///     .messages(&http, |retriever| retriever.after(MessageId(158339864557912064)).limit(25))
+///     .await?;
 /// #     Ok(())
 /// # }
 /// ```

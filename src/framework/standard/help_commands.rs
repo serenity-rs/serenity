@@ -6,19 +6,20 @@
 //! embeds:
 //!
 //! ```rust,no_run
-//! use serenity::framework::standard::{
-//!     StandardFramework,
-//!     help_commands,
-//!     Args,
-//!     HelpOptions,
-//!     CommandGroup,
-//!     CommandResult,
-//! };
-//! use serenity::framework::standard::macros::help;
-//! use serenity::model::prelude::{Message, UserId};
-//! use serenity::client::{EventHandler, Context, Client};
 //! use std::collections::HashSet;
 //! use std::env;
+//!
+//! use serenity::client::{Client, Context, EventHandler};
+//! use serenity::framework::standard::macros::help;
+//! use serenity::framework::standard::{
+//!     help_commands,
+//!     Args,
+//!     CommandGroup,
+//!     CommandResult,
+//!     HelpOptions,
+//!     StandardFramework,
+//! };
+//! use serenity::model::prelude::{Message, UserId};
 //!
 //! struct Handler;
 //!
@@ -26,12 +27,12 @@
 //!
 //! #[help]
 //! async fn my_help(
-//!    context: &Context,
-//!    msg: &Message,
-//!    args: Args,
-//!    help_options: &'static HelpOptions,
-//!    groups: &[&'static CommandGroup],
-//!    owners: HashSet<UserId>
+//!     context: &Context,
+//!     msg: &Message,
+//!     args: Args,
+//!     help_options: &'static HelpOptions,
+//!     groups: &[&'static CommandGroup],
+//!     owners: HashSet<UserId>,
 //! ) -> CommandResult {
 //! #  #[cfg(all(feature = "cache", feature = "http"))]
 //! # {
@@ -43,8 +44,7 @@
 //! # Ok(())
 //! }
 //!
-//! let framework = StandardFramework::new()
-//!     .help(&MY_HELP);
+//! let framework = StandardFramework::new().help(&MY_HELP);
 //! ```
 //!
 //! The same can be accomplished with no embeds by substituting `with_embeds`
@@ -1270,9 +1270,18 @@ async fn send_error_embed(
 /// ```rust,no_run
 /// # use serenity::prelude::*;
 /// use std::{collections::HashSet, hash::BuildHasher};
-/// use serenity::{framework::standard::{Args, CommandGroup, CommandResult,
-///     StandardFramework, macros::help, HelpOptions,
-///     help_commands::*}, model::prelude::*,
+///
+/// use serenity::{
+///     framework::standard::{
+///         help_commands::*,
+///         macros::help,
+///         Args,
+///         CommandGroup,
+///         CommandResult,
+///         HelpOptions,
+///         StandardFramework,
+///     },
+///     model::prelude::*,
 /// };
 ///
 /// #[help]
@@ -1282,14 +1291,13 @@ async fn send_error_embed(
 ///     args: Args,
 ///     help_options: &'static HelpOptions,
 ///     groups: &[&'static CommandGroup],
-///     owners: HashSet<UserId>
+///     owners: HashSet<UserId>,
 /// ) -> CommandResult {
 ///     let _ = with_embeds(context, msg, args, &help_options, groups, owners).await;
 ///     Ok(())
 /// }
 ///
-/// let framwork = StandardFramework::new()
-///     .help(&MY_HELP);
+/// let framwork = StandardFramework::new().help(&MY_HELP);
 /// ```
 ///
 /// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
@@ -1472,9 +1480,18 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 /// ```rust,no_run
 /// # use serenity::prelude::*;
 /// use std::{collections::HashSet, hash::BuildHasher};
-/// use serenity::{framework::standard::{Args, CommandGroup, CommandResult,
-///     StandardFramework, macros::help, HelpOptions,
-///     help_commands::*}, model::prelude::*,
+///
+/// use serenity::{
+///     framework::standard::{
+///         help_commands::*,
+///         macros::help,
+///         Args,
+///         CommandGroup,
+///         CommandResult,
+///         HelpOptions,
+///         StandardFramework,
+///     },
+///     model::prelude::*,
 /// };
 ///
 /// #[help]
@@ -1484,14 +1501,13 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     args: Args,
 ///     help_options: &'static HelpOptions,
 ///     groups: &[&'static CommandGroup],
-///     owners: HashSet<UserId>
+///     owners: HashSet<UserId>,
 /// ) -> CommandResult {
 ///     let _ = plain(context, msg, args, &help_options, groups, owners).await;
 ///     Ok(())
 /// }
 ///
-/// let framework = StandardFramework::new()
-///     .help(&MY_HELP);
+/// let framework = StandardFramework::new().help(&MY_HELP);
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]

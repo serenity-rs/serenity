@@ -86,7 +86,9 @@ impl Channel {
     ///     Some(guild_channel) => {
     ///         println!("It's a guild channel named {}!", guild_channel.name);
     ///     },
-    ///     None => { println!("It's not in a guild!"); },
+    ///     None => {
+    ///         println!("It's not in a guild!");
+    ///     },
     /// }
     /// # }
     /// ```
@@ -121,7 +123,9 @@ impl Channel {
     ///     Some(private) => {
     ///         println!("It's a private channel with {}!", &private.recipient);
     ///     },
-    ///     None => { println!("It's not a private channel!"); },
+    ///     None => {
+    ///         println!("It's not a private channel!");
+    ///     },
     /// }
     /// # }
     /// ```
@@ -156,7 +160,9 @@ impl Channel {
     ///     Some(category) => {
     ///         println!("It's a category named {}!", category.name);
     ///     },
-    ///     None => { println!("It's not a category!"); },
+    ///     None => {
+    ///         println!("It's not a category!");
+    ///     },
     /// }
     /// #
     /// # }

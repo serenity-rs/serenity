@@ -84,12 +84,12 @@ impl Activity {
     /// Create a command that sets the current activity:
     ///
     /// ```rust,no_run
-    /// use serenity::model::gateway::Activity;
-    /// use serenity::model::channel::Message;
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
     /// # #[cfg(feature = "client")]
     /// use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{macros::command, Args, CommandResult};
+    /// use serenity::model::channel::Message;
+    /// use serenity::model::gateway::Activity;
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
@@ -136,12 +136,12 @@ impl Activity {
     /// Create a command that sets the current streaming status:
     ///
     /// ```rust,no_run
-    /// use serenity::model::gateway::Activity;
-    /// use serenity::model::channel::Message;
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
     /// # #[cfg(feature = "client")]
     /// use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{macros::command, Args, CommandResult};
+    /// use serenity::model::channel::Message;
+    /// use serenity::model::gateway::Activity;
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
@@ -190,12 +190,12 @@ impl Activity {
     /// Create a command that sets the current listening status:
     ///
     /// ```rust,no_run
-    /// use serenity::model::gateway::Activity;
-    /// use serenity::model::channel::Message;
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
     /// # #[cfg(feature = "client")]
     /// use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{macros::command, Args, CommandResult};
+    /// use serenity::model::channel::Message;
+    /// use serenity::model::gateway::Activity;
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
@@ -241,12 +241,12 @@ impl Activity {
     /// Create a command that sets the current cometing status:
     ///
     /// ```rust,no_run
-    /// use serenity::model::gateway::Activity;
-    /// use serenity::model::channel::Message;
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
     /// # #[cfg(feature = "client")]
     /// use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{macros::command, Args, CommandResult};
+    /// use serenity::model::channel::Message;
+    /// use serenity::model::gateway::Activity;
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
@@ -292,12 +292,12 @@ impl Activity {
     /// Create a command that sets the current cometing status:
     ///
     /// ```rust,no_run
-    /// use serenity::model::gateway::Activity;
-    /// use serenity::model::channel::Message;
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
     /// # #[cfg(feature = "client")]
     /// use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{macros::command, Args, CommandResult};
+    /// use serenity::model::channel::Message;
+    /// use serenity::model::gateway::Activity;
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]

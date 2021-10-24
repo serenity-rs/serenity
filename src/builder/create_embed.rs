@@ -222,8 +222,8 @@ impl CreateEmbed {
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::prelude::*;
     /// use serenity::model::channel::Message;
+    /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
@@ -231,14 +231,14 @@ impl CreateEmbed {
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
     ///         if msg.content == "~embed" {
-    ///             let _ = msg.channel_id.send_message(&context.http, |m| {
-    ///                 m.embed(|e| {
-    ///                     e.title("hello").timestamp("2004-06-08T16:04:23")
-    ///                 });
+    ///             let _ = msg
+    ///                 .channel_id
+    ///                 .send_message(&context.http, |m| {
+    ///                     m.embed(|e| e.title("hello").timestamp("2004-06-08T16:04:23"));
     ///
-    ///                 m
-    ///             })
-    ///             .await;
+    ///                     m
+    ///                 })
+    ///                 .await;
     ///         }
     ///     }
     /// }
@@ -257,9 +257,9 @@ impl CreateEmbed {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "cache", feature = "client"))]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// use serenity::prelude::*;
     /// use serenity::model::guild::Member;
     /// use serenity::model::id::GuildId;
+    /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
@@ -267,31 +267,27 @@ impl CreateEmbed {
     /// impl EventHandler for Handler {
     ///     async fn guild_member_addition(&self, context: Context, guild_id: GuildId, member: Member) {
     ///         if let Ok(guild) = guild_id.to_partial_guild(&context).await {
-    ///             let channels = guild.channels(&context)
-    ///                 .await
-    ///                 .unwrap();
+    ///             let channels = guild.channels(&context).await.unwrap();
     ///
-    ///             let channel_search = channels.values()
-    ///                 .find(|c| c.name == "join-log");
+    ///             let channel_search = channels.values().find(|c| c.name == "join-log");
     ///
     ///             if let Some(channel) = channel_search {
     ///                 let user = &member.user;
     ///
-    ///                 let _ = channel.send_message(&context, |m| {
-    ///                     m.embed(|e| {
-    ///                         e.author(|a| {
-    ///                             a.icon_url(&user.face()).name(&user.name)
-    ///                         });
-    ///                         e.title("Member Join");
+    ///                 let _ = channel
+    ///                     .send_message(&context, |m| {
+    ///                         m.embed(|e| {
+    ///                             e.author(|a| a.icon_url(&user.face()).name(&user.name));
+    ///                             e.title("Member Join");
     ///
-    ///                         if let Some(ref joined_at) = member.joined_at {
-    ///                             e.timestamp(joined_at);
-    ///                         }
+    ///                             if let Some(ref joined_at) = member.joined_at {
+    ///                                 e.timestamp(joined_at);
+    ///                             }
     ///
-    ///                         e
+    ///                             e
+    ///                         })
     ///                     })
-    ///                 })
-    ///                 .await;
+    ///                     .await;
     ///             }
     ///         }
     ///     }
