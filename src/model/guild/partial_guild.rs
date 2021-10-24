@@ -385,6 +385,13 @@ impl PartialGuild {
     /// Overrides all guild application commands.
     ///
     /// [`create_application_command`]: Self::create_application_command
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn set_application_commands<F>(
         &self,
@@ -402,6 +409,13 @@ impl PartialGuild {
     /// **Note**: It will update instantly.
     ///
     /// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn create_application_command_permission<F>(
         &self,
@@ -421,6 +435,13 @@ impl PartialGuild {
     /// more than one permission per call.
     ///
     /// [`create_application_command_permission`]: Self::create_application_command_permission
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn set_application_commands_permissions<F>(
         &self,
@@ -436,6 +457,13 @@ impl PartialGuild {
     }
 
     /// Get all guild application commands.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_commands(
         &self,
@@ -445,6 +473,13 @@ impl PartialGuild {
     }
 
     /// Get a specific guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_command(
         &self,
@@ -455,6 +490,13 @@ impl PartialGuild {
     }
 
     /// Edit guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_application_command<F>(
         &self,
@@ -469,6 +511,13 @@ impl PartialGuild {
     }
 
     /// Delete guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn delete_application_command(
         &self,
@@ -479,6 +528,13 @@ impl PartialGuild {
     }
 
     /// Get all guild application commands permissions only.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_commands_permissions(
         &self,
@@ -488,6 +544,13 @@ impl PartialGuild {
     }
 
     /// Get permissions for specific guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_command_permissions(
         &self,

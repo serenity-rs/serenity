@@ -800,6 +800,13 @@ impl ApplicationCommand {
     /// Overrides all global application commands.
     ///
     /// [`create_global_application_command`]: Self::create_global_application_command
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn set_global_application_commands<F>(
         http: impl AsRef<Http>,
         f: F,
@@ -815,6 +822,13 @@ impl ApplicationCommand {
     }
 
     /// Edits a global command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_global_application_command<F>(
         http: impl AsRef<Http>,
         command_id: CommandId,
@@ -828,6 +842,13 @@ impl ApplicationCommand {
     }
 
     /// Gets all global commands.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_global_application_commands(
         http: impl AsRef<Http>,
     ) -> Result<Vec<ApplicationCommand>> {
@@ -835,6 +856,13 @@ impl ApplicationCommand {
     }
 
     /// Gets a global command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn get_global_application_command(
         http: impl AsRef<Http>,
         command_id: CommandId,
@@ -843,6 +871,13 @@ impl ApplicationCommand {
     }
 
     /// Deletes a global command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn delete_global_application_command(
         http: impl AsRef<Http>,
         command_id: CommandId,

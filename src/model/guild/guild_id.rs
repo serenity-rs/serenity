@@ -1166,6 +1166,12 @@ impl GuildId {
     }
 
     /// Overrides all guild application commands.
+    ///
+    /// # Errors
+    ///
+    /// Returns the same possible errors as [`set_global_application_commands`].
+    ///
+    /// [`set_global_application_commands`]: crate::model::interactions::application_command::ApplicationCommand::set_global_application_commands
     #[cfg(feature = "unstable_discord_api")]
     pub async fn set_application_commands<F>(
         &self,
@@ -1187,6 +1193,13 @@ impl GuildId {
     /// **Note**: It will update instantly.
     ///
     /// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn create_application_command_permission<F>(
         &self,
@@ -1212,6 +1225,13 @@ impl GuildId {
     }
 
     /// Overrides all application commands permissions.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn set_application_commands_permissions<F>(
         &self,
@@ -1232,6 +1252,13 @@ impl GuildId {
     }
 
     /// Get all guild application commands.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_commands(
         &self,
@@ -1241,6 +1268,13 @@ impl GuildId {
     }
 
     /// Get a specific guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_command(
         &self,
@@ -1251,6 +1285,13 @@ impl GuildId {
     }
 
     /// Edit guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_application_command<F>(
         &self,
@@ -1268,6 +1309,13 @@ impl GuildId {
     }
 
     /// Delete guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn delete_application_command(
         &self,
@@ -1278,6 +1326,13 @@ impl GuildId {
     }
 
     /// Get all guild application commands permissions only.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_commands_permissions(
         &self,
@@ -1287,6 +1342,13 @@ impl GuildId {
     }
 
     /// Get permissions for specific guild application command by its Id.
+    ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_command_permissions(
         &self,

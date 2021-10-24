@@ -143,64 +143,63 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
 }
 
 #[cfg(all(feature = "unstable_discord_api", feature = "model"))]
-fn set_resolved(
-    mut options: &mut ApplicationCommandInteractionDataOption,
+fn try_resolve(
+    value: &Value,
+    kind: ApplicationCommandOptionType,
     resolved: &ApplicationCommandInteractionDataResolved,
-) {
-    if let Some(ref value) = options.value {
-        let string = value.as_str();
+) -> Option<ApplicationCommandInteractionDataOptionValue> {
+    let string = value.as_str();
 
-        options.resolved = match options.kind {
-            ApplicationCommandOptionType::User => {
-                let id = &UserId(string.unwrap().parse().unwrap());
+    match kind {
+        ApplicationCommandOptionType::User => {
+            let id = &UserId(string?.parse().ok()?);
 
-                let user = resolved.users.get(id).unwrap().to_owned();
-                let member = resolved.members.get(id).map(|m| m.to_owned());
+            let user = resolved.users.get(id)?.to_owned();
+            let member = resolved.members.get(id).map(ToOwned::to_owned);
+
+            Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
+        },
+        ApplicationCommandOptionType::Role => {
+            let id = &RoleId(string?.parse().ok()?);
+
+            let role = resolved.roles.get(id)?.to_owned();
+
+            Some(ApplicationCommandInteractionDataOptionValue::Role(role))
+        },
+        ApplicationCommandOptionType::Channel => {
+            let id = &ChannelId(string?.parse().ok()?);
+
+            let channel = resolved.channels.get(id)?.to_owned();
+
+            Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
+        },
+        ApplicationCommandOptionType::Mentionable => {
+            let id: u64 = string?.parse().ok()?;
+
+            if let Some(user) = resolved.users.get(&UserId(id)) {
+                let user = user.to_owned();
+                let member = resolved.members.get(&UserId(id)).map(|m| m.to_owned());
 
                 Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
-            },
-            ApplicationCommandOptionType::Role => {
-                let id = &RoleId(string.unwrap().parse().unwrap());
-
-                let role = resolved.roles.get(id).unwrap().to_owned();
+            } else {
+                let role = resolved.roles.get(&RoleId(id))?.to_owned();
 
                 Some(ApplicationCommandInteractionDataOptionValue::Role(role))
-            },
-            ApplicationCommandOptionType::Channel => {
-                let id = &ChannelId(string.unwrap().parse().unwrap());
-
-                let channel = resolved.channels.get(id).unwrap().to_owned();
-
-                Some(ApplicationCommandInteractionDataOptionValue::Channel(channel))
-            },
-            ApplicationCommandOptionType::Mentionable => {
-                let id: u64 = string.unwrap().parse().unwrap();
-
-                if let Some(user) = resolved.users.get(&UserId(id)) {
-                    let user = user.to_owned();
-                    let member = resolved.members.get(&UserId(id)).map(|m| m.to_owned());
-
-                    Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
-                } else {
-                    let role = resolved.roles.get(&RoleId(id)).unwrap().to_owned();
-
-                    Some(ApplicationCommandInteractionDataOptionValue::Role(role))
-                }
-            },
-            ApplicationCommandOptionType::String => Some(
-                ApplicationCommandInteractionDataOptionValue::String(string.unwrap().to_owned()),
-            ),
-            ApplicationCommandOptionType::Integer => {
-                Some(ApplicationCommandInteractionDataOptionValue::Integer(value.as_i64().unwrap()))
-            },
-            ApplicationCommandOptionType::Boolean => Some(
-                ApplicationCommandInteractionDataOptionValue::Boolean(value.as_bool().unwrap()),
-            ),
-            ApplicationCommandOptionType::Number => {
-                Some(ApplicationCommandInteractionDataOptionValue::Number(value.as_f64().unwrap()))
-            },
-            _ => None,
-        }
+            }
+        },
+        ApplicationCommandOptionType::String => {
+            Some(ApplicationCommandInteractionDataOptionValue::String(string?.to_owned()))
+        },
+        ApplicationCommandOptionType::Integer => {
+            Some(ApplicationCommandInteractionDataOptionValue::Integer(value.as_i64()?))
+        },
+        ApplicationCommandOptionType::Boolean => {
+            Some(ApplicationCommandInteractionDataOptionValue::Boolean(value.as_bool()?))
+        },
+        ApplicationCommandOptionType::Number => {
+            Some(ApplicationCommandInteractionDataOptionValue::Number(value.as_f64()?))
+        },
+        _ => None,
     }
 }
 
@@ -209,7 +208,9 @@ fn loop_resolved(
     options: &mut ApplicationCommandInteractionDataOption,
     resolved: &ApplicationCommandInteractionDataResolved,
 ) {
-    set_resolved(options, resolved);
+    if let Some(ref value) = options.value {
+        options.resolved = try_resolve(value, options.kind, resolved);
+    }
 
     for option in options.options.iter_mut() {
         loop_resolved(option, resolved);
