@@ -1820,10 +1820,14 @@ impl Guild {
     /// Helper function that's used for getting a [`Member`]'s permissions.
     #[cfg(feature = "cache")]
     pub(crate) fn _member_permission_from_member(&self, member: &Member) -> Permissions {
+        if member.user.id == self.owner_id {
+            return Permissions::all();
+        }
+
         let everyone = match self.roles.get(&RoleId(self.id.0)) {
             Some(everyone) => everyone,
             None => {
-                error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
+                error!("@everyone role ({}) missing in '{}'", self.id, self.name);
 
                 return Permissions::empty();
             },
