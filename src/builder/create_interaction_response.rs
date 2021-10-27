@@ -150,9 +150,9 @@ impl CreateInteractionResponseData {
     }
 
     /// For autocomplete responses this sets their autocomlete suggestions.
-    /// 
+    ///
     /// See the official docs on [`Application Command Option Choices`] for more information.
-    /// 
+    ///
     /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
     pub fn set_choices(&mut self, choices: Value) -> &mut Self {
         self.0.insert("choices", choices);
@@ -196,9 +196,7 @@ impl CreateInteractionResponseData {
         let choices = self.0.entry("choices").or_insert_with(|| Value::Array(vec![]));
         let choices_arr = choices.as_array_mut().expect("Must be an array");
         choices_arr.push(value);
-        
+
         self
     }
-
-
 }

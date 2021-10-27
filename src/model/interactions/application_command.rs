@@ -660,9 +660,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
         };
 
         let focused = match map.get("focused") {
-            Some(value) => value
-                .as_bool()
-                .ok_or_else(|| DeError::custom("expected bool"))?,
+            Some(value) => value.as_bool().ok_or_else(|| DeError::custom("expected bool"))?,
             None => false,
         };
 

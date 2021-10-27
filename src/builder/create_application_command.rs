@@ -102,13 +102,13 @@ impl CreateApplicationCommandOption {
     }
 
     /// Optionally enable/disable autocomplete interactions for this option.
-    /// 
+    ///
     /// **Notes**:
     /// - May not be set to `true` if `choices` are set
     /// - Options using `autocomplete` are not confined to only use given choices
     pub fn set_autocomplete(&mut self, value: bool) -> &mut Self {
         self.0.insert("autocomplete", Value::Bool(value));
-        
+
         self
     }
 

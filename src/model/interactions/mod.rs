@@ -134,9 +134,7 @@ impl Serialize for Interaction {
             Interaction::MessageComponent(i) => {
                 MessageComponentInteraction::serialize(i, serializer)
             },
-            Interaction::AutoComplete(i) => {
-                ApplicationCommandInteraction::serialize(i, serializer)
-            },
+            Interaction::AutoComplete(i) => ApplicationCommandInteraction::serialize(i, serializer),
         }
     }
 }
