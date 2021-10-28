@@ -149,7 +149,7 @@ impl CreateInteractionResponseData {
         self
     }
 
-    /// For autocomplete responses this sets their autocomlete suggestions.
+    /// For autocomplete responses this sets their autocomplete suggestions.
     ///
     /// See the official docs on [`Application Command Option Choices`] for more information.
     ///
