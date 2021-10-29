@@ -113,7 +113,7 @@ impl<'de> Deserialize<'de> for Interaction {
             },
             InteractionType::AutoComplete => {
                 serde_json::from_value::<ApplicationCommandInteraction>(Value::Object(map))
-                    .map(Interaction::ApplicationCommand)
+                    .map(Interaction::AutoComplete)
                     .map_err(DeError::custom)
             },
             InteractionType::Unknown => Err(DeError::custom("Unknown interaction type")),
