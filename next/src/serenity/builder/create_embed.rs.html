@@ -606,10 +606,6 @@
 <span id="606">606</span>
 <span id="607">607</span>
 <span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is a set of embed builders for rich embeds.</span>
@@ -657,17 +653,17 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the documentation for [`CreateEmbedAuthor`] for more</span>
     <span class="doccomment">/// information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbedAuthor</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbedAuthor</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateEmbedAuthor</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateEmbedAuthor</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">author</span> <span class="op">=</span> <span class="ident">CreateEmbedAuthor::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">author</span>);
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">author</span>);
         <span class="self">self</span>.<span class="ident">set_author</span>(<span class="ident">author</span>)
     }
 
     <span class="doccomment">/// Set the author of the embed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_author</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">author</span>: <span class="ident">CreateEmbedAuthor</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_author</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">author</span>: <span class="ident">CreateEmbedAuthor</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">author</span>.<span class="number">0</span>);
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;author&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">map</span>));
@@ -679,7 +675,7 @@
     <span class="doccomment">/// This is an alias of [`Self::colour`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">colour</span>(<span class="ident">colour</span>);
         <span class="self">self</span>
     }
@@ -687,13 +683,13 @@
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_colour</span>(<span class="ident">colour</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">_colour</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">Colour</span>) {
+    <span class="kw">fn</span> <span class="ident">_colour</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">Colour</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">u64::from</span>(<span class="ident">colour</span>.<span class="number">0</span>)));
     }
 
@@ -702,14 +698,14 @@
     <span class="doccomment">/// This is an alias of [`colour`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">colour</span>(<span class="ident">colour</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the colour of the left-hand side of the embed.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colour</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;color&quot;</span>, <span class="ident">from_number</span>(<span class="ident">colour</span>));
         <span class="self">self</span>
     }
@@ -718,7 +714,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This can&#39;t be longer than 2048 characters.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;description&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">description</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
@@ -729,7 +725,7 @@
     <span class="doccomment">/// **Note**: Maximum amount of characters you can put is 256 in a field</span>
     <span class="doccomment">/// name and 1024 in a field value.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">value</span>: <span class="ident">U</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">value</span>: <span class="ident">U</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ToString</span>,
         <span class="ident">U</span>: <span class="ident">ToString</span>,
@@ -738,7 +734,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">_field</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="ident">String</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) {
+    <span class="kw">fn</span> <span class="ident">_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="ident">String</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) {
         {
             <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;fields&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
 
@@ -755,7 +751,7 @@
     <span class="doccomment">/// Adds multiple fields at once.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is sugar to reduce the need of calling [`Self::field`] manually multiple times.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">bool</span>)<span class="op">&gt;</span>,
         <span class="ident">T</span>: <span class="ident">ToString</span>,
@@ -772,17 +768,17 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the documentation for [`CreateEmbedFooter`] for more</span>
     <span class="doccomment">/// information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">footer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">footer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbedFooter</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbedFooter</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateEmbedFooter</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateEmbedFooter</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_embed_footer</span> <span class="op">=</span> <span class="ident">CreateEmbedFooter::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">create_embed_footer</span>);
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">create_embed_footer</span>);
         <span class="self">self</span>.<span class="ident">set_footer</span>(<span class="ident">create_embed_footer</span>)
     }
 
     <span class="doccomment">/// Set the footer of the embed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_footer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">create_embed_footer</span>: <span class="ident">CreateEmbedFooter</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_footer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">create_embed_footer</span>: <span class="ident">CreateEmbedFooter</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">footer</span> <span class="op">=</span> <span class="ident">create_embed_footer</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">footer</span>);
 
@@ -790,7 +786,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">url_object</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">url</span>: <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">url_object</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">url</span>: <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;url&quot;</span>: <span class="ident">url</span>,
         });
@@ -801,7 +797,7 @@
 
     <span class="doccomment">/// Set the image associated with the embed. This only supports HTTP(S).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">image</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">image</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">url_object</span>(<span class="string">&quot;image&quot;</span>, <span class="ident">url</span>.<span class="ident">to_string</span>());
 
         <span class="self">self</span>
@@ -809,7 +805,7 @@
 
     <span class="doccomment">/// Set the thumbnail of the embed. This only supports HTTP(S).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thumbnail</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thumbnail</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">url_object</span>(<span class="string">&quot;thumbnail&quot;</span>, <span class="ident">url</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>
     }
@@ -834,8 +830,8 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
@@ -843,14 +839,14 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn message(&amp;self, context: Context, mut msg: Message) {</span>
     <span class="doccomment">///         if msg.content == &quot;~embed&quot; {</span>
-    <span class="doccomment">///             let _ = msg.channel_id.send_message(&amp;context.http, |m| {</span>
-    <span class="doccomment">///                 m.embed(|e| {</span>
-    <span class="doccomment">///                     e.title(&quot;hello&quot;).timestamp(&quot;2004-06-08T16:04:23&quot;)</span>
-    <span class="doccomment">///                 });</span>
+    <span class="doccomment">///             let _ = msg</span>
+    <span class="doccomment">///                 .channel_id</span>
+    <span class="doccomment">///                 .send_message(&amp;context.http, |m| {</span>
+    <span class="doccomment">///                     m.embed(|e| e.title(&quot;hello&quot;).timestamp(&quot;2004-06-08T16:04:23&quot;));</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                 m</span>
-    <span class="doccomment">///             })</span>
-    <span class="doccomment">///             .await;</span>
+    <span class="doccomment">///                     m</span>
+    <span class="doccomment">///                 })</span>
+    <span class="doccomment">///                 .await;</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
@@ -869,9 +865,9 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # #[cfg(all(feature = &quot;cache&quot;, feature = &quot;client&quot;))]</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">/// use serenity::model::guild::Member;</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
+    <span class="doccomment">/// use serenity::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// struct Handler;</span>
     <span class="doccomment">///</span>
@@ -879,31 +875,27 @@
     <span class="doccomment">/// impl EventHandler for Handler {</span>
     <span class="doccomment">///     async fn guild_member_addition(&amp;self, context: Context, guild_id: GuildId, member: Member) {</span>
     <span class="doccomment">///         if let Ok(guild) = guild_id.to_partial_guild(&amp;context).await {</span>
-    <span class="doccomment">///             let channels = guild.channels(&amp;context)</span>
-    <span class="doccomment">///                 .await</span>
-    <span class="doccomment">///                 .unwrap();</span>
+    <span class="doccomment">///             let channels = guild.channels(&amp;context).await.unwrap();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///             let channel_search = channels.values()</span>
-    <span class="doccomment">///                 .find(|c| c.name == &quot;join-log&quot;);</span>
+    <span class="doccomment">///             let channel_search = channels.values().find(|c| c.name == &quot;join-log&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///             if let Some(channel) = channel_search {</span>
     <span class="doccomment">///                 let user = &amp;member.user;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                 let _ = channel.send_message(&amp;context, |m| {</span>
-    <span class="doccomment">///                     m.embed(|e| {</span>
-    <span class="doccomment">///                         e.author(|a| {</span>
-    <span class="doccomment">///                             a.icon_url(&amp;user.face()).name(&amp;user.name)</span>
-    <span class="doccomment">///                         });</span>
-    <span class="doccomment">///                         e.title(&quot;Member Join&quot;);</span>
+    <span class="doccomment">///                 let _ = channel</span>
+    <span class="doccomment">///                     .send_message(&amp;context, |m| {</span>
+    <span class="doccomment">///                         m.embed(|e| {</span>
+    <span class="doccomment">///                             e.author(|a| a.icon_url(&amp;user.face()).name(&amp;user.name));</span>
+    <span class="doccomment">///                             e.title(&quot;Member Join&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                         if let Some(ref joined_at) = member.joined_at {</span>
-    <span class="doccomment">///                             e.timestamp(joined_at);</span>
-    <span class="doccomment">///                         }</span>
+    <span class="doccomment">///                             if let Some(ref joined_at) = member.joined_at {</span>
+    <span class="doccomment">///                                 e.timestamp(joined_at);</span>
+    <span class="doccomment">///                             }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///                         e</span>
+    <span class="doccomment">///                             e</span>
+    <span class="doccomment">///                         })</span>
     <span class="doccomment">///                     })</span>
-    <span class="doccomment">///                 })</span>
-    <span class="doccomment">///                 .await;</span>
+    <span class="doccomment">///                     .await;</span>
     <span class="doccomment">///             }</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
@@ -916,25 +908,25 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_timestamp</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">_timestamp</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">Timestamp</span>) {
+    <span class="kw">fn</span> <span class="ident">_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">Timestamp</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;timestamp&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">timestamp</span>.<span class="ident">ts</span>));
     }
 
     <span class="doccomment">/// Set the title of the embed.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;title&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">title</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the URL to direct to when clicking on the title.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;url&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
@@ -946,7 +938,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attachment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filename</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attachment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">filename</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">filename</span>.<span class="ident">to_string</span>();
         <span class="ident">filename</span>.<span class="ident">insert_str</span>(<span class="number">0</span>, <span class="string">&quot;attachment://&quot;</span>);
         <span class="self">self</span>.<span class="ident">url_object</span>(<span class="string">&quot;image&quot;</span>, <span class="ident">filename</span>);
@@ -1047,19 +1039,19 @@
 
 <span class="kw">impl</span> <span class="ident">CreateEmbedAuthor</span> {
     <span class="doccomment">/// Set the URL of the author&#39;s icon.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;icon_url&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">icon_url</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the author&#39;s name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the author&#39;s URL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;url&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
@@ -1076,13 +1068,13 @@
 
 <span class="kw">impl</span> <span class="ident">CreateEmbedFooter</span> {
     <span class="doccomment">/// Set the icon URL&#39;s value. This only supports HTTP(S).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">icon_url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;icon_url&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">icon_url</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the footer&#39;s text.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;text&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">text</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }

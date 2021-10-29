@@ -324,20 +324,6 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">boxed::Box</span>,
     <span class="ident">future::Future</span>,
@@ -471,8 +457,8 @@
     <span class="doccomment">/// Sends an `interaction` to the consuming collector if the `interaction` conforms</span>
     <span class="doccomment">/// to the constraints and the limits are not reached yet.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_interaction</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">interaction</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">interaction</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_passing_constraints</span>(<span class="ident">interaction</span>) {
             <span class="self">self</span>.<span class="ident">collected</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -492,7 +478,7 @@
     <span class="doccomment">/// be sent by a specific author or in a specifc guild.</span>
     <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">interaction</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>,
+        <span class="ident">interaction</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyArc</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">bool</span> {
         <span class="comment">// TODO: On next branch, switch filter arg to &amp;T so this as_arc() call can be removed.</span>
         <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">guild_id</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">==</span> <span class="ident">interaction</span>.<span class="ident">guild_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="number">0</span>))
@@ -511,7 +497,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">struct</span> <span class="ident">FilterOptions</span> {
     <span class="ident">filter_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">collect_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
@@ -523,7 +509,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterOptions</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ComponentInteractionFilter&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;collect_limit&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">collect_limit</span>)
             .<span class="ident">field</span>(<span class="string">&quot;filter&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;Option&lt;Arc&lt;dyn Fn(&amp;Arc&lt;Reaction&gt;) -&gt; bool + &#39;static + Send + Sync&gt;&gt;&quot;</span>)
@@ -531,20 +517,6 @@
             .<span class="ident">field</span>(<span class="string">&quot;guild_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>)
             .<span class="ident">field</span>(<span class="string">&quot;author_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">author_id</span>)
             .<span class="ident">finish</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">FilterOptions</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">filter_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">collect_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">filter</span>: <span class="prelude-val">None</span>,
-            <span class="ident">channel_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">guild_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">author_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">message_id</span>: <span class="prelude-val">None</span>,
-        }
     }
 }
 
@@ -577,7 +549,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ComponentInteractionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">ComponentInteractionCollector</span>;
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">ComponentInteractionFilter::new</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
@@ -618,7 +590,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">CollectComponentInteraction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">ComponentInteractionFilter::new</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
@@ -659,7 +631,7 @@
 
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">ComponentInteractionCollector</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">timeout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span> {
             <span class="kw">match</span> <span class="ident">timeout</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">ctx</span>) {
                 <span class="ident">Poll::Ready</span>(<span class="kw">_</span>) =&gt; {
@@ -674,7 +646,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ComponentInteractionCollector</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">close</span>();
     }
 }

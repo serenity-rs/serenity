@@ -933,6 +933,56 @@
 <span id="933">933</span>
 <span id="934">934</span>
 <span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
+<span id="981">981</span>
+<span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
@@ -957,7 +1007,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Error</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
@@ -1038,19 +1088,49 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">lex</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">delims</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span> {
+<span class="comment">// A utility enum to handle an edge case with Apple OSs.</span>
+<span class="comment">//</span>
+<span class="comment">// By default, a feature called &quot;Smart Quotes&quot; is enabled on MacOS and iOS devices. This feature</span>
+<span class="comment">// automatically substitutes the lame, but simple `&quot;` ASCII character for quotation with the cool</span>
+<span class="comment">// `”` Unicode character. It can be disabled, but users may not want to do that as it is a global</span>
+<span class="comment">// setting (i.e. they might not want to disable it just for properly invoking commands of bots on</span>
+<span class="comment">// Discord).</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">enum</span> <span class="ident">QuoteKind</span> {
+    <span class="ident">Ascii</span>,
+    <span class="ident">Apple</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">QuoteKind</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">c</span> {
+            <span class="string">&#39;&quot;&#39;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">QuoteKind::Ascii</span>),
+            <span class="string">&#39;\u{201C}&#39;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">QuoteKind::Apple</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">is_ending_quote</span>(<span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">QuoteKind::Ascii</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&quot;&#39;</span>,
+            <span class="ident">QuoteKind::Apple</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\u{201D}&#39;</span>,
+        }
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">lex</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">delims</span>: <span class="kw-2">&amp;</span>[<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">offset</span>();
-    <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">current</span>()<span class="question-mark">?</span> <span class="op">==</span> <span class="string">b&#39;&quot;&#39;</span> {
-        <span class="ident">stream</span>.<span class="ident">next</span>();
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">kind</span>) <span class="op">=</span> <span class="ident">QuoteKind::new</span>(<span class="ident">stream</span>.<span class="ident">current_char</span>()<span class="question-mark">?</span>) {
+        <span class="ident">stream</span>.<span class="ident">next_char</span>();
 
-        <span class="ident">stream</span>.<span class="ident">take_until</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;&quot;&#39;</span>);
+        <span class="ident">stream</span>.<span class="ident">take_until_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">kind</span>.<span class="ident">is_ending_quote</span>(<span class="ident">c</span>));
 
-        <span class="kw">let</span> <span class="ident">is_quote</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">current</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;&quot;&#39;</span>);
-        <span class="ident">stream</span>.<span class="ident">next</span>();
+        <span class="kw">let</span> <span class="ident">is_quote</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">current_char</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">kind</span>.<span class="ident">is_ending_quote</span>(<span class="ident">c</span>));
+        <span class="ident">stream</span>.<span class="ident">next_char</span>();
 
         <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">offset</span>();
 
@@ -1085,12 +1165,35 @@
     <span class="prelude-val">Some</span>(<span class="ident">Token::new</span>(<span class="ident">TokenKind::Argument</span>, <span class="ident">start</span>, <span class="ident">end</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">remove_quotes</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;&quot;&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&quot;&#39;</span>) {
-        <span class="kw">return</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>];
+<span class="kw">fn</span> <span class="ident">is_surrounded_with</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">begin</span>: <span class="ident">char</span>, <span class="ident">end</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="ident">begin</span>) <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">ends_with</span>(<span class="ident">end</span>)
+}
+
+<span class="kw">fn</span> <span class="ident">is_quoted</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
+        <span class="kw">return</span> <span class="bool-val">false</span>;
     }
 
-    <span class="ident">s</span>
+    <span class="comment">// Refer to `QuoteKind` why we check for Unicode quote characters.</span>
+    <span class="ident">is_surrounded_with</span>(<span class="ident">s</span>, <span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">is_surrounded_with</span>(<span class="ident">s</span>, <span class="string">&#39;\u{201C}&#39;</span>, <span class="string">&#39;\u{201D}&#39;</span>)
+}
+
+<span class="kw">fn</span> <span class="ident">strip</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">begin</span>: <span class="ident">char</span>, <span class="ident">end</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">strip_prefix</span>(<span class="ident">begin</span>)<span class="question-mark">?</span>;
+    <span class="ident">s</span>.<span class="ident">strip_suffix</span>(<span class="ident">end</span>)
+}
+
+<span class="kw">fn</span> <span class="ident">remove_quotes</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
+        <span class="kw">return</span> <span class="ident">s</span>;
+    }
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">strip</span>(<span class="ident">s</span>, <span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;&quot;&#39;</span>) {
+        <span class="kw">return</span> <span class="ident">s</span>;
+    }
+
+    <span class="comment">// Refer to `QuoteKind` why we check for Unicode quote characters.</span>
+    <span class="ident">strip</span>(<span class="ident">s</span>, <span class="string">&#39;\u{201C}&#39;</span>, <span class="string">&#39;\u{201D}&#39;</span>).<span class="ident">unwrap_or</span>(<span class="ident">s</span>)
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -1234,11 +1337,8 @@
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">delims</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">message</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">message</span>.<span class="ident">starts_with</span>(<span class="string">&#39;&quot;&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">message</span>.<span class="ident">ends_with</span>(<span class="string">&#39;&quot;&#39;</span>) {
-                <span class="ident">TokenKind::QuotedArgument</span>
-            } <span class="kw">else</span> {
-                <span class="ident">TokenKind::Argument</span>
-            };
+            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span>
+                <span class="kw">if</span> <span class="ident">is_quoted</span>(<span class="ident">message</span>) { <span class="ident">TokenKind::QuotedArgument</span> } <span class="kw">else</span> { <span class="ident">TokenKind::Argument</span> };
 
             <span class="comment">// If there are no delimiters, then the only possible argument is the whole message.</span>
             <span class="macro">vec!</span>[<span class="ident">Token::new</span>(<span class="ident">kind</span>, <span class="number">0</span>, <span class="ident">message</span>.<span class="ident">len</span>())]
@@ -1246,7 +1346,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">Stream::new</span>(<span class="ident">message</span>);
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>) <span class="op">=</span> <span class="ident">lex</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">delims</span>) {
+            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>) <span class="op">=</span> <span class="ident">lex</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="ident">delims</span>) {
                 <span class="comment">// Ignore empty arguments.</span>
                 <span class="kw">if</span> <span class="ident">message</span>[<span class="ident">token</span>.<span class="ident">span</span>.<span class="number">0</span>..<span class="ident">token</span>.<span class="ident">span</span>.<span class="number">1</span>].<span class="ident">is_empty</span>() {
                     <span class="kw">continue</span>;
@@ -1282,7 +1382,7 @@
     <span class="doccomment">/// This increments the offset pointer.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Does nothing if the message is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="self">self</span>;
         }
@@ -1297,7 +1397,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Does nothing if the offset pointer is `0`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rewind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rewind</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="self">self</span>;
         }
@@ -1309,7 +1409,7 @@
 
     <span class="doccomment">/// Go back to the starting point.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restore</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">restore</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
     }
 
@@ -1397,7 +1497,7 @@
     <span class="doccomment">/// assert_eq!(args.current(), Some(&quot;     42     &quot;));</span>
     <span class="doccomment">/// assert_eq!(args.message(), &quot;     42     &quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State::None</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Trimmed</span>,
             <span class="ident">State::Quoted</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::QuotedTrimmed</span>,
@@ -1412,7 +1512,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to [`Self::trimmed`]&#39;s examples.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">untrimmed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">untrimmed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State::Trimmed</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::None</span>,
             <span class="ident">State::QuotedTrimmed</span> <span class="op">|</span> <span class="ident">State::TrimmedQuoted</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Quoted</span>,
@@ -1442,7 +1542,7 @@
     <span class="doccomment">/// assert_eq!(args.current(), Some(&quot;\&quot;42\&quot;&quot;));</span>
     <span class="doccomment">/// assert_eq!(args.message(), &quot;\&quot;42\&quot;&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quoted</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quoted</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="self">self</span>;
         }
@@ -1465,7 +1565,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to [`Self::quoted`]&#39;s examples.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unquoted</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unquoted</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State::Quoted</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::None</span>,
             <span class="ident">State::QuotedTrimmed</span> <span class="op">|</span> <span class="ident">State::TrimmedQuoted</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Trimmed</span>,
@@ -1522,7 +1622,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// May return the same errors as `parse`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">advance</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">p</span>)
@@ -1548,7 +1648,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// May return the same errors as [`Self::parse`].</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single_quoted</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single_quoted</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quoted</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">advance</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">p</span>)
@@ -1577,7 +1677,7 @@
     <span class="doccomment">/// assert!(args.is_empty());</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Iter</span> {
             <span class="ident">args</span>: <span class="self">self</span>,
             <span class="ident">state</span>: <span class="ident">State::None</span>,
@@ -1655,7 +1755,7 @@
     <span class="doccomment">/// Returns [`Error::Eos`] if no argument can be parsed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Eos`]: Error::Eos</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Eos</span>);
         }
@@ -1703,7 +1803,7 @@
     <span class="doccomment">/// Returns [`Error::Eos`] if no argument can be parsed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Eos`]: Error::Eos</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_n</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_n</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Eos</span>);
         }
@@ -1792,20 +1892,20 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Retrieve the current argument.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>;
         <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">current</span>()
     }
 
     <span class="doccomment">/// Parse the current argument independently.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>;
         <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
     }
 
     <span class="doccomment">/// Remove surrounding quotation marks from all of the arguments.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quoted</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quoted</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State::None</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Quoted</span>,
             <span class="ident">State::Trimmed</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::TrimmedQuoted</span>,
@@ -1817,7 +1917,7 @@
 
     <span class="doccomment">/// Trim leading and trailling whitespace off all arguments.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State::None</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Trimmed</span>,
             <span class="ident">State::Quoted</span> =&gt; <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::QuotedTrimmed</span>,
@@ -1831,7 +1931,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T::Err</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {
@@ -1854,7 +1954,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">start</span>, <span class="ident">end</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">get</span>(<span class="number">0</span>)<span class="question-mark">?</span>.<span class="ident">span</span>;
 
         <span class="self">self</span>.<span class="ident">tokens</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tokens</span>[<span class="number">1</span>..];

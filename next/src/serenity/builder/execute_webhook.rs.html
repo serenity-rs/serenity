@@ -231,16 +231,6 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
@@ -279,14 +269,16 @@
 <span class="doccomment">/// let resources = Embed::fake(|e| {</span>
 <span class="doccomment">///     e.title(&quot;Rust Resources&quot;)</span>
 <span class="doccomment">///         .description(&quot;A few resources to help with learning Rust&quot;)</span>
-<span class="doccomment">///         .colour(0xDEA584).field(&quot;The Rust Book&quot;, &quot;A comprehensive resource for Rust.&quot;, false)</span>
+<span class="doccomment">///         .colour(0xDEA584)</span>
+<span class="doccomment">///         .field(&quot;The Rust Book&quot;, &quot;A comprehensive resource for Rust.&quot;, false)</span>
 <span class="doccomment">///         .field(&quot;Rust by Example&quot;, &quot;A collection of Rust examples&quot;, false)</span>
 <span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// webhook.execute(&amp;http, false, |w| {</span>
-<span class="doccomment">///     w.content(&quot;Here&#39;s some information on Rust:&quot;).embeds(vec![website, resources])</span>
-<span class="doccomment">/// })</span>
-<span class="doccomment">/// .await?;</span>
+<span class="doccomment">/// webhook</span>
+<span class="doccomment">///     .execute(&amp;http, false, |w| {</span>
+<span class="doccomment">///         w.content(&quot;Here&#39;s some information on Rust:&quot;).embeds(vec![website, resources])</span>
+<span class="doccomment">///     })</span>
+<span class="doccomment">///     .await?;</span>
 <span class="doccomment">/// #     Ok(())</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
@@ -313,14 +305,11 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let avatar_url = &quot;https://i.imgur.com/KTs6whd.jpg&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// webhook.execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///     w.avatar_url(avatar_url).content(&quot;Here&#39;s a webhook&quot;)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// webhook.execute(&amp;http, false, |w| w.avatar_url(avatar_url).content(&quot;Here&#39;s a webhook&quot;)).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar_url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">avatar_url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar_url</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">avatar_url</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;avatar_url&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">avatar_url</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
@@ -341,10 +330,7 @@
     <span class="doccomment">/// # let http = Http::default();</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///     w.content(&quot;foo&quot;)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;foo&quot;)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -352,22 +338,22 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">content</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Appends a file to the webhook message.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_file</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">file</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">1</span>.<span class="ident">push</span>(<span class="ident">file</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Appends a list of files to the webhook message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
-    ) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">1</span>.<span class="ident">extend</span>(<span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>()));
         <span class="self">self</span>
     }
@@ -377,9 +363,9 @@
     <span class="doccomment">/// Calling this multiple times will overwrite the file list.</span>
     <span class="doccomment">/// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">files</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
-    ) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">into</span>()).<span class="ident">collect</span>();
         <span class="self">self</span>
     }
@@ -397,7 +383,7 @@
     <span class="doccomment">/// [`Embed::fake`]: crate::model::channel::Embed::fake</span>
     <span class="doccomment">/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute</span>
     <span class="doccomment">/// [struct-level documentation]: #examples</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">embeds</span>));
         <span class="self">self</span>
     }
@@ -415,10 +401,7 @@
     <span class="doccomment">/// # let http = Http::default();</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///     w.content(&quot;hello&quot;).tts(true)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).tts(true)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -426,7 +409,7 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tts</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tts</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tts</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">tts</span>));
         <span class="self">self</span>
     }
@@ -444,10 +427,7 @@
     <span class="doccomment">/// # let http = Http::default();</span>
     <span class="doccomment">/// # let webhook = http.get_webhook_with_token(0, &quot;&quot;).await?;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| {</span>
-    <span class="doccomment">///     w.content(&quot;hello&quot;).username(&quot;hakase&quot;)</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// .await;</span>
+    <span class="doccomment">/// let execution = webhook.execute(&amp;http, false, |w| w.content(&quot;hello&quot;).username(&quot;hakase&quot;)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(why) = execution {</span>
     <span class="doccomment">///     println!(&quot;Err sending webhook: {:?}&quot;, why);</span>
@@ -455,7 +435,7 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">username</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">username</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">username</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;username&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">username</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }

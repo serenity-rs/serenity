@@ -817,6 +817,14 @@
 <span id="817">817</span>
 <span id="818">818</span>
 <span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync::Arc</span>,
     <span class="ident">time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>},
@@ -927,9 +935,10 @@
     <span class="doccomment">/// then listening for events:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// use std::sync::Arc;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// use serenity::gateway::Shard;</span>
     <span class="doccomment">/// use tokio::sync::Mutex;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// # use serenity::client::bridge::gateway::GatewayIntents;</span>
@@ -1023,7 +1032,7 @@
     <span class="doccomment">/// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending</span>
     <span class="doccomment">/// a heartbeat.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">heartbeat</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_heartbeat</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">seq</span>)).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="self">self</span>.<span class="ident">heartbeat_instants</span>.<span class="number">0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
@@ -1070,20 +1079,20 @@
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">current_presence</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">activity</span>;
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">set_activity</span>(<span class="ident">activity</span>);
         <span class="self">self</span>.<span class="ident">set_status</span>(<span class="ident">status</span>);
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {
         <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">OnlineStatus::Offline</span> {
             <span class="ident">status</span> <span class="op">=</span> <span class="ident">OnlineStatus::Invisible</span>;
         }
@@ -1137,7 +1146,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">handle_gateway_dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seq</span>: <span class="ident">u64</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardAction</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">handle_gateway_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seq</span>: <span class="ident">u64</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardAction</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">seq</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">seq</span> <span class="op">+</span> <span class="number">1</span> {
             <span class="macro">warn!</span>(<span class="string">&quot;[Shard {:?}] Sequence off; them: {}, us: {}&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>, <span class="ident">seq</span>, <span class="self">self</span>.<span class="ident">seq</span>);
         }
@@ -1165,7 +1174,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">handle_heartbeat_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">u64</span>) -&gt; <span class="ident">ShardAction</span> {
+    <span class="kw">fn</span> <span class="ident">handle_heartbeat_event</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="ident">u64</span>) -&gt; <span class="ident">ShardAction</span> {
         <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Received shard heartbeat&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
         <span class="comment">// Received seq is off -- attempt to resume.</span>
@@ -1194,7 +1203,7 @@
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">fn</span> <span class="ident">handle_gateway_closed</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CloseFrame</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardAction</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">code</span>.<span class="ident">into</span>());
@@ -1307,7 +1316,7 @@
     <span class="doccomment">/// many guilds assigned to it.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle_event</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GatewayEvent</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardAction</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">event</span> {
@@ -1381,7 +1390,7 @@
     <span class="doccomment">/// - a heartbeat acknowledgement was not received in time</span>
     <span class="doccomment">/// - an error occurred while heartbeating</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_heartbeat</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">wait</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">heartbeat_interval</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">heartbeat_interval</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">heartbeat_interval</span>) =&gt; <span class="ident">heartbeat_interval</span>,
@@ -1444,7 +1453,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that, if the shard is already in a stage of</span>
     <span class="doccomment">/// [`ConnectionStage::Connecting`], then no action will be performed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_reconnect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReconnectType</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_reconnect</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReconnectType</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">==</span> <span class="ident">ConnectionStage::Connecting</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -1514,7 +1523,14 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// shard.chunk_guild(GuildId(81384788765712384), Some(20), ChunkGuildFilter::Query(&quot;do&quot;.to_owned()), Some(&quot;request&quot;)).await?;</span>
+    <span class="doccomment">/// shard</span>
+    <span class="doccomment">///     .chunk_guild(</span>
+    <span class="doccomment">///         GuildId(81384788765712384),</span>
+    <span class="doccomment">///         Some(20),</span>
+    <span class="doccomment">///         ChunkGuildFilter::Query(&quot;do&quot;.to_owned()),</span>
+    <span class="doccomment">///         Some(&quot;request&quot;),</span>
+    <span class="doccomment">///     )</span>
+    <span class="doccomment">///     .await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1524,7 +1540,7 @@
     <span class="doccomment">/// [`Member`]: crate::model::guild::Member</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">chunk_guild</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
         <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
@@ -1540,7 +1556,7 @@
     <span class="doccomment">/// - the time that the last heartbeat sent as being now</span>
     <span class="doccomment">/// - the `stage` to [`ConnectionStage::Identifying`]</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">identify</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">identify</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_identify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="self">self</span>.<span class="ident">intents</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">heartbeat_instants</span>.<span class="number">0</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
@@ -1554,7 +1570,7 @@
     <span class="doccomment">/// This will set the stage of the shard before and after instantiation of</span>
     <span class="doccomment">/// the client.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WsStream</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WsStream</span><span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Initializing.&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
         <span class="comment">// We need to do two, sort of three things here:</span>
@@ -1575,7 +1591,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">heartbeat_instants</span> <span class="op">=</span> (<span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>()), <span class="prelude-val">None</span>);
         <span class="self">self</span>.<span class="ident">heartbeat_interval</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="self">self</span>.<span class="ident">last_heartbeat_acknowledged</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -1585,7 +1601,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">resume</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">resume</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="string">&quot;[Shard {:?}] Attempting to resume&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);
 
         <span class="self">self</span>.<span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">initialize</span>().<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1600,7 +1616,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reconnect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reconnect</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Attempting to reconnect&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>());
 
         <span class="self">self</span>.<span class="ident">reset</span>().<span class="kw">await</span>;
@@ -1610,7 +1626,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_presence</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_presence</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_presence_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_presence</span>).<span class="kw">await</span>
     }
 }

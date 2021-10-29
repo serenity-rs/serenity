@@ -1656,7 +1656,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content.build(), &quot;test&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">clone</span>().<span class="number">0</span>
     }
 
@@ -1687,11 +1687,11 @@
     <span class="doccomment">/// [`GuildChannel`]: crate::model::channel::GuildChannel</span>
     <span class="doccomment">/// [Display implementation]: ChannelId#impl-Display</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_channel</span>(<span class="ident">channel</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_channel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">ChannelId</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">_channel</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">ChannelId</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">channel</span>.<span class="ident">mention</span>());
         <span class="comment">// should not error, ignoring</span>
@@ -1734,7 +1734,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Display implementation]: crate::model::guild::Emoji#impl-Display</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="kw-2">&amp;</span><span class="ident">Emoji</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">emoji</span>: <span class="kw-2">&amp;</span><span class="ident">Emoji</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">emoji</span>);
         <span class="comment">// should not error, ignoring</span>
@@ -1743,7 +1743,7 @@
     }
 
     <span class="doccomment">/// Mentions something that implements the [`Mentionable`] trait.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mention</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mentionable</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mention</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mentionable</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">item</span>.<span class="ident">mention</span>());
         <span class="comment">// should not error, ignoring</span>
@@ -1774,11 +1774,11 @@
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_push</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">into</span>().<span class="ident">to_string</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">_push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="ident">content</span>);
 
         <span class="self">self</span>
@@ -1822,7 +1822,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;```\nhello\n```&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_codeblock</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>, <span class="ident">language</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_codeblock</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>, <span class="ident">language</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;```&quot;</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">language</span>) <span class="op">=</span> <span class="ident">language</span> {
@@ -1860,7 +1860,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, expected);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mono</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mono</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;`&#39;</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;`&#39;</span>);
@@ -1889,7 +1889,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, expected);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_italic</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_italic</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;_&#39;</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;_&#39;</span>);
@@ -1898,7 +1898,7 @@
     }
 
     <span class="doccomment">/// Pushes an inline bold text to the content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_bold</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_bold</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;**&quot;</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;**&quot;</span>);
@@ -1907,7 +1907,7 @@
     }
 
     <span class="doccomment">/// Pushes an underlined inline text to the content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_underline</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_underline</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;__&quot;</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;__&quot;</span>);
@@ -1916,7 +1916,7 @@
     }
 
     <span class="doccomment">/// Pushes a strikethrough inline text to the content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_strike</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_strike</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;~~&quot;</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;~~&quot;</span>);
@@ -1925,7 +1925,7 @@
     }
 
     <span class="doccomment">/// Pushes a spoiler&#39;d inline text to the content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_spoiler</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_spoiler</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;||&quot;</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;||&quot;</span>);
@@ -1934,7 +1934,7 @@
     }
 
     <span class="doccomment">/// Pushes a quoted inline text to the content</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_quote</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_quote</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;&gt; &quot;</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">into</span>().<span class="ident">to_string</span>());
 
@@ -1954,7 +1954,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;hello\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -1974,7 +1974,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;`hello`\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mono_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mono_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_mono</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -1994,7 +1994,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;_hello_\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_italic_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_italic_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_italic</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2014,7 +2014,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;**hello**\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_bold_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_bold_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_bold</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2034,7 +2034,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;__hello__\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_underline_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_underline_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_underline</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2054,7 +2054,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;~~hello~~\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_strike_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_strike_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_strike</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2074,7 +2074,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;||hello||\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_spoiler_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_spoiler_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_spoiler</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2094,7 +2094,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;&gt; hello\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_quote_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_quote_line</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_quote</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2103,7 +2103,7 @@
 
     <span class="doccomment">/// Pushes text to your message, but normalizing content - that means</span>
     <span class="doccomment">/// ensuring that there&#39;s no unwanted formatting, mention spam etc.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_safe</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_safe</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">C</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
             <span class="ident">c</span>.<span class="ident">inner</span> <span class="op">=</span>
@@ -2116,7 +2116,7 @@
     }
 
     <span class="doccomment">/// Pushes a code-block to your message normalizing content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_codeblock_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>, <span class="ident">language</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_codeblock_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>, <span class="ident">language</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;```&quot;</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">language</span>) <span class="op">=</span> <span class="ident">language</span> {
@@ -2135,7 +2135,7 @@
     }
 
     <span class="doccomment">/// Pushes an inline monospaced text to the content normalizing content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mono_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mono_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;`&#39;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
@@ -2148,7 +2148,7 @@
     }
 
     <span class="doccomment">/// Pushes an inline italicized text to the content normalizing content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_italic_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_italic_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;_&#39;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
@@ -2161,7 +2161,7 @@
     }
 
     <span class="doccomment">/// Pushes an inline bold text to the content normalizing content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_bold_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_bold_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;**&quot;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
@@ -2174,7 +2174,7 @@
     }
 
     <span class="doccomment">/// Pushes an underlined inline text to the content normalizing content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_underline_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_underline_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;__&quot;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
@@ -2187,7 +2187,7 @@
     }
 
     <span class="doccomment">/// Pushes a strikethrough inline text to the content normalizing content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_strike_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_strike_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;~~&quot;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
@@ -2200,7 +2200,7 @@
     }
 
     <span class="doccomment">/// Pushes a spoiler&#39;d inline text to the content normalizing content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_spoiler_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_spoiler_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;||&quot;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
@@ -2213,7 +2213,7 @@
     }
 
     <span class="doccomment">/// Pushes a quoted inline text to the content normalizing content.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_quote_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_quote_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;&gt; &quot;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
@@ -2238,7 +2238,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;Hello @\u{200B}everyone\nHow are you?&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_safe</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2259,7 +2259,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;`&#39;hello @\u{200B}everyone&#39;`\nworld&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mono_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_mono_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_mono_safe</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2280,7 +2280,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;_@\u{200B}everyone_\nIsn&#39;t a mention.&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_italic_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_italic_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_italic_safe</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2301,7 +2301,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;**@\u{200B}everyone**\nIsn&#39;t a mention.&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_bold_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_bold_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_bold_safe</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2324,7 +2324,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;__@\u{200B}everyone__\nIsn&#39;t a mention.&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_underline_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_underline_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_underline_safe</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2346,7 +2346,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;~~@\u{200B}everyone~~\nIsn&#39;t a mention.&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_strike_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_strike_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_strike_safe</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2368,7 +2368,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;||@\u{200B}everyone||\nIsn&#39;t a mention.&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_spoiler_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_spoiler_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_spoiler_safe</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2390,7 +2390,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(content, &quot;&gt; @\u{200B}everyone\nIsn&#39;t a mention.&quot;);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_quote_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_quote_line_safe</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">push_quote_safe</span>(<span class="ident">content</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
 
@@ -2398,7 +2398,7 @@
     }
 
     <span class="doccomment">/// Starts a multi-line quote, every push after this one will be quoted</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quote_rest</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quote_rest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n&gt;&gt;&gt; &quot;</span>);
 
         <span class="self">self</span>
@@ -2414,7 +2414,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Role`]: crate::model::guild::Role</span>
     <span class="doccomment">/// [Display implementation]: RoleId#impl-Display</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">role</span>: <span class="ident">R</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">role</span>: <span class="ident">R</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">role</span>.<span class="ident">into</span>().<span class="ident">mention</span>());
         <span class="comment">// should not error, ignoring</span>
@@ -2432,7 +2432,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`User`]: crate::model::user::User</span>
     <span class="doccomment">/// [Display implementation]: UserId#impl-Display</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">user</span>.<span class="ident">into</span>().<span class="ident">mention</span>());
         <span class="comment">// should not error, ignoring</span>
@@ -2454,7 +2454,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// use serenity::utils::MessageBuilder;</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
     }
 }
@@ -2507,7 +2507,7 @@
     <span class="doccomment">/// #[cfg(not(feature = &quot;utils&quot;))]</span>
     <span class="doccomment">/// {}</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">push_named_link</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">push_named_link</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>;
 
     <span class="doccomment">/// Pushes a named link intended for use in an embed, but with a normalized</span>
     <span class="doccomment">/// name to avoid escaping issues.</span>
@@ -2535,11 +2535,11 @@
     <span class="doccomment">/// #[cfg(not(feature = &quot;utils&quot;))]</span>
     <span class="doccomment">/// {}</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">push_named_link_safe</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">push_named_link_safe</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">EmbedMessageBuilding</span> <span class="kw">for</span> <span class="ident">MessageBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">push_named_link</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">push_named_link</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>().<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">into</span>().<span class="ident">to_string</span>();
 
@@ -2550,7 +2550,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">push_named_link_safe</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">push_named_link_safe</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">I</span>, <span class="ident">U</span>: <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">url</span>: <span class="ident">U</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;[&#39;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
@@ -2579,8 +2579,8 @@
 <span class="doccomment">/// Create a new Content type which describes a bold-italic &quot;text&quot;:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use serenity::utils::ContentModifier::{Bold, Italic};</span>
 <span class="doccomment">/// use serenity::utils::Content;</span>
+<span class="doccomment">/// use serenity::utils::ContentModifier::{Bold, Italic};</span>
 <span class="doccomment">/// let content: Content = Bold + Italic + &quot;text&quot;;</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2657,7 +2657,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Content</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">modifier</span>: <span class="kw-2">&amp;</span><span class="ident">ContentModifier</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">modifier</span>: <span class="kw-2">&amp;</span><span class="ident">ContentModifier</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">modifier</span> {
             <span class="ident">ContentModifier::Italic</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">italic</span> <span class="op">=</span> <span class="bool-val">true</span>;

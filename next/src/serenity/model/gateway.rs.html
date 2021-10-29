@@ -706,8 +706,6 @@
 <span id="706">706</span>
 <span id="707">707</span>
 <span id="708">708</span>
-<span id="709">709</span>
-<span id="710">710</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
@@ -769,13 +767,11 @@
     <span class="doccomment">/// The sync ID of the activity. Mainly used by the Spotify activity</span>
     <span class="doccomment">/// type which uses this parameter to store the track ID.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="ident">sync_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The session ID of the activity. Reserved for specific activity</span>
     <span class="doccomment">/// types, such as the Activity that is transmitted when a user is</span>
     <span class="doccomment">/// listening to Spotify.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Stream URL if [`Self::kind`] is [`ActivityType::Streaming`].</span>
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
@@ -797,12 +793,12 @@
     <span class="doccomment">/// Create a command that sets the current activity:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// use serenity::framework::standard::{Args, CommandResult, macros::command};</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// use serenity::client::Context;</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
+    <span class="doccomment">/// use serenity::framework::standard::{macros::command, Args, CommandResult};</span>
+    <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
     <span class="doccomment">/// #[command]</span>
@@ -849,12 +845,12 @@
     <span class="doccomment">/// Create a command that sets the current streaming status:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// use serenity::framework::standard::{Args, CommandResult, macros::command};</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// use serenity::client::Context;</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
+    <span class="doccomment">/// use serenity::framework::standard::{macros::command, Args, CommandResult};</span>
+    <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
     <span class="doccomment">/// #[command]</span>
@@ -903,12 +899,12 @@
     <span class="doccomment">/// Create a command that sets the current listening status:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// use serenity::framework::standard::{Args, CommandResult, macros::command};</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// use serenity::client::Context;</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
+    <span class="doccomment">/// use serenity::framework::standard::{macros::command, Args, CommandResult};</span>
+    <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
     <span class="doccomment">/// #[command]</span>
@@ -954,12 +950,12 @@
     <span class="doccomment">/// Create a command that sets the current cometing status:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// use serenity::framework::standard::{Args, CommandResult, macros::command};</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// use serenity::client::Context;</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
+    <span class="doccomment">/// use serenity::framework::standard::{macros::command, Args, CommandResult};</span>
+    <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
     <span class="doccomment">/// #[command]</span>
@@ -1005,12 +1001,12 @@
     <span class="doccomment">/// Create a command that sets the current cometing status:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
-    <span class="doccomment">/// use serenity::model::channel::Message;</span>
-    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
-    <span class="doccomment">/// use serenity::framework::standard::{Args, CommandResult, macros::command};</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;client&quot;)]</span>
     <span class="doccomment">/// use serenity::client::Context;</span>
+    <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
+    <span class="doccomment">/// use serenity::framework::standard::{macros::command, Args, CommandResult};</span>
+    <span class="doccomment">/// use serenity::model::channel::Message;</span>
+    <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
     <span class="doccomment">/// #[command]</span>
@@ -1341,7 +1337,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span> <span class="comment">// method is only used with the cache feature enabled</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_with_user</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="ident">User</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_with_user</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="ident">User</span>) {
         <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">id</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>) <span class="op">=</span> <span class="ident">user</span>.<span class="ident">avatar</span> {
             <span class="self">self</span>.<span class="ident">avatar</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>);
