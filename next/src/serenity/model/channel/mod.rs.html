@@ -586,6 +586,7 @@
 <span id="586">586</span>
 <span id="587">587</span>
 <span id="588">588</span>
+<span id="589">589</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -644,7 +645,6 @@
     <span class="ident">Category</span>(<span class="ident">ChannelCategory</span>),
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Channel</span> {
     <span class="doccomment">/// Converts from [`Channel`] to `Option&lt;GuildChannel&gt;`.</span>
     <span class="doccomment">///</span>
@@ -767,6 +767,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Otherwise will return [`Error::Http`] if the current user does not</span>
     <span class="doccomment">/// have permission.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Channel::Guild</span>(<span class="ident">public_channel</span>) =&gt; {
@@ -785,6 +786,7 @@
 
     <span class="doccomment">/// Determines if the channel is NSFW.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_nsfw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">is_nsfw</span>(),
