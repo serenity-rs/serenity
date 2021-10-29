@@ -57,7 +57,6 @@ pub enum Channel {
     Category(ChannelCategory),
 }
 
-#[cfg(feature = "model")]
 impl Channel {
     /// Converts from [`Channel`] to `Option<GuildChannel>`.
     ///
@@ -180,6 +179,7 @@ impl Channel {
     ///
     /// Otherwise will return [`Error::Http`] if the current user does not
     /// have permission.
+    #[cfg(feature = "http")]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match self {
             Channel::Guild(public_channel) => {
@@ -198,6 +198,7 @@ impl Channel {
 
     /// Determines if the channel is NSFW.
     #[inline]
+    #[cfg(feature = "model")]
     pub fn is_nsfw(&self) -> bool {
         match self {
             Channel::Guild(channel) => channel.is_nsfw(),
