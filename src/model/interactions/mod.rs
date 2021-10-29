@@ -1,8 +1,10 @@
 pub mod application_command;
+pub mod autocomplete;
 pub mod message_component;
 pub mod ping;
 
 use application_command::ApplicationCommandInteraction;
+use autocomplete::AutocompleteInteraction;
 use bitflags::__impl_bitflags;
 use message_component::MessageComponentInteraction;
 use ping::PingInteraction;
@@ -18,7 +20,7 @@ pub enum Interaction {
     Ping(PingInteraction),
     ApplicationCommand(ApplicationCommandInteraction),
     MessageComponent(MessageComponentInteraction),
-    AutoComplete(ApplicationCommandInteraction),
+    Autocomplete(AutocompleteInteraction),
 }
 
 impl Interaction {
@@ -28,7 +30,7 @@ impl Interaction {
             Interaction::Ping(i) => i.id,
             Interaction::ApplicationCommand(i) => i.id,
             Interaction::MessageComponent(i) => i.id,
-            Interaction::AutoComplete(i) => i.id,
+            Interaction::Autocomplete(i) => i.id,
         }
     }
 
@@ -38,7 +40,7 @@ impl Interaction {
             Interaction::Ping(_) => InteractionType::Ping,
             Interaction::ApplicationCommand(_) => InteractionType::ApplicationCommand,
             Interaction::MessageComponent(_) => InteractionType::MessageComponent,
-            Interaction::AutoComplete(_) => InteractionType::AutoComplete,
+            Interaction::Autocomplete(_) => InteractionType::Autocomplete,
         }
     }
 
@@ -48,7 +50,7 @@ impl Interaction {
             Interaction::Ping(i) => i.application_id,
             Interaction::ApplicationCommand(i) => i.application_id,
             Interaction::MessageComponent(i) => i.application_id,
-            Interaction::AutoComplete(i) => i.application_id,
+            Interaction::Autocomplete(i) => i.application_id,
         }
     }
 
@@ -58,7 +60,7 @@ impl Interaction {
             Interaction::Ping(ref i) => i.token.as_str(),
             Interaction::ApplicationCommand(i) => i.token.as_str(),
             Interaction::MessageComponent(i) => i.token.as_str(),
-            Interaction::AutoComplete(i) => i.token.as_str(),
+            Interaction::Autocomplete(i) => i.token.as_str(),
         }
     }
 
@@ -111,9 +113,9 @@ impl<'de> Deserialize<'de> for Interaction {
                     .map(Interaction::MessageComponent)
                     .map_err(DeError::custom)
             },
-            InteractionType::AutoComplete => {
-                serde_json::from_value::<ApplicationCommandInteraction>(Value::Object(map))
-                    .map(Interaction::AutoComplete)
+            InteractionType::Autocomplete => {
+                serde_json::from_value::<AutocompleteInteraction>(Value::Object(map))
+                    .map(Interaction::Autocomplete)
                     .map_err(DeError::custom)
             },
             InteractionType::Unknown => Err(DeError::custom("Unknown interaction type")),
@@ -134,7 +136,7 @@ impl Serialize for Interaction {
             Interaction::MessageComponent(i) => {
                 MessageComponentInteraction::serialize(i, serializer)
             },
-            Interaction::AutoComplete(i) => ApplicationCommandInteraction::serialize(i, serializer),
+            Interaction::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
         }
     }
 }
@@ -147,7 +149,7 @@ pub enum InteractionType {
     Ping = 1,
     ApplicationCommand = 2,
     MessageComponent = 3,
-    AutoComplete = 4,
+    Autocomplete = 4,
     Unknown = !0,
 }
 
@@ -155,7 +157,7 @@ enum_number!(InteractionType {
     Ping,
     MessageComponent,
     ApplicationCommand,
-    AutoComplete,
+    Autocomplete,
 });
 
 /// The flags for an interaction response.
@@ -201,5 +203,5 @@ pub enum InteractionResponseType {
     DeferredChannelMessageWithSource = 5,
     DeferredUpdateMessage = 6,
     UpdateMessage = 7,
-    AutoComplete = 8,
+    Autocomplete = 8,
 }

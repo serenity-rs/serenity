@@ -88,7 +88,11 @@ pub use self::{
         CreateSelectMenuOption,
         CreateSelectMenuOptions,
     },
-    create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
+    create_interaction_response::{
+        CreateAutocompleteResponse,
+        CreateInteractionResponse,
+        CreateInteractionResponseData,
+    },
     create_interaction_response_followup::CreateInteractionResponseFollowup,
     edit_interaction_response::EditInteractionResponse,
 };

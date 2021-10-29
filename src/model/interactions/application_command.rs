@@ -91,8 +91,6 @@ impl ApplicationCommandInteraction {
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
     ///
-    /// # Errors
-    ///
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
@@ -618,7 +616,7 @@ pub struct ApplicationCommandInteractionDataOption {
     /// The resolved object of the given `value`, if there is one.
     #[serde(default)]
     pub resolved: Option<ApplicationCommandInteractionDataOptionValue>,
-    /// For `AutoComplete` Interactions this will be `true` if
+    /// For `Autocomplete` Interactions this will be `true` if
     /// this option is currently focused by the user.
     #[serde(default)]
     pub focused: bool,

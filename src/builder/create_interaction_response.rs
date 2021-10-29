@@ -148,7 +148,20 @@ impl CreateInteractionResponseData {
         self.0.insert("components", Value::Array(components.0));
         self
     }
+}
 
+#[derive(Clone, Debug)]
+pub struct CreateAutocompleteResponse(pub HashMap<&'static str, Value>);
+
+impl<'a> Default for CreateAutocompleteResponse {
+    fn default() -> CreateAutocompleteResponse {
+        let mut map = HashMap::new();
+        map.insert("choices", Value::Array(vec![]));
+        CreateAutocompleteResponse(map)
+    }
+}
+
+impl CreateAutocompleteResponse {
     /// For autocomplete responses this sets their autocomplete suggestions.
     ///
     /// See the official docs on [`Application Command Option Choices`] for more information.
@@ -162,7 +175,7 @@ impl CreateInteractionResponseData {
     /// Add an int autocomplete choice.
     ///
     /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
-    pub fn add_int_choice<D: ToString>(&mut self, name: D, value: i32) -> &mut Self {
+    pub fn add_int_choice<D: ToString>(&mut self, name: D, value: i64) -> &mut Self {
         let choice = json!({
             "name": name.to_string(),
             "value" : value
