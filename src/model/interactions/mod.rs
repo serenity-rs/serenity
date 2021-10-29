@@ -87,6 +87,14 @@ impl Interaction {
             _ => None,
         }
     }
+
+    /// Converts this to a [`AutocompleteInteraction`]
+    pub fn autocomplete(self) -> Option<AutocompleteInteraction> {
+        match self {
+            Interaction::Autocomplete(i) => Some(i),
+            _ => None,
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for Interaction {
