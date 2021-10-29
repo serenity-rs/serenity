@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 
-#[cfg(feature = "model")]
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 
 #[cfg(feature = "model")]
