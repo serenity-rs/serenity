@@ -615,9 +615,9 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_arc</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReactionAction</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_arc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReactionAction</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">added</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">added</span>;
-        <span class="kw">let</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">reaction</span>;
+        <span class="kw">let</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">reaction</span>;
         <span class="self">self</span>.<span class="ident">arc</span>
             .<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="ident">added</span> {
@@ -656,7 +656,7 @@
 
     <span class="doccomment">/// Sends a `reaction` to the consuming collector if the `reaction` conforms</span>
     <span class="doccomment">/// to the constraints and the limits are not reached yet.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_reaction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LazyReactionAction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_reaction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">reaction</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyReactionAction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_passing_constraints</span>(<span class="ident">reaction</span>) {
             <span class="self">self</span>.<span class="ident">collected</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
@@ -673,8 +673,8 @@
     <span class="doccomment">/// Checks if the `reaction` passes set constraints.</span>
     <span class="doccomment">/// Constraints are optional, as it is possible to limit reactions to</span>
     <span class="doccomment">/// be sent by a specific author or in a specifc guild.</span>
-    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reaction</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LazyReactionAction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">reaction</span>.<span class="ident">added</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reaction</span>.<span class="ident">reaction</span>) {
+    <span class="kw">fn</span> <span class="ident">is_passing_constraints</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reaction</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LazyReactionAction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="ident">reaction</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">reaction</span>.<span class="ident">added</span>, <span class="kw-2">&amp;mut</span> <span class="ident">reaction</span>.<span class="ident">reaction</span>) {
             (<span class="bool-val">true</span>, <span class="ident">reaction</span>) =&gt; {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">accept_added</span> {
                     <span class="ident">reaction</span>
@@ -769,7 +769,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ReactionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">ReactionCollector</span>;
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">ReactionFilter::new</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
@@ -810,7 +810,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">CollectReaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReactionAction</span><span class="op">&gt;</span><span class="op">&gt;</span>;
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">ReactionFilter::new</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
@@ -833,7 +833,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">FilterOptions</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ReactionFilter&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;collect_limit&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">collect_limit</span>)
             .<span class="ident">field</span>(<span class="string">&quot;filter&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;Option&lt;Arc&lt;dyn Fn(&amp;Arc&lt;Reaction&gt;) -&gt; bool + &#39;static + Send + Sync&gt;&gt;&quot;</span>)
@@ -863,7 +863,7 @@
 
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">ReactionCollector</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReactionAction</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">timeout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span> {
             <span class="kw">match</span> <span class="ident">timeout</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">ctx</span>) {
                 <span class="ident">Poll::Ready</span>(<span class="kw">_</span>) =&gt; {
@@ -878,7 +878,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ReactionCollector</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">close</span>();
     }
 }

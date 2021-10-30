@@ -51,7 +51,7 @@
     <span class="doccomment">/// The name of the thread.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 2 and 100 characters long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
 
         <span class="self">self</span>
@@ -60,7 +60,7 @@
     <span class="doccomment">/// Duration in minutes to automatically archive the thread after recent activity.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Can only be set to 60, 1440, 4320, 10080 currently.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_archive_duration</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">auto_archive_duration</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;auto_archive_duration&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">duration</span>)));
 
         <span class="self">self</span>
@@ -69,14 +69,14 @@
     <span class="doccomment">/// The archive status of the thread.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: A thread that is `locked` can only be unarchived if the user has the `MANAGE_THREADS` permission.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">archived</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">archived</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">archived</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">archived</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;archived&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">archived</span>));
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The lock status of the thread.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">locked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">lock</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">locked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">lock</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;locked&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">lock</span>));
 
         <span class="self">self</span>

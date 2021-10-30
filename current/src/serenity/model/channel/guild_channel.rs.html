@@ -1518,7 +1518,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_invite</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInvite</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInvite</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateInvite</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateInvite</span>,
     {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1746,9 +1746,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Otherwise returns [`Error::Http`] if the current user lacks permission.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditChannel</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditChannel</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditChannel</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditChannel</span>,
     {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1768,7 +1768,7 @@
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="self">self</span>.<span class="ident">position</span>)));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_channel</span> <span class="op">=</span> <span class="ident">EditChannel::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">edit_channel</span>);
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_channel</span>);
         <span class="kw">let</span> <span class="ident">edited</span> <span class="op">=</span> <span class="ident">serenity_utils::hashmap_to_json_map</span>(<span class="ident">edit_channel</span>.<span class="number">0</span>);
 
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">edited</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1801,7 +1801,7 @@
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditMessage</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditMessage</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditMessage</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditMessage</span>,
     {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">message_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
@@ -1813,7 +1813,7 @@
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_thread</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditThread</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditThread</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditThread</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditThread</span>,
     {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_thread</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
@@ -1865,7 +1865,7 @@
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditVoiceState</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditVoiceState</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditVoiceState</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditVoiceState</span>,
     {
         <span class="self">self</span>.<span class="ident">_edit_voice_state</span>(<span class="ident">http</span>, <span class="prelude-val">Some</span>(<span class="ident">user_id</span>), <span class="ident">f</span>).<span class="kw">await</span>
     }
@@ -1914,7 +1914,7 @@
     <span class="doccomment">/// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_own_voice_state</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditVoiceState</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditVoiceState</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditVoiceState</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditVoiceState</span>,
     {
         <span class="self">self</span>.<span class="ident">_edit_voice_state</span>(<span class="ident">http</span>, <span class="prelude-val">None</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
@@ -1926,14 +1926,14 @@
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditVoiceState</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditVoiceState</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditVoiceState</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditVoiceState</span>,
     {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ChannelType::Stage</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">ModelError::InvalidChannelType</span>));
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">voice_state</span> <span class="op">=</span> <span class="ident">EditVoiceState::default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">voice_state</span>);
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">voice_state</span>);
 
         <span class="ident">voice_state</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;channel_id&quot;</span>, <span class="ident">Value::String</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>.<span class="ident">to_string</span>()));
 
@@ -2013,7 +2013,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">messages</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">builder</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GetMessages</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GetMessages</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">GetMessages</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">GetMessages</span>,
     {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">messages</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">builder</span>).<span class="kw">await</span>
     }
@@ -2561,7 +2561,7 @@
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateStageInstance</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateStageInstance</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateStageInstance</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateStageInstance</span>,
     {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">num</span>() <span class="op">!</span><span class="op">=</span> <span class="number">13</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>));
@@ -2582,7 +2582,7 @@
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StageInstance</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditStageInstance</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditStageInstance</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditStageInstance</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditStageInstance</span>,
     {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">num</span>() <span class="op">!</span><span class="op">=</span> <span class="number">13</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::InvalidChannelType</span>));
@@ -2617,7 +2617,7 @@
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateThread</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateThread</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateThread</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateThread</span>,
     {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_public_thread</span>(<span class="ident">http</span>, <span class="ident">message_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
@@ -2633,7 +2633,7 @@
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateThread</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateThread</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateThread</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateThread</span>,
     {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_private_thread</span>(<span class="ident">http</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
@@ -2641,7 +2641,7 @@
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">GuildChannel</span> {
     <span class="doccomment">/// Formats the channel, creating a mention of it.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
         <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>.<span class="ident">mention</span>(), <span class="ident">f</span>)
     }
 }

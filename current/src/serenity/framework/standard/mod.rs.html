@@ -1048,9 +1048,9 @@
     <span class="doccomment">/// [allowing whitespace between prefixes]: Configuration::with_whitespace</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Configuration</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Configuration</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Configuration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Configuration</span>,
     {
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">config</span>);
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">config</span>);
 
         <span class="self">self</span>
     }
@@ -1082,11 +1082,11 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bucket</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BucketBuilder</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">BucketBuilder</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">BucketBuilder::default</span>();
 
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder</span>);
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
 
         <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">builder</span>.<span class="ident">construct</span>());
 
@@ -1262,7 +1262,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: does _not_ return [`Self`] like many other commands. This is because</span>
     <span class="doccomment">/// it&#39;s not intended to be chained as the other commands are.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_add</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>() {
             <span class="ident">Map::Prefixless</span>(
                 <span class="ident">GroupMap::new</span>(<span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>),
@@ -1280,7 +1280,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: does _not_ return [`Self`] like many other commands. This is because</span>
     <span class="doccomment">/// it&#39;s not intended to be chained as the other commands are.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
         <span class="comment">// Iterates through the vector and if a given group _doesn&#39;t_ match, we retain it</span>
         <span class="self">self</span>.<span class="ident">groups</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">g</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">g</span> <span class="op">!</span><span class="op">=</span> <span class="ident">group</span>)
     }
@@ -1499,11 +1499,11 @@
 
         <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>());
 
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">parse::prefix</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="ident">parse::prefix</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>).<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">rest</span>().<span class="ident">is_empty</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">prefix_only</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">prefix_only</span> {
-                <span class="ident">prefix_only</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+                <span class="ident">prefix_only</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
             }
 
             <span class="kw">return</span>;
@@ -1511,7 +1511,7 @@
 
         <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">no_dm_prefix</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">is_private</span>()) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">normal</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">normal_message</span> {
-                <span class="ident">normal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+                <span class="ident">normal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
             }
 
             <span class="kw">return</span>;
@@ -1520,7 +1520,7 @@
         <span class="kw">let</span> <span class="ident">invocation</span> <span class="op">=</span> <span class="ident">parse::command</span>(
             <span class="kw-2">&amp;</span><span class="ident">ctx</span>,
             <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stream</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">groups</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>,
             <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">options</span>.<span class="ident">names</span>),
@@ -1532,19 +1532,19 @@
             <span class="prelude-val">Err</span>(<span class="ident">ParseError::UnrecognisedCommand</span>(<span class="ident">unreg</span>)) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">unreg</span>) <span class="op">=</span> <span class="ident">unreg</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">unrecognised_command</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">unrecognised_command</span> {
-                        <span class="ident">unrecognised_command</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">unreg</span>).<span class="kw">await</span>;
+                        <span class="ident">unrecognised_command</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">unreg</span>).<span class="kw">await</span>;
                     }
                 }
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">normal</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">normal_message</span> {
-                    <span class="ident">normal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
+                    <span class="ident">normal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
                 }
 
                 <span class="kw">return</span>;
             },
             <span class="prelude-val">Err</span>(<span class="ident">ParseError::Dispatch</span>(<span class="ident">error</span>)) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dispatch</span> {
-                    <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>).<span class="kw">await</span>;
+                    <span class="ident">dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>).<span class="kw">await</span>;
                 }
 
                 <span class="kw">return</span>;
@@ -1567,15 +1567,15 @@
                 <span class="kw">let</span> <span class="ident">help</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">unwrap</span>();
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">before</span> {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">before</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>).<span class="kw">await</span> {
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">before</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>).<span class="kw">await</span> {
                         <span class="kw">return</span>;
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="ident">help</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>, <span class="ident">help</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="ident">owners</span>).<span class="kw">await</span>;
+                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="ident">help</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>, <span class="ident">help</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">groups</span>, <span class="ident">owners</span>).<span class="kw">await</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after</span> {
-                    <span class="ident">after</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
+                    <span class="ident">after</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
                 }
             },
             <span class="ident">Invoke::Command</span> {
@@ -1610,10 +1610,10 @@
                 };
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>) <span class="op">=</span>
-                    <span class="self">self</span>.<span class="ident">should_fail</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">args</span>, <span class="ident">command</span>.<span class="ident">options</span>, <span class="ident">group</span>.<span class="ident">options</span>).<span class="kw">await</span>
+                    <span class="self">self</span>.<span class="ident">should_fail</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="ident">command</span>.<span class="ident">options</span>, <span class="ident">group</span>.<span class="ident">options</span>).<span class="kw">await</span>
                 {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dispatch</span> {
-                        <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>).<span class="kw">await</span>;
+                        <span class="ident">dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>).<span class="kw">await</span>;
                     }
 
                     <span class="kw">return</span>;
@@ -1622,12 +1622,12 @@
                 <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>];
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">before</span> {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">before</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>).<span class="kw">await</span> {
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">before</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>).<span class="kw">await</span> {
                         <span class="kw">return</span>;
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="ident">command</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>).<span class="kw">await</span>;
+                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="ident">command</span>.<span class="ident">fun</span>)(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">args</span>).<span class="kw">await</span>;
 
                 <span class="comment">// Check if the command wants to revert the bucket by giving back a ticket.</span>
                 <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is</span>::<span class="op">&lt;</span><span class="ident">RevertBucket</span><span class="op">&gt;</span>()) {
@@ -1641,7 +1641,7 @@
                 }
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after</span> {
-                    <span class="ident">after</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
+                    <span class="ident">after</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
                 }
             },
         }

@@ -542,7 +542,7 @@
     <span class="doccomment">/// This will communicate shard boots with the [`ShardQueuer`] so that they</span>
     <span class="doccomment">/// are properly queued.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">shard_to</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_index</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">shard_init</span>;
 
         <span class="kw">for</span> <span class="ident">shard_id</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">shard_index</span>..<span class="ident">shard_to</span> {
@@ -560,7 +560,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will _not_ instantiate the new shards.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_shards</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u64</span>, <span class="ident">init</span>: <span class="ident">u64</span>, <span class="ident">total</span>: <span class="ident">u64</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_shards</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u64</span>, <span class="ident">init</span>: <span class="ident">u64</span>, <span class="ident">total</span>: <span class="ident">u64</span>) {
         <span class="self">self</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
 
         <span class="self">self</span>.<span class="ident">shard_index</span> <span class="op">=</span> <span class="ident">index</span>;
@@ -604,7 +604,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ShardRunner`]: super::ShardRunner</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restart</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restart</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>) {
         <span class="macro">info!</span>(<span class="string">&quot;Restarting shard {}&quot;</span>, <span class="ident">shard_id</span>);
         <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="number">4000</span>).<span class="kw">await</span>;
 
@@ -634,7 +634,7 @@
     <span class="doccomment">/// stopped.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>, <span class="ident">code</span>: <span class="ident">u16</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>, <span class="ident">code</span>: <span class="ident">u16</span>) {
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, <span class="ident">shard_id</span>);
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>));
@@ -665,7 +665,7 @@
     <span class="doccomment">/// over the [`Self::shutdown`] method.</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">runners</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
@@ -687,7 +687,7 @@
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">boot</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_info</span>: [<span class="ident">ShardId</span>; <span class="number">2</span>]) {
+    <span class="kw">fn</span> <span class="ident">boot</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_info</span>: [<span class="ident">ShardId</span>; <span class="number">2</span>]) {
         <span class="macro">info!</span>(<span class="string">&quot;Telling shard queuer to start shard {}&quot;</span>, <span class="ident">shard_info</span>[<span class="number">0</span>]);
 
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardQueuerMessage::Start</span>(<span class="ident">shard_info</span>[<span class="number">0</span>], <span class="ident">shard_info</span>[<span class="number">1</span>]);
@@ -705,7 +705,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ShardRunner`]: super::ShardRunner</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::Shutdown</span>);
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">monitor_tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>);
     }

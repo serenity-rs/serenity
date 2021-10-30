@@ -1862,8 +1862,8 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">IndexMut</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Matrix</span> {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">matrix_entry</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>)) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">vec</span>[<span class="ident">matrix_entry</span>.<span class="number">1</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">width</span> <span class="op">+</span> <span class="ident">matrix_entry</span>.<span class="number">0</span>]
+    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">matrix_entry</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>)) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">usize</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">vec</span>[<span class="ident">matrix_entry</span>.<span class="number">1</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">width</span> <span class="op">+</span> <span class="ident">matrix_entry</span>.<span class="number">0</span>]
     }
 }
 
@@ -2006,7 +2006,7 @@
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Args::new</span>(<span class="string">&quot;&quot;</span>, <span class="kw-2">&amp;</span>[]);
 
-            <span class="kw">if</span> (<span class="ident">check</span>.<span class="ident">function</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">args</span>, <span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">is_err</span>() {
+            <span class="kw">if</span> (<span class="ident">check</span>.<span class="ident">function</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>, <span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">is_err</span>() {
                 <span class="kw">return</span> <span class="ident">help_options</span>.<span class="ident">lacking_conditions</span>;
             }
         }
@@ -2196,7 +2196,7 @@
                 <span class="ident">ctx</span>,
                 <span class="ident">msg</span>,
                 <span class="ident">group</span>,
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">found_group_prefix</span>,
+                <span class="kw-2">&amp;mut</span> <span class="ident">found_group_prefix</span>,
                 <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span>,
                 <span class="ident">name</span>,
                 <span class="ident">help_options</span>,
@@ -2308,9 +2308,9 @@
         <span class="ident">ctx</span>,
         <span class="ident">msg</span>,
         <span class="ident">groups</span>,
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">name</span>,
+        <span class="kw-2">&amp;mut</span> <span class="ident">name</span>,
         <span class="ident">help_options</span>,
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">similar_commands</span>,
+        <span class="kw-2">&amp;mut</span> <span class="ident">similar_commands</span>,
         <span class="ident">owners</span>,
     )
     .<span class="kw">await</span>
@@ -2329,8 +2329,8 @@
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CommandGroup</span>,
-    <span class="ident">to_fill</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">GroupCommandsPair</span>,
-    <span class="ident">highest_formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HelpBehaviour</span>,
+    <span class="ident">to_fill</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GroupCommandsPair</span>,
+    <span class="ident">highest_formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HelpBehaviour</span>,
 ) {
     <span class="ident">to_fill</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">name</span>;
     <span class="ident">to_fill</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">to_vec</span>();
@@ -2402,8 +2402,8 @@
             <span class="ident">owners</span>,
             <span class="ident">help_options</span>,
             <span class="ident">group</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">group_with_cmds</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">highest_formatter</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">group_with_cmds</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">highest_formatter</span>,
         )
         .<span class="kw">await</span>;
 
@@ -2493,7 +2493,7 @@
 <span class="doccomment">/// If a group has no prefixes, it is not required to be part of</span>
 <span class="doccomment">/// `searched_group` to reach a sub-group of `group_name`.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">trim_prefixless_group</span>(<span class="ident">group_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">searched_group</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>) -&gt; <span class="ident">bool</span> {
+<span class="kw">fn</span> <span class="ident">trim_prefixless_group</span>(<span class="ident">group_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">searched_group</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="ident">group_name</span> <span class="op">==</span> <span class="ident">searched_group</span>.<span class="ident">as_str</span>() {
         <span class="kw">return</span> <span class="bool-val">true</span>;
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="ident">searched_group</span>, <span class="ident">group_name</span>) {
@@ -2593,7 +2593,7 @@
                         <span class="ident">group</span>,
                         <span class="ident">owners</span>,
                         <span class="ident">help_options</span>,
-                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">searched_named_lowercase</span>,
+                        <span class="kw-2">&amp;mut</span> <span class="ident">searched_named_lowercase</span>,
                     )
                     .<span class="kw">await</span>
                     {
@@ -2648,7 +2648,7 @@
 <span class="doccomment">/// If `nest_level` is `0`, this function will skip the group&#39;s name.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">fn</span> <span class="ident">flatten_group_to_string</span>(
-    <span class="ident">group_text</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>,
+    <span class="ident">group_text</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">GroupCommandsPair</span>,
     <span class="ident">nest_level</span>: <span class="ident">usize</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
@@ -2693,7 +2693,7 @@
         <span class="kw">if</span> <span class="op">!</span>(<span class="ident">sub_group</span>.<span class="ident">command_names</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">sub_group</span>.<span class="ident">sub_groups</span>.<span class="ident">is_empty</span>()) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub_group_text</span> <span class="op">=</span> <span class="ident">String::default</span>();
 
-            <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub_group_text</span>, <span class="ident">sub_group</span>, <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">help_options</span>)<span class="question-mark">?</span>;
+            <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub_group_text</span>, <span class="ident">sub_group</span>, <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">help_options</span>)<span class="question-mark">?</span>;
 
             <span class="macro">write!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">sub_group_text</span>)<span class="question-mark">?</span>;
         }
@@ -2708,7 +2708,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
 <span class="kw">fn</span> <span class="ident">flatten_group_to_plain_string</span>(
-    <span class="ident">group_text</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>,
+    <span class="ident">group_text</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">GroupCommandsPair</span>,
     <span class="ident">nest_level</span>: <span class="ident">usize</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
@@ -2737,7 +2737,7 @@
     <span class="kw">for</span> <span class="ident">sub_group</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">sub_groups</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub_group_text</span> <span class="op">=</span> <span class="ident">String::default</span>();
 
-        <span class="ident">flatten_group_to_plain_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub_group_text</span>, <span class="ident">sub_group</span>, <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">help_options</span>);
+        <span class="ident">flatten_group_to_plain_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub_group_text</span>, <span class="ident">sub_group</span>, <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">help_options</span>);
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">sub_group_text</span>);
     }
@@ -2762,7 +2762,7 @@
     <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed_text</span> <span class="op">=</span> <span class="ident">String::default</span>();
 
-        <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed_text</span>, <span class="ident">group</span>, <span class="number">0</span>, <span class="ident">help_options</span>)<span class="question-mark">?</span>;
+        <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">embed_text</span>, <span class="ident">group</span>, <span class="number">0</span>, <span class="ident">help_options</span>)<span class="question-mark">?</span>;
 
         <span class="ident">embed</span>.<span class="ident">field</span>(<span class="ident">group</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">embed_text</span>, <span class="bool-val">true</span>);
     }
@@ -3024,7 +3024,7 @@
     <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;\n**{}**&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">name</span>);
 
-        <span class="ident">flatten_group_to_plain_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="ident">group</span>, <span class="number">0</span>, <span class="ident">help_options</span>);
+        <span class="ident">flatten_group_to_plain_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="ident">group</span>, <span class="number">0</span>, <span class="ident">help_options</span>);
     }
 
     <span class="ident">result</span>

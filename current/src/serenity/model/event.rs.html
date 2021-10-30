@@ -3095,6 +3095,10 @@
 <span id="3095">3095</span>
 <span id="3096">3096</span>
 <span id="3097">3097</span>
+<span id="3098">3098</span>
+<span id="3099">3099</span>
+<span id="3100">3100</span>
+<span id="3101">3101</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3158,7 +3162,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelCreateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Channel</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
             <span class="ident">Channel::Guild</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">channel_id</span>) <span class="op">=</span> (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>.<span class="ident">id</span>);
@@ -3222,7 +3226,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelDeleteEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
             <span class="ident">Channel::Guild</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">channel_id</span>) <span class="op">=</span> (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>.<span class="ident">id</span>);
@@ -3285,7 +3289,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelPinsUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_id</span>) {
             <span class="ident">channel</span>.<span class="ident">last_pin_timestamp</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_pin_timestamp</span>;
 
@@ -3313,7 +3317,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ChannelUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">channel</span> {
             <span class="ident">Channel::Guild</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">channel_id</span>) <span class="op">=</span> (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>.<span class="ident">id</span>);
@@ -3385,11 +3389,11 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildCreateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">clone</span>();
 
-        <span class="kw">for</span> (<span class="ident">user_id</span>, <span class="ident">member</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild</span>.<span class="ident">members</span> {
+        <span class="kw">for</span> (<span class="ident">user_id</span>, <span class="ident">member</span>) <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">guild</span>.<span class="ident">members</span> {
             <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">user</span>).<span class="kw">await</span>;
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">u</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">user_id</span>).<span class="kw">await</span> {
                 <span class="ident">member</span>.<span class="ident">user</span> <span class="op">=</span> <span class="ident">u</span>;
@@ -3431,7 +3435,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildDeleteEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Guild</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">guild</span>) =&gt; {
                 <span class="kw">for</span> <span class="ident">channel_id</span> <span class="kw">in</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">keys</span>() {
@@ -3479,7 +3483,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildEmojisUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
             <span class="ident">guild</span>.<span class="ident">emojis</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">emojis</span>);
         }
@@ -3506,7 +3510,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMemberAddEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>;
         <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">member</span>.<span class="ident">user</span>).<span class="kw">await</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">u</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">user_id</span>).<span class="kw">await</span> {
@@ -3551,7 +3555,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMemberRemoveEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Member</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
             <span class="ident">guild</span>.<span class="ident">member_count</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
             <span class="kw">return</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>);
@@ -3584,7 +3588,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMemberUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Member</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>).<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
@@ -3645,7 +3649,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildMembersChunkEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">values</span>() {
             <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">user</span>).<span class="kw">await</span>;
         }
@@ -3730,7 +3734,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildRoleCreateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">cache</span>
             .<span class="ident">guilds</span>
             .<span class="ident">write</span>()
@@ -3785,7 +3789,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildRoleDeleteEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Role</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="ident">cache</span>
             .<span class="ident">guilds</span>
             .<span class="ident">write</span>()
@@ -3807,7 +3811,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildRoleUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Role</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">role</span>.<span class="ident">id</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="ident">role</span>, <span class="self">self</span>.<span class="ident">role</span>.<span class="ident">clone</span>()));
@@ -3881,7 +3885,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildUnavailableEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">guild_id</span>);
         <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>);
 
@@ -3900,7 +3904,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">GuildUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>) {
             <span class="ident">guild</span>.<span class="ident">afk_channel_id</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">afk_channel_id</span>);
             <span class="ident">guild</span>.<span class="ident">afk_timeout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">afk_timeout</span>;
@@ -3970,7 +3974,7 @@
     <span class="doccomment">/// The oldest message, if the channel&#39;s message cache was already full.</span>
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Message</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">settings</span>().<span class="kw">await</span>.<span class="ident">max_messages</span>;
 
         <span class="kw">if</span> <span class="ident">max</span> <span class="op">==</span> <span class="number">0</span> {
@@ -4059,7 +4063,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">MessageUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Message</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">messages</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_id</span>) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">messages</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>) {
                 <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">clone</span>();
@@ -4116,7 +4120,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">PresenceUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">as_mut</span>() {
@@ -4192,7 +4196,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">PresencesReplaceEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">extend</span>({
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::default</span>();
 
@@ -4298,7 +4302,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">ReadyEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ready</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">clone</span>();
 
         <span class="kw">for</span> <span class="ident">guild</span> <span class="kw">in</span> <span class="ident">ready</span>.<span class="ident">guilds</span> {
@@ -4338,7 +4342,7 @@
         <span class="comment">// `ready.private_channels` will always be empty, and possibly be removed in the future.</span>
         <span class="comment">// So don&#39;t handle it at all.</span>
 
-        <span class="kw">for</span> (<span class="ident">user_id</span>, <span class="ident">presence</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ready</span>.<span class="ident">presences</span> {
+        <span class="kw">for</span> (<span class="ident">user_id</span>, <span class="ident">presence</span>) <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">ready</span>.<span class="ident">presences</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">user</span>) <span class="op">=</span> <span class="ident">presence</span>.<span class="ident">user</span> {
                 <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="ident">user</span>).<span class="kw">await</span>;
             }
@@ -4405,9 +4409,9 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">UserUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">CurrentUser</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">user</span>.<span class="ident">write</span>().<span class="kw">await</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">user</span>, <span class="self">self</span>.<span class="ident">current_user</span>.<span class="ident">clone</span>()))
+        <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">user</span>, <span class="self">self</span>.<span class="ident">current_user</span>.<span class="ident">clone</span>()))
     }
 }
 
@@ -4438,7 +4442,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">VoiceServerUpdateEvent</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;VoiceServerUpdateEvent&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;channel_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_id</span>)
             .<span class="ident">field</span>(<span class="string">&quot;endpoint&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">endpoint</span>)
@@ -4459,7 +4463,7 @@
 <span class="kw">impl</span> <span class="ident">CacheUpdate</span> <span class="kw">for</span> <span class="ident">VoiceStateUpdateEvent</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">VoiceState</span>;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VoiceState</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VoiceState</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">member</span> {
@@ -5312,21 +5316,25 @@
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">user</span>.<span class="ident">id</span>),
+                    <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                 },
                 <span class="ident">guild_id</span>: <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
+                    <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 },
                 <span class="ident">channel_id</span>: <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">channel_id</span>),
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">channel_id</span>),
+                    <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">channel_id</span>),
                 },
                 <span class="ident">message_id</span>: <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">message</span>.<span class="ident">id</span>),
+                    <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">None</span>,
                 },
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -6119,7 +6127,7 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EventTypeVisitor</span> {
             <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">EventType</span>;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
+            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FmtResult</span> {
                 <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;event type str&quot;</span>)
             }
 

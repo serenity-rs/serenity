@@ -147,36 +147,36 @@
     <span class="doccomment">/// Indicates to retrieve the messages after a specific message, given by</span>
     <span class="doccomment">/// its Id.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_after</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">_after</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">MessageId</span>) {
+    <span class="kw">fn</span> <span class="ident">_after</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">MessageId</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;after&quot;</span>, <span class="ident">message_id</span>.<span class="number">0</span>);
     }
 
     <span class="doccomment">/// Indicates to retrieve the messages _around_ a specific message in either</span>
     <span class="doccomment">/// direction (before+after) the given message.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">around</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">around</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_around</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">_around</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">MessageId</span>) {
+    <span class="kw">fn</span> <span class="ident">_around</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">MessageId</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;around&quot;</span>, <span class="ident">message_id</span>.<span class="number">0</span>);
     }
 
     <span class="doccomment">/// Indicates to retrieve the messages before a specific message, given by</span>
     <span class="doccomment">/// its Id.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">before</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">before</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_before</span>(<span class="ident">message_id</span>.<span class="ident">into</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">_before</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">MessageId</span>) {
+    <span class="kw">fn</span> <span class="ident">_before</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message_id</span>: <span class="ident">MessageId</span>) {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;before&quot;</span>, <span class="ident">message_id</span>.<span class="number">0</span>);
     }
 
@@ -187,7 +187,7 @@
     <span class="doccomment">/// **Note**: This field is capped to 100 messages due to a Discord</span>
     <span class="doccomment">/// limitation. If an amount larger than 100 is supplied, it will be</span>
     <span class="doccomment">/// reduced.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">limit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;limit&quot;</span>, <span class="kw">if</span> <span class="ident">limit</span> <span class="op">&gt;</span> <span class="number">100</span> { <span class="number">100</span> } <span class="kw">else</span> { <span class="ident">limit</span> });
         <span class="self">self</span>
     }

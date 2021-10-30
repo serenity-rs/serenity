@@ -683,7 +683,7 @@
 <span class="doccomment">/// Parse a mention in the message that is of either the direct (`&lt;@id&gt;`) or nickname (`&lt;@!id&gt;`) syntax,</span>
 <span class="doccomment">/// and compare the encoded `id` with the id from [`Configuration::on_mention`] for a match.</span>
 <span class="doccomment">/// Returns `Some(&lt;id&gt;)` on success, [`None`] otherwise.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mention</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mention</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">on_mention</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">on_mention</span>.<span class="ident">as_deref</span>()<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">offset</span>();
@@ -756,7 +756,7 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prefix</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>,
 ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">mention</span>(<span class="ident">stream</span>, <span class="ident">config</span>) {
@@ -834,7 +834,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">try_parse</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">ParseMap</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>,
     <span class="ident">by_space</span>: <span class="ident">bool</span>,
     <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>,
@@ -966,7 +966,7 @@
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_group</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Context</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>,
     <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Configuration</span>,
@@ -1007,7 +1007,7 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">command</span>(
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-    <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>, <span class="ident">Map</span>)],
     <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>,
     <span class="ident">help_was_set</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>]<span class="op">&gt;</span>,

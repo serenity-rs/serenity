@@ -92,6 +92,10 @@
 <span id="92">92</span>
 <span id="93">93</span>
 <span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
 <span class="doccomment">//!</span>
@@ -182,7 +186,11 @@
         <span class="ident">CreateSelectMenuOption</span>,
         <span class="ident">CreateSelectMenuOptions</span>,
     },
-    <span class="ident">create_interaction_response</span>::{<span class="ident">CreateInteractionResponse</span>, <span class="ident">CreateInteractionResponseData</span>},
+    <span class="ident">create_interaction_response</span>::{
+        <span class="ident">CreateAutocompleteResponse</span>,
+        <span class="ident">CreateInteractionResponse</span>,
+        <span class="ident">CreateInteractionResponseData</span>,
+    },
     <span class="ident">create_interaction_response_followup::CreateInteractionResponseFollowup</span>,
     <span class="ident">edit_interaction_response::EditInteractionResponse</span>,
 };

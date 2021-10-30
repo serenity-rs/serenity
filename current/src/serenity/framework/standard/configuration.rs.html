@@ -750,7 +750,7 @@
     <span class="doccomment">/// If set to false, bot will ignore any private messages.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Defaults to `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_dm</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">allow_dm</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_dm</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">allow_dm</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">allow_dm</span> <span class="op">=</span> <span class="ident">allow_dm</span>;
 
         <span class="self">self</span>
@@ -778,7 +778,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // bot processes and executes the &quot;about&quot; command if it exists</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_whitespace</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WithWhiteSpace</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">with</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_whitespace</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WithWhiteSpace</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">with</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">with_whitespace</span> <span class="op">=</span> <span class="ident">with</span>.<span class="ident">into</span>();
 
         <span class="self">self</span>
@@ -788,7 +788,7 @@
     <span class="doccomment">/// If set to false, it will only test part of the message by the *length* of the group&#39;s or command&#39;s names.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Defaults to `true`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_space</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">by_space</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">by_space</span> <span class="op">=</span> <span class="ident">b</span>;
 
         <span class="self">self</span>
@@ -810,7 +810,7 @@
     <span class="doccomment">/// let framework = StandardFramework::new()</span>
     <span class="doccomment">///     .configure(|c| c.allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect()));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_channels</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channels</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_channels</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channels</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">allowed_channels</span> <span class="op">=</span> <span class="ident">channels</span>;
 
         <span class="self">self</span>
@@ -832,7 +832,7 @@
     <span class="doccomment">/// let framework = StandardFramework::new()</span>
     <span class="doccomment">///     .configure(|c| c.blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect()));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocked_guilds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guilds</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocked_guilds</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">guilds</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">blocked_guilds</span> <span class="op">=</span> <span class="ident">guilds</span>;
 
         <span class="self">self</span>
@@ -856,7 +856,7 @@
     <span class="doccomment">/// let framework = StandardFramework::new()</span>
     <span class="doccomment">///     .configure(|c| c.blocked_users(vec![UserId(7), UserId(77)].into_iter().collect()));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocked_users</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">users</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocked_users</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">users</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">blocked_users</span> <span class="op">=</span> <span class="ident">users</span>;
 
         <span class="self">self</span>
@@ -893,7 +893,7 @@
     <span class="doccomment">///     StandardFramework::new().group(&amp;PENG_GROUP).configure(|c| c.disabled_commands(disabled));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_commands</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">commands</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled_commands</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">commands</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">disabled_commands</span> <span class="op">=</span> <span class="ident">commands</span>;
 
         <span class="self">self</span>
@@ -959,7 +959,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Context::data`]: crate::client::Context::data</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynamic_prefix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dynamic_prefix</span>: <span class="ident">DynamicPrefixHook</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynamic_prefix</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dynamic_prefix</span>: <span class="ident">DynamicPrefixHook</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">dynamic_prefixes</span>.<span class="ident">push</span>(<span class="ident">dynamic_prefix</span>);
 
         <span class="self">self</span>
@@ -971,7 +971,7 @@
     <span class="doccomment">/// other bots including itself.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Defaults to `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_bots</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ignore_bots</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_bots</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ignore_bots</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">ignore_bots</span> <span class="op">=</span> <span class="ident">ignore_bots</span>;
 
         <span class="self">self</span>
@@ -980,7 +980,7 @@
     <span class="doccomment">/// If set to true, bot will ignore all commands called by webhooks.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Defaults to `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_webhooks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ignore_webhooks</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_webhooks</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ignore_webhooks</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">ignore_webhooks</span> <span class="op">=</span> <span class="ident">ignore_webhooks</span>;
 
         <span class="self">self</span>
@@ -1006,7 +1006,7 @@
     <span class="doccomment">/// which aids mobile devices in determining whether to display a user&#39;s</span>
     <span class="doccomment">/// nickname. It has no real meaning for your bot, and the library</span>
     <span class="doccomment">/// encourages you to ignore differentiating between the two.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_mention</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id_to_mention</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_mention</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id_to_mention</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">on_mention</span> <span class="op">=</span> <span class="ident">id_to_mention</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">to_string</span>());
 
         <span class="self">self</span>
@@ -1042,7 +1042,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.owners(set));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">owners</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user_ids</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">owners</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user_ids</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">owners</span> <span class="op">=</span> <span class="ident">user_ids</span>;
 
         <span class="self">self</span>
@@ -1067,7 +1067,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.prefix(&quot;!&quot;));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">to_string</span>();
         <span class="self">self</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_empty</span>() { <span class="macro">vec!</span>[] } <span class="kw">else</span> { <span class="macro">vec!</span>[<span class="ident">p</span>] };
 
@@ -1092,7 +1092,7 @@
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefixes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefixes</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefixes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">prefixes</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ToString</span>,
         <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
@@ -1111,7 +1111,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `cache` feature is required. If disabled this does absolutely nothing.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_dm_prefix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">no_dm_prefix</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">b</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">no_dm_prefix</span> <span class="op">=</span> <span class="ident">b</span>;
 
         <span class="self">self</span>
@@ -1130,7 +1130,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.delimiter(&quot;, &quot;));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delimiter</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">delimiter</span>: <span class="ident">I</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">push</span>(<span class="ident">delimiter</span>.<span class="ident">into</span>());
 
@@ -1151,7 +1151,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let framework = StandardFramework::new().configure(|c| c.delimiters(vec![&quot;, &quot;, &quot; &quot;]));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiters</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delimiters</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiters</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">delimiters</span>: <span class="ident">It</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span>,
         <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
@@ -1169,10 +1169,10 @@
     <span class="doccomment">/// insensitive.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Defaults to `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">case_insensitivity</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cs</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">case_insensitivity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cs</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">case_insensitive</span> <span class="op">=</span> <span class="ident">cs</span>;
 
-        <span class="kw">for</span> <span class="ident">prefix</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">prefixes</span> {
+        <span class="kw">for</span> <span class="ident">prefix</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">prefixes</span> {
             <span class="kw-2">*</span><span class="ident">prefix</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">to_lowercase</span>();
         }
 

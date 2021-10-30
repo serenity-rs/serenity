@@ -46,7 +46,7 @@ useful for anything that should “live” through the program: counters,
 database connections, custom user caches, etc.</p>
 <p>In the meaning of a context, this data can be accessed through
 <a href="../prelude/struct.Context.html#structfield.data" title="Context::data"><code>Context::data</code></a>.</p>
-<h2 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h2>
+<h3 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h3>
 <p>Create a <code>MessageEventCounter</code> to track the following events:</p>
 <ul>
 <li><a href="../model/event/enum.Event.html#variant.MessageCreate"><code>Event::MessageCreate</code></a></li>
@@ -109,7 +109,7 @@ database connections, custom user caches, etc.</p>
 <p>Refer to <a href="https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework">example 05</a> for an example on using the <a href="struct.Client.html#structfield.data" title="Self::data"><code>Self::data</code></a> field.</p>
 </div><span id="structfield.shard_manager" class="structfield small-section-header"><a href="#structfield.shard_manager" class="anchor field"></a><code>shard_manager: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../prelude/struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;<a class="struct" href="bridge/gateway/struct.ShardManager.html" title="struct serenity::client::bridge::gateway::ShardManager">ShardManager</a>&gt;&gt;</code></span><div class="docblock"><p>A HashMap of all shards instantiated by the Client.</p>
 <p>The key is the shard ID and the value is the shard itself.</p>
-<h2 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h2>
+<h3 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h3>
 <p>If you call <a href="struct.Client.html#method.start_shard" title="Client::start_shard"><code>client.start_shard(3, 5)</code></a>, this
 HashMap will only ever contain a single key of <code>3</code>, as that’s the only
 Shard the client is responsible for.</p>
