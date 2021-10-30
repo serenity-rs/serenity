@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
+use serde_json::{json, Value};
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
@@ -146,6 +146,70 @@ impl CreateInteractionResponseData {
     /// Sets the components of this message.
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
         self.0.insert("components", Value::Array(components.0));
+        self
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct CreateAutocompleteResponse(pub HashMap<&'static str, Value>);
+
+impl<'a> Default for CreateAutocompleteResponse {
+    fn default() -> CreateAutocompleteResponse {
+        let mut map = HashMap::new();
+        map.insert("choices", Value::Array(vec![]));
+        CreateAutocompleteResponse(map)
+    }
+}
+
+impl CreateAutocompleteResponse {
+    /// For autocomplete responses this sets their autocomplete suggestions.
+    ///
+    /// See the official docs on [`Application Command Option Choices`] for more information.
+    ///
+    /// [`Application Command Option Choices`]: https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure
+    pub fn set_choices(&mut self, choices: Value) -> &mut Self {
+        self.0.insert("choices", choices);
+        self
+    }
+
+    /// Add an int autocomplete choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    pub fn add_int_choice<D: ToString>(&mut self, name: D, value: i64) -> &mut Self {
+        let choice = json!({
+            "name": name.to_string(),
+            "value" : value
+        });
+        self.add_choice(choice)
+    }
+
+    /// Adds a string autocomplete choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be up to 100 characters.
+    pub fn add_string_choice<D: ToString, E: ToString>(&mut self, name: D, value: E) -> &mut Self {
+        let choice = json!({
+            "name": name.to_string(),
+            "value": value.to_string()
+        });
+        self.add_choice(choice)
+    }
+
+    /// Adds a number autocomplete choice.
+    ///
+    /// **Note**: There can be no more than 25 choices set. Name must be between 1 and 100 characters. Value must be between -2^53 and 2^53.
+    pub fn add_number_choice<D: ToString>(&mut self, name: D, value: f64) -> &mut Self {
+        let choice = json!({
+            "name": name.to_string(),
+            "value" : value
+        });
+        self.add_choice(choice)
+    }
+
+    fn add_choice(&mut self, value: Value) -> &mut Self {
+        let choices = self.0.entry("choices").or_insert_with(|| Value::Array(vec![]));
+        let choices_arr = choices.as_array_mut().expect("Must be an array");
+        choices_arr.push(value);
+
         self
     }
 }

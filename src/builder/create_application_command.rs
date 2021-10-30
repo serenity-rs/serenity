@@ -101,6 +101,17 @@ impl CreateApplicationCommandOption {
         self
     }
 
+    /// Optionally enable/disable autocomplete interactions for this option.
+    ///
+    /// **Notes**:
+    /// - May not be set to `true` if `choices` are set
+    /// - Options using `autocomplete` are not confined to only use given choices
+    pub fn set_autocomplete(&mut self, value: bool) -> &mut Self {
+        self.0.insert("autocomplete", Value::Bool(value));
+
+        self
+    }
+
     /// If the option is a [`SubCommandGroup`] or [`SubCommand`], nested options are its parameters.
     ///
     /// **Note**: A command can have up to 25 subcommand groups, or subcommands. A subcommand group can have up to 25 subcommands. A subcommand can have up to 25 options.

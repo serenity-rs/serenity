@@ -91,8 +91,6 @@ impl ApplicationCommandInteraction {
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
     ///
-    /// # Errors
-    ///
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
@@ -618,6 +616,10 @@ pub struct ApplicationCommandInteractionDataOption {
     /// The resolved object of the given `value`, if there is one.
     #[serde(default)]
     pub resolved: Option<ApplicationCommandInteractionDataOptionValue>,
+    /// For `Autocomplete` Interactions this will be `true` if
+    /// this option is currently focused by the user.
+    #[serde(default)]
+    pub focused: bool,
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
@@ -655,12 +657,18 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
             false => vec![],
         };
 
+        let focused = match map.get("focused") {
+            Some(value) => value.as_bool().ok_or_else(|| DeError::custom("expected bool"))?,
+            None => false,
+        };
+
         Ok(Self {
             name,
             value,
             kind,
             options,
             resolved: None,
+            focused,
         })
     }
 }
