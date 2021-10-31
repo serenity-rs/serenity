@@ -8,4 +8,4 @@ edition = "2018"
 serenity = { path = "../../", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "cache"] }
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 sys-info = "0.7"
-chrono = "0.4"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
