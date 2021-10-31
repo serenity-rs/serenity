@@ -59,7 +59,8 @@ optional = true
 version = "0.13"
 
 [dependencies.chrono]
-features = ["serde"]
+default-features = false
+features = ["clock", "serde"]
 version = "0.4.10"
 
 [dependencies.flate2]
