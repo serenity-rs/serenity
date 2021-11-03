@@ -18,6 +18,8 @@ __impl_bitflags! {
         SUPPRESS_PREMIUM_SUBSCRIPTIONS = 0b0000_0000_0000_0000_0000_0000_0000_0010;
         /// Suppress server setup tips.
         SUPPRESS_GUILD_REMINDER_NOTIFICATIONS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
+        /// Hide member join sticker reply buttons.
+        SUPPRESS_JOIN_NOTIFICATION_REPLIES = 0b0000_0000_0000_0000_0000_0000_0000_1000;
     }
 }
 
