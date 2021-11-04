@@ -2,7 +2,7 @@
     pub manager: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../../../prelude/struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;<a class="struct" href="struct.ShardManager.html" title="struct serenity::client::bridge::gateway::ShardManager">ShardManager</a>&gt;&gt;,
     pub rx: Receiver&lt;<a class="enum" href="enum.ShardManagerMessage.html" title="enum serenity::client::bridge::gateway::ShardManagerMessage">ShardManagerMessage</a>&gt;,
     pub shutdown: Sender&lt;<a class="struct" href="struct.ShardId.html" title="struct serenity::client::bridge::gateway::ShardId">ShardId</a>&gt;,
-}</code></pre></div><div class="item-info"><div class="stab portability">This is supported on <strong>crate features <code>client</code> and <code>gateway</code></strong> only.</div></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The shard manager monitor monitors the shard manager and performs actions
+}</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The shard manager monitor monitors the shard manager and performs actions
 on it as received.</p>
 <p>The monitor is essentially responsible for running in its own task and
 receiving <a href="enum.ShardManagerMessage.html" title="ShardManagerMessage"><code>ShardManagerMessage</code></a>s, such as whether to shutdown a shard or
