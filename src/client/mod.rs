@@ -75,10 +75,10 @@ pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
-pub struct ClientBuilder<'a> {
+pub struct ClientBuilder {
     data: Option<TypeMap>,
     http: Http,
-    fut: Option<BoxFuture<'a, Result<Client>>>,
+    fut: Option<BoxFuture<'static, Result<Client>>>,
     intents: GatewayIntents,
     #[cfg(feature = "unstable_discord_api")]
     application_id: Option<ApplicationId>,
@@ -95,7 +95,7 @@ pub struct ClientBuilder<'a> {
 }
 
 #[cfg(feature = "gateway")]
-impl<'a> ClientBuilder<'a> {
+impl ClientBuilder {
     fn _new(http: Http) -> Self {
         Self {
             data: Some(TypeMap::new()),
@@ -334,7 +334,7 @@ impl<'a> ClientBuilder<'a> {
 }
 
 #[cfg(feature = "gateway")]
-impl<'a> Future for ClientBuilder<'a> {
+impl Future for ClientBuilder {
     type Output = Result<Client>;
 
     #[allow(clippy::unwrap_used)] // Allowing unwrap because all should be Some() by this point
@@ -637,7 +637,7 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn builder<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
+    pub fn builder(token: impl AsRef<str>) -> ClientBuilder {
         ClientBuilder::new(token)
     }
 
