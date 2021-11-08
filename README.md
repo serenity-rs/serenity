@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.48.0+ badge]][rust 1.48.0+ link]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust-version-badge]][rust-version-link]
 
 # serenity
 
@@ -104,7 +104,7 @@ Add the following to your `Cargo.toml` file:
 serenity = "0.10"
 ```
 
-Serenity supports a minimum of Rust 1.48.
+Serenity supports a minimum of Rust 1.51.
 
 # Features
 
@@ -235,5 +235,5 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [repo:andesite]: https://github.com/natanbc/andesite
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust 1.48.0+ badge]: https://img.shields.io/badge/rust-1.48.0+-93450a.svg?style=flat-square
-[rust 1.48.0+ link]: https://blog.rust-lang.org/2020/11/19/Rust-1.48.html
+[rust-version-badge]: https://img.shields.io/badge/rust-1.51.0+-93450a.svg?style=flat-square
+[rust-version-link]: https://blog.rust-lang.org/2021/03/25/Rust-1.51.0.html
