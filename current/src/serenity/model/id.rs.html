@@ -188,11 +188,21 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">NaiveDateTime</span>, <span class="ident">Utc</span>};
+<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils::U64Visitor</span>;
@@ -204,12 +214,8 @@
             <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="doccomment">/// Retrieves the time that the Id was created at.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">created_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>;
-                    <span class="kw">let</span> <span class="ident">secs</span> <span class="op">=</span> <span class="ident">offset</span> <span class="op">/</span> <span class="number">1000</span>;
-                    <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> (<span class="ident">offset</span> <span class="op">%</span> <span class="number">1000</span>) <span class="op">*</span> <span class="number">1_000_000</span>; <span class="comment">// 1 million nanoseconds in a millisecond</span>
-
-                    <span class="kw">let</span> <span class="ident">tm</span> <span class="op">=</span> <span class="ident">NaiveDateTime::from_timestamp</span>(<span class="number">1_420_070_400</span> <span class="op">+</span> <span class="ident">secs</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="ident">millis</span> <span class="kw">as</span> <span class="ident">u32</span>);
-                    <span class="ident">DateTime::from_utc</span>(<span class="ident">tm</span>, <span class="ident">Utc</span>)
+                    <span class="kw">const</span> <span class="ident">DISCORD_EPOCH</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1_420_070_400_000</span>;
+                    <span class="ident">Utc</span>.<span class="ident">timestamp_millis</span>(((<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>) <span class="op">+</span> <span class="ident">DISCORD_EPOCH</span>) <span class="kw">as</span> <span class="ident">i64</span>)
                 }
 
                 <span class="doccomment">/// Immutably borrow inner Id.</span>
@@ -377,6 +383,20 @@
     <span class="ident">CommandVersionId</span>;
     <span class="ident">TargetId</span>;
     <span class="ident">StageInstanceId</span>;
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::GuildId</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_created_at</span>() {
+        <span class="comment">// The id is from discord&#39;s snowflake docs</span>
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">GuildId</span>(<span class="number">175928847299117063</span>).<span class="ident">created_at</span>().<span class="ident">to_rfc3339</span>(),
+            <span class="string">&quot;2016-04-30T11:18:25.796+00:00&quot;</span>
+        );
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
