@@ -2,7 +2,7 @@
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, TimeZone, Utc};
 use serde::de::{Deserialize, Deserializer};
 
 use super::utils::U64Visitor;
@@ -14,12 +14,8 @@ macro_rules! id_u64 {
             impl $name {
                 /// Retrieves the time that the Id was created at.
                 pub fn created_at(&self) -> DateTime<Utc> {
-                    let offset = self.0 >> 22;
-                    let secs = offset / 1000;
-                    let millis = (offset % 1000) * 1_000_000; // 1 million nanoseconds in a millisecond
-
-                    let tm = NaiveDateTime::from_timestamp(1_420_070_400 + secs as i64, millis as u32);
-                    DateTime::from_utc(tm, Utc)
+                    const DISCORD_EPOCH: u64 = 1_420_070_400_000;
+                    Utc.timestamp_millis(((self.0 >> 22) + DISCORD_EPOCH) as i64)
                 }
 
                 /// Immutably borrow inner Id.
@@ -187,4 +183,18 @@ id_u64! {
     CommandVersionId;
     TargetId;
     StageInstanceId;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::GuildId;
+
+    #[test]
+    fn test_created_at() {
+        // The id is from discord's snowflake docs
+        assert_eq!(
+            GuildId(175928847299117063).created_at().to_rfc3339(),
+            "2016-04-30T11:18:25.796+00:00"
+        );
+    }
 }
