@@ -287,6 +287,8 @@ __impl_bitflags! {
         /// This does not dictate whether custom emojis in this guild can be
         /// used in other guilds.
         USE_EXTERNAL_EMOJIS = 0b0000_0000_0000_0100_0000_0000_0000_0000;
+        /// Allows for viewing guild insights.
+        VIEW_GUILD_INSIGHTS = 0b0000_0000_0000_1000_0000_0000_0000_0000;
         /// Allows the joining of a voice channel.
         CONNECT = 0b0000_0000_0001_0000_0000_0000_0000_0000;
         /// Allows the user to speak in a voice channel.
@@ -312,20 +314,32 @@ __impl_bitflags! {
         MANAGE_ROLES = 0b0001_0000_0000_0000_0000_0000_0000_0000;
         /// Allows management of webhooks.
         MANAGE_WEBHOOKS = 0b0010_0000_0000_0000_0000_0000_0000_0000;
-        /// Allows management of emojis created without the use of an
+        /// Allows management of emojis and stickers created without the use of an
         /// [`Integration`].
         ///
         /// [`Integration`]: super::guild::Integration
         MANAGE_EMOJIS = 0b0100_0000_0000_0000_0000_0000_0000_0000;
-        /// Allows for requesting to speak in stage channels.
-        REQUEST_TO_SPEAK = 0b1_0000_0000_0000_0000_0000_0000_0000_0000;
         /// Allows using slash commands.
         USE_SLASH_COMMANDS = 0b1000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows for requesting to speak in stage channels.
+        REQUEST_TO_SPEAK = 0b1_0000_0000_0000_0000_0000_0000_0000_0000;
         /// Allows for deleting and archiving threads, and viewing all private threads.
-        MANAGE_THREADS = 0b0001_0000_0000_0000_0000_0000_0000_0000_0000;
+        MANAGE_THREADS = 0b0100_0000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows for creating threads.
+        CREATE_PUBLIC_THREADS = 0b1000_0000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows for creating private threads.
+        CREATE_PRIVATE_THREADS = 0b0001_0000_0000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows the usage of custom stickers from other servers.
+        USE_EXTERNAL_STICKERS = 0b0010_0000_0000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows for sending messages in threads
+        SEND_MESSAGES_IN_THREADS = 0b0100_0000_0000_0000_0000_0000_0000_0000_0000_0000;
+        /// Allows for launching activities in a voice channel
+        START_EMBEDDED_ACTIVITIES = 0b1000_0000_0000_0000_0000_0000_0000_0000_0000_0000;
         /// Allows for creating and participating in public threads.
+        #[deprecated(note = "This permission no longer exists")]
         USE_PUBLIC_THREADS = 0b0010_0000_0000_0000_0000_0000_0000_0000_0000;
         // Allows for creating and participating in private threads.
+        #[deprecated(note = "This permission no longer exists")]
         USE_PRIVATE_THREADS = 0b0100_0000_0000_0000_0000_0000_0000_0000_0000;
     }
 }
