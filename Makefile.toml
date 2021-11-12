@@ -343,3 +343,22 @@ args = ["make", "run_example", "e16_sqlite_database"]
 [tasks.dev_build_16]
 command = "cargo"
 args = ["make", "build_example", "e16_sqlite_database"]
+
+[tasks.17]
+alias = "run_17"
+
+[tasks.run_17]
+command = "cargo"
+args = ["make", "run_example_release", "e17_message_components"]
+
+[tasks.build_17]
+command = "cargo"
+args = ["make", "build_example_release", "e17_message_components"]
+
+[tasks.dev_run_17]
+command = "cargo"
+args = ["make", "run_example", "e17_message_components"]
+
+[tasks.dev_build_17]
+command = "cargo"
+args = ["make", "build_example", "e17_message_components"]
