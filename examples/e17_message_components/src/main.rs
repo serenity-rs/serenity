@@ -1,3 +1,11 @@
+use std::{
+    env,
+    error::Error as StdError,
+    fmt::{Display, Formatter, Result as FmtResult},
+    str::FromStr,
+    time::Duration,
+};
+
 use dotenv::dotenv;
 use serenity::{
     async_trait,
@@ -8,17 +16,11 @@ use serenity::{
         channel::{Message, ReactionType},
         interactions::{
             message_component::ButtonStyle,
-            InteractionApplicationCommandCallbackDataFlags, InteractionResponseType,
+            InteractionApplicationCommandCallbackDataFlags,
+            InteractionResponseType,
         },
     },
     Client,
-};
-use std::{
-    env,
-    error::Error as StdError,
-    fmt::{Display, Formatter, Result as FmtResult},
-    str::FromStr,
-    time::Duration,
 };
 
 #[derive(Debug)]
@@ -60,7 +62,9 @@ impl FromStr for Animal {
             "dog" => Ok(Animal::Dog),
             "horse" => Ok(Animal::Horse),
             "alpaca" => Ok(Animal::Alpaca),
-            _ => Err(ParseComponentError { 0: s.to_string() }),
+            _ => Err(ParseComponentError {
+                0: s.to_string(),
+            }),
         }
     }
 }
@@ -163,7 +167,9 @@ impl FromStr for Sound {
             "woof" => Ok(Sound::Woof),
             "neigh" => Ok(Sound::Neigh),
             "hoooooooonk" => Ok(Sound::Honk),
-            _ => Err(ParseComponentError { 0: s.to_string() }),
+            _ => Err(ParseComponentError {
+                0: s.to_string(),
+            }),
         }
     }
 }
@@ -195,7 +201,7 @@ impl EventHandler for Handler {
                 None => {
                     m.reply(&ctx, "Timed out").await.unwrap();
                     return;
-                }
+                },
             };
 
         // data.custom_id contains the id of the component (here "animal_select")
