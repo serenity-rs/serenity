@@ -183,3 +183,5 @@ jobs:
         run: cargo build -p e15_simple_dashboard
       - name: 'Build example 16'
         run: cargo build -p e16_sqlite_database
+      - name: 'Build example 17'
+        run: cargo build -p e17_message_components
