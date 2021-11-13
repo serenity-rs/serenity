@@ -957,6 +957,12 @@ pub struct ApplicationCommandOption {
     /// [`Channel`]: ApplicationCommandOptionType::Channel
     #[serde(default)]
     pub channel_types: Vec<ChannelType>,
+    /// Minimum permitted value for Integer or Number options
+    #[serde(default)]
+    pub min_value: Option<serde_json::Number>,
+    /// Maximum permitted value for Integer or Number options
+    #[serde(default)]
+    pub max_value: Option<serde_json::Number>,
 }
 
 /// An [`ApplicationCommand`] permission.
