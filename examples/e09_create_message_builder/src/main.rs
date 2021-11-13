@@ -38,7 +38,8 @@ impl EventHandler for Handler {
 
                         // Add a timestamp for the current time
                         // This also accepts a rfc3339 Timestamp
-                        e.timestamp(chrono::Utc::now());
+                        let my_timestamp = chrono::Utc::now();
+                        e.timestamp(&my_timestamp);
 
                         e
                     });
