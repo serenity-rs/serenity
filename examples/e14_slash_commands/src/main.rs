@@ -63,7 +63,14 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
-        let commands = ApplicationCommand::set_global_application_commands(&ctx.http, |commands| {
+        let guild_id = GuildId(
+            env::var("GUILD_ID")
+                .expect("Expected GUILD_ID in environment")
+                .parse()
+                .expect("GUILD_ID must be an integer"),
+        );
+
+        let commands = GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
             commands
                 .create_application_command(|command| {
                     command.name("ping").description("A ping command")
@@ -109,18 +116,41 @@ impl EventHandler for Handler {
                                 )
                         })
                 })
+                .create_application_command(|command| {
+                    command
+                        .name("numberinput")
+                        .description("Test command for number input")
+                        .create_option(|option| {
+                            option
+                                .name("int")
+                                .description("An integer from 5 to 10")
+                                .kind(ApplicationCommandOptionType::Integer)
+                                .min_int_value(5)
+                                .max_int_value(10)
+                                .required(true)
+                        })
+                        .create_option(|option| {
+                            option
+                                .name("number")
+                                .description("A float from -3.3 to 234.5")
+                                .kind(ApplicationCommandOptionType::Number)
+                                .min_number_value(-3.3)
+                                .max_number_value(234.5)
+                                .required(true)
+                        })
+                })
         })
         .await;
 
-        println!("I now have the following global slash commands: {:#?}", commands);
+        println!("I now have the following guild slash commands: {:#?}", commands);
 
-        let guild_command = GuildId(123456789)
-            .create_application_command(&ctx.http, |command| {
+        let guild_command =
+            ApplicationCommand::create_global_application_command(&ctx.http, |command| {
                 command.name("wonderful_command").description("An amazing command")
             })
             .await;
 
-        println!("I created the following guild command: {:#?}", guild_command);
+        println!("I created the following global slash command: {:#?}", guild_command);
     }
 }
 

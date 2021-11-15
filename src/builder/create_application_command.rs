@@ -158,6 +158,34 @@ impl CreateApplicationCommandOption {
 
         self
     }
+
+    /// Sets the minimum permitted value for this integer option
+    pub fn min_int_value(&mut self, value: i32) -> &mut Self {
+        self.0.insert("min_value", serde_json::Value::from(value));
+
+        self
+    }
+
+    /// Sets the maximum permitted value for this integer option
+    pub fn max_int_value(&mut self, value: i32) -> &mut Self {
+        self.0.insert("max_value", serde_json::Value::from(value));
+
+        self
+    }
+
+    /// Sets the minimum permitted value for this number option
+    pub fn min_number_value(&mut self, value: f64) -> &mut Self {
+        self.0.insert("min_value", serde_json::Value::from(value));
+
+        self
+    }
+
+    /// Sets the maximum permitted value for this number option
+    pub fn max_number_value(&mut self, value: f64) -> &mut Self {
+        self.0.insert("max_value", serde_json::Value::from(value));
+
+        self
+    }
 }
 
 /// A builder for creating a new [`ApplicationCommand`].
