@@ -1140,6 +1140,12 @@
 <span id="1140">1140</span>
 <span id="1141">1141</span>
 <span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -2099,6 +2105,12 @@
     <span class="doccomment">/// [`Channel`]: ApplicationCommandOptionType::Channel</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">channel_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelType</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Minimum permitted value for Integer or Number options</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">min_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Number</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Maximum permitted value for Integer or Number options</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">max_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Number</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// An [`ApplicationCommand`] permission.</span>
