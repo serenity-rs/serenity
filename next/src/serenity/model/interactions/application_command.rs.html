@@ -1152,6 +1152,20 @@
 <span id="1152">1152</span>
 <span id="1153">1153</span>
 <span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
+<span id="1159">1159</span>
+<span id="1160">1160</span>
+<span id="1161">1161</span>
+<span id="1162">1162</span>
+<span id="1163">1163</span>
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1247,8 +1261,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the API returns an error,</span>
     <span class="doccomment">/// or an [`Error::Json`] if there is an error in deserializing the</span>
     <span class="doccomment">/// API response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
@@ -1792,6 +1804,10 @@
     <span class="doccomment">/// The resolved object of the given `value`, if there is one.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">resolved</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationCommandInteractionDataOptionValue</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For `Autocomplete` Interactions this will be `true` if</span>
+    <span class="doccomment">/// this option is currently focused by the user.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">focused</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandInteractionDataOption</span> {
@@ -1829,12 +1845,18 @@
             <span class="bool-val">false</span> =&gt; <span class="macro">vec!</span>[],
         };
 
+        <span class="kw">let</span> <span class="ident">focused</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;focused&quot;</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>.<span class="ident">as_bool</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected bool&quot;</span>))<span class="question-mark">?</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+        };
+
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">name</span>,
             <span class="ident">value</span>,
             <span class="ident">kind</span>,
             <span class="ident">options</span>,
             <span class="ident">resolved</span>: <span class="prelude-val">None</span>,
+            <span class="ident">focused</span>,
         })
     }
 }
@@ -2123,6 +2145,12 @@
     <span class="doccomment">/// [`Channel`]: ApplicationCommandOptionType::Channel</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">channel_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ChannelType</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Minimum permitted value for Integer or Number options</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">min_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Number</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Maximum permitted value for Integer or Number options</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">max_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">serde_json::Number</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// An [`ApplicationCommand`] permission.</span>

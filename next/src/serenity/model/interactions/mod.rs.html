@@ -189,11 +189,37 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">autocomplete</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ping</span>;
 
 <span class="kw">use</span> <span class="ident">application_command::ApplicationCommandInteraction</span>;
+<span class="kw">use</span> <span class="ident">autocomplete::AutocompleteInteraction</span>;
 <span class="kw">use</span> <span class="ident">bitflags::__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">message_component::MessageComponentInteraction</span>;
 <span class="kw">use</span> <span class="ident">ping::PingInteraction</span>;
@@ -209,6 +235,7 @@
     <span class="ident">Ping</span>(<span class="ident">PingInteraction</span>),
     <span class="ident">ApplicationCommand</span>(<span class="ident">ApplicationCommandInteraction</span>),
     <span class="ident">MessageComponent</span>(<span class="ident">MessageComponentInteraction</span>),
+    <span class="ident">Autocomplete</span>(<span class="ident">AutocompleteInteraction</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Interaction</span> {
@@ -218,6 +245,7 @@
             <span class="ident">Interaction::Ping</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
+            <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
         }
     }
 
@@ -227,6 +255,7 @@
             <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::Ping</span>,
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::ApplicationCommand</span>,
             <span class="ident">Interaction::MessageComponent</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::MessageComponent</span>,
+            <span class="ident">Interaction::Autocomplete</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::Autocomplete</span>,
         }
     }
 
@@ -236,6 +265,7 @@
             <span class="ident">Interaction::Ping</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
+            <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
         }
     }
 
@@ -245,6 +275,7 @@
             <span class="ident">Interaction::Ping</span>(<span class="kw-2">ref</span> <span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
+            <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
         }
     }
 
@@ -268,6 +299,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_component</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageComponentInteraction</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Converts this to a [`AutocompleteInteraction`]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">autocomplete</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AutocompleteInteraction</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
@@ -297,6 +336,11 @@
                     .<span class="ident">map</span>(<span class="ident">Interaction::MessageComponent</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)
             },
+            <span class="ident">InteractionType::Autocomplete</span> =&gt; {
+                <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">AutocompleteInteraction</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))
+                    .<span class="ident">map</span>(<span class="ident">Interaction::Autocomplete</span>)
+                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)
+            },
             <span class="ident">InteractionType::Unknown</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown interaction type&quot;</span>)),
         }
     }
@@ -315,6 +359,7 @@
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; {
                 <span class="ident">MessageComponentInteraction::serialize</span>(<span class="ident">i</span>, <span class="ident">serializer</span>)
             },
+            <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">AutocompleteInteraction::serialize</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
         }
     }
 }
@@ -327,13 +372,15 @@
     <span class="ident">Ping</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">2</span>,
     <span class="ident">MessageComponent</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">4</span>,
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">InteractionType</span> {
     <span class="ident">Ping</span>,
     <span class="ident">MessageComponent</span>,
-    <span class="ident">ApplicationCommand</span>
+    <span class="ident">ApplicationCommand</span>,
+    <span class="ident">Autocomplete</span>,
 });
 
 <span class="doccomment">/// The flags for an interaction response.</span>
@@ -379,6 +426,7 @@
     <span class="ident">DeferredChannelMessageWithSource</span> <span class="op">=</span> <span class="number">5</span>,
     <span class="ident">DeferredUpdateMessage</span> <span class="op">=</span> <span class="number">6</span>,
     <span class="ident">UpdateMessage</span> <span class="op">=</span> <span class="number">7</span>,
+    <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">8</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>

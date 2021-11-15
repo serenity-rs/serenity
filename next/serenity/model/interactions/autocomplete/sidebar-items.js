@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["AutocompleteInteraction","An interaction recieved when the user fills in an autocomplete option"]]});
