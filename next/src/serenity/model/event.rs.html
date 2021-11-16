@@ -3174,7 +3174,7 @@
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeSeq</span>, <span class="ident">Serializer</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils::deserialize_emojis</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils</span>::{<span class="ident">emojis</span>, <span class="ident">stickers</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
@@ -3542,7 +3542,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildEmojisUpdateEvent</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_emojis&quot;</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_emojis&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;emojis&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">emojis</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
@@ -3910,7 +3910,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildStickersUpdateEvent</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_stickers&quot;</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_stickers&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;stickers&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">stickers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StickerId</span>, <span class="ident">Sticker</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }

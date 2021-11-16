@@ -408,9 +408,6 @@
 <span id="408">408</span>
 <span id="409">409</span>
 <span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -424,6 +421,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">Http</span>, <span class="ident">Typing</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::single_recipient</span>;
 
 <span class="doccomment">/// A Direct Message text channel with another user.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -443,11 +441,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
     <span class="doccomment">/// The recipient to the private channel.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_single_recipient&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_single_recipient&quot;</span>,
-        <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;recipients&quot;</span>
-    )]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;single_recipient&quot;</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;recipients&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">recipient</span>: <span class="ident">User</span>,
 }
 

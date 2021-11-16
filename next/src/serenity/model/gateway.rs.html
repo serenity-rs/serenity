@@ -698,14 +698,6 @@
 <span id="698">698</span>
 <span id="699">699</span>
 <span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
-<span id="708">708</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
@@ -1373,17 +1365,9 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ready</span> {
     <span class="kw">pub</span> <span class="ident">application</span>: <span class="ident">PartialCurrentApplicationInfo</span>,
     <span class="kw">pub</span> <span class="ident">guilds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildStatus</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">default</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_presences&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_presences&quot;</span>
-    )]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;presences&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">presences</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">default</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_private_channels&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_private_channels&quot;</span>
-    )]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;private_channels&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">private_channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="number">2</span>]<span class="op">&gt;</span>,

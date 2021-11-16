@@ -597,6 +597,58 @@
 <span id="597">597</span>
 <span id="598">598</span>
 <span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">hash::Hash</span>};
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -619,30 +671,40 @@
     <span class="bool-val">true</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_emojis</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">emojis</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+<span class="doccomment">/// Used with `#[serde(with = &quot;emojis&quot;)]`</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">emojis</span> {
+    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-    <span class="kw">for</span> <span class="ident">emoji</span> <span class="kw">in</span> <span class="ident">vec</span> {
-        <span class="ident">emojis</span>.<span class="ident">insert</span>(<span class="ident">emoji</span>.<span class="ident">id</span>, <span class="ident">emoji</span>);
+    <span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">guild::Emoji</span>, <span class="ident">id::EmojiId</span>};
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="ident">deserializer</span>: <span class="ident">D</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">emojis</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">vec</span>.<span class="ident">len</span>());
+
+        <span class="kw">for</span> <span class="ident">emoji</span> <span class="kw">in</span> <span class="ident">vec</span> {
+            <span class="ident">emojis</span>.<span class="ident">insert</span>(<span class="ident">emoji</span>.<span class="ident">id</span>, <span class="ident">emoji</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">emojis</span>)
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">emojis</span>)
-}
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
+        <span class="ident">emojis</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>,
+        <span class="ident">serializer</span>: <span class="ident">S</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">emojis</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_emojis</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">emojis</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">emojis</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+        <span class="kw">for</span> <span class="ident">emoji</span> <span class="kw">in</span> <span class="ident">emojis</span>.<span class="ident">values</span>() {
+            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">emoji</span>)<span class="question-mark">?</span>;
+        }
 
-    <span class="kw">for</span> <span class="ident">emoji</span> <span class="kw">in</span> <span class="ident">emojis</span>.<span class="ident">values</span>() {
-        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">emoji</span>)<span class="question-mark">?</span>;
+        <span class="ident">seq</span>.<span class="ident">end</span>()
     }
-
-    <span class="ident">seq</span>.<span class="ident">end</span>()
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_guild_channels</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
@@ -818,30 +880,39 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_presences</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Presence</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">presences</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+<span class="doccomment">/// Used with `#[serde(with = &quot;presences&quot;)]`</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">presences</span> {
+    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-    <span class="kw">for</span> <span class="ident">presence</span> <span class="kw">in</span> <span class="ident">vec</span> {
-        <span class="ident">presences</span>.<span class="ident">insert</span>(<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">presence</span>);
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser::SerializeSeq</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">gateway::Presence</span>, <span class="ident">id::UserId</span>};
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="ident">deserializer</span>: <span class="ident">D</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Presence</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">presences</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">vec</span>.<span class="ident">len</span>());
+
+        <span class="kw">for</span> <span class="ident">presence</span> <span class="kw">in</span> <span class="ident">vec</span> {
+            <span class="ident">presences</span>.<span class="ident">insert</span>(<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">presence</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">presences</span>)
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">presences</span>)
-}
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
+        <span class="ident">presences</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
+        <span class="ident">serializer</span>: <span class="ident">S</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">presences</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_presences</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">presences</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">presences</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+        <span class="kw">for</span> <span class="ident">presence</span> <span class="kw">in</span> <span class="ident">presences</span>.<span class="ident">values</span>() {
+            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">presence</span>)<span class="question-mark">?</span>;
+        }
 
-    <span class="kw">for</span> <span class="ident">presence</span> <span class="kw">in</span> <span class="ident">presences</span>.<span class="ident">values</span>() {
-        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">presence</span>)<span class="question-mark">?</span>;
+        <span class="ident">seq</span>.<span class="ident">end</span>()
     }
-
-    <span class="ident">seq</span>.<span class="ident">end</span>()
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_buttons</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
@@ -860,129 +931,162 @@
     <span class="prelude-val">Ok</span>(<span class="ident">buttons</span>)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_private_channels</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">private_channels</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+<span class="doccomment">/// Used with `#[serde(with = &quot;private_channels&quot;)]`</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">private_channels</span> {
+    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-    <span class="kw">for</span> <span class="ident">private_channel</span> <span class="kw">in</span> <span class="ident">vec</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">private_channel</span> {
-            <span class="ident">Channel::Private</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">id</span>,
-            <span class="ident">Channel::Guild</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Guild private channel decode&quot;</span>),
-            <span class="ident">Channel::Category</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Channel category private channel decode&quot;</span>),
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser::SerializeSeq</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">channel::Channel</span>, <span class="ident">id::ChannelId</span>};
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="ident">deserializer</span>: <span class="ident">D</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">private_channels</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">vec</span>.<span class="ident">len</span>());
+
+        <span class="kw">for</span> <span class="ident">private_channel</span> <span class="kw">in</span> <span class="ident">vec</span> {
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">private_channel</span> {
+                <span class="ident">Channel::Private</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) =&gt; <span class="ident">channel</span>.<span class="ident">id</span>,
+                <span class="ident">Channel::Guild</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Guild private channel decode&quot;</span>),
+                <span class="ident">Channel::Category</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Channel category private channel decode&quot;</span>),
+            };
+
+            <span class="ident">private_channels</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">private_channel</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">private_channels</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
+        <span class="ident">private_channels</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>,
+        <span class="ident">serializer</span>: <span class="ident">S</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">private_channels</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+
+        <span class="kw">for</span> <span class="ident">private_channel</span> <span class="kw">in</span> <span class="ident">private_channels</span>.<span class="ident">values</span>() {
+            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">private_channel</span>)<span class="question-mark">?</span>;
+        }
+
+        <span class="ident">seq</span>.<span class="ident">end</span>()
+    }
+}
+
+<span class="doccomment">/// Used with `#[serde(with = &quot;roles&quot;)]`</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">roles</span> {
+    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+
+    <span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">guild::Role</span>, <span class="ident">id::RoleId</span>};
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="ident">deserializer</span>: <span class="ident">D</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">vec</span>.<span class="ident">len</span>());
+
+        <span class="kw">for</span> <span class="ident">role</span> <span class="kw">in</span> <span class="ident">vec</span> {
+            <span class="ident">roles</span>.<span class="ident">insert</span>(<span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">role</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">roles</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
+        <span class="ident">roles</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
+        <span class="ident">serializer</span>: <span class="ident">S</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">roles</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+
+        <span class="kw">for</span> <span class="ident">role</span> <span class="kw">in</span> <span class="ident">roles</span>.<span class="ident">values</span>() {
+            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">role</span>)<span class="question-mark">?</span>;
+        }
+
+        <span class="ident">seq</span>.<span class="ident">end</span>()
+    }
+}
+
+<span class="doccomment">/// Used with `#[serde(with = &quot;stickers&quot;)]`</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">stickers</span> {
+    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser::SerializeSeq</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">id::StickerId</span>, <span class="ident">sticker::Sticker</span>};
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="ident">deserializer</span>: <span class="ident">D</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StickerId</span>, <span class="ident">Sticker</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stickers</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">vec</span>.<span class="ident">len</span>());
+
+        <span class="kw">for</span> <span class="ident">sticker</span> <span class="kw">in</span> <span class="ident">vec</span> {
+            <span class="ident">stickers</span>.<span class="ident">insert</span>(<span class="ident">sticker</span>.<span class="ident">id</span>, <span class="ident">sticker</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">stickers</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
+        <span class="ident">stickers</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StickerId</span>, <span class="ident">Sticker</span><span class="op">&gt;</span>,
+        <span class="ident">serializer</span>: <span class="ident">S</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">stickers</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+
+        <span class="kw">for</span> <span class="ident">sticker</span> <span class="kw">in</span> <span class="ident">stickers</span>.<span class="ident">values</span>() {
+            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">sticker</span>)<span class="question-mark">?</span>;
+        }
+
+        <span class="ident">seq</span>.<span class="ident">end</span>()
+    }
+}
+
+<span class="doccomment">/// Used with `#[serde(with = &quot;comma_separated_string&quot;)]`</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">comma_separated_string</span> {
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="ident">deserializer</span>: <span class="ident">D</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">str_sequence</span> <span class="op">=</span> <span class="ident">String::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">str_sequence</span>.<span class="ident">split</span>(<span class="string">&quot;, &quot;</span>).<span class="ident">map</span>(<span class="ident">str::to_owned</span>).<span class="ident">collect</span>();
+
+        <span class="prelude-val">Ok</span>(<span class="ident">vec</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">vec</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">vec</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+    }
+}
+
+<span class="doccomment">/// Used with `#[serde(with = &quot;single_recipient&quot;)]`</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">single_recipient</span> {
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::Error</span>, <span class="ident">ser::SerializeSeq</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">User</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">users</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::custom</span>(<span class="string">&quot;Expected a single recipient&quot;</span>));
+        } <span class="kw">else</span> {
+            <span class="ident">users</span>.<span class="ident">remove</span>(<span class="number">0</span>)
         };
 
-        <span class="ident">private_channels</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">private_channel</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">user</span>)
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">private_channels</span>)
-}
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>))<span class="question-mark">?</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_private_channels</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">private_channels</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">private_channels</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
+        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">user</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">for</span> <span class="ident">private_channel</span> <span class="kw">in</span> <span class="ident">private_channels</span>.<span class="ident">values</span>() {
-        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">private_channel</span>)<span class="question-mark">?</span>;
+        <span class="ident">seq</span>.<span class="ident">end</span>()
     }
-
-    <span class="ident">seq</span>.<span class="ident">end</span>()
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_roles</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-
-    <span class="kw">for</span> <span class="ident">role</span> <span class="kw">in</span> <span class="ident">vec</span> {
-        <span class="ident">roles</span>.<span class="ident">insert</span>(<span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">role</span>);
-    }
-
-    <span class="prelude-val">Ok</span>(<span class="ident">roles</span>)
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_roles</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">roles</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">roles</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
-
-    <span class="kw">for</span> <span class="ident">role</span> <span class="kw">in</span> <span class="ident">roles</span>.<span class="ident">values</span>() {
-        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">role</span>)<span class="question-mark">?</span>;
-    }
-
-    <span class="ident">seq</span>.<span class="ident">end</span>()
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_stickers</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StickerId</span>, <span class="ident">Sticker</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stickers</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-
-    <span class="kw">for</span> <span class="ident">sticker</span> <span class="kw">in</span> <span class="ident">vec</span> {
-        <span class="ident">stickers</span>.<span class="ident">insert</span>(<span class="ident">sticker</span>.<span class="ident">id</span>, <span class="ident">sticker</span>);
-    }
-
-    <span class="prelude-val">Ok</span>(<span class="ident">stickers</span>)
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_stickers</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">stickers</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StickerId</span>, <span class="ident">Sticker</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">stickers</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
-
-    <span class="kw">for</span> <span class="ident">sticker</span> <span class="kw">in</span> <span class="ident">stickers</span>.<span class="ident">values</span>() {
-        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">sticker</span>)<span class="question-mark">?</span>;
-    }
-
-    <span class="ident">seq</span>.<span class="ident">end</span>()
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_comma_separated_string</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">str_sequence</span> <span class="op">=</span> <span class="ident">String::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">str_sequence</span>.<span class="ident">split</span>(<span class="string">&quot;, &quot;</span>).<span class="ident">map</span>(<span class="ident">str::to_owned</span>).<span class="ident">collect</span>();
-
-    <span class="prelude-val">Ok</span>(<span class="ident">vec</span>)
-}
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_comma_separated_string</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">vec</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">vec</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_single_recipient</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">deserializer</span>: <span class="ident">D</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">User</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">users</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Expected a single recipient&quot;</span>));
-    } <span class="kw">else</span> {
-        <span class="ident">users</span>.<span class="ident">remove</span>(<span class="number">0</span>)
-    };
-
-    <span class="prelude-val">Ok</span>(<span class="ident">user</span>)
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_single_recipient</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>))<span class="question-mark">?</span>;
-
-    <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="ident">user</span>)<span class="question-mark">?</span>;
-
-    <span class="ident">seq</span>.<span class="ident">end</span>()
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_u16</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">u16</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
