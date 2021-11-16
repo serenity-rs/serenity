@@ -674,17 +674,9 @@ pub struct Presence {
 pub struct Ready {
     pub application: PartialCurrentApplicationInfo,
     pub guilds: Vec<GuildStatus>,
-    #[serde(
-        default,
-        serialize_with = "serialize_presences",
-        deserialize_with = "deserialize_presences"
-    )]
+    #[serde(default, with = "presences")]
     pub presences: HashMap<UserId, Presence>,
-    #[serde(
-        default,
-        serialize_with = "serialize_private_channels",
-        deserialize_with = "deserialize_private_channels"
-    )]
+    #[serde(default, with = "private_channels")]
     pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,
