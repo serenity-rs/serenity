@@ -9,7 +9,7 @@ use crate::model::prelude::*;
 use crate::model::{
     id::{GuildId, StickerId, StickerPackId},
     user::User,
-    utils::{deserialize_comma_separated_string, serialize_comma_separated_string},
+    utils::comma_separated_string,
 };
 
 pub mod sticker_id;
@@ -35,10 +35,7 @@ pub struct Sticker {
     /// For guild stickers, the Discord name of a unicode emoji representing the
     /// sticker's expression. For standard stickers, a list of
     /// related expressions.
-    #[serde(
-        serialize_with = "serialize_comma_separated_string",
-        deserialize_with = "deserialize_comma_separated_string"
-    )]
+    #[serde(with = "comma_separated_string")]
     pub tags: Vec<String>,
     /// The type of sticker.
     #[serde(rename = "type")]

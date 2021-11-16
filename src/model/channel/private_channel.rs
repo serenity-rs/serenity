@@ -11,6 +11,7 @@ use crate::http::AttachmentType;
 #[cfg(feature = "http")]
 use crate::http::{Http, Typing};
 use crate::model::prelude::*;
+use crate::model::utils::single_recipient;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -30,11 +31,7 @@ pub struct PrivateChannel {
     #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The recipient to the private channel.
-    #[serde(
-        deserialize_with = "deserialize_single_recipient",
-        serialize_with = "serialize_single_recipient",
-        rename = "recipients"
-    )]
+    #[serde(with = "single_recipient", rename = "recipients")]
     pub recipient: User,
 }
 
