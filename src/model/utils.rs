@@ -20,30 +20,40 @@ pub fn default_true() -> bool {
     true
 }
 
-pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
-    let vec: Vec<Emoji> = Deserialize::deserialize(deserializer)?;
-    let mut emojis = HashMap::new();
+/// Used with `#[serde(with = "emojis")]`
+pub mod emojis {
+    use std::collections::HashMap;
 
-    for emoji in vec {
-        emojis.insert(emoji.id, emoji);
+    use serde::ser::SerializeSeq;
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    use crate::model::{guild::Emoji, id::EmojiId};
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<HashMap<EmojiId, Emoji>, D::Error> {
+        let vec: Vec<Emoji> = Vec::deserialize(deserializer)?;
+        let mut emojis = HashMap::with_capacity(vec.len());
+
+        for emoji in vec {
+            emojis.insert(emoji.id, emoji);
+        }
+
+        Ok(emojis)
     }
 
-    Ok(emojis)
-}
+    pub fn serialize<S: Serializer>(
+        emojis: &HashMap<EmojiId, Emoji>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(emojis.len()))?;
 
-pub fn serialize_emojis<S: Serializer>(
-    emojis: &HashMap<EmojiId, Emoji>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(emojis.len()))?;
+        for emoji in emojis.values() {
+            seq.serialize_element(emoji)?;
+        }
 
-    for emoji in emojis.values() {
-        seq.serialize_element(emoji)?;
+        seq.end()
     }
-
-    seq.end()
 }
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
@@ -231,30 +241,39 @@ fn loop_resolved(
     }
 }
 
-pub fn deserialize_presences<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<UserId, Presence>, D::Error> {
-    let vec: Vec<Presence> = Deserialize::deserialize(deserializer)?;
-    let mut presences = HashMap::new();
+/// Used with `#[serde(with = "presences")]`
+pub mod presences {
+    use std::collections::HashMap;
 
-    for presence in vec {
-        presences.insert(presence.user.id, presence);
+    use serde::{ser::SerializeSeq, Deserialize, Deserializer, Serializer};
+
+    use crate::model::{gateway::Presence, id::UserId};
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<HashMap<UserId, Presence>, D::Error> {
+        let vec: Vec<Presence> = Vec::deserialize(deserializer)?;
+        let mut presences = HashMap::with_capacity(vec.len());
+
+        for presence in vec {
+            presences.insert(presence.user.id, presence);
+        }
+
+        Ok(presences)
     }
 
-    Ok(presences)
-}
+    pub fn serialize<S: Serializer>(
+        presences: &HashMap<UserId, Presence>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(presences.len()))?;
 
-pub fn serialize_presences<S: Serializer>(
-    presences: &HashMap<UserId, Presence>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(presences.len()))?;
+        for presence in presences.values() {
+            seq.serialize_element(presence)?;
+        }
 
-    for presence in presences.values() {
-        seq.serialize_element(presence)?;
+        seq.end()
     }
-
-    seq.end()
 }
 
 pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
@@ -273,129 +292,162 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     Ok(buttons)
 }
 
-pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
-    let vec: Vec<Channel> = Deserialize::deserialize(deserializer)?;
-    let mut private_channels = HashMap::new();
+/// Used with `#[serde(with = "private_channels")]`
+pub mod private_channels {
+    use std::collections::HashMap;
 
-    for private_channel in vec {
-        let id = match private_channel {
-            Channel::Private(ref channel) => channel.id,
-            Channel::Guild(_) => unreachable!("Guild private channel decode"),
-            Channel::Category(_) => unreachable!("Channel category private channel decode"),
+    use serde::{ser::SerializeSeq, Deserialize, Deserializer, Serializer};
+
+    use crate::model::{channel::Channel, id::ChannelId};
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<HashMap<ChannelId, Channel>, D::Error> {
+        let vec: Vec<Channel> = Vec::deserialize(deserializer)?;
+        let mut private_channels = HashMap::with_capacity(vec.len());
+
+        for private_channel in vec {
+            let id = match private_channel {
+                Channel::Private(ref channel) => channel.id,
+                Channel::Guild(_) => unreachable!("Guild private channel decode"),
+                Channel::Category(_) => unreachable!("Channel category private channel decode"),
+            };
+
+            private_channels.insert(id, private_channel);
+        }
+
+        Ok(private_channels)
+    }
+
+    pub fn serialize<S: Serializer>(
+        private_channels: &HashMap<ChannelId, Channel>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(private_channels.len()))?;
+
+        for private_channel in private_channels.values() {
+            seq.serialize_element(private_channel)?;
+        }
+
+        seq.end()
+    }
+}
+
+/// Used with `#[serde(with = "roles")]`
+pub mod roles {
+    use std::collections::HashMap;
+
+    use serde::ser::SerializeSeq;
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    use crate::model::{guild::Role, id::RoleId};
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<HashMap<RoleId, Role>, D::Error> {
+        let vec: Vec<Role> = Vec::deserialize(deserializer)?;
+        let mut roles = HashMap::with_capacity(vec.len());
+
+        for role in vec {
+            roles.insert(role.id, role);
+        }
+
+        Ok(roles)
+    }
+
+    pub fn serialize<S: Serializer>(
+        roles: &HashMap<RoleId, Role>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(roles.len()))?;
+
+        for role in roles.values() {
+            seq.serialize_element(role)?;
+        }
+
+        seq.end()
+    }
+}
+
+/// Used with `#[serde(with = "stickers")]`
+pub mod stickers {
+    use std::collections::HashMap;
+
+    use serde::{ser::SerializeSeq, Deserialize, Deserializer, Serializer};
+
+    use crate::model::{id::StickerId, sticker::Sticker};
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<HashMap<StickerId, Sticker>, D::Error> {
+        let vec: Vec<Sticker> = Vec::deserialize(deserializer)?;
+        let mut stickers = HashMap::with_capacity(vec.len());
+
+        for sticker in vec {
+            stickers.insert(sticker.id, sticker);
+        }
+
+        Ok(stickers)
+    }
+
+    pub fn serialize<S: Serializer>(
+        stickers: &HashMap<StickerId, Sticker>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(stickers.len()))?;
+
+        for sticker in stickers.values() {
+            seq.serialize_element(sticker)?;
+        }
+
+        seq.end()
+    }
+}
+
+/// Used with `#[serde(with = "comma_separated_string")]`
+pub mod comma_separated_string {
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Vec<String>, D::Error> {
+        let str_sequence = String::deserialize(deserializer)?;
+        let vec = str_sequence.split(", ").map(str::to_owned).collect();
+
+        Ok(vec)
+    }
+
+    #[allow(clippy::ptr_arg)]
+    pub fn serialize<S: Serializer>(vec: &Vec<String>, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&vec.join(", "))
+    }
+}
+
+/// Used with `#[serde(with = "single_recipient")]`
+pub mod single_recipient {
+    use serde::{de::Error, ser::SerializeSeq, Deserialize, Deserializer, Serializer};
+
+    use crate::model::user::User;
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<User, D::Error> {
+        let mut users: Vec<User> = Vec::deserialize(deserializer)?;
+
+        let user = if users.is_empty() {
+            return Err(Error::custom("Expected a single recipient"));
+        } else {
+            users.remove(0)
         };
 
-        private_channels.insert(id, private_channel);
+        Ok(user)
     }
 
-    Ok(private_channels)
-}
+    pub fn serialize<S: Serializer>(user: &User, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut seq = serializer.serialize_seq(Some(1))?;
 
-pub fn serialize_private_channels<S: Serializer>(
-    private_channels: &HashMap<ChannelId, Channel>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(private_channels.len()))?;
+        seq.serialize_element(user)?;
 
-    for private_channel in private_channels.values() {
-        seq.serialize_element(private_channel)?;
+        seq.end()
     }
-
-    seq.end()
-}
-
-pub fn deserialize_roles<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<RoleId, Role>, D::Error> {
-    let vec: Vec<Role> = Deserialize::deserialize(deserializer)?;
-    let mut roles = HashMap::new();
-
-    for role in vec {
-        roles.insert(role.id, role);
-    }
-
-    Ok(roles)
-}
-
-pub fn serialize_roles<S: Serializer>(
-    roles: &HashMap<RoleId, Role>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(roles.len()))?;
-
-    for role in roles.values() {
-        seq.serialize_element(role)?;
-    }
-
-    seq.end()
-}
-
-pub fn deserialize_stickers<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<StickerId, Sticker>, D::Error> {
-    let vec: Vec<Sticker> = Deserialize::deserialize(deserializer)?;
-    let mut stickers = HashMap::new();
-
-    for sticker in vec {
-        stickers.insert(sticker.id, sticker);
-    }
-
-    Ok(stickers)
-}
-
-pub fn serialize_stickers<S: Serializer>(
-    stickers: &HashMap<StickerId, Sticker>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(stickers.len()))?;
-
-    for sticker in stickers.values() {
-        seq.serialize_element(sticker)?;
-    }
-
-    seq.end()
-}
-
-pub fn deserialize_comma_separated_string<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<Vec<String>, D::Error> {
-    let str_sequence = String::deserialize(deserializer)?;
-    let vec = str_sequence.split(", ").map(str::to_owned).collect();
-
-    Ok(vec)
-}
-
-#[allow(clippy::ptr_arg)]
-pub fn serialize_comma_separated_string<S: Serializer>(
-    vec: &Vec<String>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    serializer.serialize_str(&vec.join(", "))
-}
-
-pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<User, D::Error> {
-    let mut users: Vec<User> = Deserialize::deserialize(deserializer)?;
-    let user = if users.is_empty() {
-        return Err(DeError::custom("Expected a single recipient"));
-    } else {
-        users.remove(0)
-    };
-
-    Ok(user)
-}
-
-pub fn serialize_single_recipient<S: Serializer>(
-    user: &User,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(1))?;
-
-    seq.serialize_element(user)?;
-
-    seq.end()
 }
 
 pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
