@@ -42,7 +42,11 @@ use crate::{
     },
     model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
 };
-use crate::{json::from_value, model::prelude::*};
+use crate::{
+    json::from_value,
+    model::prelude::*,
+    model::utils::{emojis, roles, stickers},
+};
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
@@ -69,7 +73,7 @@ pub struct PartialGuild {
     /// The channel id that the widget will generate an invite to, or null if set to no invite
     pub widget_channel_id: Option<ChannelId>,
     /// All of the guild's custom emojis.
-    #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")]
+    #[serde(with = "emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
     /// Features enabled for the guild.
     ///
@@ -93,7 +97,7 @@ pub struct PartialGuild {
     #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
     pub region: String,
     /// A mapping of the guild's roles.
-    #[serde(serialize_with = "serialize_roles", deserialize_with = "deserialize_roles")]
+    #[serde(with = "roles")]
     pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
@@ -159,7 +163,7 @@ pub struct PartialGuild {
     /// The user permissions in the guild.
     pub permissions: Option<String>,
     /// All of the guild's custom stickers.
-    #[serde(serialize_with = "serialize_stickers", deserialize_with = "deserialize_stickers")]
+    #[serde(with = "stickers")]
     pub stickers: HashMap<StickerId, Sticker>,
 }
 
@@ -1637,7 +1641,7 @@ impl<'de> Deserialize<'de> for PartialGuild {
         let emojis = map
             .remove("emojis")
             .ok_or_else(|| DeError::custom("expected guild emojis"))
-            .and_then(deserialize_emojis)
+            .and_then(emojis::deserialize)
             .map_err(DeError::custom)?;
         let features = map
             .remove("features")
@@ -1676,7 +1680,7 @@ impl<'de> Deserialize<'de> for PartialGuild {
         let roles = map
             .remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
-            .and_then(deserialize_roles)
+            .and_then(roles::deserialize)
             .map_err(DeError::custom)?;
         let splash = match map.remove("splash") {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
@@ -1835,7 +1839,7 @@ impl<'de> Deserialize<'de> for PartialGuild {
         let stickers = map
             .remove("stickers")
             .ok_or_else(|| DeError::custom("expected guild stickers"))
-            .and_then(deserialize_stickers)
+            .and_then(stickers::deserialize)
             .map_err(DeError::custom)?;
 
         #[allow(deprecated)]
