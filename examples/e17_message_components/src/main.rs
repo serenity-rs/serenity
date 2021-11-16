@@ -62,9 +62,7 @@ impl FromStr for Animal {
             "dog" => Ok(Animal::Dog),
             "horse" => Ok(Animal::Horse),
             "alpaca" => Ok(Animal::Alpaca),
-            _ => Err(ParseComponentError {
-                0: s.to_string(),
-            }),
+            _ => Err(ParseComponentError(s.to_string())),
         }
     }
 }
@@ -167,9 +165,7 @@ impl FromStr for Sound {
             "woof" => Ok(Sound::Woof),
             "neigh" => Ok(Sound::Neigh),
             "hoooooooonk" => Ok(Sound::Honk),
-            _ => Err(ParseComponentError {
-                0: s.to_string(),
-            }),
+            _ => Err(ParseComponentError(s.to_string())),
         }
     }
 }
