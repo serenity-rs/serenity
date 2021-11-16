@@ -78,6 +78,7 @@ use crate::{
 use crate::{
     json::{from_number, from_value, prelude::*},
     model::prelude::*,
+    model::utils::{emojis, presences, roles, stickers},
 };
 
 /// A representation of a banning of a user.
@@ -2557,7 +2558,7 @@ impl<'de> Deserialize<'de> for Guild {
         let emojis = map
             .remove("emojis")
             .ok_or_else(|| DeError::custom("expected guild emojis"))
-            .and_then(deserialize_emojis)
+            .and_then(emojis::deserialize)
             .map_err(DeError::custom)?;
         let explicit_content_filter = map
             .remove("explicit_content_filter")
@@ -2616,7 +2617,7 @@ impl<'de> Deserialize<'de> for Guild {
         let presences = map
             .remove("presences")
             .ok_or_else(|| DeError::custom("expected guild presences"))
-            .and_then(deserialize_presences)
+            .and_then(presences::deserialize)
             .map_err(DeError::custom)?;
         let region = map
             .remove("region")
@@ -2626,7 +2627,7 @@ impl<'de> Deserialize<'de> for Guild {
         let roles = map
             .remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
-            .and_then(deserialize_roles)
+            .and_then(roles::deserialize)
             .map_err(DeError::custom)?;
         let splash = match map.remove("splash") {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
@@ -2787,7 +2788,7 @@ impl<'de> Deserialize<'de> for Guild {
         let stickers = map
             .remove("stickers")
             .ok_or_else(|| DeError::custom("expected guild stickers"))
-            .and_then(deserialize_stickers)
+            .and_then(stickers::deserialize)
             .map_err(DeError::custom)?;
 
         #[allow(deprecated)]
