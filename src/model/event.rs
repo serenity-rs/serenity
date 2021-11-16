@@ -14,7 +14,7 @@ use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 
 use super::prelude::*;
-use super::utils::deserialize_emojis;
+use super::utils::{emojis, stickers};
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
 use crate::internal::prelude::*;
@@ -382,7 +382,7 @@ impl Serialize for GuildDeleteEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildEmojisUpdateEvent {
-    #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")]
+    #[serde(with = "emojis")]
     pub emojis: HashMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
 }
@@ -750,7 +750,7 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildStickersUpdateEvent {
-    #[serde(serialize_with = "serialize_stickers", deserialize_with = "deserialize_stickers")]
+    #[serde(with = "stickers")]
     pub stickers: HashMap<StickerId, Sticker>,
     pub guild_id: GuildId,
 }
