@@ -20,6 +20,7 @@ To run an example, you have various options:
 
 1. [cargo-make](https://lib.rs/crates/cargo-make)
 
+- Install cargo-make `cargo install --force cargo-make`
 - Clone the repository: `git clone https://github.com/serenity-rs/serenity.git`
 - CD into the serenity folder: `cd serenity`
 - Run `cargo make 1`, where 1 is the number of the example you wish to run; these are:
