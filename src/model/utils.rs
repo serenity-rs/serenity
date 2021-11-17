@@ -25,8 +25,7 @@ pub fn default_true() -> bool {
 pub mod emojis {
     use std::collections::HashMap;
 
-    use serde::ser::SerializeSeq;
-    use serde::{Deserializer, Serializer};
+    use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
     use crate::model::{guild::Emoji, id::EmojiId};
@@ -37,18 +36,7 @@ pub mod emojis {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|emoji: &Emoji| emoji.id))
     }
 
-    pub fn serialize<S: Serializer>(
-        emojis: &HashMap<EmojiId, Emoji>,
-        serializer: S,
-    ) -> Result<S::Ok, S::Error> {
-        let mut seq = serializer.serialize_seq(Some(emojis.len()))?;
-
-        for emoji in emojis.values() {
-            seq.serialize_element(emoji)?;
-        }
-
-        seq.end()
-    }
+    pub use super::serialize_map_values as serialize;
 }
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
@@ -212,7 +200,7 @@ fn loop_resolved(
 pub mod presences {
     use std::collections::HashMap;
 
-    use serde::{ser::SerializeSeq, Deserializer, Serializer};
+    use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
     use crate::model::{gateway::Presence, id::UserId};
@@ -223,18 +211,7 @@ pub mod presences {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|p: &Presence| p.user.id))
     }
 
-    pub fn serialize<S: Serializer>(
-        presences: &HashMap<UserId, Presence>,
-        serializer: S,
-    ) -> Result<S::Ok, S::Error> {
-        let mut seq = serializer.serialize_seq(Some(presences.len()))?;
-
-        for presence in presences.values() {
-            seq.serialize_element(presence)?;
-        }
-
-        seq.end()
-    }
+    pub use super::serialize_map_values as serialize;
 }
 
 pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
@@ -257,7 +234,7 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
 pub mod private_channels {
     use std::collections::HashMap;
 
-    use serde::{ser::SerializeSeq, Deserializer, Serializer};
+    use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
     use crate::model::{channel::Channel, id::ChannelId};
@@ -272,26 +249,14 @@ pub mod private_channels {
         }))
     }
 
-    pub fn serialize<S: Serializer>(
-        private_channels: &HashMap<ChannelId, Channel>,
-        serializer: S,
-    ) -> Result<S::Ok, S::Error> {
-        let mut seq = serializer.serialize_seq(Some(private_channels.len()))?;
-
-        for private_channel in private_channels.values() {
-            seq.serialize_element(private_channel)?;
-        }
-
-        seq.end()
-    }
+    pub use super::serialize_map_values as serialize;
 }
 
 /// Used with `#[serde(with = "roles")]`
 pub mod roles {
     use std::collections::HashMap;
 
-    use serde::ser::SerializeSeq;
-    use serde::{Deserializer, Serializer};
+    use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
     use crate::model::{guild::Role, id::RoleId};
@@ -302,25 +267,14 @@ pub mod roles {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|role: &Role| role.id))
     }
 
-    pub fn serialize<S: Serializer>(
-        roles: &HashMap<RoleId, Role>,
-        serializer: S,
-    ) -> Result<S::Ok, S::Error> {
-        let mut seq = serializer.serialize_seq(Some(roles.len()))?;
-
-        for role in roles.values() {
-            seq.serialize_element(role)?;
-        }
-
-        seq.end()
-    }
+    pub use super::serialize_map_values as serialize;
 }
 
 /// Used with `#[serde(with = "stickers")]`
 pub mod stickers {
     use std::collections::HashMap;
 
-    use serde::{ser::SerializeSeq, Deserializer, Serializer};
+    use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
     use crate::model::{id::StickerId, sticker::Sticker};
@@ -331,18 +285,7 @@ pub mod stickers {
         deserializer.deserialize_seq(SequenceToMapVisitor::new(|sticker: &Sticker| sticker.id))
     }
 
-    pub fn serialize<S: Serializer>(
-        stickers: &HashMap<StickerId, Sticker>,
-        serializer: S,
-    ) -> Result<S::Ok, S::Error> {
-        let mut seq = serializer.serialize_seq(Some(stickers.len()))?;
-
-        for sticker in stickers.values() {
-            seq.serialize_element(sticker)?;
-        }
-
-        seq.end()
-    }
+    pub use super::serialize_map_values as serialize;
 }
 
 /// Used with `#[serde(with = "comma_separated_string")]`
@@ -416,7 +359,7 @@ pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
     deserializer.deserialize_seq(SequenceToMapVisitor::new(|state: &VoiceState| state.user_id))
 }
 
-pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
+pub fn serialize_map_values<K, S: Serializer, V: Serialize>(
     map: &HashMap<K, V>,
     serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
