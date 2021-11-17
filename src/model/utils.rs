@@ -1,3 +1,4 @@
+use std::marker::PhantomData;
 use std::{collections::HashMap, hash::Hash};
 
 use serde::de::Error as DeError;
@@ -25,21 +26,15 @@ pub mod emojis {
     use std::collections::HashMap;
 
     use serde::ser::SerializeSeq;
-    use serde::{Deserialize, Deserializer, Serializer};
+    use serde::{Deserializer, Serializer};
 
+    use super::SequenceToMapVisitor;
     use crate::model::{guild::Emoji, id::EmojiId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
     ) -> Result<HashMap<EmojiId, Emoji>, D::Error> {
-        let vec: Vec<Emoji> = Vec::deserialize(deserializer)?;
-        let mut emojis = HashMap::with_capacity(vec.len());
-
-        for emoji in vec {
-            emojis.insert(emoji.id, emoji);
-        }
-
-        Ok(emojis)
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|emoji: &Emoji| emoji.id))
     }
 
     pub fn serialize<S: Serializer>(
@@ -84,16 +79,7 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
 pub fn deserialize_members<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, Member>, D::Error> {
-    let vec: Vec<Member> = Deserialize::deserialize(deserializer)?;
-    let mut members = HashMap::new();
-
-    for member in vec {
-        let user_id = member.user.id;
-
-        members.insert(user_id, member);
-    }
-
-    Ok(members)
+    deserializer.deserialize_seq(SequenceToMapVisitor::new(|member: &Member| member.user.id))
 }
 
 #[cfg(all(feature = "unstable_discord_api", feature = "model"))]
@@ -245,21 +231,15 @@ fn loop_resolved(
 pub mod presences {
     use std::collections::HashMap;
 
-    use serde::{ser::SerializeSeq, Deserialize, Deserializer, Serializer};
+    use serde::{ser::SerializeSeq, Deserializer, Serializer};
 
+    use super::SequenceToMapVisitor;
     use crate::model::{gateway::Presence, id::UserId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
     ) -> Result<HashMap<UserId, Presence>, D::Error> {
-        let vec: Vec<Presence> = Vec::deserialize(deserializer)?;
-        let mut presences = HashMap::with_capacity(vec.len());
-
-        for presence in vec {
-            presences.insert(presence.user.id, presence);
-        }
-
-        Ok(presences)
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|p: &Presence| p.user.id))
     }
 
     pub fn serialize<S: Serializer>(
@@ -296,27 +276,19 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
 pub mod private_channels {
     use std::collections::HashMap;
 
-    use serde::{ser::SerializeSeq, Deserialize, Deserializer, Serializer};
+    use serde::{ser::SerializeSeq, Deserializer, Serializer};
 
+    use super::SequenceToMapVisitor;
     use crate::model::{channel::Channel, id::ChannelId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
     ) -> Result<HashMap<ChannelId, Channel>, D::Error> {
-        let vec: Vec<Channel> = Vec::deserialize(deserializer)?;
-        let mut private_channels = HashMap::with_capacity(vec.len());
-
-        for private_channel in vec {
-            let id = match private_channel {
-                Channel::Private(ref channel) => channel.id,
-                Channel::Guild(_) => unreachable!("Guild private channel decode"),
-                Channel::Category(_) => unreachable!("Channel category private channel decode"),
-            };
-
-            private_channels.insert(id, private_channel);
-        }
-
-        Ok(private_channels)
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|channel: &Channel| match channel {
+            Channel::Private(ref channel) => channel.id,
+            Channel::Guild(_) => unreachable!("Guild private channel decode"),
+            Channel::Category(_) => unreachable!("Channel category private channel decode"),
+        }))
     }
 
     pub fn serialize<S: Serializer>(
@@ -338,21 +310,15 @@ pub mod roles {
     use std::collections::HashMap;
 
     use serde::ser::SerializeSeq;
-    use serde::{Deserialize, Deserializer, Serializer};
+    use serde::{Deserializer, Serializer};
 
+    use super::SequenceToMapVisitor;
     use crate::model::{guild::Role, id::RoleId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
     ) -> Result<HashMap<RoleId, Role>, D::Error> {
-        let vec: Vec<Role> = Vec::deserialize(deserializer)?;
-        let mut roles = HashMap::with_capacity(vec.len());
-
-        for role in vec {
-            roles.insert(role.id, role);
-        }
-
-        Ok(roles)
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|role: &Role| role.id))
     }
 
     pub fn serialize<S: Serializer>(
@@ -373,21 +339,15 @@ pub mod roles {
 pub mod stickers {
     use std::collections::HashMap;
 
-    use serde::{ser::SerializeSeq, Deserialize, Deserializer, Serializer};
+    use serde::{ser::SerializeSeq, Deserializer, Serializer};
 
+    use super::SequenceToMapVisitor;
     use crate::model::{id::StickerId, sticker::Sticker};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
     ) -> Result<HashMap<StickerId, Sticker>, D::Error> {
-        let vec: Vec<Sticker> = Vec::deserialize(deserializer)?;
-        let mut stickers = HashMap::with_capacity(vec.len());
-
-        for sticker in vec {
-            stickers.insert(sticker.id, sticker);
-        }
-
-        Ok(stickers)
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|sticker: &Sticker| sticker.id))
     }
 
     pub fn serialize<S: Serializer>(
@@ -472,14 +432,7 @@ pub fn serialize_u64<S: Serializer>(data: &u64, ser: S) -> StdResult<S::Ok, S::E
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
-    let vec: Vec<VoiceState> = Deserialize::deserialize(deserializer)?;
-    let mut voice_states = HashMap::new();
-
-    for voice_state in vec {
-        voice_states.insert(voice_state.user_id, voice_state);
-    }
-
-    Ok(voice_states)
+    deserializer.deserialize_seq(SequenceToMapVisitor::new(|state: &VoiceState| state.user_id))
 }
 
 pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
@@ -563,6 +516,46 @@ pub fn user_has_perms(
     permissions.remove(perms);
 
     Ok(permissions.is_empty())
+}
+
+/// Deserializes a sequence and builds a `HashMap` with the key extraction function.
+struct SequenceToMapVisitor<F, V> {
+    key: F,
+    marker: PhantomData<V>,
+}
+
+impl<F, V> SequenceToMapVisitor<F, V> {
+    fn new(key: F) -> Self {
+        Self {
+            key,
+            marker: PhantomData,
+        }
+    }
+}
+
+impl<'de, F, K, V> Visitor<'de> for SequenceToMapVisitor<F, V>
+where
+    K: Eq + Hash,
+    V: Deserialize<'de>,
+    F: FnMut(&V) -> K,
+{
+    type Value = HashMap<K, V>;
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str("sequence")
+    }
+
+    fn visit_seq<A>(mut self, mut seq: A) -> StdResult<Self::Value, A::Error>
+    where
+        A: serde::de::SeqAccess<'de>,
+    {
+        let mut map = seq.size_hint().map_or_else(HashMap::new, HashMap::with_capacity);
+        while let Some(elem) = seq.next_element()? {
+            map.insert((self.key)(&elem), elem);
+        }
+
+        Ok(map)
+    }
 }
 
 macro_rules! num_visitors {
