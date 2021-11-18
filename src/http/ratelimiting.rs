@@ -215,6 +215,10 @@ impl Ratelimiter {
                         if let Some(retry_after) =
                             parse_header::<f64>(response.headers(), "retry-after")?
                         {
+                            #[cfg(feature(log_ratelimits))]
+                            {
+                                println!("Ratelimited on route {:?} for {:?}s", router, retry_after)
+                            };
                             debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
                             sleep(Duration::from_secs_f64(retry_after)).await;
 
@@ -326,6 +330,10 @@ impl Ratelimit {
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             false
         } else if let Some(retry_after) = parse_header::<f64>(response.headers(), "retry-after")? {
+            #[cfg(feature(log_ratelimits))]
+            {
+                println!("Ratelimited on route {:?} for {:?}s", router, retry_after)
+            };
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
             sleep(Duration::from_secs_f64(retry_after)).await;
 

@@ -175,6 +175,7 @@ standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 unstable_discord_api = []
 utils = ["base64"]
 voice = ["client", "model"]
+log_ratelimits = ["http"]
 
 # Backends to pick from:
 # - Rustls Backends
