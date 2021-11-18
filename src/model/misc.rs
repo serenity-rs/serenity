@@ -389,9 +389,9 @@ mod test {
         use crate::model::prelude::*;
         use crate::utils::Colour;
 
-        #[tokio::test]
+        #[test]
         #[allow(clippy::unwrap_used)]
-        async fn test_mention() {
+        fn test_mention() {
             let channel = Channel::Guild(GuildChannel {
                 bitrate: None,
                 category_id: None,
