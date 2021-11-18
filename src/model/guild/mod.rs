@@ -105,13 +105,13 @@ pub struct Guild {
     ///
     /// This contains all channels regardless of permissions (i.e. the ability
     /// of the bot to read from or connect to them).
-    #[serde(serialize_with = "serialize_gen_map")]
+    #[serde(serialize_with = "serialize_map_values")]
     pub channels: HashMap<ChannelId, Channel>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
     /// All of the guild's custom emojis.
-    #[serde(serialize_with = "serialize_gen_map")]
+    #[serde(serialize_with = "serialize_map_values")]
     pub emojis: HashMap<EmojiId, Emoji>,
     /// Default explicit content filter level.
     pub explicit_content_filter: ExplicitContentFilter,
@@ -169,7 +169,7 @@ pub struct Guild {
     /// Members might not all be available when the [`ReadyEvent`] is received
     /// if the [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by
     /// the library.
-    #[serde(serialize_with = "serialize_gen_map")]
+    #[serde(serialize_with = "serialize_map_values")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
     /// [`Role`]s or [`User`]s with moderation permissions.
@@ -182,13 +182,13 @@ pub struct Guild {
     ///
     /// **Note**: This will be empty unless the "guild presences" privileged
     /// intent is enabled.
-    #[serde(serialize_with = "serialize_gen_map")]
+    #[serde(serialize_with = "serialize_map_values")]
     pub presences: HashMap<UserId, Presence>,
     /// The region that the voice servers that the guild uses are located in.
     #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
     pub region: String,
     /// A mapping of the guild's roles.
-    #[serde(serialize_with = "serialize_gen_map")]
+    #[serde(serialize_with = "serialize_map_values")]
     pub roles: HashMap<RoleId, Role>,
     /// An identifying hash of the guild's splash icon.
     ///
@@ -215,7 +215,7 @@ pub struct Guild {
     /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
     /// A mapping of [`User`]s to their current voice state.
-    #[serde(serialize_with = "serialize_gen_map")]
+    #[serde(serialize_with = "serialize_map_values")]
     pub voice_states: HashMap<UserId, VoiceState>,
     /// The server's description, if it has one.
     pub description: Option<String>,
@@ -269,7 +269,7 @@ pub struct Guild {
     #[serde(default)]
     pub threads: Vec<GuildChannel>,
     /// All of the guild's custom stickers.
-    #[serde(serialize_with = "serialize_gen_map")]
+    #[serde(serialize_with = "serialize_map_values")]
     pub stickers: HashMap<StickerId, Sticker>,
 }
 
