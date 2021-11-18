@@ -3523,13 +3523,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This contains all channels regardless of permissions (i.e. the ability</span>
     <span class="doccomment">/// of the bot to read from or connect to them).</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_map_values&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">Channel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of whether notifications for all messages are enabled by</span>
     <span class="doccomment">/// default in the guild.</span>
     <span class="kw">pub</span> <span class="ident">default_message_notifications</span>: <span class="ident">DefaultMessageNotificationLevel</span>,
     <span class="doccomment">/// All of the guild&#39;s custom emojis.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_map_values&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">emojis</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Default explicit content filter level.</span>
     <span class="kw">pub</span> <span class="ident">explicit_content_filter</span>: <span class="ident">ExplicitContentFilter</span>,
@@ -3580,7 +3580,7 @@
     <span class="doccomment">/// Members might not all be available when the [`ReadyEvent`] is received</span>
     <span class="doccomment">/// if the [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by</span>
     <span class="doccomment">/// the library.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_map_values&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Member</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of whether the guild requires multi-factor authentication for</span>
     <span class="doccomment">/// [`Role`]s or [`User`]s with moderation permissions.</span>
@@ -3593,13 +3593,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This will be empty unless the &quot;guild presences&quot; privileged</span>
     <span class="doccomment">/// intent is enabled.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_map_values&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">presences</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The region that the voice servers that the guild uses are located in.</span>
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Regions are now set per voice channel instead of globally.&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">region</span>: <span class="ident">String</span>,
     <span class="doccomment">/// A mapping of the guild&#39;s roles.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_map_values&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
     <span class="doccomment">/// An identifying hash of the guild&#39;s splash icon.</span>
     <span class="doccomment">///</span>
@@ -3626,7 +3626,7 @@
     <span class="doccomment">/// Indicator of the current verification level of the guild.</span>
     <span class="kw">pub</span> <span class="ident">verification_level</span>: <span class="ident">VerificationLevel</span>,
     <span class="doccomment">/// A mapping of [`User`]s to their current voice state.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_map_values&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">voice_states</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">VoiceState</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The server&#39;s description, if it has one.</span>
     <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -3680,7 +3680,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">threads</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// All of the guild&#39;s custom stickers.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_map_values&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">stickers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StickerId</span>, <span class="ident">Sticker</span><span class="op">&gt;</span>,
 }
 
