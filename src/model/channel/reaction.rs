@@ -650,22 +650,6 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     }
 }
 
-// TODO: Change this to `!` once it becomes stable.
-#[derive(Debug)]
-pub enum NeverFails {}
-
-impl Display for NeverFails {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "never fails")
-    }
-}
-
-impl StdError for NeverFails {
-    fn description(&self) -> &str {
-        "never fails"
-    }
-}
-
 impl FromStr for ReactionType {
     type Err = ReactionConversionError;
 
