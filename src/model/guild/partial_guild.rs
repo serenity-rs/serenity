@@ -1721,34 +1721,24 @@ impl<'de> Deserialize<'de> for PartialGuild {
             None => None,
         };
 
-        let approximate_member_count = match map.contains_key("approximate_member_count") {
-            true => Some(
-                map.remove("approximate_member_count")
-                    .ok_or_else(|| DeError::custom("expected approximate_member_count"))
-                    .and_then(u64::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let approximate_member_count = map
+            .remove("approximate_member_count")
+            .map(u64::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
-        let approximate_presence_count = match map.contains_key("approximate_presence_count") {
-            true => Some(
-                map.remove("approximate_presence_count")
-                    .ok_or_else(|| DeError::custom("expected approximate_presence_count"))
-                    .and_then(u64::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let approximate_presence_count = map
+            .remove("approximate_presence_count")
+            .map(u64::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
-        let owner = match map.contains_key("owner") {
-            true => map
-                .remove("owner")
-                .ok_or_else(|| DeError::custom("expected owner"))
-                .and_then(bool::deserialize)
-                .map_err(DeError::custom)?,
-            false => false,
-        };
+        let owner = map
+            .remove("owner")
+            .map(bool::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
         let nsfw = map
             .remove("nsfw")
@@ -1762,30 +1752,19 @@ impl<'de> Deserialize<'de> for PartialGuild {
             .and_then(NsfwLevel::deserialize)
             .map_err(DeError::custom)?;
 
-        let max_video_channel_users = match map.contains_key("max_video_channel_users") {
-            true => Some(
-                map.remove("max_video_channel_users")
-                    .ok_or_else(|| DeError::custom("expected max_video_channel_users"))
-                    .and_then(u64::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let max_video_channel_users = map
+            .remove("max_video_channel_users")
+            .map(u64::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         let max_presences = match map.remove("max_presences") {
             Some(v) => Option::<u64>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
 
-        let max_members = match map.contains_key("max_members") {
-            true => Some(
-                map.remove("max_members")
-                    .ok_or_else(|| DeError::custom("expected max_members"))
-                    .and_then(u64::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let max_members =
+            map.remove("max_members").map(u64::deserialize).transpose().map_err(DeError::custom)?;
 
         let discovery_splash = match map.remove("discovery_splash") {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
@@ -1828,15 +1807,11 @@ impl<'de> Deserialize<'de> for PartialGuild {
             None => None,
         };
 
-        let welcome_screen = match map.contains_key("welcome_screen") {
-            true => Some(
-                map.remove("welcome_screen")
-                    .ok_or_else(|| DeError::custom("expected welcome_screen"))
-                    .and_then(GuildWelcomeScreen::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let welcome_screen = map
+            .remove("welcome_screen")
+            .map(GuildWelcomeScreen::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         let stickers = map
             .remove("stickers")
