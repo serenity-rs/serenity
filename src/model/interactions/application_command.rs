@@ -347,15 +347,11 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             .and_then(ApplicationCommandInteractionData::deserialize)
             .map_err(DeError::custom)?;
 
-        let guild_id = match map.contains_key("guild_id") {
-            true => Some(
-                map.remove("guild_id")
-                    .ok_or_else(|| DeError::custom("expected guild_id"))
-                    .and_then(GuildId::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let guild_id = map
+            .remove("guild_id")
+            .map(GuildId::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         let channel_id = map
             .remove("channel_id")
@@ -363,24 +359,15 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             .and_then(ChannelId::deserialize)
             .map_err(DeError::custom)?;
 
-        let member = match map.contains_key("member") {
-            true => Some(
-                map.remove("member")
-                    .ok_or_else(|| DeError::custom("expected member"))
-                    .and_then(Member::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let member =
+            map.remove("member").map(Member::deserialize).transpose().map_err(DeError::custom)?;
 
-        let user = match map.contains_key("user") {
-            true => map
-                .remove("user")
-                .ok_or_else(|| DeError::custom("expected user"))
-                .and_then(User::deserialize)
-                .map_err(DeError::custom)?,
-            false => member.as_ref().expect("expected user or member").user.clone(),
-        };
+        let user =
+            map.remove("user").map(User::deserialize).transpose().map_err(DeError::custom)?;
+
+        let user = user
+            .or(member.as_ref().map(|m| m.user.clone()))
+            .ok_or_else(|| DeError::custom("expected user or member"))?;
 
         let token = map
             .remove("token")
@@ -458,23 +445,19 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             .and_then(CommandId::deserialize)
             .map_err(DeError::custom)?;
 
-        let resolved = match map.contains_key("resolved") {
-            true => map
-                .remove("resolved")
-                .ok_or_else(|| DeError::custom("expected resolved"))
-                .and_then(ApplicationCommandInteractionDataResolved::deserialize)
-                .map_err(DeError::custom)?,
-            false => ApplicationCommandInteractionDataResolved::default(),
-        };
+        let resolved = map
+            .remove("resolved")
+            .map(ApplicationCommandInteractionDataResolved::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
-        let options = match map.contains_key("options") {
-            true => map
-                .remove("options")
-                .ok_or_else(|| DeError::custom("expected options"))
-                .and_then(|deserializer| deserialize_options_with_resolved(deserializer, &resolved))
-                .map_err(DeError::custom)?,
-            false => vec![],
-        };
+        let options = map
+            .remove("options")
+            .map(|deserializer| deserialize_options_with_resolved(deserializer, &resolved))
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
         let kind = map
             .remove("type")
@@ -482,14 +465,15 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             .and_then(ApplicationCommandType::deserialize)
             .map_err(DeError::custom)?;
 
-        let target_id = match kind != ApplicationCommandType::ChatInput {
-            true => Some(
+        let target_id = if kind != ApplicationCommandType::ChatInput {
+            Some(
                 map.remove("target_id")
                     .ok_or_else(|| DeError::custom("expected resolved"))
                     .and_then(TargetId::deserialize)
                     .map_err(DeError::custom)?,
-            ),
-            false => None,
+            )
+        } else {
+            None
         };
 
         let target = match target_id {
@@ -556,50 +540,40 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let members = match map.contains_key("members") {
-            true => map
-                .remove("members")
-                .ok_or_else(|| DeError::custom("expected members"))
-                .and_then(deserialize_partial_members_map)
-                .map_err(DeError::custom)?,
-            false => HashMap::new(),
-        };
+        let members = map
+            .remove("members")
+            .map(deserialize_partial_members_map)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
-        let users = match map.contains_key("users") {
-            true => map
-                .remove("users")
-                .ok_or_else(|| DeError::custom("expected users"))
-                .and_then(deserialize_users)
-                .map_err(DeError::custom)?,
-            false => HashMap::new(),
-        };
+        let users = map
+            .remove("users")
+            .map(deserialize_users)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
-        let roles = match map.contains_key("roles") {
-            true => map
-                .remove("roles")
-                .ok_or_else(|| DeError::custom("expected roles"))
-                .and_then(deserialize_roles_map)
-                .map_err(DeError::custom)?,
-            false => HashMap::new(),
-        };
+        let roles = map
+            .remove("roles")
+            .map(deserialize_roles_map)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
-        let channels = match map.contains_key("channels") {
-            true => map
-                .remove("channels")
-                .ok_or_else(|| DeError::custom("expected channels"))
-                .and_then(deserialize_channels_map)
-                .map_err(DeError::custom)?,
-            false => HashMap::new(),
-        };
+        let channels = map
+            .remove("channels")
+            .map(deserialize_channels_map)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
-        let messages = match map.contains_key("messages") {
-            true => map
-                .remove("messages")
-                .ok_or_else(|| DeError::custom("expected messages"))
-                .and_then(deserialize_messages_map)
-                .map_err(DeError::custom)?,
-            false => HashMap::new(),
-        };
+        let messages = map
+            .remove("messages")
+            .map(deserialize_messages_map)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
         Ok(Self {
             users,
@@ -652,15 +626,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
 
-        let value = match map.contains_key("value") {
-            true => Some(
-                map.remove("value")
-                    .ok_or_else(|| DeError::custom("expected value"))
-                    .and_then(Value::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let value = map.remove("value");
 
         let kind = map
             .remove("type")
@@ -668,14 +634,12 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
             .and_then(ApplicationCommandOptionType::deserialize)
             .map_err(DeError::custom)?;
 
-        let options = match map.contains_key("options") {
-            true => map
-                .remove("options")
-                .ok_or_else(|| DeError::custom("expected type"))
-                .and_then(deserialize_options)
-                .map_err(DeError::custom)?,
-            false => vec![],
-        };
+        let options = map
+            .remove("options")
+            .map(deserialize_options)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
         let focused = match map.get("focused") {
             Some(value) => value.as_bool().ok_or_else(|| DeError::custom("expected bool"))?,
