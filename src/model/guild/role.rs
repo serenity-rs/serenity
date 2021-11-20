@@ -257,25 +257,14 @@ impl<'de> Deserialize<'de> for RoleTags {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let bot_id = match map.contains_key("bot_id") {
-            true => Some(
-                map.remove("bot_id")
-                    .ok_or_else(|| DeError::custom("expected bot_id"))
-                    .and_then(UserId::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let bot_id =
+            map.remove("bot_id").map(UserId::deserialize).transpose().map_err(DeError::custom)?;
 
-        let integration_id = match map.contains_key("integration_id") {
-            true => Some(
-                map.remove("integration_id")
-                    .ok_or_else(|| DeError::custom("expected integration_id"))
-                    .and_then(IntegrationId::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let integration_id = map
+            .remove("integration_id")
+            .map(IntegrationId::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         let premium_subscriber = map.contains_key("premium_subscriber");
 

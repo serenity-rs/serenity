@@ -419,14 +419,12 @@ impl<'de> Deserialize<'de> for Activity {
 
         let url = map.remove("url").and_then(|v| from_value::<Url>(v).ok());
 
-        let buttons = match map.contains_key("buttons") {
-            true => map
-                .remove("buttons")
-                .ok_or_else(|| DeError::custom("expected buttons"))
-                .and_then(deserialize_buttons)
-                .map_err(DeError::custom)?,
-            false => vec![],
-        };
+        let buttons = map
+            .remove("buttons")
+            .map(deserialize_buttons)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
 
         Ok(Activity {
             application_id,
