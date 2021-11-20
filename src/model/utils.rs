@@ -74,55 +74,42 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
 pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, PartialMember>, D::Error> {
-    let map: HashMap<UserId, PartialMember> = Deserialize::deserialize(deserializer)?;
-
-    Ok(map)
+    HashMap::deserialize(deserializer)
 }
 
 #[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_users<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, User>, D::Error> {
-    let map: HashMap<UserId, User> = Deserialize::deserialize(deserializer)?;
-
-    Ok(map)
+    HashMap::deserialize(deserializer)
 }
 
 #[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<RoleId, Role>, D::Error> {
-    let map: HashMap<RoleId, Role> = Deserialize::deserialize(deserializer)?;
-
-    Ok(map)
+    HashMap::deserialize(deserializer)
 }
 
 #[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<ChannelId, PartialChannel>, D::Error> {
-    let map: HashMap<ChannelId, PartialChannel> = Deserialize::deserialize(deserializer)?;
-
-    Ok(map)
+    HashMap::deserialize(deserializer)
 }
 
 #[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_messages_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<MessageId, Message>, D::Error> {
-    let map: HashMap<MessageId, Message> = Deserialize::deserialize(deserializer)?;
-
-    Ok(map)
+    HashMap::deserialize(deserializer)
 }
 
 #[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_options<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
-    let options: Vec<ApplicationCommandInteractionDataOption> =
-        Deserialize::deserialize(deserializer)?;
-
-    Ok(options)
+    Vec::deserialize(deserializer)
 }
 
 #[cfg(feature = "unstable_discord_api")]
@@ -130,8 +117,7 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
     deserializer: D,
     resolved: &ApplicationCommandInteractionDataResolved,
 ) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
-    let mut options: Vec<ApplicationCommandInteractionDataOption> =
-        Deserialize::deserialize(deserializer)?;
+    let mut options = Vec::deserialize(deserializer)?;
 
     for option in options.iter_mut() {
         loop_resolved(option, resolved);
@@ -236,7 +222,7 @@ pub mod presences {
 pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<ActivityButton>, D::Error> {
-    let labels: Vec<String> = Deserialize::deserialize(deserializer)?;
+    let labels = Vec::deserialize(deserializer)?;
     let mut buttons = vec![];
 
     for label in labels {
