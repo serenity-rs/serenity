@@ -628,19 +628,6 @@
 <span id="628">628</span>
 <span id="629">629</span>
 <span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -958,15 +945,11 @@
             .<span class="ident">and_then</span>(<span class="ident">MessageComponentInteractionData::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;guild_id&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected guild_id&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">GuildId::deserialize</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            ),
-            <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
-        };
+        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
+            .<span class="ident">map</span>(<span class="ident">GuildId::deserialize</span>)
+            .<span class="ident">transpose</span>()
+            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">remove</span>(<span class="string">&quot;channel_id&quot;</span>)
@@ -974,24 +957,15 @@
             .<span class="ident">and_then</span>(<span class="ident">ChannelId::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;member&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;member&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected member&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">Member::deserialize</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            ),
-            <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
-        };
+        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span>
+            <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;member&quot;</span>).<span class="ident">map</span>(<span class="ident">Member::deserialize</span>).<span class="ident">transpose</span>().<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">contains_key</span>(<span class="string">&quot;user&quot;</span>) {
-            <span class="bool-val">true</span> =&gt; <span class="ident">map</span>
-                .<span class="ident">remove</span>(<span class="string">&quot;user&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected user&quot;</span>))
-                .<span class="ident">and_then</span>(<span class="ident">User::deserialize</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            <span class="bool-val">false</span> =&gt; <span class="ident">member</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;expected user or member&quot;</span>).<span class="ident">user</span>.<span class="ident">clone</span>(),
-        };
+        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span>
+            <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;user&quot;</span>).<span class="ident">map</span>(<span class="ident">User::deserialize</span>).<span class="ident">transpose</span>().<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">user</span>
+            .<span class="ident">or</span>(<span class="ident">member</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">user</span>.<span class="ident">clone</span>()))
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected user or member&quot;</span>))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">remove</span>(<span class="string">&quot;message&quot;</span>)
