@@ -1114,10 +1114,8 @@ impl CacheUpdate for PresencesReplaceEvent {
 
 impl<'de> Deserialize<'de> for PresencesReplaceEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let presences: Vec<Presence> = Deserialize::deserialize(deserializer)?;
-
         Ok(Self {
-            presences,
+            presences: Vec::deserialize(deserializer)?,
         })
     }
 }
