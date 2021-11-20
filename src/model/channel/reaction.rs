@@ -59,25 +59,14 @@ impl<'de> Deserialize<'de> for Reaction {
             .and_then(ReactionType::deserialize)
             .map_err(DeError::custom)?;
 
-        let user_id = match map.contains_key("user_id") {
-            true => Some(
-                map.remove("user_id")
-                    .ok_or_else(|| DeError::custom("expected user_id"))
-                    .and_then(UserId::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let user_id =
+            map.remove("user_id").map(UserId::deserialize).transpose().map_err(DeError::custom)?;
 
-        let guild_id = match map.contains_key("guild_id") {
-            true => Some(
-                map.remove("guild_id")
-                    .ok_or_else(|| DeError::custom("expected guild_id"))
-                    .and_then(GuildId::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let guild_id = map
+            .remove("guild_id")
+            .map(GuildId::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         if let Some(id) = guild_id {
             if let Some(member) = map.get_mut("member") {
@@ -87,15 +76,11 @@ impl<'de> Deserialize<'de> for Reaction {
             }
         }
 
-        let member = match map.contains_key("member") {
-            true => Some(
-                map.remove("member")
-                    .ok_or_else(|| DeError::custom("expected member"))
-                    .and_then(PartialMember::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let member = map
+            .remove("member")
+            .map(PartialMember::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         Ok(Self {
             channel_id,
