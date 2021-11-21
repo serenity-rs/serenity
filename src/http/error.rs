@@ -103,6 +103,8 @@ pub enum Error {
     RateLimitUtf8,
     /// When parsing an URL failed due to invalid input.
     Url(UrlError),
+    /// When parsing a Webhook fails due to invalid input.
+    InvalidWebhook,
     /// Header value contains invalid input.
     InvalidHeader(InvalidHeaderValue),
     /// Reqwest's Error contain information on why sending a request failed.
@@ -195,6 +197,7 @@ impl Display for Error {
             Error::RateLimitI64F64 => f.write_str("Error decoding a header into an i64 or f64"),
             Error::RateLimitUtf8 => f.write_str("Error decoding a header from UTF-8"),
             Error::Url(_) => f.write_str("Provided URL is incorrect."),
+            Error::InvalidWebhook => f.write_str("Provided URL is not a valid webhook."),
             Error::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
             Error::Request(_) => f.write_str("Error while sending HTTP request."),
             Error::InvalidScheme => f.write_str("Invalid Url scheme."),

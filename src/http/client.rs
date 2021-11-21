@@ -2878,8 +2878,8 @@ impl Http {
 
     /// Retrieves a webhook given its Id.
     ///
-    /// This method requires authentication, whereas [`Self::get_webhook_with_token`] does
-    /// not.
+    /// This method requires authentication, whereas [`Self::get_webhook_with_token`] and
+    /// [`Self::get_webhook_from_url`] do not.
     ///
     /// # Examples
     ///
@@ -2927,6 +2927,53 @@ impl Http {
     /// # }
     /// ```
     pub async fn get_webhook_with_token(&self, webhook_id: u64, token: &str) -> Result<Webhook> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetWebhookWithToken {
+                token,
+                webhook_id,
+            },
+        })
+        .await
+    }
+
+    /// Retrieves a webhook given its url.
+    ///
+    /// This method does _not_ require authentication
+    ///
+    /// # Examples
+    ///
+    /// Retrieve a webhook by url:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+
+    /// let webhook = http.get_webhook_from_url(url).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub async fn get_webhook_from_url(&self, url: &str) -> Result<Webhook> {
+        fn parse_url<'a>(url: &'a Url) -> Option<(u64, &'a str)> {
+            let path = url.path().strip_prefix("/api/webhooks")?;
+            let split_idx = path.find('/')?;
+            let (webhook_id, token) = path.split_at(split_idx);
+            if !["http", "https"].contains(&url.scheme())
+                || !["discord.com", "discordapp.com"].contains(&url.domain()?)
+                || !(17..=20).contains(&webhook_id.len())
+                || !(60..=68).contains(&token.len())
+            {
+                return None;
+            }
+            Some((webhook_id.parse().ok()?, token))
+        }
+
+        let url = Url::parse(url).map_err(HttpError::Url)?;
+        let (webhook_id, token) = parse_url(&url).ok_or(HttpError::InvalidWebhook)?;
         self.fire(Request {
             body: None,
             headers: None,
