@@ -1,11 +1,8 @@
 #[cfg(feature = "model")]
 use std::cmp::Ordering;
 use std::convert::TryFrom;
+use std::fmt::{self, Display, Formatter, Result as FmtResult, Write as FmtWrite};
 use std::str::FromStr;
-use std::{
-    error::Error as StdError,
-    fmt::{self, Display, Formatter, Result as FmtResult, Write as FmtWrite},
-};
 
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{Serialize, SerializeMap, Serializer};
