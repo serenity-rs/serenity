@@ -203,7 +203,7 @@ impl CreateButton {
     }
 
     pub fn build(mut self) -> Value {
-        self.0.insert("type", from_number(2_u8 as u8));
+        self.0.insert("type", from_number(2_u8));
 
         utils::hashmap_to_json_map(self.0.clone()).into()
     }

@@ -1520,7 +1520,7 @@ impl GuildId {
 
     /// Get the widget image URL.
     pub fn widget_image_url(&self, style: GuildWidgetStyle) -> String {
-        format!(api!("/guilds/{}/widget.png?style={}"), self.0.to_string(), style.to_string())
+        format!(api!("/guilds/{}/widget.png?style={}"), self.0, style)
     }
 
     /// Gets the guild active threads.
