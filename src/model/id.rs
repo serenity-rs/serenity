@@ -127,7 +127,7 @@ pub struct AuditLogEntryId(pub u64);
 
 /// An identifier for an attachment.
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
-pub struct AttachmentId(u64);
+pub struct AttachmentId(pub u64);
 
 /// An identifier for a sticker.
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
