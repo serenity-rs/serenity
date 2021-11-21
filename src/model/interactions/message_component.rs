@@ -357,7 +357,7 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             map.remove("user").map(User::deserialize).transpose().map_err(DeError::custom)?;
 
         let user = user
-            .or(member.as_ref().map(|m| m.user.clone()))
+            .or_else(|| member.as_ref().map(|m| m.user.clone()))
             .ok_or_else(|| DeError::custom("expected user or member"))?;
 
         let message = map
