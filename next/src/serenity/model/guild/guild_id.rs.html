@@ -3175,7 +3175,7 @@
 
     <span class="doccomment">/// Get the widget image URL.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">widget_image_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">style</span>: <span class="ident">GuildWidgetStyle</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget.png?style={}&quot;</span>), <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_string</span>(), <span class="ident">style</span>.<span class="ident">to_string</span>())
+        <span class="macro">format!</span>(<span class="macro">api!</span>(<span class="string">&quot;/guilds/{}/widget.png?style={}&quot;</span>), <span class="self">self</span>.<span class="number">0</span>, <span class="ident">style</span>)
     }
 
     <span class="doccomment">/// Gets the guild active threads.</span>

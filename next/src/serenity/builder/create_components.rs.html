@@ -501,7 +501,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">2_u8</span> <span class="kw">as</span> <span class="ident">u8</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">2_u8</span>));
 
         <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }

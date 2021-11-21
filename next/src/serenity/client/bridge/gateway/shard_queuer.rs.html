@@ -458,8 +458,8 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">ShardRunner::new</span>(<span class="ident">ShardRunnerOptions</span> {
             <span class="ident">data</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>),
-            <span class="ident">event_handler</span>: <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">eh</span><span class="op">|</span> <span class="ident">Arc::clone</span>(<span class="ident">eh</span>)),
-            <span class="ident">raw_event_handler</span>: <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">rh</span><span class="op">|</span> <span class="ident">Arc::clone</span>(<span class="ident">rh</span>)),
+            <span class="ident">event_handler</span>: <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
+            <span class="ident">raw_event_handler</span>: <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Arc::clone</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
             <span class="ident">framework</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">framework</span>),
             <span class="ident">manager_tx</span>: <span class="self">self</span>.<span class="ident">manager_tx</span>.<span class="ident">clone</span>(),
