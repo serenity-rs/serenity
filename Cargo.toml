@@ -29,7 +29,8 @@ members = [
     "examples/e13_parallel_loops",
     "examples/e14_slash_commands",
     "examples/e15_simple_dashboard",
-    "examples/e16_sqlite_database"
+    "examples/e16_sqlite_database",
+    "examples/e17_message_components"
 ]
 
 [dependencies]
