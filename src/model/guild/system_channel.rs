@@ -2,7 +2,6 @@ use bitflags::__impl_bitflags;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::internal::prelude::StdResult;
-use crate::model::utils::U64Visitor;
 
 /// Describes a system channel flags.
 #[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash, Default)]
@@ -28,7 +27,7 @@ impl<'de> Deserialize<'de> for SystemChannelFlags {
     where
         D: Deserializer<'de>,
     {
-        Ok(SystemChannelFlags::from_bits_truncate(deserializer.deserialize_u64(U64Visitor)?))
+        Ok(SystemChannelFlags::from_bits_truncate(u64::deserialize(deserializer)?))
     }
 }
 
