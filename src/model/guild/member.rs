@@ -622,7 +622,7 @@ pub struct ThreadMemberFlags {
 __impl_bitflags! {
     ThreadMemberFlags: u64 {
         // Not documented.
-        NOTIFICATIONS = 0b0000_0000_0000_0000_0000_0000_0000_0001;
+        NOTIFICATIONS = 1 << 0;
     }
 }
 
