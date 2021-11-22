@@ -146,7 +146,20 @@ macro_rules! generate_get_permission_names {
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
 /// [Use VAD]: Permissions::USE_VAD
 pub const PRESET_GENERAL: Permissions = Permissions {
-    bits: 0b0000_0110_0011_0111_1101_1100_0100_0001,
+    bits: Permissions::ADD_REACTIONS.bits
+        | Permissions::ATTACH_FILES.bits
+        | Permissions::CHANGE_NICKNAME.bits
+        | Permissions::CONNECT.bits
+        | Permissions::CREATE_INVITE.bits
+        | Permissions::EMBED_LINKS.bits
+        | Permissions::MENTION_EVERYONE.bits
+        | Permissions::READ_MESSAGE_HISTORY.bits
+        | Permissions::READ_MESSAGES.bits
+        | Permissions::SEND_MESSAGES.bits
+        | Permissions::SEND_TTS_MESSAGES.bits
+        | Permissions::SPEAK.bits
+        | Permissions::USE_EXTERNAL_EMOJIS.bits
+        | Permissions::USE_VAD.bits,
 };
 
 /// Returns a set of text-only permissions with the original `@everyone`
@@ -178,7 +191,17 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
 pub const PRESET_TEXT: Permissions = Permissions {
-    bits: 0b0000_0000_0000_0111_1111_1100_0100_0000,
+    bits: Permissions::ADD_REACTIONS.bits
+        | Permissions::ATTACH_FILES.bits
+        | Permissions::CHANGE_NICKNAME.bits
+        | Permissions::CREATE_INVITE.bits
+        | Permissions::EMBED_LINKS.bits
+        | Permissions::MENTION_EVERYONE.bits
+        | Permissions::READ_MESSAGE_HISTORY.bits
+        | Permissions::READ_MESSAGES.bits
+        | Permissions::SEND_MESSAGES.bits
+        | Permissions::SEND_TTS_MESSAGES.bits
+        | Permissions::USE_EXTERNAL_EMOJIS.bits,
 };
 
 /// Returns a set of voice-only permissions with the original `@everyone`
@@ -194,7 +217,7 @@ pub const PRESET_TEXT: Permissions = Permissions {
 /// [Speak]: Permissions::SPEAK
 /// [Use VAD]: Permissions::USE_VAD
 pub const PRESET_VOICE: Permissions = Permissions {
-    bits: 0b0000_0011_1111_0000_0000_0000_0000_0000,
+    bits: Permissions::CONNECT.bits | Permissions::SPEAK.bits | Permissions::USE_VAD.bits,
 };
 
 /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
