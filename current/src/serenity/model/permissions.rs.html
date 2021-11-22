@@ -818,10 +818,10 @@
 <span class="doccomment">/// **Note**: The [Send TTS Messages] permission is set to `true`. Consider</span>
 <span class="doccomment">/// setting this to `false`, via:</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// use serenity::model::permissions;</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use serenity::model::permissions::{self, Permissions};</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// permissions::general().toggle(permissions::SEND_TTS_MESSAGES);</span>
+<span class="doccomment">/// permissions::PRESET_GENERAL.toggle(Permissions::SEND_TTS_MESSAGES);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [Add Reactions]: Permissions::ADD_REACTIONS</span>

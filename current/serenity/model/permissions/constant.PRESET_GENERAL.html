@@ -20,9 +20,9 @@ to true.</p>
 <p><strong>Note</strong>: The <a href="struct.Permissions.html#associatedconstant.SEND_TTS_MESSAGES">Send TTS Messages</a> permission is set to <code>true</code>. Consider
 setting this to <code>false</code>, via:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore"><code><span class="kw">use</span> <span class="ident">serenity::model::permissions</span>;
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::permissions</span>::{<span class="self">self</span>, <span class="ident">Permissions</span>};
 
-<span class="ident">permissions::general</span>().<span class="ident">toggle</span>(<span class="ident">permissions::SEND_TTS_MESSAGES</span>);</code></pre></div>
+<span class="ident">permissions::PRESET_GENERAL</span>.<span class="ident">toggle</span>(<span class="ident">Permissions::SEND_TTS_MESSAGES</span>);</code></pre></div>
 </div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script>
 </body></html>
