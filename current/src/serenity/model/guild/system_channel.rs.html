@@ -55,13 +55,13 @@
 <span class="macro">__impl_bitflags!</span> {
     <span class="ident">SystemChannelFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Suppress member join notifications.</span>
-        <span class="ident">SUPPRESS_JOIN_NOTIFICATIONS</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0001</span>;
+        <span class="ident">SUPPRESS_JOIN_NOTIFICATIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="doccomment">/// Suppress server boost notifications.</span>
-        <span class="ident">SUPPRESS_PREMIUM_SUBSCRIPTIONS</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0010</span>;
+        <span class="ident">SUPPRESS_PREMIUM_SUBSCRIPTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// Suppress server setup tips.</span>
-        <span class="ident">SUPPRESS_GUILD_REMINDER_NOTIFICATIONS</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0100</span>;
+        <span class="ident">SUPPRESS_GUILD_REMINDER_NOTIFICATIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// Hide member join sticker reply buttons.</span>
-        <span class="ident">SUPPRESS_JOIN_NOTIFICATION_REPLIES</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_1000</span>;
+        <span class="ident">SUPPRESS_JOIN_NOTIFICATION_REPLIES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
     }
 }
 
