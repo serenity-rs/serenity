@@ -691,6 +691,29 @@
 <span id="691">691</span>
 <span id="692">692</span>
 <span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -839,7 +862,20 @@
 <span class="doccomment">/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS</span>
 <span class="doccomment">/// [Use VAD]: Permissions::USE_VAD</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRESET_GENERAL</span>: <span class="ident">Permissions</span> <span class="op">=</span> <span class="ident">Permissions</span> {
-    <span class="ident">bits</span>: <span class="number">0b0000_0110_0011_0111_1101_1100_0100_0001</span>,
+    <span class="ident">bits</span>: <span class="ident">Permissions::ADD_REACTIONS</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::CHANGE_NICKNAME</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::CONNECT</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::CREATE_INVITE</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::EMBED_LINKS</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::MENTION_EVERYONE</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGE_HISTORY</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::SEND_MESSAGES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::SEND_TTS_MESSAGES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::SPEAK</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::USE_EXTERNAL_EMOJIS</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::USE_VAD</span>.<span class="ident">bits</span>,
 };
 
 <span class="doccomment">/// Returns a set of text-only permissions with the original `@everyone`</span>
@@ -871,7 +907,17 @@
 <span class="doccomment">/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES</span>
 <span class="doccomment">/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRESET_TEXT</span>: <span class="ident">Permissions</span> <span class="op">=</span> <span class="ident">Permissions</span> {
-    <span class="ident">bits</span>: <span class="number">0b0000_0000_0000_0111_1111_1100_0100_0000</span>,
+    <span class="ident">bits</span>: <span class="ident">Permissions::ADD_REACTIONS</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::CHANGE_NICKNAME</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::CREATE_INVITE</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::EMBED_LINKS</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::MENTION_EVERYONE</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGE_HISTORY</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::SEND_MESSAGES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::SEND_TTS_MESSAGES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::USE_EXTERNAL_EMOJIS</span>.<span class="ident">bits</span>,
 };
 
 <span class="doccomment">/// Returns a set of voice-only permissions with the original `@everyone`</span>
@@ -887,7 +933,7 @@
 <span class="doccomment">/// [Speak]: Permissions::SPEAK</span>
 <span class="doccomment">/// [Use VAD]: Permissions::USE_VAD</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRESET_VOICE</span>: <span class="ident">Permissions</span> <span class="op">=</span> <span class="ident">Permissions</span> {
-    <span class="ident">bits</span>: <span class="number">0b0000_0011_1111_0000_0000_0000_0000_0000</span>,
+    <span class="ident">bits</span>: <span class="ident">Permissions::CONNECT</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">Permissions::SPEAK</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">Permissions::USE_VAD</span>.<span class="ident">bits</span>,
 };
 
 <span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via</span>
