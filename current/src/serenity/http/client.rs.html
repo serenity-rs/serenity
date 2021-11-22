@@ -3414,6 +3414,53 @@
 <span id="3414">3414</span>
 <span id="3415">3415</span>
 <span id="3416">3416</span>
+<span id="3417">3417</span>
+<span id="3418">3418</span>
+<span id="3419">3419</span>
+<span id="3420">3420</span>
+<span id="3421">3421</span>
+<span id="3422">3422</span>
+<span id="3423">3423</span>
+<span id="3424">3424</span>
+<span id="3425">3425</span>
+<span id="3426">3426</span>
+<span id="3427">3427</span>
+<span id="3428">3428</span>
+<span id="3429">3429</span>
+<span id="3430">3430</span>
+<span id="3431">3431</span>
+<span id="3432">3432</span>
+<span id="3433">3433</span>
+<span id="3434">3434</span>
+<span id="3435">3435</span>
+<span id="3436">3436</span>
+<span id="3437">3437</span>
+<span id="3438">3438</span>
+<span id="3439">3439</span>
+<span id="3440">3440</span>
+<span id="3441">3441</span>
+<span id="3442">3442</span>
+<span id="3443">3443</span>
+<span id="3444">3444</span>
+<span id="3445">3445</span>
+<span id="3446">3446</span>
+<span id="3447">3447</span>
+<span id="3448">3448</span>
+<span id="3449">3449</span>
+<span id="3450">3450</span>
+<span id="3451">3451</span>
+<span id="3452">3452</span>
+<span id="3453">3453</span>
+<span id="3454">3454</span>
+<span id="3455">3455</span>
+<span id="3456">3456</span>
+<span id="3457">3457</span>
+<span id="3458">3458</span>
+<span id="3459">3459</span>
+<span id="3460">3460</span>
+<span id="3461">3461</span>
+<span id="3462">3462</span>
+<span id="3463">3463</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
@@ -6294,8 +6341,8 @@
 
     <span class="doccomment">/// Retrieves a webhook given its Id.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method requires authentication, whereas [`Self::get_webhook_with_token`] does</span>
-    <span class="doccomment">/// not.</span>
+    <span class="doccomment">/// This method requires authentication, whereas [`Self::get_webhook_with_token`] and</span>
+    <span class="doccomment">/// [`Self::get_webhook_from_url`] do not.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -6343,6 +6390,53 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_webhook_with_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::GetWebhookWithToken</span> {
+                <span class="ident">token</span>,
+                <span class="ident">webhook_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Retrieves a webhook given its url.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method does _not_ require authentication</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Retrieve a webhook by url:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+
+    <span class="doccomment">/// let webhook = http.get_webhook_from_url(url).await?;</span>
+    <span class="doccomment">/// #     Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_webhook_from_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">parse_url</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">strip_prefix</span>(<span class="string">&quot;/api/webhooks&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">split_idx</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">find</span>(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">path</span>.<span class="ident">split_at</span>(<span class="ident">split_idx</span>);
+            <span class="kw">if</span> <span class="op">!</span>[<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">scheme</span>())
+                <span class="op">|</span><span class="op">|</span> <span class="op">!</span>[<span class="string">&quot;discord.com&quot;</span>, <span class="string">&quot;discordapp.com&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">domain</span>()<span class="question-mark">?</span>)
+                <span class="op">|</span><span class="op">|</span> <span class="op">!</span>(<span class="number">17</span>..<span class="op">=</span><span class="number">20</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">webhook_id</span>.<span class="ident">len</span>())
+                <span class="op">|</span><span class="op">|</span> <span class="op">!</span>(<span class="number">60</span>..<span class="op">=</span><span class="number">68</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">len</span>())
+            {
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            }
+            <span class="prelude-val">Some</span>((<span class="ident">webhook_id</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>, <span class="ident">token</span>))
+        }
+
+        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="ident">HttpError::Url</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">parse_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">ok_or</span>(<span class="ident">HttpError::InvalidWebhook</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
