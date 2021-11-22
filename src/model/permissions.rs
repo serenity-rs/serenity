@@ -125,10 +125,10 @@ macro_rules! generate_get_permission_names {
 /// **Note**: The [Send TTS Messages] permission is set to `true`. Consider
 /// setting this to `false`, via:
 ///
-/// ```rust,ignore
-/// use serenity::model::permissions;
+/// ```rust
+/// use serenity::model::permissions::{self, Permissions};
 ///
-/// permissions::general().toggle(permissions::SEND_TTS_MESSAGES);
+/// permissions::PRESET_GENERAL.toggle(Permissions::SEND_TTS_MESSAGES);
 /// ```
 ///
 /// [Add Reactions]: Permissions::ADD_REACTIONS
