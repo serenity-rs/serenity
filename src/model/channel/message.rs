@@ -1208,21 +1208,21 @@ pub struct MessageFlags {
 __impl_bitflags! {
     MessageFlags: u64 {
         /// This message has been published to subscribed channels (via Channel Following).
-        CROSSPOSTED = 0b0000_0000_0000_0000_0000_0000_0000_0001;
+        CROSSPOSTED = 1 << 0;
         /// This message originated from a message in another channel (via Channel Following).
-        IS_CROSSPOST = 0b0000_0000_0000_0000_0000_0000_0000_0010;
+        IS_CROSSPOST = 1 << 1;
         /// Do not include any embeds when serializing this message.
-        SUPPRESS_EMBEDS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
+        SUPPRESS_EMBEDS = 1 << 2;
         /// The source message for this crosspost has been deleted (via Channel Following).
-        SOURCE_MESSAGE_DELETED = 0b0000_0000_0000_0000_0000_0000_0000_1000;
+        SOURCE_MESSAGE_DELETED = 1 << 3;
         /// This message came from the urgent message system.
-        URGENT = 0b0000_0000_0000_0000_0000_0000_0001_0000;
+        URGENT = 1 << 4;
         /// This message has an associated thread, with the same id as the message.
-        HAS_THREAD = 0b0000_0000_0000_0000_0000_0000_0010_0000;
+        HAS_THREAD = 1 << 5;
         /// This message is only visible to the user who invoked the Interaction.
-        EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
+        EPHEMERAL = 1 << 6;
         /// This message is an Interaction Response and the bot is "thinking".
-        LOADING = 0b0000_0000_0000_0000_0000_0000_1000_0000;
+        LOADING = 1 << 7;
     }
 }
 

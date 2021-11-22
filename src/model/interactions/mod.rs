@@ -179,7 +179,7 @@ __impl_bitflags! {
     InteractionApplicationCommandCallbackDataFlags: u64 {
         /// Interaction message will only be visible to sender and will
         /// be quickly deleted.
-        EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
+        EPHEMERAL = 1 << 6;
     }
 }
 

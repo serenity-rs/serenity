@@ -13,13 +13,13 @@ pub struct SystemChannelFlags {
 __impl_bitflags! {
     SystemChannelFlags: u64 {
         /// Suppress member join notifications.
-        SUPPRESS_JOIN_NOTIFICATIONS = 0b0000_0000_0000_0000_0000_0000_0000_0001;
+        SUPPRESS_JOIN_NOTIFICATIONS = 1 << 0;
         /// Suppress server boost notifications.
-        SUPPRESS_PREMIUM_SUBSCRIPTIONS = 0b0000_0000_0000_0000_0000_0000_0000_0010;
+        SUPPRESS_PREMIUM_SUBSCRIPTIONS = 1 << 1;
         /// Suppress server setup tips.
-        SUPPRESS_GUILD_REMINDER_NOTIFICATIONS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
+        SUPPRESS_GUILD_REMINDER_NOTIFICATIONS = 1 << 2;
         /// Hide member join sticker reply buttons.
-        SUPPRESS_JOIN_NOTIFICATION_REPLIES = 0b0000_0000_0000_0000_0000_0000_0000_1000;
+        SUPPRESS_JOIN_NOTIFICATION_REPLIES = 1 << 3;
     }
 }
 

@@ -514,33 +514,33 @@ pub struct UserPublicFlags {
 __impl_bitflags! {
     UserPublicFlags: u32 {
         /// User's flag as discord employee
-        DISCORD_EMPLOYEE = 0b0000_0000_0000_0000_0000_0000_0000_0001;
+        DISCORD_EMPLOYEE = 1 << 0;
         /// User's flag as partnered server owner
-        PARTNERED_SERVER_OWNER = 0b0000_0000_0000_0000_0000_0000_0000_0010;
+        PARTNERED_SERVER_OWNER = 1 << 1;
         /// User's flag as hypesquad events
-        HYPESQUAD_EVENTS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
+        HYPESQUAD_EVENTS = 1 << 2;
         /// User's flag as bug hunter level 1
-        BUG_HUNTER_LEVEL_1 = 0b0000_0000_0000_0000_0000_0000_0000_1000;
+        BUG_HUNTER_LEVEL_1 = 1 << 3;
         /// User's flag as house bravery
-        HOUSE_BRAVERY = 0b0000_0000_0000_0000_0000_0000_0100_0000;
+        HOUSE_BRAVERY = 1 << 6;
         /// User's flag as house brilliance
-        HOUSE_BRILLIANCE = 0b0000_0000_0000_0000_0000_0000_1000_0000;
+        HOUSE_BRILLIANCE = 1 << 7;
         /// User's flag as house balance
-        HOUSE_BALANCE = 0b0000_0000_0000_0000_0000_0001_0000_0000;
+        HOUSE_BALANCE = 1 << 8;
         /// User's flag as early supporter
-        EARLY_SUPPORTER = 0b0000_0000_0000_0000_0000_0010_0000_0000;
+        EARLY_SUPPORTER = 1 << 9;
         /// User's flag as team user
-        TEAM_USER = 0b0000_0000_0000_0000_0000_0100_0000_0000;
+        TEAM_USER = 1 << 10;
         /// User's flag as system
-        SYSTEM = 0b0000_0000_0000_0000_0001_0000_0000_0000;
+        SYSTEM = 1 << 12;
         /// User's flag as bug hunter level 2
-        BUG_HUNTER_LEVEL_2 = 0b0000_0000_0000_0000_0100_0000_0000_0000;
+        BUG_HUNTER_LEVEL_2 = 1 << 14;
         /// User's flag as verified bot
-        VERIFIED_BOT = 0b0000_0000_0000_0001_0000_0000_0000_0000;
+        VERIFIED_BOT = 1 << 16;
         /// User's flag as early verified bot developer
-        EARLY_VERIFIED_BOT_DEVELOPER = 0b0000_0000_0000_0010_0000_0000_0000_0000;
+        EARLY_VERIFIED_BOT_DEVELOPER = 1 << 17;
         /// User's flag as discord certified moderator
-        DISCORD_CERTIFIED_MODERATOR = 0b0000_0000_0000_0100_0000_0000_0000_0000;
+        DISCORD_CERTIFIED_MODERATOR = 1 << 18;
     }
 }
 
