@@ -575,7 +575,7 @@ impl<'de> Deserialize<'de> for UserPublicFlags {
     where
         D: Deserializer<'de>,
     {
-        Ok(UserPublicFlags::from_bits_truncate(deserializer.deserialize_u32(U32Visitor)?))
+        Ok(UserPublicFlags::from_bits_truncate(u32::deserialize(deserializer)?))
     }
 }
 

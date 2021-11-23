@@ -548,7 +548,7 @@ macro_rules! num_visitors {
     }
 }
 
-num_visitors!(U16Visitor: u16, U32Visitor: u32, U64Visitor: u64);
+num_visitors!(U16Visitor: u16, U64Visitor: u64);
 
 macro_rules! num_opt_visitors {
     ($($visitor:ident: $type:ty, $visitor_impl:ident),*) => {
