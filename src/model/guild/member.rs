@@ -633,7 +633,7 @@ impl<'de> Deserialize<'de> for ThreadMemberFlags {
     where
         D: Deserializer<'de>,
     {
-        Ok(ThreadMemberFlags::from_bits_truncate(deserializer.deserialize_u64(U64Visitor)?))
+        Ok(ThreadMemberFlags::from_bits_truncate(u64::deserialize(deserializer)?))
     }
 }
 
