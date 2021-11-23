@@ -40,8 +40,6 @@ use crate::json::Value;
 use crate::model::interactions::{message_component::ActionRow, MessageInteraction};
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
-use crate::model::utils::U64Visitor;
-#[cfg(feature = "model")]
 use crate::{
     constants,
     model::{
@@ -1276,7 +1274,7 @@ impl<'de> Deserialize<'de> for MessageFlags {
     where
         D: Deserializer<'de>,
     {
-        Ok(MessageFlags::from_bits_truncate(deserializer.deserialize_u64(U64Visitor)?))
+        Ok(MessageFlags::from_bits_truncate(u64::deserialize(deserializer)?))
     }
 }
 
