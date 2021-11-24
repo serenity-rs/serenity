@@ -77,13 +77,11 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
-<span id="79">79</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">UserId</span>},
+    <span class="ident">id</span>::{<span class="ident">snowflake</span>, <span class="ident">ApplicationId</span>, <span class="ident">UserId</span>},
     <span class="ident">user::User</span>,
-    <span class="ident">utils</span>::<span class="kw-2">*</span>,
 };
 
 <span class="doccomment">/// Partial information about the given application.</span>
@@ -120,7 +118,7 @@
     <span class="doccomment">/// The icon of the team.</span>
     <span class="kw">pub</span> <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The snowflake ID of the team.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_u64&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The name of the team.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
@@ -140,7 +138,7 @@
     <span class="doccomment">/// NOTE: Will always be [&quot;*&quot;] for now.</span>
     <span class="kw">pub</span> <span class="ident">permissions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The ID of the team they are a member of.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_u64&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">team_id</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The user type of the team member.</span>
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
