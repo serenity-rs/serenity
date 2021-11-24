@@ -26,7 +26,6 @@ pub use self::message::*;
 pub use self::partial_channel::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
-use super::utils::deserialize_u64;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
@@ -363,7 +362,7 @@ impl ChannelType {
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
-    #[serde(serialize_with = "serialize_u64", deserialize_with = "deserialize_u64")]
+    #[serde(with = "snowflake")]
     id: u64,
     #[serde(rename = "type")]
     kind: u8,
