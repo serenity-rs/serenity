@@ -330,15 +330,6 @@ pub fn deserialize_opt_u16<'de, D: Deserializer<'de>>(
     deserializer.deserialize_option(OptU16Visitor)
 }
 
-pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
-    deserializer.deserialize_any(U64Visitor)
-}
-
-#[allow(clippy::trivially_copy_pass_by_ref)]
-pub fn serialize_u64<S: Serializer>(data: &u64, ser: S) -> StdResult<S::Ok, S::Error> {
-    ser.serialize_str(&data.to_string())
-}
-
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
@@ -529,7 +520,7 @@ macro_rules! num_visitors {
     }
 }
 
-num_visitors!(U16Visitor: u16, U64Visitor: u64);
+num_visitors!(U16Visitor: u16);
 
 macro_rules! num_opt_visitors {
     ($($visitor:ident: $type:ty, $visitor_impl:ident),*) => {
