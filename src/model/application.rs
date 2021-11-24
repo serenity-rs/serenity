@@ -1,9 +1,8 @@
 //! Models about OAuth2 applications.
 
 use super::{
-    id::{ApplicationId, UserId},
+    id::{snowflake, ApplicationId, UserId},
     user::User,
-    utils::*,
 };
 
 /// Partial information about the given application.
@@ -40,7 +39,7 @@ pub struct Team {
     /// The icon of the team.
     pub icon: Option<String>,
     /// The snowflake ID of the team.
-    #[serde(deserialize_with = "deserialize_u64")]
+    #[serde(with = "snowflake")]
     pub id: u64,
     /// The name of the team.
     pub name: String,
@@ -60,7 +59,7 @@ pub struct TeamMember {
     /// NOTE: Will always be ["*"] for now.
     pub permissions: Vec<String>,
     /// The ID of the team they are a member of.
-    #[serde(deserialize_with = "deserialize_u64")]
+    #[serde(with = "snowflake")]
     pub team_id: u64,
     /// The user type of the team member.
     pub user: User,
