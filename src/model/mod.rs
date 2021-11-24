@@ -55,7 +55,6 @@ pub use serenity_voice_model as voice_gateway;
 
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
-use self::utils::*;
 use crate::internal::prelude::*;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
