@@ -169,7 +169,7 @@ enum_number!(InteractionType {
 });
 
 /// The flags for an interaction response.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone)]
 #[non_exhaustive]
 pub struct InteractionApplicationCommandCallbackDataFlags {
     bits: u64,
@@ -180,6 +180,18 @@ __impl_bitflags! {
         /// Interaction message will only be visible to sender and will
         /// be quickly deleted.
         EPHEMERAL = 1 << 6;
+    }
+}
+
+impl<'de> Deserialize<'de> for InteractionApplicationCommandCallbackDataFlags {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(Self::from_bits_truncate(u64::deserialize(deserializer)?))
+    }
+}
+
+impl Serialize for InteractionApplicationCommandCallbackDataFlags {
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        serializer.serialize_u64(self.bits())
     }
 }
 
