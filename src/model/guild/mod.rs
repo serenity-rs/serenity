@@ -15,7 +15,6 @@ mod role;
 mod system_channel;
 mod welcome_screen;
 
-use chrono::{DateTime, Utc};
 #[cfg(feature = "model")]
 use futures::stream::StreamExt;
 use serde::de::Error as DeError;
@@ -80,6 +79,7 @@ use crate::{
     json::{from_number, from_value, prelude::*},
     model::prelude::*,
     model::utils::{emojis, presences, roles, stickers},
+    model::Timestamp,
 };
 
 /// A representation of a banning of a user.
@@ -160,7 +160,7 @@ pub struct Guild {
     /// that of the default channel (typically `#general`).
     pub id: GuildId,
     /// The date that the current user joined the guild.
-    pub joined_at: DateTime<Utc>,
+    pub joined_at: Timestamp,
     /// Indicator of whether the guild is considered "large" by Discord.
     pub large: bool,
     /// The number of members in the guild.
@@ -2576,7 +2576,7 @@ impl<'de> Deserialize<'de> for Guild {
         let joined_at = map
             .remove("joined_at")
             .ok_or_else(|| DeError::custom("expected guild joined_at"))
-            .and_then(DateTime::deserialize)
+            .and_then(Timestamp::deserialize)
             .map_err(DeError::custom)?;
         let large = map
             .remove("large")
@@ -3139,8 +3139,6 @@ mod test {
     mod model {
         use std::collections::*;
 
-        use chrono::prelude::*;
-
         use crate::model::prelude::*;
 
         fn gen_user() -> User {
@@ -3148,9 +3146,7 @@ mod test {
         }
 
         fn gen_member() -> Member {
-            #[allow(clippy::zero_prefixed_literal)]
-            let dt: DateTime<Utc> =
-                FixedOffset::east(5 * 3600).ymd(2016, 11, 08).and_hms(0, 0, 0).with_timezone(&Utc);
+            let dt = Timestamp::now();
 
             let vec1 = Vec::new();
             let u = gen_user();
@@ -3180,9 +3176,7 @@ mod test {
             let hm2 = HashMap::new();
             let vec1 = Vec::new();
 
-            #[allow(clippy::zero_prefixed_literal)]
-            let dt: DateTime<Utc> =
-                FixedOffset::east(5 * 3600).ymd(2016, 11, 08).and_hms(0, 0, 0).with_timezone(&Utc);
+            let dt = Timestamp::now();
 
             let mut hm3 = HashMap::new();
             let hm4 = HashMap::new();

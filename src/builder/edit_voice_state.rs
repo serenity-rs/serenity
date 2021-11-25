@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
-use chrono::{DateTime, Utc};
-
-use super::create_embed::Timestamp;
 use crate::internal::prelude::*;
 use crate::json;
+use crate::model::Timestamp;
 
 /// A builder which edits a user's voice state, to be used in conjunction with
 /// [`GuildChannel::edit_voice_state`].
@@ -34,9 +32,9 @@ impl EditVoiceState {
     /// [Request to Speak]: crate::model::permissions::Permissions::REQUEST_TO_SPEAK
     pub fn request_to_speak(&mut self, request: bool) -> &mut Self {
         if request {
-            self.request_to_speak_timestamp(Some(&Utc::now()));
+            self.request_to_speak_timestamp(Some(Timestamp::now()));
         } else {
-            self.request_to_speak_timestamp(None::<&DateTime<Utc>>);
+            self.request_to_speak_timestamp(None::<Timestamp>);
         }
 
         self
@@ -53,7 +51,7 @@ impl EditVoiceState {
         timestamp: Option<T>,
     ) -> &mut Self {
         if let Some(timestamp) = timestamp {
-            self.0.insert("request_to_speak_timestamp", Value::from(timestamp.into().ts));
+            self.0.insert("request_to_speak_timestamp", Value::from(timestamp.into().to_string()));
         } else {
             self.0.insert("request_to_speak_timestamp", json::NULL);
         }

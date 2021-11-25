@@ -1,12 +1,10 @@
 use std::collections::HashMap;
-use std::fmt::Display;
-
-use chrono::{DateTime, TimeZone};
 
 use crate::{internal::prelude::*, json::from_number};
 use crate::{
     json::NULL,
     model::id::{ChannelId, RoleId},
+    model::Timestamp,
 };
 
 /// A builder which edits the properties of a [`Member`], to be used in
@@ -114,13 +112,8 @@ impl EditMember {
     ///
     /// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
-    pub fn disable_communication_until_datetime<Tz>(&mut self, time: DateTime<Tz>) -> &mut Self
-    where
-        Tz: TimeZone,
-        Tz::Offset: Display,
-    {
-        let timestamp = time.to_rfc3339();
-        self.0.insert("communication_disabled_until", Value::String(timestamp));
+    pub fn disable_communication_until_datetime(&mut self, time: Timestamp) -> &mut Self {
+        self.0.insert("communication_disabled_until", Value::String(time.to_string()));
         self
     }
 
