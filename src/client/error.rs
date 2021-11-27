@@ -1,7 +1,4 @@
-use std::{
-    error::Error as StdError,
-    fmt::{Display, Formatter, Result as FmtResult},
-};
+use std::{error::Error as StdError, fmt};
 
 /// An error returned from the [`Client`].
 ///
@@ -22,8 +19,8 @@ pub enum Error {
     Shutdown,
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::ShardBootFailure => f.write_str("Failed to (re-)boot a shard"),
             Error::Shutdown => f.write_str("The clients shards shutdown"),

@@ -1,5 +1,4 @@
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
@@ -1289,10 +1288,10 @@ impl GuildChannel {
     }
 }
 
-impl Display for GuildChannel {
+impl fmt::Display for GuildChannel {
     /// Formats the channel, creating a mention of it.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        Display::fmt(&self.id.mention(), f)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.id.mention(), f)
     }
 }
 

@@ -1,6 +1,6 @@
 use std::{
     error::Error as StdError,
-    fmt::{self, Display, Error as FormatError},
+    fmt::{self, Error as FormatError},
     io::Error as IoError,
     num::ParseIntError,
 };
@@ -203,7 +203,7 @@ impl From<ReqwestError> for Error {
     }
 }
 
-impl Display for Error {
+impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::Decode(msg, _) | Error::Other(msg) => f.write_str(msg),

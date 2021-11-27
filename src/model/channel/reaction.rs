@@ -1,7 +1,9 @@
 #[cfg(feature = "model")]
 use std::cmp::Ordering;
 use std::convert::TryFrom;
-use std::fmt::{self, Display, Formatter, Result as FmtResult, Write as FmtWrite};
+#[cfg(doc)]
+use std::fmt::Display as _;
+use std::fmt::{self, Write as _};
 use std::str::FromStr;
 
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
@@ -318,6 +320,7 @@ pub enum ReactionType {
 }
 
 impl<'de> Deserialize<'de> for ReactionType {
+    #[allow(clippy::unwrap_used)] // allow unwrap here because name being none is unreachable
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
@@ -332,7 +335,7 @@ impl<'de> Deserialize<'de> for ReactionType {
         impl<'de> Visitor<'de> for ReactionTypeVisitor {
             type Value = ReactionType;
 
-            fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
                 formatter.write_str("enum ReactionType")
             }
 
@@ -526,8 +529,8 @@ impl From<EmojiIdentifier> for ReactionType {
 #[derive(Debug)]
 pub struct ReactionConversionError;
 
-impl Display for ReactionConversionError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+impl fmt::Display for ReactionConversionError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("failed to convert from a string to ReactionType")
     }
 }
@@ -637,7 +640,7 @@ impl FromStr for ReactionType {
     }
 }
 
-impl Display for ReactionType {
+impl fmt::Display for ReactionType {
     /// Formats the reaction type, displaying the associated emoji in a
     /// way that clients can understand.
     ///
@@ -645,7 +648,7 @@ impl Display for ReactionType {
     /// the documentation for [emoji's formatter][`Emoji::fmt`] on how this is
     /// displayed. Otherwise, if the type is a
     /// [unicode][`ReactionType::Unicode`], then the inner unicode is displayed.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             ReactionType::Custom {
                 animated,
@@ -659,7 +662,7 @@ impl Display for ReactionType {
                 }
                 f.write_str(name.as_ref().map_or("", |s| s.as_str()))?;
                 f.write_char(':')?;
-                Display::fmt(&id, f)?;
+                fmt::Display::fmt(&id, f)?;
                 f.write_char('>')
             },
             ReactionType::Unicode(ref unicode) => f.write_str(unicode),

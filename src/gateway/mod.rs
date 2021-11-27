@@ -50,7 +50,7 @@ mod error;
 mod shard;
 mod ws_client_ext;
 
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt;
 
 pub use self::{
     error::Error as GatewayError,
@@ -132,8 +132,8 @@ impl ConnectionStage {
     }
 }
 
-impl Display for ConnectionStage {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for ConnectionStage {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use self::ConnectionStage::*;
 
         f.write_str(match *self {

@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
+use std::fmt;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
@@ -218,22 +218,22 @@ impl Emoji {
     }
 }
 
-impl Display for Emoji {
+impl fmt::Display for Emoji {
     /// Formats the emoji into a string that will cause Discord clients to
     /// render the emoji.
     ///
     /// This is in the format of either `<:NAME:EMOJI_ID>` for normal emojis,
     /// or `<a:NAME:EMOJI_ID>` for animated emojis.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.animated {
             f.write_str("<a:")?;
         } else {
             f.write_str("<:")?;
         }
         f.write_str(&self.name)?;
-        FmtWrite::write_char(f, ':')?;
-        Display::fmt(&self.id, f)?;
-        FmtWrite::write_char(f, '>')
+        fmt::Write::write_char(f, ':')?;
+        fmt::Display::fmt(&self.id, f)?;
+        fmt::Write::write_char(f, '>')
     }
 }
 
