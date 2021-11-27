@@ -1,8 +1,6 @@
 use std::marker::PhantomData;
 use std::{collections::HashMap, hash::Hash};
 
-use serde::de::Error as DeError;
-use serde::de::MapAccess;
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 #[cfg(feature = "simd-json")]
 use simd_json::ValueAccess;
@@ -339,16 +337,6 @@ pub mod single_recipient {
     }
 }
 
-pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
-    deserializer.deserialize_any(U16Visitor)
-}
-
-pub fn deserialize_opt_u16<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<Option<u16>, D::Error> {
-    deserializer.deserialize_option(OptU16Visitor)
-}
-
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
@@ -477,100 +465,3 @@ where
         Ok(map)
     }
 }
-
-macro_rules! num_visitors {
-    ($($visitor:ident: $type:ty),*) => {
-        $(
-            #[derive(Debug)]
-            pub struct $visitor;
-
-            impl<'de> Visitor<'de> for $visitor {
-                type Value = $type;
-
-                fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
-                    formatter.write_str("number")
-                }
-
-                fn visit_str<E: DeError>(self, v: &str) -> StdResult<Self::Value, E> {
-                    v.parse::<$type>().map_err(|_| {
-                        let mut s = String::with_capacity(32);
-                        s.push_str("Unknown ");
-                        s.push_str(stringify!($type));
-                        s.push_str(" value: ");
-                        s.push_str(v);
-
-                        DeError::custom(s)
-                    })
-                }
-
-                fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as $type) }
-
-                fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v as $type) }
-
-                // This is called when serde_json's `arbitrary_precision` feature is enabled.
-                fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> StdResult<Self::Value, A::Error> {
-                    struct Id {
-                        num: $type,
-                    }
-
-                    struct StrVisitor;
-
-                    impl<'de> Visitor<'de> for StrVisitor {
-                        type Value = $type;
-
-                        fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
-                            formatter.write_str("string")
-                        }
-
-                        fn visit_str<E: DeError>(self, s: &str) -> StdResult<Self::Value, E> { s.parse().map_err(E::custom) }
-                        fn visit_string<E: DeError>(self, s: String) -> StdResult<Self::Value, E> { s.parse().map_err(E::custom) }
-                    }
-
-                    impl<'de> Deserialize<'de> for Id {
-                        fn deserialize<D: Deserializer<'de>>(des: D) -> StdResult<Self, D::Error> {
-                            Ok(Id { num: des.deserialize_str(StrVisitor)? })
-                        }
-                    }
-
-                    map.next_value::<Id>().map(|id| id.num)
-                }
-            }
-        )*
-    }
-}
-
-num_visitors!(U16Visitor: u16);
-
-macro_rules! num_opt_visitors {
-    ($($visitor:ident: $type:ty, $visitor_impl:ident),*) => {
-        $(
-            #[derive(Debug)]
-            pub struct $visitor;
-
-            impl<'de> Visitor<'de> for $visitor {
-                type Value = Option<$type>;
-
-                fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
-                    formatter.write_str("optional number")
-                }
-
-                fn visit_unit<E: DeError>(self) -> StdResult<Self::Value, E> {
-                    Ok(None)
-                }
-
-                fn visit_none<E: DeError>(self) -> StdResult<Self::Value, E> {
-                    Ok(None)
-                }
-
-                fn visit_some<D>(self, deserializer: D) -> StdResult<Self::Value, D::Error>
-                where
-                    D: Deserializer<'de>,
-                {
-                    deserializer.deserialize_any($visitor_impl).map(Some)
-                }
-            }
-        )*
-    }
-}
-
-num_opt_visitors!(OptU16Visitor: u16, U16Visitor);
