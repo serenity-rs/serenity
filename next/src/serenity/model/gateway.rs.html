@@ -1284,7 +1284,7 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">UserId</span>,
     <span class="kw">pub</span> <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">bot</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_opt_u16&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;discriminator::option&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">discriminator</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">email</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">mfa_enabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
