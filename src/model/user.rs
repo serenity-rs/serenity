@@ -10,7 +10,6 @@ use futures::future::{BoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use super::prelude::*;
-use super::utils::deserialize_u16;
 #[cfg(feature = "model")]
 use crate::builder::{CreateBotAuthParameters, CreateMessage, EditProfile};
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -35,6 +34,136 @@ use crate::json::to_string;
 use crate::utils;
 use crate::{internal::prelude::*, model::misc::Mentionable};
 
+/// Used with `#[serde(with|deserialize_with|serialize_with)]`
+///
+/// # Examples
+///
+/// ```rust,ignore
+/// #[derive(Deserialize, Serialize)]
+/// struct A {
+///     #[serde(with = "discriminator")]
+///     id: u16,
+/// }
+///
+/// #[derive(Deserialize)]
+/// struct B {
+///     #[serde(deserialize_with = "discriminator::deserialize")]
+///     id: u16,
+/// }
+///
+/// #[derive(Serialize)]
+/// struct C {
+///     #[serde(serialize_with = "discriminator::serialize")]
+///     id: u16,
+/// }
+/// ```
+pub(crate) mod discriminator {
+    use std::convert::TryFrom;
+    use std::fmt;
+
+    use serde::de::{Error, Visitor};
+    use serde::{Deserializer, Serializer};
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<u16, D::Error> {
+        deserializer.deserialize_any(DiscriminatorVisitor)
+    }
+
+    pub fn serialize<S: Serializer>(value: &u16, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.collect_str(&format_args!("{:04}", value))
+    }
+
+    struct DiscriminatorVisitor;
+
+    impl<'de> Visitor<'de> for DiscriminatorVisitor {
+        type Value = u16;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            formatter.write_str("string or integer discriminator")
+        }
+
+        fn visit_u64<E: Error>(self, value: u64) -> Result<Self::Value, E> {
+            u16::try_from(value).map_err(Error::custom)
+        }
+
+        fn visit_str<E: Error>(self, s: &str) -> Result<Self::Value, E> {
+            s.parse().map_err(Error::custom)
+        }
+    }
+
+    /// Used with `#[serde(with|deserialize_with|serialize_with)]`
+    ///
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// #[derive(Deserialize, Serialize)]
+    /// struct A {
+    ///     #[serde(with = "discriminator::option")]
+    ///     id: Option<u16>,
+    /// }
+    ///
+    /// #[derive(Deserialize)]
+    /// struct B {
+    ///     #[serde(deserialize_with = "discriminator::option::deserialize")]
+    ///     id: Option<u16>,
+    /// }
+    ///
+    /// #[derive(Serialize)]
+    /// struct C {
+    ///     #[serde(serialize_with = "discriminator::option::serialize")]
+    ///     id: Option<u16>,
+    /// }
+    /// ```
+    pub(crate) mod option {
+        use std::fmt;
+
+        use serde::de::{Error, Visitor};
+        use serde::{Deserializer, Serializer};
+
+        use super::DiscriminatorVisitor;
+
+        pub fn deserialize<'de, D: Deserializer<'de>>(
+            deserializer: D,
+        ) -> Result<Option<u16>, D::Error> {
+            deserializer.deserialize_option(OptionalDiscriminatorVisitor)
+        }
+
+        pub fn serialize<S: Serializer>(
+            value: &Option<u16>,
+            serializer: S,
+        ) -> Result<S::Ok, S::Error> {
+            match value {
+                Some(value) => serializer.serialize_some(&format_args!("{:04}", value)),
+                None => serializer.serialize_none(),
+            }
+        }
+
+        struct OptionalDiscriminatorVisitor;
+
+        impl<'de> Visitor<'de> for OptionalDiscriminatorVisitor {
+            type Value = Option<u16>;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                formatter.write_str("optional string or integer discriminator")
+            }
+
+            fn visit_none<E: Error>(self) -> Result<Self::Value, E> {
+                Ok(None)
+            }
+
+            fn visit_unit<E: Error>(self) -> Result<Self::Value, E> {
+                Ok(None)
+            }
+
+            fn visit_some<D: Deserializer<'de>>(
+                self,
+                deserializer: D,
+            ) -> Result<Self::Value, D::Error> {
+                Ok(Some(deserializer.deserialize_any(DiscriminatorVisitor)?))
+            }
+        }
+    }
+}
+
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -43,7 +172,7 @@ pub struct CurrentUser {
     pub avatar: Option<String>,
     #[serde(default)]
     pub bot: bool,
-    #[serde(deserialize_with = "deserialize_u16")]
+    #[serde(with = "discriminator")]
     pub discriminator: u16,
     pub email: Option<String>,
     pub mfa_enabled: bool,
@@ -503,7 +632,7 @@ pub struct User {
     pub bot: bool,
     /// The account's discriminator to differentiate the user from others with
     /// the same [`Self::name`]. The name+discriminator pair is always unique.
-    #[serde(deserialize_with = "deserialize_u16")]
+    #[serde(with = "discriminator")]
     pub discriminator: u16,
     /// The account's username. Changing username will trigger a discriminator
     /// change if the username+discriminator pair becomes non-unique.
@@ -1189,6 +1318,72 @@ fn tag(name: &str, discriminator: u16) -> String {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod test {
+    #[test]
+    fn test_discriminator_serde() {
+        use serde::{Deserialize, Serialize};
+        use serde_test::{assert_de_tokens, assert_tokens, Token};
+
+        use super::discriminator;
+
+        #[derive(Debug, PartialEq, Deserialize, Serialize)]
+        struct User {
+            #[serde(with = "discriminator")]
+            discriminator: u16,
+        }
+
+        let user = User {
+            discriminator: 123,
+        };
+        assert_tokens(&user, &[
+            Token::Struct {
+                name: "User",
+                len: 1,
+            },
+            Token::Str("discriminator"),
+            Token::Str("0123"),
+            Token::StructEnd,
+        ]);
+        assert_de_tokens(&user, &[
+            Token::Struct {
+                name: "User",
+                len: 1,
+            },
+            Token::Str("discriminator"),
+            Token::U16(123),
+            Token::StructEnd,
+        ]);
+
+        #[derive(Debug, PartialEq, Deserialize, Serialize)]
+        struct UserOpt {
+            #[serde(with = "discriminator::option")]
+            discriminator: Option<u16>,
+        }
+
+        let user = UserOpt {
+            discriminator: Some(123),
+        };
+        assert_tokens(&user, &[
+            Token::Struct {
+                name: "UserOpt",
+                len: 1,
+            },
+            Token::Str("discriminator"),
+            Token::Some,
+            Token::Str("0123"),
+            Token::StructEnd,
+        ]);
+        assert_de_tokens(&user, &[
+            Token::Struct {
+                name: "UserOpt",
+                len: 1,
+            },
+            Token::Str("discriminator"),
+            Token::Some,
+            Token::U16(123),
+            Token::StructEnd,
+        ]);
+    }
+
     #[cfg(feature = "model")]
     mod model {
         use crate::model::user::User;
