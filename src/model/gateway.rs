@@ -585,7 +585,7 @@ pub struct PresenceUser {
     pub id: UserId,
     pub avatar: Option<String>,
     pub bot: Option<bool>,
-    #[serde(deserialize_with = "deserialize_opt_u16")]
+    #[serde(with = "discriminator::option")]
     pub discriminator: Option<u16>,
     pub email: Option<String>,
     pub mfa_enabled: Option<bool>,
