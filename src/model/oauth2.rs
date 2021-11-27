@@ -80,6 +80,6 @@ impl fmt::Display for OAuth2Scope {
             Self::RelactionshipsRead => "relationships.read",
         };
 
-        write!(f, "{}", val)
+        f.write_str(val)
     }
 }

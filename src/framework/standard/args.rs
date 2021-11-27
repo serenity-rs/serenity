@@ -26,7 +26,7 @@ impl<E: fmt::Display> fmt::Display for Error<E> {
         use self::Error::*;
 
         match *self {
-            Eos => write!(f, "ArgError(\"end of string\")"),
+            Eos => f.write_str(r#"ArgError("end of string")"#),
             Parse(ref e) => write!(f, "ArgError(\"{}\")", e),
         }
     }

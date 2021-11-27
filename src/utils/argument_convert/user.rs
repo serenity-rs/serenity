@@ -15,7 +15,7 @@ impl std::error::Error for UserParseError {}
 impl std::fmt::Display for UserParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::NotFoundOrMalformed => write!(f, "User not found or unknown format"),
+            Self::NotFoundOrMalformed => f.write_str("User not found or unknown format"),
         }
     }
 }

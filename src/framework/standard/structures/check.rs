@@ -68,7 +68,7 @@ impl Debug for Check {
 impl Display for Reason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Unknown => write!(f, "Unknown"),
+            Self::Unknown => f.write_str("Unknown"),
             Self::User(reason) => write!(f, "User {}", reason),
             Self::Log(reason) => write!(f, "Log {}", reason),
             Self::UserAndLog {

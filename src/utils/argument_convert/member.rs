@@ -19,9 +19,9 @@ impl std::error::Error for MemberParseError {}
 impl std::fmt::Display for MemberParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::OutsideGuild => write!(f, "Tried to find member outside a guild"),
-            Self::GuildNotInCache => write!(f, "Guild is not in cache"),
-            Self::NotFoundOrMalformed => write!(f, "Member not found or unknown format"),
+            Self::OutsideGuild => f.write_str("Tried to find member outside a guild"),
+            Self::GuildNotInCache => f.write_str("Guild is not in cache"),
+            Self::NotFoundOrMalformed => f.write_str("Member not found or unknown format"),
         }
     }
 }

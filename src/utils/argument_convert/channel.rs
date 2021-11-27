@@ -24,8 +24,8 @@ impl std::error::Error for ChannelParseError {
 impl std::fmt::Display for ChannelParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Http(_) => write!(f, "Failed to request channel via HTTP"),
-            Self::NotFoundOrMalformed => write!(f, "Channel not found or unknown format"),
+            Self::Http(_) => f.write_str("Failed to request channel via HTTP"),
+            Self::NotFoundOrMalformed => f.write_str("Channel not found or unknown format"),
         }
     }
 }
@@ -113,9 +113,9 @@ impl std::error::Error for GuildChannelParseError {
 impl std::fmt::Display for GuildChannelParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Http(_) => write!(f, "Failed to request channel via HTTP"),
-            Self::NotFoundOrMalformed => write!(f, "Channel not found or unknown format"),
-            Self::NotAGuildChannel => write!(f, "Channel is not a guild channel"),
+            Self::Http(_) => f.write_str("Failed to request channel via HTTP"),
+            Self::NotFoundOrMalformed => f.write_str("Channel not found or unknown format"),
+            Self::NotAGuildChannel => f.write_str("Channel is not a guild channel"),
         }
     }
 }
@@ -173,9 +173,9 @@ impl std::error::Error for ChannelCategoryParseError {
 impl std::fmt::Display for ChannelCategoryParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Http(_) => write!(f, "Failed to request channel via HTTP"),
-            Self::NotFoundOrMalformed => write!(f, "Channel not found or unknown format"),
-            Self::NotAChannelCategory => write!(f, "Channel is not a channel category"),
+            Self::Http(_) => f.write_str("Failed to request channel via HTTP"),
+            Self::NotFoundOrMalformed => f.write_str("Channel not found or unknown format"),
+            Self::NotAChannelCategory => f.write_str("Channel is not a channel category"),
         }
     }
 }
