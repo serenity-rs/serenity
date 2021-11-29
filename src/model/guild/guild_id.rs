@@ -1560,11 +1560,11 @@ pub enum GuildWidgetStyle {
 impl Display for GuildWidgetStyle {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         match self {
-            GuildWidgetStyle::Shield => write!(f, "shield"),
-            GuildWidgetStyle::Banner1 => write!(f, "banner1"),
-            GuildWidgetStyle::Banner2 => write!(f, "banner2"),
-            GuildWidgetStyle::Banner3 => write!(f, "banner3"),
-            GuildWidgetStyle::Banner4 => write!(f, "banner4"),
+            GuildWidgetStyle::Shield => f.write_str("shield"),
+            GuildWidgetStyle::Banner1 => f.write_str("banner1"),
+            GuildWidgetStyle::Banner2 => f.write_str("banner2"),
+            GuildWidgetStyle::Banner3 => f.write_str("banner3"),
+            GuildWidgetStyle::Banner4 => f.write_str("banner4"),
         }
     }
 }

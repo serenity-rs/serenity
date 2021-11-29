@@ -15,7 +15,7 @@ impl std::error::Error for EmojiParseError {}
 impl std::fmt::Display for EmojiParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::NotFoundOrMalformed => write!(f, "Emoji not found or unknown format"),
+            Self::NotFoundOrMalformed => f.write_str("Emoji not found or unknown format"),
         }
     }
 }

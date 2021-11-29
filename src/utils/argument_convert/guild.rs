@@ -15,7 +15,7 @@ impl std::error::Error for GuildParseError {}
 impl std::fmt::Display for GuildParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::NotFoundOrMalformed => write!(f, "Guild not found or unknown format"),
+            Self::NotFoundOrMalformed => f.write_str("Guild not found or unknown format"),
         }
     }
 }

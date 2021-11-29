@@ -324,7 +324,7 @@ pub struct RevertBucket;
 
 impl std::fmt::Display for RevertBucket {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "RevertBucket")
+        f.write_str("RevertBucket")
     }
 }
 

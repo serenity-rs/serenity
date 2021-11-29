@@ -108,7 +108,7 @@ impl<'de> Visitor<'de> for EventVisitor {
     type Value = Event;
 
     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(formatter, "a map with at least two keys ('d', 'op')")
+        formatter.write_str("a map with at least two keys ('d', 'op')")
     }
 
     fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
