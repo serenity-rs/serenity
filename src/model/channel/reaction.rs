@@ -403,7 +403,7 @@ impl Serialize for ReactionType {
                 let mut map = serializer.serialize_map(Some(3))?;
 
                 map.serialize_entry("animated", &animated)?;
-                map.serialize_entry("id", &id.0)?;
+                map.serialize_entry("id", &id)?;
                 map.serialize_entry("name", &name)?;
 
                 map.end()
