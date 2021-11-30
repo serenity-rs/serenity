@@ -84,7 +84,7 @@ impl Attachment {
     ///                 },
     ///             };
     ///
-    ///             if let Err(why) = file.write(&content).await {
+    ///             if let Err(why) = file.write_all(&content).await {
     ///                 println!("Error writing to file: {:?}", why);
     ///
     ///                 return;
