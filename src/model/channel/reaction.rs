@@ -338,7 +338,6 @@ pub enum ReactionType {
 }
 
 impl<'de> Deserialize<'de> for ReactionType {
-    #[allow(clippy::unwrap_used)] // allow unwrap here because name being none is unreachable
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
@@ -385,23 +384,21 @@ impl<'de> Deserialize<'de> for ReactionType {
                                 return Err(DeError::duplicate_field("name"));
                             }
 
-                            name = Some(map.next_value()?);
+                            name = Some(map.next_value::<Option<String>>()?);
                         },
                     }
                 }
 
-                let animated = animated.unwrap_or(false);
-                let name = name.ok_or_else(|| DeError::missing_field("name"))?;
-
-                Ok(if let Some(id) = id {
-                    ReactionType::Custom {
-                        animated,
+                let rt = match (id, name) {
+                    (Some(id), name) => ReactionType::Custom {
+                        animated: animated.unwrap_or_default(),
                         id,
-                        name,
-                    }
-                } else {
-                    ReactionType::Unicode(name.unwrap())
-                })
+                        name: name.flatten(),
+                    },
+                    (None, Some(Some(name))) => ReactionType::Unicode(name),
+                    _ => return Err(DeError::custom("invalid reaction type data")),
+                };
+                Ok(rt)
             }
         }
 
