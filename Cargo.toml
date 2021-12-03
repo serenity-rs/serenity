@@ -80,7 +80,7 @@ version = "1.0.13"
 default-features = false
 features = ["json", "multipart", "stream"]
 optional = true
-version = "0.11"
+version = "0.11.7"
 
 # Tokio v0.2
 [dependencies.reqwest_compat]
@@ -103,7 +103,7 @@ version = "1.1"
 default-features = false
 features = ["tokio-runtime"]
 optional = true
-version = "0.15"
+version = "0.16"
 
 # Tokio v0.2
 [dependencies.async-tungstenite_compat]
