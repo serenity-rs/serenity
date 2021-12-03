@@ -309,7 +309,7 @@ impl Ratelimit {
         }
 
         #[cfg(feature = "absolute_ratelimits")]
-        if let Some(_reset) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset")? {
+        if let Some(_reset) = parse_header::<f64>(response.headers(), "x-ratelimit-reset")? {
             self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(_reset));
         }
 
