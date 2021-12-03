@@ -627,7 +627,7 @@ impl ShardRunner {
         #[cfg(feature = "voice")]
         {
             if let Ok(GatewayEvent::Dispatch(_, ref event)) = event {
-                self.handle_voice_event(&event).await;
+                self.handle_voice_event(event).await;
             }
         }
 
