@@ -117,7 +117,7 @@ impl MessageFilter {
             if self.options.filter.as_ref().map_or(true, |f| f(&message.as_arc())) {
                 self.collected += 1;
 
-                if let Err(_) = self.sender.send(message.as_arc()) {
+                if self.sender.send(message.as_arc()).is_err() {
                     return false;
                 }
             }

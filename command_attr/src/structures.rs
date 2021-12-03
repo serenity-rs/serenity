@@ -237,7 +237,7 @@ pub struct ClosureHook {
 
 #[derive(Debug)]
 pub enum Hook {
-    Function(FunctionHook),
+    Function(Box<FunctionHook>),
     Closure(ClosureHook),
 }
 
@@ -247,7 +247,7 @@ impl Parse for Hook {
         let cooked = remove_cooked(&mut attributes);
 
         if is_function(input) {
-            parse_function_hook(input, attributes, cooked).map(Self::Function)
+            parse_function_hook(input, attributes, cooked).map(|h| Self::Function(Box::new(h)))
         } else {
             parse_closure_hook(input, attributes, cooked).map(Self::Closure)
         }
