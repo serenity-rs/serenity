@@ -164,11 +164,8 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
 #[cfg(feature = "native_tls_backend_marker")]
 #[instrument]
 pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
-    let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
-        url.into(),
-        Some(websocket_config()),
-    )
-    .await?;
+    let (stream, _) =
+        async_tungstenite::tokio::connect_async_with_config(url, Some(websocket_config())).await?;
 
     Ok(stream)
 }
