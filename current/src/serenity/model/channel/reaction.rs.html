@@ -703,9 +703,6 @@
 <span id="702">702</span>
 <span id="703">703</span>
 <span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
@@ -1046,7 +1043,6 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReactionType</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span> <span class="comment">// allow unwrap here because name being none is unreachable</span>
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
         <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">field_identifier</span>, <span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;snake_case&quot;</span>)]</span>
@@ -1093,23 +1089,21 @@
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::duplicate_field</span>(<span class="string">&quot;name&quot;</span>));
                             }
 
-                            <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>);
+                            <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
                         },
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">animated</span> <span class="op">=</span> <span class="ident">animated</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;name&quot;</span>))<span class="question-mark">?</span>;
-
-                <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">id</span> {
-                    <span class="ident">ReactionType::Custom</span> {
-                        <span class="ident">animated</span>,
+                <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">id</span>, <span class="ident">name</span>) {
+                    (<span class="prelude-val">Some</span>(<span class="ident">id</span>), <span class="ident">name</span>) =&gt; <span class="ident">ReactionType::Custom</span> {
+                        <span class="ident">animated</span>: <span class="ident">animated</span>.<span class="ident">unwrap_or_default</span>(),
                         <span class="ident">id</span>,
-                        <span class="ident">name</span>,
-                    }
-                } <span class="kw">else</span> {
-                    <span class="ident">ReactionType::Unicode</span>(<span class="ident">name</span>.<span class="ident">unwrap</span>())
-                })
+                        <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">flatten</span>(),
+                    },
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">name</span>))) =&gt; <span class="ident">ReactionType::Unicode</span>(<span class="ident">name</span>),
+                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;invalid reaction type data&quot;</span>)),
+                };
+                <span class="prelude-val">Ok</span>(<span class="ident">rt</span>)
             }
         }
 
@@ -1414,5 +1408,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (acbe4443c 2021-12-02)" ></div>
 </body></html>
