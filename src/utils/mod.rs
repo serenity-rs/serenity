@@ -976,10 +976,10 @@ mod test {
         let cache = Arc::new(Cache::default());
 
         guild.members.insert(user.id, member.clone());
-        guild.roles.insert(role.id, role.clone());
+        guild.roles.insert(role.id, role);
         cache.users.insert(user.id, user.clone());
         cache.guilds.insert(guild.id, guild.clone());
-        cache.channels.insert(channel.id, channel.clone());
+        cache.channels.insert(channel.id, channel);
 
         let with_user_mentions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
         <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
