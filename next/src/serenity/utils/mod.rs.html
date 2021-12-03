@@ -1964,10 +1964,10 @@
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Cache::default</span>());
 
         <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">member</span>.<span class="ident">clone</span>());
-        <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">insert</span>(<span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">role</span>.<span class="ident">clone</span>());
+        <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">insert</span>(<span class="ident">role</span>.<span class="ident">id</span>, <span class="ident">role</span>);
         <span class="ident">cache</span>.<span class="ident">users</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">user</span>.<span class="ident">clone</span>());
         <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">insert</span>(<span class="ident">guild</span>.<span class="ident">id</span>, <span class="ident">guild</span>.<span class="ident">clone</span>());
-        <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel</span>.<span class="ident">id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>());
+        <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel</span>.<span class="ident">id</span>, <span class="ident">channel</span>);
 
         <span class="kw">let</span> <span class="ident">with_user_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;@!100000000000000000&gt; &lt;@!000000000000000000&gt; &lt;@123&gt; &lt;@!123&gt; \
         &lt;@!123123123123123123123&gt; &lt;@123&gt; &lt;@123123123123123123&gt; &lt;@!invalid&gt; \

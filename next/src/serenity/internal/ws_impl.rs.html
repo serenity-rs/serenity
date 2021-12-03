@@ -170,9 +170,6 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
@@ -339,11 +336,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">instrument</span>]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_native_tls_client</span>(<span class="ident">url</span>: <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WsStream</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">stream</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">async_tungstenite::tokio::connect_async_with_config</span>::<span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>(
-        <span class="ident">url</span>.<span class="ident">into</span>(),
-        <span class="prelude-val">Some</span>(<span class="ident">websocket_config</span>()),
-    )
-    .<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> (<span class="ident">stream</span>, <span class="kw">_</span>) <span class="op">=</span>
+        <span class="ident">async_tungstenite::tokio::connect_async_with_config</span>(<span class="ident">url</span>, <span class="prelude-val">Some</span>(<span class="ident">websocket_config</span>())).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">stream</span>)
 }
