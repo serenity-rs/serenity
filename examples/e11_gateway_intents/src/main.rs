@@ -3,7 +3,10 @@ use std::env;
 use serenity::{
     async_trait,
     client::bridge::gateway::GatewayIntents,
-    model::{channel::Message, event::PresenceUpdateEvent, gateway::Ready},
+    model::{
+        channel::Message,
+        gateway::{Presence, Ready},
+    },
     prelude::*,
 };
 
@@ -18,7 +21,7 @@ impl EventHandler for Handler {
 
     // As the intents set in this example, this event shall never be dispatched.
     // Try it by changing your status.
-    async fn presence_update(&self, _ctx: Context, _new_data: PresenceUpdateEvent) {
+    async fn presence_update(&self, _ctx: Context, _new_data: Presence) {
         println!("Presence Update");
     }
 

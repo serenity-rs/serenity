@@ -504,7 +504,7 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_member_addition", async move {
-                event_handler.guild_member_addition(context, event.guild_id, event.member).await;
+                event_handler.guild_member_addition(context, event.member).await;
             });
         },
         DispatchEvent::Model(Event::GuildMemberRemove(mut event)) => {
@@ -552,7 +552,7 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::guild_role_create", async move {
-                event_handler.guild_role_create(context, event.guild_id, event.role).await;
+                event_handler.guild_role_create(context, event.role).await;
             });
         },
         DispatchEvent::Model(Event::GuildRoleDelete(mut event)) => {
@@ -573,9 +573,9 @@ async fn handle_event(
 
             spawn_named("dispatch::event_handler::guild_role_update", async move {
                 feature_cache! {{
-                    event_handler.guild_role_update(context, event.guild_id, _before, event.role).await;
+                    event_handler.guild_role_update(context, _before, event.role).await;
                 } else {
-                    event_handler.guild_role_update(context, event.guild_id, event.role).await;
+                    event_handler.guild_role_update(context, event.role).await;
                 }}
             });
         },
@@ -674,7 +674,7 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             spawn_named("dispatch::event_handler::presence_update", async move {
-                event_handler.presence_update(context, event).await;
+                event_handler.presence_update(context, event.presence).await;
             });
         },
         DispatchEvent::Model(Event::ReactionAdd(event)) => {
@@ -754,9 +754,9 @@ async fn handle_event(
 
             spawn_named("dispatch::event_handler::voice_state_update", async move {
                 feature_cache! {{
-                    event_handler.voice_state_update(context, event.guild_id, _before, event.voice_state).await;
+                    event_handler.voice_state_update(context, _before, event.voice_state).await;
                 } else {
-                    event_handler.voice_state_update(context, event.guild_id, event.voice_state).await;
+                    event_handler.voice_state_update(context, event.voice_state).await;
                 }}
             });
         },
