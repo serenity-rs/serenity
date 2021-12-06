@@ -1,4 +1,4 @@
-msrv = "1.48"
+msrv = "1.51"
 cognitive-complexity-threshold = 20
 doc-valid-idents = [
     "UserAgent",

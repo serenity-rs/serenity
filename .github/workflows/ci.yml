@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 env:
-  minrust: 1.48.0
+  minrust: 1.51.0
 
 jobs:
   test:
