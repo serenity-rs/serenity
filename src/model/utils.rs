@@ -2,8 +2,6 @@ use std::marker::PhantomData;
 use std::{collections::HashMap, hash::Hash};
 
 use serde::ser::{Serialize, SerializeSeq, Serializer};
-#[cfg(feature = "simd-json")]
-use simd_json::ValueAccess;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::permissions::Permissions;
