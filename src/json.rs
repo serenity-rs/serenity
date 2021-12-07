@@ -15,9 +15,13 @@ pub type Value = simd_json::OwnedValue;
 #[cfg(not(feature = "simd-json"))]
 pub use serde_json::json;
 #[cfg(not(feature = "simd-json"))]
+pub use serde_json::Error;
+#[cfg(not(feature = "simd-json"))]
 use serde_json::Number;
 #[cfg(feature = "simd-json")]
 pub use simd_json::json;
+#[cfg(feature = "simd-json")]
+pub use simd_json::Error;
 
 #[cfg(not(feature = "simd-json"))]
 pub type JsonMap = serde_json::Map<String, Value>;
