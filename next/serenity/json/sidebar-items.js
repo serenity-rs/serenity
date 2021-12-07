@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["NULL",""]],"macro":[["json","Construct a `serde_json::Value` from a JSON literal."]],"mod":[["prelude",""]],"type":[["JsonMap",""],["Value",""]]});
+initSidebarItems({"constant":[["NULL",""]],"macro":[["json","Construct a `serde_json::Value` from a JSON literal."]],"mod":[["prelude",""]],"struct":[["JsonError","This type represents all possible errors that can occur when serializing or deserializing JSON data."]],"type":[["JsonMap",""],["Value",""]]});
