@@ -152,6 +152,7 @@ pub mod prelude {
     pub use simd_json::{
         from_slice,
         from_str,
+        from_reader,
         to_string,
         to_string_pretty,
         to_vec,
@@ -165,6 +166,7 @@ pub mod prelude {
         from_slice,
         from_str,
         from_value,
+        from_reader,
         to_string,
         to_string_pretty,
         to_value,
