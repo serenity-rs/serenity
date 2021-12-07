@@ -148,5 +148,29 @@ pub mod prelude {
     #[cfg(feature = "simd-json")]
     pub use simd_json::{Builder, Mutable, Value as ValueTrait, ValueAccess};
 
+    #[cfg(feature = "simd-json")]
+    pub use simd_json::{
+        from_slice,
+        from_str,
+        to_string,
+        to_string_pretty,
+        to_vec,
+        to_vec_pretty,
+        serde::from_owned_value as from_value,
+        serde::to_owned_value as to_value,
+    };
+
+    #[cfg(not(feature = "simd-json"))]
+    pub use serde_json::{
+        from_slice,
+        from_str,
+        from_value,
+        to_string,
+        to_string_pretty,
+        to_value,
+        to_vec,
+        to_vec_pretty,
+    };
+
     pub use super::*;
 }
