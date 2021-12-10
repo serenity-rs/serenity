@@ -11,7 +11,7 @@ use std::mem;
 use std::{collections::HashMap, fmt};
 
 use chrono::{DateTime, Utc};
-use serde::de::Error as DeError;
+use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 
 use super::prelude::*;
@@ -572,61 +572,100 @@ impl CacheUpdate for GuildMembersChunkEvent {
 
 impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
+        #[derive(Deserialize)]
+        #[serde(field_identifier, rename_all = "snake_case")]
+        enum Field {
+            GuildId,
+            ChunkIndex,
+            ChunkCount,
+            Members,
+            Nonce,
+            Unknown(String),
+        }
 
-        let guild_id = map
-            .get("guild_id")
-            .ok_or_else(|| DeError::custom("missing member chunk guild id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
+        struct GuildMembersChunkVisitor;
 
-        let mut members =
-            map.remove("members").ok_or_else(|| DeError::custom("missing member chunk members"))?;
+        impl<'de> Visitor<'de> for GuildMembersChunkVisitor {
+            type Value = GuildMembersChunkEvent;
 
-        let chunk_index = map
-            .get("chunk_index")
-            .ok_or_else(|| DeError::custom("missing member chunk index"))
-            .and_then(u32::deserialize)
-            .map_err(DeError::custom)?;
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                formatter.write_str("struct GuildMembersChunkEvent")
+            }
 
-        let chunk_count = map
-            .get("chunk_count")
-            .ok_or_else(|| DeError::custom("missing member chunk count"))
-            .and_then(u32::deserialize)
-            .map_err(DeError::custom)?;
+            fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> StdResult<Self::Value, A::Error> {
+                let mut guild_id = None;
+                let mut chunk_index = None;
+                let mut chunk_count = None;
+                let mut members = None;
+                let mut nonce = None;
 
-        if let Some(members) = members.as_array_mut() {
-            let num = from_number(guild_id.0);
-
-            for member in members {
-                if let Some(map) = member.as_object_mut() {
-                    map.insert("guild_id".to_string(), num.clone());
+                while let Some(key) = map.next_key()? {
+                    match key {
+                        Field::GuildId => {
+                            if guild_id.is_some() {
+                                return Err(DeError::duplicate_field("guild_id"));
+                            }
+                            guild_id = Some(map.next_value()?);
+                        },
+                        Field::ChunkIndex => {
+                            if chunk_index.is_some() {
+                                return Err(DeError::duplicate_field("chunk_index"));
+                            }
+                            chunk_index = Some(map.next_value()?);
+                        },
+                        Field::ChunkCount => {
+                            if chunk_count.is_some() {
+                                return Err(DeError::duplicate_field("chunk_count"));
+                            }
+                            chunk_count = Some(map.next_value()?);
+                        },
+                        Field::Members => {
+                            if members.is_some() {
+                                return Err(DeError::duplicate_field("members"));
+                            }
+                            members = Some(map.next_value::<Vec<InterimMember>>()?);
+                        },
+                        Field::Nonce => {
+                            if nonce.is_some() {
+                                return Err(DeError::duplicate_field("nonce"));
+                            }
+                            nonce = Some(map.next_value()?);
+                        },
+                        Field::Unknown(_) => {
+                            // ignore unknown keys
+                            map.next_value::<IgnoredAny>()?;
+                        },
+                    }
                 }
+
+                let guild_id = guild_id.ok_or_else(|| DeError::missing_field("guild_id"))?;
+                let chunk_index =
+                    chunk_index.ok_or_else(|| DeError::missing_field("chunk_index"))?;
+                let chunk_count =
+                    chunk_count.ok_or_else(|| DeError::missing_field("chunk_count"))?;
+                let members = members.ok_or_else(|| DeError::missing_field("members"))?;
+
+                let members = members
+                    .into_iter()
+                    .map(|m| {
+                        let mut m = Member::from(m);
+                        m.guild_id = guild_id;
+                        (m.user.id, m)
+                    })
+                    .collect();
+
+                Ok(GuildMembersChunkEvent {
+                    guild_id,
+                    chunk_index,
+                    chunk_count,
+                    members,
+                    nonce,
+                })
             }
         }
 
-        let members = from_value::<Vec<Member>>(members)
-            .map(|members| {
-                members.into_iter().fold(HashMap::new(), |mut acc, member| {
-                    let id = member.user.id;
-
-                    acc.insert(id, member);
-
-                    acc
-                })
-            })
-            .map_err(DeError::custom)?;
-
-        let nonce =
-            map.get("nonce").and_then(|nonce| nonce.as_str()).map(|nonce| nonce.to_string());
-
-        Ok(GuildMembersChunkEvent {
-            guild_id,
-            members,
-            chunk_index,
-            chunk_count,
-            nonce,
-        })
+        const FIELDS: &[&str] = &["guild_id", "chunk_index", "chunk_count", "members", "nonce"];
+        deserializer.deserialize_struct("GuildMembersChunkEvent", FIELDS, GuildMembersChunkVisitor)
     }
 }
 
