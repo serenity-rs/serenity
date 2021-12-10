@@ -265,7 +265,8 @@ impl CreateEmbed {
     ///
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     async fn guild_member_addition(&self, context: Context, guild_id: GuildId, member: Member) {
+    ///     async fn guild_member_addition(&self, context: Context, member: Member) {
+    ///         let guild_id = member.guild_id;
     ///         if let Ok(guild) = guild_id.to_partial_guild(&context).await {
     ///             let channels = guild.channels(&context).await.unwrap();
     ///
