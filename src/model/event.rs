@@ -410,7 +410,6 @@ pub struct GuildIntegrationsUpdateEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct GuildMemberAddEvent {
-    pub guild_id: GuildId,
     pub member: Member,
 }
 
@@ -425,7 +424,7 @@ impl CacheUpdate for GuildMemberAddEvent {
             self.member.user = u;
         }
 
-        if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
+        if let Some(mut guild) = cache.guilds.get_mut(&self.member.guild_id) {
             guild.member_count += 1;
             guild.members.insert(user_id, self.member.clone());
         }
@@ -436,17 +435,8 @@ impl CacheUpdate for GuildMemberAddEvent {
 
 impl<'de> Deserialize<'de> for GuildMemberAddEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = map
-            .get("guild_id")
-            .ok_or_else(|| DeError::custom("missing member add guild id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
-
         Ok(GuildMemberAddEvent {
-            guild_id,
-            member: Member::deserialize(Value::from(map)).map_err(DeError::custom)?,
+            member: Member::deserialize(deserializer)?,
         })
     }
 }
@@ -671,7 +661,6 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleCreateEvent {
-    pub guild_id: GuildId,
     pub role: Role,
 }
 
@@ -682,7 +671,7 @@ impl CacheUpdate for GuildRoleCreateEvent {
     fn update(&mut self, cache: &Cache) -> Option<()> {
         cache
             .guilds
-            .get_mut(&self.guild_id)
+            .get_mut(&self.role.guild_id)
             .map(|mut g| g.roles.insert(self.role.id, self.role.clone()));
 
         None
@@ -714,7 +703,6 @@ impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
             .map_err(DeError::custom)?;
 
         Ok(Self {
-            guild_id,
             role,
         })
     }
@@ -739,7 +727,6 @@ impl CacheUpdate for GuildRoleDeleteEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct GuildRoleUpdateEvent {
-    pub guild_id: GuildId,
     pub role: Role,
 }
 
@@ -748,7 +735,7 @@ impl CacheUpdate for GuildRoleUpdateEvent {
     type Output = Role;
 
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
+        if let Some(mut guild) = cache.guilds.get_mut(&self.role.guild_id) {
             if let Some(role) = guild.roles.get_mut(&self.role.id) {
                 return Some(mem::replace(role, self.role.clone()));
             }
@@ -783,7 +770,6 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
             .map_err(DeError::custom)?;
 
         Ok(Self {
-            guild_id,
             role,
         })
     }
@@ -1063,7 +1049,6 @@ impl CacheUpdate for MessageUpdateEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct PresenceUpdateEvent {
-    pub guild_id: Option<GuildId>,
     pub presence: Presence,
 }
 
@@ -1080,7 +1065,7 @@ impl CacheUpdate for PresenceUpdateEvent {
             self.presence.user.update_with_user(user);
         }
 
-        if let Some(guild_id) = self.guild_id {
+        if let Some(guild_id) = self.presence.guild_id {
             if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
                 // If the member went offline, remove them from the presence list.
                 if self.presence.status == OnlineStatus::Offline {
@@ -1121,17 +1106,8 @@ impl CacheUpdate for PresenceUpdateEvent {
 
 impl<'de> Deserialize<'de> for PresenceUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = match map.remove("guild_id") {
-            Some(v) => from_value::<Option<GuildId>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-        let presence = Presence::deserialize(Value::from(map)).map_err(DeError::custom)?;
-
         Ok(Self {
-            guild_id,
-            presence,
+            presence: Presence::deserialize(deserializer)?,
         })
     }
 }
@@ -1398,7 +1374,6 @@ impl fmt::Debug for VoiceServerUpdateEvent {
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct VoiceStateUpdateEvent {
-    pub guild_id: Option<GuildId>,
     pub voice_state: VoiceState,
 }
 
@@ -1407,7 +1382,7 @@ impl CacheUpdate for VoiceStateUpdateEvent {
     type Output = VoiceState;
 
     fn update(&mut self, cache: &Cache) -> Option<VoiceState> {
-        if let Some(guild_id) = self.guild_id {
+        if let Some(guild_id) = self.voice_state.guild_id {
             if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
                 if let Some(member) = &self.voice_state.member {
                     guild.members.insert(member.user.id, member.clone());
@@ -1431,15 +1406,8 @@ impl CacheUpdate for VoiceStateUpdateEvent {
 
 impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
-        let guild_id = match map.get("guild_id") {
-            Some(v) => Some(GuildId::deserialize(v).map_err(DeError::custom)?),
-            None => None,
-        };
-
         Ok(VoiceStateUpdateEvent {
-            guild_id,
-            voice_state: VoiceState::deserialize(Value::from(map)).map_err(DeError::custom)?,
+            voice_state: VoiceState::deserialize(deserializer)?,
         })
     }
 }
@@ -2100,7 +2068,7 @@ macro_rules! with_related_ids_for_event_types {
             },
             Self::GuildMemberAdd, Self::GuildMemberAdd(e) => {
                 user_id: Some(e.member.user.id),
-                guild_id: Some(e.guild_id),
+                guild_id: Some(e.member.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
@@ -2124,7 +2092,7 @@ macro_rules! with_related_ids_for_event_types {
             },
             Self::GuildRoleCreate, Self::GuildRoleCreate(e) => {
                 user_id: Never,
-                guild_id: Some(e.guild_id),
+                guild_id: Some(e.role.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
@@ -2136,7 +2104,7 @@ macro_rules! with_related_ids_for_event_types {
             },
             Self::GuildRoleUpdate, Self::GuildRoleUpdate(e) => {
                 user_id: Never,
-                guild_id: Some(e.guild_id),
+                guild_id: Some(e.role.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
@@ -2196,7 +2164,7 @@ macro_rules! with_related_ids_for_event_types {
             },
             Self::PresenceUpdate, Self::PresenceUpdate(e) => {
                 user_id: Some(e.presence.user.id),
-                guild_id: e.guild_id.into(),
+                guild_id: e.presence.guild_id.into(),
                 channel_id: Never,
                 message_id: Never,
             },
@@ -2316,7 +2284,7 @@ macro_rules! with_related_ids_for_event_types {
             },
             Self::VoiceStateUpdate, Self::VoiceStateUpdate(e) => {
                 user_id: Some(e.voice_state.user_id),
-                guild_id: e.guild_id.into(),
+                guild_id: e.voice_state.guild_id.into(),
                 channel_id: Never,
                 message_id: Never,
             },
