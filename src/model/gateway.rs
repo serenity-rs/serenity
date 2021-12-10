@@ -651,6 +651,8 @@ pub struct Presence {
     /// The devices a user are currently active on, if available.
     #[serde(default)]
     pub client_status: Option<ClientStatus>,
+    /// The `GuildId` the presence update is coming from.
+    pub guild_id: Option<GuildId>,
     /// The user's online status.
     pub status: OnlineStatus,
     /// Data about the associated user.
