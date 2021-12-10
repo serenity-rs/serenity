@@ -139,7 +139,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
-    async fn guild_member_addition(&self, _ctx: Context, _guild_id: GuildId, _new_member: Member) {}
+    async fn guild_member_addition(&self, _ctx: Context, _new_member: Member) {}
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
@@ -198,7 +198,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a role is created.
     ///
     /// Provides the guild's id and the new role's data.
-    async fn guild_role_create(&self, _ctx: Context, _guild_id: GuildId, _new: Role) {}
+    async fn guild_role_create(&self, _ctx: Context, _new: Role) {}
 
     /// Dispatched when a role is deleted.
     ///
@@ -227,7 +227,6 @@ pub trait EventHandler: Send + Sync {
     async fn guild_role_update(
         &self,
         _ctx: Context,
-        _guild_id: GuildId,
         _old_data_if_available: Option<Role>,
         _new: Role,
     ) {
@@ -237,7 +236,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's id and the role's new data.
     #[cfg(not(feature = "cache"))]
-    async fn guild_role_update(&self, _ctx: Context, _guild_id: GuildId, _new_data: Role) {}
+    async fn guild_role_update(&self, _ctx: Context, _new_data: Role) {}
 
     /// Dispatched when the stickers are updated.
     ///
@@ -363,7 +362,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Note: This event will not trigger unless the "guild presences" privileged intent
     /// is enabled on the bot application page.
-    async fn presence_update(&self, _ctx: Context, _new_data: PresenceUpdateEvent) {}
+    async fn presence_update(&self, _ctx: Context, _new_data: Presence) {}
 
     /// Dispatched upon startup.
     ///
@@ -408,21 +407,14 @@ pub trait EventHandler: Send + Sync {
     /// Provides the guild's id (if available) and
     /// the old and the new state of the guild's voice channels.
     #[cfg(feature = "cache")]
-    async fn voice_state_update(
-        &self,
-        _ctx: Context,
-        _: Option<GuildId>,
-        _old: Option<VoiceState>,
-        _new: VoiceState,
-    ) {
-    }
+    async fn voice_state_update(&self, _ctx: Context, _old: Option<VoiceState>, _new: VoiceState) {}
 
     /// Dispatched when a user joins, leaves or moves to a voice channel.
     ///
     /// Provides the guild's id (if available) and
     /// the new state of the guild's voice channels.
     #[cfg(not(feature = "cache"))]
-    async fn voice_state_update(&self, _ctx: Context, _: Option<GuildId>, _: VoiceState) {}
+    async fn voice_state_update(&self, _ctx: Context, _: VoiceState) {}
 
     /// Dispatched when a guild's webhook is updated.
     ///
