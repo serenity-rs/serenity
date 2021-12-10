@@ -60,6 +60,46 @@ pub struct Member {
     pub avatar: Option<String>,
 }
 
+/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
+///
+/// The only difference to `Member` is `#[serde(default)]` on `guild_id`.
+#[derive(Deserialize)]
+pub(crate) struct InterimMember {
+    pub deaf: bool,
+    #[serde(default)]
+    pub guild_id: GuildId,
+    pub joined_at: Option<DateTime<Utc>>,
+    pub mute: bool,
+    pub nick: Option<String>,
+    pub roles: Vec<RoleId>,
+    pub user: User,
+    #[serde(default)]
+    pub pending: bool,
+    pub premium_since: Option<DateTime<Utc>>,
+    #[cfg(feature = "unstable_discord_api")]
+    pub permissions: Option<Permissions>,
+    pub avatar: Option<String>,
+}
+
+impl From<InterimMember> for Member {
+    fn from(m: InterimMember) -> Self {
+        Self {
+            deaf: m.deaf,
+            guild_id: m.guild_id,
+            joined_at: m.joined_at,
+            mute: m.mute,
+            nick: m.nick,
+            roles: m.roles,
+            user: m.user,
+            pending: m.pending,
+            premium_since: m.premium_since,
+            #[cfg(feature = "unstable_discord_api")]
+            permissions: m.permissions,
+            avatar: m.avatar,
+        }
+    }
+}
+
 #[cfg(feature = "model")]
 impl Member {
     /// Adds a [`Role`] to the member, editing its roles in-place if the request
