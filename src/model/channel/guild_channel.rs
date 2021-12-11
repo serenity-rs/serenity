@@ -38,9 +38,9 @@ use crate::http::AttachmentType;
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(all(feature = "model", feature = "utils"))]
-use crate::utils as serenity_utils;
-use crate::{json::from_number, model::prelude::*};
+#[cfg(feature = "model")]
+use crate::json::{self, from_number};
+use crate::model::prelude::*;
 
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
@@ -436,7 +436,7 @@ impl GuildChannel {
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
-        let edited = serenity_utils::hashmap_to_json_map(edit_channel.0);
+        let edited = json::hashmap_to_json_map(edit_channel.0);
 
         *self = cache_http.http().edit_channel(self.id.0, &edited, None).await?;
 
@@ -604,7 +604,7 @@ impl GuildChannel {
 
         voice_state.0.insert("channel_id", Value::from(self.id.0.to_string()));
 
-        let map = serenity_utils::hashmap_to_json_map(voice_state.0);
+        let map = json::hashmap_to_json_map(voice_state.0);
 
         if let Some(id) = user_id {
             http.as_ref().edit_voice_state(self.guild_id.0, id.into().0, &map).await

@@ -3,9 +3,8 @@ use std::collections::HashMap;
 #[cfg(feature = "simd-json")]
 use simd_json::Mutable;
 
-use crate::json::{from_number, Value};
+use crate::json::{self, from_number, Value};
 use crate::model::interactions::application_command::ApplicationCommandPermissionType;
-use crate::utils;
 
 /// A builder for creating several [`ApplicationCommandPermission`].
 ///
@@ -35,7 +34,7 @@ impl CreateApplicationCommandsPermissions {
         &mut self,
         application_command: CreateApplicationCommandPermissions,
     ) -> &mut Self {
-        let new_data = Value::from(utils::hashmap_to_json_map(application_command.0));
+        let new_data = Value::from(json::hashmap_to_json_map(application_command.0));
 
         self.0.push(new_data);
 
@@ -49,7 +48,7 @@ impl CreateApplicationCommandsPermissions {
     ) -> &mut Self {
         let new_application_commands = application_commands
             .into_iter()
-            .map(|f| Value::from(utils::hashmap_to_json_map(f.0)))
+            .map(|f| Value::from(json::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();
 
         for application_command in new_application_commands {
@@ -95,7 +94,7 @@ impl CreateApplicationCommandPermissions {
         &mut self,
         permission: CreateApplicationCommandPermissionData,
     ) -> &mut Self {
-        let new_data = utils::hashmap_to_json_map(permission.0);
+        let new_data = json::hashmap_to_json_map(permission.0);
         let permissions =
             self.0.entry("permissions").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
@@ -113,7 +112,7 @@ impl CreateApplicationCommandPermissions {
     ) -> &mut Self {
         let new_permissions = permissions
             .into_iter()
-            .map(|f| Value::from(utils::hashmap_to_json_map(f.0)))
+            .map(|f| Value::from(json::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();
 
         self.0.insert("permissions", Value::from(new_permissions));
@@ -150,7 +149,7 @@ impl CreateApplicationCommandPermissionsData {
         &mut self,
         permission: CreateApplicationCommandPermissionData,
     ) -> &mut Self {
-        let new_data = utils::hashmap_to_json_map(permission.0);
+        let new_data = json::hashmap_to_json_map(permission.0);
         let permissions =
             self.0.entry("permissions").or_insert_with(|| Value::from(Vec::<Value>::new()));
 
@@ -168,7 +167,7 @@ impl CreateApplicationCommandPermissionsData {
     ) -> &mut Self {
         let new_permissions = permissions
             .into_iter()
-            .map(|f| Value::from(utils::hashmap_to_json_map(f.0)))
+            .map(|f| Value::from(json::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();
 
         self.0.insert("permissions", Value::from(new_permissions));
