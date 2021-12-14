@@ -14,7 +14,7 @@ use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 
 use super::prelude::*;
-use super::utils::{emojis, stickers};
+use super::utils::{emojis, roles, stickers};
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
 use crate::internal::prelude::*;
@@ -677,30 +677,8 @@ impl CacheUpdate for GuildRoleCreateEvent {
 
 impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .ok_or_else(|| DeError::custom("expected guild_id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let id = *guild_id.as_u64();
-
-        if let Some(value) = map.get_mut("role") {
-            if let Some(role) = value.as_object_mut() {
-                role.insert("guild_id".to_string(), from_number(id));
-            }
-        }
-
-        let role = map
-            .remove("role")
-            .ok_or_else(|| DeError::custom("expected role"))
-            .and_then(Role::deserialize)
-            .map_err(DeError::custom)?;
-
         Ok(Self {
-            role,
+            role: roles::deserialize_event(deserializer)?,
         })
     }
 }
@@ -744,30 +722,8 @@ impl CacheUpdate for GuildRoleUpdateEvent {
 
 impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let guild_id = map
-            .remove("guild_id")
-            .ok_or_else(|| DeError::custom("expected guild_id"))
-            .and_then(GuildId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let id = *guild_id.as_u64();
-
-        if let Some(value) = map.get_mut("role") {
-            if let Some(role) = value.as_object_mut() {
-                role.insert("guild_id".to_string(), from_number(id));
-            }
-        }
-
-        let role = map
-            .remove("role")
-            .ok_or_else(|| DeError::custom("expected role"))
-            .and_then(Role::deserialize)
-            .map_err(DeError::custom)?;
-
         Ok(Self {
-            role,
+            role: roles::deserialize_event(deserializer)?,
         })
     }
 }
