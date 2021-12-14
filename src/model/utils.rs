@@ -259,10 +259,11 @@ pub mod private_channels {
 pub mod roles {
     use std::collections::HashMap;
 
-    use serde::Deserializer;
+    use serde::{Deserialize, Deserializer};
 
     use super::SequenceToMapVisitor;
-    use crate::model::{guild::Role, id::RoleId};
+    use crate::model::guild::{InterimRole, Role};
+    use crate::model::id::{GuildId, RoleId};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -271,6 +272,25 @@ pub mod roles {
     }
 
     pub use super::serialize_map_values as serialize;
+
+    /// Helper to deserialize `GuildRoleCreateEvent` and `GuildRoleUpdateEvent`.
+    pub fn deserialize_event<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Role, D::Error> {
+        #[derive(Deserialize)]
+        struct Event {
+            guild_id: GuildId,
+            role: InterimRole,
+        }
+
+        let Event {
+            guild_id,
+            role,
+        } = Event::deserialize(deserializer)?;
+
+        let mut role = Role::from(role);
+        role.guild_id = guild_id;
+
+        Ok(role)
+    }
 }
 
 /// Used with `#[serde(with = "stickers")]`
