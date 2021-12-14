@@ -167,16 +167,13 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::EditChannel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span> <span class="kw">as</span> <span class="ident">serenity_utils</span>;
 
 <span class="doccomment">/// A category of [`GuildChannel`]s.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -290,7 +287,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
     <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditChannel</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditChannel</span>,
@@ -301,7 +297,7 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edit_channel</span> <span class="op">=</span> <span class="ident">EditChannel::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">edit_channel</span>);
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">serenity_utils::hashmap_to_json_map</span>(<span class="ident">edit_channel</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">edit_channel</span>.<span class="number">0</span>);
 
         <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_channel</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">channel</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">GuildChannel</span> {

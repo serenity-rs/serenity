@@ -100,8 +100,8 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::GuildWelcomeScreenEmoji</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].</span>
 <span class="doccomment">///</span>
@@ -137,7 +137,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_welcome_channel</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel</span>: <span class="ident">CreateGuildWelcomeChannel</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">channel</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">channel</span>.<span class="number">0</span>);
 
         <span class="kw">let</span> <span class="ident">channels</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;welcome_channels&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
@@ -151,7 +151,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_welcome_channels</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateGuildWelcomeChannel</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_channels</span> <span class="op">=</span> <span class="ident">channels</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">json::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;welcome_channels&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">new_channels</span>));

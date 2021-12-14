@@ -1011,27 +1011,6 @@
 <span id="1010">1010</span>
 <span id="1011">1011</span>
 <span id="1012">1012</span>
-<span id="1013">1013</span>
-<span id="1014">1014</span>
-<span id="1015">1015</span>
-<span id="1016">1016</span>
-<span id="1017">1017</span>
-<span id="1018">1018</span>
-<span id="1019">1019</span>
-<span id="1020">1020</span>
-<span id="1021">1021</span>
-<span id="1022">1022</span>
-<span id="1023">1023</span>
-<span id="1024">1024</span>
-<span id="1025">1025</span>
-<span id="1026">1026</span>
-<span id="1027">1027</span>
-<span id="1028">1028</span>
-<span id="1029">1029</span>
-<span id="1030">1030</span>
-<span id="1031">1031</span>
-<span id="1032">1032</span>
-<span id="1033">1033</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -1053,14 +1032,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">ffi::OsStr</span>,
-    <span class="ident">fs::File</span>,
-    <span class="ident">hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>},
-    <span class="ident">io::Read</span>,
-    <span class="ident">path::Path</span>,
-};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ffi::OsStr</span>, <span class="ident">fs::File</span>, <span class="ident">io::Read</span>, <span class="ident">path::Path</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
@@ -1070,21 +1042,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">id::EmojiId</span>, <span class="ident">misc::EmojiIdentifier</span>};
-
-<span class="doccomment">/// Converts a HashMap into a final [`serde_json::Map`] representation.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hashmap_to_json_map</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Value</span>, <span class="ident">H</span><span class="op">&gt;</span>) -&gt; <span class="ident">JsonMap</span>
-<span class="kw">where</span>
-    <span class="ident">H</span>: <span class="ident">BuildHasher</span>,
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">ToString</span>,
-{
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">json_map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
-
-    <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">map</span> {
-        <span class="ident">json_map</span>.<span class="ident">insert</span>(<span class="ident">key</span>.<span class="ident">to_string</span>(), <span class="ident">value</span>);
-    }
-
-    <span class="ident">json_map</span>
-}
 
 <span class="doccomment">/// Retrieves the &quot;code&quot; part of an invite out of a URL.</span>
 <span class="doccomment">///</span>
@@ -1838,6 +1795,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_content_safe</span>() {
+        <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
         <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
         <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};

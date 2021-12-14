@@ -328,14 +328,12 @@
 <span id="327">327</span>
 <span id="328">328</span>
 <span id="329">329</span>
-<span id="330">330</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ReactionType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::message_component::ButtonStyle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// A builder for creating several [`ActionRow`]s.</span>
 <span class="doccomment">///</span>
@@ -434,7 +432,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Value</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">1_u8</span>));
 
-        <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
+        <span class="ident">json::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
 }
 
@@ -504,7 +502,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Value</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">2_u8</span>));
 
-        <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
+        <span class="ident">json::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
 }
 
@@ -554,7 +552,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Value</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">from_number</span>(<span class="number">3_u8</span>));
 
-        <span class="ident">utils::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
+        <span class="ident">json::hashmap_to_json_map</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()
     }
 }
 
@@ -580,7 +578,7 @@
 
     <span class="doccomment">/// Adds an option.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_option</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">CreateSelectMenuOption</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">data</span>.<span class="ident">into</span>());
 
@@ -591,7 +589,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_options</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateSelectMenuOption</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_options</span> <span class="op">=</span> <span class="ident">options</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">option</span><span class="op">|</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>).<span class="ident">into</span>())
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">option</span><span class="op">|</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>).<span class="ident">into</span>())
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">for</span> <span class="ident">option</span> <span class="kw">in</span> <span class="ident">new_options</span> {

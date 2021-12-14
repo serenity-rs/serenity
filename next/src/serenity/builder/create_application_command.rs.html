@@ -306,19 +306,17 @@
 <span id="305">305</span>
 <span id="306">306</span>
 <span id="307">307</span>
-<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">simd_json::Mutable</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ChannelType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command</span>::{
     <span class="ident">ApplicationCommandOptionType</span>,
     <span class="ident">ApplicationCommandType</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommandOption`].</span>
 <span class="doccomment">///</span>
@@ -444,7 +442,7 @@
     <span class="doccomment">/// [`SubCommandGroup`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommandGroup</span>
     <span class="doccomment">/// [`SubCommand`]: crate::model::interactions::application_command::ApplicationCommandOptionType::SubCommand</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_sub_option</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sub_option</span>: <span class="ident">CreateApplicationCommandOption</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">sub_option</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">sub_option</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;options&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="kw">let</span> <span class="ident">opt_arr</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
         <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value::from</span>(<span class="ident">new_option</span>));
@@ -550,7 +548,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Application commands can have up to 25 options.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_option</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">CreateApplicationCommandOption</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;options&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::new</span>()));
         <span class="kw">let</span> <span class="ident">opt_arr</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
         <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value::from</span>(<span class="ident">new_option</span>));
@@ -564,7 +562,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_options</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateApplicationCommandOption</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_options</span> <span class="op">=</span> <span class="ident">options</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">json::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;options&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">new_options</span>));
@@ -591,7 +589,7 @@
 
     <span class="doccomment">/// Adds a new application command.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_application_command</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">command</span>: <span class="ident">CreateApplicationCommand</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">command</span>.<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">new_data</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">json::hashmap_to_json_map</span>(<span class="ident">command</span>.<span class="number">0</span>));
 
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">new_data</span>);
 
@@ -605,7 +603,7 @@
     ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_application_command</span> <span class="op">=</span> <span class="ident">commands</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value::from</span>(<span class="ident">json::hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
         <span class="kw">for</span> <span class="ident">application_command</span> <span class="kw">in</span> <span class="ident">new_application_command</span> {

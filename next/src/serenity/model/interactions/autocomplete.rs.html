@@ -186,7 +186,6 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
-<span id="188">188</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
@@ -196,14 +195,13 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateAutocompleteResponse</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude::StdResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">InteractionId</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{
     <span class="ident">application_command::ApplicationCommandInteractionData</span>,
     <span class="ident">InteractionType</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude::User</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// An interaction recieved when the user fills in an autocomplete option</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -250,7 +248,7 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">CreateAutocompleteResponse::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">response</span>);
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">response</span>.<span class="number">0</span>);
 
         <span class="comment">// Autocomplete response type is 8</span>
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json!</span>({

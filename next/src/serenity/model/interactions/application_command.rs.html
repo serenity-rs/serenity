@@ -1130,7 +1130,6 @@
 <span id="1129">1129</span>
 <span id="1130">1130</span>
 <span id="1131">1131</span>
-<span id="1132">1132</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1148,7 +1147,7 @@
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude::StdResult</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::{<span class="ident">ChannelType</span>, <span class="ident">PartialChannel</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild</span>::{<span class="ident">Member</span>, <span class="ident">PartialMember</span>, <span class="ident">Role</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{
@@ -1171,7 +1170,6 @@
     <span class="ident">deserialize_roles_map</span>,
     <span class="ident">deserialize_users</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
 
 <span class="doccomment">/// An interaction when a user invokes a slash command.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
@@ -1237,7 +1235,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponse::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
 
         <span class="ident">Message::check_lengths</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
@@ -1274,7 +1272,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">EditInteractionResponse::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
 
         <span class="ident">Message::check_lengths</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
@@ -1317,7 +1315,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponseFollowup::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
 
         <span class="ident">Message::check_lengths</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
@@ -1361,7 +1359,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponseFollowup::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
 
         <span class="ident">Message::check_lengths</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
@@ -2018,7 +2016,7 @@
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_application_command</span> <span class="op">=</span> <span class="ident">CreateApplicationCommand::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">create_application_command</span>);
-        <span class="ident">utils::hashmap_to_json_map</span>(<span class="ident">create_application_command</span>.<span class="number">0</span>)
+        <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">create_application_command</span>.<span class="number">0</span>)
     }
 }
 
