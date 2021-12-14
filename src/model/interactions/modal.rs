@@ -11,9 +11,8 @@ use crate::builder::{
     EditInteractionResponse,
 };
 use crate::http::Http;
-use crate::json::from_number;
+use crate::json::{self, from_number};
 use crate::model::interactions::InteractionType;
-use crate::utils;
 
 /// An interaction triggered by a modal submit.
 #[derive(Clone, Debug, Serialize)]
@@ -90,7 +89,7 @@ impl ModalSubmitInteraction {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = utils::hashmap_to_json_map(interaction_response.0);
+        let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
@@ -128,7 +127,7 @@ impl ModalSubmitInteraction {
         let mut interaction_response = EditInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = utils::hashmap_to_json_map(interaction_response.0);
+        let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
@@ -172,7 +171,7 @@ impl ModalSubmitInteraction {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
 
-        let map = utils::hashmap_to_json_map(interaction_response.0);
+        let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
@@ -207,7 +206,7 @@ impl ModalSubmitInteraction {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
 
-        let map = utils::hashmap_to_json_map(interaction_response.0);
+        let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;

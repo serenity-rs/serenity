@@ -3,7 +3,7 @@ use crate::builder::CreateEmbed;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::utils;
+use crate::json;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -96,7 +96,7 @@ impl Embed {
     {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
-        let map = utils::hashmap_to_json_map(create_embed.0);
+        let map = json::hashmap_to_json_map(create_embed.0);
 
         Value::from(map)
     }

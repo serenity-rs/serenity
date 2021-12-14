@@ -35,6 +35,8 @@ use crate::collector::{
 use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+#[cfg(feature = "model")]
+use crate::json;
 use crate::json::Value;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::{message_component::ActionRow, MessageInteraction};
@@ -336,7 +338,6 @@ impl Message {
     ///
     /// [`EditMessage`]: crate::builder::EditMessage
     /// [`the limit`]: crate::builder::EditMessage::content
-    #[cfg(feature = "utils")]
     pub async fn edit<'a, F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
     where
         F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
@@ -361,7 +362,7 @@ impl Message {
 
         f(&mut builder);
 
-        let map = crate::utils::hashmap_to_json_map(builder.0);
+        let map = json::hashmap_to_json_map(builder.0);
 
         *self = cache_http
             .http()
@@ -789,7 +790,7 @@ impl Message {
         let mut suppress = EditMessage::default();
         suppress.suppress_embeds(true);
 
-        let map = crate::utils::hashmap_to_json_map(suppress.0);
+        let map = json::hashmap_to_json_map(suppress.0);
 
         *self =
             cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::from(map)).await?;
