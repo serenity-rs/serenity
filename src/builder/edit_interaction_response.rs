@@ -5,8 +5,7 @@ use simd_json::Mutable;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-use crate::json::Value;
-use crate::utils;
+use crate::json::{self, Value};
 
 #[derive(Clone, Debug, Default)]
 pub struct EditInteractionResponse(pub HashMap<&'static str, Value>);
@@ -39,7 +38,7 @@ impl EditInteractionResponse {
 
     /// Adds an embed for the message.
     pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = utils::hashmap_to_json_map(embed.0);
+        let map = json::hashmap_to_json_map(embed.0);
         let embed = Value::from(map);
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
@@ -73,7 +72,7 @@ impl EditInteractionResponse {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = utils::hashmap_to_json_map(allowed_mentions.0);
+        let map = json::hashmap_to_json_map(allowed_mentions.0);
         let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);

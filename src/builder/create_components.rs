@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
 use crate::internal::prelude::*;
-use crate::json::{from_number, Value};
+use crate::json::{self, from_number, Value};
 use crate::model::channel::ReactionType;
 use crate::model::interactions::message_component::ButtonStyle;
-use crate::utils;
 
 /// A builder for creating several [`ActionRow`]s.
 ///
@@ -103,7 +102,7 @@ impl CreateActionRow {
     pub fn build(&mut self) -> Value {
         self.0.insert("type", from_number(1_u8));
 
-        utils::hashmap_to_json_map(self.0.clone()).into()
+        json::hashmap_to_json_map(self.0.clone()).into()
     }
 }
 
@@ -173,7 +172,7 @@ impl CreateButton {
     pub fn build(mut self) -> Value {
         self.0.insert("type", from_number(2_u8));
 
-        utils::hashmap_to_json_map(self.0.clone()).into()
+        json::hashmap_to_json_map(self.0.clone()).into()
     }
 }
 
@@ -229,7 +228,7 @@ impl CreateSelectMenu {
     pub fn build(mut self) -> Value {
         self.0.insert("type", from_number(3_u8));
 
-        utils::hashmap_to_json_map(self.0.clone()).into()
+        json::hashmap_to_json_map(self.0.clone()).into()
     }
 }
 
@@ -255,7 +254,7 @@ impl CreateSelectMenuOptions {
 
     /// Adds an option.
     pub fn add_option(&mut self, option: CreateSelectMenuOption) -> &mut Self {
-        let data = utils::hashmap_to_json_map(option.0);
+        let data = json::hashmap_to_json_map(option.0);
 
         self.0.push(data.into());
 
@@ -266,7 +265,7 @@ impl CreateSelectMenuOptions {
     pub fn set_options(&mut self, options: Vec<CreateSelectMenuOption>) -> &mut Self {
         let new_options = options
             .into_iter()
-            .map(|option| utils::hashmap_to_json_map(option.0).into())
+            .map(|option| json::hashmap_to_json_map(option.0).into())
             .collect::<Vec<Value>>();
 
         for option in new_options {

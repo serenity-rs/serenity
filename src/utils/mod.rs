@@ -20,14 +20,7 @@ pub type Color = Colour;
 
 #[cfg(feature = "cache")]
 use std::str::FromStr;
-use std::{
-    collections::HashMap,
-    ffi::OsStr,
-    fs::File,
-    hash::{BuildHasher, Hash},
-    io::Read,
-    path::Path,
-};
+use std::{ffi::OsStr, fs::File, io::Read, path::Path};
 
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
@@ -37,21 +30,6 @@ use crate::model::channel::Channel;
 #[cfg(feature = "cache")]
 use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
 use crate::model::{id::EmojiId, misc::EmojiIdentifier};
-
-/// Converts a HashMap into a final [`serde_json::Map`] representation.
-pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>) -> JsonMap
-where
-    H: BuildHasher,
-    T: Eq + Hash + ToString,
-{
-    let mut json_map = JsonMap::new();
-
-    for (key, value) in map {
-        json_map.insert(key.to_string(), value);
-    }
-
-    json_map
-}
 
 /// Retrieves the "code" part of an invite out of a URL.
 ///
@@ -842,6 +820,7 @@ mod test {
     #[cfg(feature = "cache")]
     #[test]
     fn test_content_safe() {
+        use std::collections::HashMap;
         use std::sync::Arc;
 
         use chrono::{DateTime, Utc};

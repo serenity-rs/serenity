@@ -6,10 +6,9 @@ use super::CreateEmbed;
 use crate::builder::CreateComponents;
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
-use crate::json::{from_number, to_value};
+use crate::json::{self, from_number, to_value};
 use crate::model::channel::{MessageFlags, MessageReference, ReactionType};
 use crate::model::id::StickerId;
-use crate::utils;
 
 /// A builder to specify the contents of an [`Http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].
@@ -79,7 +78,7 @@ impl<'a> CreateMessage<'a> {
     }
 
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = utils::hashmap_to_json_map(embed.0);
+        let map = json::hashmap_to_json_map(embed.0);
         let embed = Value::from(map);
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
@@ -213,7 +212,7 @@ impl<'a> CreateMessage<'a> {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = utils::hashmap_to_json_map(allowed_mentions.0);
+        let map = json::hashmap_to_json_map(allowed_mentions.0);
         let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
