@@ -413,7 +413,6 @@ impl GuildChannel {
     /// if the current user lacks permission to edit the channel.
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
-    #[cfg(feature = "utils")]
     pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
     where
         F: FnOnce(&mut EditChannel) -> &mut EditChannel,
