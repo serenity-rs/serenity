@@ -7,14 +7,13 @@ use super::prelude::*;
 use crate::builder::CreateAutocompleteResponse;
 use crate::http::Http;
 use crate::internal::prelude::StdResult;
-use crate::json::{from_number, json, JsonMap, Value};
+use crate::json::{self, from_number, json, JsonMap, Value};
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::interactions::{
     application_command::ApplicationCommandInteractionData,
     InteractionType,
 };
 use crate::model::prelude::User;
-use crate::utils;
 
 /// An interaction recieved when the user fills in an autocomplete option
 #[derive(Clone, Debug, Serialize)]
@@ -61,7 +60,7 @@ impl AutocompleteInteraction {
     {
         let mut response = CreateAutocompleteResponse::default();
         f(&mut response);
-        let data = utils::hashmap_to_json_map(response.0);
+        let data = json::hashmap_to_json_map(response.0);
 
         // Autocomplete response type is 8
         let map = json!({

@@ -16,13 +16,13 @@ use crate::builder::{EditWebhookMessage, ExecuteWebhook};
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+#[cfg(feature = "model")]
+use crate::json;
 use crate::json::NULL;
 #[cfg(feature = "model")]
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::ModelError;
-#[cfg(feature = "model")]
-use crate::utils;
 
 /// A representation of a type of webhook.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
@@ -310,7 +310,7 @@ impl Webhook {
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
 
-        let map = utils::hashmap_to_json_map(execute_webhook.0);
+        let map = json::hashmap_to_json_map(execute_webhook.0);
 
         if !execute_webhook.1.is_empty() {
             http.as_ref()
@@ -348,7 +348,7 @@ impl Webhook {
         let mut edit_webhook_message = EditWebhookMessage::default();
         f(&mut edit_webhook_message);
 
-        let map = utils::hashmap_to_json_map(edit_webhook_message.0);
+        let map = json::hashmap_to_json_map(edit_webhook_message.0);
 
         http.as_ref().edit_webhook_message(self.id.0, token, message_id.0, &map).await
     }
