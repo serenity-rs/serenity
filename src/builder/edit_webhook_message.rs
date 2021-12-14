@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use super::CreateAllowedMentions;
 use crate::internal::prelude::*;
-use crate::utils;
+use crate::json;
 
 /// A builder to specify the fields to edit in an existing [`Webhook`]'s message.
 ///
@@ -45,7 +45,7 @@ impl EditWebhookMessage {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = utils::hashmap_to_json_map(allowed_mentions.0);
+        let map = json::hashmap_to_json_map(allowed_mentions.0);
         let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);

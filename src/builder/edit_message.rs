@@ -5,9 +5,8 @@ use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
-use crate::json::from_number;
+use crate::json::{self, from_number};
 use crate::model::channel::MessageFlags;
-use crate::utils;
 
 /// A builder to specify the fields to edit in an existing message.
 ///
@@ -46,7 +45,7 @@ impl<'a> EditMessage<'a> {
     }
 
     fn _add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = utils::hashmap_to_json_map(embed.0);
+        let map = json::hashmap_to_json_map(embed.0);
         let embed = Value::from(map);
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
@@ -140,7 +139,7 @@ impl<'a> EditMessage<'a> {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = utils::hashmap_to_json_map(allowed_mentions.0);
+        let map = json::hashmap_to_json_map(allowed_mentions.0);
         let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
