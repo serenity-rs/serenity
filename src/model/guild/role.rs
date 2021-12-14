@@ -82,6 +82,48 @@ pub struct Role {
     pub unicode_emoji: Option<String>,
 }
 
+/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
+///
+/// The only difference to `Role` is `#[serde(default)]` on `guild_id`.
+#[derive(Deserialize)]
+pub(crate) struct InterimRole {
+    pub id: RoleId,
+    #[serde(default)]
+    pub guild_id: GuildId,
+    #[cfg(feature = "utils")]
+    #[serde(rename = "color")]
+    pub colour: Colour,
+    #[cfg(not(feature = "utils"))]
+    #[serde(rename = "color")]
+    pub colour: u32,
+    pub hoist: bool,
+    pub managed: bool,
+    #[serde(default)]
+    pub mentionable: bool,
+    pub name: String,
+    pub permissions: Permissions,
+    pub position: i64,
+    #[serde(default)]
+    pub tags: RoleTags,
+}
+
+impl From<InterimRole> for Role {
+    fn from(r: InterimRole) -> Self {
+        Self {
+            id: r.id,
+            guild_id: r.guild_id,
+            colour: r.colour,
+            hoist: r.hoist,
+            managed: r.managed,
+            mentionable: r.mentionable,
+            name: r.name,
+            permissions: r.permissions,
+            position: r.position,
+            tags: r.tags,
+        }
+    }
+}
+
 #[cfg(feature = "model")]
 impl Role {
     /// Deletes the role.
