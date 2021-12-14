@@ -15,7 +15,7 @@ use crate::builder::{
 };
 use crate::http::Http;
 use crate::internal::prelude::StdResult;
-use crate::json::{from_number, JsonMap, Value};
+use crate::json::{self, from_number, JsonMap, Value};
 use crate::model::channel::{ChannelType, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
@@ -38,7 +38,6 @@ use crate::model::utils::{
     deserialize_roles_map,
     deserialize_users,
 };
-use crate::utils;
 
 /// An interaction when a user invokes a slash command.
 #[derive(Clone, Debug, Serialize)]
@@ -108,7 +107,7 @@ impl ApplicationCommandInteraction {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = utils::hashmap_to_json_map(interaction_response.0);
+        let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_lengths(&map)?;
 
@@ -145,7 +144,7 @@ impl ApplicationCommandInteraction {
         let mut interaction_response = EditInteractionResponse::default();
         f(&mut interaction_response);
 
-        let map = utils::hashmap_to_json_map(interaction_response.0);
+        let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_lengths(&map)?;
 
@@ -188,7 +187,7 @@ impl ApplicationCommandInteraction {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
 
-        let map = utils::hashmap_to_json_map(interaction_response.0);
+        let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_lengths(&map)?;
 
@@ -232,7 +231,7 @@ impl ApplicationCommandInteraction {
         let mut interaction_response = CreateInteractionResponseFollowup::default();
         f(&mut interaction_response);
 
-        let map = utils::hashmap_to_json_map(interaction_response.0);
+        let map = json::hashmap_to_json_map(interaction_response.0);
 
         Message::check_lengths(&map)?;
 
@@ -921,7 +920,7 @@ impl ApplicationCommand {
     {
         let mut create_application_command = CreateApplicationCommand::default();
         f(&mut create_application_command);
-        utils::hashmap_to_json_map(create_application_command.0)
+        json::hashmap_to_json_map(create_application_command.0)
     }
 }
 

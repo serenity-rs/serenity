@@ -37,11 +37,9 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{AttachmentType, CacheHttp, Http, Typing};
-#[cfg(feature = "model")]
-use crate::json::json;
-use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::utils;
+use crate::json::{self, json};
+use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl ChannelId {
@@ -95,7 +93,7 @@ impl ChannelId {
         let mut invite = CreateInvite::default();
         f(&mut invite);
 
-        let map = utils::hashmap_to_json_map(invite.0);
+        let map = json::hashmap_to_json_map(invite.0);
 
         http.as_ref().create_invite(self.0, &map, None).await
     }
@@ -343,7 +341,7 @@ impl ChannelId {
         let mut channel = EditChannel::default();
         f(&mut channel);
 
-        let map = utils::hashmap_to_json_map(channel.0);
+        let map = json::hashmap_to_json_map(channel.0);
 
         http.as_ref().edit_channel(self.0, &map, None).await
     }
@@ -385,7 +383,7 @@ impl ChannelId {
             }
         }
 
-        let map = utils::hashmap_to_json_map(msg.0);
+        let map = json::hashmap_to_json_map(msg.0);
 
         http.as_ref()
             .edit_message_and_attachments(self.0, message_id.into().0, &Value::from(map), msg.1)
@@ -732,7 +730,7 @@ impl ChannelId {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
 
-        let map = utils::hashmap_to_json_map(msg.0.clone());
+        let map = json::hashmap_to_json_map(msg.0.clone());
 
         Message::check_lengths(&map)?;
 
@@ -767,7 +765,7 @@ impl ChannelId {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
 
-        let map = utils::hashmap_to_json_map(msg.0.clone());
+        let map = json::hashmap_to_json_map(msg.0.clone());
 
         Message::check_lengths(&map)?;
 
@@ -996,7 +994,7 @@ impl ChannelId {
         let mut instance = CreateStageInstance::default();
         f(&mut instance);
 
-        let map = utils::hashmap_to_json_map(instance.0);
+        let map = json::hashmap_to_json_map(instance.0);
 
         http.as_ref().create_stage_instance(&Value::from(map)).await
     }
@@ -1018,7 +1016,7 @@ impl ChannelId {
         let mut instance = EditStageInstance::default();
         f(&mut instance);
 
-        let map = utils::hashmap_to_json_map(instance.0);
+        let map = json::hashmap_to_json_map(instance.0);
 
         http.as_ref().edit_stage_instance(self.0, &Value::from(map)).await
     }
@@ -1035,7 +1033,7 @@ impl ChannelId {
         let mut instance = EditThread::default();
         f(&mut instance);
 
-        let map = utils::hashmap_to_json_map(instance.0);
+        let map = json::hashmap_to_json_map(instance.0);
 
         http.as_ref().edit_thread(self.0, &map).await
     }
@@ -1067,7 +1065,7 @@ impl ChannelId {
         let mut instance = CreateThread::default();
         f(&mut instance);
 
-        let map = utils::hashmap_to_json_map(instance.0);
+        let map = json::hashmap_to_json_map(instance.0);
 
         http.as_ref().create_public_thread(self.0, message_id.into().0, &map).await
     }
@@ -1089,7 +1087,7 @@ impl ChannelId {
         instance.kind(ChannelType::PrivateThread);
         f(&mut instance);
 
-        let map = utils::hashmap_to_json_map(instance.0);
+        let map = json::hashmap_to_json_map(instance.0);
 
         http.as_ref().create_private_thread(self.0, &map).await
     }

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use crate::internal::prelude::*;
+use crate::json;
 use crate::model::guild::GuildWelcomeScreenEmoji;
-use crate::utils;
 
 /// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].
 ///
@@ -38,7 +38,7 @@ impl EditGuildWelcomeScreen {
     }
 
     pub fn add_welcome_channel(&mut self, channel: CreateGuildWelcomeChannel) -> &mut Self {
-        let new_data = utils::hashmap_to_json_map(channel.0);
+        let new_data = json::hashmap_to_json_map(channel.0);
 
         let channels =
             self.0.entry("welcome_channels").or_insert_with(|| Value::from(Vec::<Value>::new()));
@@ -52,7 +52,7 @@ impl EditGuildWelcomeScreen {
     pub fn set_welcome_channels(&mut self, channels: Vec<CreateGuildWelcomeChannel>) -> &mut Self {
         let new_channels = channels
             .into_iter()
-            .map(|f| Value::from(utils::hashmap_to_json_map(f.0)))
+            .map(|f| Value::from(json::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();
 
         self.0.insert("welcome_channels", Value::from(new_channels));

@@ -290,6 +290,7 @@ impl Http {
         let response = self
             .request(Request {
                 body: Some(&body),
+                multipart: None,
                 headers: None,
                 route: RouteInfo::AddGuildMember {
                     guild_id,
