@@ -607,6 +607,7 @@
 <span id="606">606</span>
 <span id="607">607</span>
 <span id="608">608</span>
+<span id="609">609</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is a set of embed builders for rich embeds.</span>
@@ -874,7 +875,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// #[serenity::async_trait]</span>
     <span class="doccomment">/// impl EventHandler for Handler {</span>
-    <span class="doccomment">///     async fn guild_member_addition(&amp;self, context: Context, guild_id: GuildId, member: Member) {</span>
+    <span class="doccomment">///     async fn guild_member_addition(&amp;self, context: Context, member: Member) {</span>
+    <span class="doccomment">///         let guild_id = member.guild_id;</span>
     <span class="doccomment">///         if let Ok(guild) = guild_id.to_partial_guild(&amp;context).await {</span>
     <span class="doccomment">///             let channels = guild.channels(&amp;context).await.unwrap();</span>
     <span class="doccomment">///</span>
@@ -1216,5 +1218,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (0b42deacc 2021-12-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (8f117a77d 2021-12-13)" ></div>
 </body></html>

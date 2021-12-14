@@ -1400,7 +1400,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::guild_member_addition&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_member_addition</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">member</span>).<span class="kw">await</span>;
+                <span class="ident">event_handler</span>.<span class="ident">guild_member_addition</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">member</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::GuildMemberRemove</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) =&gt; {
@@ -1448,7 +1448,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::guild_role_create&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_role_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
+                <span class="ident">event_handler</span>.<span class="ident">guild_role_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::GuildRoleDelete</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) =&gt; {
@@ -1469,9 +1469,9 @@
 
             <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::guild_role_update&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
                 }}
             });
         },
@@ -1570,7 +1570,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::presence_update&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">presence_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
+                <span class="ident">event_handler</span>.<span class="ident">presence_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">presence</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ReactionAdd</span>(<span class="ident">event</span>)) =&gt; {
@@ -1650,9 +1650,9 @@
 
             <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::voice_state_update&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
                 }}
             });
         },
@@ -1790,5 +1790,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (0b42deacc 2021-12-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (8f117a77d 2021-12-13)" ></div>
 </body></html>

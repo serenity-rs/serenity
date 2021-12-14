@@ -269,6 +269,48 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
@@ -344,6 +386,48 @@
     <span class="doccomment">/// [`Integration`]: super::Integration</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">tags</span>: <span class="ident">RoleTags</span>,
+}
+
+<span class="doccomment">/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The only difference to `Role` is `#[serde(default)]` on `guild_id`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">InterimRole</span> {
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">RoleId</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">Colour</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;color&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">colour</span>: <span class="ident">u32</span>,
+    <span class="kw">pub</span> <span class="ident">hoist</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">managed</span>: <span class="ident">bool</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">mentionable</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
+    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">tags</span>: <span class="ident">RoleTags</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InterimRole</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Role</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r</span>: <span class="ident">InterimRole</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">id</span>: <span class="ident">r</span>.<span class="ident">id</span>,
+            <span class="ident">guild_id</span>: <span class="ident">r</span>.<span class="ident">guild_id</span>,
+            <span class="ident">colour</span>: <span class="ident">r</span>.<span class="ident">colour</span>,
+            <span class="ident">hoist</span>: <span class="ident">r</span>.<span class="ident">hoist</span>,
+            <span class="ident">managed</span>: <span class="ident">r</span>.<span class="ident">managed</span>,
+            <span class="ident">mentionable</span>: <span class="ident">r</span>.<span class="ident">mentionable</span>,
+            <span class="ident">name</span>: <span class="ident">r</span>.<span class="ident">name</span>,
+            <span class="ident">permissions</span>: <span class="ident">r</span>.<span class="ident">permissions</span>,
+            <span class="ident">position</span>: <span class="ident">r</span>.<span class="ident">position</span>,
+            <span class="ident">tags</span>: <span class="ident">r</span>.<span class="ident">tags</span>,
+        }
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -540,5 +624,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (0b42deacc 2021-12-09)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (8f117a77d 2021-12-13)" ></div>
 </body></html>
