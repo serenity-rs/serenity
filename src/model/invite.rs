@@ -14,7 +14,7 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::utils;
+use crate::json;
 
 /// Information about an invite code.
 ///
@@ -104,7 +104,7 @@ impl Invite {
             }
         }
 
-        let map = utils::hashmap_to_json_map(f(CreateInvite::default()).0);
+        let map = json::hashmap_to_json_map(f(CreateInvite::default()).0);
 
         cache_http.http().create_invite(channel_id.0, &map, None).await
     }
@@ -235,6 +235,8 @@ impl InviteGuild {
     /// **Note**: When the cache is enabled, this function unlocks the cache to
     /// retrieve the total number of shards in use. If you already have the
     /// total, consider using [`utils::shard_id`].
+    ///
+    /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     pub fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
