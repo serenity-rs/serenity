@@ -5,13 +5,10 @@ use simd_json::Mutable;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-use crate::json::{from_number, json, Value};
-use crate::{
-    model::interactions::{
-        InteractionApplicationCommandCallbackDataFlags,
-        InteractionResponseType,
-    },
-    utils,
+use crate::json::{self, from_number, json, Value};
+use crate::model::interactions::{
+    InteractionApplicationCommandCallbackDataFlags,
+    InteractionResponseType,
 };
 
 #[derive(Clone, Debug)]
@@ -33,7 +30,7 @@ impl CreateInteractionResponse {
     {
         let mut data = CreateInteractionResponseData::default();
         f(&mut data);
-        let map = utils::hashmap_to_json_map(data.0);
+        let map = json::hashmap_to_json_map(data.0);
         let data = Value::from(map);
 
         self.0.insert("data", data);
@@ -89,7 +86,7 @@ impl CreateInteractionResponseData {
 
     /// Adds an embed to the message.
     pub fn add_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = utils::hashmap_to_json_map(embed.0);
+        let map = json::hashmap_to_json_map(embed.0);
         let embed = Value::from(map);
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::from(Vec::<Value>::new()));
@@ -115,7 +112,7 @@ impl CreateInteractionResponseData {
     /// Calling this will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
-        let map = utils::hashmap_to_json_map(embed.0);
+        let map = json::hashmap_to_json_map(embed.0);
         let embed = Value::from(map);
         self.0.insert("embeds", Value::from(vec![embed]));
 
@@ -129,7 +126,7 @@ impl CreateInteractionResponseData {
     pub fn set_embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
         let embeds = embeds
             .into_iter()
-            .map(|embed| utils::hashmap_to_json_map(embed.0).into())
+            .map(|embed| json::hashmap_to_json_map(embed.0).into())
             .collect::<Vec<Value>>();
 
         self.0.insert("embeds", Value::from(embeds));
@@ -143,7 +140,7 @@ impl CreateInteractionResponseData {
     {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
-        let map = utils::hashmap_to_json_map(allowed_mentions.0);
+        let map = json::hashmap_to_json_map(allowed_mentions.0);
         let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);

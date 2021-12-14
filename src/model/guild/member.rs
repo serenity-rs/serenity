@@ -16,11 +16,11 @@ use crate::cache::Cache;
 use crate::http::{CacheHttp, Http};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
+#[cfg(feature = "model")]
+use crate::json;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
-#[cfg(feature = "model")]
-use crate::utils;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::Colour;
 
@@ -162,7 +162,7 @@ impl Member {
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
-        let map = utils::hashmap_to_json_map(builder.0);
+        let map = json::hashmap_to_json_map(builder.0);
 
         match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await {
             Ok(member) => Ok(member.roles),
@@ -310,7 +310,7 @@ impl Member {
     {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
-        let map = utils::hashmap_to_json_map(edit_member.0);
+        let map = json::hashmap_to_json_map(edit_member.0);
 
         http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await
     }
@@ -580,7 +580,7 @@ impl Member {
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
-        let map = utils::hashmap_to_json_map(builder.0);
+        let map = json::hashmap_to_json_map(builder.0);
 
         match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map, None).await {
             Ok(member) => Ok(member.roles),

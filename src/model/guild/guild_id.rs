@@ -30,9 +30,9 @@ use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json::json;
+use crate::json;
 #[cfg(feature = "model")]
-use crate::utils;
+use crate::json::json;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
     builder::{
@@ -65,7 +65,7 @@ impl GuildId {
         let mut builder = AddMember::default();
         f(&mut builder);
 
-        let map = utils::hashmap_to_json_map(builder.0);
+        let map = json::hashmap_to_json_map(builder.0);
 
         http.as_ref().add_guild_member(self.0, user_id.into().0, &map).await
     }
@@ -242,7 +242,7 @@ impl GuildId {
         let mut builder = CreateChannel::default();
         f(&mut builder);
 
-        let map = utils::hashmap_to_json_map(builder.0);
+        let map = json::hashmap_to_json_map(builder.0);
 
         http.as_ref().create_channel(self.0, &map, None).await
     }
@@ -326,7 +326,7 @@ impl GuildId {
     {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
-        let map = utils::hashmap_to_json_map(edit_role.0);
+        let map = json::hashmap_to_json_map(edit_role.0);
 
         let role = http.as_ref().create_role(self.0, &map, None).await?;
 
@@ -354,7 +354,7 @@ impl GuildId {
     {
         let mut create_sticker = CreateSticker::default();
         f(&mut create_sticker);
-        let map = utils::hashmap_to_json_map(create_sticker.0);
+        let map = json::hashmap_to_json_map(create_sticker.0);
 
         let file = match create_sticker.1 {
             Some(f) => f,
@@ -480,7 +480,7 @@ impl GuildId {
     {
         let mut edit_guild = EditGuild::default();
         f(&mut edit_guild);
-        let map = utils::hashmap_to_json_map(edit_guild.0);
+        let map = json::hashmap_to_json_map(edit_guild.0);
 
         http.as_ref().edit_guild(self.0, &map, None).await
     }
@@ -543,7 +543,7 @@ impl GuildId {
     {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
-        let map = utils::hashmap_to_json_map(edit_member.0);
+        let map = json::hashmap_to_json_map(edit_member.0);
 
         http.as_ref().edit_member(self.0, user_id.into().0, &map, None).await
     }
@@ -601,7 +601,7 @@ impl GuildId {
     {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
-        let map = utils::hashmap_to_json_map(edit_role.0);
+        let map = json::hashmap_to_json_map(edit_role.0);
 
         http.as_ref().edit_role(self.0, role_id.into().0, &map, None).await
     }
@@ -636,7 +636,7 @@ impl GuildId {
     {
         let mut edit_sticker = EditSticker::default();
         f(&mut edit_sticker);
-        let map = utils::hashmap_to_json_map(edit_sticker.0);
+        let map = json::hashmap_to_json_map(edit_sticker.0);
 
         http.as_ref().edit_sticker(self.0, sticker_id.into().0, &map, None).await
     }
@@ -689,7 +689,7 @@ impl GuildId {
         f(&mut map);
 
         http.as_ref()
-            .edit_guild_welcome_screen(self.0, &Value::from(utils::hashmap_to_json_map(map.0)))
+            .edit_guild_welcome_screen(self.0, &Value::from(json::hashmap_to_json_map(map.0)))
             .await
     }
 
@@ -710,7 +710,7 @@ impl GuildId {
         f(&mut map);
 
         http.as_ref()
-            .edit_guild_widget(self.0, &Value::from(utils::hashmap_to_json_map(map.0)))
+            .edit_guild_widget(self.0, &Value::from(json::hashmap_to_json_map(map.0)))
             .await
     }
 
@@ -1119,6 +1119,8 @@ impl GuildId {
     /// **Note**: When the cache is enabled, this function unlocks the cache to
     /// retrieve the total number of shards in use. If you already have the
     /// total, consider using [`utils::shard_id`].
+    ///
+    /// [`utils::shard_id`]: crate::utils::shard_id
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     pub fn shard_id(self, cache: impl AsRef<Cache>) -> u64 {
@@ -1351,7 +1353,7 @@ impl GuildId {
             .edit_guild_application_command_permissions(
                 self.0,
                 command_id.into(),
-                &Value::from(utils::hashmap_to_json_map(map.0)),
+                &Value::from(json::hashmap_to_json_map(map.0)),
             )
             .await
     }

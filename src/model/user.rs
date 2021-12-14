@@ -28,10 +28,10 @@ use crate::http::GuildPagination;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
+use crate::json;
+#[cfg(feature = "model")]
 use crate::json::json;
 use crate::json::to_string;
-#[cfg(feature = "model")]
-use crate::utils;
 use crate::{internal::prelude::*, model::misc::Mentionable};
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
@@ -274,7 +274,7 @@ impl CurrentUser {
 
         let mut edit_profile = EditProfile(map);
         f(&mut edit_profile);
-        let map = utils::hashmap_to_json_map(edit_profile.0);
+        let map = json::hashmap_to_json_map(edit_profile.0);
 
         *self = http.as_ref().edit_profile(&map).await?;
 
