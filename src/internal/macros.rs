@@ -96,3 +96,25 @@ macro_rules! enum_number {
         }
     }
 }
+
+macro_rules! impl_bitflags_serde {
+    ($name:ident: $type:tt) => {
+        impl<'de> serde::de::Deserialize<'de> for $name {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+            where
+                D: serde::de::Deserializer<'de>,
+            {
+                Ok(Self::from_bits_truncate(<$type>::deserialize(deserializer)?))
+            }
+        }
+
+        impl serde::ser::Serialize for $name {
+            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+            where
+                S: serde::ser::Serializer,
+            {
+                self.bits().serialize(serializer)
+            }
+        }
+    };
+}
