@@ -2882,7 +2882,7 @@ pub struct GuildWelcomeChannel {
     /// The description shown for the channel.
     pub description: String,
     /// The emoji shown, if there is one.
-    pub emoji: Option<GuildWelcomeScreenEmoji>,
+    pub emoji: Option<GuildWelcomeChannelEmoji>,
 }
 
 impl<'de> Deserialize<'de> for GuildWelcomeChannel {
@@ -2890,39 +2890,28 @@ impl<'de> Deserialize<'de> for GuildWelcomeChannel {
     where
         D: Deserializer<'de>,
     {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let channel_id = map
-            .remove("channel_id")
-            .ok_or_else(|| DeError::custom("expected channel_id"))
-            .and_then(ChannelId::deserialize)
-            .map_err(DeError::custom)?;
-
-        let description = map
-            .remove("description")
-            .ok_or_else(|| DeError::custom("expected description"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-
-        let mut emoji = None;
-
-        let emoji_id =
-            map.remove("emoji_id").ok_or_else(|| DeError::custom("expected emoji_id"))?;
-
-        let emoji_name =
-            map.remove("emoji_name").ok_or_else(|| DeError::custom("expected emoji_name"))?;
-
-        if emoji_id != NULL {
-            emoji = Some(GuildWelcomeScreenEmoji::Custom(
-                EmojiId::deserialize(emoji_id).expect("expected emoji_id"),
-            ));
+        #[derive(Deserialize)]
+        struct Helper {
+            channel_id: ChannelId,
+            description: String,
+            emoji_id: Option<EmojiId>,
+            emoji_name: Option<String>,
         }
+        let Helper {
+            channel_id,
+            description,
+            emoji_id,
+            emoji_name,
+        } = Helper::deserialize(deserializer)?;
 
-        if emoji_name != NULL {
-            emoji = Some(GuildWelcomeScreenEmoji::Unicode(
-                String::deserialize(emoji_name).expect("expected emoji_name"),
-            ));
-        }
+        let emoji = match (emoji_id, emoji_name) {
+            (Some(id), Some(name)) => Some(GuildWelcomeChannelEmoji::Custom {
+                id,
+                name,
+            }),
+            (None, Some(name)) => Some(GuildWelcomeChannelEmoji::Unicode(name)),
+            _ => None,
+        };
 
         Ok(Self {
             channel_id,
@@ -2937,35 +2926,31 @@ impl Serialize for GuildWelcomeChannel {
     where
         S: Serializer,
     {
-        let mut map = JsonMap::new();
+        use serde::ser::SerializeStruct;
 
-        map.insert("channel_id".to_owned(), Value::from(self.channel_id.to_string()));
-        map.insert("description".to_owned(), Value::from(self.description.to_string()));
-
-        map.insert("emoji_id".to_owned(), NULL);
-        map.insert("emoji_name".to_owned(), NULL);
-
-        if let Some(emoji) = self.emoji.to_owned() {
-            match emoji {
-                GuildWelcomeScreenEmoji::Custom(id) => {
-                    map.insert("emoji_id".to_owned(), Value::from(id.to_string()))
-                },
-                GuildWelcomeScreenEmoji::Unicode(name) => {
-                    map.insert("emoji_name".to_owned(), Value::from(name))
-                },
-            };
+        let mut s = serializer.serialize_struct("GuildWelcomeChannel", 4)?;
+        s.serialize_field("channel_id", &self.channel_id)?;
+        s.serialize_field("description", &self.description)?;
+        let (emoji_id, emoji_name) = match &self.emoji {
+            Some(GuildWelcomeChannelEmoji::Custom {
+                id,
+                name,
+            }) => (Some(id), Some(name)),
+            Some(GuildWelcomeChannelEmoji::Unicode(name)) => (None, Some(name)),
+            None => (None, None),
         };
-
-        map.serialize(serializer)
+        s.serialize_field("emoji_id", &emoji_id)?;
+        s.serialize_field("emoji_name", &emoji_name)?;
+        s.end()
     }
 }
 
 /// A [`GuildWelcomeScreen`] emoji.
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[non_exhaustive]
-pub enum GuildWelcomeScreenEmoji {
+pub enum GuildWelcomeChannelEmoji {
     /// A custom emoji.
-    Custom(EmojiId),
+    Custom { id: EmojiId, name: String },
     /// A unicode emoji.
     Unicode(String),
 }
