@@ -85,7 +85,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Create Invite]: Permissions::CREATE_INVITE
-    #[cfg(feature = "utils")]
     pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
     where
         F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
@@ -332,7 +331,6 @@ impl ChannelId {
     /// or if an invalid value is set.
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
-    #[cfg(feature = "utils")]
     #[inline]
     pub async fn edit<F>(self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
     where
@@ -363,7 +361,6 @@ impl ChannelId {
     ///
     /// [`EditMessage`]: crate::builder::EditMessage
     /// [`the limit`]: crate::builder::EditMessage::content
-    #[cfg(feature = "utils")]
     #[inline]
     pub async fn edit_message<F>(
         self,
@@ -715,7 +712,6 @@ impl ChannelId {
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [`File`]: tokio::fs::File
-    #[cfg(feature = "utils")]
     pub async fn send_files<'a, F, T, It>(
         self,
         http: impl AsRef<Http>,
@@ -757,7 +753,6 @@ impl ChannelId {
     ///
     /// [`CreateMessage`]: crate::builder::CreateMessage
     /// [Send Messages]: Permissions::SEND_MESSAGES
-    #[cfg(feature = "utils")]
     pub async fn send_message<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Message>
     where
         for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
