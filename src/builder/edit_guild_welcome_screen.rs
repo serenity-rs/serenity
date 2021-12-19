@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::internal::prelude::*;
 use crate::json;
-use crate::model::guild::GuildWelcomeScreenEmoji;
+use crate::model::guild::GuildWelcomeChannelEmoji;
 
 /// A builder to specify the fields to edit in a [`GuildWelcomeScreen`].
 ///
@@ -83,15 +83,19 @@ impl CreateGuildWelcomeChannel {
     }
 
     /// The emoji shown for the channel.
-    pub fn emoji(&mut self, emoji: GuildWelcomeScreenEmoji) -> &mut Self {
+    pub fn emoji(&mut self, emoji: GuildWelcomeChannelEmoji) -> &mut Self {
         match emoji {
-            GuildWelcomeScreenEmoji::Unicode(name) => {
-                self.0.insert("emoji_name", Value::from(name))
+            GuildWelcomeChannelEmoji::Unicode(name) => {
+                self.0.insert("emoji_name", Value::from(name));
             },
-            GuildWelcomeScreenEmoji::Custom(id) => {
-                self.0.insert("emoji_id", Value::from(id.to_string()))
+            GuildWelcomeChannelEmoji::Custom {
+                id,
+                name,
+            } => {
+                self.0.insert("emoji_id", Value::from(id.to_string()));
+                self.0.insert("emoji_name", Value::from(name));
             },
-        };
+        }
 
         self
     }
