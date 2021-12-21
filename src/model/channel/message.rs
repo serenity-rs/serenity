@@ -150,7 +150,7 @@ impl Message {
     ///
     /// Returns a [`ModelError::MessageAlreadyCrossposted`] if the message has already been crossposted.
     ///
-    /// Returns a [`ModelError`::CannotCrosspostMessage`] if the message cannot be crossposted.
+    /// Returns a [`ModelError::CannotCrosspostMessage`] if the message cannot be crossposted.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn crosspost(&self, cache_http: impl CacheHttp) -> Result<Message> {
