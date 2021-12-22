@@ -58,6 +58,10 @@ pub struct Member {
     pub permissions: Option<Permissions>,
     /// The guild avatar hash
     pub avatar: Option<String>,
+    ///	When the user's timeout will expire and the user will be able to communicate in the guild again.
+    ///
+    ///	Will be None or a time in the past if the user is not timed out.
+    pub communication_disabled_until: Option<DateTime<Utc>>,
 }
 
 #[cfg(feature = "model")]

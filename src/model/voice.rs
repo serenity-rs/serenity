@@ -110,6 +110,7 @@ impl<'de> Deserialize<'de> for VoiceState {
             #[cfg(feature = "unstable_discord_api")]
             permissions: Option<Permissions>,
             avatar: Option<String>,
+            communication_disabled_until: Option<DateTime<Utc>>,
         }
 
         struct VoiceStateVisitor;
@@ -186,6 +187,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                                     #[cfg(feature = "unstable_discord_api")]
                                     permissions: partial_member.permissions,
                                     avatar: partial_member.avatar,
+                                    communication_disabled_until: partial_member.communication_disabled_until,
                                 });
                             }
                         },
