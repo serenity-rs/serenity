@@ -668,9 +668,6 @@
 <span id="666">666</span>
 <span id="667">667</span>
 <span id="668">668</span>
-<span id="669">669</span>
-<span id="670">670</span>
-<span id="671">671</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
@@ -991,7 +988,6 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReactionType</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span> <span class="comment">// allow unwrap here because name being none is unreachable</span>
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
         <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">field_identifier</span>, <span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;snake_case&quot;</span>)]</span>
@@ -1038,23 +1034,21 @@
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::duplicate_field</span>(<span class="string">&quot;name&quot;</span>));
                             }
 
-                            <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>);
+                            <span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
                         },
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">animated</span> <span class="op">=</span> <span class="ident">animated</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::missing_field</span>(<span class="string">&quot;name&quot;</span>))<span class="question-mark">?</span>;
-
-                <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">id</span> {
-                    <span class="ident">ReactionType::Custom</span> {
-                        <span class="ident">animated</span>,
+                <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">id</span>, <span class="ident">name</span>) {
+                    (<span class="prelude-val">Some</span>(<span class="ident">id</span>), <span class="ident">name</span>) =&gt; <span class="ident">ReactionType::Custom</span> {
+                        <span class="ident">animated</span>: <span class="ident">animated</span>.<span class="ident">unwrap_or_default</span>(),
                         <span class="ident">id</span>,
-                        <span class="ident">name</span>,
-                    }
-                } <span class="kw">else</span> {
-                    <span class="ident">ReactionType::Unicode</span>(<span class="ident">name</span>.<span class="ident">unwrap</span>())
-                })
+                        <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">flatten</span>(),
+                    },
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">name</span>))) =&gt; <span class="ident">ReactionType::Unicode</span>(<span class="ident">name</span>),
+                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;invalid reaction type data&quot;</span>)),
+                };
+                <span class="prelude-val">Ok</span>(<span class="ident">rt</span>)
             }
         }
 
@@ -1204,7 +1198,7 @@
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ReactionConversionError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to convert from a string to ReactionType&quot;</span>)
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;failed to convert from a string to ReactionType&quot;</span>)
     }
 }
 
@@ -1343,5 +1337,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (91a0600a5 2021-12-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e100ec5bc 2021-12-21)" ></div>
 </body></html>

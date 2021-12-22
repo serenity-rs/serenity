@@ -1862,8 +1862,6 @@
 <span id="1860">1860</span>
 <span id="1861">1861</span>
 <span id="1862">1862</span>
-<span id="1863">1863</span>
-<span id="1864">1864</span>
 </pre><pre class="rust"><code><span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 
@@ -1995,8 +1993,6 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">premium_tier</span>: <span class="ident">PremiumTier</span>,
     <span class="doccomment">/// The total number of users currently boosting this server.</span>
-    <span class="comment">// In some cases Discord returns `null` rather than 0.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_u64_or_zero&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">premium_subscription_count</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The guild&#39;s banner, if it has one.</span>
     <span class="kw">pub</span> <span class="ident">banner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -3729,5 +3725,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (91a0600a5 2021-12-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e100ec5bc 2021-12-21)" ></div>
 </body></html>

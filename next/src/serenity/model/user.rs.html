@@ -2028,33 +2028,33 @@
 <span class="macro">__impl_bitflags!</span> {
     <span class="ident">UserPublicFlags</span>: <span class="ident">u32</span> {
         <span class="doccomment">/// User&#39;s flag as discord employee</span>
-        <span class="ident">DISCORD_EMPLOYEE</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0001</span>;
+        <span class="ident">DISCORD_EMPLOYEE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="doccomment">/// User&#39;s flag as partnered server owner</span>
-        <span class="ident">PARTNERED_SERVER_OWNER</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0010</span>;
+        <span class="ident">PARTNERED_SERVER_OWNER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// User&#39;s flag as hypesquad events</span>
-        <span class="ident">HYPESQUAD_EVENTS</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0100</span>;
+        <span class="ident">HYPESQUAD_EVENTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// User&#39;s flag as bug hunter level 1</span>
-        <span class="ident">BUG_HUNTER_LEVEL_1</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_1000</span>;
+        <span class="ident">BUG_HUNTER_LEVEL_1</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="doccomment">/// User&#39;s flag as house bravery</span>
-        <span class="ident">HOUSE_BRAVERY</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0100_0000</span>;
+        <span class="ident">HOUSE_BRAVERY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
         <span class="doccomment">/// User&#39;s flag as house brilliance</span>
-        <span class="ident">HOUSE_BRILLIANCE</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_1000_0000</span>;
+        <span class="ident">HOUSE_BRILLIANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
         <span class="doccomment">/// User&#39;s flag as house balance</span>
-        <span class="ident">HOUSE_BALANCE</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0001_0000_0000</span>;
+        <span class="ident">HOUSE_BALANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
         <span class="doccomment">/// User&#39;s flag as early supporter</span>
-        <span class="ident">EARLY_SUPPORTER</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0010_0000_0000</span>;
+        <span class="ident">EARLY_SUPPORTER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
         <span class="doccomment">/// User&#39;s flag as team user</span>
-        <span class="ident">TEAM_USER</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0100_0000_0000</span>;
+        <span class="ident">TEAM_USER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
         <span class="doccomment">/// User&#39;s flag as system</span>
-        <span class="ident">SYSTEM</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0001_0000_0000_0000</span>;
+        <span class="ident">SYSTEM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
         <span class="doccomment">/// User&#39;s flag as bug hunter level 2</span>
-        <span class="ident">BUG_HUNTER_LEVEL_2</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0100_0000_0000_0000</span>;
+        <span class="ident">BUG_HUNTER_LEVEL_2</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
         <span class="doccomment">/// User&#39;s flag as verified bot</span>
-        <span class="ident">VERIFIED_BOT</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0001_0000_0000_0000_0000</span>;
+        <span class="ident">VERIFIED_BOT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
         <span class="doccomment">/// User&#39;s flag as early verified bot developer</span>
-        <span class="ident">EARLY_VERIFIED_BOT_DEVELOPER</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0010_0000_0000_0000_0000</span>;
+        <span class="ident">EARLY_VERIFIED_BOT_DEVELOPER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
         <span class="doccomment">/// User&#39;s flag as discord certified moderator</span>
-        <span class="ident">DISCORD_CERTIFIED_MODERATOR</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0100_0000_0000_0000_0000</span>;
+        <span class="ident">DISCORD_CERTIFIED_MODERATOR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
     }
 }
 
@@ -2761,5 +2761,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (91a0600a5 2021-12-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e100ec5bc 2021-12-21)" ></div>
 </body></html>

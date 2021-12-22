@@ -248,6 +248,9 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>},
@@ -351,6 +354,8 @@
     <span class="ident">RateLimitUtf8</span>,
     <span class="doccomment">/// When parsing an URL failed due to invalid input.</span>
     <span class="ident">Url</span>(<span class="ident">UrlError</span>),
+    <span class="doccomment">/// When parsing a Webhook fails due to invalid input.</span>
+    <span class="ident">InvalidWebhook</span>,
     <span class="doccomment">/// Header value contains invalid input.</span>
     <span class="ident">InvalidHeader</span>(<span class="ident">InvalidHeaderValue</span>),
     <span class="doccomment">/// Reqwest&#39;s Error contain information on why sending a request failed.</span>
@@ -443,6 +448,7 @@
             <span class="ident">Error::RateLimitI64F64</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error decoding a header into an i64 or f64&quot;</span>),
             <span class="ident">Error::RateLimitUtf8</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error decoding a header from UTF-8&quot;</span>),
             <span class="ident">Error::Url</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided URL is incorrect.&quot;</span>),
+            <span class="ident">Error::InvalidWebhook</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided URL is not a valid webhook.&quot;</span>),
             <span class="ident">Error::InvalidHeader</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided value is an invalid header value.&quot;</span>),
             <span class="ident">Error::Request</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error while sending HTTP request.&quot;</span>),
             <span class="ident">Error::InvalidScheme</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid Url scheme.&quot;</span>),
@@ -497,5 +503,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (91a0600a5 2021-12-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e100ec5bc 2021-12-21)" ></div>
 </body></html>

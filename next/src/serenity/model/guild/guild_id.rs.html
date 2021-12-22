@@ -3354,14 +3354,14 @@
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">GuildWidgetStyle</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">core::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">GuildWidgetStyle::Shield</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;shield&quot;</span>),
-            <span class="ident">GuildWidgetStyle::Banner1</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;banner1&quot;</span>),
-            <span class="ident">GuildWidgetStyle::Banner2</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;banner2&quot;</span>),
-            <span class="ident">GuildWidgetStyle::Banner3</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;banner3&quot;</span>),
-            <span class="ident">GuildWidgetStyle::Banner4</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;banner4&quot;</span>),
+            <span class="ident">GuildWidgetStyle::Shield</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;shield&quot;</span>),
+            <span class="ident">GuildWidgetStyle::Banner1</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner1&quot;</span>),
+            <span class="ident">GuildWidgetStyle::Banner2</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner2&quot;</span>),
+            <span class="ident">GuildWidgetStyle::Banner3</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner3&quot;</span>),
+            <span class="ident">GuildWidgetStyle::Banner4</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;banner4&quot;</span>),
         }
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (91a0600a5 2021-12-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e100ec5bc 2021-12-21)" ></div>
 </body></html>

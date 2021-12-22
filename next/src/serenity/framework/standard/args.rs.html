@@ -1013,7 +1013,7 @@
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Error</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Eos</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ArgError(\&quot;end of string\&quot;)&quot;</span>),
+            <span class="ident">Eos</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">r#&quot;ArgError(&quot;end of string&quot;)&quot;#</span>),
             <span class="ident">Parse</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ArgError(\&quot;{}\&quot;)&quot;</span>, <span class="ident">e</span>),
         }
     }
@@ -1971,5 +1971,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (91a0600a5 2021-12-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e100ec5bc 2021-12-21)" ></div>
 </body></html>

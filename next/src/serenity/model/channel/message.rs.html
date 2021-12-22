@@ -1458,7 +1458,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a [`ModelError::MessageAlreadyCrossposted`] if the message has already been crossposted.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError`::CannotCrosspostMessage`] if the message cannot be crossposted.</span>
+    <span class="doccomment">/// Returns a [`ModelError::CannotCrosspostMessage`] if the message cannot be crossposted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">crosspost</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
@@ -2530,21 +2530,21 @@
 <span class="macro">__impl_bitflags!</span> {
     <span class="ident">MessageFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// This message has been published to subscribed channels (via Channel Following).</span>
-        <span class="ident">CROSSPOSTED</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0001</span>;
+        <span class="ident">CROSSPOSTED</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="doccomment">/// This message originated from a message in another channel (via Channel Following).</span>
-        <span class="ident">IS_CROSSPOST</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0010</span>;
+        <span class="ident">IS_CROSSPOST</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// Do not include any embeds when serializing this message.</span>
-        <span class="ident">SUPPRESS_EMBEDS</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_0100</span>;
+        <span class="ident">SUPPRESS_EMBEDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// The source message for this crosspost has been deleted (via Channel Following).</span>
-        <span class="ident">SOURCE_MESSAGE_DELETED</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0000_1000</span>;
+        <span class="ident">SOURCE_MESSAGE_DELETED</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="doccomment">/// This message came from the urgent message system.</span>
-        <span class="ident">URGENT</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0001_0000</span>;
+        <span class="ident">URGENT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
         <span class="doccomment">/// This message has an associated thread, with the same id as the message.</span>
-        <span class="ident">HAS_THREAD</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0010_0000</span>;
+        <span class="ident">HAS_THREAD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
         <span class="doccomment">/// This message is only visible to the user who invoked the Interaction.</span>
-        <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_0100_0000</span>;
+        <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
         <span class="doccomment">/// This message is an Interaction Response and the bot is &quot;thinking&quot;.</span>
-        <span class="ident">LOADING</span> <span class="op">=</span> <span class="number">0b0000_0000_0000_0000_0000_0000_1000_0000</span>;
+        <span class="ident">LOADING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
     }
 }
 
@@ -2603,5 +2603,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (91a0600a5 2021-12-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e100ec5bc 2021-12-21)" ></div>
 </body></html>
