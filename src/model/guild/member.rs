@@ -66,6 +66,31 @@ pub struct Member {
 
 #[cfg(feature = "model")]
 impl Member {
+
+    /// Times the user out until `time`.
+    ///
+    /// Requires the [Moderate Members] permission.
+    ///
+    /// **Note**: [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Moderate Members]: Permissions::MODERATE_MEMBERS
+    pub async fn disable_communication_until_datetime(&mut self, http: impl AsRef<Http>, time: DateTime<Utc>) -> Result<()> {
+        match self.guild_id.edit_member(http, self.user.id, |member| {
+            member.disable_communication_until_datetime(time);
+            member
+        }).await {
+            Ok(_) => {
+                self.communication_disabled_until = Some(time);
+                Ok(())
+            }
+            Err(why) => Err(why)
+        }
+    }
+
     /// Adds a [`Role`] to the member, editing its roles in-place if the request
     /// was successful.
     ///
@@ -96,7 +121,7 @@ impl Member {
                 self.roles.push(role_id);
 
                 Ok(())
-            },
+            }
             Err(why) => Err(why),
         }
     }
@@ -129,7 +154,7 @@ impl Member {
                 self.roles.retain(|r| !role_ids.contains(r));
 
                 Err(why)
-            },
+            }
         }
     }
 
@@ -451,7 +476,7 @@ impl Member {
                 self.roles.retain(|r| r.0 != role_id.0);
 
                 Ok(())
-            },
+            }
             Err(why) => Err(why),
         }
     }
@@ -484,7 +509,7 @@ impl Member {
                 self.roles.extend_from_slice(role_ids);
 
                 Err(why)
-            },
+            }
         }
     }
 
