@@ -458,6 +458,7 @@ mod test {
                 #[cfg(feature = "unstable_discord_api")]
                 permissions: None,
                 avatar: None,
+                communication_disabled_until: None,
             };
 
             assert_eq!(ChannelId(1).mention().to_string(), "<#1>");

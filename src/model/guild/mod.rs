@@ -3222,6 +3222,7 @@ mod test {
                 #[cfg(feature = "unstable_discord_api")]
                 permissions: None,
                 avatar: None,
+                communication_disabled_until: None,
             }
         }
 
