@@ -96,7 +96,7 @@ impl EditMember {
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
-    pub fn communication_disabled_until<Tz>(&mut self, time: String) -> &mut Self
+    pub fn disable_communication_until<Tz>(&mut self, time: String) -> &mut Self
     {
         self.0.insert("communication_disabled_until", Value::String(time));
         self
@@ -107,7 +107,7 @@ impl EditMember {
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
-    pub fn communication_disabled_until_datetime<Tz>(&mut self, time: DateTime<Tz>) -> &mut Self
+    pub fn disable_communication_until_datetime<Tz>(&mut self, time: DateTime<Tz>) -> &mut Self
     where
         Tz: TimeZone,
         Tz::Offset: Display,
