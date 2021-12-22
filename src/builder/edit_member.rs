@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 use std::fmt::Display;
 
+use chrono::{DateTime, TimeZone};
+
 use crate::internal::prelude::*;
 use crate::model::id::{ChannelId, RoleId};
-
-use chrono::{DateTime, TimeZone};
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].
@@ -93,8 +93,8 @@ impl EditMember {
 
     /// Times the user out until `time`, an ISO8601-formatted datetime string.
     ///
-    ///`time` is considered invalid if it is not a valid ISO8601 timestamp or if it is greater
-    ///than 28 days from the current time.
+    /// `time` is considered invalid if it is not a valid ISO8601 timestamp or if it is greater
+    /// than 28 days from the current time.
     ///
     /// Requires the [Moderate Members] permission.
     ///
@@ -106,7 +106,7 @@ impl EditMember {
 
     /// Times the user out until `time`.
     ///
-    ///`time` is considered invalid if it is greater than 28 days from the current time.
+    /// `time` is considered invalid if it is greater than 28 days from the current time.
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS

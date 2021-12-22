@@ -58,15 +58,14 @@ pub struct Member {
     pub permissions: Option<Permissions>,
     /// The guild avatar hash
     pub avatar: Option<String>,
-    ///	When the user's timeout will expire and the user will be able to communicate in the guild again.
+    /// 	When the user's timeout will expire and the user will be able to communicate in the guild again.
     ///
-    ///	Will be None or a time in the past if the user is not timed out.
+    /// 	Will be None or a time in the past if the user is not timed out.
     pub communication_disabled_until: Option<DateTime<Utc>>,
 }
 
 #[cfg(feature = "model")]
 impl Member {
-
     /// Adds a [`Role`] to the member, editing its roles in-place if the request
     /// was successful.
     ///
@@ -97,7 +96,7 @@ impl Member {
                 self.roles.push(role_id);
 
                 Ok(())
-            }
+            },
             Err(why) => Err(why),
         }
     }
@@ -130,7 +129,7 @@ impl Member {
                 self.roles.retain(|r| !role_ids.contains(r));
 
                 Err(why)
-            }
+            },
         }
     }
 
@@ -215,16 +214,24 @@ impl Member {
     /// 28 days from the current time.
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
-    pub async fn disable_communication_until_datetime(&mut self, http: impl AsRef<Http>, time: DateTime<Utc>) -> Result<()> {
-        match self.guild_id.edit_member(http, self.user.id, |member| {
-            member.disable_communication_until_datetime(time);
-            member
-        }).await {
+    pub async fn disable_communication_until_datetime(
+        &mut self,
+        http: impl AsRef<Http>,
+        time: DateTime<Utc>,
+    ) -> Result<()> {
+        match self
+            .guild_id
+            .edit_member(http, self.user.id, |member| {
+                member.disable_communication_until_datetime(time);
+                member
+            })
+            .await
+        {
             Ok(_) => {
                 self.communication_disabled_until = Some(time);
                 Ok(())
-            }
-            Err(why) => Err(why)
+            },
+            Err(why) => Err(why),
         }
     }
 
@@ -274,15 +281,19 @@ impl Member {
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        match self.guild_id.edit_member(&http, self.user.id, |member| {
-            member.enable_communication();
-            member
-        }).await {
+        match self
+            .guild_id
+            .edit_member(&http, self.user.id, |member| {
+                member.enable_communication();
+                member
+            })
+            .await
+        {
             Ok(_) => {
                 self.communication_disabled_until = None;
                 Ok(())
-            }
-            Err(why) => Err(why)
+            },
+            Err(why) => Err(why),
         }
     }
 
@@ -499,7 +510,7 @@ impl Member {
                 self.roles.retain(|r| r.0 != role_id.0);
 
                 Ok(())
-            }
+            },
             Err(why) => Err(why),
         }
     }
@@ -532,7 +543,7 @@ impl Member {
                 self.roles.extend_from_slice(role_ids);
 
                 Err(why)
-            }
+            },
         }
     }
 

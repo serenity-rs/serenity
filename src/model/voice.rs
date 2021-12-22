@@ -187,7 +187,8 @@ impl<'de> Deserialize<'de> for VoiceState {
                                     #[cfg(feature = "unstable_discord_api")]
                                     permissions: partial_member.permissions,
                                     avatar: partial_member.avatar,
-                                    communication_disabled_until: partial_member.communication_disabled_until,
+                                    communication_disabled_until: partial_member
+                                        .communication_disabled_until,
                                 });
                             }
                         },
