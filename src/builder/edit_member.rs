@@ -93,17 +93,20 @@ impl EditMember {
 
     /// Times the user out until `time`, an ISO8601-formatted datetime string.
     ///
+    ///`time` is considered invalid if it is not a valid ISO8601 timestamp or if it is greater
+    ///than 28 days from the current time.
+    ///
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
-    pub fn disable_communication_until(&mut self, time: String) -> &mut Self
-    {
+    pub fn disable_communication_until(&mut self, time: String) -> &mut Self {
         self.0.insert("communication_disabled_until", Value::String(time));
         self
     }
 
     /// Times the user out until `time`.
     ///
+    ///`time` is considered invalid if it is greater than 28 days from the current time.
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS

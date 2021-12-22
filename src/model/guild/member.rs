@@ -211,7 +211,8 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks permission or if `time` is greater than
+    /// 28 days from the current time.
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     pub async fn disable_communication_until_datetime(&mut self, http: impl AsRef<Http>, time: DateTime<Utc>) -> Result<()> {
