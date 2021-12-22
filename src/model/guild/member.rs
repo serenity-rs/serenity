@@ -67,30 +67,6 @@ pub struct Member {
 #[cfg(feature = "model")]
 impl Member {
 
-    /// Times the user out until `time`.
-    ///
-    /// Requires the [Moderate Members] permission.
-    ///
-    /// **Note**: [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
-    ///
-    /// [Moderate Members]: Permissions::MODERATE_MEMBERS
-    pub async fn disable_communication_until_datetime(&mut self, http: impl AsRef<Http>, time: DateTime<Utc>) -> Result<()> {
-        match self.guild_id.edit_member(http, self.user.id, |member| {
-            member.disable_communication_until_datetime(time);
-            member
-        }).await {
-            Ok(_) => {
-                self.communication_disabled_until = Some(time);
-                Ok(())
-            }
-            Err(why) => Err(why)
-        }
-    }
-
     /// Adds a [`Role`] to the member, editing its roles in-place if the request
     /// was successful.
     ///
@@ -225,6 +201,30 @@ impl Member {
         }
 
         None
+    }
+
+    /// Times the user out until `time`.
+    ///
+    /// Requires the [Moderate Members] permission.
+    ///
+    /// **Note**: [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Moderate Members]: Permissions::MODERATE_MEMBERS
+    pub async fn disable_communication_until_datetime(&mut self, http: impl AsRef<Http>, time: DateTime<Utc>) -> Result<()> {
+        match self.guild_id.edit_member(http, self.user.id, |member| {
+            member.disable_communication_until_datetime(time);
+            member
+        }).await {
+            Ok(_) => {
+                self.communication_disabled_until = Some(time);
+                Ok(())
+            }
+            Err(why) => Err(why)
+        }
     }
 
     /// Calculates the member's display name.
