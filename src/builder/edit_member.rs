@@ -123,7 +123,7 @@ impl EditMember {
     ///
     /// [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
     pub fn enable_communication(&mut self) -> &mut Self {
-        self.0.remove("communication_disabled_until");
+        self.0.insert("communication_disabled_until", Value::Null);
         self
     }
 }
