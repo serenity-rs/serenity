@@ -7,10 +7,8 @@ use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::result::Result as StdResult;
 
-#[cfg(feature = "model")]
 use bitflags::__impl_bitflags;
 use chrono::{DateTime, Utc};
-#[cfg(feature = "model")]
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
@@ -1241,12 +1239,10 @@ pub struct ChannelMention {
 
 /// Describes extra features of the message.
 #[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
-#[cfg_attr(not(feature = "model"), derive(Debug, Deserialize, Serialize))]
 pub struct MessageFlags {
     pub bits: u64,
 }
 
-#[cfg(feature = "model")]
 __impl_bitflags! {
     MessageFlags: u64 {
         /// This message has been published to subscribed channels (via Channel Following).
@@ -1268,7 +1264,6 @@ __impl_bitflags! {
     }
 }
 
-#[cfg(feature = "model")]
 impl<'de> Deserialize<'de> for MessageFlags {
     fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
     where
@@ -1278,7 +1273,6 @@ impl<'de> Deserialize<'de> for MessageFlags {
     }
 }
 
-#[cfg(feature = "model")]
 impl Serialize for MessageFlags {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
     where
