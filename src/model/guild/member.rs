@@ -263,6 +263,28 @@ impl Member {
         http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await
     }
 
+    /// Allow a user to communicate, removing their timeout, if there is one.
+    ///
+    /// **Note**: Requires the [Moderate Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Moderate Members]: Permissions::MODERATE_MEMBERS
+    pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
+        match self.guild_id.edit_member(&http, self.user.id, |member| {
+            member.enable_communication();
+            member
+        }).await {
+            Ok(_) => {
+                self.communication_disabled_until = None;
+                Ok(())
+            }
+            Err(why) => Err(why)
+        }
+    }
+
     /// Retrieves the ID and position of the member's highest role in the
     /// hierarchy, if they have one.
     ///
