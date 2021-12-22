@@ -96,7 +96,7 @@ impl EditMember {
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permission::Permissions::MODERATE_MEMBERS
-    pub fn disable_communication_until<Tz>(&mut self, time: String) -> &mut Self
+    pub fn disable_communication_until(&mut self, time: String) -> &mut Self
     {
         self.0.insert("communication_disabled_until", Value::String(time));
         self
