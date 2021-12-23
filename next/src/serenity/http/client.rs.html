@@ -3827,6 +3827,25 @@
 <span id="3825">3825</span>
 <span id="3826">3826</span>
 <span id="3827">3827</span>
+<span id="3828">3828</span>
+<span id="3829">3829</span>
+<span id="3830">3830</span>
+<span id="3831">3831</span>
+<span id="3832">3832</span>
+<span id="3833">3833</span>
+<span id="3834">3834</span>
+<span id="3835">3835</span>
+<span id="3836">3836</span>
+<span id="3837">3837</span>
+<span id="3838">3838</span>
+<span id="3839">3839</span>
+<span id="3840">3840</span>
+<span id="3841">3841</span>
+<span id="3842">3842</span>
+<span id="3843">3843</span>
+<span id="3844">3844</span>
+<span id="3845">3845</span>
+<span id="3846">3846</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 
@@ -7195,22 +7214,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_webhook_from_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">parse_url</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">strip_prefix</span>(<span class="string">&quot;/api/webhooks&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">split_idx</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">find</span>(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">path</span>.<span class="ident">split_at</span>(<span class="ident">split_idx</span>);
-            <span class="kw">if</span> <span class="op">!</span>[<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">scheme</span>())
-                <span class="op">|</span><span class="op">|</span> <span class="op">!</span>[<span class="string">&quot;discord.com&quot;</span>, <span class="string">&quot;discordapp.com&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">domain</span>()<span class="question-mark">?</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="op">!</span>(<span class="number">17</span>..<span class="op">=</span><span class="number">20</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">webhook_id</span>.<span class="ident">len</span>())
-                <span class="op">|</span><span class="op">|</span> <span class="op">!</span>(<span class="number">60</span>..<span class="op">=</span><span class="number">68</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">len</span>())
-            {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
-            }
-            <span class="prelude-val">Some</span>((<span class="ident">webhook_id</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>, <span class="ident">token</span>))
-        }
-
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="ident">HttpError::Url</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">parse_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">ok_or</span>(<span class="ident">HttpError::InvalidWebhook</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">parse_webhook_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
@@ -7652,6 +7657,39 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">application_id</span>: <span class="number">0</span>,
         }
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">parse_webhook_url</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">strip_prefix</span>(<span class="string">&quot;/api/webhooks/&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">split_idx</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">find</span>(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">webhook_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">path</span>[..<span class="ident">split_idx</span>];
+        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">path</span>[<span class="ident">split_idx</span> <span class="op">+</span> <span class="number">1</span>..];
+        <span class="kw">if</span> <span class="op">!</span>[<span class="string">&quot;http&quot;</span>, <span class="string">&quot;https&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">scheme</span>())
+            <span class="op">|</span><span class="op">|</span> <span class="op">!</span>[<span class="string">&quot;discord.com&quot;</span>, <span class="string">&quot;discordapp.com&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>.<span class="ident">domain</span>()<span class="question-mark">?</span>)
+            <span class="op">|</span><span class="op">|</span> <span class="op">!</span>(<span class="number">17</span>..<span class="op">=</span><span class="number">20</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">webhook_id</span>.<span class="ident">len</span>())
+            <span class="op">|</span><span class="op">|</span> <span class="op">!</span>(<span class="number">60</span>..<span class="op">=</span><span class="number">68</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">len</span>())
+        {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        }
+        <span class="prelude-val">Some</span>((<span class="ident">webhook_id</span>.<span class="ident">parse</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>, <span class="ident">token</span>))
+    }
+    <span class="ident">parse</span>(<span class="ident">url</span>).<span class="ident">ok_or</span>(<span class="ident">HttpError::InvalidWebhook</span>.<span class="ident">into</span>())
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">reqwest::Url</span>;
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::parse_webhook_url</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_webhook_parsing</span>() {
+        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="string">&quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>;
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
+        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert!</span>(<span class="ident">parse_webhook_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">is_ok</span>());
     }
 }
 </code></pre></div>
