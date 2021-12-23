@@ -700,6 +700,9 @@
 <span id="698">698</span>
 <span id="699">699</span>
 <span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
@@ -1179,17 +1182,20 @@
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Whether the activity is an instance activity.</span>
-        <span class="kw">const</span> <span class="ident">INSTANCE</span> <span class="op">=</span> <span class="number">0b001</span>;
+        <span class="kw">const</span> <span class="ident">INSTANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="doccomment">/// Whether the activity is joinable.</span>
-        <span class="kw">const</span> <span class="ident">JOIN</span> <span class="op">=</span> <span class="number">0b010</span>;
+        <span class="kw">const</span> <span class="ident">JOIN</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// Whether the activity can be spectated.</span>
-        <span class="kw">const</span> <span class="ident">SPECTATE</span> <span class="op">=</span> <span class="number">0b011</span>;
+        <span class="kw">const</span> <span class="ident">SPECTATE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// Whether a request can be sent to join the user&#39;s party.</span>
-        <span class="kw">const</span> <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">0b100</span>;
+        <span class="kw">const</span> <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="doccomment">/// Whether the activity can be synced.</span>
-        <span class="kw">const</span> <span class="ident">SYNC</span> <span class="op">=</span> <span class="number">0b101</span>;
+        <span class="kw">const</span> <span class="ident">SYNC</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
         <span class="doccomment">/// Whether the activity can be played.</span>
-        <span class="kw">const</span> <span class="ident">PLAY</span> <span class="op">=</span> <span class="number">0b110</span>;
+        <span class="kw">const</span> <span class="ident">PLAY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
+        <span class="kw">const</span> <span class="ident">PARTY_PRIVACY_FRIENDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="kw">const</span> <span class="ident">PARTY_PRIVACY_VOICE_CHANNEL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="kw">const</span> <span class="ident">EMBEDDED</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
     }
 }
 
@@ -1401,5 +1407,5 @@
     <span class="kw">pub</span> <span class="ident">start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e100ec5bc 2021-12-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (34926f0a1 2021-12-22)" ></div>
 </body></html>
