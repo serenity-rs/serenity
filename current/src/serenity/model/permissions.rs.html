@@ -716,6 +716,9 @@
 <span id="714">714</span>
 <span id="715">715</span>
 <span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -1076,6 +1079,9 @@
         <span class="ident">SEND_MESSAGES_IN_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">38</span>;
         <span class="doccomment">/// Allows for launching activities in a voice channel</span>
         <span class="ident">START_EMBEDDED_ACTIVITIES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">39</span>;
+        <span class="doccomment">/// Allows for timing out users to prevent them from sending or reacting to messages in</span>
+        <span class="doccomment">/// chat and threads, and from speaking in voice and stage channels.</span>
+        <span class="ident">MODERATE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">40</span>;
         <span class="doccomment">/// Allows for creating and participating in public threads.</span>
         <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;This permission no longer exists&quot;</span>)]</span>
         <span class="ident">USE_PUBLIC_THREADS</span> <span class="op">=</span> <span class="number">0b0010_0000_0000_0000_0000_0000_0000_0000_0000</span>;
@@ -1433,5 +1439,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (34926f0a1 2021-12-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (c09a9529c 2021-12-23)" ></div>
 </body></html>
