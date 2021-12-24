@@ -1,13 +1,11 @@
 //! Models pertaining to the gateway.
 
 use bitflags::bitflags;
-use serde::de::Error as DeError;
 use serde::{Serialize, Serializer};
 use url::Url;
 
 use super::prelude::*;
 use super::utils::*;
-use crate::json::from_value;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -29,7 +27,7 @@ pub struct BotGateway {
 }
 
 /// Representation of an activity that a [`User`] is performing.
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Activity {
     /// The ID of the application for the activity.
@@ -43,7 +41,7 @@ pub struct Activity {
     /// Whether or not the activity is an instanced game session.
     pub instance: Option<bool>,
     /// The type of activity being performed
-    #[serde(default = "ActivityType::default", rename = "type")]
+    #[serde(default, rename = "type")]
     pub kind: ActivityType,
     /// The name of the activity.
     pub name: String,
@@ -71,7 +69,7 @@ pub struct Activity {
     /// The buttons of this activity.
     ///
     /// **Note**: There can only be up to 2 buttons.
-    #[serde(default)]
+    #[serde(default, deserialize_with = "deserialize_buttons")]
     pub buttons: Vec<ActivityButton>,
 }
 
@@ -266,116 +264,6 @@ impl Activity {
         N: ToString,
     {
         Activity::new(name.to_string(), ActivityType::Competing)
-    }
-}
-
-impl<'de> Deserialize<'de> for Activity {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let application_id = match map.remove("application_id") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let assets = match map.remove("assets") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let details = match map.remove("details") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let flags = match map.remove("flags") {
-            Some(v) => from_value::<Option<u64>>(v)
-                .map_err(DeError::custom)?
-                .map(ActivityFlags::from_bits_truncate),
-            None => None,
-        };
-
-        let instance = match map.remove("instance") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let kind = map
-            .remove("type")
-            .and_then(|v| ActivityType::deserialize(v).ok())
-            .unwrap_or(ActivityType::Playing);
-
-        let name = map
-            .remove("name")
-            .and_then(|v| String::deserialize(v).ok())
-            .unwrap_or_else(String::new);
-
-        let party = match map.remove("party") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let secrets = match map.remove("secrets") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let state = match map.remove("state") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let emoji = match map.remove("emoji") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let timestamps = match map.remove("timestamps") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        #[cfg(feature = "unstable_discord_api")]
-        let sync_id = match map.remove("sync_id") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        #[cfg(feature = "unstable_discord_api")]
-        let session_id = match map.remove("session_id") {
-            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let url = map.remove("url").and_then(|v| from_value::<Url>(v).ok());
-
-        let buttons = map
-            .remove("buttons")
-            .map(deserialize_buttons)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        Ok(Activity {
-            application_id,
-            assets,
-            details,
-            flags,
-            instance,
-            kind,
-            name,
-            party,
-            secrets,
-            state,
-            emoji,
-            timestamps,
-            #[cfg(feature = "unstable_discord_api")]
-            sync_id,
-            #[cfg(feature = "unstable_discord_api")]
-            session_id,
-            url,
-            buttons,
-        })
     }
 }
 
