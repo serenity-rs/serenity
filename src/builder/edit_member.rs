@@ -1,4 +1,7 @@
 use std::collections::HashMap;
+use std::fmt::Display;
+
+use chrono::{DateTime, TimeZone};
 
 use crate::internal::prelude::*;
 use crate::model::id::{ChannelId, RoleId};
@@ -85,6 +88,45 @@ impl EditMember {
     pub fn disconnect_member(&mut self) -> &mut Self {
         self.0.insert("channel_id", Value::Null);
 
+        self
+    }
+
+    /// Times the user out until `time`, an ISO8601-formatted datetime string.
+    ///
+    /// `time` is considered invalid if it is not a valid ISO8601 timestamp or if it is greater
+    /// than 28 days from the current time.
+    ///
+    /// Requires the [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS
+    pub fn disable_communication_until(&mut self, time: String) -> &mut Self {
+        self.0.insert("communication_disabled_until", Value::String(time));
+        self
+    }
+
+    /// Times the user out until `time`.
+    ///
+    /// `time` is considered invalid if it is greater than 28 days from the current time.
+    /// Requires the [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS
+    pub fn disable_communication_until_datetime<Tz>(&mut self, time: DateTime<Tz>) -> &mut Self
+    where
+        Tz: TimeZone,
+        Tz::Offset: Display,
+    {
+        let timestamp = time.to_rfc3339();
+        self.0.insert("communication_disabled_until", Value::String(timestamp));
+        self
+    }
+
+    /// Allow a user to communicate, removing their timeout, if there is one.
+    ///
+    /// Requires the [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS
+    pub fn enable_communication(&mut self) -> &mut Self {
+        self.0.insert("communication_disabled_until", Value::Null);
         self
     }
 }

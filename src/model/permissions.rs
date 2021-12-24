@@ -358,6 +358,9 @@ __impl_bitflags! {
         SEND_MESSAGES_IN_THREADS = 1 << 38;
         /// Allows for launching activities in a voice channel
         START_EMBEDDED_ACTIVITIES = 1 << 39;
+        /// Allows for timing out users to prevent them from sending or reacting to messages in
+        /// chat and threads, and from speaking in voice and stage channels.
+        MODERATE_MEMBERS = 1 << 40;
         /// Allows for creating and participating in public threads.
         #[deprecated(note = "This permission no longer exists")]
         USE_PUBLIC_THREADS = 0b0010_0000_0000_0000_0000_0000_0000_0000_0000;

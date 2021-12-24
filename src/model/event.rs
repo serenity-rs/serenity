@@ -480,6 +480,7 @@ pub struct GuildMemberUpdateEvent {
     #[serde(default)]
     pub mute: bool,
     pub avatar: Option<String>,
+    pub communication_disabled_until: Option<DateTime<Utc>>,
 }
 
 #[cfg(feature = "cache")]
@@ -523,6 +524,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
                     avatar: self.avatar.clone(),
+                    communication_disabled_until: self.communication_disabled_until.clone(),
                 });
             }
 
@@ -1054,6 +1056,7 @@ impl CacheUpdate for PresenceUpdateEvent {
                         #[cfg(feature = "unstable_discord_api")]
                         permissions: None,
                         avatar: None,
+                        communication_disabled_until: None,
                     });
                 }
             }
