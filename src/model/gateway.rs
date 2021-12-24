@@ -80,6 +80,30 @@ pub struct Activity {
 
 #[cfg(feature = "model")]
 impl Activity {
+    /// Common constructor for the different `ActivityType`s.
+    fn new(name: String, kind: ActivityType) -> Self {
+        Self {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind,
+            name,
+            party: None,
+            secrets: None,
+            state: None,
+            emoji: None,
+            timestamps: None,
+            #[cfg(feature = "unstable_discord_api")]
+            sync_id: None,
+            #[cfg(feature = "unstable_discord_api")]
+            session_id: None,
+            url: None,
+            buttons: vec![],
+        }
+    }
+
     /// Creates a [`Activity`] struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
@@ -109,26 +133,7 @@ impl Activity {
     where
         N: ToString,
     {
-        Activity {
-            application_id: None,
-            assets: None,
-            details: None,
-            flags: None,
-            instance: None,
-            kind: ActivityType::Playing,
-            name: name.to_string(),
-            party: None,
-            secrets: None,
-            state: None,
-            emoji: None,
-            timestamps: None,
-            #[cfg(feature = "unstable_discord_api")]
-            sync_id: None,
-            #[cfg(feature = "unstable_discord_api")]
-            session_id: None,
-            url: None,
-            buttons: vec![],
-        }
+        Activity::new(name.to_string(), ActivityType::Playing)
     }
 
     /// Creates an [`Activity`] struct that appears as a `Streaming <name>`
@@ -165,24 +170,8 @@ impl Activity {
         U: AsRef<str>,
     {
         Activity {
-            application_id: None,
-            assets: None,
-            details: None,
-            flags: None,
-            instance: None,
-            kind: ActivityType::Streaming,
-            name: name.to_string(),
-            party: None,
-            secrets: None,
-            state: None,
-            emoji: None,
-            timestamps: None,
-            #[cfg(feature = "unstable_discord_api")]
-            sync_id: None,
-            #[cfg(feature = "unstable_discord_api")]
-            session_id: None,
             url: Some(Url::parse(url.as_ref()).expect("Failed to parse url")),
-            buttons: vec![],
+            ..Activity::new(name.to_string(), ActivityType::Streaming)
         }
     }
 
@@ -215,26 +204,7 @@ impl Activity {
     where
         N: ToString,
     {
-        Activity {
-            application_id: None,
-            assets: None,
-            details: None,
-            flags: None,
-            instance: None,
-            kind: ActivityType::Listening,
-            name: name.to_string(),
-            party: None,
-            secrets: None,
-            state: None,
-            emoji: None,
-            timestamps: None,
-            #[cfg(feature = "unstable_discord_api")]
-            sync_id: None,
-            #[cfg(feature = "unstable_discord_api")]
-            session_id: None,
-            url: None,
-            buttons: vec![],
-        }
+        Activity::new(name.to_string(), ActivityType::Listening)
     }
 
     /// Creates a [`Activity`] struct that appears as a `Watching <name>` status.
@@ -266,26 +236,7 @@ impl Activity {
     where
         N: ToString,
     {
-        Activity {
-            application_id: None,
-            assets: None,
-            details: None,
-            flags: None,
-            instance: None,
-            kind: ActivityType::Watching,
-            name: name.to_string(),
-            party: None,
-            secrets: None,
-            state: None,
-            emoji: None,
-            timestamps: None,
-            #[cfg(feature = "unstable_discord_api")]
-            sync_id: None,
-            #[cfg(feature = "unstable_discord_api")]
-            session_id: None,
-            url: None,
-            buttons: vec![],
-        }
+        Activity::new(name.to_string(), ActivityType::Watching)
     }
 
     /// Creates a [`Activity`] struct that appears as a `Competing in <name>` status.
@@ -317,26 +268,7 @@ impl Activity {
     where
         N: ToString,
     {
-        Activity {
-            application_id: None,
-            assets: None,
-            details: None,
-            flags: None,
-            instance: None,
-            kind: ActivityType::Competing,
-            name: name.to_string(),
-            party: None,
-            secrets: None,
-            state: None,
-            emoji: None,
-            timestamps: None,
-            #[cfg(feature = "unstable_discord_api")]
-            sync_id: None,
-            #[cfg(feature = "unstable_discord_api")]
-            session_id: None,
-            url: None,
-            buttons: vec![],
-        }
+        Activity::new(name.to_string(), ActivityType::Competing)
     }
 }
 
