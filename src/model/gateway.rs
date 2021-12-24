@@ -5,6 +5,7 @@
 
 use bitflags::bitflags;
 use serde::de::Error as DeError;
+use serde::{Serialize, Serializer};
 use url::Url;
 
 use super::prelude::*;
@@ -477,7 +478,6 @@ pub struct ActivityAssets {
 
 bitflags! {
     /// A set of flags defining what is in an activity's payload.
-    #[derive(Deserialize, Serialize)]
     pub struct ActivityFlags: u64 {
         /// Whether the activity is an instance activity.
         const INSTANCE = 1 << 0;
@@ -497,6 +497,18 @@ bitflags! {
         const PARTY_PRIVACY_VOICE_CHANNEL = 1 << 7;
         /// Whether the activity can be embedded.
         const EMBEDDED = 1 << 8;
+    }
+}
+
+impl<'de> Deserialize<'de> for ActivityFlags {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(ActivityFlags::from_bits_truncate(u64::deserialize(deserializer)?))
+    }
+}
+
+impl Serialize for ActivityFlags {
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        serializer.serialize_u64(self.bits())
     }
 }
 
