@@ -85,6 +85,7 @@ pub struct ClientBuilder<'a> {
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
     #[cfg(feature = "cache")]
+    // Option in order to take() it out in the Future impl
     cache_settings: Option<CacheSettings>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<Box<dyn Framework + Send + Sync + 'static>>>,
@@ -166,6 +167,12 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
+    /// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn get_application_id(&self) -> Option<ApplicationId> {
+        self.application_id
+    }
+
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
     /// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]
     /// can be used to insert one type at a time.
@@ -175,19 +182,17 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
+    /// Gets the type map, if already initialized. See [`Self::type_map`] for more info.
+    pub fn get_type_map(&self) -> Option<&TypeMap> {
+        self.data.as_ref()
+    }
+
     /// Insert a single `value` into the internal [`TypeMap`] that will
     /// be available in [`Context::data`].
     /// This method can be called multiple times in order to populate the
     /// [`TypeMap`] with `value`s.
     pub fn type_map_insert<T: TypeMapKey>(mut self, value: T::Value) -> Self {
-        if let Some(ref mut data) = self.data {
-            data.insert::<T>(value);
-        } else {
-            let mut type_map = TypeMap::new();
-            type_map.insert::<T>(value);
-
-            self.data = Some(type_map);
-        }
+        self.data.get_or_insert_with(TypeMap::new).insert::<T>(value);
 
         self
     }
@@ -206,6 +211,13 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
+    /// Gets the cache update timeout, if already initialized. See [`Self::cache_update_timeout`]
+    /// for more info.
+    #[cfg(feature = "cache")]
+    pub fn get_cache_update_timeout(&self) -> Option<Duration> {
+        self.timeout
+    }
+
     /// Sets the settings of the cache.
     /// Refer to [`Settings`] for more information.
     ///
@@ -220,6 +232,14 @@ impl<'a> ClientBuilder<'a> {
         }
 
         self
+    }
+
+    /// Gets the cache settings. See [`Self::cache_settings`] for more info.
+    #[cfg(feature = "cache")]
+    pub fn get_cache_settings(&self) -> &CacheSettings {
+        // unwrap() is ok because cache_settings will only ever be None in the middle of being
+        // .await'ed
+        self.cache_settings.as_ref().unwrap()
     }
 
     /// Sets the command framework to be used. It will receive messages sent
@@ -251,6 +271,12 @@ impl<'a> ClientBuilder<'a> {
         self.framework = Some(framework);
 
         self
+    }
+
+    /// Gets the framework, if already initialized. See [`Self::framework`] for more info.
+    #[cfg(feature = "framework")]
+    pub fn get_framework(&self) -> Option<Arc<Box<dyn Framework + Send + Sync>>> {
+        self.framework.clone()
     }
 
     /// Sets the voice gateway handler to be used. It will receive voice events sent
@@ -286,6 +312,12 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
+    /// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.
+    #[cfg(feature = "voice")]
+    pub fn get_voice_manager(&self) -> Option<Arc<dyn VoiceGatewayManager + Send + Sync>> {
+        self.voice_manager.clone()
+    }
+
     /// Sets all intents directly, replacing already set intents.
     /// Intents are a bitflag, you can combine them by performing the
     /// `|`-operator.
@@ -317,11 +349,21 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
+    /// Gets the intents. See [`Self::intents`] for more info.
+    pub fn get_intents(&self) -> GatewayIntents {
+        self.intents
+    }
+
     /// Sets an event handler with multiple methods for each possible event.
     pub fn event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
         self.event_handler = Some(Arc::new(event_handler));
 
         self
+    }
+
+    /// Gets the event handler, if already initialized. See [`Self::event_handler`] for more info.
+    pub fn get_event_handler(&self) -> Option<Arc<dyn EventHandler>> {
+        self.event_handler.clone()
     }
 
     /// Sets an event handler with a single method where all received gateway
@@ -330,6 +372,12 @@ impl<'a> ClientBuilder<'a> {
         self.raw_event_handler = Some(Arc::new(raw_event_handler));
 
         self
+    }
+
+    /// Gets the raw event handler, if already initialized. See [`Self::raw_event_handler`] for more
+    /// info.
+    pub fn get_raw_event_handler(&self) -> Option<Arc<dyn RawEventHandler>> {
+        self.raw_event_handler.clone()
     }
 }
 
