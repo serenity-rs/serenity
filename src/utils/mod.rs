@@ -9,6 +9,7 @@ mod message_builder;
 
 #[cfg(all(feature = "client", feature = "cache"))]
 pub use argument_convert::*;
+use reqwest::Url;
 
 pub use self::{
     colour::{colours, Colour},
@@ -432,6 +433,21 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
     args
 }
 
+pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
+    let path = url.path().strip_prefix("/api/webhooks/")?;
+    let split_idx = path.find('/')?;
+    let webhook_id = &path[..split_idx];
+    let token = &path[split_idx + 1..];
+    if !["http", "https"].contains(&url.scheme())
+        || !["discord.com", "discordapp.com"].contains(&url.domain()?)
+        || !(17..=20).contains(&webhook_id.len())
+        || !(60..=68).contains(&token.len())
+    {
+        return None;
+    }
+    Some((webhook_id.parse().ok()?, token))
+}
+
 /// Calculates the Id of the shard responsible for a guild, given its Id and
 /// total number of shards used.
 ///
@@ -800,6 +816,15 @@ mod test {
     fn test_quote_parser() {
         let parsed = parse_quotes("a \"b c\" d\"e f\"  g");
         assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
+    }
+
+    #[test]
+    fn test_webhook_parser() {
+        let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+        let url = Url::parse(url).unwrap();
+        let (id, token) = parse_webhook(&url).unwrap();
+        assert_eq!(id, 245037420704169985);
+        assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
     }
 
     #[cfg(feature = "cache")]
