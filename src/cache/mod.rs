@@ -1060,7 +1060,6 @@ mod test {
     };
 
     #[test]
-    #[allow(clippy::unwrap_used)]
     fn test_cache_messages() {
         let mut settings = Settings::new();
         settings.max_messages(2);

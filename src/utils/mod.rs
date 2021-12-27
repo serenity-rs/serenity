@@ -765,7 +765,7 @@ pub fn content_safe(
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::non_ascii_literal)]
+#[allow(clippy::non_ascii_literal)]
 mod test {
     use super::*;
     #[cfg(feature = "cache")]
