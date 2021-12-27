@@ -1316,7 +1316,6 @@ fn tag(name: &str, discriminator: u16) -> String {
 }
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used)]
 mod test {
     #[test]
     fn test_discriminator_serde() {
