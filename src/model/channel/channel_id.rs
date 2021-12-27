@@ -730,7 +730,7 @@ impl ChannelId {
 
         Message::check_lengths(&map)?;
 
-        http.as_ref().send_files(self.0, files, map).await
+        http.as_ref().send_files(self.0, files, &map).await
     }
 
     /// Sends a message to the channel.
@@ -767,7 +767,7 @@ impl ChannelId {
         let message = if msg.2.is_empty() {
             http.as_ref().send_message(self.0, &Value::from(map)).await?
         } else {
-            http.as_ref().send_files(self.0, msg.2.clone(), map).await?
+            http.as_ref().send_files(self.0, msg.2.clone(), &map).await?
         };
 
         if let Some(reactions) = msg.1.clone() {
