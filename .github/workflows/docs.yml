@@ -16,12 +16,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        id: tc
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          profile: minimal
-          override: true
+        run: |
+          rustup install --profile minimal nightly
+          rustup override set nightly
 
       - name: Cache
         uses: Swatinem/rust-cache@v1
