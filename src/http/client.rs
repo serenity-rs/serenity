@@ -3839,7 +3839,6 @@ mod test {
     #[test]
     fn test_webhook_parsing() {
         let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-        #[allow(clippy::unwrap_used)]
         let url = Url::parse(url).unwrap();
         assert!(parse_webhook_url(&url).is_ok());
     }
