@@ -5990,7 +5990,7 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">wait</span>: <span class="ident">bool</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
-        <span class="ident">map</span>: <span class="ident">JsonMap</span>,
+        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -7277,7 +7277,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">channel_id</span>: <span class="ident">u64</span>,
         <span class="ident">files</span>: <span class="ident">It</span>,
-        <span class="ident">map</span>: <span class="ident">JsonMap</span>,
+        <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
