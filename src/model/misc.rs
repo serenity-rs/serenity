@@ -408,7 +408,6 @@ mod test {
         use crate::utils::Colour;
 
         #[test]
-        #[allow(clippy::unwrap_used)]
         fn test_mention() {
             let channel = Channel::Guild(GuildChannel {
                 bitrate: None,
@@ -496,7 +495,6 @@ mod test {
 
         #[cfg(feature = "model")]
         #[test]
-        #[allow(clippy::unwrap_used)]
         fn parse_mentions() {
             assert_eq!("<@1234>".parse::<UserId>().unwrap(), UserId(1234));
             assert_eq!("<@&1234>".parse::<RoleId>().unwrap(), RoleId(1234));
