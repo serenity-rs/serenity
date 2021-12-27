@@ -3370,7 +3370,6 @@ mod test {
         }
 
         #[test]
-        #[allow(clippy::unwrap_used)]
         fn member_named_username() {
             let guild = gen();
             let lhs = guild.member_named("test#1432").unwrap().display_name();
@@ -3379,7 +3378,6 @@ mod test {
         }
 
         #[test]
-        #[allow(clippy::unwrap_used)]
         fn member_named_nickname() {
             let guild = gen();
             let lhs = guild.member_named("aaaa").unwrap().display_name();
