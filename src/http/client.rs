@@ -2197,7 +2197,7 @@ impl Http {
         token: &str,
         wait: bool,
         files: It,
-        map: JsonMap,
+        map: &JsonMap,
     ) -> Result<Option<Message>>
     where
         T: Into<AttachmentType<'a>>,
@@ -3504,7 +3504,7 @@ impl Http {
         &self,
         channel_id: u64,
         files: It,
-        map: JsonMap,
+        map: &JsonMap,
     ) -> Result<Message>
     where
         T: Into<AttachmentType<'a>>,
