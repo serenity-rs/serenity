@@ -314,7 +314,7 @@ impl Webhook {
 
         if !execute_webhook.1.is_empty() {
             http.as_ref()
-                .execute_webhook_with_files(self.id.0, token, wait, execute_webhook.1.clone(), map)
+                .execute_webhook_with_files(self.id.0, token, wait, execute_webhook.1.clone(), &map)
                 .await
         } else {
             http.as_ref().execute_webhook(self.id.0, token, wait, &map).await
