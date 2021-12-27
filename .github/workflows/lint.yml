@@ -14,23 +14,17 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install nightly toolchain
-        id: toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          components: clippy
-          profile: minimal
-          override: true
+      - name: Install toolchain
+        run: rustup install stable
+
+      - name: Add problem matchers
+        run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Cache
         uses: Swatinem/rust-cache@v1
 
       - name: Run clippy
-        uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --workspace --tests
+        run: cargo clippy --workspace --tests
 
   rustfmt:
     name: Format
@@ -40,13 +34,14 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install stable toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          components: rustfmt
-          profile: minimal
-          override: true
+      - name: Install toolchain
+        run: |
+          rustup install --profile minimal nightly
+          rustup override set nightly
+          rustup component add rustfmt
+
+      - name: Add problem matchers
+        run: echo "::add-matcher::.github/matchers/rust.json"
 
       - name: Run cargo fmt
         run: cargo fmt --all -- --check
