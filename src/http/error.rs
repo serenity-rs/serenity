@@ -17,7 +17,7 @@ pub struct DiscordJsonError {
     pub message: String,
     /// The full explained errors with their path in the request
     /// body.
-    #[serde(deserialize_with = "deserialize_errors")]
+    #[serde(default, deserialize_with = "deserialize_errors")]
     pub errors: Vec<DiscordJsonSingleError>,
 }
 
