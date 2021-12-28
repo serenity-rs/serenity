@@ -312,7 +312,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">simd_json::Mutable</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">json</span>, <span class="ident">ToNumber</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::ChannelType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command</span>::{
     <span class="ident">ApplicationCommandOptionType</span>,
@@ -464,15 +464,15 @@
     }
 
     <span class="doccomment">/// Sets the minimum permitted value for this integer option</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_int_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;min_value&quot;</span>, <span class="ident">from_number</span>(<span class="ident">value</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_int_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">ToNumber</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;min_value&quot;</span>, <span class="ident">value</span>.<span class="ident">to_number</span>());
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Sets the maximum permitted value for this integer option</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_int_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_value&quot;</span>, <span class="ident">from_number</span>(<span class="ident">value</span>));
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_int_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">ToNumber</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;max_value&quot;</span>, <span class="ident">value</span>.<span class="ident">to_number</span>());
 
         <span class="self">self</span>
     }
