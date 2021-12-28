@@ -19,8 +19,6 @@ pub type Value = simd_json::OwnedValue;
 pub use serde_json::json;
 #[cfg(not(feature = "simd-json"))]
 pub use serde_json::Error as JsonError;
-#[cfg(not(feature = "simd-json"))]
-use serde_json::Number;
 #[cfg(feature = "simd-json")]
 pub use simd_json::json;
 #[cfg(feature = "simd-json")]
@@ -140,20 +138,26 @@ where
     Ok(simd_json::serde::to_owned_value(value)?)
 }
 
+pub trait ToNumber {
+    fn to_number(self) -> Value;
+}
+
 #[cfg(not(feature = "simd-json"))]
-pub(crate) fn from_number<T>(n: T) -> Value
-where
-    serde_json::Number: From<T>,
-{
-    Value::Number(Number::from(n))
+impl<T: Into<serde_json::Number>> ToNumber for T {
+    fn to_number(self) -> Value {
+        Value::Number(self.into())
+    }
 }
 
 #[cfg(feature = "simd-json")]
-pub(crate) fn from_number<T>(n: T) -> Value
-where
-    Value: From<T>,
-{
-    Value::from(n)
+impl<T: Into<Value>> ToNumber for T {
+    fn to_number(self) -> Value {
+        self.into()
+    }
+}
+
+pub(crate) fn from_number(n: impl ToNumber) -> Value {
+    n.to_number()
 }
 
 pub mod prelude {
