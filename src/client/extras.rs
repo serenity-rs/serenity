@@ -4,7 +4,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use super::{EventHandler, RawEventHandler};
-use crate::client::bridge::gateway::GatewayIntents;
+use crate::model::gateway::GatewayIntents;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 

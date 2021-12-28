@@ -44,12 +44,13 @@ use typemap_rev::{TypeMap, TypeMapKey};
 
 #[cfg(feature = "gateway")]
 use self::bridge::gateway::{
-    GatewayIntents,
     ShardManager,
     ShardManagerError,
     ShardManagerMonitor,
     ShardManagerOptions,
 };
+#[cfg(feature = "gateway")]
+use crate::model::gateway::GatewayIntents;
 #[cfg(feature = "voice")]
 use self::bridge::voice::VoiceGatewayManager;
 pub use self::{context::Context, error::Error as ClientError};

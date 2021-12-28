@@ -44,7 +44,6 @@
 
 pub mod event;
 
-mod intents;
 mod shard_manager;
 mod shard_manager_monitor;
 mod shard_messenger;
@@ -57,7 +56,6 @@ use std::{
     time::Duration as StdDuration,
 };
 
-pub use self::intents::GatewayIntents;
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
 pub use self::shard_manager_monitor::{ShardManagerError, ShardManagerMonitor};
 pub use self::shard_messenger::ShardMessenger;

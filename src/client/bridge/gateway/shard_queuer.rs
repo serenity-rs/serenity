@@ -17,7 +17,6 @@ use tracing::{debug, info, instrument, warn};
 use typemap_rev::TypeMap;
 
 use super::{
-    GatewayIntents,
     ShardClientMessage,
     ShardId,
     ShardManagerMessage,
@@ -37,6 +36,7 @@ use crate::gateway::{InterMessage, Shard};
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::CacheAndHttp;
+use crate::model::gateway::GatewayIntents;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 
