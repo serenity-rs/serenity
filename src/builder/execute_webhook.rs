@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::http::AttachmentType;
+use crate::model::channel::AttachmentType;
 use crate::json::Value;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.

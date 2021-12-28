@@ -6,11 +6,13 @@ use serde::{Serialize, Serializer};
 use simd_json::ValueAccess;
 
 use super::prelude::*;
+#[cfg(feature = "http")]
 use crate::builder::{
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
+#[cfg(feature = "http")]
 use crate::http::Http;
 use crate::json::{self, from_number, from_value, Value};
 use crate::model::interactions::InteractionType;
@@ -49,6 +51,7 @@ pub struct MessageComponentInteraction {
     pub version: u8,
 }
 
+#[cfg(feature = "http")]
 impl MessageComponentInteraction {
     /// Gets the interaction response.
     ///

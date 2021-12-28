@@ -9,6 +9,7 @@ mod message;
 mod partial_channel;
 mod private_channel;
 mod reaction;
+mod attachment_type;
 
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -18,6 +19,7 @@ use serde::de::{Error as DeError, Unexpected};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 pub use self::attachment::*;
+pub use self::attachment_type::*;
 pub use self::channel_category::*;
 pub use self::channel_id::*;
 pub use self::embed::*;

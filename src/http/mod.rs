@@ -32,16 +32,10 @@ pub mod routing;
 pub mod typing;
 mod utils;
 
-use std::{
-    borrow::Cow,
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::sync::Arc;
 
-use bytes::buf::Buf;
+use reqwest::Method;
 pub use reqwest::StatusCode;
-use reqwest::{Client, Method, Url};
-use tokio::{fs::File, io::AsyncReadExt};
 
 pub use self::client::*;
 pub use self::error::Error as HttpError;
@@ -51,7 +45,6 @@ pub use self::typing::*;
 use crate::cache::Cache;
 #[cfg(feature = "client")]
 use crate::client::Context;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "client")]
 use crate::CacheAndHttp;
@@ -188,114 +181,6 @@ impl LightMethod {
     }
 }
 
-/// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
-///
-/// [`send_files`]: crate::model::id::ChannelId::send_files
-#[derive(Clone, Debug)]
-#[non_exhaustive]
-pub enum AttachmentType<'a> {
-    /// Indicates that the [`AttachmentType`] is a byte slice with a filename.
-    Bytes { data: Cow<'a, [u8]>, filename: String },
-    /// Indicates that the [`AttachmentType`] is a [`File`]
-    File { file: &'a File, filename: String },
-    /// Indicates that the [`AttachmentType`] is a [`Path`]
-    Path(&'a Path),
-    /// Indicates that the [`AttachmentType`] is an image URL.
-    Image(Url),
-}
-
-impl<'a> AttachmentType<'a> {
-    pub(crate) async fn data(&self, client: &Client) -> Result<Vec<u8>> {
-        let data = match self {
-            AttachmentType::Bytes {
-                data, ..
-            } => data.clone().into_owned(),
-            AttachmentType::File {
-                file, ..
-            } => {
-                let mut buf = Vec::new();
-                file.try_clone().await?.read_to_end(&mut buf).await?;
-                buf
-            },
-            AttachmentType::Path(path) => {
-                let mut file = File::open(path).await?;
-                let mut buf = Vec::new();
-                file.read_to_end(&mut buf).await?;
-                buf
-            },
-            AttachmentType::Image(url) => {
-                let response = client.get(url.clone()).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = Vec::with_capacity(bytes.len());
-                bytes.copy_to_slice(&mut picture);
-                picture
-            },
-        };
-        Ok(data)
-    }
-
-    pub(crate) fn filename(&self) -> Result<Option<String>> {
-        match self {
-            AttachmentType::Bytes {
-                filename, ..
-            }
-            | AttachmentType::File {
-                filename, ..
-            } => Ok(Some(filename.to_string())),
-            AttachmentType::Path(path) => {
-                Ok(path.file_name().map(|filename| filename.to_string_lossy().to_string()))
-            },
-            AttachmentType::Image(url) => {
-                match url.path_segments().and_then(|segments| segments.last()) {
-                    Some(filename) => Ok(Some(filename.to_string())),
-                    None => Err(Error::Url(url.to_string())),
-                }
-            },
-        }
-    }
-}
-
-impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
-    fn from(params: (&'a [u8], &str)) -> AttachmentType<'a> {
-        AttachmentType::Bytes {
-            data: Cow::Borrowed(params.0),
-            filename: params.1.to_string(),
-        }
-    }
-}
-
-impl<'a> From<&'a str> for AttachmentType<'a> {
-    /// Constructs an [`AttachmentType`] from a string.
-    /// This string may refer to the path of a file on disk, or the http url to an image on the internet.
-    fn from(s: &'a str) -> AttachmentType<'_> {
-        match Url::parse(s) {
-            Ok(url) => AttachmentType::Image(url),
-            Err(_) => AttachmentType::Path(Path::new(s)),
-        }
-    }
-}
-
-impl<'a> From<&'a Path> for AttachmentType<'a> {
-    fn from(path: &'a Path) -> AttachmentType<'_> {
-        AttachmentType::Path(path)
-    }
-}
-
-impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
-    fn from(pathbuf: &'a PathBuf) -> AttachmentType<'_> {
-        AttachmentType::Path(pathbuf.as_path())
-    }
-}
-
-impl<'a> From<(&'a File, &str)> for AttachmentType<'a> {
-    fn from(f: (&'a File, &str)) -> AttachmentType<'a> {
-        AttachmentType::File {
-            file: f.0,
-            filename: f.1.to_string(),
-        }
-    }
-}
-
 /// Representation of the method of a query to send for the [`get_guilds`]
 /// function.
 ///
@@ -306,31 +191,4 @@ pub enum GuildPagination {
     After(GuildId),
     /// The Id to get the guilds before.
     Before(GuildId),
-}
-
-#[cfg(test)]
-mod test {
-    use std::path::Path;
-
-    use super::AttachmentType;
-
-    #[test]
-    fn test_attachment_type() {
-        assert!(matches!(
-            AttachmentType::from(Path::new("./dogs/corgis/kona.png")),
-            AttachmentType::Path(_)
-        ));
-        assert!(matches!(
-            AttachmentType::from(Path::new("./cats/copycat.png")),
-            AttachmentType::Path(_)
-        ));
-        assert!(matches!(
-            AttachmentType::from("./mascots/crabs/ferris.png"),
-            AttachmentType::Path(_)
-        ));
-        assert!(matches!(
-            AttachmentType::from("https://test.url/test.jpg"),
-            AttachmentType::Image(_)
-        ))
-    }
 }

@@ -7,7 +7,7 @@ use chrono::{DateTime, Utc};
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "model")]
-use crate::http::AttachmentType;
+use crate::model::channel::AttachmentType;
 #[cfg(feature = "http")]
 use crate::http::{Http, Typing};
 use crate::model::prelude::*;

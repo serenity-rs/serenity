@@ -4,7 +4,9 @@ use serde::{Deserialize, Deserializer};
 use simd_json::ValueAccess;
 
 use super::prelude::*;
+#[cfg(feature = "http")]
 use crate::builder::CreateAutocompleteResponse;
+#[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::StdResult;
 use crate::json::{self, from_number, json, JsonMap, Value};
@@ -46,6 +48,7 @@ pub struct AutocompleteInteraction {
     pub version: u8,
 }
 
+#[cfg(feature = "http")]
 impl AutocompleteInteraction {
     /// Creates a response to an autocomplete interaction.
     ///
