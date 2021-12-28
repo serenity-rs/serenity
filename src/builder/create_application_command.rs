@@ -3,7 +3,7 @@ use std::collections::HashMap;
 #[cfg(feature = "simd-json")]
 use simd_json::Mutable;
 
-use crate::json::{self, from_number, json, Value};
+use crate::json::{self, from_number, json, ToNumber, Value};
 use crate::model::channel::ChannelType;
 use crate::model::interactions::application_command::{
     ApplicationCommandOptionType,
@@ -155,15 +155,15 @@ impl CreateApplicationCommandOption {
     }
 
     /// Sets the minimum permitted value for this integer option
-    pub fn min_int_value(&mut self, value: i32) -> &mut Self {
-        self.0.insert("min_value", from_number(value));
+    pub fn min_int_value(&mut self, value: impl ToNumber) -> &mut Self {
+        self.0.insert("min_value", value.to_number());
 
         self
     }
 
     /// Sets the maximum permitted value for this integer option
-    pub fn max_int_value(&mut self, value: i32) -> &mut Self {
-        self.0.insert("max_value", from_number(value));
+    pub fn max_int_value(&mut self, value: impl ToNumber) -> &mut Self {
+        self.0.insert("max_value", value.to_number());
 
         self
     }
