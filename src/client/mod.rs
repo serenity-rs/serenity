@@ -239,6 +239,7 @@ impl<'a> ClientBuilder<'a> {
     pub fn get_cache_settings(&self) -> &CacheSettings {
         // unwrap() is ok because cache_settings will only ever be None in the middle of being
         // .await'ed
+        #[allow(clippy::unwrap_used)]
         self.cache_settings.as_ref().unwrap()
     }
 
