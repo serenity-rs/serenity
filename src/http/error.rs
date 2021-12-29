@@ -4,13 +4,11 @@ use std::{
 };
 
 use reqwest::{header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url};
-use serde::de::{Deserialize, Deserializer, Error as DeError};
 use url::ParseError as UrlError;
 
 use crate::http::utils::deserialize_errors;
-use crate::internal::prelude::{JsonMap, StdResult};
 
-#[derive(Clone, Serialize, PartialEq, Debug)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Debug)]
 #[non_exhaustive]
 pub struct DiscordJsonError {
     /// The error code.
@@ -19,38 +17,8 @@ pub struct DiscordJsonError {
     pub message: String,
     /// The full explained errors with their path in the request
     /// body.
+    #[serde(default, deserialize_with = "deserialize_errors")]
     pub errors: Vec<DiscordJsonSingleError>,
-}
-
-impl<'de> Deserialize<'de> for DiscordJsonError {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let code = map
-            .remove("code")
-            .ok_or_else(|| DeError::custom("expected code"))
-            .and_then(isize::deserialize)
-            .map_err(DeError::custom)?;
-
-        let message = map
-            .remove("message")
-            .ok_or_else(|| DeError::custom("expected message"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
-
-        let errors = map
-            .remove("errors")
-            .map(deserialize_errors)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        Ok(Self {
-            code,
-            message,
-            errors,
-        })
-    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
