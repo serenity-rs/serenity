@@ -5,12 +5,13 @@ use async_trait::async_trait;
 use tracing::instrument;
 use tracing::{debug, trace};
 
-use crate::client::bridge::gateway::{ChunkGuildFilter, GatewayIntents};
+use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, OpCode};
 use crate::gateway::{CurrentPresence, WsStream};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
 use crate::json::json;
+use crate::model::gateway::GatewayIntents;
 use crate::model::id::GuildId;
 
 #[async_trait]
