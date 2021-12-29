@@ -4,9 +4,9 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use super::{EventHandler, RawEventHandler};
-use crate::client::bridge::gateway::GatewayIntents;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::model::gateway::GatewayIntents;
 
 /// A builder to extra things for altering the [`Client`].
 ///
