@@ -1,10 +1,10 @@
 use std::borrow::Cow;
+#[cfg(not(feature = "tokio"))]
+use std::fs::File;
 use std::path::{Path, PathBuf};
 
 #[cfg(feature = "tokio")]
 use tokio::fs::File;
-#[cfg(not(feature = "tokio"))]
-use std::fs::File;
 
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///
