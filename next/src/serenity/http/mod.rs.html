@@ -276,6 +276,66 @@
 <span id="274">274</span>
 <span id="275">275</span>
 <span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The HTTP module which provides functions for performing requests to</span>
 <span class="doccomment">//! endpoints in Discord&#39;s API.</span>
 <span class="doccomment">//!</span>
@@ -316,9 +376,10 @@
     <span class="ident">sync::Arc</span>,
 };
 
-<span class="kw">use</span> <span class="ident">reqwest::Method</span>;
+<span class="kw">use</span> <span class="ident">bytes::buf::Buf</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reqwest::StatusCode</span>;
-<span class="kw">use</span> <span class="ident">tokio::fs::File</span>;
+<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">Method</span>, <span class="ident">Url</span>};
+<span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">fs::File</span>, <span class="ident">io::AsyncReadExt</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::client</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">HttpError</span>;
@@ -328,6 +389,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
@@ -477,7 +539,58 @@
     <span class="doccomment">/// Indicates that the [`AttachmentType`] is a [`Path`]</span>
     <span class="ident">Path</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Path</span>),
     <span class="doccomment">/// Indicates that the [`AttachmentType`] is an image URL.</span>
-    <span class="ident">Image</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
+    <span class="ident">Image</span>(<span class="ident">Url</span>),
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Client</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">AttachmentType::Bytes</span> {
+                <span class="ident">data</span>, ..
+            } =&gt; <span class="ident">data</span>.<span class="ident">clone</span>().<span class="ident">into_owned</span>(),
+            <span class="ident">AttachmentType::File</span> {
+                <span class="ident">file</span>, ..
+            } =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+                <span class="ident">file</span>.<span class="ident">try_clone</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">buf</span>
+            },
+            <span class="ident">AttachmentType::Path</span>(<span class="ident">path</span>) =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+                <span class="ident">file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">buf</span>
+            },
+            <span class="ident">AttachmentType::Image</span>(<span class="ident">url</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="ident">send</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">bytes</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">picture</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">bytes</span>.<span class="ident">len</span>());
+                <span class="ident">bytes</span>.<span class="ident">copy_to_slice</span>(<span class="kw-2">&amp;mut</span> <span class="ident">picture</span>);
+                <span class="ident">picture</span>
+            },
+        };
+        <span class="prelude-val">Ok</span>(<span class="ident">data</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">filename</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">AttachmentType::Bytes</span> {
+                <span class="ident">filename</span>, ..
+            }
+            <span class="op">|</span> <span class="ident">AttachmentType::File</span> {
+                <span class="ident">filename</span>, ..
+            } =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">filename</span>.<span class="ident">to_string</span>())),
+            <span class="ident">AttachmentType::Path</span>(<span class="ident">path</span>) =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="ident">path</span>.<span class="ident">file_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">filename</span><span class="op">|</span> <span class="ident">filename</span>.<span class="ident">to_string_lossy</span>().<span class="ident">to_string</span>()))
+            },
+            <span class="ident">AttachmentType::Image</span>(<span class="ident">url</span>) =&gt; {
+                <span class="kw">match</span> <span class="ident">url</span>.<span class="ident">path_segments</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">segments</span><span class="op">|</span> <span class="ident">segments</span>.<span class="ident">last</span>()) {
+                    <span class="prelude-val">Some</span>(<span class="ident">filename</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">filename</span>.<span class="ident">to_string</span>())),
+                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>())),
+                }
+            },
+        }
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -493,10 +606,9 @@
     <span class="doccomment">/// Constructs an [`AttachmentType`] from a string.</span>
     <span class="doccomment">/// This string may refer to the path of a file on disk, or the http url to an image on the internet.</span>
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&quot;http://&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&quot;https://&quot;</span>) {
-            <span class="ident">AttachmentType::Image</span>(<span class="ident">s</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">AttachmentType::Path</span>(<span class="ident">Path::new</span>(<span class="ident">s</span>))
+        <span class="kw">match</span> <span class="ident">Url::parse</span>(<span class="ident">s</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">url</span>) =&gt; <span class="ident">AttachmentType::Image</span>(<span class="ident">url</span>),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">AttachmentType::Path</span>(<span class="ident">Path::new</span>(<span class="ident">s</span>)),
         }
     }
 }
@@ -550,8 +662,16 @@
             <span class="ident">AttachmentType::from</span>(<span class="ident">Path::new</span>(<span class="string">&quot;./cats/copycat.png&quot;</span>)),
             <span class="ident">AttachmentType::Path</span>(<span class="kw">_</span>)
         ));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(
+            <span class="ident">AttachmentType::from</span>(<span class="string">&quot;./mascots/crabs/ferris.png&quot;</span>),
+            <span class="ident">AttachmentType::Path</span>(<span class="kw">_</span>)
+        ));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(
+            <span class="ident">AttachmentType::from</span>(<span class="string">&quot;https://test.url/test.jpg&quot;</span>),
+            <span class="ident">AttachmentType::Image</span>(<span class="kw">_</span>)
+        ))
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (f8abed9ed 2021-12-26)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (83b15bfe1 2021-12-28)" ></div>
 </body></html>
