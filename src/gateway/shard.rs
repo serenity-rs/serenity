@@ -20,7 +20,7 @@ use super::{
     WebSocketGatewayClientExt,
     WsStream,
 };
-use crate::client::bridge::gateway::{ChunkGuildFilter, GatewayIntents};
+use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, close_codes};
 use crate::internal::prelude::*;
 #[cfg(feature = "native_tls_backend_marker")]
@@ -29,7 +29,7 @@ use crate::internal::ws_impl::create_native_tls_client;
 use crate::internal::ws_impl::create_rustls_client;
 use crate::model::{
     event::{Event, GatewayEvent},
-    gateway::Activity,
+    gateway::{Activity, GatewayIntents},
     id::GuildId,
     user::OnlineStatus,
 };
@@ -114,7 +114,7 @@ impl Shard {
     /// use tokio::sync::Mutex;
     /// #
     /// # use serenity::http::Http;
-    /// # use serenity::client::bridge::gateway::GatewayIntents;
+    /// # use serenity::model::gateway::GatewayIntents;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Arc::new(Http::default());
@@ -295,7 +295,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use serenity::gateway::Shard;
     /// # use serenity::prelude::Mutex;
-    /// # use serenity::client::bridge::gateway::GatewayIntents;
+    /// # use serenity::model::gateway::GatewayIntents;
     /// # use std::sync::Arc;
     /// #
     /// # #[cfg(feature = "model")]
@@ -662,7 +662,8 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
+    /// # use serenity::model::gateway::GatewayIntents;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
@@ -684,7 +685,8 @@ impl Shard {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
+    /// # use serenity::model::gateway::GatewayIntents;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
