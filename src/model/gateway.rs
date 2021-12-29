@@ -2,8 +2,8 @@
 
 use bitflags::{__impl_bitflags, bitflags};
 use serde::{
-    de::{Error as DeError, Deserialize, Deserializer},
-    ser::{Serialize, SerializeStruct, Serializer}
+    de::{Deserialize, Deserializer},
+    ser::{Serialize, Serializer},
 };
 use url::Url;
 
@@ -537,7 +537,6 @@ pub struct ActivityTimestamps {
     pub start: Option<u64>,
 }
 
-
 /// [Gateway Intents] will limit the events your bot will receive via the gateway.
 /// By default, all intents except [Privileged Intents] are selected.
 ///
@@ -706,8 +705,8 @@ impl<'de> Deserialize<'de> for GatewayIntents {
 
 impl Serialize for GatewayIntents {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where
-            S: Serializer,
+    where
+        S: Serializer,
     {
         serializer.serialize_u64(self.bits())
     }

@@ -11,8 +11,8 @@ use crate::gateway::{CurrentPresence, WsStream};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
 use crate::json::json;
-use crate::model::id::GuildId;
 use crate::model::gateway::GatewayIntents;
+use crate::model::id::GuildId;
 
 #[async_trait]
 pub trait WebSocketGatewayClientExt {

@@ -25,8 +25,8 @@ use crate::client::{EventHandler, RawEventHandler};
 use crate::framework::Framework;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::CacheAndHttp;
 use crate::model::gateway::GatewayIntents;
+use crate::CacheAndHttp;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -53,11 +53,11 @@ use crate::model::gateway::GatewayIntents;
 /// use std::env;
 /// use std::sync::Arc;
 ///
-/// use serenity::model::gateway::GatewayIntents;
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// use serenity::framework::{Framework, StandardFramework};
 /// use serenity::http::Http;
+/// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
 /// use serenity::CacheAndHttp;
 /// use tokio::sync::{Mutex, RwLock};

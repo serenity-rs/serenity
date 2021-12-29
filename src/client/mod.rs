@@ -49,8 +49,6 @@ use self::bridge::gateway::{
     ShardManagerMonitor,
     ShardManagerOptions,
 };
-#[cfg(feature = "gateway")]
-use crate::model::gateway::GatewayIntents;
 #[cfg(feature = "voice")]
 use self::bridge::voice::VoiceGatewayManager;
 pub use self::{context::Context, error::Error as ClientError};
@@ -69,6 +67,8 @@ use crate::cache::Settings as CacheSettings;
 use crate::framework::Framework;
 use crate::http::Http;
 use crate::internal::prelude::*;
+#[cfg(feature = "gateway")]
+use crate::model::gateway::GatewayIntents;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::id::ApplicationId;
 use crate::model::id::UserId;
