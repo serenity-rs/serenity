@@ -1,6 +1,7 @@
 use std::borrow::Cow;
-use tokio::fs::File;
 use std::path::{Path, PathBuf};
+
+use tokio::fs::File;
 
 /// Enum that allows a user to pass a [`Path`] or a [`File`] type to [`send_files`]
 ///

@@ -1,6 +1,7 @@
 //! Models relating to channels and types within channels.
 
 mod attachment;
+mod attachment_type;
 mod channel_category;
 mod channel_id;
 mod embed;
@@ -9,7 +10,6 @@ mod message;
 mod partial_channel;
 mod private_channel;
 mod reaction;
-mod attachment_type;
 
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
