@@ -42,7 +42,9 @@ use crate::{
     },
     model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
 };
-use crate::{json::prelude::*, model::prelude::*};
+#[cfg(feature = "model")]
+use crate::json::prelude::*;
+use crate::model::prelude::*;
 
 #[cfg(feature = "model")]
 impl GuildId {

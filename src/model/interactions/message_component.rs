@@ -14,7 +14,9 @@ use crate::builder::{
 };
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::json::{self, from_number, from_value, Value};
+#[cfg(feature = "http")]
+use crate::json;
+use crate::json::{from_number, from_value, Value};
 use crate::model::interactions::InteractionType;
 
 /// An interaction triggered by a message component.
