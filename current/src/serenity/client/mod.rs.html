@@ -1037,6 +1037,55 @@
 <span id="1035">1035</span>
 <span id="1036">1036</span>
 <span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1124,6 +1173,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="comment">// Option in order to take() it out in the Future impl</span>
     <span class="ident">cache_settings</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CacheSettings</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
     <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -1205,6 +1255,12 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">application_id</span>
+    }
+
     <span class="doccomment">/// Sets the entire [`TypeMap`] that will be available in [`Context`]s.</span>
     <span class="doccomment">/// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]</span>
     <span class="doccomment">/// can be used to insert one type at a time.</span>
@@ -1214,19 +1270,17 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Gets the type map, if already initialized. See [`Self::type_map`] for more info.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TypeMap</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_ref</span>()
+    }
+
     <span class="doccomment">/// Insert a single `value` into the internal [`TypeMap`] that will</span>
     <span class="doccomment">/// be available in [`Context::data`].</span>
     <span class="doccomment">/// This method can be called multiple times in order to populate the</span>
     <span class="doccomment">/// [`TypeMap`] with `value`s.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_map_insert</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">TypeMapKey</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">data</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span> {
-            <span class="ident">data</span>.<span class="ident">insert</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>);
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">type_map</span> <span class="op">=</span> <span class="ident">TypeMap::new</span>();
-            <span class="ident">type_map</span>.<span class="ident">insert</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>);
-
-            <span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">type_map</span>);
-        }
+        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">TypeMap::new</span>).<span class="ident">insert</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>);
 
         <span class="self">self</span>
     }
@@ -1245,6 +1299,13 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Gets the cache update timeout, if already initialized. See [`Self::cache_update_timeout`]</span>
+    <span class="doccomment">/// for more info.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_cache_update_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">timeout</span>
+    }
+
     <span class="doccomment">/// Sets the settings of the cache.</span>
     <span class="doccomment">/// Refer to [`Settings`] for more information.</span>
     <span class="doccomment">///</span>
@@ -1259,6 +1320,15 @@
         }
 
         <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Gets the cache settings. See [`Self::cache_settings`] for more info.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_cache_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">CacheSettings</span> {
+        <span class="comment">// unwrap() is ok because cache_settings will only ever be None in the middle of being</span>
+        <span class="comment">// .await&#39;ed</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
+        <span class="self">self</span>.<span class="ident">cache_settings</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// Sets the command framework to be used. It will receive messages sent</span>
@@ -1290,6 +1360,12 @@
         <span class="self">self</span>.<span class="ident">framework</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">framework</span>);
 
         <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Gets the framework, if already initialized. See [`Self::framework`] for more info.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_framework</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">framework</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Sets the voice gateway handler to be used. It will receive voice events sent</span>
@@ -1325,6 +1401,12 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Gets the voice manager, if already initialized. See [`Self::voice_manager`] for more info.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_voice_manager</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">clone</span>()
+    }
+
     <span class="doccomment">/// Sets all intents directly, replacing already set intents.</span>
     <span class="doccomment">/// Intents are a bitflag, you can combine them by performing the</span>
     <span class="doccomment">/// `|`-operator.</span>
@@ -1356,11 +1438,21 @@
         <span class="self">self</span>
     }
 
+    <span class="doccomment">/// Gets the intents. See [`Self::intents`] for more info.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_intents</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GatewayIntents</span> {
+        <span class="self">self</span>.<span class="ident">intents</span>
+    }
+
     <span class="doccomment">/// Sets an event handler with multiple methods for each possible event.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_handler</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">EventHandler</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">event_handler</span>: <span class="ident">H</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">event_handler</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">event_handler</span>));
 
         <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Gets the event handler, if already initialized. See [`Self::event_handler`] for more info.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_event_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Sets an event handler with a single method where all received gateway</span>
@@ -1369,6 +1461,12 @@
         <span class="self">self</span>.<span class="ident">raw_event_handler</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">raw_event_handler</span>));
 
         <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Gets the raw event handler, if already initialized. See [`Self::raw_event_handler`] for more</span>
+    <span class="doccomment">/// info.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_raw_event_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">clone</span>()
     }
 }
 
@@ -2075,5 +2173,5 @@
     })
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (f8abed9ed 2021-12-26)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (83b15bfe1 2021-12-28)" ></div>
 </body></html>
