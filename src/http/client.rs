@@ -807,16 +807,13 @@ impl Http {
     /// **Note**: Requires the [Manage Emojis and Stickers] permission.
     ///
     /// [Manage Emojis and Stickers]: Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn create_sticker<'a, T>(
+    pub async fn create_sticker<'a>(
         &self,
         guild_id: u64,
         map: JsonMap,
-        file: T,
+        file: impl Into<AttachmentType<'a>>,
         audit_log_reason: Option<&str>,
-    ) -> Result<Sticker>
-    where
-        T: Into<AttachmentType<'a>>,
-    {
+    ) -> Result<Sticker> {
         self.fire(Request {
             body: None,
             multipart: Some(Multipart {
