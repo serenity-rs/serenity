@@ -30,7 +30,7 @@ pub mod ratelimiting;
 pub mod request;
 pub mod routing;
 pub mod typing;
-pub mod utils;
+mod utils;
 
 use std::{
     borrow::Cow,
