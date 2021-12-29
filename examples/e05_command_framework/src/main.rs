@@ -18,7 +18,7 @@ use std::{
 use serenity::prelude::*;
 use serenity::{
     async_trait,
-    client::bridge::gateway::{GatewayIntents, ShardId, ShardManager},
+    client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
         buckets::{LimitedFor, RevertBucket},
         help_commands,
@@ -35,7 +35,7 @@ use serenity::{
     http::Http,
     model::{
         channel::{Channel, Message},
-        gateway::Ready,
+        gateway::{GatewayIntents, Ready},
         id::UserId,
         permissions::Permissions,
     },
@@ -308,7 +308,7 @@ async fn main() {
     let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
-        // For this example to run properly, the "Presence Intent" and "Server Members Intent" 
+        // For this example to run properly, the "Presence Intent" and "Server Members Intent"
         // options need to be enabled.
         // These are needed so the `required_permissions` macro works on the commands that need to
         // use it.

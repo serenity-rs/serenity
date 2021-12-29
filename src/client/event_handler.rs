@@ -539,7 +539,7 @@ pub trait EventHandler: Send + Sync {
     /// Provides the added/removed members, the approximate member count of members in the thread,
     /// the thread Id and its guild Id.
     ///
-    /// [`GatewayIntents::GUILDS`]: crate::client::bridge::gateway::GatewayIntents::GUILDS
+    /// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS
     async fn thread_members_update(
         &self,
         _ctx: Context,

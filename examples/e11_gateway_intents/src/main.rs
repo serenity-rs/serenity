@@ -2,10 +2,9 @@ use std::env;
 
 use serenity::{
     async_trait,
-    client::bridge::gateway::GatewayIntents,
     model::{
         channel::Message,
-        gateway::{Presence, Ready},
+        gateway::{GatewayIntents, Presence, Ready},
     },
     prelude::*,
 };

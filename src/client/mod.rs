@@ -44,7 +44,6 @@ use typemap_rev::{TypeMap, TypeMapKey};
 
 #[cfg(feature = "gateway")]
 use self::bridge::gateway::{
-    GatewayIntents,
     ShardManager,
     ShardManagerError,
     ShardManagerMonitor,
@@ -68,6 +67,8 @@ use crate::cache::Settings as CacheSettings;
 use crate::framework::Framework;
 use crate::http::Http;
 use crate::internal::prelude::*;
+#[cfg(feature = "gateway")]
+use crate::model::gateway::GatewayIntents;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::id::ApplicationId;
 use crate::model::id::UserId;
@@ -309,8 +310,8 @@ impl ClientBuilder {
     /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
-    /// [`GatewayIntents::GUILD_PRESENCES`]: crate::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES
-    /// [`GatewayIntents::GUILD_MEMBERS`]: crate::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS
+    /// [`GatewayIntents::GUILD_PRESENCES`]: crate::model::gateway::GatewayIntents::GUILD_PRESENCES
+    /// [`GatewayIntents::GUILD_MEMBERS`]: crate::model::gateway::GatewayIntents::GUILD_MEMBERS
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
         self.intents = intents;
 

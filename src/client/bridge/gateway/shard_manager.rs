@@ -11,7 +11,6 @@ use tracing::{info, instrument, warn};
 use typemap_rev::TypeMap;
 
 use super::{
-    GatewayIntents,
     ShardId,
     ShardManagerMessage,
     ShardManagerMonitor,
@@ -26,6 +25,7 @@ use crate::client::{EventHandler, RawEventHandler};
 use crate::framework::Framework;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
+use crate::model::gateway::GatewayIntents;
 use crate::CacheAndHttp;
 
 /// A manager for handling the status of shards by starting them, restarting
@@ -53,10 +53,11 @@ use crate::CacheAndHttp;
 /// use std::env;
 /// use std::sync::Arc;
 ///
-/// use serenity::client::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerOptions};
+/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// use serenity::framework::{Framework, StandardFramework};
 /// use serenity::http::Http;
+/// use serenity::model::gateway::GatewayIntents;
 /// use serenity::prelude::*;
 /// use serenity::CacheAndHttp;
 /// use tokio::sync::{Mutex, RwLock};
