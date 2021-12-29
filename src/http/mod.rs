@@ -38,9 +38,10 @@ use std::{
     sync::Arc,
 };
 
-use reqwest::Method;
+use bytes::buf::Buf;
 pub use reqwest::StatusCode;
-use tokio::fs::File;
+use reqwest::{Client, Method, Url};
+use tokio::{fs::File, io::AsyncReadExt};
 
 pub use self::client::*;
 pub use self::error::Error as HttpError;
@@ -50,6 +51,7 @@ pub use self::typing::*;
 use crate::cache::Cache;
 #[cfg(feature = "client")]
 use crate::client::Context;
+use crate::internal::prelude::*;
 use crate::model::prelude::*;
 #[cfg(feature = "client")]
 use crate::CacheAndHttp;
@@ -199,7 +201,58 @@ pub enum AttachmentType<'a> {
     /// Indicates that the [`AttachmentType`] is a [`Path`]
     Path(&'a Path),
     /// Indicates that the [`AttachmentType`] is an image URL.
-    Image(&'a str),
+    Image(Url),
+}
+
+impl<'a> AttachmentType<'a> {
+    pub(crate) async fn data(&self, client: &Client) -> Result<Vec<u8>> {
+        let data = match self {
+            AttachmentType::Bytes {
+                data, ..
+            } => data.clone().into_owned(),
+            AttachmentType::File {
+                file, ..
+            } => {
+                let mut buf = Vec::new();
+                file.try_clone().await?.read_to_end(&mut buf).await?;
+                buf
+            },
+            AttachmentType::Path(path) => {
+                let mut file = File::open(path).await?;
+                let mut buf = Vec::new();
+                file.read_to_end(&mut buf).await?;
+                buf
+            },
+            AttachmentType::Image(url) => {
+                let response = client.get(url.clone()).send().await?;
+                let mut bytes = response.bytes().await?;
+                let mut picture: Vec<u8> = Vec::with_capacity(bytes.len());
+                bytes.copy_to_slice(&mut picture);
+                picture
+            },
+        };
+        Ok(data)
+    }
+
+    pub(crate) fn filename(&self) -> Result<Option<String>> {
+        match self {
+            AttachmentType::Bytes {
+                filename, ..
+            }
+            | AttachmentType::File {
+                filename, ..
+            } => Ok(Some(filename.to_string())),
+            AttachmentType::Path(path) => {
+                Ok(path.file_name().map(|filename| filename.to_string_lossy().to_string()))
+            },
+            AttachmentType::Image(url) => {
+                match url.path_segments().and_then(|segments| segments.last()) {
+                    Some(filename) => Ok(Some(filename.to_string())),
+                    None => Err(Error::Url(url.to_string())),
+                }
+            },
+        }
+    }
 }
 
 impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
@@ -215,10 +268,9 @@ impl<'a> From<&'a str> for AttachmentType<'a> {
     /// Constructs an [`AttachmentType`] from a string.
     /// This string may refer to the path of a file on disk, or the http url to an image on the internet.
     fn from(s: &'a str) -> AttachmentType<'_> {
-        if s.starts_with("http://") || s.starts_with("https://") {
-            AttachmentType::Image(s)
-        } else {
-            AttachmentType::Path(Path::new(s))
+        match Url::parse(s) {
+            Ok(url) => AttachmentType::Image(url),
+            Err(_) => AttachmentType::Path(Path::new(s)),
         }
     }
 }
@@ -272,5 +324,13 @@ mod test {
             AttachmentType::from(Path::new("./cats/copycat.png")),
             AttachmentType::Path(_)
         ));
+        assert!(matches!(
+            AttachmentType::from("./mascots/crabs/ferris.png"),
+            AttachmentType::Path(_)
+        ));
+        assert!(matches!(
+            AttachmentType::from("https://test.url/test.jpg"),
+            AttachmentType::Image(_)
+        ))
     }
 }
