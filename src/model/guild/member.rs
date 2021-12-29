@@ -10,7 +10,7 @@ use serde::{Serialize, Serializer};
 
 #[cfg(feature = "model")]
 use crate::builder::EditMember;
-#[cfg(all(feature = "cache"))]
+#[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
