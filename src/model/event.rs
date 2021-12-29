@@ -1943,7 +1943,7 @@ pub enum Event {
     /// Anyone is added to or removed from a thread. If the current user does not have the [`GatewayIntents::GUILDS`],
     /// then this event will only be sent if the current user was added to or removed from the thread.
     ///
-    /// [`GatewayIntents::GUILDS`]: crate::client::bridge::gateway::GatewayIntents::GUILDS
+    /// [`GatewayIntents::GUILDS`]: crate::model::gateway::GatewayIntents::GUILDS
     ThreadMembersUpdate(ThreadMembersUpdateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
