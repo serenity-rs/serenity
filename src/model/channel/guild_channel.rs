@@ -1183,7 +1183,6 @@ impl GuildChannel {
         avatar: impl Into<AttachmentType<'a>>,
     ) -> Result<Webhook> {
         let name = name.to_string();
-        let avatar = avatar.into();
 
         if name.len() < 2 {
             return Err(Error::Model(ModelError::NameTooShort));

@@ -4,13 +4,7 @@ use std::fmt::Write as FmtWrite;
 use std::sync::Arc;
 
 #[cfg(feature = "model")]
-use bytes::buf::Buf;
-#[cfg(feature = "model")]
 use futures::stream::Stream;
-#[cfg(feature = "model")]
-use reqwest::Url;
-#[cfg(feature = "model")]
-use tokio::{fs::File, io::AsyncReadExt};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -892,47 +886,14 @@ impl ChannelId {
         name: impl std::fmt::Display,
         avatar: impl Into<AttachmentType<'a>>,
     ) -> Result<Webhook> {
-        let name = name.to_string();
-        let avatar = avatar.into();
-
-        let avatar = match avatar {
-            AttachmentType::Bytes {
-                data,
-                filename: _,
-            } => "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned()),
-            AttachmentType::File {
-                file,
-                filename: _,
-            } => {
-                let mut buf = Vec::new();
-                file.try_clone().await?.read_to_end(&mut buf).await?;
-
-                "data:image/png;base64,".to_string() + &base64::encode(&buf)
-            },
-            AttachmentType::Path(path) => {
-                let mut file = File::open(path).await?;
-                let mut buf = vec![];
-                file.read_to_end(&mut buf).await?;
-
-                "data:image/png;base64,".to_string() + &base64::encode(&buf)
-            },
-            AttachmentType::Image(url) => {
-                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
-                let response = http.as_ref().client.get(url).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = vec![0; bytes.len()];
-                bytes.copy_to_slice(&mut picture[..]);
-
-                "data:image/png;base64,".to_string() + &base64::encode(&picture)
-            },
-        };
-
-        let map = crate::json::json!({
-            "name": name,
-            "avatar": avatar
+        let http = http.as_ref();
+        let data = avatar.into().data(&http.client).await?;
+        let map = json!({
+            "name": name.to_string(),
+            "avatar": format!("data:image/png;base64,{}", base64::encode(data)),
         });
 
-        http.as_ref().create_webhook(self.0, &map, None).await
+        http.create_webhook(self.0, &map, None).await
     }
 
     /// Returns a future that will await one message sent in this channel.
