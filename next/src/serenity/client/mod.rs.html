@@ -1037,6 +1037,7 @@
 <span id="1035">1035</span>
 <span id="1036">1036</span>
 <span id="1037">1037</span>
+<span id="1038">1038</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1083,7 +1084,6 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::bridge::gateway</span>::{
-    <span class="ident">GatewayIntents</span>,
     <span class="ident">ShardManager</span>,
     <span class="ident">ShardManagerError</span>,
     <span class="ident">ShardManagerMonitor</span>,
@@ -1107,6 +1107,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::framework::Framework</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::GatewayIntents</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ApplicationId</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
@@ -1348,8 +1350,8 @@
     <span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
     <span class="doccomment">/// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
     <span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
-    <span class="doccomment">/// [`GatewayIntents::GUILD_PRESENCES`]: crate::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES</span>
-    <span class="doccomment">/// [`GatewayIntents::GUILD_MEMBERS`]: crate::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS</span>
+    <span class="doccomment">/// [`GatewayIntents::GUILD_PRESENCES`]: crate::model::gateway::GatewayIntents::GUILD_PRESENCES</span>
+    <span class="doccomment">/// [`GatewayIntents::GUILD_MEMBERS`]: crate::model::gateway::GatewayIntents::GUILD_MEMBERS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intents</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">intents</span> <span class="op">=</span> <span class="ident">intents</span>;
 

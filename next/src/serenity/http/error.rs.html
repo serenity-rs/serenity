@@ -218,51 +218,17 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>},
 };
 
 <span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">header::InvalidHeaderValue</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>, <span class="ident">Url</span>};
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">url::ParseError</span> <span class="kw">as</span> <span class="ident">UrlError</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::utils::deserialize_errors</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::{<span class="ident">JsonMap</span>, <span class="ident">StdResult</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiscordJsonError</span> {
     <span class="doccomment">/// The error code.</span>
@@ -271,38 +237,8 @@
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The full explained errors with their path in the request</span>
     <span class="doccomment">/// body.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_errors&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DiscordJsonSingleError</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DiscordJsonError</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;code&quot;</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected code&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="ident">isize::deserialize</span>)
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;message&quot;</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected message&quot;</span>))
-            .<span class="ident">and_then</span>(<span class="ident">String::deserialize</span>)
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;errors&quot;</span>)
-            .<span class="ident">map</span>(<span class="ident">deserialize_errors</span>)
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">unwrap_or_default</span>();
-
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">code</span>,
-            <span class="ident">message</span>,
-            <span class="ident">errors</span>,
-        })
-    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>)]</span>

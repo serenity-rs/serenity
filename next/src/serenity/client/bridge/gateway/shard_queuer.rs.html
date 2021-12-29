@@ -285,7 +285,6 @@
 <span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">GatewayIntents</span>,
     <span class="ident">ShardClientMessage</span>,
     <span class="ident">ShardId</span>,
     <span class="ident">ShardManagerMessage</span>,
@@ -304,6 +303,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway</span>::{<span class="ident">InterMessage</span>, <span class="ident">Shard</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::tokio::spawn_named</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::GatewayIntents</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
 
 <span class="kw">const</span> <span class="ident">WAIT_BETWEEN_BOOTS_IN_SECONDS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">5</span>;

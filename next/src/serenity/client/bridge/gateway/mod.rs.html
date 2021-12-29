@@ -161,8 +161,6 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The client gateway bridge is support essential for the [`client`] module.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is made available for user use if one wishes to be lower-level or avoid</span>
@@ -209,7 +207,6 @@
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event</span>;
 
-<span class="kw">mod</span> <span class="ident">intents</span>;
 <span class="kw">mod</span> <span class="ident">shard_manager</span>;
 <span class="kw">mod</span> <span class="ident">shard_manager_monitor</span>;
 <span class="kw">mod</span> <span class="ident">shard_messenger</span>;
@@ -222,7 +219,6 @@
     <span class="ident">time::Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>,
 };
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::intents::GatewayIntents</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_manager</span>::{<span class="ident">ShardManager</span>, <span class="ident">ShardManagerOptions</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_manager_monitor</span>::{<span class="ident">ShardManagerError</span>, <span class="ident">ShardManagerMonitor</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard_messenger::ShardMessenger</span>;

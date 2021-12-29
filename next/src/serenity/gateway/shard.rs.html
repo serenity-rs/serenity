@@ -827,6 +827,8 @@
 <span id="825">825</span>
 <span id="826">826</span>
 <span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync::Arc</span>,
     <span class="ident">time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>},
@@ -849,7 +851,7 @@
     <span class="ident">WebSocketGatewayClientExt</span>,
     <span class="ident">WsStream</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">GatewayIntents</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ChunkGuildFilter</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)]</span>
@@ -858,7 +860,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl::create_rustls_client</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
     <span class="ident">event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>},
-    <span class="ident">gateway::Activity</span>,
+    <span class="ident">gateway</span>::{<span class="ident">Activity</span>, <span class="ident">GatewayIntents</span>},
     <span class="ident">id::GuildId</span>,
     <span class="ident">user::OnlineStatus</span>,
 };
@@ -943,7 +945,7 @@
     <span class="doccomment">/// use tokio::sync::Mutex;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Arc::new(Http::default());</span>
@@ -1124,7 +1126,7 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
     <span class="doccomment">/// # use serenity::prelude::Mutex;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # #[cfg(feature = &quot;model&quot;)]</span>
@@ -1491,7 +1493,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};</span>
+    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::client::bridge::gateway::ChunkGuildFilter;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
@@ -1513,7 +1516,8 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};</span>
+    <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
+    <span class="doccomment">/// # use serenity::client::bridge::gateway::ChunkGuildFilter;</span>
     <span class="doccomment">/// # use std::error::Error;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
