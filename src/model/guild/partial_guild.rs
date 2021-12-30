@@ -926,7 +926,6 @@ impl PartialGuild {
     /// Returns an [`Error::Http`] if some mandatory fields are not provided.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
-    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
     pub async fn edit_welcome_screen<F>(
         &self,
         http: impl AsRef<Http>,
@@ -946,7 +945,6 @@ impl PartialGuild {
     /// permission.
     ///
     /// [`Error::Http`]: crate::error::Error::Http
-    /// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen
     pub async fn edit_widget<F>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildWidget>
     where
         F: FnOnce(&mut EditGuildWidget) -> &mut EditGuildWidget,
