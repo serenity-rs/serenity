@@ -435,9 +435,7 @@ impl Guild {
 
     /// Returns the formatted URL of the guild's banner image, if one exists.
     pub fn banner_url(&self) -> Option<String> {
-        self.banner
-            .as_ref()
-            .map(|banner| format!(cdn!("/banners/{}/{}.webp?size=1024"), self.id, banner))
+        self.banner.as_ref().map(|banner| cdn!("/banners/{}/{}.webp?size=1024", self.id, banner))
     }
 
     /// Retrieves a list of [`Ban`]s for the guild.
@@ -1391,7 +1389,7 @@ impl Guild {
         self.icon.as_ref().map(|icon| {
             let ext = if icon.starts_with("a_") { "gif" } else { "webp" };
 
-            format!(cdn!("/icons/{}/{}.{}"), self.id, icon, ext)
+            cdn!("/icons/{}/{}.{}", self.id, icon, ext)
         })
     }
 
@@ -2275,9 +2273,7 @@ impl Guild {
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.splash
-            .as_ref()
-            .map(|splash| format!(cdn!("/splashes/{}/{}.webp?size=4096"), self.id, splash))
+        self.splash.as_ref().map(|splash| cdn!("/splashes/{}/{}.webp?size=4096", self.id, splash))
     }
 
     /// Starts an integration sync for the given integration Id.
@@ -3012,7 +3008,7 @@ impl GuildInfo {
         self.icon.as_ref().map(|icon| {
             let ext = if icon.starts_with("a_") { "gif" } else { "webp" };
 
-            format!(cdn!("/icons/{}/{}.{}"), self.id, icon, ext)
+            cdn!("/icons/{}/{}.{}", self.id, icon, ext)
         })
     }
 }
@@ -3039,9 +3035,7 @@ impl From<u64> for GuildContainer {
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.splash
-            .as_ref()
-            .map(|splash| format!(cdn!("/splashes/{}/{}.webp?size=4096"), self.id, splash))
+        self.splash.as_ref().map(|splash| cdn!("/splashes/{}/{}.webp?size=4096", self.id, splash))
     }
 }
 
