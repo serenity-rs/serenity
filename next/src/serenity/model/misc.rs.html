@@ -500,7 +500,6 @@
 <span id="498">498</span>
 <span id="499">499</span>
 <span id="500">500</span>
-<span id="501">501</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
@@ -789,10 +788,9 @@
 <span class="kw">impl</span> <span class="ident">EmojiIdentifier</span> {
     <span class="doccomment">/// Generates a URL to the emoji&#39;s image.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">animated</span> {
-            <span class="bool-val">true</span> =&gt; <span class="macro">format!</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/emojis/{}.gif&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>),
-            <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/emojis/{}.png&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>),
-        }
+        <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">animated</span> { <span class="string">&quot;gif&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;png&quot;</span> };
+
+        <span class="macro">cdn!</span>(<span class="string">&quot;/emojis/{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">ext</span>)
     }
 }
 
@@ -1003,5 +1001,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (83b15bfe1 2021-12-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (b60e32c82 2021-12-30)" ></div>
 </body></html>

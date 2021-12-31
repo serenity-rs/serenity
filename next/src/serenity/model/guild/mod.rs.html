@@ -3372,12 +3372,6 @@
 <span id="3370">3370</span>
 <span id="3371">3371</span>
 <span id="3372">3372</span>
-<span id="3373">3373</span>
-<span id="3374">3374</span>
-<span id="3375">3375</span>
-<span id="3376">3376</span>
-<span id="3377">3377</span>
-<span id="3378">3378</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.</span>
@@ -3815,9 +3809,7 @@
 
     <span class="doccomment">/// Returns the formatted URL of the guild&#39;s banner image, if one exists.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">banner_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">banner</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">banner</span><span class="op">|</span> <span class="macro">format!</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/banners/{}/{}.webp?size=1024&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">banner</span>))
+        <span class="self">self</span>.<span class="ident">banner</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">banner</span><span class="op">|</span> <span class="macro">cdn!</span>(<span class="string">&quot;/banners/{}/{}.webp?size=1024&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">banner</span>))
     }
 
     <span class="doccomment">/// Retrieves a list of [`Ban`]s for the guild.</span>
@@ -4771,7 +4763,7 @@
         <span class="self">self</span>.<span class="ident">icon</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">icon</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">icon</span>.<span class="ident">starts_with</span>(<span class="string">&quot;a_&quot;</span>) { <span class="string">&quot;gif&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;webp&quot;</span> };
 
-            <span class="macro">format!</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/icons/{}/{}.{}&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>, <span class="ident">ext</span>)
+            <span class="macro">cdn!</span>(<span class="string">&quot;/icons/{}/{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>, <span class="ident">ext</span>)
         })
     }
 
@@ -5655,9 +5647,7 @@
 
     <span class="doccomment">/// Returns the formatted URL of the guild&#39;s splash image, if one exists.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splash_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">splash</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">splash</span><span class="op">|</span> <span class="macro">format!</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/splashes/{}/{}.webp?size=4096&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">splash</span>))
+        <span class="self">self</span>.<span class="ident">splash</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">splash</span><span class="op">|</span> <span class="macro">cdn!</span>(<span class="string">&quot;/splashes/{}/{}.webp?size=4096&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">splash</span>))
     }
 
     <span class="doccomment">/// Starts an integration sync for the given integration Id.</span>
@@ -6392,7 +6382,7 @@
         <span class="self">self</span>.<span class="ident">icon</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">icon</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">icon</span>.<span class="ident">starts_with</span>(<span class="string">&quot;a_&quot;</span>) { <span class="string">&quot;gif&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;webp&quot;</span> };
 
-            <span class="macro">format!</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/icons/{}/{}.{}&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>, <span class="ident">ext</span>)
+            <span class="macro">cdn!</span>(<span class="string">&quot;/icons/{}/{}.{}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>, <span class="ident">ext</span>)
         })
     }
 }
@@ -6419,9 +6409,7 @@
 <span class="kw">impl</span> <span class="ident">InviteGuild</span> {
     <span class="doccomment">/// Returns the formatted URL of the guild&#39;s splash image, if one exists.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splash_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">splash</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">splash</span><span class="op">|</span> <span class="macro">format!</span>(<span class="macro">cdn!</span>(<span class="string">&quot;/splashes/{}/{}.webp?size=4096&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">splash</span>))
+        <span class="self">self</span>.<span class="ident">splash</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">splash</span><span class="op">|</span> <span class="macro">cdn!</span>(<span class="string">&quot;/splashes/{}/{}.webp?size=4096&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">splash</span>))
     }
 }
 
@@ -6757,5 +6745,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (83b15bfe1 2021-12-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (b60e32c82 2021-12-30)" ></div>
 </body></html>
