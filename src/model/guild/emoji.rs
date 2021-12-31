@@ -214,7 +214,7 @@ impl Emoji {
     #[inline]
     pub fn url(&self) -> String {
         let extension = if self.animated { "gif" } else { "png" };
-        format!(cdn!("/emojis/{}.{}"), self.id, extension)
+        cdn!("/emojis/{}.{}", self.id, extension)
     }
 }
 
