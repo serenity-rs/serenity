@@ -286,10 +286,9 @@ pub struct EmojiIdentifier {
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
     pub fn url(&self) -> String {
-        match self.animated {
-            true => format!(cdn!("/emojis/{}.gif"), self.id),
-            false => format!(cdn!("/emojis/{}.png"), self.id),
-        }
+        let ext = if self.animated { "gif" } else { "png" };
+
+        cdn!("/emojis/{}.{}", self.id, ext)
     }
 }
 
