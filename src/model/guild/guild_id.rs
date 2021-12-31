@@ -32,6 +32,9 @@ use crate::internal::prelude::*;
 use crate::json;
 #[cfg(feature = "model")]
 use crate::json::json;
+#[cfg(feature = "model")]
+use crate::json::prelude::*;
+use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
     builder::{
@@ -42,7 +45,6 @@ use crate::{
     },
     model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
 };
-use crate::{json::prelude::*, model::prelude::*};
 
 #[cfg(feature = "model")]
 impl GuildId {

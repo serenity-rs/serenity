@@ -2,8 +2,10 @@ use std::{env, path::Path};
 
 use serenity::{
     async_trait,
-    http::AttachmentType,
-    model::{channel::Message, gateway::Ready},
+    model::{
+        channel::{AttachmentType, Message},
+        gateway::Ready,
+    },
     prelude::*,
 };
 

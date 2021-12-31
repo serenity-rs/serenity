@@ -1,6 +1,7 @@
 //! Models relating to channels and types within channels.
 
 mod attachment;
+mod attachment_type;
 mod channel_category;
 mod channel_id;
 mod embed;
@@ -18,6 +19,7 @@ use serde::de::{Error as DeError, Unexpected};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 pub use self::attachment::*;
+pub use self::attachment_type::*;
 pub use self::channel_category::*;
 pub use self::channel_id::*;
 pub use self::embed::*;
