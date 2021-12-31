@@ -4,10 +4,9 @@ use super::CreateAllowedMentions;
 use super::CreateEmbed;
 #[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
-use crate::http::AttachmentType;
 use crate::internal::prelude::*;
 use crate::json::{self, from_number, to_value};
-use crate::model::channel::{MessageFlags, MessageReference, ReactionType};
+use crate::model::channel::{AttachmentType, MessageFlags, MessageReference, ReactionType};
 use crate::model::id::StickerId;
 
 /// A builder to specify the contents of an [`Http::send_message`] request,

@@ -33,13 +33,13 @@ use crate::collector::{
     ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::AttachmentType;
-#[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json::{self, from_number};
+#[cfg(feature = "model")]
+use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 
 /// Represents a guild's text, news, or voice channel. Some methods are available

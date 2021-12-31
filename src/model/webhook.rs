@@ -17,8 +17,7 @@ use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::json;
-use crate::json::NULL;
+use crate::json::{self, NULL};
 #[cfg(feature = "model")]
 use crate::model::prelude::*;
 #[cfg(feature = "model")]

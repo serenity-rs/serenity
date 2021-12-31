@@ -5,8 +5,8 @@ use simd_json::Mutable;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-use crate::http::AttachmentType;
 use crate::json::{self, from_number, Value};
+use crate::model::channel::AttachmentType;
 use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 
 #[derive(Clone, Debug, Default)]

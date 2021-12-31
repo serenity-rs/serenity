@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use crate::http::AttachmentType;
 use crate::internal::prelude::*;
+use crate::model::channel::AttachmentType;
 
 /// A builder to create or edit a [`Sticker`] for use via a number of model methods.
 ///

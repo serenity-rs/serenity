@@ -6,13 +6,15 @@ use serde::{Deserialize, Deserializer};
 use simd_json::ValueAccess;
 
 use super::prelude::*;
+use crate::builder::CreateApplicationCommand;
+#[cfg(feature = "http")]
 use crate::builder::{
-    CreateApplicationCommand,
     CreateApplicationCommands,
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
+#[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::StdResult;
 use crate::json::{self, from_number, JsonMap, Value};
@@ -29,6 +31,7 @@ use crate::model::id::{
 };
 use crate::model::interactions::InteractionType;
 use crate::model::prelude::User;
+#[cfg(feature = "unstable_discord_api")]
 use crate::model::utils::{
     deserialize_channels_map,
     deserialize_messages_map,
@@ -74,6 +77,7 @@ pub struct ApplicationCommandInteraction {
     pub locale: String,
 }
 
+#[cfg(feature = "http")]
 impl ApplicationCommandInteraction {
     /// Gets the interaction response.
     ///
@@ -651,6 +655,7 @@ pub struct ApplicationCommandInteractionDataOption {
     pub focused: bool,
 }
 
+#[cfg(feature = "unstable_discord_api")]
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
@@ -740,6 +745,7 @@ pub struct ApplicationCommand {
     pub version: CommandVersionId,
 }
 
+#[cfg(feature = "http")]
 impl ApplicationCommand {
     /// Creates a global [`ApplicationCommand`],
     /// overriding an existing one with the same name if it exists.
@@ -912,7 +918,9 @@ impl ApplicationCommand {
     ) -> Result<()> {
         http.as_ref().delete_global_application_command(command_id.into()).await
     }
+}
 
+impl ApplicationCommand {
     #[inline]
     pub(crate) fn build_application_command<F>(f: F) -> JsonMap
     where
