@@ -588,9 +588,12 @@
 <span id="586">586</span>
 <span id="587">587</span>
 <span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
+<span class="kw">mod</span> <span class="ident">attachment_type</span>;
 <span class="kw">mod</span> <span class="ident">channel_category</span>;
 <span class="kw">mod</span> <span class="ident">channel_id</span>;
 <span class="kw">mod</span> <span class="ident">embed</span>;
@@ -608,6 +611,7 @@
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeStruct</span>, <span class="ident">Serializer</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::attachment</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::attachment_type</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::channel_category</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::channel_id</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::embed</span>::<span class="kw-2">*</span>;

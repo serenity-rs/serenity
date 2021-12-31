@@ -1131,6 +1131,14 @@
 <span id="1129">1129</span>
 <span id="1130">1130</span>
 <span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1139,13 +1147,15 @@
 <span class="kw">use</span> <span class="ident">simd_json::ValueAccess</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateApplicationCommand</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
-    <span class="ident">CreateApplicationCommand</span>,
     <span class="ident">CreateApplicationCommands</span>,
     <span class="ident">CreateInteractionResponse</span>,
     <span class="ident">CreateInteractionResponseFollowup</span>,
     <span class="ident">EditInteractionResponse</span>,
 };
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude::StdResult</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">JsonMap</span>, <span class="ident">Value</span>};
@@ -1162,6 +1172,7 @@
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::InteractionType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude::User</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils</span>::{
     <span class="ident">deserialize_channels_map</span>,
     <span class="ident">deserialize_messages_map</span>,
@@ -1203,6 +1214,7 @@
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u8</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">ApplicationCommandInteraction</span> {
     <span class="doccomment">/// Gets the interaction response.</span>
     <span class="doccomment">///</span>
@@ -1748,6 +1760,7 @@
     <span class="kw">pub</span> <span class="ident">focused</span>: <span class="ident">bool</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandInteractionDataOption</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
@@ -1837,6 +1850,7 @@
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">CommandVersionId</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">ApplicationCommand</span> {
     <span class="doccomment">/// Creates a global [`ApplicationCommand`],</span>
     <span class="doccomment">/// overriding an existing one with the same name if it exists.</span>
@@ -2009,7 +2023,9 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_global_application_command</span>(<span class="ident">command_id</span>.<span class="ident">into</span>()).<span class="kw">await</span>
     }
+}
 
+<span class="kw">impl</span> <span class="ident">ApplicationCommand</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">JsonMap</span>
     <span class="kw">where</span>

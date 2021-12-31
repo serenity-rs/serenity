@@ -418,10 +418,10 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{<span class="ident">CreateMessage</span>, <span class="ident">EditMessage</span>, <span class="ident">GetMessages</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::AttachmentType</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">Http</span>, <span class="ident">Typing</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::single_recipient</span>;
 
