@@ -4,9 +4,10 @@ use bytes::buf::Buf;
 use reqwest::Url;
 use tokio::{fs::File, io::AsyncReadExt};
 
-use crate::http::{AttachmentType, Http};
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::json::from_number;
+use crate::model::channel::AttachmentType;
 use crate::model::{guild::Role, Permissions};
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
