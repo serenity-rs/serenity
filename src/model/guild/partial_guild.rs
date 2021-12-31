@@ -1236,12 +1236,12 @@ impl PartialGuild {
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
-        self.icon.as_ref().map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+        self.icon.as_ref().map(|icon| cdn!("/icons/{}/{}.webp", self.id, icon))
     }
 
     /// Returns a formatted URL of the guild's banner, if the guild has a banner.
     pub fn banner_url(&self) -> Option<String> {
-        self.banner.as_ref().map(|banner| format!(cdn!("/banners/{}/{}.webp"), self.id, banner))
+        self.banner.as_ref().map(|banner| cdn!("/banners/{}/{}.webp", self.id, banner))
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
@@ -1451,9 +1451,7 @@ impl PartialGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
     #[inline]
     pub fn splash_url(&self) -> Option<String> {
-        self.splash
-            .as_ref()
-            .map(|splash| format!(cdn!("/splashes/{}/{}.webp?size=4096"), self.id, splash))
+        self.splash.as_ref().map(|splash| cdn!("/splashes/{}/{}.webp?size=4096", self.id, splash))
     }
 
     /// Starts an integration sync for the given integration Id.
