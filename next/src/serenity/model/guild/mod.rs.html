@@ -3278,8 +3278,6 @@
 <span id="3276">3276</span>
 <span id="3277">3277</span>
 <span id="3278">3278</span>
-<span id="3279">3279</span>
-<span id="3280">3280</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.</span>
@@ -4549,7 +4547,6 @@
     <span class="doccomment">/// Returns an [`Error::Http`] if some mandatory fields are not provided.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_welcome_screen</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -4569,7 +4566,6 @@
     <span class="doccomment">/// permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
-    <span class="doccomment">/// [`GuildWelcomeScreen`]: super::guild::GuildWelcomeScreen</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_widget</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildWidget</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">EditGuildWidget</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">EditGuildWidget</span>,
