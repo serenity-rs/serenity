@@ -30,9 +30,11 @@ use crate::collector::{
     ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::{AttachmentType, CacheHttp, Http, Typing};
-#[cfg(all(feature = "model", feature = "utils"))]
+use crate::http::{CacheHttp, Http, Typing};
+#[cfg(feature = "model")]
 use crate::json::{self, json};
+#[cfg(feature = "model")]
+use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 
 #[cfg(feature = "model")]

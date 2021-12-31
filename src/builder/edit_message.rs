@@ -3,10 +3,9 @@ use std::collections::HashMap;
 use super::{CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
-use crate::http::AttachmentType;
 use crate::internal::prelude::*;
 use crate::json::{self, from_number};
-use crate::model::channel::MessageFlags;
+use crate::model::channel::{AttachmentType, MessageFlags};
 
 /// A builder to specify the fields to edit in an existing message.
 ///

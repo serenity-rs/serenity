@@ -1,10 +1,10 @@
 use std::collections::HashMap;
-#[cfg(not(feature = "http"))]
+#[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
-#[cfg(feature = "http")]
-use crate::http::AttachmentType;
 use crate::json::{from_number, Value};
+#[cfg(feature = "model")]
+use crate::model::channel::AttachmentType;
 use crate::model::channel::MessageFlags;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
@@ -60,8 +60,8 @@ use crate::model::channel::MessageFlags;
 #[derive(Clone, Debug)]
 pub struct ExecuteWebhook<'a>(
     pub HashMap<&'static str, Value>,
-    #[cfg(feature = "http")] pub Vec<AttachmentType<'a>>,
-    #[cfg(not(feature = "http"))] PhantomData<&'a ()>,
+    #[cfg(feature = "model")] pub Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "model"))] PhantomData<&'a ()>,
 );
 
 impl<'a> ExecuteWebhook<'a> {
@@ -119,14 +119,14 @@ impl<'a> ExecuteWebhook<'a> {
     }
 
     /// Appends a file to the webhook message.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
         self.1.push(file.into());
         self
     }
 
     /// Appends a list of files to the webhook message.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -139,7 +139,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,

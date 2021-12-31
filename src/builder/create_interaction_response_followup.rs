@@ -10,6 +10,7 @@ use crate::builder::CreateComponents;
 #[cfg(feature = "http")]
 use crate::http::AttachmentType;
 use crate::json::{self, from_number, Value};
+use crate::model::channel::AttachmentType;
 use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 
 #[derive(Clone, Debug, Default)]
