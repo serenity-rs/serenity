@@ -4,12 +4,14 @@ use serde::{Deserialize, Deserializer};
 use simd_json::ValueAccess;
 
 use super::prelude::*;
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::builder::CreateAutocompleteResponse;
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::StdResult;
-use crate::json::{self, from_number, json, JsonMap, Value};
+#[cfg(feature = "http")]
+use crate::json::{self, json};
+use crate::json::{from_number, JsonMap, Value};
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
 use crate::model::interactions::{
     application_command::ApplicationCommandInteractionData,
@@ -52,7 +54,7 @@ pub struct AutocompleteInteraction {
     pub locale: String,
 }
 
-#[cfg(feature = "model")]
+#[cfg(feature = "http")]
 impl AutocompleteInteraction {
     /// Creates a response to an autocomplete interaction.
     ///

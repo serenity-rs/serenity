@@ -1,15 +1,15 @@
 use std::collections::HashMap;
-#[cfg(not(feature = "http"))]
+#[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
 use super::CreateAllowedMentions;
 use super::CreateEmbed;
 #[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
-#[cfg(feature = "http")]
-use crate::http::AttachmentType;
 use crate::internal::prelude::*;
 use crate::json::{self, from_number, to_value};
+#[cfg(feature = "model")]
+use crate::model::channel::AttachmentType;
 use crate::model::channel::{MessageFlags, MessageReference, ReactionType};
 use crate::model::id::StickerId;
 
@@ -63,8 +63,8 @@ use crate::model::id::StickerId;
 pub struct CreateMessage<'a>(
     pub HashMap<&'static str, Value>,
     pub Option<Vec<ReactionType>>,
-    #[cfg(feature = "http")] pub Vec<AttachmentType<'a>>,
-    #[cfg(not(feature = "http"))] PhantomData<&'a ()>,
+    #[cfg(feature = "model")] pub Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "model"))] PhantomData<&'a ()>,
 );
 
 impl<'a> CreateMessage<'a> {
@@ -183,14 +183,14 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Appends a file to the message.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
         self.2.push(file.into());
         self
     }
 
     /// Appends a list of files to the message.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -203,7 +203,7 @@ impl<'a> CreateMessage<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,

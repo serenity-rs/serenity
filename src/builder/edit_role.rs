@@ -1,16 +1,18 @@
 use std::collections::HashMap;
 
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use bytes::buf::Buf;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use reqwest::Url;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use tokio::{fs::File, io::AsyncReadExt};
 
-#[cfg(feature = "http")]
-use crate::http::{AttachmentType, Http};
+#[cfg(feature = "model")]
+use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::json::from_number;
+#[cfg(feature = "model")]
+use crate::model::channel::AttachmentType;
 use crate::model::{guild::Role, Permissions};
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
@@ -135,7 +137,7 @@ impl EditRole {
     ///
     /// May error if the icon is a URL and the HTTP request fails, or if the icon is a file
     /// on a path that doesn't exist.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub async fn icon<'a>(
         &mut self,
         http: impl AsRef<Http>,
