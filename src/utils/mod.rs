@@ -433,6 +433,20 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
     args
 }
 
+/// Parses the id and token from a webhook url. Expects a [`reqwest::Url`] object rather than a [`&str`].
+///
+/// # Examples
+///
+/// ```rust
+/// use serenity::utils;
+///
+/// let url_str = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+/// let url = url_str.parse().unwrap();
+/// let (id, token) = utils::parse_webhook(&url).unwrap();
+///
+/// assert_eq!(id, 245037420704169985);
+/// assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
+/// ```
 pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
     let path = url.path().strip_prefix("/api/webhooks/")?;
     let split_idx = path.find('/')?;
@@ -820,8 +834,7 @@ mod test {
 
     #[test]
     fn test_webhook_parser() {
-        let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-        let url = Url::parse(url).unwrap();
+        let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV".parse().unwrap();
         let (id, token) = parse_webhook(&url).unwrap();
         assert_eq!(id, 245037420704169985);
         assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
