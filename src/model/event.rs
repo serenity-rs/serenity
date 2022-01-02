@@ -12,7 +12,6 @@ use std::{collections::HashMap, fmt};
 
 use chrono::{DateTime, Utc};
 use serde::de::{Error as DeError, IgnoredAny, MapAccess};
-use serde::ser::{Serialize, SerializeSeq, Serializer};
 
 use super::prelude::*;
 use super::utils::{emojis, roles, stickers};
@@ -31,28 +30,12 @@ use crate::{constants::OpCode, json::prelude::*};
 ///
 /// - A [`Channel`] is created in a [`Guild`]
 /// - A [`PrivateChannel`] is created
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ChannelCreateEvent {
     /// The channel that was created.
     pub channel: Channel,
-}
-
-impl<'de> Deserialize<'de> for ChannelCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            channel: Channel::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for ChannelCreateEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Channel::serialize(&self.channel, serializer)
-    }
 }
 
 #[cfg(feature = "cache")]
@@ -110,7 +93,8 @@ impl CacheUpdate for ChannelCreateEvent {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ChannelDeleteEvent {
     pub channel: Channel,
@@ -150,23 +134,6 @@ impl CacheUpdate for ChannelDeleteEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for ChannelDeleteEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            channel: Channel::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for ChannelDeleteEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Channel::serialize(&self.channel, serializer)
-    }
-}
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ChannelPinsUpdateEvent {
@@ -196,7 +163,8 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ChannelUpdateEvent {
     pub channel: Channel,
@@ -239,23 +207,6 @@ impl CacheUpdate for ChannelUpdateEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for ChannelUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            channel: Channel::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for ChannelUpdateEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Channel::serialize(&self.channel, serializer)
-    }
-}
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildBanAddEvent {
@@ -270,7 +221,8 @@ pub struct GuildBanRemoveEvent {
     pub user: User,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildCreateEvent {
     pub guild: Guild,
@@ -309,24 +261,8 @@ impl CacheUpdate for GuildCreateEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for GuildCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            guild: Guild::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for GuildCreateEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Guild::serialize(&self.guild, serializer)
-    }
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildDeleteEvent {
     pub guild: GuildUnavailable,
@@ -363,23 +299,6 @@ impl CacheUpdate for GuildDeleteEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for GuildDeleteEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            guild: GuildUnavailable::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for GuildDeleteEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        GuildUnavailable::serialize(&self.guild, serializer)
-    }
-}
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildEmojisUpdateEvent {
@@ -407,7 +326,8 @@ pub struct GuildIntegrationsUpdateEvent {
     pub guild_id: GuildId,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildMemberAddEvent {
     pub member: Member,
@@ -430,14 +350,6 @@ impl CacheUpdate for GuildMemberAddEvent {
         }
 
         None
-    }
-}
-
-impl<'de> Deserialize<'de> for GuildMemberAddEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(GuildMemberAddEvent {
-            member: Member::deserialize(deserializer)?,
-        })
     }
 }
 
@@ -791,7 +703,8 @@ impl CacheUpdate for GuildUnavailableEvent {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildUpdateEvent {
     pub guild: PartialGuild,
@@ -842,24 +755,8 @@ impl CacheUpdate for GuildUpdateEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for GuildUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            guild: PartialGuild::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for GuildUpdateEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        PartialGuild::serialize(&self.guild, serializer)
-    }
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct MessageCreateEvent {
     pub message: Message,
@@ -894,23 +791,6 @@ impl CacheUpdate for MessageCreateEvent {
         messages.insert(self.message.id, self.message.clone());
 
         removed_msg.map(|i| i.1)
-    }
-}
-
-impl<'de> Deserialize<'de> for MessageCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            message: Message::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for MessageCreateEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Message::serialize(&self.message, serializer)
     }
 }
 
@@ -1002,7 +882,8 @@ impl CacheUpdate for MessageUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct PresenceUpdateEvent {
     pub presence: Presence,
@@ -1060,15 +941,8 @@ impl CacheUpdate for PresenceUpdateEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for PresenceUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            presence: Presence::deserialize(deserializer)?,
-        })
-    }
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct PresencesReplaceEvent {
     pub presences: Vec<Presence>,
@@ -1087,73 +961,18 @@ impl CacheUpdate for PresencesReplaceEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for PresencesReplaceEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            presences: Vec::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for PresencesReplaceEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut seq = serializer.serialize_seq(Some(self.presences.len()))?;
-
-        for value in &self.presences {
-            seq.serialize_element(value)?;
-        }
-
-        seq.end()
-    }
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ReactionAddEvent {
     pub reaction: Reaction,
 }
 
-impl<'de> Deserialize<'de> for ReactionAddEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            reaction: Reaction::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for ReactionAddEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Reaction::serialize(&self.reaction, serializer)
-    }
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ReactionRemoveEvent {
     pub reaction: Reaction,
-}
-
-impl<'de> Deserialize<'de> for ReactionRemoveEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            reaction: Reaction::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for ReactionRemoveEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Reaction::serialize(&self.reaction, serializer)
-    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
@@ -1165,7 +984,8 @@ pub struct ReactionRemoveAllEvent {
 }
 
 /// The "Ready" event, containing initial ready cache
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ReadyEvent {
     pub ready: Ready,
@@ -1235,23 +1055,6 @@ impl CacheUpdate for ReadyEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for ReadyEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            ready: Ready::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for ReadyEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Ready::serialize(&self.ready, serializer)
-    }
-}
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ResumedEvent {
@@ -1275,7 +1078,8 @@ pub struct UnknownEvent {
     pub value: Value,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct UserUpdateEvent {
     pub current_user: CurrentUser,
@@ -1288,23 +1092,6 @@ impl CacheUpdate for UserUpdateEvent {
     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         let mut user = cache.user.write();
         Some(mem::replace(&mut user, self.current_user.clone()))
-    }
-}
-
-impl<'de> Deserialize<'de> for UserUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            current_user: CurrentUser::deserialize(deserializer)?,
-        })
-    }
-}
-
-impl Serialize for UserUpdateEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        CurrentUser::serialize(&self.current_user, serializer)
     }
 }
 
@@ -1327,7 +1114,8 @@ impl fmt::Debug for VoiceServerUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct VoiceStateUpdateEvent {
     pub voice_state: VoiceState,
@@ -1360,14 +1148,6 @@ impl CacheUpdate for VoiceStateUpdateEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(VoiceStateUpdateEvent {
-            voice_state: VoiceState::deserialize(deserializer)?,
-        })
-    }
-}
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct WebhookUpdateEvent {
@@ -1376,65 +1156,27 @@ pub struct WebhookUpdateEvent {
 }
 
 #[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct InteractionCreateEvent {
     pub interaction: Interaction,
 }
 
 #[cfg(feature = "unstable_discord_api")]
-impl<'de> Deserialize<'de> for InteractionCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self {
-            interaction: Interaction::deserialize(deserializer)?,
-        })
-    }
-}
-
-#[cfg(feature = "unstable_discord_api")]
-impl Serialize for InteractionCreateEvent {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        Interaction::serialize(&self.interaction, serializer)
-    }
-}
-
-#[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct IntegrationCreateEvent {
     pub integration: Integration,
 }
 
 #[cfg(feature = "unstable_discord_api")]
-impl<'de> Deserialize<'de> for IntegrationCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let integration = Integration::deserialize(deserializer)?;
-
-        Ok(Self {
-            integration,
-        })
-    }
-}
-
-#[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct IntegrationUpdateEvent {
     pub integration: Integration,
-}
-
-#[cfg(feature = "unstable_discord_api")]
-impl<'de> Deserialize<'de> for IntegrationUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let integration = Integration::deserialize(deserializer)?;
-
-        Ok(Self {
-            integration,
-        })
-    }
 }
 
 #[cfg(feature = "unstable_discord_api")]
@@ -1447,7 +1189,8 @@ pub struct IntegrationDeleteEvent {
 }
 
 #[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
 #[allow(deprecated)]
@@ -1456,19 +1199,8 @@ pub struct ApplicationCommandCreateEvent {
 }
 
 #[cfg(feature = "unstable_discord_api")]
-#[allow(deprecated)]
-impl<'de> Deserialize<'de> for ApplicationCommandCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let application_command = ApplicationCommand::deserialize(deserializer)?;
-
-        Ok(Self {
-            application_command,
-        })
-    }
-}
-
-#[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
 #[allow(deprecated)]
@@ -1477,19 +1209,8 @@ pub struct ApplicationCommandUpdateEvent {
 }
 
 #[cfg(feature = "unstable_discord_api")]
-#[allow(deprecated)]
-impl<'de> Deserialize<'de> for ApplicationCommandUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let application_command = ApplicationCommand::deserialize(deserializer)?;
-
-        Ok(Self {
-            application_command,
-        })
-    }
-}
-
-#[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
 #[allow(deprecated)]
@@ -1497,67 +1218,29 @@ pub struct ApplicationCommandDeleteEvent {
     pub application_command: ApplicationCommand,
 }
 
-#[cfg(feature = "unstable_discord_api")]
-#[allow(deprecated)]
-impl<'de> Deserialize<'de> for ApplicationCommandDeleteEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let application_command = ApplicationCommand::deserialize(deserializer)?;
-
-        Ok(Self {
-            application_command,
-        })
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct StageInstanceCreateEvent {
     pub stage_instance: StageInstance,
 }
 
-impl<'de> Deserialize<'de> for StageInstanceCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let stage_instance = StageInstance::deserialize(deserializer)?;
-
-        Ok(Self {
-            stage_instance,
-        })
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct StageInstanceUpdateEvent {
     pub stage_instance: StageInstance,
 }
 
-impl<'de> Deserialize<'de> for StageInstanceUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let stage_instance = StageInstance::deserialize(deserializer)?;
-
-        Ok(Self {
-            stage_instance,
-        })
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct StageInstanceDeleteEvent {
     pub stage_instance: StageInstance,
 }
 
-impl<'de> Deserialize<'de> for StageInstanceDeleteEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let stage_instance = StageInstance::deserialize(deserializer)?;
-
-        Ok(Self {
-            stage_instance,
-        })
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ThreadCreateEvent {
     pub thread: GuildChannel,
@@ -1581,17 +1264,8 @@ impl CacheUpdate for ThreadCreateEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for ThreadCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let thread = GuildChannel::deserialize(deserializer)?;
-
-        Ok(Self {
-            thread,
-        })
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ThreadUpdateEvent {
     pub thread: GuildChannel,
@@ -1615,17 +1289,8 @@ impl CacheUpdate for ThreadUpdateEvent {
     }
 }
 
-impl<'de> Deserialize<'de> for ThreadUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let thread = GuildChannel::deserialize(deserializer)?;
-
-        Ok(Self {
-            thread,
-        })
-    }
-}
-
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ThreadDeleteEvent {
     pub thread: PartialGuildChannel,
@@ -1640,16 +1305,6 @@ impl CacheUpdate for ThreadDeleteEvent {
 
         cache.guilds.get_mut(&guild_id).and_then(|mut g| {
             g.threads.iter().position(|e| e.id == thread_id).map(|i| g.threads.remove(i))
-        })
-    }
-}
-
-impl<'de> Deserialize<'de> for ThreadDeleteEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let thread = PartialGuildChannel::deserialize(deserializer)?;
-
-        Ok(Self {
-            thread,
         })
     }
 }
@@ -1670,20 +1325,11 @@ pub struct ThreadListSyncEvent {
     pub members: Vec<ThreadMember>,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
 #[non_exhaustive]
 pub struct ThreadMemberUpdateEvent {
     pub member: ThreadMember,
-}
-
-impl<'de> Deserialize<'de> for ThreadMemberUpdateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let member = ThreadMember::deserialize(deserializer)?;
-
-        Ok(Self {
-            member,
-        })
-    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
