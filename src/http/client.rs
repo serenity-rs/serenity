@@ -41,6 +41,7 @@ use crate::model::interactions::application_command::{
     ApplicationCommandPermission,
 };
 use crate::model::prelude::*;
+use crate::utils;
 
 /// A builder implementing [`Future`] building a [`Http`] client to perform
 /// requests to Discord's HTTP API. If you do not need to use a proxy or do not
@@ -2690,7 +2691,7 @@ impl Http {
     pub async fn get_invite(&self, mut code: &str, stats: bool) -> Result<Invite> {
         #[cfg(feature = "utils")]
         {
-            code = crate::utils::parse_invite(code);
+            code = utils::parse_invite(code);
         }
 
         self.fire(Request {
@@ -2959,7 +2960,7 @@ impl Http {
     /// ```
     pub async fn get_webhook_from_url(&self, url: &str) -> Result<Webhook> {
         let url = Url::parse(url).map_err(HttpError::Url)?;
-        let (webhook_id, token) = parse_webhook_url(&url)?;
+        let (webhook_id, token) = utils::parse_webhook(&url).ok_or(HttpError::InvalidWebhook)?;
         self.fire(Request {
             body: None,
             headers: None,
@@ -3445,38 +3446,5 @@ impl Default for Http {
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
-    }
-}
-
-fn parse_webhook_url<'a>(url: &'a Url) -> Result<(u64, &'a str)> {
-    fn parse<'a>(url: &'a Url) -> Option<(u64, &'a str)> {
-        let path = url.path().strip_prefix("/api/webhooks/")?;
-        let split_idx = path.find('/')?;
-        let webhook_id = &path[..split_idx];
-        let token = &path[split_idx + 1..];
-        if !["http", "https"].contains(&url.scheme())
-            || !["discord.com", "discordapp.com"].contains(&url.domain()?)
-            || !(17..=20).contains(&webhook_id.len())
-            || !(60..=68).contains(&token.len())
-        {
-            return None;
-        }
-        Some((webhook_id.parse().ok()?, token))
-    }
-    parse(url).ok_or(HttpError::InvalidWebhook.into())
-}
-
-#[cfg(test)]
-mod test {
-    use reqwest::Url;
-
-    use super::parse_webhook_url;
-
-    #[test]
-    fn test_webhook_parsing() {
-        let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-        #[allow(clippy::unwrap_used)]
-        let url = Url::parse(url).unwrap();
-        assert!(parse_webhook_url(&url).is_ok());
     }
 }
