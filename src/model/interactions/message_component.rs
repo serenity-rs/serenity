@@ -423,6 +423,7 @@ impl<'de> Deserialize<'de> for Component {
             ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
                 .map(Component::SelectMenu)
                 .map_err(DeError::custom),
+            ComponentType::InputText => unimplemented!(),
             ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
         }
     }

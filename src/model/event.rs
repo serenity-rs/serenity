@@ -2219,24 +2219,28 @@ macro_rules! with_related_ids_for_event_types {
                     Interaction::ApplicationCommand(i) => Some(i.user.id),
                     Interaction::MessageComponent(i) => Some(i.user.id),
                     Interaction::Autocomplete(i) => Some(i.user.id),
+                    Interaction::ModalSubmit(i) => Some(i.user.id),
                 },
                 guild_id: match &e.interaction {
                     Interaction::Ping(_) => None,
                     Interaction::ApplicationCommand(i) => i.guild_id.into(),
                     Interaction::MessageComponent(i) => i.guild_id.into(),
                     Interaction::Autocomplete(i) => i.guild_id.into(),
+                    Interaction::ModalSubmit(i) => i.guild_id.into(),
                 },
                 channel_id: match &e.interaction {
                     Interaction::Ping(_) => None,
                     Interaction::ApplicationCommand(i) => Some(i.channel_id),
                     Interaction::MessageComponent(i) => Some(i.channel_id),
                     Interaction::Autocomplete(i) => Some(i.channel_id),
+                    Interaction::ModalSubmit(i) => Some(i.channel_id),
                 },
                 message_id: match &e.interaction {
                     Interaction::Ping(_) => None,
                     Interaction::ApplicationCommand(_) => None,
                     Interaction::MessageComponent(i) => Some(i.message.id),
                     Interaction::Autocomplete(i) => None,
+                    Interaction::ModalSubmit(i) => Some(i.message.id),
                 },
             },
             #[cfg(feature = "unstable_discord_api")]

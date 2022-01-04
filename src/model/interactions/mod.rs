@@ -21,6 +21,8 @@ pub enum Interaction {
     ApplicationCommand(ApplicationCommandInteraction),
     MessageComponent(MessageComponentInteraction),
     Autocomplete(AutocompleteInteraction),
+    // TODO This should probably become a new struct
+    ModalSubmit(MessageComponentInteraction),
 }
 
 impl Interaction {
@@ -31,6 +33,7 @@ impl Interaction {
             Interaction::ApplicationCommand(i) => i.id,
             Interaction::MessageComponent(i) => i.id,
             Interaction::Autocomplete(i) => i.id,
+            Interaction::ModalSubmit(i) => i.id,
         }
     }
 
@@ -41,6 +44,7 @@ impl Interaction {
             Interaction::ApplicationCommand(_) => InteractionType::ApplicationCommand,
             Interaction::MessageComponent(_) => InteractionType::MessageComponent,
             Interaction::Autocomplete(_) => InteractionType::Autocomplete,
+            Interaction::ModalSubmit(_) => InteractionType::Autocomplete,
         }
     }
 
@@ -51,6 +55,7 @@ impl Interaction {
             Interaction::ApplicationCommand(i) => i.application_id,
             Interaction::MessageComponent(i) => i.application_id,
             Interaction::Autocomplete(i) => i.application_id,
+            Interaction::ModalSubmit(i) => i.application_id,
         }
     }
 
@@ -61,6 +66,7 @@ impl Interaction {
             Interaction::ApplicationCommand(i) => i.token.as_str(),
             Interaction::MessageComponent(i) => i.token.as_str(),
             Interaction::Autocomplete(i) => i.token.as_str(),
+            Interaction::ModalSubmit(i) => i.token.as_str(),
         }
     }
 
@@ -126,6 +132,11 @@ impl<'de> Deserialize<'de> for Interaction {
                     .map(Interaction::Autocomplete)
                     .map_err(DeError::custom)
             },
+            InteractionType::ModalSubmit => {
+                serde_json::from_value::<MessageComponentInteraction>(Value::Object(map))
+                    .map(Interaction::MessageComponent)
+                    .map_err(DeError::custom)
+            },
             InteractionType::Unknown => Err(DeError::custom("Unknown interaction type")),
         }
     }
@@ -145,6 +156,9 @@ impl Serialize for Interaction {
                 MessageComponentInteraction::serialize(i, serializer)
             },
             Interaction::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
+            Interaction::ModalSubmit(i) => {
+                MessageComponentInteraction::serialize(i, serializer)
+            },
         }
     }
 }
@@ -167,6 +181,7 @@ enum_number!(InteractionType {
     MessageComponent,
     ApplicationCommand,
     Autocomplete,
+    ModalSubmit,
 });
 
 /// The flags for an interaction response.
