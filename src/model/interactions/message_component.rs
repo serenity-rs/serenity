@@ -467,6 +467,7 @@ pub enum ComponentType {
     ActionRow = 1,
     Button = 2,
     SelectMenu = 3,
+    InputText = 4,
     Unknown = !0,
 }
 

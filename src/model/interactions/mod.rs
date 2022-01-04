@@ -158,6 +158,7 @@ pub enum InteractionType {
     ApplicationCommand = 2,
     MessageComponent = 3,
     Autocomplete = 4,
+    ModalSubmit = 5,
     Unknown = !0,
 }
 
@@ -224,4 +225,5 @@ pub enum InteractionResponseType {
     DeferredUpdateMessage = 6,
     UpdateMessage = 7,
     Autocomplete = 8,
+    Modal = 9,
 }
