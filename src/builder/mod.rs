@@ -84,6 +84,7 @@ pub use self::{
         CreateActionRow,
         CreateButton,
         CreateComponents,
+        CreateInputText,
         CreateSelectMenu,
         CreateSelectMenuOption,
         CreateSelectMenuOptions,
