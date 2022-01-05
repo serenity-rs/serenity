@@ -1,7 +1,4 @@
 use bitflags::__impl_bitflags;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-
-use crate::internal::prelude::StdResult;
 
 /// Describes a system channel flags.
 #[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash, Default)]
@@ -22,20 +19,4 @@ __impl_bitflags! {
     }
 }
 
-impl<'de> Deserialize<'de> for SystemChannelFlags {
-    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Ok(SystemChannelFlags::from_bits_truncate(u64::deserialize(deserializer)?))
-    }
-}
-
-impl Serialize for SystemChannelFlags {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_u64(self.bits())
-    }
-}
+impl_bitflags_serde!(SystemChannelFlags: u64);

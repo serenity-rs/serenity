@@ -4,15 +4,9 @@
 use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
-#[cfg(feature = "model")]
-use std::result::Result as StdResult;
 
 use bitflags::__impl_bitflags;
 use chrono::{DateTime, Utc};
-use serde::{
-    de::{Deserialize, Deserializer},
-    ser::{Serialize, Serializer},
-};
 #[cfg(feature = "simd-json")]
 use simd_json::ValueAccess;
 
@@ -1264,23 +1258,7 @@ __impl_bitflags! {
     }
 }
 
-impl<'de> Deserialize<'de> for MessageFlags {
-    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Ok(MessageFlags::from_bits_truncate(u64::deserialize(deserializer)?))
-    }
-}
-
-impl Serialize for MessageFlags {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_u64(self.bits())
-    }
-}
+impl_bitflags_serde!(MessageFlags: u64);
 
 #[cfg(feature = "model")]
 impl MessageId {
