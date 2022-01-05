@@ -76,7 +76,7 @@ impl CreateBotAuthParameters {
     ///
     /// **Note**: This needs to include the [`Bot`] scope.
     ///
-    /// [`Bot`]: crate::model::oauth2::OAuth2Scope::Bot
+    /// [`Bot`]: OAuth2Scope::Bot
     pub fn scopes(&mut self, scopes: &[OAuth2Scope]) -> &mut Self {
         self.scopes = scopes.to_vec();
         self

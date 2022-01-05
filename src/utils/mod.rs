@@ -699,8 +699,6 @@ fn clean_users(
 /// assert_eq!("@\u{200B}everyone".to_string(), without_mention);
 /// # }
 /// ```
-///
-/// [`Cache`]: crate::cache::Cache
 #[cfg(feature = "cache")]
 pub fn content_safe(
     cache: impl AsRef<Cache>,
