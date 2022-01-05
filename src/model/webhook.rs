@@ -127,51 +127,22 @@ impl Webhook {
         http.as_ref().delete_webhook_with_token(self.id.0, token).await
     }
 
-    /// Edits the webhook in-place. All fields are optional.
+    /// Edits the name of a webhook.
     ///
-    /// To nullify the avatar, pass `Some("")`. Otherwise, passing [`None`] will
-    /// not modify the avatar.
+    /// Refer to [`Http::edit_webhook`] for restrictions on webhook names.
     ///
-    /// Refer to [`Http::edit_webhook`] for httprictions on editing webhooks.
-    ///
-    /// As this calls the [`Http::edit_webhook_with_token`] function,
-    /// authentication is not required.
-    ///
+    /// Does not require authentication, as this calls [`Http::edit_webhook_with_token`] internally.
     /// # Examples
     ///
-    /// Editing a webhook's name:
-    ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::default();
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
-    /// let id = 245037420704169985;
-    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    ///
-    /// let mut webhook = http.get_webhook_with_token(id, token).await?;
-    ///
-    /// webhook.edit(&http, Some("new name"), None).await?;
-    /// #     Ok(())
-    /// # }
-    /// ```
-    ///
-    /// Setting a webhook's avatar:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
-    /// let id = 245037420704169985;
-    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    ///
-    /// let mut webhook = http.get_webhook_with_token(id, token).await?;
-    ///
-    /// let image = serenity::utils::read_image("./webhook_img.png")?;
-    ///
-    /// webhook.edit(&http, None, Some(&image)).await?;
+    /// webhook.edit_name(&http, "new name").await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -187,33 +158,97 @@ impl Webhook {
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn edit(
+    pub async fn edit_name(&mut self, http: impl AsRef<Http>, name: &str) -> Result<()> {
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        let mut map = JsonMap::new();
+        map.insert("name".to_string(), Value::from(name));
+        *self = http.as_ref().edit_webhook_with_token(self.id.0, token, &map).await?;
+        Ok(())
+    }
+
+    /// Edits a webhook's avatar.
+    ///
+    /// Refer to [`Http::edit_webhook`] for restrictions on wehbhook avatars.
+    ///
+    /// Does not require authentication, as it calls [`Http::edit_webhook_with_token`] internally.
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    /// let mut webhook = http.get_webhook_from_url(url).await?;
+    ///
+    /// webhook.edit_avatar(&http, "./webhook_img.png").await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
+    ///
+    /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
+    ///
+    /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn edit_avatar<'a>(
         &mut self,
         http: impl AsRef<Http>,
-        name: Option<&str>,
-        avatar: Option<&str>,
+        avatar: impl Into<AttachmentType<'a>>,
     ) -> Result<()> {
-        if name.is_none() && avatar.is_none() {
-            return Ok(());
-        }
-
+        let http = http.as_ref();
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
-
+        let data = avatar.into().data(&http.client).await?;
         let mut map = JsonMap::new();
+        map.insert(
+            "avatar".to_string(),
+            Value::from(format!("data:image/png;base64,{}", base64::encode(data))),
+        );
+        *self = http.edit_webhook_with_token(self.id.0, token, &map).await?;
+        Ok(())
+    }
 
-        if let Some(avatar) = avatar {
-            map.insert(
-                "avatar".to_string(),
-                if avatar.is_empty() { NULL } else { Value::from(avatar.to_string()) },
-            );
-        }
-
-        if let Some(name) = name {
-            map.insert("name".to_string(), Value::from(name.to_string()));
-        }
-
+    /// Deletes a webhook's avatar, resetting it to the default logo.
+    ///
+    /// Does not require authentication, as it calls [`Http::edit_webhook_with_token`] internally.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    /// let mut webhook = http.get_webhook_from_url(url).await?;
+    ///
+    /// webhook.delete_avatar(&http).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
+    ///
+    /// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.
+    ///
+    /// Or may return an [`Error::Json`] if there is an error in deserialising Discord's response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn delete_avatar(&mut self, http: impl AsRef<Http>) -> Result<()> {
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+        let mut map = JsonMap::new();
+        map.insert("avatar".to_string(), NULL);
         *self = http.as_ref().edit_webhook_with_token(self.id.0, token, &map).await?;
-
         Ok(())
     }
 
@@ -231,10 +266,8 @@ impl Webhook {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Http::default();
-    /// let id = 245037420704169985;
-    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    ///
-    /// let mut webhook = http.get_webhook_with_token(id, token).await?;
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
     /// webhook
     ///     .execute(&http, false, |mut w| {
@@ -256,10 +289,8 @@ impl Webhook {
     /// # let http = Http::default();
     /// use serenity::model::channel::Embed;
     ///
-    /// let id = 245037420704169985;
-    /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-    ///
-    /// let mut webhook = http.get_webhook_with_token(id, token).await?;
+    /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+    /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
     /// let embed = Embed::fake(|mut e| {
     ///     e.title("Rust's website");
