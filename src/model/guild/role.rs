@@ -1,7 +1,5 @@
 use std::cmp::Ordering;
 
-use serde::de::{Deserialize, Deserializer, Error as DeError};
-
 #[cfg(feature = "model")]
 use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -15,6 +13,7 @@ use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::model::misc::RoleParseError;
 use crate::model::prelude::*;
+use crate::model::utils::is_false;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_role;
 
@@ -276,7 +275,8 @@ impl FromStrAndCache for Role {
 }
 
 /// The tags of a [`Role`].
-#[derive(Clone, Debug, Default, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(test, derive(PartialEq))]
 #[non_exhaustive]
 pub struct RoleTags {
     /// The Id of the bot the [`Role`] belongs to.
@@ -284,29 +284,93 @@ pub struct RoleTags {
     /// The Id of the integration the [`Role`] belongs to.
     pub integration_id: Option<IntegrationId>,
     /// Whether this is the guild's premium subscriber role.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "is_false", with = "premium_subscriber")]
     pub premium_subscriber: bool,
 }
 
-impl<'de> Deserialize<'de> for RoleTags {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
+/// A premium subscriber role is reported with the field present and the value `null`.
+mod premium_subscriber {
+    use std::fmt;
 
-        let bot_id =
-            map.remove("bot_id").map(UserId::deserialize).transpose().map_err(DeError::custom)?;
+    use serde::de::{Error, Visitor};
+    use serde::{Deserializer, Serializer};
 
-        let integration_id = map
-            .remove("integration_id")
-            .map(IntegrationId::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?;
+    pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<bool, D::Error> {
+        deserializer.deserialize_option(NullValueVisitor)
+    }
 
-        let premium_subscriber = map.contains_key("premium_subscriber");
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn serialize<S: Serializer>(_: &bool, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_none()
+    }
 
-        Ok(Self {
-            bot_id,
-            integration_id,
-            premium_subscriber,
-        })
+    struct NullValueVisitor;
+
+    impl<'de> Visitor<'de> for NullValueVisitor {
+        type Value = bool;
+
+        fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            f.write_str("null value")
+        }
+
+        fn visit_none<E: Error>(self) -> Result<Self::Value, E> {
+            Ok(true)
+        }
+
+        /// Called by the `simd_json` crate
+        fn visit_unit<E: Error>(self) -> Result<Self::Value, E> {
+            Ok(true)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_test::{assert_tokens, Token};
+
+    use super::RoleTags;
+
+    #[test]
+    fn premium_subscriber_role_serde() {
+        let value = RoleTags {
+            bot_id: None,
+            integration_id: None,
+            premium_subscriber: true,
+        };
+
+        assert_tokens(&value, &[
+            Token::Struct {
+                name: "RoleTags",
+                len: 3,
+            },
+            Token::Str("bot_id"),
+            Token::None,
+            Token::Str("integration_id"),
+            Token::None,
+            Token::Str("premium_subscriber"),
+            Token::None,
+            Token::StructEnd,
+        ]);
+    }
+
+    #[test]
+    fn non_premium_subscriber_role_serde() {
+        let value = RoleTags {
+            bot_id: None,
+            integration_id: None,
+            premium_subscriber: false,
+        };
+
+        assert_tokens(&value, &[
+            Token::Struct {
+                name: "RoleTags",
+                len: 2,
+            },
+            Token::Str("bot_id"),
+            Token::None,
+            Token::Str("integration_id"),
+            Token::None,
+            Token::StructEnd,
+        ]);
     }
 }
