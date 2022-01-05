@@ -7,7 +7,7 @@ use std::fmt::Write;
 use bitflags::__impl_bitflags;
 #[cfg(feature = "model")]
 use futures::future::{BoxFuture, FutureExt};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 
 use super::prelude::*;
 #[cfg(feature = "model")]
@@ -676,23 +676,7 @@ __impl_bitflags! {
     }
 }
 
-impl<'de> Deserialize<'de> for UserPublicFlags {
-    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Ok(UserPublicFlags::from_bits_truncate(u32::deserialize(deserializer)?))
-    }
-}
-
-impl Serialize for UserPublicFlags {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_u32(self.bits())
-    }
-}
+impl_bitflags_serde!(UserPublicFlags: u32);
 
 impl Default for User {
     /// Initializes a [`User`] with default values. Setting the following:

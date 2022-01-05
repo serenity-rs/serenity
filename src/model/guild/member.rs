@@ -6,7 +6,6 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 
 use bitflags::__impl_bitflags;
 use chrono::{DateTime, Utc};
-use serde::{Serialize, Serializer};
 
 #[cfg(feature = "model")]
 use crate::builder::EditMember;
@@ -668,20 +667,4 @@ __impl_bitflags! {
     }
 }
 
-impl<'de> Deserialize<'de> for ThreadMemberFlags {
-    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Ok(ThreadMemberFlags::from_bits_truncate(u64::deserialize(deserializer)?))
-    }
-}
-
-impl Serialize for ThreadMemberFlags {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_u64(self.bits())
-    }
-}
+impl_bitflags_serde!(ThreadMemberFlags: u64);
