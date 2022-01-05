@@ -4,10 +4,6 @@
 #![allow(deprecated)]
 
 use bitflags::{__impl_bitflags, bitflags};
-use serde::{
-    de::{Deserialize, Deserializer},
-    ser::{Serialize, Serializer},
-};
 use url::Url;
 
 use super::prelude::*;
@@ -323,17 +319,7 @@ bitflags! {
     }
 }
 
-impl<'de> Deserialize<'de> for ActivityFlags {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(ActivityFlags::from_bits_truncate(u64::deserialize(deserializer)?))
-    }
-}
-
-impl Serialize for ActivityFlags {
-    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        serializer.serialize_u64(self.bits())
-    }
-}
+impl_bitflags_serde!(ActivityFlags: u64);
 
 /// Information about an activity's party.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -703,20 +689,7 @@ impl Default for GatewayIntents {
     }
 }
 
-impl<'de> Deserialize<'de> for GatewayIntents {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self::from_bits_truncate(u64::deserialize(deserializer)?))
-    }
-}
-
-impl Serialize for GatewayIntents {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_u64(self.bits())
-    }
-}
+impl_bitflags_serde!(GatewayIntents: u64);
 
 #[cfg(feature = "model")]
 impl GatewayIntents {
