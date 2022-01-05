@@ -232,7 +232,6 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
-<span id="233">233</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
@@ -258,9 +257,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
 <span class="doccomment">/// # let http = Http::default();</span>
-<span class="doccomment">/// let id = 245037420704169985;</span>
-<span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
-<span class="doccomment">/// let webhook = http.get_webhook_with_token(id, token).await?;</span>
+<span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+<span class="doccomment">/// let webhook = http.get_webhook_from_url(url).await?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let website = Embed::fake(|e| {</span>
 <span class="doccomment">///     e.title(&quot;The Rust Language Website&quot;)</span>

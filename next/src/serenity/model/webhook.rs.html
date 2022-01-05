@@ -443,6 +443,37 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -572,51 +603,22 @@
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Edits the webhook in-place. All fields are optional.</span>
+    <span class="doccomment">/// Edits the name of a webhook.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// To nullify the avatar, pass `Some(&quot;&quot;)`. Otherwise, passing [`None`] will</span>
-    <span class="doccomment">/// not modify the avatar.</span>
+    <span class="doccomment">/// Refer to [`Http::edit_webhook`] for restrictions on webhook names.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to [`Http::edit_webhook`] for httprictions on editing webhooks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// As this calls the [`Http::edit_webhook_with_token`] function,</span>
-    <span class="doccomment">/// authentication is not required.</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// Does not require authentication, as this calls [`Http::edit_webhook_with_token`] internally.</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Editing a webhook&#39;s name:</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+    <span class="doccomment">/// let mut webhook = http.get_webhook_from_url(url).await?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let id = 245037420704169985;</span>
-    <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut webhook = http.get_webhook_with_token(id, token).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// webhook.edit(&amp;http, Some(&quot;new name&quot;), None).await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting a webhook&#39;s avatar:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
-    <span class="doccomment">/// let id = 245037420704169985;</span>
-    <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut webhook = http.get_webhook_with_token(id, token).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let image = serenity::utils::read_image(&quot;./webhook_img.png&quot;)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// webhook.edit(&amp;http, None, Some(&amp;image)).await?;</span>
+    <span class="doccomment">/// webhook.edit_name(&amp;http, &quot;new name&quot;).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -632,33 +634,97 @@
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">name</span>));
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Edits a webhook&#39;s avatar.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Refer to [`Http::edit_webhook`] for restrictions on wehbhook avatars.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Does not require authentication, as it calls [`Http::edit_webhook_with_token`] internally.</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+    <span class="doccomment">/// let mut webhook = http.get_webhook_from_url(url).await?;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// webhook.edit_avatar(&amp;http, &quot;./webhook_img.png&quot;).await?;</span>
+    <span class="doccomment">/// #     Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_avatar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
-        <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+        <span class="ident">avatar</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">avatar</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
-        }
-
+        <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>();
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
-
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">avatar</span>.<span class="ident">into</span>().<span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>.<span class="ident">client</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
+        <span class="ident">map</span>.<span class="ident">insert</span>(
+            <span class="string">&quot;avatar&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">Value::from</span>(<span class="macro">format!</span>(<span class="string">&quot;data:image/png;base64,{}&quot;</span>, <span class="ident">base64::encode</span>(<span class="ident">data</span>))),
+        );
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">edit_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">avatar</span>) <span class="op">=</span> <span class="ident">avatar</span> {
-            <span class="ident">map</span>.<span class="ident">insert</span>(
-                <span class="string">&quot;avatar&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="kw">if</span> <span class="ident">avatar</span>.<span class="ident">is_empty</span>() { <span class="ident">NULL</span> } <span class="kw">else</span> { <span class="ident">Value::from</span>(<span class="ident">avatar</span>.<span class="ident">to_string</span>()) },
-            );
-        }
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value::from</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()));
-        }
-
+    <span class="doccomment">/// Deletes a webhook&#39;s avatar, resetting it to the default logo.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Does not require authentication, as it calls [`Http::edit_webhook_with_token`] internally.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::http::Http;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+    <span class="doccomment">/// let mut webhook = http.get_webhook_from_url(url).await?;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// webhook.delete_avatar(&amp;http).await?;</span>
+    <span class="doccomment">/// #     Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May also return an [`Error::Http`] if the content is malformed, or if the token is invalid.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error in deserialising Discord&#39;s response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_avatar</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::new</span>();
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;avatar&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">NULL</span>);
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -676,10 +742,8 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let http = Http::default();</span>
-    <span class="doccomment">/// let id = 245037420704169985;</span>
-    <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut webhook = http.get_webhook_with_token(id, token).await?;</span>
+    <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+    <span class="doccomment">/// let mut webhook = http.get_webhook_from_url(url).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// webhook</span>
     <span class="doccomment">///     .execute(&amp;http, false, |mut w| {</span>
@@ -701,10 +765,8 @@
     <span class="doccomment">/// # let http = Http::default();</span>
     <span class="doccomment">/// use serenity::model::channel::Embed;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let id = 245037420704169985;</span>
-    <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut webhook = http.get_webhook_with_token(id, token).await?;</span>
+    <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
+    <span class="doccomment">/// let mut webhook = http.get_webhook_from_url(url).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let embed = Embed::fake(|mut e| {</span>
     <span class="doccomment">///     e.title(&quot;Rust&#39;s website&quot;);</span>
