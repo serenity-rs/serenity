@@ -156,9 +156,7 @@ impl Serialize for Interaction {
                 MessageComponentInteraction::serialize(i, serializer)
             },
             Interaction::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
-            Interaction::ModalSubmit(i) => {
-                MessageComponentInteraction::serialize(i, serializer)
-            },
+            Interaction::ModalSubmit(i) => MessageComponentInteraction::serialize(i, serializer),
         }
     }
 }
