@@ -44,7 +44,7 @@ impl Interaction {
             Interaction::ApplicationCommand(_) => InteractionType::ApplicationCommand,
             Interaction::MessageComponent(_) => InteractionType::MessageComponent,
             Interaction::Autocomplete(_) => InteractionType::Autocomplete,
-            Interaction::ModalSubmit(_) => InteractionType::Autocomplete,
+            Interaction::ModalSubmit(_) => InteractionType::ModalSubmit,
         }
     }
 

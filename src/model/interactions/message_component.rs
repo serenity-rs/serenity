@@ -401,6 +401,7 @@ pub enum Component {
     ActionRow(ActionRow),
     Button(Button),
     SelectMenu(SelectMenu),
+    InputText(InputText),
 }
 
 impl<'de> Deserialize<'de> for Component {
@@ -423,7 +424,9 @@ impl<'de> Deserialize<'de> for Component {
             ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
                 .map(Component::SelectMenu)
                 .map_err(DeError::custom),
-            ComponentType::InputText => unimplemented!(),
+            ComponentType::InputText => serde_json::from_value::<InputText>(Value::Object(map))
+                .map(Component::InputText)
+                .map_err(DeError::custom),
             ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
         }
     }
@@ -438,6 +441,7 @@ impl Serialize for Component {
             Component::ActionRow(c) => ActionRow::serialize(c, serializer),
             Component::Button(c) => Button::serialize(c, serializer),
             Component::SelectMenu(c) => SelectMenu::serialize(c, serializer),
+            Component::InputText(c) => InputText::serialize(c, serializer),
         }
     }
 }
@@ -460,6 +464,12 @@ impl From<SelectMenu> for Component {
     }
 }
 
+impl From<InputText> for Component {
+    fn from(component: InputText) -> Self {
+        Component::InputText(component)
+    }
+}
+
 /// The type of a component
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
@@ -475,7 +485,8 @@ pub enum ComponentType {
 enum_number!(ComponentType {
     ActionRow,
     Button,
-    SelectMenu
+    SelectMenu,
+    InputText
 });
 
 /// An action row.
@@ -495,6 +506,7 @@ pub struct ActionRow {
 pub enum ActionRowComponent {
     Button(Button),
     SelectMenu(SelectMenu),
+    InputText(InputText),
 }
 
 impl<'de> Deserialize<'de> for ActionRowComponent {
@@ -527,6 +539,7 @@ impl Serialize for ActionRowComponent {
         match self {
             ActionRowComponent::Button(c) => Button::serialize(c, serializer),
             ActionRowComponent::SelectMenu(c) => SelectMenu::serialize(c, serializer),
+            ActionRowComponent::InputText(c) => InputText::serialize(c, serializer),
         }
     }
 }
@@ -536,6 +549,7 @@ impl From<ActionRowComponent> for Component {
         match component {
             ActionRowComponent::Button(b) => Component::Button(b),
             ActionRowComponent::SelectMenu(s) => Component::SelectMenu(s),
+            ActionRowComponent::InputText(i) => Component::InputText(i),
         }
     }
 }
@@ -548,6 +562,7 @@ impl TryFrom<Component> for ActionRowComponent {
             Component::ActionRow(_) => Err(Error::Model(ModelError::InvalidComponentType)),
             Component::Button(b) => Ok(ActionRowComponent::Button(b)),
             Component::SelectMenu(s) => Ok(ActionRowComponent::SelectMenu(s)),
+            Component::InputText(i) => Ok(ActionRowComponent::InputText(i)),
         }
     }
 }
@@ -640,3 +655,44 @@ pub struct SelectMenuOption {
     #[serde(default)]
     pub default: bool,
 }
+
+
+/// A input text component for modal interactions
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct InputText {
+    /// The component type, it will always be [`ComponentType::InputText`].
+    #[serde(rename = "type")]
+    pub kind: ComponentType,
+    /// An identifier defined by the developer for the select menu.
+    pub custom_id: String,
+    /// The style of the input text
+    pub style: InputTextStyle,
+    /// The text that appears on top of the input text field, max 80 characters
+    pub label: String,
+    /// placeholder for the text input
+    pub placeholder: Option<String>,
+    /// Minimal length of text input
+    pub min_length: Option<u64>,
+    /// Maximal length of text input
+    pub max_length: Option<u64>,
+    /// Whether this text input is required
+    pub required: Option<bool>,
+    /// The pre-filled value
+    pub value: Option<String>,
+}
+
+/// The style of the input text
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum InputTextStyle {
+    Short = 1,
+    Paragraph = 2,
+    Unknown = !0,
+}
+
+enum_number!(InputTextStyle {
+    Short,
+    Paragraph,
+    Unknown
+});
