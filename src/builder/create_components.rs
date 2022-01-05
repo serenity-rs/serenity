@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::internal::prelude::*;
 use crate::model::channel::ReactionType;
-use crate::model::interactions::message_component::ButtonStyle;
+use crate::model::interactions::message_component::{ButtonStyle, InputTextStyle};
 use crate::utils;
 
 /// A builder for creating several [`ActionRow`]s.
@@ -93,6 +93,29 @@ impl CreateActionRow {
         let components_array = components.as_array_mut().expect("Must be an array");
 
         components_array.push(menu.build());
+
+        self
+    }
+
+    /// Creates an input text.
+    pub fn create_input_text<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateInputText) -> &mut CreateInputText,
+    {
+        let mut data = CreateInputText::default();
+        f(&mut data);
+
+        self.add_input_text(data);
+
+        self
+    }
+
+    /// Adds an input text.
+    pub fn add_input_text(&mut self, input_text: CreateInputText) -> &mut Self {
+        let components = self.0.entry("components").or_insert_with(|| Value::Array(Vec::new()));
+        let components_array = components.as_array_mut().expect("Must be an array");
+
+        components_array.push(input_text.build());
 
         self
     }
@@ -323,5 +346,67 @@ impl CreateSelectMenuOption {
     pub fn default_selection(&mut self, disabled: bool) -> &mut Self {
         self.0.insert("default", Value::Bool(disabled));
         self
+    }
+}
+
+/// A builder for creating an [`InputText`].
+///
+/// [`InputText`]: crate::model::interactions::message_component::InputText
+#[derive(Clone, Debug, Default)]
+pub struct CreateInputText(pub HashMap<&'static str, Value>);
+
+impl CreateInputText {
+    /// Sets the custom id of the input text, a developer-defined identifier.
+    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
+        self.0.insert("custom_id", Value::String(id.to_string()));
+        self
+    }
+
+    /// Sets the style of this input text
+    pub fn style(&mut self, kind: InputTextStyle) -> &mut Self {
+        self.0.insert("style", Value::Number(serde_json::Number::from(kind as u8)));
+        self
+    }
+
+    /// Sets the label of this input text.
+    pub fn label<D: ToString>(&mut self, label: D) -> &mut Self {
+        self.0.insert("label", Value::String(label.to_string()));
+        self
+    }
+
+    /// Sets the placeholder of this input text.
+    pub fn placeholder<D: ToString>(&mut self, label: D) -> &mut Self {
+        self.0.insert("placeholder", Value::String(label.to_string()));
+        self
+    }
+
+    /// Sets the minimum length required for the input text
+    pub fn min_values(&mut self, min: u64) -> &mut Self {
+        self.0.insert("min_length", Value::Number(Number::from(min)));
+        self
+    }
+
+    /// Sets the maximum length required for the input text
+    pub fn max_values(&mut self, max: u64) -> &mut Self {
+        self.0.insert("max_length", Value::Number(Number::from(max)));
+        self
+    }
+
+    /// Sets the value of this input text.
+    pub fn value<D: ToString>(&mut self, value: D) -> &mut Self {
+        self.0.insert("value", Value::String(value.to_string()));
+        self
+    }
+
+    /// Sets if the input text is required
+    pub fn required(&mut self, required: bool) -> &mut Self {
+        self.0.insert("required", Value::Bool(required));
+        self
+    }
+
+    pub fn build(mut self) -> Value {
+        self.0.insert("type", Value::Number(serde_json::Number::from(4_u8)));
+
+        utils::hashmap_to_json_map(self.0.clone()).into()
     }
 }
