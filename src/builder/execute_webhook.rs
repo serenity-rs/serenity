@@ -23,9 +23,8 @@ use crate::model::channel::{AttachmentType, MessageFlags};
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # let http = Http::default();
-/// let id = 245037420704169985;
-/// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-/// let webhook = http.get_webhook_with_token(id, token).await?;
+/// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
+/// let webhook = http.get_webhook_from_url(url).await?;
 ///
 /// let website = Embed::fake(|e| {
 ///     e.title("The Rust Language Website")
