@@ -45,7 +45,7 @@
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 use bitflags::__impl_bitflags;
-use serde::de::{Deserialize, Deserializer, Error as DeError};
+use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 
 /// This macro generates the [`Permissions::get_permission_names`] method.
@@ -685,8 +685,26 @@ impl Default for Permissions {
 
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let str_u64 = String::deserialize(deserializer)?;
-        Ok(Permissions::from_bits_truncate(str_u64.parse::<u64>().map_err(D::Error::custom)?))
+        use std::fmt;
+
+        struct StringVisitor;
+
+        impl<'de> serde::de::Visitor<'de> for StringVisitor {
+            type Value = Permissions;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+                formatter.write_str("permissions string")
+            }
+
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                let value = v.parse().map_err(E::custom)?;
+                Ok(Permissions::from_bits_truncate(value))
+            }
+        }
+        deserializer.deserialize_str(StringVisitor)
     }
 }
 
@@ -718,5 +736,18 @@ impl Display for Permissions {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_test::{assert_tokens, Token};
+
+    use super::*;
+
+    #[test]
+    fn permissions_serde() {
+        let value = Permissions::MANAGE_GUILD | Permissions::MANAGE_ROLES;
+        assert_tokens(&value, &[Token::Str("268435488")]);
     }
 }
