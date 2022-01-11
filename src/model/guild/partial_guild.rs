@@ -1330,7 +1330,7 @@ impl PartialGuild {
     /// may also return [`Error::NotInRange`] if the input is
     /// not within range.
     ///
-    /// [`User`]: ../user/struct.User.html
+    /// [`User`]: crate::model::user::User
     #[inline]
     pub async fn members(
         &self,

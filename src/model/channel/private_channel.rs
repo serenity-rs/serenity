@@ -40,8 +40,6 @@ impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
     ///
     /// See [ChannelId::broadcast_typing] for more details.
-    ///
-    /// [`ChannelId::broadcast_typing`]: crate::model::channel::ChannelId::broadcast_typing
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
@@ -157,7 +155,6 @@ impl PrivateChannel {
     ///
     /// Returns [`Error::Http`] if the current user is not the owner of the message.
     ///
-    /// [`EditMessage`]: crate::builder::EditMessage
     /// [`the limit`]: crate::builder::EditMessage::content
     #[inline]
     pub async fn edit_message<F>(
@@ -203,8 +200,6 @@ impl PrivateChannel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if an invalid value is set in the builder.
-    ///
-    /// [`GetMessages`]: crate::builder::GetMessages
     #[inline]
     pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
     where
@@ -323,8 +318,6 @@ impl PrivateChannel {
     /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
-    ///
-    /// [`CreateMessage`]: crate::builder::CreateMessage
     #[inline]
     pub async fn send_message<'a, F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
     where

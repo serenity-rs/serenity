@@ -251,8 +251,6 @@ impl CurrentUser {
     /// # }
     /// ```
     ///
-    /// [`EditProfile`]: crate::builder::EditProfile
-    ///
     /// # Errors
     ///
     /// Returns an [`Error::Http`] if an invalid value is set.
@@ -771,8 +769,6 @@ impl User {
     /// # Errors
     ///
     /// See [`UserId::create_dm_channel`] for what errors may be returned.
-    ///
-    /// [`UserId::create_dm_channel`]: crate::model::id::UserId::create_dm_channel
     #[inline]
     pub async fn create_dm_channel(&self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
         if self.bot {
@@ -978,8 +974,6 @@ impl User {
     /// # Errors
     ///
     /// See [`UserId::to_user`] for what errors may be returned.
-    ///
-    /// [`UserId::to_user`]: crate::model::id::UserId::to_user
     #[inline]
     pub async fn refresh(&mut self, cache_http: impl CacheHttp) -> Result<()> {
         *self = self.id.to_user(cache_http).await?;

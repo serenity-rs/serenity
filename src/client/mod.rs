@@ -137,8 +137,6 @@ impl ClientBuilder {
     /// If you have enabled the `framework`-feature (on by default), you must specify
     /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
-    ///
-    /// [`Http`]: crate::http::Http
     pub fn new_with_http(http: Http) -> Self {
         Self::_new(http)
     }
@@ -152,8 +150,6 @@ impl ClientBuilder {
     }
 
     /// Gets the current token used for the [`Http`] client.
-    ///
-    /// [`Http`]: crate::http::Http
     pub fn get_token(&self) -> &str {
         &self.http.token
     }
@@ -222,7 +218,7 @@ impl ClientBuilder {
     /// Sets the settings of the cache.
     /// Refer to [`Settings`] for more information.
     ///
-    /// [`Settings`]: self::CacheSettings
+    /// [`Settings`]: CacheSettings
     #[cfg(feature = "cache")]
     pub fn cache_settings<F>(mut self, f: F) -> Self
     where
@@ -303,7 +299,7 @@ impl ClientBuilder {
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
     ///
-    /// [`voice_manager`]: #method.voice_manager
+    /// [`voice_manager`]: Self::voice_manager
     #[cfg(feature = "voice")]
     pub fn voice_manager_arc(
         mut self,
@@ -343,8 +339,6 @@ impl ClientBuilder {
     /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
-    /// [`GatewayIntents::GUILD_PRESENCES`]: crate::model::gateway::GatewayIntents::GUILD_PRESENCES
-    /// [`GatewayIntents::GUILD_MEMBERS`]: crate::model::gateway::GatewayIntents::GUILD_MEMBERS
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
         self.intents = intents;
 

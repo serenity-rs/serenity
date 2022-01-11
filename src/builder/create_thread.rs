@@ -47,9 +47,6 @@ impl CreateThread {
     /// when thread documentation was first published. This is a bit of a weird default though,
     /// and thus is highly likely to change in the future, so it is recommended to always
     /// explicitly setting it to avoid any breaking change.
-    ///
-    /// [`ChannelType::PublicThread`]: crate::model::channel::ChannelType::PublicThread
-    /// [`ChannelType::PrivateThread`]: crate::model::channel::ChannelType::PrivateThread
     pub fn kind(&mut self, kind: ChannelType) -> &mut Self {
         self.0.insert("type", from_number(kind as u8));
 

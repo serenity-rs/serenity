@@ -1295,7 +1295,6 @@ async fn send_error_embed(
 /// Returns the same errors as [`ChannelId::send_message`].
 ///
 /// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub async fn with_embeds(
@@ -1501,8 +1500,6 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 /// # Errors
 ///
 /// Returns the same errors as [`ChannelId::send_message`].
-///
-/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub async fn plain(

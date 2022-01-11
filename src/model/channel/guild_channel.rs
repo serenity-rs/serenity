@@ -459,7 +459,6 @@ impl GuildChannel {
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`EditMessage`]: crate::builder::EditMessage
     /// [`the limit`]: crate::builder::EditMessage::content
     #[inline]
     pub async fn edit_message<F>(
@@ -676,7 +675,6 @@ impl GuildChannel {
     /// Returns [`Error::Http`] if the current user lacks permission to
     /// view the channel.
     ///
-    /// [`GetMessages`]: crate::builder::GetMessages
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
