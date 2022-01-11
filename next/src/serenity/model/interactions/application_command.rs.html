@@ -1135,11 +1135,6 @@
 <span id="1132">1132</span>
 <span id="1133">1133</span>
 <span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1263,8 +1258,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s docs for Edit Webhook Message for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
@@ -2117,9 +2110,6 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandPermissionData</span> {
     <span class="doccomment">/// The [`RoleId`] or [`UserId`], depends on `kind` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RoleId`]: crate::model::id::RoleId</span>
-    <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">CommandPermissionId</span>,
     <span class="doccomment">/// The type of data this permissions applies to.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>

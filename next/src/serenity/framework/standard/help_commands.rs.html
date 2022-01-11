@@ -1619,9 +1619,6 @@
 <span id="1616">1616</span>
 <span id="1617">1617</span>
 <span id="1618">1618</span>
-<span id="1619">1619</span>
-<span id="1620">1620</span>
-<span id="1621">1621</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Example</span>
@@ -2919,7 +2916,6 @@
 <span class="doccomment">/// Returns the same errors as [`ChannelId::send_message`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help</span>
-<span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::implicit_hasher</span>)]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_embeds</span>(
@@ -3125,8 +3121,6 @@
 <span class="doccomment">/// # Errors</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns the same errors as [`ChannelId::send_message`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::implicit_hasher</span>)]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">plain</span>(

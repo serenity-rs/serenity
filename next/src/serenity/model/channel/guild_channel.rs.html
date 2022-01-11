@@ -1320,8 +1320,6 @@
 <span id="1317">1317</span>
 <span id="1318">1318</span>
 <span id="1319">1319</span>
-<span id="1320">1320</span>
-<span id="1321">1321</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1781,7 +1779,6 @@
     <span class="doccomment">/// is over the [`the limit`], containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EditMessage`]: crate::builder::EditMessage</span>
     <span class="doccomment">/// [`the limit`]: crate::builder::EditMessage::content</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -1998,7 +1995,6 @@
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission to</span>
     <span class="doccomment">/// view the channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GetMessages`]: crate::builder::GetMessages</span>
     <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">messages</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">builder</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>

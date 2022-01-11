@@ -823,8 +823,6 @@
 <span id="820">820</span>
 <span id="821">821</span>
 <span id="822">822</span>
-<span id="823">823</span>
-<span id="824">824</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">bitflags</span>::{<span class="ident">__impl_bitflags</span>, <span class="ident">bitflags</span>};
@@ -1375,8 +1373,6 @@
 <span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
 <span class="doccomment">/// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
 <span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
-<span class="doccomment">/// [`GatewayIntents::GuildPresences`]: crate::model::gateway::GatewayIntents::GUILD_PRESENCES</span>
-<span class="doccomment">/// [`GatewayIntents::GuildMembers`]: crate::model::gateway::GatewayIntents::GUILD_MEMBERS</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GatewayIntents</span> {
     <span class="doccomment">/// The flags composing gateway intents.</span>

@@ -1033,12 +1033,6 @@
 <span id="1030">1030</span>
 <span id="1031">1031</span>
 <span id="1032">1032</span>
-<span id="1033">1033</span>
-<span id="1034">1034</span>
-<span id="1035">1035</span>
-<span id="1036">1036</span>
-<span id="1037">1037</span>
-<span id="1038">1038</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1177,8 +1171,6 @@
     <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
     <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
     <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Http`]: crate::http::Http</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_http</span>(<span class="ident">http</span>: <span class="ident">Http</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">http</span>)
     }
@@ -1192,8 +1184,6 @@
     }
 
     <span class="doccomment">/// Gets the current token used for the [`Http`] client.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Http`]: crate::http::Http</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>.<span class="ident">token</span>
     }
@@ -1251,7 +1241,7 @@
     <span class="doccomment">/// Sets the settings of the cache.</span>
     <span class="doccomment">/// Refer to [`Settings`] for more information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Settings`]: self::CacheSettings</span>
+    <span class="doccomment">/// [`Settings`]: CacheSettings</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_settings</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
@@ -1317,7 +1307,7 @@
     <span class="doccomment">/// extra control.</span>
     <span class="doccomment">/// You can provide a clone and keep the original to manually dispatch.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`voice_manager`]: #method.voice_manager</span>
+    <span class="doccomment">/// [`voice_manager`]: Self::voice_manager</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_manager_arc</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
@@ -1351,8 +1341,6 @@
     <span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
     <span class="doccomment">/// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
     <span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
-    <span class="doccomment">/// [`GatewayIntents::GUILD_PRESENCES`]: crate::model::gateway::GatewayIntents::GUILD_PRESENCES</span>
-    <span class="doccomment">/// [`GatewayIntents::GUILD_MEMBERS`]: crate::model::gateway::GatewayIntents::GUILD_MEMBERS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intents</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">intents</span> <span class="op">=</span> <span class="ident">intents</span>;
 

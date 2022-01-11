@@ -212,10 +212,6 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
@@ -227,7 +223,6 @@
 <span class="doccomment">/// A builder for creating several [`ApplicationCommandPermission`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandsPermissions</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -279,7 +274,6 @@
 <span class="doccomment">/// A builder for creating an [`ApplicationCommandPermission`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandPermission`]: crate::model::interactions::application_command::ApplicationCommandPermission</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissions</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -342,7 +336,6 @@
 <span class="doccomment">/// A builder for creating several [`ApplicationCommandPermissionData`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionsData</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -399,7 +392,6 @@
 <span class="doccomment">/// All fields are required.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`ApplicationCommandPermissionData`]: crate::model::interactions::application_command::ApplicationCommandPermissionData</span>
-<span class="doccomment">/// [`kind`]: Self::kind</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateApplicationCommandPermissionData</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 

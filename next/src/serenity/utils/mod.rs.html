@@ -1011,8 +1011,6 @@
 <span id="1008">1008</span>
 <span id="1009">1009</span>
 <span id="1010">1010</span>
-<span id="1011">1011</span>
-<span id="1012">1012</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -1714,8 +1712,6 @@
 <span class="doccomment">/// assert_eq!(&quot;@\u{200B}everyone&quot;.to_string(), without_mention);</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content_safe</span>(
     <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,

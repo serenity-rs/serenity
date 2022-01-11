@@ -404,13 +404,6 @@
 <span id="401">401</span>
 <span id="402">402</span>
 <span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -453,8 +446,6 @@
     <span class="doccomment">/// Broadcasts that the current user is typing to the recipient.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [ChannelId::broadcast_typing] for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId::broadcast_typing`]: crate::model::channel::ChannelId::broadcast_typing</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">broadcast_typing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -570,7 +561,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user is not the owner of the message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EditMessage`]: crate::builder::EditMessage</span>
     <span class="doccomment">/// [`the limit`]: crate::builder::EditMessage::content</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -616,8 +606,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if an invalid value is set in the builder.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GetMessages`]: crate::builder::GetMessages</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">messages</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">builder</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -736,8 +724,6 @@
     <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the content of the message</span>
     <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CreateMessage`]: crate::builder::CreateMessage</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>

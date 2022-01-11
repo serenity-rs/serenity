@@ -1230,9 +1230,6 @@
 <span id="1227">1227</span>
 <span id="1228">1228</span>
 <span id="1229">1229</span>
-<span id="1230">1230</span>
-<span id="1231">1231</span>
-<span id="1232">1232</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -2114,8 +2111,6 @@
     <span class="doccomment">/// The only advantage of this method is that you can pass in anything that</span>
     <span class="doccomment">/// is indirectly a [`UserId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Retrieve a user from the cache and print their name:</span>
@@ -2227,7 +2222,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the [`CacheUpdate` examples].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CacheUpdate`]: CacheUpdate</span>
     <span class="doccomment">/// [`CacheUpdate` examples]: CacheUpdate#examples</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">e</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">CacheUpdate</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="kw-2">&amp;mut</span> <span class="ident">E</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E::Output</span><span class="op">&gt;</span> {

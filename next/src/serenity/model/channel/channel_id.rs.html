@@ -1313,9 +1313,6 @@
 <span id="1310">1310</span>
 <span id="1311">1311</span>
 <span id="1312">1312</span>
-<span id="1313">1313</span>
-<span id="1314">1314</span>
-<span id="1315">1315</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span> <span class="kw">as</span> <span class="ident">FmtWrite</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1675,7 +1672,6 @@
     <span class="doccomment">/// is over the [`the limit`], containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EditMessage`]: crate::builder::EditMessage</span>
     <span class="doccomment">/// [`the limit`]: crate::builder::EditMessage::content</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -1778,7 +1774,6 @@
     <span class="doccomment">/// Returns [`Error::Http`] if the current user does not have</span>
     <span class="doccomment">/// permission to view the channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GetMessages`]: crate::builder::GetMessages</span>
     <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">messages</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">builder</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2065,7 +2060,6 @@
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission to</span>
     <span class="doccomment">/// send a message in this channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CreateMessage`]: crate::builder::CreateMessage</span>
     <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span>

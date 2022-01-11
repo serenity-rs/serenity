@@ -1358,12 +1358,6 @@
 <span id="1355">1355</span>
 <span id="1356">1356</span>
 <span id="1357">1357</span>
-<span id="1358">1358</span>
-<span id="1359">1359</span>
-<span id="1360">1360</span>
-<span id="1361">1361</span>
-<span id="1362">1362</span>
-<span id="1363">1363</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1611,8 +1605,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EditProfile`]: crate::builder::EditProfile</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
@@ -2101,8 +2093,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [`UserId::create_dm_channel`] for what errors may be returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`UserId::create_dm_channel`]: crate::model::id::UserId::create_dm_channel</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_dm_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">bot</span> {
@@ -2308,8 +2298,6 @@
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [`UserId::to_user`] for what errors may be returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`UserId::to_user`]: crate::model::id::UserId::to_user</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">refresh</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">to_user</span>(<span class="ident">cache_http</span>).<span class="kw">await</span><span class="question-mark">?</span>;
