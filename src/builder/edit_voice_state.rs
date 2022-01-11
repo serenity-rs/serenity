@@ -9,7 +9,6 @@ use crate::json;
 /// A builder which edits a user's voice state, to be used in conjunction with
 /// [`GuildChannel::edit_voice_state`].
 ///
-/// [`Member`]: crate::model::guild::Member
 /// [`GuildChannel::edit_voice_state`]: crate::model::channel::GuildChannel::edit_voice_state
 #[derive(Clone, Debug, Default)]
 pub struct EditVoiceState(pub HashMap<&'static str, Value>);

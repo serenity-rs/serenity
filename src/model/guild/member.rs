@@ -263,8 +263,6 @@ impl Member {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks necessary permissions.
-    ///
-    /// [`EditMember`]: crate::builder::EditMember
     pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Member>
     where
         F: FnOnce(&mut EditMember) -> &mut EditMember,

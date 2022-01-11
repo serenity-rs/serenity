@@ -548,8 +548,6 @@ pub struct ActivityTimestamps {
 /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
 /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
 /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
-/// [`GatewayIntents::GuildPresences`]: crate::model::gateway::GatewayIntents::GUILD_PRESENCES
-/// [`GatewayIntents::GuildMembers`]: crate::model::gateway::GatewayIntents::GUILD_MEMBERS
 #[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct GatewayIntents {
     /// The flags composing gateway intents.

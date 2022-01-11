@@ -1121,7 +1121,6 @@ impl Guild {
     ///
     /// Returns [`Error::Http`] if the current user lacks the necessary permissions.
     ///
-    /// [`EditMember`]: crate::builder::EditMember
     /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_member<F>(
