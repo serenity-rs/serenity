@@ -328,7 +328,6 @@ impl Message {
     /// is over [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`EditMessage`]: crate::builder::EditMessage
     /// [`the limit`]: crate::builder::EditMessage::content
     pub async fn edit<'a, F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
     where

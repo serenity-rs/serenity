@@ -355,7 +355,6 @@ impl ChannelId {
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`EditMessage`]: crate::builder::EditMessage
     /// [`the limit`]: crate::builder::EditMessage::content
     #[inline]
     pub async fn edit_message<F>(
@@ -467,7 +466,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user does not have
     /// permission to view the channel.
     ///
-    /// [`GetMessages`]: crate::builder::GetMessages
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn messages<F>(self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
     where
@@ -756,7 +754,6 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to
     /// send a message in this channel.
     ///
-    /// [`CreateMessage`]: crate::builder::CreateMessage
     /// [Send Messages]: Permissions::SEND_MESSAGES
     pub async fn send_message<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Message>
     where

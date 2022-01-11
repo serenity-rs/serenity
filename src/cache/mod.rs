@@ -890,8 +890,6 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`UserId`].
     ///
-    /// [`UserId`]: crate::model::id::UserId
-    ///
     /// # Examples
     ///
     /// Retrieve a user from the cache and print their name:
@@ -1007,7 +1005,6 @@ impl Cache {
     ///
     /// Refer to the [`CacheUpdate` examples].
     ///
-    /// [`CacheUpdate`]: CacheUpdate
     /// [`CacheUpdate` examples]: CacheUpdate#examples
     #[instrument(skip(self, e))]
     pub fn update<E: CacheUpdate>(&self, e: &mut E) -> Option<E::Output> {
