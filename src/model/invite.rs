@@ -78,7 +78,6 @@ impl Invite {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [`CreateInvite`]: crate::builder::CreateInvite
     /// [Create Invite]: Permissions::CREATE_INVITE
     /// [permission]: super::permissions
     #[inline]
