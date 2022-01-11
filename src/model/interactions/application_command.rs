@@ -126,8 +126,6 @@ impl ApplicationCommandInteraction {
     ///
     /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
     ///
-    /// [`UserId`]: crate::model::id::UserId
-    ///
     /// # Errors
     ///
     /// Returns [`Error::Model`] if the edited content is too long.
@@ -1011,9 +1009,6 @@ pub struct ApplicationCommandPermission {
 #[non_exhaustive]
 pub struct ApplicationCommandPermissionData {
     /// The [`RoleId`] or [`UserId`], depends on `kind` value.
-    ///
-    /// [`RoleId`]: crate::model::id::RoleId
-    /// [`UserId`]: crate::model::id::UserId
     pub id: CommandPermissionId,
     /// The type of data this permissions applies to.
     #[serde(rename = "type")]
