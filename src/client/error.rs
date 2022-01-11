@@ -9,9 +9,7 @@ use std::{
 /// variant.
 ///
 /// [`Client`]: super::Client
-/// [`Error`]: crate::Error
 /// [`Error::Client`]: crate::Error::Client
-/// [`GuildId::ban`]: crate::model::id::GuildId::ban
 #[allow(clippy::enum_variant_names)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
