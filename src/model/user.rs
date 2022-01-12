@@ -506,10 +506,18 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
-    /// the public flags on a user's account
+    /// The public flags on a user's account
     pub public_flags: Option<UserPublicFlags>,
     /// Optional banner hash.
+    ///
+    /// **Note**: This will only be present if the user is fetched via Rest API,
+    /// e.g. with [`Http::get_user`].
     pub banner: Option<String>,
+    /// The user's banner color encoded as an integer representation of
+    /// hexadecimal color code
+    ///
+    /// **Note**: This will only be present if the user is fetched via Rest API,
+    /// e.g. with [`Http::get_user`].
     #[cfg(feature = "utils")]
     pub accent_color: Option<Colour>,
     #[cfg(not(feature = "utils"))]
@@ -627,6 +635,9 @@ impl User {
     /// Returns the formatted URL of the user's banner, if one exists.
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF banner.
+    ///
+    /// **Note**: This will only be present if the user is fetched via Rest API,
+    /// e.g. with [`Http::get_user`].
     #[inline]
     pub fn banner_url(&self) -> Option<String> {
         banner_url(self.id, self.banner.as_ref())
