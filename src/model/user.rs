@@ -52,9 +52,9 @@ pub struct CurrentUser {
     pub public_flags: Option<UserPublicFlags>,
     pub banner: Option<String>,
     #[cfg(feature = "utils")]
-    pub accent_color: Option<Colour>,
+    pub accent_colour: Option<Colour>,
     #[cfg(not(feature = "utils"))]
-    pub accent_color: Option<u32>,
+    pub accent_colour: Option<u32>,
 }
 
 #[cfg(feature = "model")]
@@ -513,15 +513,17 @@ pub struct User {
     /// **Note**: This will only be present if the user is fetched via Rest API,
     /// e.g. with [`Http::get_user`].
     pub banner: Option<String>,
-    /// The user's banner color encoded as an integer representation of
-    /// hexadecimal color code
+    /// The user's banner colour encoded as an integer representation of
+    /// hexadecimal colour code
     ///
     /// **Note**: This will only be present if the user is fetched via Rest API,
     /// e.g. with [`Http::get_user`].
     #[cfg(feature = "utils")]
-    pub accent_color: Option<Colour>,
+    #[serde(rename = "accent_color")]
+    pub accent_colour: Option<Colour>,
     #[cfg(not(feature = "utils"))]
-    pub accent_color: Option<u32>,
+    #[serde(rename = "accent_color")]
+    pub accent_colour: Option<u32>,
 }
 
 /// User's public flags
@@ -598,7 +600,7 @@ impl Default for User {
             name: "test".to_string(),
             public_flags: None,
             banner: None,
-            accent_color: None,
+            accent_colour: None,
         }
     }
 }
@@ -1077,7 +1079,7 @@ impl From<CurrentUser> for User {
             name: user.name,
             public_flags: user.public_flags,
             banner: user.banner,
-            accent_color: user.accent_color,
+            accent_colour: user.accent_colour,
         }
     }
 }
@@ -1092,7 +1094,7 @@ impl<'a> From<&'a CurrentUser> for User {
             name: user.name.clone(),
             public_flags: user.public_flags,
             banner: user.banner.clone(),
-            accent_color: user.accent_color,
+            accent_colour: user.accent_colour,
         }
     }
 }

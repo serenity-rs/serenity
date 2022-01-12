@@ -445,7 +445,7 @@ mod test {
                 name: "fake".to_string(),
                 public_flags: None,
                 banner: None,
-                accent_color: None,
+                accent_colour: None,
             };
             let member = Member {
                 deaf: false,

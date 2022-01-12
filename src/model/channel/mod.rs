@@ -540,7 +540,7 @@ mod test {
                     name: "ab".to_string(),
                     public_flags: None,
                     banner: None,
-                    accent_color: None,
+                    accent_colour: None,
                 },
             }
         }

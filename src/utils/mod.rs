@@ -857,7 +857,7 @@ mod test {
             name: "Crab".to_string(),
             public_flags: None,
             banner: None,
-            accent_color: None,
+            accent_colour: None,
         };
 
         #[allow(deprecated)]
