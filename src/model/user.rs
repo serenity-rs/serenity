@@ -51,7 +51,10 @@ pub struct CurrentUser {
     pub verified: Option<bool>,
     pub public_flags: Option<UserPublicFlags>,
     pub banner: Option<String>,
+    #[cfg(feature = "utils")]
     pub accent_color: Option<Colour>,
+    #[cfg(not(feature = "utils"))]
+    pub accent_color: Option<u32>,
 }
 
 #[cfg(feature = "model")]
@@ -507,7 +510,10 @@ pub struct User {
     pub public_flags: Option<UserPublicFlags>,
     /// Optional banner hash.
     pub banner: Option<String>,
+    #[cfg(feature = "utils")]
     pub accent_color: Option<Colour>,
+    #[cfg(not(feature = "utils"))]
+    pub accent_color: Option<u32>,
 }
 
 /// User's public flags
