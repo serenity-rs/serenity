@@ -400,15 +400,11 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
-        let guild_locale = match map.contains_key("guild_locale") {
-            true => Some(
-                map.remove("guild_locale")
-                    .ok_or_else(|| DeError::custom("expected guild_locale"))
-                    .and_then(String::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let guild_locale = map
+            .remove("guild_locale")
+            .map(String::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         let locale = map
             .remove("locale")
