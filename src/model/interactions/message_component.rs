@@ -51,6 +51,10 @@ pub struct MessageComponentInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
+    /// The selected language of the invoking user
+    pub locale: String,
+    /// The guild's preferred locale, if invoked in a guild
+    pub guild_locale: Option<String>,
 }
 
 #[cfg(feature = "http")]
@@ -359,6 +363,18 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
+        let locale = map
+            .remove("locale")
+            .ok_or_else(|| DeError::custom("expected locale"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
+        let guild_locale = map
+            .remove("guild_locale")
+            .map(String::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
+
         Ok(Self {
             id,
             application_id,
@@ -371,6 +387,8 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             user,
             token,
             version,
+            locale,
+            guild_locale,
         })
     }
 }
