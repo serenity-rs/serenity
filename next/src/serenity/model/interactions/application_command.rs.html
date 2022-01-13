@@ -1135,6 +1135,24 @@
 <span id="1132">1132</span>
 <span id="1133">1133</span>
 <span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
+<span id="1152">1152</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1208,6 +1226,10 @@
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Always `1`.</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// The selected language of the invoking user</span>
+    <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The guild&#39;s preferred locale, if invoked in a guild</span>
+    <span class="kw">pub</span> <span class="ident">guild_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
@@ -1519,6 +1541,18 @@
             .<span class="ident">and_then</span>(<span class="ident">u8::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
+        <span class="kw">let</span> <span class="ident">locale</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;locale&quot;</span>)
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected locale&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="ident">String::deserialize</span>)
+            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">guild_locale</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;guild_locale&quot;</span>)
+            .<span class="ident">map</span>(<span class="ident">String::deserialize</span>)
+            .<span class="ident">transpose</span>()
+            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
+
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">id</span>,
             <span class="ident">application_id</span>,
@@ -1530,6 +1564,8 @@
             <span class="ident">user</span>,
             <span class="ident">token</span>,
             <span class="ident">version</span>,
+            <span class="ident">locale</span>,
+            <span class="ident">guild_locale</span>,
         })
     }
 }
@@ -2270,5 +2306,5 @@
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (89b9f7b28 2022-01-10)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (1bd4fdc94 2022-01-12)" ></div>
 </body></html>
