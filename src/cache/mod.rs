@@ -1040,6 +1040,8 @@ mod test {
                     discriminator: 1,
                     name: "user 1".to_owned(),
                     public_flags: None,
+                    banner: None,
+                    accent_colour: None,
                 },
                 channel_id: ChannelId(2),
                 guild_id: Some(GuildId(1)),
