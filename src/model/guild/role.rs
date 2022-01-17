@@ -72,6 +72,16 @@ pub struct Role {
     /// [`Integration`]: super::Integration
     #[serde(default)]
     pub tags: RoleTags,
+    /// role icon hash.
+    ///
+    /// Present if the guild has the ROLE_ICONS feature and if the role has one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon: Option<String>,
+    /// role unicode emoji.
+    ///
+    /// Present if the guild has the ROLE_ICONS feature and if the role has one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unicode_emoji: Option<String>,
 }
 
 /// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
@@ -97,6 +107,8 @@ pub(crate) struct InterimRole {
     pub position: i64,
     #[serde(default)]
     pub tags: RoleTags,
+    pub icon: Option<String>,
+    pub unicode_emoji: Option<String>,
 }
 
 impl From<InterimRole> for Role {
@@ -112,6 +124,8 @@ impl From<InterimRole> for Role {
             permissions: r.permissions,
             position: r.position,
             tags: r.tags,
+            icon: r.icon,
+            unicode_emoji: r.unicode_emoji,
         }
     }
 }
