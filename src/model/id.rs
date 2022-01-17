@@ -253,8 +253,8 @@ id_u64! {
 pub(crate) mod snowflake {
     use std::fmt;
 
-    use serde::de::{Error, MapAccess, Visitor};
-    use serde::{Deserialize, Deserializer, Serializer};
+    use serde::de::{Error, Visitor};
+    use serde::{Deserializer, Serializer};
 
     pub fn deserialize<'de, D: Deserializer<'de>>(deserializer: D) -> Result<u64, D::Error> {
         deserializer.deserialize_any(SnowflakeVisitor)
@@ -280,39 +280,6 @@ pub(crate) mod snowflake {
 
         fn visit_str<E: Error>(self, value: &str) -> Result<Self::Value, E> {
             value.parse().map_err(Error::custom)
-        }
-
-        // This is called when serde_json's `arbitrary_precision` feature is enabled.
-        fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Self::Value, A::Error> {
-            let id = map.next_value::<Snowflake>()?;
-            Ok(id.value)
-        }
-    }
-
-    struct Snowflake {
-        value: u64,
-    }
-
-    impl<'de> Deserialize<'de> for Snowflake {
-        fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-            struct StrVisitor;
-
-            impl<'de> Visitor<'de> for StrVisitor {
-                type Value = Snowflake;
-
-                fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    formatter.write_str("string containing a number")
-                }
-
-                fn visit_str<E: Error>(self, s: &str) -> Result<Snowflake, E> {
-                    let value = s.parse().map_err(Error::custom)?;
-                    Ok(Snowflake {
-                        value,
-                    })
-                }
-            }
-
-            deserializer.deserialize_str(StrVisitor)
         }
     }
 }
