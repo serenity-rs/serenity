@@ -3256,28 +3256,6 @@
 <span id="3253">3253</span>
 <span id="3254">3254</span>
 <span id="3255">3255</span>
-<span id="3256">3256</span>
-<span id="3257">3257</span>
-<span id="3258">3258</span>
-<span id="3259">3259</span>
-<span id="3260">3260</span>
-<span id="3261">3261</span>
-<span id="3262">3262</span>
-<span id="3263">3263</span>
-<span id="3264">3264</span>
-<span id="3265">3265</span>
-<span id="3266">3266</span>
-<span id="3267">3267</span>
-<span id="3268">3268</span>
-<span id="3269">3269</span>
-<span id="3270">3270</span>
-<span id="3271">3271</span>
-<span id="3272">3272</span>
-<span id="3273">3273</span>
-<span id="3274">3274</span>
-<span id="3275">3275</span>
-<span id="3276">3276</span>
-<span id="3277">3277</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.</span>
@@ -6226,34 +6204,12 @@
 
 <span class="doccomment">/// Data for an unavailable guild.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildUnavailable</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnavailableGuild</span> {
     <span class="doccomment">/// The Id of the [`Guild`] that may be unavailable.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">GuildId</span>,
     <span class="doccomment">/// Indicator of whether the guild is unavailable.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">unavailable</span>: <span class="ident">bool</span>,
-}
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GuildStatus</span> {
-    <span class="ident">OnlinePartialGuild</span>(<span class="ident">PartialGuild</span>),
-    <span class="ident">OnlineGuild</span>(<span class="ident">Guild</span>),
-    <span class="ident">Offline</span>(<span class="ident">GuildUnavailable</span>),
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">GuildStatus</span> {
-    <span class="doccomment">/// Retrieves the Id of the inner [`Guild`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GuildId</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">GuildStatus::Offline</span>(<span class="ident">offline</span>) =&gt; <span class="ident">offline</span>.<span class="ident">id</span>,
-            <span class="ident">GuildStatus::OnlineGuild</span>(<span class="kw-2">ref</span> <span class="ident">guild</span>) =&gt; <span class="ident">guild</span>.<span class="ident">id</span>,
-            <span class="ident">GuildStatus::OnlinePartialGuild</span>(<span class="kw-2">ref</span> <span class="ident">partial_guild</span>) =&gt; <span class="ident">partial_guild</span>.<span class="ident">id</span>,
-        }
-    }
 }
 
 <span class="doccomment">/// Default message notification level for a guild.</span>

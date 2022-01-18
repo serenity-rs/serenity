@@ -1313,7 +1313,7 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ready</span> {
     <span class="kw">pub</span> <span class="ident">application</span>: <span class="ident">PartialCurrentApplicationInfo</span>,
-    <span class="kw">pub</span> <span class="ident">guilds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildStatus</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">guilds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UnavailableGuild</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;presences&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">presences</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;private_channels&quot;</span>)]</span>

@@ -2445,7 +2445,7 @@
         <span class="macro">assert!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="ident">event</span>).<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild_delete</span> <span class="op">=</span> <span class="ident">GuildDeleteEvent</span> {
-            <span class="ident">guild</span>: <span class="ident">GuildUnavailable</span> {
+            <span class="ident">guild</span>: <span class="ident">UnavailableGuild</span> {
                 <span class="ident">id</span>: <span class="ident">GuildId</span>(<span class="number">1</span>),
                 <span class="ident">unavailable</span>: <span class="bool-val">false</span>,
             },

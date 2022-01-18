@@ -652,12 +652,12 @@
     <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
     <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`unavailable`]: GuildUnavailable::unavailable</span>
+    <span class="doccomment">/// [`unavailable`]: UnavailableGuild::unavailable</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_incomplete</span>: <span class="ident">GuildUnavailable</span>,
+        <span class="ident">_incomplete</span>: <span class="ident">UnavailableGuild</span>,
         <span class="ident">_full</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span>,
     ) {
     }
@@ -670,9 +670,9 @@
     <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
     <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`unavailable`]: GuildUnavailable::unavailable</span>
+    <span class="doccomment">/// [`unavailable`]: UnavailableGuild::unavailable</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">GuildUnavailable</span>) {}
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">UnavailableGuild</span>) {}
 
     <span class="comment">// the emojis were updated.</span>
 
