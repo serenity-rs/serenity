@@ -658,6 +658,7 @@ pub struct User {
 
 bitflags! {
     /// User's public flags
+    #[derive(Default)]
     pub struct UserPublicFlags: u32 {
         /// User's flag as discord employee
         const DISCORD_EMPLOYEE = 1 << 0;
