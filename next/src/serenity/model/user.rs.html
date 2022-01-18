@@ -1353,6 +1353,7 @@
 <span id="1350">1350</span>
 <span id="1351">1351</span>
 <span id="1352">1352</span>
+<span id="1353">1353</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1992,6 +1993,7 @@
 
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// User&#39;s public flags</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserPublicFlags</span>: <span class="ident">u32</span> {
         <span class="doccomment">/// User&#39;s flag as discord employee</span>
         <span class="kw">const</span> <span class="ident">DISCORD_EMPLOYEE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;

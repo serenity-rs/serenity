@@ -212,6 +212,7 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
+<span id="212">212</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">autocomplete</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
@@ -384,6 +385,7 @@
 
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// The flags for an interaction response.</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Interaction message will only be visible to sender and will</span>
         <span class="doccomment">/// be quickly deleted.</span>

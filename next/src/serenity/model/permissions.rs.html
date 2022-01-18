@@ -736,11 +736,6 @@
 <span id="733">733</span>
 <span id="734">734</span>
 <span id="735">735</span>
-<span id="736">736</span>
-<span id="737">737</span>
-<span id="738">738</span>
-<span id="739">739</span>
-<span id="740">740</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -973,6 +968,7 @@
     <span class="doccomment">/// [`PermissionOverwrite`]: super::channel::PermissionOverwrite</span>
     <span class="doccomment">/// [`Role`]: super::guild::Role</span>
     <span class="doccomment">/// [`User`]: super::user::User</span>
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Permissions</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Allows for the creation of [`RichInvite`]s.</span>
         <span class="doccomment">///</span>
@@ -1404,12 +1400,6 @@
     <span class="doccomment">/// [Use VAD]: Self::USE_VAD</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_vad</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_VAD</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Permissions</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::empty</span>()
     }
 }
 
