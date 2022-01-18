@@ -369,39 +369,6 @@
 <span id="366">366</span>
 <span id="367">367</span>
 <span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
@@ -658,8 +625,8 @@
     <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
     <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-    <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Error</span>, <span class="ident">MapAccess</span>, <span class="ident">Visitor</span>};
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+    <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Error</span>, <span class="ident">Visitor</span>};
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="ident">SnowflakeVisitor</span>)
@@ -690,39 +657,6 @@
 
         <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span> {
             <span class="ident">value</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="ident">Error::custom</span>)
-        }
-
-        <span class="comment">// This is called when serde_json&#39;s `arbitrary_precision` feature is enabled.</span>
-        <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">Snowflake</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">id</span>.<span class="ident">value</span>)
-        }
-    }
-
-    <span class="kw">struct</span> <span class="ident">Snowflake</span> {
-        <span class="ident">value</span>: <span class="ident">u64</span>,
-    }
-
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Snowflake</span> {
-        <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-            <span class="kw">struct</span> <span class="ident">StrVisitor</span>;
-
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrVisitor</span> {
-                <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Snowflake</span>;
-
-                <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                    <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;string containing a number&quot;</span>)
-                }
-
-                <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Error</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Snowflake</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">map_err</span>(<span class="ident">Error::custom</span>)<span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">Snowflake</span> {
-                        <span class="ident">value</span>,
-                    })
-                }
-            }
-
-            <span class="ident">deserializer</span>.<span class="ident">deserialize_str</span>(<span class="ident">StrVisitor</span>)
         }
     }
 }
