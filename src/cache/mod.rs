@@ -1215,7 +1215,7 @@ mod test {
         assert!(cache.update(&mut event).is_none());
 
         let mut guild_delete = GuildDeleteEvent {
-            guild: GuildUnavailable {
+            guild: UnavailableGuild {
                 id: GuildId(1),
                 unavailable: false,
             },
