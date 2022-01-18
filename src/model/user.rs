@@ -4,7 +4,7 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 
-use bitflags::__impl_bitflags;
+use bitflags::bitflags;
 #[cfg(feature = "model")]
 use futures::future::{BoxFuture, FutureExt};
 use serde::{Deserialize, Serialize};
@@ -635,42 +635,37 @@ pub struct User {
     pub public_flags: Option<UserPublicFlags>,
 }
 
-/// User's public flags
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct UserPublicFlags {
-    pub bits: u32,
-}
-
-__impl_bitflags! {
-    UserPublicFlags: u32 {
+bitflags! {
+    /// User's public flags
+    pub struct UserPublicFlags: u32 {
         /// User's flag as discord employee
-        DISCORD_EMPLOYEE = 1 << 0;
+        const DISCORD_EMPLOYEE = 1 << 0;
         /// User's flag as partnered server owner
-        PARTNERED_SERVER_OWNER = 1 << 1;
+        const PARTNERED_SERVER_OWNER = 1 << 1;
         /// User's flag as hypesquad events
-        HYPESQUAD_EVENTS = 1 << 2;
+        const HYPESQUAD_EVENTS = 1 << 2;
         /// User's flag as bug hunter level 1
-        BUG_HUNTER_LEVEL_1 = 1 << 3;
+        const BUG_HUNTER_LEVEL_1 = 1 << 3;
         /// User's flag as house bravery
-        HOUSE_BRAVERY = 1 << 6;
+        const HOUSE_BRAVERY = 1 << 6;
         /// User's flag as house brilliance
-        HOUSE_BRILLIANCE = 1 << 7;
+        const HOUSE_BRILLIANCE = 1 << 7;
         /// User's flag as house balance
-        HOUSE_BALANCE = 1 << 8;
+        const HOUSE_BALANCE = 1 << 8;
         /// User's flag as early supporter
-        EARLY_SUPPORTER = 1 << 9;
+        const EARLY_SUPPORTER = 1 << 9;
         /// User's flag as team user
-        TEAM_USER = 1 << 10;
+        const TEAM_USER = 1 << 10;
         /// User's flag as system
-        SYSTEM = 1 << 12;
+        const SYSTEM = 1 << 12;
         /// User's flag as bug hunter level 2
-        BUG_HUNTER_LEVEL_2 = 1 << 14;
+        const BUG_HUNTER_LEVEL_2 = 1 << 14;
         /// User's flag as verified bot
-        VERIFIED_BOT = 1 << 16;
+        const VERIFIED_BOT = 1 << 16;
         /// User's flag as early verified bot developer
-        EARLY_VERIFIED_BOT_DEVELOPER = 1 << 17;
+        const EARLY_VERIFIED_BOT_DEVELOPER = 1 << 17;
         /// User's flag as discord certified moderator
-        DISCORD_CERTIFIED_MODERATOR = 1 << 18;
+        const DISCORD_CERTIFIED_MODERATOR = 1 << 18;
     }
 }
 

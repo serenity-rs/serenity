@@ -4,7 +4,7 @@ use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use bitflags::__impl_bitflags;
+use bitflags::bitflags;
 use chrono::{DateTime, Utc};
 
 #[cfg(feature = "model")]
@@ -652,16 +652,11 @@ pub struct ThreadMember {
     pub flags: ThreadMemberFlags,
 }
 
-/// Describes extra features of the message.
-#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
-pub struct ThreadMemberFlags {
-    pub bits: u64,
-}
-
-__impl_bitflags! {
-    ThreadMemberFlags: u64 {
+bitflags! {
+    /// Describes extra features of the message.
+    pub struct ThreadMemberFlags: u64 {
         // Not documented.
-        NOTIFICATIONS = 1 << 0;
+        const NOTIFICATIONS = 1 << 0;
     }
 }
 

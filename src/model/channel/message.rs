@@ -5,7 +5,7 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
-use bitflags::__impl_bitflags;
+use bitflags::bitflags;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "simd-json")]
 use simd_json::ValueAccess;
@@ -1207,30 +1207,25 @@ pub struct ChannelMention {
     pub name: String,
 }
 
-/// Describes extra features of the message.
-#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
-pub struct MessageFlags {
-    pub bits: u64,
-}
-
-__impl_bitflags! {
-    MessageFlags: u64 {
+bitflags! {
+    /// Describes extra features of the message.
+    pub struct MessageFlags: u64 {
         /// This message has been published to subscribed channels (via Channel Following).
-        CROSSPOSTED = 1 << 0;
+        const CROSSPOSTED = 1 << 0;
         /// This message originated from a message in another channel (via Channel Following).
-        IS_CROSSPOST = 1 << 1;
+        const IS_CROSSPOST = 1 << 1;
         /// Do not include any embeds when serializing this message.
-        SUPPRESS_EMBEDS = 1 << 2;
+        const SUPPRESS_EMBEDS = 1 << 2;
         /// The source message for this crosspost has been deleted (via Channel Following).
-        SOURCE_MESSAGE_DELETED = 1 << 3;
+        const SOURCE_MESSAGE_DELETED = 1 << 3;
         /// This message came from the urgent message system.
-        URGENT = 1 << 4;
+        const URGENT = 1 << 4;
         /// This message has an associated thread, with the same id as the message.
-        HAS_THREAD = 1 << 5;
+        const HAS_THREAD = 1 << 5;
         /// This message is only visible to the user who invoked the Interaction.
-        EPHEMERAL = 1 << 6;
+        const EPHEMERAL = 1 << 6;
         /// This message is an Interaction Response and the bot is "thinking".
-        LOADING = 1 << 7;
+        const LOADING = 1 << 7;
     }
 }
 
