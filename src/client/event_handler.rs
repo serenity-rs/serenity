@@ -93,12 +93,12 @@ pub trait EventHandler: Send + Sync {
     /// If the flag is false, the bot was removed from the guild, either by being
     /// kicked or banned. If the flag is true, the guild went offline.
     ///
-    /// [`unavailable`]: GuildUnavailable::unavailable
+    /// [`unavailable`]: UnavailableGuild::unavailable
     #[cfg(feature = "cache")]
     async fn guild_delete(
         &self,
         _ctx: Context,
-        _incomplete: GuildUnavailable,
+        _incomplete: UnavailableGuild,
         _full: Option<Guild>,
     ) {
     }
@@ -111,9 +111,9 @@ pub trait EventHandler: Send + Sync {
     /// If the flag is false, the bot was removed from the guild, either by being
     /// kicked or banned. If the flag is true, the guild went offline.
     ///
-    /// [`unavailable`]: GuildUnavailable::unavailable
+    /// [`unavailable`]: UnavailableGuild::unavailable
     #[cfg(not(feature = "cache"))]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: GuildUnavailable) {}
+    async fn guild_delete(&self, _ctx: Context, _incomplete: UnavailableGuild) {}
 
     // the emojis were updated.
 
