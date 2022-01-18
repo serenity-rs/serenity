@@ -294,6 +294,7 @@ pub struct ActivityAssets {
 
 bitflags! {
     /// A set of flags defining what is in an activity's payload.
+    #[derive(Default)]
     pub struct ActivityFlags: u64 {
         /// Whether the activity is an instance activity.
         const INSTANCE = 1 << 0;
@@ -552,6 +553,7 @@ bitflags! {
     /// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
+    #[derive(Default)]
     pub struct GatewayIntents: u64 {
         /// Enables following gateway events:
         ///
@@ -665,12 +667,6 @@ bitflags! {
         ///
         /// - TYPING_START
         const DIRECT_MESSAGE_TYPING = 1 << 14;
-    }
-}
-
-impl Default for GatewayIntents {
-    fn default() -> Self {
-        Self::empty()
     }
 }
 
