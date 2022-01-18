@@ -251,6 +251,7 @@ id_u64! {
 /// }
 /// ```
 pub(crate) mod snowflake {
+    use std::convert::TryFrom;
     use std::fmt;
 
     use serde::de::{Error, MapAccess, Visitor};
@@ -272,6 +273,11 @@ pub(crate) mod snowflake {
 
         fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
             formatter.write_str("string or integer snowflake")
+        }
+
+        // Called by formats like TOML.
+        fn visit_i64<E: Error>(self, value: i64) -> Result<Self::Value, E> {
+            u64::try_from(value).map_err(Error::custom)
         }
 
         fn visit_u64<E: Error>(self, value: u64) -> Result<Self::Value, E> {
