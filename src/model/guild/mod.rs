@@ -2972,35 +2972,12 @@ impl InviteGuild {
 
 /// Data for an unavailable guild.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct GuildUnavailable {
+pub struct UnavailableGuild {
     /// The Id of the [`Guild`] that may be unavailable.
     pub id: GuildId,
     /// Indicator of whether the guild is unavailable.
     #[serde(default)]
     pub unavailable: bool,
-}
-
-#[deprecated(note = "will be replaced by `UnavailableGuild` with serenity 0.11")]
-#[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-#[serde(untagged)]
-pub enum GuildStatus {
-    OnlinePartialGuild(PartialGuild),
-    OnlineGuild(Guild),
-    Offline(GuildUnavailable),
-}
-
-#[cfg(feature = "model")]
-impl GuildStatus {
-    /// Retrieves the Id of the inner [`Guild`].
-    pub fn id(&self) -> GuildId {
-        match *self {
-            GuildStatus::Offline(offline) => offline.id,
-            GuildStatus::OnlineGuild(ref guild) => guild.id,
-            GuildStatus::OnlinePartialGuild(ref partial_guild) => partial_guild.id,
-        }
-    }
 }
 
 /// Default message notification level for a guild.
