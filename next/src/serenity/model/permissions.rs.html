@@ -741,16 +741,6 @@
 <span id="738">738</span>
 <span id="739">739</span>
 <span id="740">740</span>
-<span id="741">741</span>
-<span id="742">742</span>
-<span id="743">743</span>
-<span id="744">744</span>
-<span id="745">745</span>
-<span id="746">746</span>
-<span id="747">747</span>
-<span id="748">748</span>
-<span id="749">749</span>
-<span id="750">750</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -797,7 +787,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 
-<span class="kw">use</span> <span class="ident">bitflags::__impl_bitflags</span>;
+<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
@@ -973,51 +963,41 @@
     <span class="ident">bits</span>: <span class="ident">Permissions::CONNECT</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">Permissions::SPEAK</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">Permissions::USE_VAD</span>.<span class="ident">bits</span>,
 };
 
-<span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via</span>
-<span class="doccomment">/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to</span>
-<span class="doccomment">/// [`GuildChannel`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Guild`]: super::guild::Guild</span>
-<span class="doccomment">/// [`GuildChannel`]: super::channel::GuildChannel</span>
-<span class="doccomment">/// [`PermissionOverwrite`]: super::channel::PermissionOverwrite</span>
-<span class="doccomment">/// [`Role`]: super::guild::Role</span>
-<span class="doccomment">/// [`User`]: super::user::User</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Permissions</span> {
-    <span class="doccomment">/// The flags making up the permissions.</span>
+<span class="macro">bitflags!</span> {
+    <span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via</span>
+    <span class="doccomment">/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to</span>
+    <span class="doccomment">/// [`GuildChannel`]s.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">/// Do not modify this yourself; use the provided methods.</span>
-    <span class="doccomment">/// Do the same when creating, unless you&#39;re absolutely certain that you&#39;re giving valid permission flags.</span>
-    <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u64</span>,
-}
-
-<span class="macro">__impl_bitflags!</span> {
-    <span class="ident">Permissions</span>: <span class="ident">u64</span> {
+    <span class="doccomment">/// [`Guild`]: super::guild::Guild</span>
+    <span class="doccomment">/// [`GuildChannel`]: super::channel::GuildChannel</span>
+    <span class="doccomment">/// [`PermissionOverwrite`]: super::channel::PermissionOverwrite</span>
+    <span class="doccomment">/// [`Role`]: super::guild::Role</span>
+    <span class="doccomment">/// [`User`]: super::user::User</span>
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Permissions</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Allows for the creation of [`RichInvite`]s.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`RichInvite`]: super::invite::RichInvite</span>
-        <span class="ident">CREATE_INVITE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
+        <span class="kw">const</span> <span class="ident">CREATE_INVITE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="doccomment">/// Allows for the kicking of guild [member]s.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [member]: super::guild::Member</span>
-        <span class="ident">KICK_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
+        <span class="kw">const</span> <span class="ident">KICK_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// Allows the banning of guild [member]s.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [member]: super::guild::Member</span>
-        <span class="ident">BAN_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
+        <span class="kw">const</span> <span class="ident">BAN_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// Allows all permissions, bypassing channel [permission overwrite]s.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [permission overwrite]: super::channel::PermissionOverwrite</span>
-        <span class="ident">ADMINISTRATOR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
+        <span class="kw">const</span> <span class="ident">ADMINISTRATOR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="doccomment">/// Allows management and editing of guild [channel]s.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [channel]: super::channel::GuildChannel</span>
-        <span class="ident">MANAGE_CHANNELS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
+        <span class="kw">const</span> <span class="ident">MANAGE_CHANNELS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
         <span class="doccomment">/// Allows management and editing of the [guild].</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [guild]: super::guild::Guild</span>
-        <span class="ident">MANAGE_GUILD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
+        <span class="kw">const</span> <span class="ident">MANAGE_GUILD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
         <span class="doccomment">/// [`Member`]s with this permission can add new [`Reaction`]s to a</span>
         <span class="doccomment">/// [`Message`]. Members can still react using reactions already added</span>
         <span class="doccomment">/// to messages without this permission.</span>
@@ -1025,92 +1005,92 @@
         <span class="doccomment">/// [`Member`]: super::guild::Member</span>
         <span class="doccomment">/// [`Message`]: super::channel::Message</span>
         <span class="doccomment">/// [`Reaction`]: super::channel::Reaction</span>
-        <span class="ident">ADD_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="kw">const</span> <span class="ident">ADD_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
         <span class="doccomment">/// Allows viewing a guild&#39;s audit logs.</span>
-        <span class="ident">VIEW_AUDIT_LOG</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="kw">const</span> <span class="ident">VIEW_AUDIT_LOG</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
         <span class="doccomment">/// Allows the use of priority speaking in voice channels.</span>
-        <span class="ident">PRIORITY_SPEAKER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
+        <span class="kw">const</span> <span class="ident">PRIORITY_SPEAKER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
         <span class="comment">// Allows the user to go live</span>
-        <span class="ident">STREAM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
+        <span class="kw">const</span> <span class="ident">STREAM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
         <span class="doccomment">/// Allows reading messages in a guild channel. If a user does not have</span>
         <span class="doccomment">/// this permission, then they will not be able to see the channel.</span>
-        <span class="ident">READ_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
+        <span class="kw">const</span> <span class="ident">READ_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
         <span class="doccomment">/// Allows sending messages in a guild channel.</span>
-        <span class="ident">SEND_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
+        <span class="kw">const</span> <span class="ident">SEND_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
         <span class="doccomment">/// Allows the sending of text-to-speech messages in a channel.</span>
-        <span class="ident">SEND_TTS_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
+        <span class="kw">const</span> <span class="ident">SEND_TTS_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
         <span class="doccomment">/// Allows the deleting of other messages in a guild channel.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// **Note**: This does not allow the editing of other messages.</span>
-        <span class="ident">MANAGE_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
+        <span class="kw">const</span> <span class="ident">MANAGE_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
         <span class="doccomment">/// Allows links from this user - or users of this role - to be</span>
         <span class="doccomment">/// embedded, with potential data such as a thumbnail, description, and</span>
         <span class="doccomment">/// page name.</span>
-        <span class="ident">EMBED_LINKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
+        <span class="kw">const</span> <span class="ident">EMBED_LINKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
         <span class="doccomment">/// Allows uploading of files.</span>
-        <span class="ident">ATTACH_FILES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
+        <span class="kw">const</span> <span class="ident">ATTACH_FILES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
         <span class="doccomment">/// Allows the reading of a channel&#39;s message history.</span>
-        <span class="ident">READ_MESSAGE_HISTORY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
+        <span class="kw">const</span> <span class="ident">READ_MESSAGE_HISTORY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
         <span class="doccomment">/// Allows the usage of the `@everyone` mention, which will notify all</span>
         <span class="doccomment">/// users in a channel. The `@here` mention will also be available, and</span>
         <span class="doccomment">/// can be used to mention all non-offline users.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// **Note**: You probably want this to be disabled for most roles and</span>
         <span class="doccomment">/// users.</span>
-        <span class="ident">MENTION_EVERYONE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
+        <span class="kw">const</span> <span class="ident">MENTION_EVERYONE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
         <span class="doccomment">/// Allows the usage of custom emojis from other guilds.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This does not dictate whether custom emojis in this guild can be</span>
         <span class="doccomment">/// used in other guilds.</span>
-        <span class="ident">USE_EXTERNAL_EMOJIS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
+        <span class="kw">const</span> <span class="ident">USE_EXTERNAL_EMOJIS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
         <span class="doccomment">/// Allows for viewing guild insights.</span>
-        <span class="ident">VIEW_GUILD_INSIGHTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">19</span>;
+        <span class="kw">const</span> <span class="ident">VIEW_GUILD_INSIGHTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">19</span>;
         <span class="doccomment">/// Allows the joining of a voice channel.</span>
-        <span class="ident">CONNECT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>;
+        <span class="kw">const</span> <span class="ident">CONNECT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>;
         <span class="doccomment">/// Allows the user to speak in a voice channel.</span>
-        <span class="ident">SPEAK</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">21</span>;
+        <span class="kw">const</span> <span class="ident">SPEAK</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">21</span>;
         <span class="doccomment">/// Allows the muting of members in a voice channel.</span>
-        <span class="ident">MUTE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">22</span>;
+        <span class="kw">const</span> <span class="ident">MUTE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">22</span>;
         <span class="doccomment">/// Allows the deafening of members in a voice channel.</span>
-        <span class="ident">DEAFEN_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">23</span>;
+        <span class="kw">const</span> <span class="ident">DEAFEN_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">23</span>;
         <span class="doccomment">/// Allows the moving of members from one voice channel to another.</span>
-        <span class="ident">MOVE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>;
+        <span class="kw">const</span> <span class="ident">MOVE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>;
         <span class="doccomment">/// Allows the usage of voice-activity-detection in a [voice] channel.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// If this is disabled, then [`Member`]s must use push-to-talk.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`Member`]: super::guild::Member</span>
         <span class="doccomment">/// [voice]: super::channel::ChannelType::Voice</span>
-        <span class="ident">USE_VAD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">25</span>;
+        <span class="kw">const</span> <span class="ident">USE_VAD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">25</span>;
         <span class="doccomment">/// Allows members to change their own nickname in the guild.</span>
-        <span class="ident">CHANGE_NICKNAME</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">26</span>;
+        <span class="kw">const</span> <span class="ident">CHANGE_NICKNAME</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">26</span>;
         <span class="doccomment">/// Allows members to change other members&#39; nicknames.</span>
-        <span class="ident">MANAGE_NICKNAMES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">27</span>;
+        <span class="kw">const</span> <span class="ident">MANAGE_NICKNAMES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">27</span>;
         <span class="doccomment">/// Allows management and editing of roles below their own.</span>
-        <span class="ident">MANAGE_ROLES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">28</span>;
+        <span class="kw">const</span> <span class="ident">MANAGE_ROLES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">28</span>;
         <span class="doccomment">/// Allows management of webhooks.</span>
-        <span class="ident">MANAGE_WEBHOOKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">29</span>;
+        <span class="kw">const</span> <span class="ident">MANAGE_WEBHOOKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">29</span>;
         <span class="doccomment">/// Allows management of emojis and stickers created without the use of an</span>
         <span class="doccomment">/// [`Integration`].</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`Integration`]: super::guild::Integration</span>
-        <span class="ident">MANAGE_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">30</span>;
+        <span class="kw">const</span> <span class="ident">MANAGE_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">30</span>;
         <span class="doccomment">/// Allows using slash commands.</span>
-        <span class="ident">USE_SLASH_COMMANDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
+        <span class="kw">const</span> <span class="ident">USE_SLASH_COMMANDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
         <span class="doccomment">/// Allows for requesting to speak in stage channels.</span>
-        <span class="ident">REQUEST_TO_SPEAK</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>;
+        <span class="kw">const</span> <span class="ident">REQUEST_TO_SPEAK</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>;
         <span class="doccomment">/// Allows for deleting and archiving threads, and viewing all private threads.</span>
-        <span class="ident">MANAGE_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">34</span>;
+        <span class="kw">const</span> <span class="ident">MANAGE_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">34</span>;
         <span class="doccomment">/// Allows for creating threads.</span>
-        <span class="ident">CREATE_PUBLIC_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">35</span>;
+        <span class="kw">const</span> <span class="ident">CREATE_PUBLIC_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">35</span>;
         <span class="doccomment">/// Allows for creating private threads.</span>
-        <span class="ident">CREATE_PRIVATE_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">36</span>;
+        <span class="kw">const</span> <span class="ident">CREATE_PRIVATE_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">36</span>;
         <span class="doccomment">/// Allows the usage of custom stickers from other servers.</span>
-        <span class="ident">USE_EXTERNAL_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">37</span>;
+        <span class="kw">const</span> <span class="ident">USE_EXTERNAL_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">37</span>;
         <span class="doccomment">/// Allows for sending messages in threads</span>
-        <span class="ident">SEND_MESSAGES_IN_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">38</span>;
+        <span class="kw">const</span> <span class="ident">SEND_MESSAGES_IN_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">38</span>;
         <span class="doccomment">/// Allows for launching activities in a voice channel</span>
-        <span class="ident">START_EMBEDDED_ACTIVITIES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">39</span>;
+        <span class="kw">const</span> <span class="ident">START_EMBEDDED_ACTIVITIES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">39</span>;
     }
 }
 

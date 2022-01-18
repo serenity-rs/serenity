@@ -1011,10 +1011,10 @@
     <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream2</span>) {
         <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
 
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::model::permissions::Permissions</span>);
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">serenity::model::permissions::Permissions::from_bits_truncate</span>);
 
         <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-            #<span class="ident">path</span> { <span class="ident">bits</span>: #<span class="ident">bits</span> }
+            #<span class="ident">path</span>(#<span class="ident">bits</span>)
         });
     }
 }

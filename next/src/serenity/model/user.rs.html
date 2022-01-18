@@ -1353,18 +1353,13 @@
 <span id="1350">1350</span>
 <span id="1351">1351</span>
 <span id="1352">1352</span>
-<span id="1353">1353</span>
-<span id="1354">1354</span>
-<span id="1355">1355</span>
-<span id="1356">1356</span>
-<span id="1357">1357</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
-<span class="kw">use</span> <span class="ident">bitflags::__impl_bitflags</span>;
+<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">futures::future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -1995,42 +1990,37 @@
     <span class="kw">pub</span> <span class="ident">public_flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserPublicFlags</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// User&#39;s public flags</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserPublicFlags</span> {
-    <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u32</span>,
-}
-
-<span class="macro">__impl_bitflags!</span> {
-    <span class="ident">UserPublicFlags</span>: <span class="ident">u32</span> {
+<span class="macro">bitflags!</span> {
+    <span class="doccomment">/// User&#39;s public flags</span>
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserPublicFlags</span>: <span class="ident">u32</span> {
         <span class="doccomment">/// User&#39;s flag as discord employee</span>
-        <span class="ident">DISCORD_EMPLOYEE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
+        <span class="kw">const</span> <span class="ident">DISCORD_EMPLOYEE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="doccomment">/// User&#39;s flag as partnered server owner</span>
-        <span class="ident">PARTNERED_SERVER_OWNER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
+        <span class="kw">const</span> <span class="ident">PARTNERED_SERVER_OWNER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// User&#39;s flag as hypesquad events</span>
-        <span class="ident">HYPESQUAD_EVENTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
+        <span class="kw">const</span> <span class="ident">HYPESQUAD_EVENTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// User&#39;s flag as bug hunter level 1</span>
-        <span class="ident">BUG_HUNTER_LEVEL_1</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
+        <span class="kw">const</span> <span class="ident">BUG_HUNTER_LEVEL_1</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="doccomment">/// User&#39;s flag as house bravery</span>
-        <span class="ident">HOUSE_BRAVERY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="kw">const</span> <span class="ident">HOUSE_BRAVERY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
         <span class="doccomment">/// User&#39;s flag as house brilliance</span>
-        <span class="ident">HOUSE_BRILLIANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="kw">const</span> <span class="ident">HOUSE_BRILLIANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
         <span class="doccomment">/// User&#39;s flag as house balance</span>
-        <span class="ident">HOUSE_BALANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
+        <span class="kw">const</span> <span class="ident">HOUSE_BALANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
         <span class="doccomment">/// User&#39;s flag as early supporter</span>
-        <span class="ident">EARLY_SUPPORTER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
+        <span class="kw">const</span> <span class="ident">EARLY_SUPPORTER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
         <span class="doccomment">/// User&#39;s flag as team user</span>
-        <span class="ident">TEAM_USER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
+        <span class="kw">const</span> <span class="ident">TEAM_USER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
         <span class="doccomment">/// User&#39;s flag as system</span>
-        <span class="ident">SYSTEM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
+        <span class="kw">const</span> <span class="ident">SYSTEM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
         <span class="doccomment">/// User&#39;s flag as bug hunter level 2</span>
-        <span class="ident">BUG_HUNTER_LEVEL_2</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
+        <span class="kw">const</span> <span class="ident">BUG_HUNTER_LEVEL_2</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
         <span class="doccomment">/// User&#39;s flag as verified bot</span>
-        <span class="ident">VERIFIED_BOT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
+        <span class="kw">const</span> <span class="ident">VERIFIED_BOT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
         <span class="doccomment">/// User&#39;s flag as early verified bot developer</span>
-        <span class="ident">EARLY_VERIFIED_BOT_DEVELOPER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
+        <span class="kw">const</span> <span class="ident">EARLY_VERIFIED_BOT_DEVELOPER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
         <span class="doccomment">/// User&#39;s flag as discord certified moderator</span>
-        <span class="ident">DISCORD_CERTIFIED_MODERATOR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
+        <span class="kw">const</span> <span class="ident">DISCORD_CERTIFIED_MODERATOR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
     }
 }
 

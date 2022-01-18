@@ -813,19 +813,9 @@
 <span id="810">810</span>
 <span id="811">811</span>
 <span id="812">812</span>
-<span id="813">813</span>
-<span id="814">814</span>
-<span id="815">815</span>
-<span id="816">816</span>
-<span id="817">817</span>
-<span id="818">818</span>
-<span id="819">819</span>
-<span id="820">820</span>
-<span id="821">821</span>
-<span id="822">822</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
-<span class="kw">use</span> <span class="ident">bitflags</span>::{<span class="ident">__impl_bitflags</span>, <span class="ident">bitflags</span>};
+<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
@@ -1348,43 +1338,33 @@
     <span class="kw">pub</span> <span class="ident">start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// [Gateway Intents] will limit the events your bot will receive via the gateway.</span>
-<span class="doccomment">/// By default, all intents except [Privileged Intents] are selected.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # What are Intents</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A [gateway intent] sets the types of gateway events</span>
-<span class="doccomment">/// (e.g. member joins, guild integrations, guild emoji updates, ...) the</span>
-<span class="doccomment">/// bot shall receive. Carefully picking the needed intents greatly helps</span>
-<span class="doccomment">/// the bot to scale, as less intents will result in less events to be</span>
-<span class="doccomment">/// received via the network from Discord and less processing needed for</span>
-<span class="doccomment">/// handling the data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Privileged Intents</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]</span>
-<span class="doccomment">/// are [Privileged Intents]. They need to be enabled in the</span>
-<span class="doccomment">/// *developer portal*.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note**:</span>
-<span class="doccomment">/// Once the bot is in 100 guilds or more, [the bot must be verified] in</span>
-<span class="doccomment">/// order to use privileged intents.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
-<span class="doccomment">/// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
-<span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GatewayIntents</span> {
-    <span class="doccomment">/// The flags composing gateway intents.</span>
+<span class="macro">bitflags!</span> {
+    <span class="doccomment">/// [Gateway Intents] will limit the events your bot will receive via the gateway.</span>
+    <span class="doccomment">/// By default, all intents except [Privileged Intents] are selected.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">/// Do not modify this yourself; use the provided methods.</span>
-    <span class="doccomment">/// Do the same when creating, unless you&#39;re absolutely certain that you&#39;re giving valid intents flags.</span>
-    <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u64</span>,
-}
-
-<span class="macro">__impl_bitflags!</span> {
-    <span class="ident">GatewayIntents</span>: <span class="ident">u64</span> {
+    <span class="doccomment">/// # What are Intents</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A [gateway intent] sets the types of gateway events</span>
+    <span class="doccomment">/// (e.g. member joins, guild integrations, guild emoji updates, ...) the</span>
+    <span class="doccomment">/// bot shall receive. Carefully picking the needed intents greatly helps</span>
+    <span class="doccomment">/// the bot to scale, as less intents will result in less events to be</span>
+    <span class="doccomment">/// received via the network from Discord and less processing needed for</span>
+    <span class="doccomment">/// handling the data.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Privileged Intents</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]</span>
+    <span class="doccomment">/// are [Privileged Intents]. They need to be enabled in the</span>
+    <span class="doccomment">/// *developer portal*.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**:</span>
+    <span class="doccomment">/// Once the bot is in 100 guilds or more, [the bot must be verified] in</span>
+    <span class="doccomment">/// order to use privileged intents.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [gateway intent]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
+    <span class="doccomment">/// [Privileged Intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents</span>
+    <span class="doccomment">/// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting</span>
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GatewayIntents</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_CREATE</span>
@@ -1405,7 +1385,7 @@
         <span class="doccomment">/// - STAGE_INSTANCE_CREATE</span>
         <span class="doccomment">/// - STAGE_INSTANCE_UPDATE</span>
         <span class="doccomment">/// - STAGE_INSTANCE_DELETE</span>
-        <span class="ident">GUILDS</span> <span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">const</span> <span class="ident">GUILDS</span> <span class="op">=</span> <span class="number">1</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_MEMBER_ADD</span>
@@ -1419,37 +1399,37 @@
         <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This intent is also necessary to even receive the events in contains.</span>
-        <span class="ident">GUILD_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_BAN_ADD</span>
         <span class="doccomment">/// - GUILD_BAN_REMOVE</span>
-        <span class="ident">GUILD_BANS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_BANS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_EMOJIS_UPDATE</span>
         <span class="doccomment">/// - GUILD_STICKERS_UPDATE</span>
-        <span class="ident">GUILD_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_EMOJIS_AND_STICKERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - GUILD_INTEGRATIONS_UPDATE</span>
         <span class="doccomment">/// - INTEGRATION_CREATE</span>
         <span class="doccomment">/// - INTEGRATION_UPDATE</span>
         <span class="doccomment">/// - INTEGRATION_DELETE</span>
-        <span class="ident">GUILD_INTEGRATIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_INTEGRATIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - WEBHOOKS_UPDATE</span>
-        <span class="ident">GUILD_WEBHOOKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_WEBHOOKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - INVITE_CREATE</span>
         <span class="doccomment">/// - INVITE_DELETE</span>
-        <span class="ident">GUILD_INVITES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_INVITES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - VOICE_STATE_UPDATE</span>
-        <span class="ident">GUILD_VOICE_STATES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_VOICE_STATES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
         <span class="doccomment">/// Enables following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - PRESENCE_UPDATE</span>
@@ -1460,43 +1440,43 @@
         <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This intent is also necessary to even receive the events in contains.</span>
-        <span class="ident">GUILD_PRESENCES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_PRESENCES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - MESSAGE_CREATE</span>
         <span class="doccomment">/// - MESSAGE_UPDATE</span>
         <span class="doccomment">/// - MESSAGE_DELETE</span>
         <span class="doccomment">/// - MESSAGE_DELETE_BULK</span>
-        <span class="ident">GUILD_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
         <span class="doccomment">/// Enables following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - MESSAGE_REACTION_ADD</span>
         <span class="doccomment">/// - MESSAGE_REACTION_REMOVE</span>
         <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_ALL</span>
         <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_EMOJI</span>
-        <span class="ident">GUILD_MESSAGE_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_MESSAGE_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
         <span class="doccomment">/// Enable following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - TYPING_START</span>
-        <span class="ident">GUILD_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
+        <span class="kw">const</span> <span class="ident">GUILD_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
         <span class="doccomment">/// Enable following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - MESSAGE_CREATE</span>
         <span class="doccomment">/// - MESSAGE_UPDATE</span>
         <span class="doccomment">/// - MESSAGE_DELETE</span>
         <span class="doccomment">/// - CHANNEL_PINS_UPDATE</span>
-        <span class="ident">DIRECT_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
+        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
         <span class="doccomment">/// Enable following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - MESSAGE_REACTION_ADD</span>
         <span class="doccomment">/// - MESSAGE_REACTION_REMOVE</span>
         <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_ALL</span>
         <span class="doccomment">/// - MESSAGE_REACTION_REMOVE_EMOJI</span>
-        <span class="ident">DIRECT_MESSAGE_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
+        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGE_REACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
         <span class="doccomment">/// Enable following gateway event:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - TYPING_START</span>
-        <span class="ident">DIRECT_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
+        <span class="kw">const</span> <span class="ident">DIRECT_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
     }
 }
 

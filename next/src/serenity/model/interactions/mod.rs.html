@@ -212,12 +212,6 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">autocomplete</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
@@ -225,7 +219,7 @@
 
 <span class="kw">use</span> <span class="ident">application_command::ApplicationCommandInteraction</span>;
 <span class="kw">use</span> <span class="ident">autocomplete::AutocompleteInteraction</span>;
-<span class="kw">use</span> <span class="ident">bitflags::__impl_bitflags</span>;
+<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 <span class="kw">use</span> <span class="ident">message_component::MessageComponentInteraction</span>;
 <span class="kw">use</span> <span class="ident">ping::PingInteraction</span>;
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
@@ -388,18 +382,12 @@
     <span class="ident">Autocomplete</span>,
 });
 
-<span class="doccomment">/// The flags for an interaction response.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionApplicationCommandCallbackDataFlags</span> {
-    <span class="ident">bits</span>: <span class="ident">u64</span>,
-}
-
-<span class="macro">__impl_bitflags!</span> {
-    <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>: <span class="ident">u64</span> {
+<span class="macro">bitflags!</span> {
+    <span class="doccomment">/// The flags for an interaction response.</span>
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Interaction message will only be visible to sender and will</span>
         <span class="doccomment">/// be quickly deleted.</span>
-        <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="kw">const</span> <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
     }
 }
 
