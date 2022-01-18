@@ -122,7 +122,7 @@ impl Attachment {
     /// [`Message`]: super::Message
     pub async fn download(&self) -> Result<Vec<u8>> {
         let reqwest = ReqwestClient::new();
-
-        Ok(reqwest.get(&self.url).send().await?.bytes().await?.into_iter().collect::<Vec<u8>>())
+        let bytes = reqwest.get(&self.url).send().await?.bytes().await?;
+        Ok(bytes.to_vec())
     }
 }
