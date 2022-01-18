@@ -719,6 +719,7 @@ pub struct ThreadMember {
 
 bitflags! {
     /// Describes extra features of the message.
+    #[derive(Default)]
     pub struct ThreadMemberFlags: u64 {
         // Not documented.
         const NOTIFICATIONS = 1 << 0;

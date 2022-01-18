@@ -230,6 +230,7 @@ bitflags! {
     /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
     /// [`Role`]: super::guild::Role
     /// [`User`]: super::user::User
+    #[derive(Default)]
     pub struct Permissions: u64 {
         /// Allows for the creation of [`RichInvite`]s.
         ///
@@ -664,12 +665,6 @@ impl Permissions {
     /// [Use VAD]: Self::USE_VAD
     pub fn use_vad(self) -> bool {
         self.contains(Self::USE_VAD)
-    }
-}
-
-impl Default for Permissions {
-    fn default() -> Self {
-        Self::empty()
     }
 }
 
