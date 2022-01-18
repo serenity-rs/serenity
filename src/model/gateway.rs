@@ -488,7 +488,7 @@ pub struct Presence {
 #[non_exhaustive]
 pub struct Ready {
     pub application: PartialCurrentApplicationInfo,
-    pub guilds: Vec<GuildStatus>,
+    pub guilds: Vec<UnavailableGuild>,
     #[serde(default, with = "presences")]
     pub presences: HashMap<UserId, Presence>,
     #[serde(default, with = "private_channels")]
