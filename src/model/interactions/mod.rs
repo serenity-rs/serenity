@@ -170,6 +170,7 @@ enum_number!(InteractionType {
 
 bitflags! {
     /// The flags for an interaction response.
+    #[derive(Default)]
     pub struct InteractionApplicationCommandCallbackDataFlags: u64 {
         /// Interaction message will only be visible to sender and will
         /// be quickly deleted.
