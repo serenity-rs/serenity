@@ -2,7 +2,8 @@ use std::collections::HashMap;
 #[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
-use crate::json::{from_number, Value};
+use super::CreateAllowedMentions;
+use crate::json::{self, from_number, Value};
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::channel::MessageFlags;
@@ -144,6 +145,20 @@ impl<'a> ExecuteWebhook<'a> {
         files: It,
     ) -> &mut Self {
         self.1 = files.into_iter().map(|f| f.into()).collect();
+        self
+    }
+
+    /// Set the allowed mentions for the message.
+    pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
+    {
+        let mut allowed_mentions = CreateAllowedMentions::default();
+        f(&mut allowed_mentions);
+        let map = json::hashmap_to_json_map(allowed_mentions.0);
+        let allowed_mentions = Value::from(map);
+
+        self.0.insert("allowed_mentions", allowed_mentions);
         self
     }
 
