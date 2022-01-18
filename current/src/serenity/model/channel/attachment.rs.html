@@ -253,10 +253,10 @@
     <span class="doccomment">/// [`Message`]: super::Message</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">download</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">reqwest</span> <span class="op">=</span> <span class="ident">ReqwestClient::new</span>();
-
-        <span class="prelude-val">Ok</span>(<span class="ident">reqwest</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">url</span>).<span class="ident">send</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">bytes</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>())
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">reqwest</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">url</span>).<span class="ident">send</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">bytes</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>.<span class="ident">to_vec</span>())
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (ad46af247 2022-01-14)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (ee5d8d37b 2022-01-17)" ></div>
 </body></html>
