@@ -167,7 +167,7 @@ impl<'a> EditMessage<'a> {
 
     /// Sets the flags for the message.
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", from_number(flags.bits));
+        self.0.insert("flags", from_number(flags.bits()));
         self
     }
 
