@@ -265,7 +265,7 @@ impl CacheUpdate for GuildCreateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildDeleteEvent {
-    pub guild: GuildUnavailable,
+    pub guild: UnavailableGuild,
 }
 
 #[cfg(feature = "cache")]
@@ -999,26 +999,15 @@ impl CacheUpdate for ReadyEvent {
     fn update(&mut self, cache: &Cache) -> Option<()> {
         let mut ready = self.ready.clone();
 
-        // `GuildStatus` will by replaced by `UnavailableGuild`
-        #[allow(deprecated)]
-        for guild in ready.guilds {
-            match guild {
-                GuildStatus::Offline(unavailable) => {
-                    cache.guilds.remove(&unavailable.id);
-                    cache.unavailable_guilds.insert(unavailable.id);
-                },
-                GuildStatus::OnlineGuild(guild) => {
-                    cache.unavailable_guilds.remove(&guild.id);
-                    cache.guilds.insert(guild.id, guild);
-                },
-                GuildStatus::OnlinePartialGuild(_) => {},
-            }
+        for unavailable in ready.guilds {
+            cache.guilds.remove(&unavailable.id);
+            cache.unavailable_guilds.insert(unavailable.id);
         }
 
         // We may be removed from some guilds between disconnect and ready, so we should handle that.
         let mut guilds_to_remove = vec![];
         let ready_guilds_hashset =
-            HashSet::<GuildId>::from_iter(self.ready.guilds.iter().map(|status| status.id()));
+            HashSet::<GuildId>::from_iter(self.ready.guilds.iter().map(|status| status.id));
         let shard_data = self.ready.shard.unwrap_or([1, 1]);
         for guild_entry in cache.guilds.iter() {
             let guild = guild_entry.key();
