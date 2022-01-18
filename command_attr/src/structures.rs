@@ -362,10 +362,10 @@ impl ToTokens for Permissions {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let bits = self.0;
 
-        let path = quote!(serenity::model::permissions::Permissions);
+        let path = quote!(serenity::model::permissions::Permissions::from_bits_truncate);
 
         stream.extend(quote! {
-            #path { bits: #bits }
+            #path(#bits)
         });
     }
 }

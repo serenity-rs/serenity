@@ -6,7 +6,7 @@ pub mod ping;
 
 use application_command::ApplicationCommandInteraction;
 use autocomplete::AutocompleteInteraction;
-use bitflags::__impl_bitflags;
+use bitflags::bitflags;
 use message_component::MessageComponentInteraction;
 use modal::ModalSubmitInteraction;
 use ping::PingInteraction;
@@ -192,18 +192,12 @@ enum_number!(InteractionType {
     ModalSubmit
 });
 
-/// The flags for an interaction response.
-#[derive(Clone)]
-#[non_exhaustive]
-pub struct InteractionApplicationCommandCallbackDataFlags {
-    bits: u64,
-}
-
-__impl_bitflags! {
-    InteractionApplicationCommandCallbackDataFlags: u64 {
+bitflags! {
+    /// The flags for an interaction response.
+    pub struct InteractionApplicationCommandCallbackDataFlags: u64 {
         /// Interaction message will only be visible to sender and will
         /// be quickly deleted.
-        EPHEMERAL = 1 << 6;
+        const EPHEMERAL = 1 << 6;
     }
 }
 
