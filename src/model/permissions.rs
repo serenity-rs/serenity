@@ -44,7 +44,7 @@
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use bitflags::__impl_bitflags;
+use bitflags::bitflags;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 
@@ -220,51 +220,41 @@ pub const PRESET_VOICE: Permissions = Permissions {
     bits: Permissions::CONNECT.bits | Permissions::SPEAK.bits | Permissions::USE_VAD.bits,
 };
 
-/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
-/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
-/// [`GuildChannel`]s.
-///
-/// [`Guild`]: super::guild::Guild
-/// [`GuildChannel`]: super::channel::GuildChannel
-/// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
-/// [`Role`]: super::guild::Role
-/// [`User`]: super::user::User
-#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
-pub struct Permissions {
-    /// The flags making up the permissions.
+bitflags! {
+    /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
+    /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
+    /// [`GuildChannel`]s.
     ///
-    /// # Note
-    /// Do not modify this yourself; use the provided methods.
-    /// Do the same when creating, unless you're absolutely certain that you're giving valid permission flags.
-    pub bits: u64,
-}
-
-__impl_bitflags! {
-    Permissions: u64 {
+    /// [`Guild`]: super::guild::Guild
+    /// [`GuildChannel`]: super::channel::GuildChannel
+    /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
+    /// [`Role`]: super::guild::Role
+    /// [`User`]: super::user::User
+    pub struct Permissions: u64 {
         /// Allows for the creation of [`RichInvite`]s.
         ///
         /// [`RichInvite`]: super::invite::RichInvite
-        CREATE_INVITE = 1 << 0;
+        const CREATE_INVITE = 1 << 0;
         /// Allows for the kicking of guild [member]s.
         ///
         /// [member]: super::guild::Member
-        KICK_MEMBERS = 1 << 1;
+        const KICK_MEMBERS = 1 << 1;
         /// Allows the banning of guild [member]s.
         ///
         /// [member]: super::guild::Member
-        BAN_MEMBERS = 1 << 2;
+        const BAN_MEMBERS = 1 << 2;
         /// Allows all permissions, bypassing channel [permission overwrite]s.
         ///
         /// [permission overwrite]: super::channel::PermissionOverwrite
-        ADMINISTRATOR = 1 << 3;
+        const ADMINISTRATOR = 1 << 3;
         /// Allows management and editing of guild [channel]s.
         ///
         /// [channel]: super::channel::GuildChannel
-        MANAGE_CHANNELS = 1 << 4;
+        const MANAGE_CHANNELS = 1 << 4;
         /// Allows management and editing of the [guild].
         ///
         /// [guild]: super::guild::Guild
-        MANAGE_GUILD = 1 << 5;
+        const MANAGE_GUILD = 1 << 5;
         /// [`Member`]s with this permission can add new [`Reaction`]s to a
         /// [`Message`]. Members can still react using reactions already added
         /// to messages without this permission.
@@ -272,95 +262,95 @@ __impl_bitflags! {
         /// [`Member`]: super::guild::Member
         /// [`Message`]: super::channel::Message
         /// [`Reaction`]: super::channel::Reaction
-        ADD_REACTIONS = 1 << 6;
+        const ADD_REACTIONS = 1 << 6;
         /// Allows viewing a guild's audit logs.
-        VIEW_AUDIT_LOG = 1 << 7;
+        const VIEW_AUDIT_LOG = 1 << 7;
         /// Allows the use of priority speaking in voice channels.
-        PRIORITY_SPEAKER = 1 << 8;
+        const PRIORITY_SPEAKER = 1 << 8;
         // Allows the user to go live
-        STREAM = 1 << 9;
+        const STREAM = 1 << 9;
         /// Allows reading messages in a guild channel. If a user does not have
         /// this permission, then they will not be able to see the channel.
-        READ_MESSAGES = 1 << 10;
+        const READ_MESSAGES = 1 << 10;
         /// Allows sending messages in a guild channel.
-        SEND_MESSAGES = 1 << 11;
+        const SEND_MESSAGES = 1 << 11;
         /// Allows the sending of text-to-speech messages in a channel.
-        SEND_TTS_MESSAGES = 1 << 12;
+        const SEND_TTS_MESSAGES = 1 << 12;
         /// Allows the deleting of other messages in a guild channel.
         ///
         /// **Note**: This does not allow the editing of other messages.
-        MANAGE_MESSAGES = 1 << 13;
+        const MANAGE_MESSAGES = 1 << 13;
         /// Allows links from this user - or users of this role - to be
         /// embedded, with potential data such as a thumbnail, description, and
         /// page name.
-        EMBED_LINKS = 1 << 14;
+        const EMBED_LINKS = 1 << 14;
         /// Allows uploading of files.
-        ATTACH_FILES = 1 << 15;
+        const ATTACH_FILES = 1 << 15;
         /// Allows the reading of a channel's message history.
-        READ_MESSAGE_HISTORY = 1 << 16;
+        const READ_MESSAGE_HISTORY = 1 << 16;
         /// Allows the usage of the `@everyone` mention, which will notify all
         /// users in a channel. The `@here` mention will also be available, and
         /// can be used to mention all non-offline users.
         ///
         /// **Note**: You probably want this to be disabled for most roles and
         /// users.
-        MENTION_EVERYONE = 1 << 17;
+        const MENTION_EVERYONE = 1 << 17;
         /// Allows the usage of custom emojis from other guilds.
         ///
         /// This does not dictate whether custom emojis in this guild can be
         /// used in other guilds.
-        USE_EXTERNAL_EMOJIS = 1 << 18;
+        const USE_EXTERNAL_EMOJIS = 1 << 18;
         /// Allows for viewing guild insights.
-        VIEW_GUILD_INSIGHTS = 1 << 19;
+        const VIEW_GUILD_INSIGHTS = 1 << 19;
         /// Allows the joining of a voice channel.
-        CONNECT = 1 << 20;
+        const CONNECT = 1 << 20;
         /// Allows the user to speak in a voice channel.
-        SPEAK = 1 << 21;
+        const SPEAK = 1 << 21;
         /// Allows the muting of members in a voice channel.
-        MUTE_MEMBERS = 1 << 22;
+        const MUTE_MEMBERS = 1 << 22;
         /// Allows the deafening of members in a voice channel.
-        DEAFEN_MEMBERS = 1 << 23;
+        const DEAFEN_MEMBERS = 1 << 23;
         /// Allows the moving of members from one voice channel to another.
-        MOVE_MEMBERS = 1 << 24;
+        const MOVE_MEMBERS = 1 << 24;
         /// Allows the usage of voice-activity-detection in a [voice] channel.
         ///
         /// If this is disabled, then [`Member`]s must use push-to-talk.
         ///
         /// [`Member`]: super::guild::Member
         /// [voice]: super::channel::ChannelType::Voice
-        USE_VAD = 1 << 25;
+        const USE_VAD = 1 << 25;
         /// Allows members to change their own nickname in the guild.
-        CHANGE_NICKNAME = 1 << 26;
+        const CHANGE_NICKNAME = 1 << 26;
         /// Allows members to change other members' nicknames.
-        MANAGE_NICKNAMES = 1 << 27;
+        const MANAGE_NICKNAMES = 1 << 27;
         /// Allows management and editing of roles below their own.
-        MANAGE_ROLES = 1 << 28;
+        const MANAGE_ROLES = 1 << 28;
         /// Allows management of webhooks.
-        MANAGE_WEBHOOKS = 1 << 29;
+        const MANAGE_WEBHOOKS = 1 << 29;
         /// Allows management of emojis and stickers created without the use of an
         /// [`Integration`].
         ///
         /// [`Integration`]: super::guild::Integration
-        MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
+        const MANAGE_EMOJIS_AND_STICKERS = 1 << 30;
         /// Allows using slash commands.
-        USE_SLASH_COMMANDS = 1 << 31;
+        const USE_SLASH_COMMANDS = 1 << 31;
         /// Allows for requesting to speak in stage channels.
-        REQUEST_TO_SPEAK = 1 << 32;
+        const REQUEST_TO_SPEAK = 1 << 32;
         /// Allows for deleting and archiving threads, and viewing all private threads.
-        MANAGE_THREADS = 1 << 34;
+        const MANAGE_THREADS = 1 << 34;
         /// Allows for creating threads.
-        CREATE_PUBLIC_THREADS = 1 << 35;
+        const CREATE_PUBLIC_THREADS = 1 << 35;
         /// Allows for creating private threads.
-        CREATE_PRIVATE_THREADS = 1 << 36;
+        const CREATE_PRIVATE_THREADS = 1 << 36;
         /// Allows the usage of custom stickers from other servers.
-        USE_EXTERNAL_STICKERS = 1 << 37;
+        const USE_EXTERNAL_STICKERS = 1 << 37;
         /// Allows for sending messages in threads
-        SEND_MESSAGES_IN_THREADS = 1 << 38;
+        const SEND_MESSAGES_IN_THREADS = 1 << 38;
         /// Allows for launching activities in a voice channel
-        START_EMBEDDED_ACTIVITIES = 1 << 39;
+        const START_EMBEDDED_ACTIVITIES = 1 << 39;
         /// Allows for timing out users to prevent them from sending or reacting to messages in
         /// chat and threads, and from speaking in voice and stage channels.
-        MODERATE_MEMBERS = 1 << 40;
+        const MODERATE_MEMBERS = 1 << 40;
     }
 }
 

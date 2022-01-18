@@ -245,7 +245,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
-        self.0.insert("flags", from_number(flags.bits));
+        self.0.insert("flags", from_number(flags.bits()));
         self
     }
 }
