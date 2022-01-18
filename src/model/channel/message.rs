@@ -1232,6 +1232,7 @@ pub struct ChannelMention {
 
 bitflags! {
     /// Describes extra features of the message.
+    #[derive(Default)]
     pub struct MessageFlags: u64 {
         /// This message has been published to subscribed channels (via Channel Following).
         const CROSSPOSTED = 1 << 0;
