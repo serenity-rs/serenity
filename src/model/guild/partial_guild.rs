@@ -1,6 +1,3 @@
-// FIXME: Remove after the removal of the `̀nsfw` field.
-#![allow(deprecated)]
-
 use serde::de::Error as DeError;
 #[cfg(feature = "simd-json")]
 use simd_json::StaticNode;
@@ -93,9 +90,6 @@ pub struct PartialGuild {
     /// Whether or not the user is the owner of the guild.
     #[serde(default)]
     pub owner: bool,
-    /// The region that the voice servers that the guild uses are located in.
-    #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
-    pub region: String,
     /// A mapping of the guild's roles.
     #[serde(with = "roles")]
     pub roles: HashMap<RoleId, Role>,
@@ -142,12 +136,6 @@ pub struct PartialGuild {
     pub approximate_member_count: Option<u64>,
     /// Approximate number of non-offline members in this guild.
     pub approximate_presence_count: Option<u64>,
-    /// Whether or not this guild is designated as NSFW. See [`discord support article`].
-    ///
-    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
-    #[deprecated(note = "Removed in favor of Guild::nsfw_level.")]
-    #[serde(default)]
-    pub nsfw: bool,
     /// The guild NSFW state. See [`discord support article`].
     ///
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
@@ -738,12 +726,6 @@ impl PartialGuild {
                 self.mfa_level = guild.mfa_level;
                 self.name = guild.name;
                 self.owner_id = guild.owner_id;
-
-                #[allow(deprecated)]
-                {
-                    self.region = guild.region;
-                }
-
                 self.roles = guild.roles;
                 self.splash = guild.splash;
                 self.verification_level = guild.verification_level;
@@ -1668,11 +1650,6 @@ impl<'de> Deserialize<'de> for PartialGuild {
             .ok_or_else(|| DeError::custom("expected guild owner_id"))
             .and_then(UserId::deserialize)
             .map_err(DeError::custom)?;
-        let region = map
-            .remove("region")
-            .ok_or_else(|| DeError::custom("expected guild region"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
         let roles = map
             .remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
@@ -1733,12 +1710,6 @@ impl<'de> Deserialize<'de> for PartialGuild {
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
-
-        let nsfw = map
-            .remove("nsfw")
-            .ok_or_else(|| DeError::custom("expected approximate_presence_count"))
-            .and_then(bool::deserialize)
-            .map_err(DeError::custom)?;
 
         let nsfw_level = map
             .remove("nsfw_level")
@@ -1813,7 +1784,6 @@ impl<'de> Deserialize<'de> for PartialGuild {
             .and_then(stickers::deserialize)
             .map_err(DeError::custom)?;
 
-        #[allow(deprecated)]
         Ok(Self {
             application_id,
             id,
@@ -1829,7 +1799,6 @@ impl<'de> Deserialize<'de> for PartialGuild {
             name,
             owner_id,
             owner,
-            region,
             roles,
             splash,
             discovery_splash,
@@ -1846,7 +1815,6 @@ impl<'de> Deserialize<'de> for PartialGuild {
             welcome_screen,
             approximate_member_count,
             approximate_presence_count,
-            nsfw,
             nsfw_level,
             max_video_channel_users,
             max_presences,

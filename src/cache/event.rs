@@ -425,12 +425,6 @@ impl CacheUpdate for GuildUpdateEvent {
             guild.splash.clone_from(&self.guild.splash);
             guild.vanity_url_code.clone_from(&self.guild.vanity_url_code);
             guild.welcome_screen.clone_from(&self.guild.welcome_screen);
-
-            #[allow(deprecated)]
-            {
-                guild.region.clone_from(&self.guild.region);
-            }
-
             guild.default_message_notifications = self.guild.default_message_notifications;
             guild.max_members = self.guild.max_members;
             guild.max_presences = self.guild.max_presences;

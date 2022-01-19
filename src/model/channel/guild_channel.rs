@@ -45,7 +45,7 @@ use crate::model::Timestamp;
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
 /// News channels are a subset of text channels and lack slow mode hence
-/// [`Self::slow_mode_rate`] will be [`None`].
+/// [`Self::rate_limit_per_user`] will be [`None`].
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct GuildChannel {
@@ -109,9 +109,8 @@ pub struct GuildChannel {
     /// **Note**: This is only available for text channels excluding news
     /// channels.
     #[doc(alias = "slowmode")]
-    #[deprecated(note = "will be renamed to `rate_limit_per_user` with serenity 0.11")]
-    #[serde(default, rename = "rate_limit_per_user")]
-    pub slow_mode_rate: Option<u64>,
+    #[serde(default)]
+    pub rate_limit_per_user: Option<u64>,
     /// The region override.
     ///
     /// **Note**: This is only available for voice and stage channels. [`None`]
