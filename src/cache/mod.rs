@@ -47,6 +47,7 @@ use tracing::instrument;
 
 use crate::model::prelude::*;
 mod cache_update;
+mod event;
 mod settings;
 
 pub use self::cache_update::CacheUpdate;
