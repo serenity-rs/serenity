@@ -3073,6 +3073,7 @@ enum_number!(MfaLevel {
 /// The name of a region that a voice server can be located in.
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 #[non_exhaustive]
+#[deprecated(note = "Regions are now set per voice channel instead of globally.")]
 pub enum Region {
     #[serde(rename = "amsterdam")]
     Amsterdam,
