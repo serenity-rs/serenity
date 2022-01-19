@@ -3748,8 +3748,8 @@
         <span class="macro">api!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/permissions&quot;</span>, <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instances</span>() -&gt; <span class="ident">String</span> {
-        <span class="macro">api!</span>(<span class="string">&quot;/stage-instances&quot;</span>).<span class="ident">to_string</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instances</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="macro">api!</span>(<span class="string">&quot;/stage-instances&quot;</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stage_instance</span>(<span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="ident">String</span> {
