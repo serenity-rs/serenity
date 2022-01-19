@@ -1028,8 +1028,8 @@ impl Route {
         api!("/applications/{}/guilds/{}/commands/permissions", application_id, guild_id)
     }
 
-    pub fn stage_instances() -> String {
-        api!("/stage-instances").to_string()
+    pub fn stage_instances() -> &'static str {
+        api!("/stage-instances")
     }
 
     pub fn stage_instance(channel_id: u64) -> String {
