@@ -343,7 +343,7 @@
 
     <span class="doccomment">/// The seconds a user has to wait before sending another message.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Info**: Only values from 0 to 120 are valid.</span>
+    <span class="doccomment">/// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slow_mode_rate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u64</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rate_limit_per_user&quot;</span>, <span class="ident">Value::Number</span>(<span class="ident">Number::from</span>(<span class="ident">seconds</span>)));
