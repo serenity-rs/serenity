@@ -136,6 +136,9 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
@@ -237,6 +240,7 @@
     <span class="doccomment">/// Requires the [Moderate Members] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS</span>
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_communication_until</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;communication_disabled_until&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">time</span>));
         <span class="self">self</span>
@@ -248,6 +252,7 @@
     <span class="doccomment">/// Requires the [Moderate Members] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS</span>
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_communication_until_datetime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">Tz</span>: <span class="ident">TimeZone</span>,
@@ -263,6 +268,7 @@
     <span class="doccomment">/// Requires the [Moderate Members] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS</span>
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_communication</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;communication_disabled_until&quot;</span>, <span class="ident">Value::Null</span>);
         <span class="self">self</span>
