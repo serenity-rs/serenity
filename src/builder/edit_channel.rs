@@ -136,7 +136,7 @@ impl EditChannel {
 
     /// The seconds a user has to wait before sending another message.
     ///
-    /// **Info**: Only values from 0 to 120 are valid.
+    /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
     #[inline]
     pub fn slow_mode_rate(&mut self, seconds: u64) -> &mut Self {
         self.0.insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
