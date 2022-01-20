@@ -214,6 +214,7 @@ impl Member {
     /// 28 days from the current time.
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
+    #[doc(alias = "timeout")]
     pub async fn disable_communication_until_datetime(
         &mut self,
         http: impl AsRef<Http>,
@@ -280,6 +281,7 @@ impl Member {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
+    #[doc(alias = "timeout")]
     pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
         match self
             .guild_id
