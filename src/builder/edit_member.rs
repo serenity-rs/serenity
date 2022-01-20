@@ -99,6 +99,7 @@ impl EditMember {
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS
+    #[doc(alias = "timeout")]
     pub fn disable_communication_until(&mut self, time: String) -> &mut Self {
         self.0.insert("communication_disabled_until", Value::String(time));
         self
@@ -110,6 +111,7 @@ impl EditMember {
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS
+    #[doc(alias = "timeout")]
     pub fn disable_communication_until_datetime<Tz>(&mut self, time: DateTime<Tz>) -> &mut Self
     where
         Tz: TimeZone,
@@ -125,6 +127,7 @@ impl EditMember {
     /// Requires the [Moderate Members] permission.
     ///
     /// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS
+    #[doc(alias = "timeout")]
     pub fn enable_communication(&mut self) -> &mut Self {
         self.0.insert("communication_disabled_until", Value::Null);
         self
