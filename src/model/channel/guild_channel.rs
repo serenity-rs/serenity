@@ -107,6 +107,8 @@ pub struct GuildChannel {
     ///
     /// **Note**: This is only available for text channels excluding news
     /// channels.
+    #[doc(alias = "slowmode")]
+    #[deprecated(note = "will be renamed to `rate_limit_per_user` with serenity 0.11")]
     #[serde(default, rename = "rate_limit_per_user")]
     pub slow_mode_rate: Option<u64>,
     /// The region override.
