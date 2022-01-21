@@ -97,24 +97,52 @@ macro_rules! enum_number {
     }
 }
 
-macro_rules! impl_bitflags_serde {
-    ($name:ident: $type:tt) => {
-        impl<'de> serde::de::Deserialize<'de> for $name {
-            fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
-            where
-                D: serde::de::Deserializer<'de>,
-            {
-                Ok(Self::from_bits_truncate(<$type>::deserialize(deserializer)?))
+/// The macro forwards the generation to the `bitflags::bitflags!` macro and implements
+/// the default (de)serialization for Discord's bitmask values.
+///
+/// The flags are created with `T::from_bits_truncate` for the deserialized integer value.
+///
+/// Use the `bitflags::bitflags! macro directly if a different serde implementation is required.
+macro_rules! bitflags {
+    (
+        $(#[$outer:meta])*
+        $vis:vis struct $BitFlags:ident: $T:ty {
+            $(
+                $(#[$inner:ident $($args:tt)*])*
+                const $Flag:ident = $value:expr;
+            )*
+        }
+
+        $($t:tt)*
+    ) => {
+        bitflags::bitflags! {
+            $(#[$outer])*
+            $vis struct $BitFlags: $T {
+                $(
+                    $(#[$inner $($args)*])*
+                    const $Flag = $value;
+                )*
             }
         }
 
-        impl serde::ser::Serialize for $name {
-            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
-            where
-                S: serde::ser::Serializer,
-            {
+        bitflags!(__impl_serde $BitFlags: $T);
+
+        bitflags! {
+            $($t)*
+        }
+    };
+    (__impl_serde $BitFlags:ident: $T:tt) => {
+        impl<'de> serde::de::Deserialize<'de> for $BitFlags {
+            fn deserialize<D: serde::de::Deserializer<'de>>(deserializer: D) -> std::result::Result<Self, D::Error> {
+                Ok(Self::from_bits_truncate(<$T>::deserialize(deserializer)?))
+            }
+        }
+
+        impl serde::ser::Serialize for $BitFlags {
+            fn serialize<S: serde::ser::Serializer>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error> {
                 self.bits().serialize(serializer)
             }
         }
     };
+    () => {};
 }

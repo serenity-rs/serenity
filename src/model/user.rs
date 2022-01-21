@@ -4,7 +4,6 @@ use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 
-use bitflags::bitflags;
 #[cfg(feature = "model")]
 use futures::future::{BoxFuture, FutureExt};
 use serde::{Deserialize, Serialize};
@@ -669,8 +668,6 @@ bitflags! {
         const DISCORD_CERTIFIED_MODERATOR = 1 << 18;
     }
 }
-
-impl_bitflags_serde!(UserPublicFlags: u32);
 
 impl Default for User {
     /// Initializes a [`User`] with default values. Setting the following:

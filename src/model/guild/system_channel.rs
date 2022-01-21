@@ -1,5 +1,3 @@
-use bitflags::bitflags;
-
 bitflags! {
     /// Describes a system channel flags.
     #[derive(Default)]
@@ -14,5 +12,3 @@ bitflags! {
         const SUPPRESS_JOIN_NOTIFICATION_REPLIES = 1 << 3;
     }
 }
-
-impl_bitflags_serde!(SystemChannelFlags: u64);
