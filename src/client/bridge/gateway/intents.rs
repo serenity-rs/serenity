@@ -154,6 +154,14 @@ __impl_bitflags! {
         ///
         /// - TYPING_START
         DIRECT_MESSAGE_TYPING = 1 << 14;
+        /// Enable following gateway events:
+        ///
+        /// - GUILD_SCHEDULED_EVENT_CREATE
+        /// - GUILD_SCHEDULED_EVENT_UPDATE
+        /// - GUILD_SCHEDULED_EVENT_DELETE
+        /// - GUILD_SCHEDULED_EVENT_USER_ADD
+        /// - GUILD_SCHEDULED_EVENT_USER_REMOVE
+        GUILD_SCHEDULED_EVENTS = 1 << 16;
     }
 }
 

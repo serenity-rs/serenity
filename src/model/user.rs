@@ -562,6 +562,8 @@ __impl_bitflags! {
         EARLY_VERIFIED_BOT_DEVELOPER = 1 << 17;
         /// User's flag as discord certified moderator
         DISCORD_CERTIFIED_MODERATOR = 1 << 18;
+        /// Bot's running with HTTP interactions
+        BOT_HTTP_INTERACTIONS = 1 << 19;
     }
 }
 

@@ -30,6 +30,12 @@ pub struct Attachment {
     ///
     /// [media type]: https://en.wikipedia.org/wiki/Media_type
     pub content_type: Option<String>,
+    /// Whether this attachment is ephemeral.
+    ///
+    /// Ephemeral attachments will automatically be removed after a set period of time.
+    /// Ephemeral attachments on messages are guaranteed to be available as long as
+    /// the message itself exists.
+    pub ephemeral: Option<bool>,
 }
 
 #[cfg(feature = "model")]

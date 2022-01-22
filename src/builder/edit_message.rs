@@ -5,6 +5,7 @@ use super::CreateEmbed;
 use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
 use crate::utils;
+use crate::model::channel::MessageFlags;
 
 /// A builder to specify the fields to edit in an existing message.
 ///
@@ -140,6 +141,12 @@ impl EditMessage {
         f(&mut components);
 
         self.0.insert("components", Value::Array(components.0));
+        self
+    }
+
+    /// Sets the flags for the message.
+    pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
+        self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits)));
         self
     }
 }

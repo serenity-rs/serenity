@@ -43,6 +43,10 @@ pub struct AutocompleteInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
+    /// The selected language of the invoking user.
+    pub locale: String,
 }
 
 impl AutocompleteInteraction {
@@ -183,6 +187,22 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
+        let guild_locale = match map.contains_key("guild_locale") {
+            true => Some(
+                map.remove("guild_locale")
+                    .ok_or_else(|| DeError::custom("expected guild_locale"))
+                    .and_then(String::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let locale = map
+            .remove("locale")
+            .ok_or_else(|| DeError::custom("expected locale"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
         Ok(Self {
             id,
             application_id,
@@ -194,6 +214,8 @@ impl<'de> Deserialize<'de> for AutocompleteInteraction {
             user,
             token,
             version,
+            guild_locale,
+            locale,
         })
     }
 }

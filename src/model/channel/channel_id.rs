@@ -38,9 +38,7 @@ use crate::collector::{
     ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::AttachmentType;
-#[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http, Typing};
+use crate::http::{CacheHttp, Http, Typing, AttachmentType};
 use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils;
@@ -655,7 +653,9 @@ impl ChannelId {
     ///
     /// The [Attach Files] and [Send Messages] permissions are required.
     ///
-    /// **Note**: Message contents must be under 2000 unicode code points.
+    /// **Note**: Message contents must be under 2000 unicode code points, and embeds must be under
+    /// 6000 unicode code points.
+    /// 
     ///
     /// # Examples
     ///

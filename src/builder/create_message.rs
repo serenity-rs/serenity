@@ -6,7 +6,7 @@ use super::CreateEmbed;
 use crate::builder::CreateComponents;
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
-use crate::model::channel::{MessageReference, ReactionType};
+use crate::model::channel::{MessageReference, ReactionType, MessageFlags};
 use crate::utils;
 
 /// A builder to specify the contents of an [`Http::send_message`] request,
@@ -240,6 +240,12 @@ impl<'a> CreateMessage<'a> {
     #[cfg(feature = "unstable_discord_api")]
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
         self.0.insert("components", Value::Array(components.0));
+        self
+    }
+
+    /// Sets the flags for the message.
+    pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
+        self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits)));
         self
     }
 }

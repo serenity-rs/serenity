@@ -16,4 +16,6 @@ pub struct PingInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
 }

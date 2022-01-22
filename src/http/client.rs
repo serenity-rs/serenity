@@ -1177,6 +1177,29 @@ impl Http {
         .await
     }
 
+    /// Get a follow-up message for an interaction.
+    ///
+    /// Refer to Discord's [docs] for Get Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#get-webhook-message
+    #[cfg(feature = "unstable_discord_api")]
+    pub async fn get_followup_message(
+        &self,
+        interaction_token: &str,
+        message_id: u64,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetFollowupMessage {
+                application_id: self.application_id,
+                interaction_token,
+                message_id,
+            },
+        })
+        .await
+    }
+
     /// Edits a global command.
     ///
     /// Updates will be available in all guilds after 1 hour.

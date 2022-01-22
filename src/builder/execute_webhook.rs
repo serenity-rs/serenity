@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use serde_json::Value;
 
 use crate::http::AttachmentType;
+use crate::model::channel::MessageFlags;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -205,6 +206,33 @@ impl<'a> ExecuteWebhook<'a> {
     /// ```
     pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));
+        self
+    }
+
+    /// Sets the flags for the message.
+    ///
+    /// # Examples
+    ///
+    /// Supressing an embed on the message.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::channel::MessageFlags;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
+    /// #
+    /// let execution = webhook.execute(&http, false, |w| w.content("https://docs.rs/serenity/latest/serenity/").flags(MessageFlags::SUPPRESS_EMBEDS)).await;
+    ///
+    /// if let Err(why) = execution {
+    ///     println!("Err sending webhook: {:?}", why);
+    /// }
+    /// #     Ok(())
+    /// # }
+    /// ```
+    pub fn flags(&mut self, flags: MessageFlags) -> &mut Self {
+        self.0.insert("flags", Value::Number(serde_json::Number::from(flags.bits)));
         self
     }
 }

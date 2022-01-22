@@ -479,6 +479,14 @@ pub struct ThreadMetadata {
     /// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
     #[serde(default)]
     pub locked: bool,
+    /// Timestamp when the thread was created.
+    ///
+    /// **Note**: only populated for threads created after 2022-01-09
+    pub create_timestamp: Option<DateTime<Utc>>,
+    /// Whether non-moderators can add other non-moderators to a thread.
+    ///
+    /// **Note**: Only available on private threads.
+    pub invitable: Option<bool>,
 }
 
 /// A response to getting several threads channels.
