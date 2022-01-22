@@ -86,10 +86,6 @@ jobs:
         if: ${{ !matrix.dont-test && matrix.features }}
         run: cargo test --no-default-features --features "${{ matrix.features }}"
 
-      - name: Check minimal versions
-        if: matrix.toolchain == 'nightly'
-        run: cargo clean; cargo update -Z minimal-versions; cargo check
-
   MSRV:
     runs-on: ubuntu-latest
 
@@ -110,6 +106,30 @@ jobs:
 
       - name: Check
         run: cargo check --all-features
+
+  min_versions:
+    name: Check minimal versions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain (nightly)
+        run: |
+          rustup install --profile minimal nightly
+          rustup override set nightly
+
+      - name: Add problem matchers
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Check minimal versions
+        run: |
+          cargo update -Z minimal-versions
+          cargo check
 
   doc:
     name: Build docs
