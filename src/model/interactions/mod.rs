@@ -6,7 +6,6 @@ pub mod ping;
 
 use application_command::ApplicationCommandInteraction;
 use autocomplete::AutocompleteInteraction;
-use bitflags::bitflags;
 use message_component::MessageComponentInteraction;
 use modal::ModalSubmitInteraction;
 use ping::PingInteraction;
@@ -209,8 +208,6 @@ bitflags! {
         const EPHEMERAL = 1 << 6;
     }
 }
-
-impl_bitflags_serde!(InteractionApplicationCommandCallbackDataFlags: u64);
 
 /// Sent when a [`Message`] is a response to an [`Interaction`].
 ///
