@@ -3,6 +3,133 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.10.10] - 2021-01-22
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@AldanTanneo]
+- [@almeidx]
+- [@Atakku]
+- [@drklee3]
+- [@Friz64]
+- [@HarmoGlace]
+- [@JellyWX]
+- [@JohnTheCoolingFan]
+- [@KaDiWa4]
+- [@kafinsalim]
+- [@kangalioo]
+- [@kristopherbullinger]
+- [@lhjt]
+- [@lo48576]
+- [@mbenoukaiss]
+- [@mdonoughe]
+- [@Milo123459]
+- [@mkrasnitski]
+- [@nickelc]
+- [@OverHash]
+- [@pascalharp]
+- [@Splingush]
+- [@Squili]
+- [@Th3-M4jor]
+- [@Vaimer9]
+- [@vicky5124]
+- [@woongzeyi]
+
+### Added
+
+- [builder] Add a `timeout` doc alias to various methods ([@Milo123459]) [c:1d05a1e]
+- [builder] Add support for enabling slowmode on thread creation ([@nickelc]) [c:69896e0]
+- [ci] Add GitHub Actions workflow for labeling pull requests ([@nickelc]) [c:93b66d0]
+- [model] Add `banner` and `accent_color` fields to `User` ([@drklee3]) [c:9e10d54]
+- [client] Add `get_*` methods for many `ClientBuilder` fields ([@kangalioo]) [c:90dae53]
+- [model] Add support for member timeout ([@kristopherbullinger]) [c:944cd54]
+- [utils] Add `get_webhook_from_url` ([@mkrasnitski]) [c:b026f00] [c:6bd2f74] [c:7b89775]
+- [examples] Add an example for message components ([@pascalharp]) [c:ee00e92]
+- [examples] Add step for installing `cargo make` to the Running Examples section ([@kafinsalim]) [c:47a297b]
+- [model] Add support for `min_value` and `max_value` to slash command options ([@kangalioo]) [c:cfd518e]
+- [model] Add `SUPPRESS_JOIN_NOTIFICATION_REPLIES` system channel flag ([@almeidx]) [c:6121fd0]
+- [model] Add support for Autocomplete interactions ([@Th3-M4jor]) [c:c322657]
+- [misc] Format code in documentation comments ([@acdenisSK]) [c:5b84896]
+- [client] Add a method to `ClientBuilder` for retrieving the current token ([@kangalioo]) [c:6f87d25]
+- [utils] Add Discord's new branding, CSS & role colours ([@nickelc]) [c:c0463c0]
+- [misc] Add `poise` to the "Projects extending Serenity" section ([@vicky5124]) [c:bfb5f13]
+- [model] Add channel types to application command options ([@vicky5124]) [c:5a700f7]
+- [model] Add new audit log models for `STAGE_INSTANCE`, `STICKER`, and `THREAD` ([@woongzeyi]) [c:0bc3ce0]
+- [model] Add `defer` helper methods for deferring interactions ([@Milo123459]) [c:d50628e]
+- [examples] Add a database example using SQLite ([@kangalioo]) [c:02a5e15]
+- [model] Add support for editing threads ([@lhjt]) [c:afeb76e]
+- [ci] Use a better cache designed for Rust software in CI ([@Milo123459]) [c:c74162c]
+- [examples] Add a simple web dashboard example ([@vicky5124]) [c:6c5aa4d]
+- [model] Add new invite fields ([@vicky5124]) [c:cf4e216]
+- [model] Add `ApplicationCommand::version` field  ([@HarmoGlace]) [c:c85d44a]
+- [http] Add the guild active threads endpoint ([@HarmoGlace]) [c:93d6ab8]
+- [builder] Implement `From<Datetime>` for `Timestamp` ([@drklee3]) [c:b905554]
+- [command_attr] Add undocumented `#[required_permissions(perms)]` requirements ([@woongzeyi]) [c:f9de6c5]
+- [http] Add paths to HTTP errors ([@Splingush]) [c:2da46a8]
+- [builder] Add a `set_component` method to respective builders ([@JellyWX]) [c:99eba2b]
+- [model] Support context menus ([@HarmoGlace]) [c:e87293e]
+- [model] Add `ContextMenuCommand` message type ([@HarmoGlace]) [c:2a571d3]
+
+### Changed
+
+- [model] Mark the `model::guild::GuildStatus` enum as deprecated ([@nickelc]) [c:bd1342e]
+- [model] Suppress deprecation warning for the use of `Region` ([@nickelc]) [c:2dcb9b3]
+- [builder] Deprecate `slow_mode_rate`/`rate_limit` methods and field ([@nickelc]) [c:5c1e31e]
+- [builder] Update the notice about the max value for the "per user" ratelimit ([@nickelc]) [c:32f4430]
+- [model] Mark the `model::guild::Region` enum as deprecated ([@nickelc]) [c:6d476cf]
+- [model] Improve the download of `Attachment`s by calling `Bytes::to_vec` ([@nickelc]) [c:f630f32]
+- [examples] Refactor examples 03 and 13 to better use the builder pattern ([@mkrasnitski]) [c:34c2f22]
+- [examples] Refactor example 09 to more idiomatically use the builder pattern ([@mkrasnitski]) [c:4f7dad7]
+- [misc] Increase MSRV to 1.51 ([@acdenisSK]) [c:04fc541]
+- [model] Use the `write_all` variant in the `Attachment::download` example ([@acdenisSK]) [c:a8b4e2f]
+- [misc] Use `Formatter::write_str` directly instead of `writeln` for string literals ([@nickelc]) [c:6a0106c]
+- [model] Use the permission flags for the `permissions::PRESET_*` constants ([@nickelc]) [c:fc7c76a]
+- [model] Use bitshift notation for the values of Discord's bit flags ([@nickelc]) [c:57a2e4d]
+- [model] Make the `u64` value of `AttachmentId`s public ([@nickelc]) [c:5379d3e]
+- [model] Simplify the `*Id::created_at` method by using `Utc.timestamp_millis` ([@nickelc]) [c:1977e9f]
+- [misc] Set `rustfmt` edition to match library edition ([@mkrasnitski]) [c:4f2a73b]
+- [misc] Remove old version of `time` from dependency tree ([@KaDiWa4]) [c:d9c8980]
+- [framework] Change `Configuration::prefix`  to accept types that implement `ToString` ([@mkrasnitski]) [c:738465f]
+- [gateway] Remove guilds from cache if they were removed between a disconnect and a ready ([@Squili]) [c:b21f053]
+- [internal] Put the internal `tokio` module behind `tokio*` features ([@nickelc]) [c:921ff6f]
+- [examples] Use `ClientBuilder::type_map_insert` in examples where it makes sense ([@nickelc]) [c:c3358cf]
+- [examples] Simplify `tracing_subscriber` initialization in the examples ([@nickelc]) [c:46f7608]
+- [ci] Specify MSRV for clippy and use stable toolchain for the lint job ([@nickelc]) [c:bade6e5]
+- [misc] Replace instances of `tokio::spawn` with `spawn_named` ([@Milo123459] [@acdenisSK]) [c:5f81d4a] [c:247c073] [c:b2197db]
+- [voice] Replace some instances of `match` with the `matches!` macro  ([@Milo123459]) [c:6987175]
+- [utils] Fall back to `Member` parsing if `User` is not in the cache in `ArgumentConvert` ([@kangalioo]) [c:6085aad]
+- [model] Define `Sticker::pack_id` as optional ([@Atakku]) [c:cf040cb]
+- [model] Guarantee the `MessageComponentInteraction::message` to not be partial ([@HarmoGlace]) [c:f915fee]
+
+### Fixed
+
+- [examples] Fix a typo in example 12 ([@Vaimer9]) [c:38b11da]
+- [model] Fix documentation typo in `Message::crosspost` ([@OverHash]) [c:b180f21]
+- [model] Fix non-idiomatic comment ([@nickelc]) [c:f70112d]
+- [model] Fix panic in `ReactionType` deserialization ([@nickelc]) [c:fe946df]
+- [model] Fix faulty (de)serialization of `InteractionApplicationCommandDataFlags` ([@nickelc]) [c:62b9c84]
+- [model] Fix the example for `permissions::PRESET_GENERAL` ([@nickelc]) [c:707697e]
+- [command_attr] Fix `#[help]` to generate its variables without an extra underscore ([@JohnTheCoolingFan]) [c:df47df1]
+- [model] Fix `Permissions` bitflags ([@AldanTanneo]) [c:0acabdf]
+- [misc] Make the library compilable with minimal dependency versions ([@lo48576]) [c:37e33bd]
+- [model] Perform owner check when calculating permissions for a member ([@acdenisSK]) [c:ccf0d5b]
+- [misc] Clean up Clippy errors ([@mdonoughe]) [c:2eeb336]
+- [framework] Handle Unicode double-quote characters when parsing arguments ([@acdenisSK]) [c:9bfc1e7]
+- [builder] Fix permission overwrites by sending Discord the correct overwrite types ([@woongzeyi]) [c:f36b4c1]
+- [misc] Fix compilation without default features ([@nickelc]) [c:0611e2c]
+- [framework] Check for discrepancies in default commands of groups ([@acdenisSK]) [c:cfbb7b3]
+- [misc] Apply fixes by clippy ([@Milo123459]) [c:7e1a64e]
+- [command_attr] Fix support for raw identifiers in `command_attr`'s macros ([@Friz64]) [c:5b7a23c]
+- [utils] Use the correct method for formatting an emoji in `MessageBuilder` documentation ([@mbenoukaiss]) [c:eb29760]
+- [model] Make `CreateApplicationCommandPermissions` public and fix documentation links ([@Squili]) [c:7392f3f]
+
+### Removed
+
+- [model] Remove unused `#[serde(deserialize_with = "..")]` attribute ([@nickelc]) [c:e848af8]
+- [misc] Remove `#[tokio::test]` from synchronous tests ([@nickelc]) [c:0d1c88e]
+- [utils] Remove unused function names from the `colour!` macro ([@nickelc]) [c:096d1da]
+
 ## [0.10.9] - 2021-08-15
 
 Thanks to the following for their contributions:
@@ -4293,6 +4420,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.10.10]: https://github.com/serenity-rs/serenity/compare/v0.10.9...v0.10.10
 [0.10.9]: https://github.com/serenity-rs/serenity/compare/v0.10.8...v0.10.9
 [0.10.8]: https://github.com/serenity-rs/serenity/compare/v0.10.7...v0.10.8
 [0.10.7]: https://github.com/serenity-rs/serenity/compare/v0.10.6...v0.10.7
@@ -4381,12 +4509,15 @@ Initial commit.
 [@7596ff]: https://github.com/7596ff
 [@AgathaSorceress]: https://github.com/AgathaSorceress
 [@Alch-Emi]: https://github.com/Alch-Emi
+[@AldanTanneo]: https://github.com/AldanTanneo
 [@Arcterus]: https://github.com/Arcterus
 [@AregevDev]: https://github.com/AregevDev
 [@AriusX7]: https://github.com/AriusX7
+[@Atakku]: https://github.com/Atakku
 [@abalabahaha]: https://github.com/abalabahaha
 [@acdenisSK]: https://github.com/acdenisSK
 [@adumbidiot]: https://github.com/adumbidiot
+[@almeidx]: https://github.com/almeidx
 [@andreasots]: https://github.com/andreasots
 [@aria-7553]: https://github.com/aria-7553
 [@asherkin]: https://github.com/asherkin
@@ -4424,10 +4555,11 @@ Initial commit.
 [@eLunate]: https://github.com/eLunate
 [@emoticon]: https://github.com/emoticon
 [@efyang]: https://github.com/efyang
-[@fenhl]: https://github.com/fenhl
 [@FelixMcFelix]: https://github.com/FelixMcFelix
 [@Flat]: https://github.com/Flat
 [@ForsakenHarmony]: https://github.com/ForsakenHarmony
+[@Friz64]: https://github.com/Friz64
+[@fenhl]: https://github.com/fenhl
 [@foxbot]: https://github.com/foxbot
 [@ftriquet]: https://github.com/ftriquet
 [@fwrs]: https://github.com/fwrs
@@ -4444,17 +4576,21 @@ Initial commit.
 [@ijks]: https://github.com/ijks
 [@JellyWX]: https://github.com/JellyWX
 [@Jerald]: https://github.com/Jerald
+[@JohnTheCoolingFan]: https://github.com/JohnTheCoolingFan
 [@james7132]: https://github.com/james7132
 [@jhelwig]: https://github.com/jhelwig
 [@jkcclemens]: https://github.com/jkcclemens
 [@jmgao]: https://github.com/jmgao
 [@joek13]: https://github.com/joek13
 [@johnchildren]: https://github.com/johnchildren
+[@KaDiWa4]: https://github.com/KaDiWa4
 [@KamranMackey]: https://github.com/KamranMackey
+[@Kroisse]: https://github.com/Kroisse
+[@kafinsalim]: https://github.com/kafinsalim
 [@kangalioo]: https://github.com/kangalioo
 [@KangarooCoder]: https://github.com/KangarooCoder
 [@khazhyk]: https://github.com/khazhyk
-[@Kroisse]: https://github.com/Kroisse
+[@kristopherbullinger]: https://github.com/kristopherbullinger
 [@kotx]: https://github.com/kotx
 [@ks129]: https://github.com/ks129
 [@kyranet]: https://github.com/kyranet
@@ -4467,20 +4603,26 @@ Initial commit.
 [@legendofmiracles]: https://github.com/legendofmiracles
 [@leo-lb]: https://github.com/leo-lb
 [@leumasme]: https://github.com/leumasme
+[@lhjt]: https://github.com/lhjt
+[@lo48576]: https://github.com/lo48576
 [@lolzballs]: https://github.com/lolzballs
 [@Max2408]: https://github.com/Max2408
 [@MaxOhn]: https://github.com/MaxOhn
 [@MelonShooter]: https://github.com/MelonShooter
 [@Mendess2526]: https://github.com/Mendess2526
+[@Milo123459]: https://github.com/Milo123459
 [@Mishio595]: https://github.com/Mishio595
 [@MonliH]: https://github.com/MonliH
 [@mTvare6]: https://github.com/mTvare6
 [@mattico]: https://github.com/mattico
+[@mbenoukaiss]: https://github.com/mbenoukaiss
+[@mdonoughe]: https://github.com/mdonoughe
 [@megumisonoda]: https://github.com/megumisonoda
 [@mendess]: https://github.com/mendess
 [@merlleu]: https://github.com/merlleu
 [@miqbalrr]: https://github.com/miqbalrr
 [@mjsir911]: https://github.com/mjsir911
+[@mkrasnitski]: https://github.com/mkrasnitski
 [@molenzwiebel]: https://github.com/molenzwiebel
 [@mysteriouspants]: https://github.com/mysteriouspants
 [@mshenrick]: https://github.com/mshenrick
@@ -4494,22 +4636,25 @@ Initial commit.
 [@natsukagami]: https://github.com/natsukagami
 [@nickelc]: https://github.com/nickelc
 [@nycex]: https://github.com/nycex
+[@OverHash]: https://github.com/OverHash
+[@PvdBerg1998]: https://github.com/PvdBerg1998
 [@Proximyst]: https://github.com/Proximyst
 [@Prof-Bloodstone]: https://github.com/Prof-Bloodstone
+[@pascalharp]: https://github.com/pascalharp
 [@peppizza]: https://github.com/peppizza
 [@perryprog]: https://github.com/perryprog
-[@PvdBerg1998]: https://github.com/PvdBerg1998
+[@Qeenon]: https://github.com/Qeenon
+[@qm3ster]: https://github.com/qm3ster
 [@Roughsketch]: https://github.com/Roughsketch
 [@rasm47]: https://github.com/rasm47
 [@rsaihe]: https://github.com/rsaihe
-[@Qeenon]: https://github.com/Qeenon
-[@qm3ster]: https://github.com/qm3ster
 [@SOF3]: https://github.com/SOF3
 [@Sei4or]: https://github.com/Sei4or
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@Scetch]: https://github.com/Scetch
 [@SinsofSloth]: https://github.com/SinsofSloth
 [@Splingush]: https://github.com/Splingush
+[@Squili]: https://github.com/Squili
 [@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
 [@SunDwarf]: https://github.com/SunDwarf
 [@s0lst1ce]: https://github.com/s0lst1ce
@@ -4535,10 +4680,12 @@ Initial commit.
 [@tweirtx]: https://github.com/tweirtx
 [@Unoqwy]: https://github.com/Unoqwy
 [@u5surf]: https://github.com/u5surf
+[@Vaimer9]: https://github.com/Vaimer9
 [@vicky5124]: https://github.com/vicky5124
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
 [@Wolvereness]: https://github.com/Wolvereness
+[@woongzeyi]: https://github.com/woongzeyi
 [@xentec]: https://github.com/xentec
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
@@ -4549,6 +4696,93 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:1d05a1e]: https://github.com/serenity-rs/serenity/commit/1d05a1e6ecc078d355618114bfad3cf053016657
+[c:69896e0]: https://github.com/serenity-rs/serenity/commit/69896e03cc86b2a3c0261c80540cf59de60ea662
+[c:93b66d0]: https://github.com/serenity-rs/serenity/commit/93b66d00454037284c95db07adcda971fef99e9e
+[c:9e10d54]: https://github.com/serenity-rs/serenity/commit/9e10d546441ccdaccb1a1ad1d94c915e95869eba
+[c:90dae53]: https://github.com/serenity-rs/serenity/commit/90dae534fa3c2438693ad12eae4297e4bc617b37
+[c:944cd54]: https://github.com/serenity-rs/serenity/commit/944cd541ee7fcb4476af4ca518390d62c1572927
+[c:b026f00]: https://github.com/serenity-rs/serenity/commit/b026f00a65dbe6425d62bf6f20f38766b1dc4216
+[c:6bd2f74]: https://github.com/serenity-rs/serenity/commit/6bd2f74067edfe71070509f5ac0ccf389b00437d
+[c:7b89775]: https://github.com/serenity-rs/serenity/commit/7b89775858d92a1c8be05f213b92fbe72b083980
+[c:ee00e92]: https://github.com/serenity-rs/serenity/commit/ee00e92b21af0cfa6c0e5e245ccccec2463e40ec
+[c:47a297b]: https://github.com/serenity-rs/serenity/commit/47a297b453017cf38b8f22d32f6d61f36164c627
+[c:cfd518e]: https://github.com/serenity-rs/serenity/commit/cfd518e328697525339175ef6ed4a1f69ec9ba86
+[c:6121fd0]: https://github.com/serenity-rs/serenity/commit/6121fd0b388783301146a1f586cc5fda15f4388e
+[c:c322657]: https://github.com/serenity-rs/serenity/commit/c322657acaae0624f893ae4b8258b7da30e43501
+[c:5b84896]: https://github.com/serenity-rs/serenity/commit/5b84896127e1182341d45042d7148041e44f3d01
+[c:6f87d25]: https://github.com/serenity-rs/serenity/commit/6f87d25935b0dd13bd55ef7e53a13bf2bc30a50d
+[c:c0463c0]: https://github.com/serenity-rs/serenity/commit/c0463c0d7f04250aab178e823c19f4866ffa9e09
+[c:bfb5f13]: https://github.com/serenity-rs/serenity/commit/bfb5f13e72f8694864ec3863d39785f425611dba
+[c:5a700f7]: https://github.com/serenity-rs/serenity/commit/5a700f7ea40fc89ff1c5550e673dd37a3b739f06
+[c:0bc3ce0]: https://github.com/serenity-rs/serenity/commit/0bc3ce0c9b68d5005948c5624173963aa930a40c
+[c:d50628e]: https://github.com/serenity-rs/serenity/commit/d50628ef832296bf6b4f5b11dcc41d230b39335f
+[c:02a5e15]: https://github.com/serenity-rs/serenity/commit/02a5e1533c217c4a88d3e6a96f2a1fc21bb54a52
+[c:afeb76e]: https://github.com/serenity-rs/serenity/commit/afeb76e0d96e244eab84646310d71ccc55f9b4a2
+[c:c74162c]: https://github.com/serenity-rs/serenity/commit/c74162cff0d033736cdae99acaadb156b1bcf9fd
+[c:6c5aa4d]: https://github.com/serenity-rs/serenity/commit/6c5aa4dcd83129dbc26f69dac2d46bed934283b0
+[c:cf4e216]: https://github.com/serenity-rs/serenity/commit/cf4e216cdaac6887324b7bde753f0681a4c9574a
+[c:c85d44a]: https://github.com/serenity-rs/serenity/commit/c85d44a5004f9bea9052908175b98ac2a927c41f
+[c:93d6ab8]: https://github.com/serenity-rs/serenity/commit/93d6ab83d5da143044f83c37bcb981988231e9c2
+[c:b905554]: https://github.com/serenity-rs/serenity/commit/b90555404a4334110d52c6fa92b0bde04059c7c4
+[c:f9de6c5]: https://github.com/serenity-rs/serenity/commit/f9de6c5d97ff55382e8f5396b5ec916cc9048d12
+[c:2da46a8]: https://github.com/serenity-rs/serenity/commit/2da46a8402926f2acc90d183a44d370f8708dad0
+[c:99eba2b]: https://github.com/serenity-rs/serenity/commit/99eba2b5edb976a1652e47a8d18c4116a330adc3
+[c:e87293e]: https://github.com/serenity-rs/serenity/commit/e87293eccbee6c8c04b92c552a99eb654a6d81bd
+[c:2a571d3]: https://github.com/serenity-rs/serenity/commit/2a571d3c2af40cbf1007f72886c7651e668fc360
+[c:bd1342e]: https://github.com/serenity-rs/serenity/commit/bd1342e41e5357cea5ff7541a53f1a88ae1f21ec
+[c:2dcb9b3]: https://github.com/serenity-rs/serenity/commit/2dcb9b350f9498b69dfda5759b329c363b9453c1
+[c:5c1e31e]: https://github.com/serenity-rs/serenity/commit/5c1e31e732a59c50d172a50a3f9f815d0d675c8c
+[c:32f4430]: https://github.com/serenity-rs/serenity/commit/32f4430b702e7fc2a37008e41e4a7091c0477669
+[c:6d476cf]: https://github.com/serenity-rs/serenity/commit/6d476cff91cea4de6394e0307a3ff9765e66ee2e
+[c:f630f32]: https://github.com/serenity-rs/serenity/commit/f630f324617e66fb6d3f91ac04e8121e0ee03370
+[c:34c2f22]: https://github.com/serenity-rs/serenity/commit/34c2f22bcc521a0ff2d9158678f05532e5be3b55
+[c:4f7dad7]: https://github.com/serenity-rs/serenity/commit/4f7dad7c96b0b2111502325090147beacc04b5ce
+[c:04fc541]: https://github.com/serenity-rs/serenity/commit/04fc541b0e34d0e16c99039ce94cfe3cb79881b8
+[c:a8b4e2f]: https://github.com/serenity-rs/serenity/commit/a8b4e2f9ef8bee24f967944f184d77789b4a9be8
+[c:6a0106c]: https://github.com/serenity-rs/serenity/commit/6a0106c92f8b56cc584ff350c0bb3651bb14edd6
+[c:fc7c76a]: https://github.com/serenity-rs/serenity/commit/fc7c76a150f667dfea26a4a8a5908f52fa40c88b
+[c:57a2e4d]: https://github.com/serenity-rs/serenity/commit/57a2e4dac15ee03dedb994ef683b5d47cf85a60a
+[c:5379d3e]: https://github.com/serenity-rs/serenity/commit/5379d3e2874069b17a08c21a9579e45917ad253b
+[c:1977e9f]: https://github.com/serenity-rs/serenity/commit/1977e9f8d409b68d31437a5aa4412f55bd82960b
+[c:4f2a73b]: https://github.com/serenity-rs/serenity/commit/4f2a73b82cf487e0cef9712a90dc9f37b6e4f2ad
+[c:d9c8980]: https://github.com/serenity-rs/serenity/commit/d9c898018d6ce5ff9f2cf325ce6a4392b118b2d3
+[c:738465f]: https://github.com/serenity-rs/serenity/commit/738465fc800b91b8f214b7ebb7075a21936e60af
+[c:b21f053]: https://github.com/serenity-rs/serenity/commit/b21f053b87d611d0f803cdfbc232b70621daa3ab
+[c:921ff6f]: https://github.com/serenity-rs/serenity/commit/921ff6fe8ca25449cf3b94540d9a5ffb58d1f69a
+[c:c3358cf]: https://github.com/serenity-rs/serenity/commit/c3358cf6b251d9c3e6b4bfa8aba7b953b33074a9
+[c:46f7608]: https://github.com/serenity-rs/serenity/commit/46f760854da7f8f9fe4b930e0ffdf17a96d6d14a
+[c:bade6e5]: https://github.com/serenity-rs/serenity/commit/bade6e59c365228ba83e2bd7072c3ca62f8bdfd4
+[c:5f81d4a]: https://github.com/serenity-rs/serenity/commit/5f81d4a9ddedcb352424753b7b790153d18bb728
+[c:247c073]: https://github.com/serenity-rs/serenity/commit/247c073566880ea3ee8619eee0edb2f930f1c4cf
+[c:b2197db]: https://github.com/serenity-rs/serenity/commit/b2197dbbbf01588e06c3597b2079b79180958ef9
+[c:6987175]: https://github.com/serenity-rs/serenity/commit/6987175e56140162c32d0fa0724e3fbaac601f70
+[c:6085aad]: https://github.com/serenity-rs/serenity/commit/6085aad8c8f82b3d4f661729ab5cb69aea63e381
+[c:cf040cb]: https://github.com/serenity-rs/serenity/commit/cf040cb73582cac640c2c7ce050e5bb03da9887a
+[c:f915fee]: https://github.com/serenity-rs/serenity/commit/f915fee1e61254307e4845c75370ec3c6c110377
+[c:38b11da]: https://github.com/serenity-rs/serenity/commit/38b11da9bc806e342351e32e81bcf4eee69ff1c7
+[c:b180f21]: https://github.com/serenity-rs/serenity/commit/b180f217d4f8e381ef1c81fa9fc481cc7e595040
+[c:f70112d]: https://github.com/serenity-rs/serenity/commit/f70112da89395e28ac6a791ca9da67246157e9dd
+[c:fe946df]: https://github.com/serenity-rs/serenity/commit/fe946df80ed725784ed5b6d5ee233fe82b896861
+[c:62b9c84]: https://github.com/serenity-rs/serenity/commit/62b9c841ddd430eebdc3e40c796015e374897cd8
+[c:707697e]: https://github.com/serenity-rs/serenity/commit/707697e5b44f09e997b40029533e37e9ccf61dcf
+[c:df47df1]: https://github.com/serenity-rs/serenity/commit/df47df1d2ccebcc3dc5fa0866fcb8e877f10a72a
+[c:0acabdf]: https://github.com/serenity-rs/serenity/commit/0acabdf71f64d0eaa28ef3992a459b0570fdcd89
+[c:37e33bd]: https://github.com/serenity-rs/serenity/commit/37e33bd693dfc4e0ca1ff70ff476b4aee571371e
+[c:ccf0d5b]: https://github.com/serenity-rs/serenity/commit/ccf0d5b101b723ba249530da4365edaffbc8991c
+[c:2eeb336]: https://github.com/serenity-rs/serenity/commit/2eeb336428263afc71355f9b72430b7aac19d2a2
+[c:9bfc1e7]: https://github.com/serenity-rs/serenity/commit/9bfc1e78d47ee55c69ab36f00e743ee35f02a497
+[c:f36b4c1]: https://github.com/serenity-rs/serenity/commit/f36b4c12936c29d61a15c6806a5f60efde0ea20e
+[c:0611e2c]: https://github.com/serenity-rs/serenity/commit/0611e2c64d9abe436702b89bcfdf27c50222f437
+[c:cfbb7b3]: https://github.com/serenity-rs/serenity/commit/cfbb7b32ff87cf2375995aab539bea3de0a33074
+[c:7e1a64e]: https://github.com/serenity-rs/serenity/commit/7e1a64e23fedfb28c68604beca2136469cc55c69
+[c:5b7a23c]: https://github.com/serenity-rs/serenity/commit/5b7a23c032d2c055dd20da652516c7f1b5fa8294
+[c:eb29760]: https://github.com/serenity-rs/serenity/commit/eb2976047c51fd265a03c5a8098225d7363bbead
+[c:7392f3f]: https://github.com/serenity-rs/serenity/commit/7392f3f237e3126fc1fa5affbd1359e1984da799
+[c:e848af8]: https://github.com/serenity-rs/serenity/commit/e848af85ccaa7b44168a97102e6febdcd598be3d
+[c:0d1c88e]: https://github.com/serenity-rs/serenity/commit/0d1c88edb77e5ba41fda4c9d63c4220127574a9c
+[c:096d1da]: https://github.com/serenity-rs/serenity/commit/096d1da60290fa9823ccdc72f48958aec1f7de27
 
 [c:dbf4d68]: https://github.com/serenity-rs/serenity/commit/dbf4d685a94f6b7f6f4a2f7f21e12c4e1425c231
 [c:ea8ec29]: https://github.com/serenity-rs/serenity/commit/ea8ec292711eefe285eab9ad47322c7d96ff43f1
