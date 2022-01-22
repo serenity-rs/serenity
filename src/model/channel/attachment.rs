@@ -1,6 +1,7 @@
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
 
+use crate::internal::is_false;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::id::AttachmentId;
