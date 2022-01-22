@@ -1354,16 +1354,12 @@
 <span id="1348">1348</span>
 <span id="1349">1349</span>
 <span id="1350">1350</span>
-<span id="1351">1351</span>
-<span id="1352">1352</span>
-<span id="1353">1353</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
-<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">futures::future</span>::{<span class="ident">BoxFuture</span>, <span class="ident">FutureExt</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -2028,8 +2024,6 @@
         <span class="kw">const</span> <span class="ident">DISCORD_CERTIFIED_MODERATOR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
     }
 }
-
-<span class="macro">impl_bitflags_serde!</span>(<span class="ident">UserPublicFlags</span>: <span class="ident">u32</span>);
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">User</span> {
     <span class="doccomment">/// Initializes a [`User`] with default values. Setting the following:</span>

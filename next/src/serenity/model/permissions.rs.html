@@ -738,7 +738,6 @@
 <span id="732">732</span>
 <span id="733">733</span>
 <span id="734">734</span>
-<span id="735">735</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -785,7 +784,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 
-<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>};
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
@@ -961,7 +959,7 @@
     <span class="ident">bits</span>: <span class="ident">Permissions::CONNECT</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">Permissions::SPEAK</span>.<span class="ident">bits</span> <span class="op">|</span> <span class="ident">Permissions::USE_VAD</span>.<span class="ident">bits</span>,
 };
 
-<span class="macro">bitflags!</span> {
+<span class="macro">bitflags::bitflags!</span> {
     <span class="doccomment">/// A set of permissions that can be assigned to [`User`]s and [`Role`]s via</span>
     <span class="doccomment">/// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to</span>
     <span class="doccomment">/// [`GuildChannel`]s.</span>
