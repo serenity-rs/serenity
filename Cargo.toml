@@ -8,7 +8,7 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.10.9"
+version = "0.10.10"
 edition = "2018"
 include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
 
@@ -26,7 +26,7 @@ features = ["log"]
 
 [dependencies.command_attr]
 path = "./command_attr"
-version = "0.3.7"
+version = "0.3.8"
 optional = true
 
 [dependencies.serde]
@@ -66,7 +66,7 @@ version = "0.10"
 
 [dependencies.serenity-voice-model]
 path = "./voice-model"
-version = "0.1"
+version = "0.1.1"
 optional = true
 
 [dependencies.static_assertions]
