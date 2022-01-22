@@ -190,7 +190,7 @@ pub struct ApplicationFlags {
 }
 
 impl ApplicationFlags {
-    fn from_u64(bits: u64) -> Self {
+    pub fn from_u64(bits: u64) -> Self {
         Self {
             bits,
         }
