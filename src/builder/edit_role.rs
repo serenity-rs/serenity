@@ -1,5 +1,10 @@
 use std::collections::HashMap;
 
+use bytes::buf::Buf;
+use reqwest::Url;
+use tokio::{fs::File, io::AsyncReadExt};
+
+use crate::http::{AttachmentType, Http};
 use crate::internal::prelude::*;
 use crate::model::{guild::Role, Permissions};
 
@@ -43,7 +48,7 @@ pub struct EditRole(pub HashMap<&'static str, Value>);
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     pub fn new(role: &Role) -> Self {
-        let mut map = HashMap::with_capacity(8);
+        let mut map = HashMap::with_capacity(9);
 
         #[cfg(feature = "utils")]
         {
@@ -61,6 +66,14 @@ impl EditRole {
         map.insert("name", Value::String(role.name.clone()));
         map.insert("permissions", Value::Number(Number::from(role.permissions.bits())));
         map.insert("position", Value::Number(Number::from(role.position)));
+
+        if let Some(unicode_emoji) = &role.unicode_emoji {
+            map.insert("unicode_emoji", Value::String(unicode_emoji.clone()));
+        }
+
+        if let Some(icon) = &role.icon {
+            map.insert("icon", Value::String(icon.clone()));
+        }
 
         EditRole(map)
     }
@@ -101,5 +114,62 @@ impl EditRole {
     pub fn position(&mut self, position: u8) -> &mut Self {
         self.0.insert("position", Value::Number(Number::from(position)));
         self
+    }
+
+    /// The unicode emoji to set as the role image.
+    pub fn unicode_emoji<S: ToString>(&mut self, unicode_emoji: S) -> &mut Self {
+        self.0.remove("icon");
+        self.0.insert("unicode_emoji", Value::String(unicode_emoji.to_string()));
+
+        self
+    }
+
+    /// The image to set as the role icon.
+    ///
+    /// # Errors
+    ///
+    /// May error if the icon is a URL and the HTTP request fails, or if the icon is a file
+    /// on a path that doesn't exist.
+    pub async fn icon<'a>(
+        &mut self,
+        http: impl AsRef<Http>,
+        icon: impl Into<AttachmentType<'a>>,
+    ) -> Result<&mut Self> {
+        let icon = match icon.into() {
+            AttachmentType::Bytes {
+                data,
+                filename: _,
+            } => "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned()),
+            AttachmentType::File {
+                file,
+                filename: _,
+            } => {
+                let mut buf = Vec::new();
+                file.try_clone().await?.read_to_end(&mut buf).await?;
+
+                "data:image/png;base64,".to_string() + &base64::encode(&buf)
+            },
+            AttachmentType::Path(path) => {
+                let mut file = File::open(path).await?;
+                let mut buf = vec![];
+                file.read_to_end(&mut buf).await?;
+
+                "data:image/png;base64,".to_string() + &base64::encode(&buf)
+            },
+            AttachmentType::Image(url) => {
+                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
+                let response = http.as_ref().client.get(url).send().await?;
+                let mut bytes = response.bytes().await?;
+                let mut picture: Vec<u8> = vec![0; bytes.len()];
+                bytes.copy_to_slice(&mut picture[..]);
+
+                "data:image/png;base64,".to_string() + &base64::encode(&picture)
+            },
+        };
+
+        self.0.remove("unicode_emoji");
+        self.0.insert("icon", Value::String(icon));
+
+        Ok(self)
     }
 }

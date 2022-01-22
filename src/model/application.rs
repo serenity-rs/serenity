@@ -2,7 +2,12 @@
 
 use std::fmt;
 
+use bitflags::__impl_bitflags;
+use serde::de::{Deserialize, Deserializer};
+use serde::ser::{Serialize, Serializer};
+
 use super::{id::UserId, user::User, utils::*};
+use crate::model::StdResult;
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
@@ -26,6 +31,8 @@ pub struct ApplicationInfo {
     pub description: String,
     /// A set of bitflags assigned to the application, which represent gated
     /// feature flags that have been enabled for the application.
+    ///
+    /// You can get a usable value from this by using [`ApplicationFlags::from_u64`]
     pub flags: Option<u64>,
     /// A hash pointing to the application's icon.
     ///
@@ -111,8 +118,7 @@ pub struct PartialCurrentApplicationInfo {
     pub id: UserId,
     /// The flags associated with the application.
     ///
-    /// These flags are unknown and are not yet documented in the Discord API
-    /// documentation.
+    /// You can get a usable value from this by using [`ApplicationFlags::from_u64`]
     pub flags: u64,
 }
 
@@ -175,3 +181,43 @@ enum_number!(MembershipState {
     Invited,
     Accepted
 });
+
+/// The flags of the application.
+#[derive(Clone)]
+#[non_exhaustive]
+pub struct ApplicationFlags {
+    bits: u64,
+}
+
+impl ApplicationFlags {
+    pub fn from_u64(bits: u64) -> Self {
+        Self {
+            bits,
+        }
+    }
+}
+
+__impl_bitflags! {
+    ApplicationFlags: u64 {
+        GATEWAY_PRESENCE = 1 << 12;
+        GATEWAY_PRESENCE_LIMITED = 1 << 13;
+        GATEWAY_GUILD_MEMBERS = 1 << 14;
+        GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15;
+        VERIFICATION_PENDING_GUILD_LIMIT = 2 << 16;
+        EMBEDDED = 2 << 17;
+        GATEWAY_MESSAGE_CONTENT = 2 << 18;
+        GATEWAY_MESSAGE_CONTENT_LIMITED = 2 << 19;
+    }
+}
+
+impl<'de> Deserialize<'de> for ApplicationFlags {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(Self::from_bits_truncate(u64::deserialize(deserializer)?))
+    }
+}
+
+impl Serialize for ApplicationFlags {
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        serializer.serialize_u64(self.bits())
+    }
+}

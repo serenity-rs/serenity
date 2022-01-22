@@ -942,6 +942,8 @@ mod test {
             permissions: Permissions::all(),
             position: 0,
             tags: RoleTags::default(),
+            icon: None,
+            unicode_emoji: None,
         };
 
         let channel = GuildChannel {

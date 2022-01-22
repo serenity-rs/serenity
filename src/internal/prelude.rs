@@ -10,6 +10,7 @@ pub use std::result::Result as StdResult;
 
 pub use serde_json::{Map, Number, Value};
 
+pub use super::is_false;
 #[cfg(feature = "client")]
 pub use crate::client::ClientError;
 pub use crate::error::{Error, Result};

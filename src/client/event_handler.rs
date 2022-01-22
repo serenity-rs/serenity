@@ -459,6 +459,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the created application command.
     #[cfg(feature = "unstable_discord_api")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     async fn application_command_create(
         &self,
         _ctx: Context,
@@ -470,6 +471,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the updated application command.
     #[cfg(feature = "unstable_discord_api")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     async fn application_command_update(
         &self,
         _ctx: Context,
@@ -481,6 +483,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the deleted application command.
     #[cfg(feature = "unstable_discord_api")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     async fn application_command_delete(
         &self,
         _ctx: Context,

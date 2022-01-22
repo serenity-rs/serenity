@@ -205,6 +205,12 @@ impl CreateSelectMenu {
         self
     }
 
+    /// Sets the disabled state for the button.
+    pub fn disabled(&mut self, disabled: bool) -> &mut Self {
+        self.0.insert("disabled", Value::Bool(disabled));
+        self
+    }
+
     pub fn options<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateSelectMenuOptions) -> &mut CreateSelectMenuOptions,
