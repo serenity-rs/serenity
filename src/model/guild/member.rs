@@ -4,7 +4,6 @@ use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use bitflags::bitflags;
 use chrono::{DateTime, Utc};
 
 #[cfg(feature = "model")]
@@ -725,5 +724,3 @@ bitflags! {
         const NOTIFICATIONS = 1 << 0;
     }
 }
-
-impl_bitflags_serde!(ThreadMemberFlags: u64);
