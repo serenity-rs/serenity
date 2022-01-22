@@ -175,7 +175,7 @@ enum_number!(InteractionType {
     Ping,
     MessageComponent,
     ApplicationCommand,
-    Autocomplete,
+    Autocomplete
 });
 
 /// The flags for an interaction response.

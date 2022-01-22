@@ -436,6 +436,8 @@ mod test {
                 permissions: Permissions::empty(),
                 position: 1,
                 tags: RoleTags::default(),
+                icon: None,
+                unicode_emoji: None,
             };
             let user = User {
                 id: UserId(6),
