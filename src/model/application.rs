@@ -31,7 +31,9 @@ pub struct ApplicationInfo {
     pub description: String,
     /// A set of bitflags assigned to the application, which represent gated
     /// feature flags that have been enabled for the application.
-    pub flags: Option<ApplicationFlags>,
+    pub flags: Option<u64>,
+    #[serde(renme = "flags")]
+    pub new_flags: Option<ApplicationFlags>,
     /// A hash pointing to the application's icon.
     ///
     /// This is not necessarily equivalent to the bot user's avatar.
@@ -115,7 +117,9 @@ pub struct PartialCurrentApplicationInfo {
     /// The unique Id of the user.
     pub id: UserId,
     /// The flags associated with the application.
-    pub flags: ApplicationFlags,
+    pub flags: u64,
+    #[serde(renme = "flags")]
+    pub new_flags: Option<ApplicationFlags>,
 }
 
 /// Information about the current application and its owner.
