@@ -1,6 +1,5 @@
 //! Models pertaining to the gateway.
 
-use bitflags::bitflags;
 use url::Url;
 
 use super::prelude::*;
@@ -316,8 +315,6 @@ bitflags! {
         const EMBEDDED = 1 << 8;
     }
 }
-
-impl_bitflags_serde!(ActivityFlags: u64);
 
 /// Information about an activity's party.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -669,8 +666,6 @@ bitflags! {
         const DIRECT_MESSAGE_TYPING = 1 << 14;
     }
 }
-
-impl_bitflags_serde!(GatewayIntents: u64);
 
 #[cfg(feature = "model")]
 impl GatewayIntents {

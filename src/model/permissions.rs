@@ -44,7 +44,6 @@
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use bitflags::bitflags;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 
@@ -220,7 +219,7 @@ pub const PRESET_VOICE: Permissions = Permissions {
     bits: Permissions::CONNECT.bits | Permissions::SPEAK.bits | Permissions::USE_VAD.bits,
 };
 
-bitflags! {
+bitflags::bitflags! {
     /// A set of permissions that can be assigned to [`User`]s and [`Role`]s via
     /// [`PermissionOverwrite`]s, roles globally in a [`Guild`], and to
     /// [`GuildChannel`]s.
