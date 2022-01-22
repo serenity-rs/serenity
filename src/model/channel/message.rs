@@ -5,7 +5,6 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
-use bitflags::bitflags;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "simd-json")]
 use simd_json::ValueAccess;
@@ -1252,8 +1251,6 @@ bitflags! {
         const LOADING = 1 << 7;
     }
 }
-
-impl_bitflags_serde!(MessageFlags: u64);
 
 #[cfg(feature = "model")]
 impl MessageId {
