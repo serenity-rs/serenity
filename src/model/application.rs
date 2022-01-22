@@ -31,9 +31,9 @@ pub struct ApplicationInfo {
     pub description: String,
     /// A set of bitflags assigned to the application, which represent gated
     /// feature flags that have been enabled for the application.
+    ///
+    /// You can get a usable value from this by using [`ApplicationFlags::from_u64`]
     pub flags: Option<u64>,
-    #[serde(renme = "flags")]
-    pub new_flags: Option<ApplicationFlags>,
     /// A hash pointing to the application's icon.
     ///
     /// This is not necessarily equivalent to the bot user's avatar.
@@ -117,9 +117,9 @@ pub struct PartialCurrentApplicationInfo {
     /// The unique Id of the user.
     pub id: UserId,
     /// The flags associated with the application.
+    ///
+    /// You can get a usable value from this by using [`ApplicationFlags::from_u64`]
     pub flags: u64,
-    #[serde(renme = "flags")]
-    pub new_flags: Option<ApplicationFlags>,
 }
 
 /// Information about the current application and its owner.
@@ -187,6 +187,12 @@ enum_number!(MembershipState {
 #[non_exhaustive]
 pub struct ApplicationFlags {
     bits: u64,
+}
+
+impl ApplicationFlags {
+    fn from_u64(bits: u64) -> Self {
+        Self { bits }
+    }
 }
 
 __impl_bitflags! {
