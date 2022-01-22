@@ -2994,6 +2994,7 @@ pub struct GuildUnavailable {
     pub unavailable: bool,
 }
 
+#[deprecated(note = "will be replaced by `UnavailableGuild` with serenity 0.11")]
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
