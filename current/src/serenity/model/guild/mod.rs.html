@@ -3323,6 +3323,7 @@
 <span id="3317">3317</span>
 <span id="3318">3318</span>
 <span id="3319">3319</span>
+<span id="3320">3320</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.</span>
@@ -6319,6 +6320,7 @@
     <span class="kw">pub</span> <span class="ident">unavailable</span>: <span class="ident">bool</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;will be replaced by `UnavailableGuild` with serenity 0.11&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
