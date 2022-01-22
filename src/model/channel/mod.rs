@@ -37,6 +37,7 @@ use crate::cache::Cache;
 use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
+use crate::internal::is_false;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::model::misc::ChannelParseError;
 use crate::model::prelude::*;
@@ -486,7 +487,8 @@ pub struct ThreadMetadata {
     /// Whether non-moderators can add other non-moderators to a thread.
     ///
     /// **Note**: Only available on private threads.
-    pub invitable: Option<bool>,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub invitable: bool,
 }
 
 /// A response to getting several threads channels.

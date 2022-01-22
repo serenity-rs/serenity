@@ -33,9 +33,11 @@ pub struct Attachment {
     /// Whether this attachment is ephemeral.
     ///
     /// Ephemeral attachments will automatically be removed after a set period of time.
+    ///
     /// Ephemeral attachments on messages are guaranteed to be available as long as
     /// the message itself exists.
-    pub ephemeral: Option<bool>,
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub ephemeral: bool,
 }
 
 #[cfg(feature = "model")]
