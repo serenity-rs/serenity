@@ -46,6 +46,15 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
@@ -84,6 +93,15 @@
     <span class="doccomment">/// The lock status of the thread.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">locked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">lock</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;locked&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">lock</span>));
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Whether non-moderators can add other non-moderators to a thread.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Only available on private threads.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invitable</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">invitable</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;invitable&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">invitable</span>));
 
         <span class="self">self</span>
     }

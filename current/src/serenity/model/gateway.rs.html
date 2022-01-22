@@ -737,6 +737,12 @@
 <span id="731">731</span>
 <span id="732">732</span>
 <span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="comment">// TODO: Remove after `GuildStatus` was replaced</span>
@@ -1220,17 +1226,23 @@
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityFlags</span>: <span class="ident">u64</span> {
         <span class="doccomment">/// Whether the activity is an instance activity.</span>
-        <span class="kw">const</span> <span class="ident">INSTANCE</span> <span class="op">=</span> <span class="number">0b001</span>;
+        <span class="kw">const</span> <span class="ident">INSTANCE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="doccomment">/// Whether the activity is joinable.</span>
-        <span class="kw">const</span> <span class="ident">JOIN</span> <span class="op">=</span> <span class="number">0b010</span>;
+        <span class="kw">const</span> <span class="ident">JOIN</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
         <span class="doccomment">/// Whether the activity can be spectated.</span>
-        <span class="kw">const</span> <span class="ident">SPECTATE</span> <span class="op">=</span> <span class="number">0b011</span>;
+        <span class="kw">const</span> <span class="ident">SPECTATE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
         <span class="doccomment">/// Whether a request can be sent to join the user&#39;s party.</span>
-        <span class="kw">const</span> <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">0b100</span>;
+        <span class="kw">const</span> <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="doccomment">/// Whether the activity can be synced.</span>
-        <span class="kw">const</span> <span class="ident">SYNC</span> <span class="op">=</span> <span class="number">0b101</span>;
+        <span class="kw">const</span> <span class="ident">SYNC</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
         <span class="doccomment">/// Whether the activity can be played.</span>
-        <span class="kw">const</span> <span class="ident">PLAY</span> <span class="op">=</span> <span class="number">0b110</span>;
+        <span class="kw">const</span> <span class="ident">PLAY</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
+        <span class="doccomment">/// Whether the activity party is friend only.</span>
+        <span class="kw">const</span> <span class="ident">PARTY_PRIVACY_FRIENDS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+        <span class="doccomment">/// Whether the activity party is in a voice channel.</span>
+        <span class="kw">const</span> <span class="ident">PARTY_PRIVACY_VOICE_CHANNEL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="doccomment">/// Whether the activity can be embedded.</span>
+        <span class="kw">const</span> <span class="ident">EMBEDDED</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
     }
 }
 

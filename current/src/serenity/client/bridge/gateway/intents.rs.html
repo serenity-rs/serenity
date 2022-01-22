@@ -321,6 +321,14 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bitflags::__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{
     <span class="ident">de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>},
@@ -477,6 +485,14 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// - TYPING_START</span>
         <span class="ident">DIRECT_MESSAGE_TYPING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
+        <span class="doccomment">/// Enable following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_CREATE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_UPDATE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_DELETE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_USER_ADD</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_USER_REMOVE</span>
+        <span class="ident">GUILD_SCHEDULED_EVENTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
     }
 }
 

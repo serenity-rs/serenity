@@ -3110,7 +3110,40 @@
 <span id="3104">3104</span>
 <span id="3105">3105</span>
 <span id="3106">3106</span>
-</pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
+<span id="3107">3107</span>
+<span id="3108">3108</span>
+<span id="3109">3109</span>
+<span id="3110">3110</span>
+<span id="3111">3111</span>
+<span id="3112">3112</span>
+<span id="3113">3113</span>
+<span id="3114">3114</span>
+<span id="3115">3115</span>
+<span id="3116">3116</span>
+<span id="3117">3117</span>
+<span id="3118">3118</span>
+<span id="3119">3119</span>
+<span id="3120">3120</span>
+<span id="3121">3121</span>
+<span id="3122">3122</span>
+<span id="3123">3123</span>
+<span id="3124">3124</span>
+<span id="3125">3125</span>
+<span id="3126">3126</span>
+<span id="3127">3127</span>
+<span id="3128">3128</span>
+<span id="3129">3129</span>
+<span id="3130">3130</span>
+<span id="3131">3131</span>
+<span id="3132">3132</span>
+<span id="3133">3133</span>
+<span id="3134">3134</span>
+<span id="3135">3135</span>
+<span id="3136">3136</span>
+<span id="3137">3137</span>
+<span id="3138">3138</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span> <span class="comment">// This is done beause it can&#39;t be used inside macro definitions.</span>
+<span class="doccomment">//! All the events this library handles.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
@@ -4598,11 +4631,14 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandCreateEvent</span> {
     <span class="kw">pub</span> <span class="ident">application_command</span>: <span class="ident">ApplicationCommand</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandCreateEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">application_command</span> <span class="op">=</span> <span class="ident">ApplicationCommand::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
@@ -4616,11 +4652,14 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">application_command</span>: <span class="ident">ApplicationCommand</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandUpdateEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">application_command</span> <span class="op">=</span> <span class="ident">ApplicationCommand::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
@@ -4634,11 +4673,14 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandDeleteEvent</span> {
     <span class="kw">pub</span> <span class="ident">application_command</span>: <span class="ident">ApplicationCommand</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandDeleteEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">application_command</span> <span class="op">=</span> <span class="ident">ApplicationCommand::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
@@ -4999,12 +5041,18 @@
     <span class="ident">IntegrationDelete</span>(<span class="ident">IntegrationDeleteEvent</span>),
     <span class="doccomment">/// An application command was created</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
     <span class="ident">ApplicationCommandCreate</span>(<span class="ident">ApplicationCommandCreateEvent</span>),
     <span class="doccomment">/// An application command was updated</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
     <span class="ident">ApplicationCommandUpdate</span>(<span class="ident">ApplicationCommandUpdateEvent</span>),
     <span class="doccomment">/// An application command was deleted</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
     <span class="ident">ApplicationCommandDelete</span>(<span class="ident">ApplicationCommandDeleteEvent</span>),
     <span class="doccomment">/// A stage instance was created.</span>
     <span class="ident">StageInstanceCreate</span>(<span class="ident">StageInstanceCreateEvent</span>),
@@ -5041,6 +5089,7 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
 <span class="macro">macro_rules!</span> <span class="ident">with_related_ids_for_event_types</span> {
     (<span class="macro-nonterminal">$</span><span class="kw">macro</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">macro!</span> {
@@ -5514,10 +5563,13 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationDelete</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::IntegrationDelete</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident"><span class="self">Self</span>::ApplicationCommandCreate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ApplicationCommandCreate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident"><span class="self">Self</span>::ApplicationCommandUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ApplicationCommandUpdate</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident"><span class="self">Self</span>::ApplicationCommandDelete</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::ApplicationCommandDelete</span>,
             <span class="ident"><span class="self">Self</span>::StageInstanceCreate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::StageInstanceCreate</span>,
             <span class="ident"><span class="self">Self</span>::StageInstanceUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::StageInstanceUpdate</span>,
@@ -5670,14 +5722,17 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">EventType::IntegrationDelete</span> =&gt; <span class="ident">Event::IntegrationDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="ident">EventType::ApplicationCommandCreate</span> =&gt; {
             <span class="ident">Event::ApplicationCommandCreate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
         },
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="ident">EventType::ApplicationCommandUpdate</span> =&gt; {
             <span class="ident">Event::ApplicationCommandUpdate</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
         },
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="ident">EventType::ApplicationCommandDelete</span> =&gt; {
             <span class="ident">Event::ApplicationCommandDelete</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
         },
@@ -5879,16 +5934,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`ApplicationCommandCreateEvent`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
     <span class="ident">ApplicationCommandCreate</span>,
     <span class="doccomment">/// Indicator that an application command was updated.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`ApplicationCommandUpdateEvent`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
     <span class="ident">ApplicationCommandUpdate</span>,
     <span class="doccomment">/// Indicator that an application command was deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`ApplicationCommandDeleteEvent`].</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
     <span class="ident">ApplicationCommandDelete</span>,
     <span class="doccomment">/// Indicator that a stage instance was created.</span>
     <span class="doccomment">///</span>
@@ -6108,10 +6166,13 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationDelete</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTEGRATION_DELETE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident"><span class="self">Self</span>::ApplicationCommandCreate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::APPLICATION_COMMAND_CREATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident"><span class="self">Self</span>::ApplicationCommandUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::APPLICATION_COMMAND_UPDATE</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident"><span class="self">Self</span>::ApplicationCommandDelete</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::APPLICATION_COMMAND_DELETE</span>),
             <span class="ident"><span class="self">Self</span>::StageInstanceCreate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::STAGE_INSTANCE_CREATE</span>),
             <span class="ident"><span class="self">Self</span>::StageInstanceUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::STAGE_INSTANCE_UPDATE</span>),
@@ -6197,10 +6258,13 @@
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">EventType::INTEGRATION_DELETE</span> =&gt; <span class="ident">EventType::IntegrationDelete</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
                     <span class="ident">EventType::APPLICATION_COMMAND_CREATE</span> =&gt; <span class="ident">EventType::ApplicationCommandCreate</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
                     <span class="ident">EventType::APPLICATION_COMMAND_UPDATE</span> =&gt; <span class="ident">EventType::ApplicationCommandUpdate</span>,
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
                     <span class="ident">EventType::APPLICATION_COMMAND_DELETE</span> =&gt; <span class="ident">EventType::ApplicationCommandDelete</span>,
                     <span class="ident">EventType::STAGE_INSTANCE_CREATE</span> =&gt; <span class="ident">EventType::StageInstanceCreate</span>,
                     <span class="ident">EventType::STAGE_INSTANCE_UPDATE</span> =&gt; <span class="ident">EventType::StageInstanceUpdate</span>,

@@ -601,6 +601,16 @@
 <span id="595">595</span>
 <span id="596">596</span>
 <span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -640,6 +650,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::FromStrAndCache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::CacheHttp</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::is_false</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::misc::ChannelParseError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
@@ -1082,6 +1093,15 @@
     <span class="doccomment">/// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">locked</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Timestamp when the thread was created.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: only populated for threads created after 2022-01-09</span>
+    <span class="kw">pub</span> <span class="ident">create_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether non-moderators can add other non-moderators to a thread.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Only available on private threads.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;is_false&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">invitable</span>: <span class="ident">bool</span>,
 }
 
 <span class="doccomment">/// A response to getting several threads channels.</span>

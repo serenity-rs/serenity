@@ -715,7 +715,7 @@
 
     <span class="doccomment">/// Set the description of the embed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This can&#39;t be longer than 2048 characters.</span>
+    <span class="doccomment">/// **Note**: This can&#39;t be longer than 4096 characters.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;description&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">description</span>.<span class="ident">to_string</span>()));
