@@ -4,8 +4,8 @@ use super::CreateEmbed;
 #[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
-use crate::utils;
 use crate::model::channel::MessageFlags;
+use crate::utils;
 
 /// A builder to specify the fields to edit in an existing message.
 ///

@@ -223,7 +223,12 @@ impl<'a> ExecuteWebhook<'a> {
     /// # let http = Http::default();
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
-    /// let execution = webhook.execute(&http, false, |w| w.content("https://docs.rs/serenity/latest/serenity/").flags(MessageFlags::SUPPRESS_EMBEDS)).await;
+    /// let execution = webhook
+    ///     .execute(&http, false, |w| {
+    ///         w.content("https://docs.rs/serenity/latest/serenity/")
+    ///             .flags(MessageFlags::SUPPRESS_EMBEDS)
+    ///     })
+    ///     .await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);

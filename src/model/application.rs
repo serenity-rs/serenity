@@ -2,12 +2,12 @@
 
 use std::fmt;
 
-use super::{id::UserId, user::User, utils::*};
-
-use crate::model::StdResult;
 use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
+
+use super::{id::UserId, user::User, utils::*};
+use crate::model::StdResult;
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
@@ -178,7 +178,6 @@ enum_number!(MembershipState {
     Accepted
 });
 
-
 /// The flags of the application.
 #[derive(Clone)]
 #[non_exhaustive]
@@ -210,4 +209,3 @@ impl Serialize for ApplicationFlags {
         serializer.serialize_u64(self.bits())
     }
 }
-

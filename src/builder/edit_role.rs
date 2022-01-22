@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
+use bytes::buf::Buf;
+use reqwest::Url;
+use tokio::{fs::File, io::AsyncReadExt};
+
+use crate::http::{AttachmentType, Http};
 use crate::internal::prelude::*;
 use crate::model::{guild::Role, Permissions};
-
-use crate::http::{Http, AttachmentType};
-use bytes::buf::Buf;
-use tokio::{fs::File, io::AsyncReadExt};
-use reqwest::Url;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -125,7 +125,16 @@ impl EditRole {
     }
 
     /// The image to set as the role icon.
-    pub async fn icon<'a>(&mut self, http: impl AsRef<Http>, icon: impl Into<AttachmentType<'a>>) -> Result<&mut Self> {
+    ///
+    /// # Errors
+    ///
+    /// May error if the icon is a URL and the HTTP request fails, or if the icon is a file
+    /// on a path that doesn't exist.
+    pub async fn icon<'a>(
+        &mut self,
+        http: impl AsRef<Http>,
+        icon: impl Into<AttachmentType<'a>>,
+    ) -> Result<&mut Self> {
         let icon = match icon.into() {
             AttachmentType::Bytes {
                 data,

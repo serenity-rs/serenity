@@ -1487,7 +1487,7 @@ pub struct IntegrationDeleteEvent {
 #[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-#[deprecated(since="0.10.10", note="bots do no receive this event")]
+#[deprecated(since = "0.10.10", note = "bots do no receive this event")]
 #[allow(deprecated)]
 pub struct ApplicationCommandCreateEvent {
     pub application_command: ApplicationCommand,
@@ -1508,7 +1508,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandCreateEvent {
 #[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-#[deprecated(since="0.10.10", note="bots do no receive this event")]
+#[deprecated(since = "0.10.10", note = "bots do no receive this event")]
 #[allow(deprecated)]
 pub struct ApplicationCommandUpdateEvent {
     pub application_command: ApplicationCommand,
@@ -1529,7 +1529,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandUpdateEvent {
 #[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
-#[deprecated(since="0.10.10", note="bots do no receive this event")]
+#[deprecated(since = "0.10.10", note = "bots do no receive this event")]
 #[allow(deprecated)]
 pub struct ApplicationCommandDeleteEvent {
     pub application_command: ApplicationCommand,
@@ -1897,16 +1897,16 @@ pub enum Event {
     IntegrationDelete(IntegrationDeleteEvent),
     /// An application command was created
     #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since="0.10.10", note="bots do no receive this event")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     #[allow(deprecated)]
     ApplicationCommandCreate(ApplicationCommandCreateEvent),
     /// An application command was updated
     #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since="0.10.10", note="bots do no receive this event")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     #[allow(deprecated)]
     ApplicationCommandUpdate(ApplicationCommandUpdateEvent),
     /// An application command was deleted
-    #[deprecated(since="0.10.10", note="bots do no receive this event")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     #[cfg(feature = "unstable_discord_api")]
     #[allow(deprecated)]
     ApplicationCommandDelete(ApplicationCommandDeleteEvent),
@@ -2790,19 +2790,19 @@ pub enum EventType {
     ///
     /// This maps to [`ApplicationCommandCreateEvent`].
     #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since="0.10.10", note="bots do no receive this event")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     ApplicationCommandCreate,
     /// Indicator that an application command was updated.
     ///
     /// This maps to [`ApplicationCommandUpdateEvent`].
     #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since="0.10.10", note="bots do no receive this event")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     ApplicationCommandUpdate,
     /// Indicator that an application command was deleted.
     ///
     /// This maps to [`ApplicationCommandDeleteEvent`].
     #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since="0.10.10", note="bots do no receive this event")]
+    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
     ApplicationCommandDelete,
     /// Indicator that a stage instance was created.
     ///

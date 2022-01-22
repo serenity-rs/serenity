@@ -6,7 +6,7 @@ use super::CreateEmbed;
 use crate::builder::CreateComponents;
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
-use crate::model::channel::{MessageReference, ReactionType, MessageFlags};
+use crate::model::channel::{MessageFlags, MessageReference, ReactionType};
 use crate::utils;
 
 /// A builder to specify the contents of an [`Http::send_message`] request,

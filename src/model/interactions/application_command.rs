@@ -408,7 +408,6 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteraction {
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
 
-
         Ok(Self {
             id,
             application_id,
