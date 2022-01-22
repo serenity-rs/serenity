@@ -38,6 +38,7 @@ Thanks to the following for their contributions:
 
 ### Added
 
+- [misc] Implement missing fields, methods, endpoints, and other values that are documented ([@vicky5124]) [c:be5cb54]
 - [builder] Add a `timeout` doc alias to various methods ([@Milo123459]) [c:1d05a1e]
 - [builder] Add support for enabling slowmode on thread creation ([@nickelc]) [c:69896e0]
 - [ci] Add GitHub Actions workflow for labeling pull requests ([@nickelc]) [c:93b66d0]
@@ -4697,6 +4698,7 @@ Initial commit.
 
 <!-- COMMITS -->
 
+[c:be5cb54]: https://github.com/serenity-rs/serenity/commit/be5cb544b62562b1d66a48ade8a8882b9bcbae3d
 [c:1d05a1e]: https://github.com/serenity-rs/serenity/commit/1d05a1e6ecc078d355618114bfad3cf053016657
 [c:69896e0]: https://github.com/serenity-rs/serenity/commit/69896e03cc86b2a3c0261c80540cf59de60ea662
 [c:93b66d0]: https://github.com/serenity-rs/serenity/commit/93b66d00454037284c95db07adcda971fef99e9e
