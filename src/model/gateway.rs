@@ -1,5 +1,8 @@
 //! Models pertaining to the gateway.
 
+// TODO: Remove after `GuildStatus` was replaced
+#![allow(deprecated)]
+
 use bitflags::bitflags;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeStruct, Serializer};

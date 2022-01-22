@@ -1207,6 +1207,8 @@ impl CacheUpdate for ReadyEvent {
     async fn update(&mut self, cache: &Cache) -> Option<()> {
         let mut ready = self.ready.clone();
 
+        // `GuildStatus` will by replaced by `UnavailableGuild`
+        #[allow(deprecated)]
         for guild in ready.guilds {
             match guild {
                 GuildStatus::Offline(unavailable) => {
