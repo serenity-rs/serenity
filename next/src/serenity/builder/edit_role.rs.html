@@ -110,10 +110,84 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
+<span class="kw">use</span> <span class="ident">bytes::buf::Buf</span>;
+<span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">fs::File</span>, <span class="ident">io::AsyncReadExt</span>};
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">guild::Role</span>, <span class="ident">Permissions</span>};
 
 <span class="doccomment">/// A builder to create or edit a [`Role`] for use via a number of model methods.</span>
@@ -156,7 +230,7 @@
 <span class="kw">impl</span> <span class="ident">EditRole</span> {
     <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="number">8</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="number">9</span>);
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
         {
@@ -174,6 +248,14 @@
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>()));
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="ident">role</span>.<span class="ident">position</span>));
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">unicode_emoji</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">role</span>.<span class="ident">unicode_emoji</span> {
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;unicode_emoji&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">unicode_emoji</span>.<span class="ident">clone</span>()));
+        }
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">icon</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">role</span>.<span class="ident">icon</span> {
+            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;icon&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">icon</span>.<span class="ident">clone</span>()));
+        }
 
         <span class="ident">EditRole</span>(<span class="ident">map</span>)
     }
@@ -215,7 +297,63 @@
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">from_number</span>(<span class="ident">position</span>));
         <span class="self">self</span>
     }
+
+    <span class="doccomment">/// The unicode emoji to set as the role image.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unicode_emoji</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">unicode_emoji</span>: <span class="ident">S</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">remove</span>(<span class="string">&quot;icon&quot;</span>);
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;unicode_emoji&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">unicode_emoji</span>.<span class="ident">to_string</span>()));
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// The image to set as the role icon.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May error if the icon is a URL and the HTTP request fails, or if the icon is a file</span>
+    <span class="doccomment">/// on a path that doesn&#39;t exist.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">icon</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">icon</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">icon</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">icon</span>.<span class="ident">into</span>() {
+            <span class="ident">AttachmentType::Bytes</span> {
+                <span class="ident">data</span>,
+                <span class="ident">filename</span>: <span class="kw">_</span>,
+            } =&gt; <span class="string">&quot;data:image/png;base64,&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">into_owned</span>()),
+            <span class="ident">AttachmentType::File</span> {
+                <span class="ident">file</span>,
+                <span class="ident">filename</span>: <span class="kw">_</span>,
+            } =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+                <span class="ident">file</span>.<span class="ident">try_clone</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+                <span class="string">&quot;data:image/png;base64,&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>)
+            },
+            <span class="ident">AttachmentType::Path</span>(<span class="ident">path</span>) =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+                <span class="ident">file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+                <span class="string">&quot;data:image/png;base64,&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>)
+            },
+            <span class="ident">AttachmentType::Image</span>(<span class="ident">url</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">client</span>.<span class="ident">get</span>(<span class="ident">url</span>).<span class="ident">send</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">bytes</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">picture</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">bytes</span>.<span class="ident">len</span>()];
+                <span class="ident">bytes</span>.<span class="ident">copy_to_slice</span>(<span class="kw-2">&amp;mut</span> <span class="ident">picture</span>[..]);
+
+                <span class="string">&quot;data:image/png;base64,&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">picture</span>)
+            },
+        };
+
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">remove</span>(<span class="string">&quot;unicode_emoji&quot;</span>);
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;icon&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">icon</span>));
+
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
+    }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (17d29dcdc 2022-01-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (bfe156467 2022-01-22)" ></div>
 </body></html>

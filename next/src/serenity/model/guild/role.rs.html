@@ -380,6 +380,15 @@
 <span id="374">374</span>
 <span id="375">375</span>
 <span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -454,6 +463,13 @@
     <span class="doccomment">/// [`Integration`]: super::Integration</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">tags</span>: <span class="ident">RoleTags</span>,
+    <span class="doccomment">/// Role icon image hash.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `role-icons/&lt;role_id&gt;/&lt;hash&gt;.png` - PNG, JPEG, WEBP</span>
+    <span class="doccomment">/// `role-icons/&lt;role_id&gt;/a_&lt;hash&gt;.gif` - GIF, Animated WEBP</span>
+    <span class="kw">pub</span> <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Role unicoded image.</span>
+    <span class="kw">pub</span> <span class="ident">unicode_emoji</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.</span>
@@ -494,6 +510,8 @@
             <span class="ident">permissions</span>: <span class="ident">r</span>.<span class="ident">permissions</span>,
             <span class="ident">position</span>: <span class="ident">r</span>.<span class="ident">position</span>,
             <span class="ident">tags</span>: <span class="ident">r</span>.<span class="ident">tags</span>,
+            <span class="ident">icon</span>: <span class="prelude-val">None</span>,
+            <span class="ident">unicode_emoji</span>: <span class="prelude-val">None</span>,
         }
     }
 }
@@ -534,7 +552,7 @@
     <span class="doccomment">///     r</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user does not</span>
@@ -757,5 +775,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (17d29dcdc 2022-01-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (bfe156467 2022-01-22)" ></div>
 </body></html>

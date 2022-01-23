@@ -1354,6 +1354,55 @@
 <span id="1348">1348</span>
 <span id="1349">1349</span>
 <span id="1350">1350</span>
+<span id="1351">1351</span>
+<span id="1352">1352</span>
+<span id="1353">1353</span>
+<span id="1354">1354</span>
+<span id="1355">1355</span>
+<span id="1356">1356</span>
+<span id="1357">1357</span>
+<span id="1358">1358</span>
+<span id="1359">1359</span>
+<span id="1360">1360</span>
+<span id="1361">1361</span>
+<span id="1362">1362</span>
+<span id="1363">1363</span>
+<span id="1364">1364</span>
+<span id="1365">1365</span>
+<span id="1366">1366</span>
+<span id="1367">1367</span>
+<span id="1368">1368</span>
+<span id="1369">1369</span>
+<span id="1370">1370</span>
+<span id="1371">1371</span>
+<span id="1372">1372</span>
+<span id="1373">1373</span>
+<span id="1374">1374</span>
+<span id="1375">1375</span>
+<span id="1376">1376</span>
+<span id="1377">1377</span>
+<span id="1378">1378</span>
+<span id="1379">1379</span>
+<span id="1380">1380</span>
+<span id="1381">1381</span>
+<span id="1382">1382</span>
+<span id="1383">1383</span>
+<span id="1384">1384</span>
+<span id="1385">1385</span>
+<span id="1386">1386</span>
+<span id="1387">1387</span>
+<span id="1388">1388</span>
+<span id="1389">1389</span>
+<span id="1390">1390</span>
+<span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
+<span id="1399">1399</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1535,6 +1584,11 @@
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">verified</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">public_flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserPublicFlags</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">banner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">accent_colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="ident">accent_colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1986,8 +2040,24 @@
     <span class="doccomment">/// change if the username+discriminator pair becomes non-unique.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;username&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// the public flags on a user&#39;s account</span>
+    <span class="doccomment">/// The public flags on a user&#39;s account</span>
     <span class="kw">pub</span> <span class="ident">public_flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserPublicFlags</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Optional banner hash.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will only be present if the user is fetched via Rest API,</span>
+    <span class="doccomment">/// e.g. with [`Http::get_user`].</span>
+    <span class="kw">pub</span> <span class="ident">banner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The user&#39;s banner colour encoded as an integer representation of</span>
+    <span class="doccomment">/// hexadecimal colour code</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will only be present if the user is fetched via Rest API,</span>
+    <span class="doccomment">/// e.g. with [`Http::get_user`].</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;accent_color&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">accent_colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;accent_color&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">accent_colour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
 }
 
 <span class="macro">bitflags!</span> {
@@ -2022,6 +2092,8 @@
         <span class="kw">const</span> <span class="ident">EARLY_VERIFIED_BOT_DEVELOPER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
         <span class="doccomment">/// User&#39;s flag as discord certified moderator</span>
         <span class="kw">const</span> <span class="ident">DISCORD_CERTIFIED_MODERATOR</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
+        <span class="doccomment">/// Bot&#39;s running with HTTP interactions</span>
+        <span class="kw">const</span> <span class="ident">BOT_HTTP_INTERACTIONS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">19</span>;
     }
 }
 
@@ -2041,6 +2113,8 @@
             <span class="ident">discriminator</span>: <span class="number">1432</span>,
             <span class="ident">name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">public_flags</span>: <span class="prelude-val">None</span>,
+            <span class="ident">banner</span>: <span class="prelude-val">None</span>,
+            <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
         }
     }
 }
@@ -2072,6 +2146,17 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">avatar_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="ident">avatar_url</span>(<span class="self">self</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">avatar</span>.<span class="ident">as_ref</span>())
+    }
+
+    <span class="doccomment">/// Returns the formatted URL of the user&#39;s banner, if one exists.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will produce a WEBP image URL, or GIF if the user has a GIF banner.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This will only be present if the user is fetched via Rest API,</span>
+    <span class="doccomment">/// e.g. with [`Http::get_user`].</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">banner_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="ident">banner_url</span>(<span class="self">self</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">banner</span>.<span class="ident">as_ref</span>())
     }
 
     <span class="doccomment">/// Creates a direct message channel between the [current user] and the</span>
@@ -2500,6 +2585,8 @@
             <span class="ident">id</span>: <span class="ident">user</span>.<span class="ident">id</span>,
             <span class="ident">name</span>: <span class="ident">user</span>.<span class="ident">name</span>,
             <span class="ident">public_flags</span>: <span class="ident">user</span>.<span class="ident">public_flags</span>,
+            <span class="ident">banner</span>: <span class="ident">user</span>.<span class="ident">banner</span>,
+            <span class="ident">accent_colour</span>: <span class="ident">user</span>.<span class="ident">accent_colour</span>,
         }
     }
 }
@@ -2513,6 +2600,8 @@
             <span class="ident">id</span>: <span class="ident">user</span>.<span class="ident">id</span>,
             <span class="ident">name</span>: <span class="ident">user</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
             <span class="ident">public_flags</span>: <span class="ident">user</span>.<span class="ident">public_flags</span>,
+            <span class="ident">banner</span>: <span class="ident">user</span>.<span class="ident">banner</span>.<span class="ident">clone</span>(),
+            <span class="ident">accent_colour</span>: <span class="ident">user</span>.<span class="ident">accent_colour</span>,
         }
     }
 }
@@ -2576,6 +2665,15 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">static_avatar_url</span>(<span class="ident">user_id</span>: <span class="ident">UserId</span>, <span class="ident">hash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">hash</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">hash</span><span class="op">|</span> <span class="macro">cdn!</span>(<span class="string">&quot;/avatars/{}/{}.webp?size=1024&quot;</span>, <span class="ident">user_id</span>, <span class="ident">hash</span>))
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">banner_url</span>(<span class="ident">user_id</span>: <span class="ident">UserId</span>, <span class="ident">hash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="ident">hash</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">hash</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hash</span>.<span class="ident">starts_with</span>(<span class="string">&quot;a_&quot;</span>) { <span class="string">&quot;gif&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;webp&quot;</span> };
+
+        <span class="macro">cdn!</span>(<span class="string">&quot;/banners/{}/{}.{}?size=1024&quot;</span>, <span class="ident">user_id</span>.<span class="number">0</span>, <span class="ident">hash</span>, <span class="ident">ext</span>)
+    })
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2705,5 +2803,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (17d29dcdc 2022-01-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (bfe156467 2022-01-22)" ></div>
 </body></html>

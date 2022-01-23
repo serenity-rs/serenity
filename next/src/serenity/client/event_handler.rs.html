@@ -560,6 +560,9 @@
 <span id="554">554</span>
 <span id="555">555</span>
 <span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -1024,6 +1027,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the created application command.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_create</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -1035,6 +1039,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the updated application command.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_update</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -1046,6 +1051,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the deleted application command.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_delete</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,
@@ -1117,5 +1123,5 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_ev</span>: <span class="ident">Event</span>) {}
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (17d29dcdc 2022-01-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (bfe156467 2022-01-22)" ></div>
 </body></html>

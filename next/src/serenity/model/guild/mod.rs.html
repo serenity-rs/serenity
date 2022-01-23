@@ -3259,6 +3259,15 @@
 <span id="3253">3253</span>
 <span id="3254">3254</span>
 <span id="3255">3255</span>
+<span id="3256">3256</span>
+<span id="3257">3257</span>
+<span id="3258">3258</span>
+<span id="3259">3259</span>
+<span id="3260">3260</span>
+<span id="3261">3261</span>
+<span id="3262">3262</span>
+<span id="3263">3263</span>
+<span id="3264">3264</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="comment">// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.</span>
@@ -3390,9 +3399,16 @@
     <span class="doccomment">/// - `FEATURABLE`</span>
     <span class="doccomment">/// - `INVITE_SPLASH`</span>
     <span class="doccomment">/// - `MEMBER_VERIFICATION_GATE_ENABLED`</span>
+    <span class="doccomment">/// - `MONETIZATION_ENABLED`</span>
+    <span class="doccomment">/// - `MORE_STICKERS`</span>
     <span class="doccomment">/// - `NEWS`</span>
     <span class="doccomment">/// - `PARTNERED`</span>
     <span class="doccomment">/// - `PREVIEW_ENABLED`</span>
+    <span class="doccomment">/// - `PRIVATE_THREADS`</span>
+    <span class="doccomment">/// - `ROLE_ICONS`</span>
+    <span class="doccomment">/// - `SEVEN_DAY_THREAD_ARCHIVE`</span>
+    <span class="doccomment">/// - `THREE_DAY_THREAD_ARCHIVE`</span>
+    <span class="doccomment">/// - `TICKETED_EVENTS_ENABLED`</span>
     <span class="doccomment">/// - `VANITY_URL`</span>
     <span class="doccomment">/// - `VERIFIED`</span>
     <span class="doccomment">/// - `VIP_REGIONS`</span>
@@ -6272,6 +6288,7 @@
 <span class="doccomment">/// The name of a region that a voice server can be located in.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Regions are now set per voice channel instead of globally.&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Region</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;amsterdam&quot;</span>)]</span>
     <span class="ident">Amsterdam</span>,
@@ -6421,6 +6438,7 @@
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                 <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
                 <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
+                <span class="ident">communication_disabled_until</span>: <span class="prelude-val">None</span>,
             }
         }
 
@@ -6515,5 +6533,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (17d29dcdc 2022-01-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (bfe156467 2022-01-22)" ></div>
 </body></html>

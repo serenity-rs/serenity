@@ -2718,6 +2718,26 @@
 <span id="2712">2712</span>
 <span id="2713">2713</span>
 <span id="2714">2714</span>
+<span id="2715">2715</span>
+<span id="2716">2716</span>
+<span id="2717">2717</span>
+<span id="2718">2718</span>
+<span id="2719">2719</span>
+<span id="2720">2720</span>
+<span id="2721">2721</span>
+<span id="2722">2722</span>
+<span id="2723">2723</span>
+<span id="2724">2724</span>
+<span id="2725">2725</span>
+<span id="2726">2726</span>
+<span id="2727">2727</span>
+<span id="2728">2728</span>
+<span id="2729">2729</span>
+<span id="2730">2730</span>
+<span id="2731">2731</span>
+<span id="2732">2732</span>
+<span id="2733">2733</span>
+<span id="2734">2734</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -4125,6 +4145,12 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">emoji_id</span>: <span class="ident">u64</span>,
     },
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="ident">GetFollowupMessage</span> {
+        <span class="ident">application_id</span>: <span class="ident">u64</span>,
+        <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">message_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">GetGateway</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">GetGlobalApplicationCommands</span> {
@@ -5010,6 +5036,20 @@
                 <span class="ident">Route::ChannelsIdMeJoindedArchivedPrivateThreads</span>(<span class="ident">channel_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::channel_joined_private_threads</span>(<span class="ident">channel_id</span>, <span class="ident">before</span>, <span class="ident">limit</span>)),
             ),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="ident">RouteInfo::GetFollowupMessage</span> {
+                <span class="ident">application_id</span>,
+                <span class="ident">interaction_token</span>,
+                <span class="ident">message_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::WebhooksApplicationId</span>(<span class="ident">application_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_followup_message</span>(
+                    <span class="ident">application_id</span>,
+                    <span class="ident">interaction_token</span>,
+                    <span class="ident">message_id</span>,
+                )),
+            ),
             <span class="ident">RouteInfo::GetGuildActiveThreads</span> {
                 <span class="ident">guild_id</span>,
             } =&gt; (
@@ -5433,5 +5473,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (17d29dcdc 2022-01-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (bfe156467 2022-01-22)" ></div>
 </body></html>
