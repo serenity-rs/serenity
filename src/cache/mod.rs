@@ -1049,8 +1049,6 @@ impl Default for Cache {
 mod test {
     use std::collections::HashMap;
 
-    use chrono::{DateTime, Utc};
-
     use crate::json::from_number;
     use crate::{
         cache::{Cache, CacheUpdate, Settings},
@@ -1064,10 +1062,7 @@ mod test {
         let cache = Cache::new_with_settings(settings);
 
         // Test inserting one message into a channel's message cache.
-        let datetime =
-            DateTime::parse_from_str("1983 Apr 13 12:09:14.274 +0000", "%Y %b %d %H:%M:%S%.3f %z")
-                .unwrap()
-                .with_timezone(&Utc);
+        let datetime = Timestamp::now();
         let mut event = MessageCreateEvent {
             message: Message {
                 id: MessageId(3),

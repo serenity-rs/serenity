@@ -21,6 +21,7 @@
 
 #[macro_use]
 mod utils;
+mod timestamp;
 
 pub mod application;
 pub mod channel;
@@ -52,6 +53,7 @@ use serde::de::Visitor;
 use serde::{Deserialize, Deserializer};
 #[cfg(feature = "voice-model")]
 pub use serenity_voice_model as voice_gateway;
+pub use timestamp::Timestamp;
 
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;

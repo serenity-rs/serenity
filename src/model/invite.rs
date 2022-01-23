@@ -1,7 +1,5 @@
 //! Models for server and channel invites.
 
-use chrono::{DateTime, Utc};
-
 use super::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::{utils as model_utils, Permissions};
@@ -15,6 +13,7 @@ use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json;
+use crate::model::Timestamp;
 
 /// Information about an invite code.
 ///
@@ -57,7 +56,7 @@ pub struct Invite {
 
     // /// The expiration date of this invite, returned from `Http::get_invite` when
     // /// `with_expiration` is true.
-    // pub expires_at: Option<DateTime<Utc>>,
+    // pub expires_at: Option<Timestamp>,
     /// The Stage instance data if there is a public Stage instance in the Stage
     /// channel this invite is for.
     pub stage_instance: Option<InviteStageInstance>,
@@ -284,7 +283,7 @@ pub struct RichInvite {
     /// The unique code for the invite.
     pub code: String,
     /// When the invite was created.
-    pub created_at: DateTime<Utc>,
+    pub created_at: Timestamp,
     /// A representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
     pub guild: Option<InviteGuild>,

@@ -2,8 +2,6 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
-use chrono::{DateTime, Utc};
-
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "http")]
@@ -12,6 +10,7 @@ use crate::http::{Http, Typing};
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
 use crate::model::utils::single_recipient;
+use crate::model::Timestamp;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -24,7 +23,7 @@ pub struct PrivateChannel {
     /// The Id of the last message sent.
     pub last_message_id: Option<MessageId>,
     /// Timestamp of the last time a [`Message`] was pinned.
-    pub last_pin_timestamp: Option<DateTime<Utc>>,
+    pub last_pin_timestamp: Option<Timestamp>,
     /// Indicator of the type of channel this is.
     ///
     /// This should always be [`ChannelType::Private`].
