@@ -97,6 +97,7 @@ impl Timestamp {
     }
 }
 
+/// Signifies the failure to parse the `Timestamp` from an RFC 3339 string.
 #[derive(Debug)]
 pub struct ParseError;
 
