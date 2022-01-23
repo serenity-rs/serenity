@@ -131,7 +131,7 @@ impl EditMember {
     /// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
     pub fn enable_communication(&mut self) -> &mut Self {
-        self.0.insert("communication_disabled_until", Value::Null);
+        self.0.insert("communication_disabled_until", NULL);
         self
     }
 }

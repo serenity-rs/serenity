@@ -44,7 +44,7 @@ impl EditThread {
     ///
     /// **Note**: Only available on private threads.
     pub fn invitable(&mut self, invitable: bool) -> &mut Self {
-        self.0.insert("invitable", Value::Bool(invitable));
+        self.0.insert("invitable", Value::from(invitable));
 
         self
     }

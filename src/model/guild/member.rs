@@ -98,6 +98,7 @@ impl From<InterimMember> for Member {
             #[cfg(feature = "unstable_discord_api")]
             permissions: m.permissions,
             avatar: m.avatar,
+            communication_disabled_until: None,
         }
     }
 }
