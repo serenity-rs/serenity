@@ -422,10 +422,7 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
-<span id="419">419</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models for server and channel invites.</span>
-
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
@@ -440,6 +437,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
 
 <span class="doccomment">/// Information about an invite code.</span>
 <span class="doccomment">///</span>
@@ -482,7 +480,7 @@
 
     <span class="comment">// /// The expiration date of this invite, returned from `Http::get_invite` when</span>
     <span class="comment">// /// `with_expiration` is true.</span>
-    <span class="comment">// pub expires_at: Option&lt;DateTime&lt;Utc&gt;&gt;,</span>
+    <span class="comment">// pub expires_at: Option&lt;Timestamp&gt;,</span>
     <span class="doccomment">/// The Stage instance data if there is a public Stage instance in the Stage</span>
     <span class="doccomment">/// channel this invite is for.</span>
     <span class="kw">pub</span> <span class="ident">stage_instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InviteStageInstance</span><span class="op">&gt;</span>,
@@ -709,7 +707,7 @@
     <span class="doccomment">/// The unique code for the invite.</span>
     <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
     <span class="doccomment">/// When the invite was created.</span>
-    <span class="kw">pub</span> <span class="ident">created_at</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">created_at</span>: <span class="ident">Timestamp</span>,
     <span class="doccomment">/// A representation of the minimal amount of information needed about the</span>
     <span class="doccomment">/// [`Guild`] being invited to.</span>
     <span class="kw">pub</span> <span class="ident">guild</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InviteGuild</span><span class="op">&gt;</span>,

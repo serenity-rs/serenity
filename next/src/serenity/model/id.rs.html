@@ -370,22 +370,19 @@
 <span id="364">364</span>
 <span id="365">365</span>
 <span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Timestamp</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">id_u64</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) =&gt; {
         $(
             <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="doccomment">/// Retrieves the time that the Id was created at.</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">created_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-                    <span class="kw">const</span> <span class="ident">DISCORD_EPOCH</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1_420_070_400_000</span>;
-                    <span class="ident">Utc</span>.<span class="ident">timestamp_millis</span>(((<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">22</span>) <span class="op">+</span> <span class="ident">DISCORD_EPOCH</span>) <span class="kw">as</span> <span class="ident">i64</span>)
+                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">created_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Timestamp</span> {
+                    <span class="ident">Timestamp::from_discord_id</span>(<span class="self">self</span>.<span class="number">0</span>)
                 }
 
                 <span class="doccomment">/// Immutably borrow inner Id.</span>
@@ -671,10 +668,9 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_created_at</span>() {
         <span class="comment">// The id is from discord&#39;s snowflake docs</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">GuildId</span>(<span class="number">175928847299117063</span>).<span class="ident">created_at</span>().<span class="ident">to_rfc3339</span>(),
-            <span class="string">&quot;2016-04-30T11:18:25.796+00:00&quot;</span>
-        );
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">GuildId</span>(<span class="number">175928847299117063</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">id</span>.<span class="ident">created_at</span>().<span class="ident">unix_timestamp</span>(), <span class="number">1462015105</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">id</span>.<span class="ident">created_at</span>().<span class="ident">to_string</span>(), <span class="string">&quot;2016-04-30T11:18:25.796Z&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>

@@ -284,11 +284,9 @@
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
-<span id="281">281</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::NULL</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::NULL</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
 
 <span class="doccomment">/// A builder for constructing a personal [`Message`] instance.</span>
 <span class="doccomment">/// This can be useful for emitting a manual [`dispatch`] to the framework,</span>
@@ -366,8 +364,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If not used, the default value is [`None`] (not all messages are edited).</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edited_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">edited_timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edited_timestamp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">edited_timestamp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>.<span class="ident">into</span>());
 
         <span class="self">self</span>
     }
@@ -480,8 +478,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If not used, the default value is the current local time.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">timestamp</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">into</span>();
 
         <span class="self">self</span>
     }
@@ -553,7 +551,7 @@
         <span class="ident">reactions</span>: <span class="ident">Vec::new</span>(),
         <span class="ident">tts</span>: <span class="bool-val">false</span>,
         <span class="ident">webhook_id</span>: <span class="prelude-val">None</span>,
-        <span class="ident">timestamp</span>: <span class="ident">Utc::now</span>(),
+        <span class="ident">timestamp</span>: <span class="ident">Timestamp::now</span>(),
         <span class="ident">activity</span>: <span class="prelude-val">None</span>,
         <span class="ident">application</span>: <span class="prelude-val">None</span>,
         <span class="ident">message_reference</span>: <span class="prelude-val">None</span>,

@@ -1276,7 +1276,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::fmt::Write</span>;
 
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">simd_json::ValueAccess</span>;
 
@@ -1304,6 +1303,7 @@
     <span class="ident">model</span>::{
         <span class="ident">id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">MessageId</span>},
         <span class="ident">sticker::StickerItem</span>,
+        <span class="ident">timestamp::Timestamp</span>,
     },
 };
 
@@ -1324,7 +1324,7 @@
     <span class="doccomment">/// The content of the message.</span>
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The timestamp of the last time the message was updated, if it was.</span>
-    <span class="kw">pub</span> <span class="ident">edited_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">edited_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Array of embeds sent with the message.</span>
     <span class="kw">pub</span> <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Embed</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will</span>
@@ -1369,7 +1369,7 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">reactions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageReaction</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Initial message creation timestamp, calculated from its Id.</span>
-    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="ident">Timestamp</span>,
     <span class="doccomment">/// Indicator of whether the command is to be played back via</span>
     <span class="doccomment">/// text-to-speech.</span>
     <span class="doccomment">///</span>
@@ -1640,7 +1640,7 @@
                     <span class="macro">format!</span>(<span class="string">&quot;{} pinned a message to this channel. See all the pins.&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>);
             },
             <span class="ident">MessageType::MemberJoin</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timestamp</span>.<span class="ident">timestamp</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+                <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timestamp</span>.<span class="ident">unix_timestamp</span>() <span class="kw">as</span> <span class="ident">usize</span>;
                 <span class="kw">let</span> <span class="ident">chosen</span> <span class="op">=</span> <span class="ident">constants::JOIN_MESSAGES</span>[<span class="ident">sec</span> <span class="op">%</span> <span class="ident">constants::JOIN_MESSAGES</span>.<span class="ident">len</span>()];
 
                 <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">chosen</span>.<span class="ident">contains</span>(<span class="string">&quot;$user&quot;</span>) {

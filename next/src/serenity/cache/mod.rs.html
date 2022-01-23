@@ -1231,11 +1231,6 @@
 <span id="1225">1225</span>
 <span id="1226">1226</span>
 <span id="1227">1227</span>
-<span id="1228">1228</span>
-<span id="1229">1229</span>
-<span id="1230">1230</span>
-<span id="1231">1231</span>
-<span id="1232">1232</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -2270,8 +2265,6 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-    <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>, <span class="ident">Settings</span>},
@@ -2285,10 +2278,7 @@
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Cache::new_with_settings</span>(<span class="ident">settings</span>);
 
         <span class="comment">// Test inserting one message into a channel&#39;s message cache.</span>
-        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span>
-            <span class="ident">DateTime::parse_from_str</span>(<span class="string">&quot;1983 Apr 13 12:09:14.274 +0000&quot;</span>, <span class="string">&quot;%Y %b %d %H:%M:%S%.3f %z&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>);
+        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident">Timestamp::now</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">MessageCreateEvent</span> {
             <span class="ident">message</span>: <span class="ident">Message</span> {
                 <span class="ident">id</span>: <span class="ident">MessageId</span>(<span class="number">3</span>),
