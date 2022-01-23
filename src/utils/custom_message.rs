@@ -1,7 +1,6 @@
-use chrono::{DateTime, Utc};
-
 use crate::json::NULL;
 use crate::model::prelude::*;
+use crate::model::Timestamp;
 
 /// A builder for constructing a personal [`Message`] instance.
 /// This can be useful for emitting a manual [`dispatch`] to the framework,
@@ -79,8 +78,8 @@ impl CustomMessage {
     ///
     /// If not used, the default value is [`None`] (not all messages are edited).
     #[inline]
-    pub fn edited_timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
-        self.msg.edited_timestamp = Some(timestamp);
+    pub fn edited_timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
+        self.msg.edited_timestamp = Some(timestamp.into());
 
         self
     }
@@ -193,8 +192,8 @@ impl CustomMessage {
     ///
     /// If not used, the default value is the current local time.
     #[inline]
-    pub fn timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
-        self.msg.timestamp = timestamp;
+    pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {
+        self.msg.timestamp = timestamp.into();
 
         self
     }
@@ -266,7 +265,7 @@ fn dummy_message() -> Message {
         reactions: Vec::new(),
         tts: false,
         webhook_id: None,
-        timestamp: Utc::now(),
+        timestamp: Timestamp::now(),
         activity: None,
         application: None,
         message_reference: None,

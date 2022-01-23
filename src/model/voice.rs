@@ -2,7 +2,6 @@
 
 use std::fmt;
 
-use chrono::{DateTime, Utc};
 use serde::de::{self, Deserialize, Deserializer, IgnoredAny, MapAccess, Visitor};
 
 use super::{
@@ -12,6 +11,7 @@ use super::{
 };
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::permissions::Permissions;
+use crate::model::Timestamp;
 
 /// Information about an available voice region.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -49,7 +49,7 @@ pub struct VoiceState {
     /// When unsuppressed, non-bot users will have this set to the current time.
     /// Bot users will be set to [`None`]. When suppressed, the user will have
     /// their [`Self::request_to_speak_timestamp`] removed.
-    pub request_to_speak_timestamp: Option<DateTime<Utc>>,
+    pub request_to_speak_timestamp: Option<Timestamp>,
 }
 
 impl fmt::Debug for VoiceState {
@@ -97,18 +97,18 @@ impl<'de> Deserialize<'de> for VoiceState {
         #[non_exhaustive]
         struct PartialMember {
             deaf: bool,
-            joined_at: Option<DateTime<Utc>>,
+            joined_at: Option<Timestamp>,
             mute: bool,
             nick: Option<String>,
             roles: Vec<RoleId>,
             user: User,
             #[serde(default)]
             pending: bool,
-            premium_since: Option<DateTime<Utc>>,
+            premium_since: Option<Timestamp>,
             #[cfg(feature = "unstable_discord_api")]
             permissions: Option<Permissions>,
             avatar: Option<String>,
-            communication_disabled_until: Option<DateTime<Utc>>,
+            communication_disabled_until: Option<Timestamp>,
         }
 
         struct VoiceStateVisitor;

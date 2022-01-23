@@ -716,9 +716,6 @@ impl Default for User {
 
 use std::hash::{Hash, Hasher};
 
-#[cfg(feature = "model")]
-use chrono::{DateTime, Utc};
-
 impl PartialEq for User {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
@@ -773,7 +770,7 @@ impl User {
 
     /// Retrieves the time that this user was created at.
     #[inline]
-    pub fn created_at(&self) -> DateTime<Utc> {
+    pub fn created_at(&self) -> Timestamp {
         self.id.created_at()
     }
 
