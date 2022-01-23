@@ -3,8 +3,6 @@ use std::collections::HashMap;
 #[cfg(feature = "model")]
 use bytes::buf::Buf;
 #[cfg(feature = "model")]
-use reqwest::Url;
-#[cfg(feature = "model")]
 use tokio::{fs::File, io::AsyncReadExt};
 
 #[cfg(feature = "model")]
@@ -165,7 +163,6 @@ impl EditRole {
                 "data:image/png;base64,".to_string() + &base64::encode(&buf)
             },
             AttachmentType::Image(url) => {
-                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
                 let response = http.as_ref().client.get(url).send().await?;
                 let mut bytes = response.bytes().await?;
                 let mut picture: Vec<u8> = vec![0; bytes.len()];
