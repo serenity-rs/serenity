@@ -2,16 +2,15 @@
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use chrono::{DateTime, TimeZone, Utc};
+use super::Timestamp;
 
 macro_rules! id_u64 {
     ($($name:ident;)*) => {
         $(
             impl $name {
                 /// Retrieves the time that the Id was created at.
-                pub fn created_at(&self) -> DateTime<Utc> {
-                    const DISCORD_EPOCH: u64 = 1_420_070_400_000;
-                    Utc.timestamp_millis(((self.0 >> 22) + DISCORD_EPOCH) as i64)
+                pub fn created_at(&self) -> Timestamp {
+                    Timestamp::from_discord_id(self.0)
                 }
 
                 /// Immutably borrow inner Id.
@@ -297,10 +296,9 @@ mod tests {
     #[test]
     fn test_created_at() {
         // The id is from discord's snowflake docs
-        assert_eq!(
-            GuildId(175928847299117063).created_at().to_rfc3339(),
-            "2016-04-30T11:18:25.796+00:00"
-        );
+        let id = GuildId(175928847299117063);
+        assert_eq!(id.created_at().unix_timestamp(), 1462015105);
+        assert_eq!(id.created_at().to_string(), "2016-04-30T11:18:25.796Z");
     }
 
     #[test]

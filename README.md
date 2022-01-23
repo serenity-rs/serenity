@@ -148,6 +148,7 @@ enough level that optional parameters can be provided at will via a JsonMap.
 - **model**: Method implementations for models, acting as helper methods over
 the HTTP functions.
 - **standard_framework**: A standard, default implementation of the Framework
+- **time**: Use the `time` crate for Discord's timestamp fields. See `serenity::model::Timestamp`.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
 [lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
