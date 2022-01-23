@@ -4,8 +4,6 @@ use std::borrow::Cow;
 use std::cmp::Reverse;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use chrono::{DateTime, Utc};
-
 #[cfg(feature = "model")]
 use crate::builder::EditMember;
 #[cfg(feature = "cache")]
@@ -19,6 +17,7 @@ use crate::json;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
+use crate::model::Timestamp;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::Colour;
 
@@ -31,7 +30,7 @@ pub struct Member {
     /// The unique Id of the guild that the member is a part of.
     pub guild_id: GuildId,
     /// Timestamp representing the date when the member joined.
-    pub joined_at: Option<DateTime<Utc>>,
+    pub joined_at: Option<Timestamp>,
     /// Indicator of whether the member can speak in voice channels.
     pub mute: bool,
     /// The member's nickname, if present.
@@ -46,7 +45,7 @@ pub struct Member {
     #[serde(default)]
     pub pending: bool,
     /// Timestamp representing the date since the member is boosting the guild.
-    pub premium_since: Option<DateTime<Utc>>,
+    pub premium_since: Option<Timestamp>,
     /// The total permissions of the member in a channel, including overrides.
     ///
     /// This is only [`Some`] when returned in an [`Interaction`] object.
@@ -59,7 +58,7 @@ pub struct Member {
     /// 	When the user's timeout will expire and the user will be able to communicate in the guild again.
     ///
     /// 	Will be None or a time in the past if the user is not timed out.
-    pub communication_disabled_until: Option<DateTime<Utc>>,
+    pub communication_disabled_until: Option<Timestamp>,
 }
 
 /// Helper for deserialization without a `GuildId` but then later updated to the correct `GuildId`.
@@ -70,14 +69,14 @@ pub(crate) struct InterimMember {
     pub deaf: bool,
     #[serde(default)]
     pub guild_id: GuildId,
-    pub joined_at: Option<DateTime<Utc>>,
+    pub joined_at: Option<Timestamp>,
     pub mute: bool,
     pub nick: Option<String>,
     pub roles: Vec<RoleId>,
     pub user: User,
     #[serde(default)]
     pub pending: bool,
-    pub premium_since: Option<DateTime<Utc>>,
+    pub premium_since: Option<Timestamp>,
     #[cfg(feature = "unstable_discord_api")]
     pub permissions: Option<Permissions>,
     pub avatar: Option<String>,
@@ -260,7 +259,7 @@ impl Member {
     pub async fn disable_communication_until_datetime(
         &mut self,
         http: impl AsRef<Http>,
-        time: DateTime<Utc>,
+        time: Timestamp,
     ) -> Result<()> {
         match self
             .guild_id
@@ -667,7 +666,7 @@ pub struct PartialMember {
     #[serde(default)]
     pub deaf: bool,
     /// Timestamp representing the date when the member joined.
-    pub joined_at: Option<DateTime<Utc>>,
+    pub joined_at: Option<Timestamp>,
     /// Indicator of whether the member can speak in voice channels
     #[serde(default)]
     pub mute: bool,
@@ -681,7 +680,7 @@ pub struct PartialMember {
     #[serde(default)]
     pub pending: bool,
     /// Timestamp representing the date since the member is boosting the guild.
-    pub premium_since: Option<DateTime<Utc>>,
+    pub premium_since: Option<Timestamp>,
     /// The unique Id of the guild that the member is a part of.
     pub guild_id: Option<GuildId>,
     /// Attached User struct.
@@ -712,7 +711,7 @@ pub struct ThreadMember {
     /// The id of the user.
     pub user_id: Option<UserId>,
     /// The time the current user last joined the thread.
-    pub join_timestamp: DateTime<Utc>,
+    pub join_timestamp: Timestamp,
     /// Any user-thread settings, currently only used for notifications
     pub flags: ThreadMemberFlags,
 }
