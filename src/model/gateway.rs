@@ -432,6 +432,8 @@ impl PresenceUser {
             id: self.id,
             name: self.name?,
             public_flags: self.public_flags,
+            banner: None,
+            accent_colour: None,
         })
     }
 
@@ -448,6 +450,8 @@ impl PresenceUser {
             id: self.id,
             name: self.name.clone()?,
             public_flags: self.public_flags,
+            banner: None,
+            accent_colour: None,
         })
     }
 
