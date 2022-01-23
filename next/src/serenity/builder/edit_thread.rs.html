@@ -101,7 +101,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Only available on private threads.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invitable</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">invitable</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;invitable&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">invitable</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;invitable&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">invitable</span>));
 
         <span class="self">self</span>
     }

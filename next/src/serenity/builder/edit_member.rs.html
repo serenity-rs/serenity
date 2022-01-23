@@ -274,7 +274,7 @@
     <span class="doccomment">/// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_communication</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;communication_disabled_until&quot;</span>, <span class="ident">Value::Null</span>);
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;communication_disabled_until&quot;</span>, <span class="ident">NULL</span>);
         <span class="self">self</span>
     }
 }

@@ -550,7 +550,7 @@
 
     <span class="doccomment">/// Sets the disabled state for the button.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disabled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">disabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;disabled&quot;</span>, <span class="ident">Value::Bool</span>(<span class="ident">disabled</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;disabled&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">disabled</span>));
         <span class="self">self</span>
     }
 
