@@ -49,7 +49,7 @@ pub use self::{
     create_allowed_mentions::CreateAllowedMentions,
     create_allowed_mentions::ParseValue,
     create_channel::CreateChannel,
-    create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, Timestamp},
+    create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter},
     create_invite::CreateInvite,
     create_message::CreateMessage,
     create_stage_instance::CreateStageInstance,

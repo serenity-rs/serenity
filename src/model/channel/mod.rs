@@ -14,7 +14,6 @@ mod reaction;
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use chrono::{DateTime, Utc};
 use serde::de::{Error as DeError, Unexpected};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
@@ -37,6 +36,7 @@ use crate::http::CacheHttp;
 use crate::internal::is_false;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::model::misc::ChannelParseError;
+use crate::model::Timestamp;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
 use crate::{json::prelude::*, model::prelude::*};
@@ -472,14 +472,14 @@ pub struct ThreadMetadata {
     /// **Note**: It can currently only be set to 60, 1440, 4320, 10080.
     pub auto_archive_duration: Option<u64>,
     /// Timestamp when the thread's archive status was last changed, used for calculating recent activity.
-    pub archive_timestamp: Option<DateTime<Utc>>,
+    pub archive_timestamp: Option<Timestamp>,
     /// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
     #[serde(default)]
     pub locked: bool,
     /// Timestamp when the thread was created.
     ///
     /// **Note**: only populated for threads created after 2022-01-09
-    pub create_timestamp: Option<DateTime<Utc>>,
+    pub create_timestamp: Option<Timestamp>,
     /// Whether non-moderators can add other non-moderators to a thread.
     ///
     /// **Note**: Only available on private threads.

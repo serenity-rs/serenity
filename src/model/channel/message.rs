@@ -5,7 +5,6 @@ use std::fmt::Display;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 
-use chrono::{DateTime, Utc};
 #[cfg(feature = "simd-json")]
 use simd_json::ValueAccess;
 
@@ -33,6 +32,7 @@ use crate::{
     model::{
         id::{ApplicationId, ChannelId, GuildId, MessageId},
         sticker::StickerItem,
+        timestamp::Timestamp,
     },
 };
 
@@ -53,7 +53,7 @@ pub struct Message {
     /// The content of the message.
     pub content: String,
     /// The timestamp of the last time the message was updated, if it was.
-    pub edited_timestamp: Option<DateTime<Utc>>,
+    pub edited_timestamp: Option<Timestamp>,
     /// Array of embeds sent with the message.
     pub embeds: Vec<Embed>,
     /// The Id of the [`Guild`] that the message was sent in. This value will
@@ -98,7 +98,7 @@ pub struct Message {
     #[serde(default)]
     pub reactions: Vec<MessageReaction>,
     /// Initial message creation timestamp, calculated from its Id.
-    pub timestamp: DateTime<Utc>,
+    pub timestamp: Timestamp,
     /// Indicator of whether the command is to be played back via
     /// text-to-speech.
     ///
@@ -369,7 +369,7 @@ impl Message {
                     format!("{} pinned a message to this channel. See all the pins.", self.author);
             },
             MessageType::MemberJoin => {
-                let sec = self.timestamp.timestamp() as usize;
+                let sec = self.timestamp.unix_timestamp() as usize;
                 let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
 
                 self.content = if chosen.contains("$user") {

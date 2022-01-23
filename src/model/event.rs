@@ -4,7 +4,6 @@
 use std::convert::TryFrom;
 use std::{collections::HashMap, fmt};
 
-use chrono::{DateTime, Utc};
 use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 
 use super::prelude::*;
@@ -40,7 +39,7 @@ pub struct ChannelDeleteEvent {
 pub struct ChannelPinsUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
-    pub last_pin_timestamp: Option<DateTime<Utc>>,
+    pub last_pin_timestamp: Option<Timestamp>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -111,10 +110,10 @@ pub struct GuildMemberRemoveEvent {
 pub struct GuildMemberUpdateEvent {
     pub guild_id: GuildId,
     pub nick: Option<String>,
-    pub joined_at: DateTime<Utc>,
+    pub joined_at: Timestamp,
     pub roles: Vec<RoleId>,
     pub user: User,
-    pub premium_since: Option<DateTime<Utc>>,
+    pub premium_since: Option<Timestamp>,
     #[serde(default)]
     pub pending: bool,
     #[serde(default)]
@@ -122,7 +121,7 @@ pub struct GuildMemberUpdateEvent {
     #[serde(default)]
     pub mute: bool,
     pub avatar: Option<String>,
-    pub communication_disabled_until: Option<DateTime<Utc>>,
+    pub communication_disabled_until: Option<Timestamp>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -346,8 +345,8 @@ pub struct MessageUpdateEvent {
     pub nonce: Option<String>,
     pub tts: Option<bool>,
     pub pinned: Option<bool>,
-    pub timestamp: Option<DateTime<Utc>>,
-    pub edited_timestamp: Option<DateTime<Utc>>,
+    pub timestamp: Option<Timestamp>,
+    pub edited_timestamp: Option<Timestamp>,
     pub author: Option<User>,
     pub mention_everyone: Option<bool>,
     pub mentions: Option<Vec<User>>,

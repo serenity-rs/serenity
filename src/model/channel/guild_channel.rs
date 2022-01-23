@@ -3,7 +3,6 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
-use chrono::{DateTime, Utc};
 #[cfg(feature = "cache")]
 use futures::stream::StreamExt;
 
@@ -41,6 +40,7 @@ use crate::json::{self, from_number};
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::prelude::*;
+use crate::model::Timestamp;
 
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
@@ -78,7 +78,7 @@ pub struct GuildChannel {
     /// The timestamp of the time a pin was most recently made.
     ///
     /// **Note**: This is only available for text channels.
-    pub last_pin_timestamp: Option<DateTime<Utc>>,
+    pub last_pin_timestamp: Option<Timestamp>,
     /// The name of the channel.
     pub name: String,
     /// Permission overwrites for [`Member`]s and for [`Role`]s.

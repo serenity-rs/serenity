@@ -15,12 +15,10 @@
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
 use std::collections::HashMap;
-use std::fmt::Display;
-
-use chrono::{DateTime, TimeZone};
 
 use crate::json::{self, from_number, json, Value};
 use crate::model::channel::Embed;
+use crate::model::Timestamp;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -305,7 +303,7 @@ impl CreateEmbed {
     }
 
     fn _timestamp(&mut self, timestamp: Timestamp) {
-        self.0.insert("timestamp", Value::from(timestamp.ts));
+        self.0.insert("timestamp", Value::from(timestamp.to_string()));
     }
 
     /// Set the title of the embed.
@@ -468,49 +466,6 @@ impl CreateEmbedFooter {
     pub fn text<S: ToString>(&mut self, text: S) -> &mut Self {
         self.0.insert("text", Value::from(text.to_string()));
         self
-    }
-}
-
-#[derive(Clone, Debug)]
-pub struct Timestamp {
-    pub ts: String,
-}
-
-impl From<String> for Timestamp {
-    fn from(ts: String) -> Self {
-        Self {
-            ts,
-        }
-    }
-}
-
-impl<'a> From<&'a str> for Timestamp {
-    fn from(ts: &'a str) -> Self {
-        Self {
-            ts: ts.to_string(),
-        }
-    }
-}
-
-impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp
-where
-    Tz::Offset: Display,
-{
-    fn from(dt: DateTime<Tz>) -> Self {
-        Self {
-            ts: dt.to_rfc3339(),
-        }
-    }
-}
-
-impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
-where
-    Tz::Offset: Display,
-{
-    fn from(dt: &'a DateTime<Tz>) -> Self {
-        Self {
-            ts: dt.to_rfc3339(),
-        }
     }
 }
 
