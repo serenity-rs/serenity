@@ -119,6 +119,8 @@ impl From<InterimRole> for Role {
             permissions: r.permissions,
             position: r.position,
             tags: r.tags,
+            icon: None,
+            unicode_emoji: None,
         }
     }
 }
