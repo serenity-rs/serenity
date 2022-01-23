@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use bytes::buf::Buf;
-use reqwest::Url;
 use tokio::{fs::File, io::AsyncReadExt};
 
 use crate::http::Http;
@@ -159,7 +158,6 @@ impl EditRole {
                 "data:image/png;base64,".to_string() + &base64::encode(&buf)
             },
             AttachmentType::Image(url) => {
-                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
                 let response = http.as_ref().client.get(url).send().await?;
                 let mut bytes = response.bytes().await?;
                 let mut picture: Vec<u8> = vec![0; bytes.len()];
