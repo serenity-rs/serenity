@@ -620,7 +620,6 @@ impl Http {
     /// #    let http = Http::default();
     /// let map = json!({
     ///     "name": "test",
-    ///     "region": "us-west",
     /// });
     ///
     /// let _result = http.create_guild(&map).await?;
@@ -630,7 +629,6 @@ impl Http {
     ///
     /// [`Shard`]: crate::gateway::Shard
     /// [GameBridge]: https://discord.com/developers/docs/topics/gamebridge
-    /// [US West Region]: Region::UsWest
     /// [documentation on this endpoint]:
     /// https://discord.com/developers/docs/resources/guild#create-guild
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
@@ -2387,20 +2385,6 @@ impl Http {
         .await
     }
 
-    /// Gets all active threads from a channel.
-    #[deprecated(note = "Use get_guild_active_threads instead")]
-    pub async fn get_channel_active_threads(&self, channel_id: u64) -> Result<ThreadsData> {
-        self.fire(Request {
-            body: None,
-            multipart: None,
-            headers: None,
-            route: RouteInfo::GetChannelActiveThreads {
-                channel_id,
-            },
-        })
-        .await
-    }
-
     /// Gets all archived public threads from a channel.
     pub async fn get_channel_archived_public_threads(
         &self,
@@ -2776,21 +2760,6 @@ impl Http {
                 application_id: self.application_id,
                 guild_id,
                 command_id,
-            },
-        })
-        .await
-    }
-
-    /// Gets a guild embed information.
-    #[deprecated(note = "get_guild_embed was renamed to get_guild_widget")]
-    #[allow(deprecated)]
-    pub async fn get_guild_embed(&self, guild_id: u64) -> Result<GuildEmbed> {
-        self.fire(Request {
-            body: None,
-            multipart: None,
-            headers: None,
-            route: RouteInfo::GetGuildWidget {
-                guild_id,
             },
         })
         .await

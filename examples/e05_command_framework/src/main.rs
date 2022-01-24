@@ -578,8 +578,7 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
             format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
         }
     } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache) {
-        #[allow(deprecated)]
-        let slow_mode_rate = channel.slow_mode_rate.unwrap_or(0);
+        let slow_mode_rate = channel.rate_limit_per_user.unwrap_or(0);
         format!("Current slow mode rate is `{}` seconds.", slow_mode_rate)
     } else {
         "Failed to find channel in cache.".to_string()
