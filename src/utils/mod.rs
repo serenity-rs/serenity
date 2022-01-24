@@ -834,7 +834,6 @@ mod test {
             accent_colour: None,
         };
 
-        #[allow(deprecated)]
         let mut guild = Guild {
             afk_channel_id: None,
             afk_timeout: 0,
@@ -854,7 +853,6 @@ mod test {
             name: "serenity".to_string(),
             owner_id: UserId(114941315417899012),
             presences: HashMap::new(),
-            region: "Ferris Island".to_string(),
             roles: HashMap::new(),
             splash: None,
             discovery_splash: None,
@@ -873,7 +871,6 @@ mod test {
             welcome_screen: None,
             approximate_member_count: None,
             approximate_presence_count: None,
-            nsfw: false,
             nsfw_level: NsfwLevel::Default,
             max_video_channel_users: None,
             max_presences: None,
@@ -930,7 +927,7 @@ mod test {
             topic: None,
             user_limit: None,
             nsfw: false,
-            slow_mode_rate: Some(0),
+            rate_limit_per_user: Some(0),
             rtc_region: None,
             video_quality_mode: None,
             message_count: None,

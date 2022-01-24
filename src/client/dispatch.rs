@@ -801,33 +801,6 @@ async fn handle_event(
                     .await;
             });
         },
-        #[cfg(feature = "unstable_discord_api")]
-        #[allow(deprecated)]
-        DispatchEvent::Model(Event::ApplicationCommandCreate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
-            spawn_named("dispatch::event_handler::application_command_create", async move {
-                event_handler.application_command_create(context, event.application_command).await;
-            });
-        },
-        #[cfg(feature = "unstable_discord_api")]
-        #[allow(deprecated)]
-        DispatchEvent::Model(Event::ApplicationCommandUpdate(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
-            spawn_named("dispatch::event_handler::application_command_update", async move {
-                event_handler.application_command_update(context, event.application_command).await;
-            });
-        },
-        #[cfg(feature = "unstable_discord_api")]
-        #[allow(deprecated)]
-        DispatchEvent::Model(Event::ApplicationCommandDelete(event)) => {
-            let event_handler = Arc::clone(event_handler);
-
-            spawn_named("dispatch::event_handler::application_command_delete", async move {
-                event_handler.application_command_delete(context, event.application_command).await;
-            });
-        },
         DispatchEvent::Model(Event::StageInstanceCreate(event)) => {
             let event_handler = Arc::clone(event_handler);
 

@@ -1,8 +1,5 @@
 //! Models relating to guilds and types that it owns.
 
-// FIXME: Remove after the removal of the `̀nsfw` field and the `GuildEmbed` structure.
-#![allow(deprecated)]
-
 mod audit_log;
 mod emoji;
 mod guild_id;
@@ -186,9 +183,6 @@ pub struct Guild {
     /// intent is enabled.
     #[serde(serialize_with = "serialize_map_values")]
     pub presences: HashMap<UserId, Presence>,
-    /// The region that the voice servers that the guild uses are located in.
-    #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
-    pub region: String,
     /// A mapping of the guild's roles.
     #[serde(serialize_with = "serialize_map_values")]
     pub roles: HashMap<RoleId, Role>,
@@ -242,12 +236,6 @@ pub struct Guild {
     pub approximate_member_count: Option<u64>,
     /// Approximate number of non-offline members in this guild.
     pub approximate_presence_count: Option<u64>,
-    /// Whether or not this guild is designated as NSFW. See [`discord support article`].
-    ///
-    /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
-    #[deprecated(note = "Removed in favor of Guild::nsfw_level.")]
-    #[serde(default)]
-    pub nsfw: bool,
     /// The guild NSFW state. See [`discord support article`].
     ///
     /// [`discord support article`]: https://support.discord.com/hc/en-us/articles/1500005389362-NSFW-Server-Designation
@@ -540,9 +528,9 @@ impl Guild {
     /// Create a guild called `"test"` in the [US West region] with no icon:
     ///
     /// ```rust,ignore
-    /// use serenity::model::{Guild, Region};
+    /// use serenity::model::Guild;
     ///
-    /// let _guild = Guild::create_guild(&http, "test", Region::UsWest, None).await;
+    /// let _guild = Guild::create_guild(&http, "test", None).await;
     /// ```
     ///
     /// # Errors
@@ -550,18 +538,15 @@ impl Guild {
     /// Returns [`Error::Http`] if the current user cannot create a Guild.
     ///
     /// [`Shard`]: crate::gateway::Shard
-    /// [US West region]: Region::UsWest
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub async fn create(
         http: impl AsRef<Http>,
         name: &str,
-        region: Region,
         icon: Option<&str>,
     ) -> Result<PartialGuild> {
         let map = json!({
             "icon": icon,
             "name": name,
-            "region": region.name(),
         });
 
         http.as_ref().create_guild(&map).await
@@ -1090,12 +1075,6 @@ impl Guild {
                 self.mfa_level = guild.mfa_level;
                 self.name = guild.name;
                 self.owner_id = guild.owner_id;
-
-                #[allow(deprecated)]
-                {
-                    self.region = guild.region;
-                }
-
                 self.roles = guild.roles;
                 self.splash = guild.splash;
                 self.verification_level = guild.verification_level;
@@ -2632,11 +2611,6 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| DeError::custom("expected guild presences"))
             .and_then(presences::deserialize)
             .map_err(DeError::custom)?;
-        let region = map
-            .remove("region")
-            .ok_or_else(|| DeError::custom("expected guild region"))
-            .and_then(String::deserialize)
-            .map_err(DeError::custom)?;
         let roles = map
             .remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
@@ -2727,12 +2701,6 @@ impl<'de> Deserialize<'de> for Guild {
             None => None,
         };
 
-        let nsfw = map
-            .remove("nsfw")
-            .ok_or_else(|| DeError::custom("expected nsfw"))
-            .and_then(bool::deserialize)
-            .map_err(DeError::custom)?;
-
         let nsfw_level = map
             .remove("nsfw_level")
             .ok_or_else(|| DeError::custom("expected nsfw_level"))
@@ -2781,7 +2749,6 @@ impl<'de> Deserialize<'de> for Guild {
             .and_then(stickers::deserialize)
             .map_err(DeError::custom)?;
 
-        #[allow(deprecated)]
         Ok(Self {
             afk_channel_id,
             afk_timeout,
@@ -2801,7 +2768,6 @@ impl<'de> Deserialize<'de> for Guild {
             name,
             owner_id,
             presences,
-            region,
             roles,
             splash,
             discovery_splash,
@@ -2820,7 +2786,6 @@ impl<'de> Deserialize<'de> for Guild {
             welcome_screen,
             approximate_member_count,
             approximate_presence_count,
-            nsfw,
             nsfw_level,
             max_video_channel_users,
             max_presences,
@@ -2880,17 +2845,6 @@ pub enum GuildContainer {
     Guild(PartialGuild),
     /// A guild's id, which can be used to search the cache for a guild.
     Id(GuildId),
-}
-
-/// A [`Guild`] embed.
-#[deprecated(note = "GuildEmbed was renamed to GuildWidget")]
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[non_exhaustive]
-pub struct GuildEmbed {
-    /// Whether the embed is enabled.
-    pub enabled: bool,
-    /// The widget channel id.
-    pub channel_id: Option<ChannelId>,
 }
 
 /// A [`Guild`] widget.
@@ -3034,74 +2988,6 @@ enum_number!(MfaLevel {
     Elevated
 });
 
-/// The name of a region that a voice server can be located in.
-#[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
-#[non_exhaustive]
-#[deprecated(note = "Regions are now set per voice channel instead of globally.")]
-pub enum Region {
-    #[serde(rename = "amsterdam")]
-    Amsterdam,
-    #[serde(rename = "brazil")]
-    Brazil,
-    #[serde(rename = "eu-central")]
-    EuCentral,
-    #[serde(rename = "eu-west")]
-    EuWest,
-    #[serde(rename = "frankfurt")]
-    Frankfurt,
-    #[serde(rename = "hongkong")]
-    HongKong,
-    #[serde(rename = "japan")]
-    Japan,
-    #[serde(rename = "london")]
-    London,
-    #[serde(rename = "russia")]
-    Russia,
-    #[serde(rename = "singapore")]
-    Singapore,
-    #[serde(rename = "sydney")]
-    Sydney,
-    #[serde(rename = "us-central")]
-    UsCentral,
-    #[serde(rename = "us-east")]
-    UsEast,
-    #[serde(rename = "us-south")]
-    UsSouth,
-    #[serde(rename = "us-west")]
-    UsWest,
-    #[serde(rename = "vip-amsterdam")]
-    VipAmsterdam,
-    #[serde(rename = "vip-us-east")]
-    VipUsEast,
-    #[serde(rename = "vip-us-west")]
-    VipUsWest,
-}
-
-impl Region {
-    pub fn name(&self) -> &str {
-        match *self {
-            Region::Amsterdam => "amsterdam",
-            Region::Brazil => "brazil",
-            Region::EuCentral => "eu-central",
-            Region::EuWest => "eu-west",
-            Region::Frankfurt => "frankfurt",
-            Region::HongKong => "hongkong",
-            Region::Japan => "japan",
-            Region::London => "london",
-            Region::Russia => "russia",
-            Region::Singapore => "singapore",
-            Region::Sydney => "sydney",
-            Region::UsCentral => "us-central",
-            Region::UsEast => "us-east",
-            Region::UsSouth => "us-south",
-            Region::UsWest => "us-west",
-            Region::VipAmsterdam => "vip-amsterdam",
-            Region::VipUsEast => "vip-us-east",
-            Region::VipUsWest => "vip-us-west",
-        }
-    }
-}
-
 /// The level to set as criteria prior to a user being able to send
 /// messages in a [`Guild`].
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
@@ -3224,7 +3110,6 @@ mod test {
                 name: "Spaghetti".to_string(),
                 owner_id: UserId(210),
                 presences: hm4,
-                region: "NA".to_string(),
                 roles: hm5,
                 splash: Some("asdf".to_string()),
                 verification_level: VerificationLevel::None,
@@ -3243,7 +3128,6 @@ mod test {
                 welcome_screen: None,
                 approximate_member_count: None,
                 approximate_presence_count: None,
-                nsfw: false,
                 nsfw_level: NsfwLevel::Default,
                 max_video_channel_users: None,
                 max_presences: None,

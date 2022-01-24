@@ -1,4 +1,3 @@
-#![allow(deprecated)] // This is done beause it can't be used inside macro definitions.
 //! All the events this library handles.
 
 use std::convert::TryFrom;
@@ -10,7 +9,7 @@ use super::prelude::*;
 use super::utils::{emojis, roles, stickers};
 use crate::internal::prelude::*;
 #[cfg(feature = "unstable_discord_api")]
-use crate::model::interactions::{application_command::ApplicationCommand, Interaction};
+use crate::model::interactions::Interaction;
 use crate::{constants::OpCode, json::prelude::*};
 
 /// Event data for the channel creation event.
@@ -496,36 +495,6 @@ pub struct IntegrationDeleteEvent {
     pub application_id: Option<ApplicationId>,
 }
 
-#[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(transparent)]
-#[non_exhaustive]
-#[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-#[allow(deprecated)]
-pub struct ApplicationCommandCreateEvent {
-    pub application_command: ApplicationCommand,
-}
-
-#[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(transparent)]
-#[non_exhaustive]
-#[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-#[allow(deprecated)]
-pub struct ApplicationCommandUpdateEvent {
-    pub application_command: ApplicationCommand,
-}
-
-#[cfg(feature = "unstable_discord_api")]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(transparent)]
-#[non_exhaustive]
-#[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-#[allow(deprecated)]
-pub struct ApplicationCommandDeleteEvent {
-    pub application_command: ApplicationCommand,
-}
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -813,21 +782,6 @@ pub enum Event {
     /// A guild integration was deleted
     #[cfg(feature = "unstable_discord_api")]
     IntegrationDelete(IntegrationDeleteEvent),
-    /// An application command was created
-    #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    #[allow(deprecated)]
-    ApplicationCommandCreate(ApplicationCommandCreateEvent),
-    /// An application command was updated
-    #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    #[allow(deprecated)]
-    ApplicationCommandUpdate(ApplicationCommandUpdateEvent),
-    /// An application command was deleted
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    #[cfg(feature = "unstable_discord_api")]
-    #[allow(deprecated)]
-    ApplicationCommandDelete(ApplicationCommandDeleteEvent),
     /// A stage instance was created.
     StageInstanceCreate(StageInstanceCreateEvent),
     /// A stage instance was updated.
@@ -863,7 +817,6 @@ fn gid_from_channel(c: &Channel) -> RelatedId<GuildId> {
     }
 }
 
-#[allow(deprecated)]
 macro_rules! with_related_ids_for_event_types {
     ($macro:ident) => {
         $macro! {
@@ -1207,27 +1160,6 @@ macro_rules! with_related_ids_for_event_types {
                 channel_id: Never,
                 message_id: Never,
             },
-            #[cfg(feature = "unstable_discord_api")]
-            Self::ApplicationCommandCreate, Self::ApplicationCommandCreate(e) => {
-                user_id: Never,
-                guild_id: e.application_command.guild_id.into(),
-                channel_id: Never,
-                message_id: Never,
-            },
-            #[cfg(feature = "unstable_discord_api")]
-            Self::ApplicationCommandUpdate, Self::ApplicationCommandUpdate(e) => {
-                user_id: Never,
-                guild_id: e.application_command.guild_id.into(),
-                channel_id: Never,
-                message_id: Never,
-            },
-            #[cfg(feature = "unstable_discord_api")]
-            Self::ApplicationCommandDelete, Self::ApplicationCommandDelete(e) => {
-                user_id: Never,
-                guild_id: e.application_command.guild_id.into(),
-                channel_id: Never,
-                message_id: Never,
-            },
         }
     };
 }
@@ -1347,15 +1279,6 @@ impl Event {
             Self::IntegrationUpdate(_) => EventType::IntegrationUpdate,
             #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationDelete(_) => EventType::IntegrationDelete,
-            #[cfg(feature = "unstable_discord_api")]
-            #[allow(deprecated)]
-            Self::ApplicationCommandCreate(_) => EventType::ApplicationCommandCreate,
-            #[cfg(feature = "unstable_discord_api")]
-            #[allow(deprecated)]
-            Self::ApplicationCommandUpdate(_) => EventType::ApplicationCommandUpdate,
-            #[cfg(feature = "unstable_discord_api")]
-            #[allow(deprecated)]
-            Self::ApplicationCommandDelete(_) => EventType::ApplicationCommandDelete,
             Self::StageInstanceCreate(_) => EventType::StageInstanceCreate,
             Self::StageInstanceUpdate(_) => EventType::StageInstanceUpdate,
             Self::StageInstanceDelete(_) => EventType::StageInstanceDelete,
@@ -1505,15 +1428,6 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::IntegrationUpdate => Event::IntegrationUpdate(from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
         EventType::IntegrationDelete => Event::IntegrationDelete(from_value(v)?),
-        #[cfg(feature = "unstable_discord_api")]
-        #[allow(deprecated)]
-        EventType::ApplicationCommandCreate => Event::ApplicationCommandCreate(from_value(v)?),
-        #[cfg(feature = "unstable_discord_api")]
-        #[allow(deprecated)]
-        EventType::ApplicationCommandUpdate => Event::ApplicationCommandUpdate(from_value(v)?),
-        #[cfg(feature = "unstable_discord_api")]
-        #[allow(deprecated)]
-        EventType::ApplicationCommandDelete => Event::ApplicationCommandDelete(from_value(v)?),
         EventType::StageInstanceCreate => Event::StageInstanceCreate(from_value(v)?),
         EventType::StageInstanceUpdate => Event::StageInstanceUpdate(from_value(v)?),
         EventType::StageInstanceDelete => Event::StageInstanceDelete(from_value(v)?),
@@ -1712,24 +1626,6 @@ pub enum EventType {
     /// This maps to [`IntegrationDeleteEvent`].
     #[cfg(feature = "unstable_discord_api")]
     IntegrationDelete,
-    /// Indicator that an application command was created.
-    ///
-    /// This maps to [`ApplicationCommandCreateEvent`].
-    #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    ApplicationCommandCreate,
-    /// Indicator that an application command was updated.
-    ///
-    /// This maps to [`ApplicationCommandUpdateEvent`].
-    #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    ApplicationCommandUpdate,
-    /// Indicator that an application command was deleted.
-    ///
-    /// This maps to [`ApplicationCommandDeleteEvent`].
-    #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    ApplicationCommandDelete,
     /// Indicator that a stage instance was created.
     ///
     /// This maps to [`StageInstanceCreateEvent`].
@@ -1883,12 +1779,6 @@ impl EventType {
     const INTEGRATION_UPDATE: &'static str = "INTEGRATION_UPDATE";
     #[cfg(feature = "unstable_discord_api")]
     const INTEGRATION_DELETE: &'static str = "INTEGRATION_DELETE";
-    #[cfg(feature = "unstable_discord_api")]
-    const APPLICATION_COMMAND_CREATE: &'static str = "APPLICATION_COMMAND_CREATE";
-    #[cfg(feature = "unstable_discord_api")]
-    const APPLICATION_COMMAND_UPDATE: &'static str = "APPLICATION_COMMAND_UPDATE";
-    #[cfg(feature = "unstable_discord_api")]
-    const APPLICATION_COMMAND_DELETE: &'static str = "APPLICATION_COMMAND_DELETE";
     const STAGE_INSTANCE_CREATE: &'static str = "STAGE_INSTANCE_CREATE";
     const STAGE_INSTANCE_UPDATE: &'static str = "STAGE_INSTANCE_UPDATE";
     const STAGE_INSTANCE_DELETE: &'static str = "STAGE_INSTANCE_DELETE";
@@ -1949,15 +1839,6 @@ impl EventType {
             Self::IntegrationUpdate => Some(Self::INTEGRATION_UPDATE),
             #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationDelete => Some(Self::INTEGRATION_DELETE),
-            #[cfg(feature = "unstable_discord_api")]
-            #[allow(deprecated)]
-            Self::ApplicationCommandCreate => Some(Self::APPLICATION_COMMAND_CREATE),
-            #[cfg(feature = "unstable_discord_api")]
-            #[allow(deprecated)]
-            Self::ApplicationCommandUpdate => Some(Self::APPLICATION_COMMAND_UPDATE),
-            #[cfg(feature = "unstable_discord_api")]
-            #[allow(deprecated)]
-            Self::ApplicationCommandDelete => Some(Self::APPLICATION_COMMAND_DELETE),
             Self::StageInstanceCreate => Some(Self::STAGE_INSTANCE_CREATE),
             Self::StageInstanceUpdate => Some(Self::STAGE_INSTANCE_UPDATE),
             Self::StageInstanceDelete => Some(Self::STAGE_INSTANCE_DELETE),
@@ -2042,15 +1923,6 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::INTEGRATION_UPDATE => EventType::IntegrationUpdate,
                     #[cfg(feature = "unstable_discord_api")]
                     EventType::INTEGRATION_DELETE => EventType::IntegrationDelete,
-                    #[cfg(feature = "unstable_discord_api")]
-                    #[allow(deprecated)]
-                    EventType::APPLICATION_COMMAND_CREATE => EventType::ApplicationCommandCreate,
-                    #[cfg(feature = "unstable_discord_api")]
-                    #[allow(deprecated)]
-                    EventType::APPLICATION_COMMAND_UPDATE => EventType::ApplicationCommandUpdate,
-                    #[cfg(feature = "unstable_discord_api")]
-                    #[allow(deprecated)]
-                    EventType::APPLICATION_COMMAND_DELETE => EventType::ApplicationCommandDelete,
                     EventType::STAGE_INSTANCE_CREATE => EventType::StageInstanceCreate,
                     EventType::STAGE_INSTANCE_UPDATE => EventType::StageInstanceUpdate,
                     EventType::STAGE_INSTANCE_DELETE => EventType::StageInstanceDelete,

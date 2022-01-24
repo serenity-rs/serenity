@@ -1130,7 +1130,7 @@ mod test {
             topic: None,
             user_limit: None,
             nsfw: false,
-            slow_mode_rate: Some(0),
+            rate_limit_per_user: Some(0),
             rtc_region: None,
             video_quality_mode: None,
             message_count: None,
@@ -1154,7 +1154,6 @@ mod test {
             let mut channels = HashMap::new();
             channels.insert(ChannelId(2), channel);
 
-            #[allow(deprecated)]
             GuildCreateEvent {
                 guild: Guild {
                     id: GuildId(1),
@@ -1174,7 +1173,6 @@ mod test {
                     name: String::new(),
                     owner_id: UserId(3),
                     presences: HashMap::new(),
-                    region: String::new(),
                     roles: HashMap::new(),
                     splash: None,
                     discovery_splash: None,
@@ -1194,7 +1192,6 @@ mod test {
                     welcome_screen: None,
                     approximate_member_count: None,
                     approximate_presence_count: None,
-                    nsfw: false,
                     nsfw_level: NsfwLevel::Default,
                     max_video_channel_users: None,
                     max_presences: None,

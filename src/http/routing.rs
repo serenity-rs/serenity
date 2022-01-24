@@ -140,12 +140,6 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdThreadMembers(u64),
-    /// Route for the `/channels/:channel_id/threads/active` path.
-    ///
-    /// The data is the relevant [`ChannelId`].
-    ///
-    /// [`ChannelId`]: crate::model::id::ChannelId
-    ChannelsIdActiveThreads(u64),
     /// Route for the `/channels/:channel_id/threads/archived/public` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -580,10 +574,6 @@ impl Route {
 
     pub fn channel_thread_members(channel_id: u64) -> String {
         api!("/channels/{}/thread-members", channel_id)
-    }
-
-    pub fn channel_active_threads(channel_id: u64) -> String {
-        api!("/channels/{}/threads/active", channel_id)
     }
 
     #[allow(clippy::let_underscore_must_use)]
@@ -1380,9 +1370,6 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
     },
     GetChannelThreadMembers {
-        channel_id: u64,
-    },
-    GetChannelActiveThreads {
         channel_id: u64,
     },
     GetChannelArchivedPublicThreads {
@@ -2273,13 +2260,6 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::ChannelsIdThreadMembers(channel_id),
                 Cow::from(Route::channel_thread_members(channel_id)),
-            ),
-            RouteInfo::GetChannelActiveThreads {
-                channel_id,
-            } => (
-                LightMethod::Get,
-                Route::ChannelsIdActiveThreads(channel_id),
-                Cow::from(Route::channel_active_threads(channel_id)),
             ),
             RouteInfo::GetChannelArchivedPublicThreads {
                 channel_id,

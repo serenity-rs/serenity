@@ -125,33 +125,6 @@ impl EditGuild {
         self.0.insert("owner_id", id);
     }
 
-    /// Set the voice region of the server.
-    ///
-    /// # Examples
-    ///
-    /// Setting the region to [`Region::UsWest`]:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::{http::Http, model::id::GuildId};
-    /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
-    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
-    /// use serenity::model::guild::Region;
-    ///
-    /// // assuming a `guild` has already been bound
-    ///
-    /// guild.edit(&http, |g| g.region(Region::UsWest)).await?;
-    /// #     Ok(())
-    /// # }
-    /// ```
-    #[deprecated(note = "Regions are now set per voice channel instead of globally.")]
-    #[allow(deprecated)]
-    pub fn region(&mut self, region: Region) -> &mut Self {
-        self.0.insert("region", Value::from(region.name().to_string()));
-        self
-    }
-
     /// Set the splash image of the guild on the invitation page.
     ///
     /// The `splash` must be base64-encoded 1024x1024 png/jpeg/gif image-data.
