@@ -1,10 +1,10 @@
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
 
-use crate::internal::is_false;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::id::AttachmentId;
+use crate::model::utils::is_false;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
