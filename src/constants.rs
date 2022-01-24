@@ -32,7 +32,6 @@ pub const USER_AGENT: &str = concat!(
 );
 
 /// List of messages Discord shows on member join.
-#[allow(clippy::non_ascii_literal)] // allow for discord join messages
 pub static JOIN_MESSAGES: &[&str] = &[
     "$user joined the party.",
     "$user is here.",
