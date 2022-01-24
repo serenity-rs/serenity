@@ -874,33 +874,6 @@
 <span id="869">869</span>
 <span id="870">870</span>
 <span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
-<span id="877">877</span>
-<span id="878">878</span>
-<span id="879">879</span>
-<span id="880">880</span>
-<span id="881">881</span>
-<span id="882">882</span>
-<span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
-<span id="886">886</span>
-<span id="887">887</span>
-<span id="888">888</span>
-<span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
-<span id="892">892</span>
-<span id="893">893</span>
-<span id="894">894</span>
-<span id="895">895</span>
-<span id="896">896</span>
-<span id="897">897</span>
-<span id="898">898</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -1702,33 +1675,6 @@
                 <span class="ident">event_handler</span>
                     .<span class="ident">integration_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">id</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">application_id</span>)
                     .<span class="kw">await</span>;
-            });
-        },
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ApplicationCommandCreate</span>(<span class="ident">event</span>)) =&gt; {
-            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
-
-            <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::application_command_create&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">application_command_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">application_command</span>).<span class="kw">await</span>;
-            });
-        },
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ApplicationCommandUpdate</span>(<span class="ident">event</span>)) =&gt; {
-            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
-
-            <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::application_command_update&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">application_command_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">application_command</span>).<span class="kw">await</span>;
-            });
-        },
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-        <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::ApplicationCommandDelete</span>(<span class="ident">event</span>)) =&gt; {
-            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
-
-            <span class="ident">spawn_named</span>(<span class="string">&quot;dispatch::event_handler::application_command_delete&quot;</span>, <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">application_command_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">application_command</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::StageInstanceCreate</span>(<span class="ident">event</span>)) =&gt; {

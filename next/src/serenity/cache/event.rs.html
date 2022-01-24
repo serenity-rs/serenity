@@ -725,12 +725,6 @@
 <span id="720">720</span>
 <span id="721">721</span>
 <span id="722">722</span>
-<span id="723">723</span>
-<span id="724">724</span>
-<span id="725">725</span>
-<span id="726">726</span>
-<span id="727">727</span>
-<span id="728">728</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
@@ -1158,12 +1152,6 @@
             <span class="ident">guild</span>.<span class="ident">splash</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">splash</span>);
             <span class="ident">guild</span>.<span class="ident">vanity_url_code</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">vanity_url_code</span>);
             <span class="ident">guild</span>.<span class="ident">welcome_screen</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">welcome_screen</span>);
-
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-            {
-                <span class="ident">guild</span>.<span class="ident">region</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">region</span>);
-            }
-
             <span class="ident">guild</span>.<span class="ident">default_message_notifications</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">default_message_notifications</span>;
             <span class="ident">guild</span>.<span class="ident">max_members</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">max_members</span>;
             <span class="ident">guild</span>.<span class="ident">max_presences</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">max_presences</span>;

@@ -526,42 +526,6 @@
 <span id="521">521</span>
 <span id="522">522</span>
 <span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -570,7 +534,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::event</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{<span class="ident">application_command::ApplicationCommand</span>, <span class="ident">Interaction</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// The core trait for handling events by serenity.</span>
@@ -1019,42 +983,6 @@
         <span class="ident">_integration_id</span>: <span class="ident">IntegrationId</span>,
         <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>,
         <span class="ident">_application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
-    ) {
-    }
-
-    <span class="doccomment">/// Dispatched when an application command is created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the created application command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_create</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_application_command</span>: <span class="ident">ApplicationCommand</span>,
-    ) {
-    }
-
-    <span class="doccomment">/// Dispatched when an application command is updated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the updated application command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_update</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_application_command</span>: <span class="ident">ApplicationCommand</span>,
-    ) {
-    }
-
-    <span class="doccomment">/// Dispatched when an application command is deleted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the deleted application command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.10.10&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;bots do no receive this event&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">application_command_delete</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_ctx</span>: <span class="ident">Context</span>,
-        <span class="ident">_application_command</span>: <span class="ident">ApplicationCommand</span>,
     ) {
     }
 

@@ -3806,37 +3806,6 @@
 <span id="3801">3801</span>
 <span id="3802">3802</span>
 <span id="3803">3803</span>
-<span id="3804">3804</span>
-<span id="3805">3805</span>
-<span id="3806">3806</span>
-<span id="3807">3807</span>
-<span id="3808">3808</span>
-<span id="3809">3809</span>
-<span id="3810">3810</span>
-<span id="3811">3811</span>
-<span id="3812">3812</span>
-<span id="3813">3813</span>
-<span id="3814">3814</span>
-<span id="3815">3815</span>
-<span id="3816">3816</span>
-<span id="3817">3817</span>
-<span id="3818">3818</span>
-<span id="3819">3819</span>
-<span id="3820">3820</span>
-<span id="3821">3821</span>
-<span id="3822">3822</span>
-<span id="3823">3823</span>
-<span id="3824">3824</span>
-<span id="3825">3825</span>
-<span id="3826">3826</span>
-<span id="3827">3827</span>
-<span id="3828">3828</span>
-<span id="3829">3829</span>
-<span id="3830">3830</span>
-<span id="3831">3831</span>
-<span id="3832">3832</span>
-<span id="3833">3833</span>
-<span id="3834">3834</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 
@@ -4429,7 +4398,6 @@
     <span class="doccomment">/// #    let http = Http::default();</span>
     <span class="doccomment">/// let map = json!({</span>
     <span class="doccomment">///     &quot;name&quot;: &quot;test&quot;,</span>
-    <span class="doccomment">///     &quot;region&quot;: &quot;us-west&quot;,</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let _result = http.create_guild(&amp;map).await?;</span>
@@ -4439,7 +4407,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
     <span class="doccomment">/// [GameBridge]: https://discord.com/developers/docs/topics/gamebridge</span>
-    <span class="doccomment">/// [US West Region]: Region::UsWest</span>
     <span class="doccomment">/// [documentation on this endpoint]:</span>
     <span class="doccomment">/// https://discord.com/developers/docs/resources/guild#create-guild</span>
     <span class="doccomment">/// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild</span>
@@ -6176,20 +6143,6 @@
         .<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Gets all active threads from a channel.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use get_guild_active_threads instead&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_channel_active_threads</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ThreadsData</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">None</span>,
-            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
-            <span class="ident">route</span>: <span class="ident">RouteInfo::GetChannelActiveThreads</span> {
-                <span class="ident">channel_id</span>,
-            },
-        })
-        .<span class="kw">await</span>
-    }
-
     <span class="doccomment">/// Gets all archived public threads from a channel.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_channel_archived_public_threads</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -6565,21 +6518,6 @@
                 <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
                 <span class="ident">guild_id</span>,
                 <span class="ident">command_id</span>,
-            },
-        })
-        .<span class="kw">await</span>
-    }
-
-    <span class="doccomment">/// Gets a guild embed information.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;get_guild_embed was renamed to get_guild_widget&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_embed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildEmbed</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
-            <span class="ident">body</span>: <span class="prelude-val">None</span>,
-            <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
-            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
-            <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildWidget</span> {
-                <span class="ident">guild_id</span>,
             },
         })
         .<span class="kw">await</span>

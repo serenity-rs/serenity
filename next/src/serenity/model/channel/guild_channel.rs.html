@@ -1323,7 +1323,6 @@
 <span id="1318">1318</span>
 <span id="1319">1319</span>
 <span id="1320">1320</span>
-<span id="1321">1321</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1371,7 +1370,7 @@
 <span class="doccomment">/// Represents a guild&#39;s text, news, or voice channel. Some methods are available</span>
 <span class="doccomment">/// only for voice channels and some are only available for text channels.</span>
 <span class="doccomment">/// News channels are a subset of text channels and lack slow mode hence</span>
-<span class="doccomment">/// [`Self::slow_mode_rate`] will be [`None`].</span>
+<span class="doccomment">/// [`Self::rate_limit_per_user`] will be [`None`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildChannel</span> {
@@ -1435,9 +1434,8 @@
     <span class="doccomment">/// **Note**: This is only available for text channels excluding news</span>
     <span class="doccomment">/// channels.</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;slowmode&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;will be renamed to `rate_limit_per_user` with serenity 0.11&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;rate_limit_per_user&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">slow_mode_rate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">rate_limit_per_user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The region override.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is only available for voice and stage channels. [`None`]</span>

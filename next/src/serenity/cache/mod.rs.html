@@ -1227,9 +1227,6 @@
 <span id="1222">1222</span>
 <span id="1223">1223</span>
 <span id="1224">1224</span>
-<span id="1225">1225</span>
-<span id="1226">1226</span>
-<span id="1227">1227</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -2362,7 +2359,7 @@
             <span class="ident">topic</span>: <span class="prelude-val">None</span>,
             <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
             <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
-            <span class="ident">slow_mode_rate</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+            <span class="ident">rate_limit_per_user</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
             <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
             <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
             <span class="ident">message_count</span>: <span class="prelude-val">None</span>,
@@ -2386,7 +2383,6 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
             <span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">ChannelId</span>(<span class="number">2</span>), <span class="ident">channel</span>);
 
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
             <span class="ident">GuildCreateEvent</span> {
                 <span class="ident">guild</span>: <span class="ident">Guild</span> {
                     <span class="ident">id</span>: <span class="ident">GuildId</span>(<span class="number">1</span>),
@@ -2406,7 +2402,6 @@
                     <span class="ident">name</span>: <span class="ident">String::new</span>(),
                     <span class="ident">owner_id</span>: <span class="ident">UserId</span>(<span class="number">3</span>),
                     <span class="ident">presences</span>: <span class="ident">HashMap::new</span>(),
-                    <span class="ident">region</span>: <span class="ident">String::new</span>(),
                     <span class="ident">roles</span>: <span class="ident">HashMap::new</span>(),
                     <span class="ident">splash</span>: <span class="prelude-val">None</span>,
                     <span class="ident">discovery_splash</span>: <span class="prelude-val">None</span>,
@@ -2426,7 +2421,6 @@
                     <span class="ident">welcome_screen</span>: <span class="prelude-val">None</span>,
                     <span class="ident">approximate_member_count</span>: <span class="prelude-val">None</span>,
                     <span class="ident">approximate_presence_count</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
                     <span class="ident">nsfw_level</span>: <span class="ident">NsfwLevel::Default</span>,
                     <span class="ident">max_video_channel_users</span>: <span class="prelude-val">None</span>,
                     <span class="ident">max_presences</span>: <span class="prelude-val">None</span>,

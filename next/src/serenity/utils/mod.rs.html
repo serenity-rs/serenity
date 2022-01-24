@@ -1046,9 +1046,6 @@
 <span id="1041">1041</span>
 <span id="1042">1042</span>
 <span id="1043">1043</span>
-<span id="1044">1044</span>
-<span id="1045">1045</span>
-<span id="1046">1046</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -1885,7 +1882,6 @@
             <span class="ident">accent_colour</span>: <span class="prelude-val">None</span>,
         };
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild</span> <span class="op">=</span> <span class="ident">Guild</span> {
             <span class="ident">afk_channel_id</span>: <span class="prelude-val">None</span>,
             <span class="ident">afk_timeout</span>: <span class="number">0</span>,
@@ -1905,7 +1901,6 @@
             <span class="ident">name</span>: <span class="string">&quot;serenity&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">owner_id</span>: <span class="ident">UserId</span>(<span class="number">114941315417899012</span>),
             <span class="ident">presences</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">region</span>: <span class="string">&quot;Ferris Island&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">roles</span>: <span class="ident">HashMap::new</span>(),
             <span class="ident">splash</span>: <span class="prelude-val">None</span>,
             <span class="ident">discovery_splash</span>: <span class="prelude-val">None</span>,
@@ -1924,7 +1919,6 @@
             <span class="ident">welcome_screen</span>: <span class="prelude-val">None</span>,
             <span class="ident">approximate_member_count</span>: <span class="prelude-val">None</span>,
             <span class="ident">approximate_presence_count</span>: <span class="prelude-val">None</span>,
-            <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
             <span class="ident">nsfw_level</span>: <span class="ident">NsfwLevel::Default</span>,
             <span class="ident">max_video_channel_users</span>: <span class="prelude-val">None</span>,
             <span class="ident">max_presences</span>: <span class="prelude-val">None</span>,
@@ -1981,7 +1975,7 @@
             <span class="ident">topic</span>: <span class="prelude-val">None</span>,
             <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
             <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
-            <span class="ident">slow_mode_rate</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+            <span class="ident">rate_limit_per_user</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
             <span class="ident">rtc_region</span>: <span class="prelude-val">None</span>,
             <span class="ident">video_quality_mode</span>: <span class="prelude-val">None</span>,
             <span class="ident">message_count</span>: <span class="prelude-val">None</span>,

@@ -306,33 +306,6 @@
 <span id="301">301</span>
 <span id="302">302</span>
 <span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
@@ -458,33 +431,6 @@
     <span class="kw">fn</span> <span class="ident">_owner</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>) {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">from_number</span>(<span class="ident">user_id</span>.<span class="number">0</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;owner_id&quot;</span>, <span class="ident">id</span>);
-    }
-
-    <span class="doccomment">/// Set the voice region of the server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting the region to [`Region::UsWest`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::{http::Http, model::id::GuildId};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
-    <span class="doccomment">/// #     let mut guild = GuildId(0).to_partial_guild(&amp;http).await?;</span>
-    <span class="doccomment">/// use serenity::model::guild::Region;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // assuming a `guild` has already been bound</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// guild.edit(&amp;http, |g| g.region(Region::UsWest)).await?;</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Regions are now set per voice channel instead of globally.&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">region</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">region</span>: <span class="ident">Region</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;region&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">region</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()));
-        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the splash image of the guild on the invitation page.</span>
