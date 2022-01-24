@@ -8,7 +8,3 @@ pub mod ws_impl;
 
 #[cfg(any(feature = "tokio", feature = "tokio_compat"))]
 pub mod tokio;
-
-pub fn is_false(b: &bool) -> bool {
-    !b
-}
