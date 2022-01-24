@@ -404,7 +404,7 @@ impl ShardRunner {
                     self.shard.chunk_guild(guild_id, limit, filter, nonce.as_deref()).await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::Close(code, reason)) => {
-                    let reason = reason.unwrap_or_else(String::new);
+                    let reason = reason.unwrap_or_default();
                     let close = CloseFrame {
                         code: code.into(),
                         reason: Cow::from(reason),

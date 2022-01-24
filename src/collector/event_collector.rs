@@ -109,6 +109,7 @@ impl EventFilter {
     /// Checks if the `event` passes set constraints.
     /// Constraints are optional, as it is possible to limit events to
     /// be sent by a specific user or in a specifc guild.
+    #[allow(clippy::wrong_self_convention)]
     fn is_passing_constraints(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
         fn empty_or_any<T, F>(slice: &[T], f: F) -> bool
         where
