@@ -2,13 +2,8 @@
 
 use std::fmt;
 
-use bitflags::__impl_bitflags;
-use serde::de::{Deserialize, Deserializer};
-use serde::ser::{Serialize, Serializer};
-
 use super::id::{snowflake, ApplicationId, UserId};
 use super::{user::User, utils::*};
-use crate::model::StdResult;
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
@@ -183,11 +178,19 @@ enum_number!(MembershipState {
     Accepted
 });
 
-/// The flags of the application.
-#[derive(Clone)]
-#[non_exhaustive]
-pub struct ApplicationFlags {
-    bits: u64,
+bitflags! {
+    /// The flags of the application.
+    #[derive(Default)]
+    pub struct ApplicationFlags: u64 {
+        const GATEWAY_PRESENCE = 1 << 12;
+        const GATEWAY_PRESENCE_LIMITED = 1 << 13;
+        const GATEWAY_GUILD_MEMBERS = 1 << 14;
+        const GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15;
+        const VERIFICATION_PENDING_GUILD_LIMIT = 2 << 16;
+        const EMBEDDED = 2 << 17;
+        const GATEWAY_MESSAGE_CONTENT = 2 << 18;
+        const GATEWAY_MESSAGE_CONTENT_LIMITED = 2 << 19;
+    }
 }
 
 impl ApplicationFlags {
@@ -195,30 +198,5 @@ impl ApplicationFlags {
         Self {
             bits,
         }
-    }
-}
-
-__impl_bitflags! {
-    ApplicationFlags: u64 {
-        GATEWAY_PRESENCE = 1 << 12;
-        GATEWAY_PRESENCE_LIMITED = 1 << 13;
-        GATEWAY_GUILD_MEMBERS = 1 << 14;
-        GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15;
-        VERIFICATION_PENDING_GUILD_LIMIT = 2 << 16;
-        EMBEDDED = 2 << 17;
-        GATEWAY_MESSAGE_CONTENT = 2 << 18;
-        GATEWAY_MESSAGE_CONTENT_LIMITED = 2 << 19;
-    }
-}
-
-impl<'de> Deserialize<'de> for ApplicationFlags {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        Ok(Self::from_bits_truncate(u64::deserialize(deserializer)?))
-    }
-}
-
-impl Serialize for ApplicationFlags {
-    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
-        serializer.serialize_u64(self.bits())
     }
 }
