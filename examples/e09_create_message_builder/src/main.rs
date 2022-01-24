@@ -2,6 +2,7 @@ use std::env;
 
 use serenity::{
     async_trait,
+    model::Timestamp,
     model::{channel::Message, gateway::Ready},
     prelude::*,
 };
@@ -32,7 +33,7 @@ impl EventHandler for Handler {
                                 .footer(|f| f.text("This is a footer"))
                                 // Add a timestamp for the current time
                                 // This also accepts a rfc3339 Timestamp
-                                .timestamp(chrono::Utc::now())
+                                .timestamp(Timestamp::now())
                         })
                         .add_file("./ferris_eyes.png")
                 })
