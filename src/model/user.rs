@@ -67,6 +67,7 @@ pub(crate) mod discriminator {
         deserializer.deserialize_any(DiscriminatorVisitor)
     }
 
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S: Serializer>(value: &u16, serializer: S) -> Result<S::Ok, S::Error> {
         serializer.collect_str(&format_args!("{:04}", value))
     }
@@ -126,6 +127,7 @@ pub(crate) mod discriminator {
             deserializer.deserialize_option(OptionalDiscriminatorVisitor)
         }
 
+        #[allow(clippy::trivially_copy_pass_by_ref)]
         pub fn serialize<S: Serializer>(
             value: &Option<u16>,
             serializer: S,
