@@ -6,7 +6,7 @@ use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use crate::json::Value;
 #[cfg(feature = "unstable_discord_api")]
-use crate::model::interactions::{application_command::ApplicationCommand, Interaction};
+use crate::model::interactions::Interaction;
 use crate::model::prelude::*;
 
 /// The core trait for handling events by serenity.
@@ -455,42 +455,6 @@ pub trait EventHandler: Send + Sync {
         _integration_id: IntegrationId,
         _guild_id: GuildId,
         _application_id: Option<ApplicationId>,
-    ) {
-    }
-
-    /// Dispatched when an application command is created.
-    ///
-    /// Provides the created application command.
-    #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    async fn application_command_create(
-        &self,
-        _ctx: Context,
-        _application_command: ApplicationCommand,
-    ) {
-    }
-
-    /// Dispatched when an application command is updated.
-    ///
-    /// Provides the updated application command.
-    #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    async fn application_command_update(
-        &self,
-        _ctx: Context,
-        _application_command: ApplicationCommand,
-    ) {
-    }
-
-    /// Dispatched when an application command is deleted.
-    ///
-    /// Provides the deleted application command.
-    #[cfg(feature = "unstable_discord_api")]
-    #[deprecated(since = "0.10.10", note = "bots do no receive this event")]
-    async fn application_command_delete(
-        &self,
-        _ctx: Context,
-        _application_command: ApplicationCommand,
     ) {
     }
 

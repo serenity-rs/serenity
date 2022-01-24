@@ -22,26 +22,6 @@ pub use emoji::*;
 use crate::model::prelude::*;
 use crate::prelude::*;
 
-#[deprecated(note = "Superseded by ArgumentConvert trait")]
-#[async_trait::async_trait]
-pub trait Parse: Sized {
-    /// The associated error which can be returned from parsing.
-    type Err;
-
-    /// Parses a string `s` as a command parameter of this type.
-    async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err>;
-}
-
-#[allow(deprecated)]
-#[async_trait::async_trait]
-impl<T: ArgumentConvert> Parse for T {
-    type Err = <T as ArgumentConvert>::Err;
-
-    async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
-        Self::convert(ctx, msg.guild_id, Some(msg.channel_id), s).await
-    }
-}
-
 /// Parse a value from a string in context of a received message.
 ///
 /// This trait is a superset of [`std::str::FromStr`]. The
