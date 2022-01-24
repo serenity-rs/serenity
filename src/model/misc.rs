@@ -422,7 +422,7 @@ mod test {
                 topic: None,
                 user_limit: None,
                 nsfw: false,
-                slow_mode_rate: Some(0),
+                rate_limit_per_user: Some(0),
                 rtc_region: None,
                 video_quality_mode: None,
                 message_count: None,
