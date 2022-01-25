@@ -611,7 +611,7 @@ impl Framework for StandardFramework {
 
         let mut stream = Stream::new(&msg.content);
 
-        stream.take_while_char(|c| c.is_whitespace());
+        stream.take_while_char(char::is_whitespace);
 
         let prefix = parse::prefix(&ctx, &msg, &mut stream, &self.config).await;
 

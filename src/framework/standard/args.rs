@@ -349,7 +349,7 @@ impl Args {
                 Delimiter::Single(c) => message.contains(*c),
                 Delimiter::Multiple(s) => message.contains(s),
             })
-            .map(|delim| delim.to_str())
+            .map(Delimiter::to_str)
             .collect::<Vec<_>>();
 
         let args = if delims.is_empty() && !message.is_empty() {

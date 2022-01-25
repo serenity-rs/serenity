@@ -193,7 +193,7 @@ impl AttributeOption for bool {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::Name, ValueKind::SingleList])?;
 
-        Ok(values.literals.get(0).map_or(true, |l| l.to_bool()))
+        Ok(values.literals.get(0).map_or(true, LitExt::to_bool))
     }
 }
 
@@ -211,7 +211,7 @@ impl AttributeOption for Vec<Ident> {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::List])?;
 
-        Ok(values.literals.into_iter().map(|l| l.to_ident()).collect())
+        Ok(values.literals.iter().map(LitExt::to_ident).collect())
     }
 }
 
@@ -219,7 +219,7 @@ impl AttributeOption for Option<String> {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::Name, ValueKind::Equals, ValueKind::SingleList])?;
 
-        Ok(values.literals.get(0).map(|l| l.to_str()))
+        Ok(values.literals.get(0).map(LitExt::to_str))
     }
 }
 

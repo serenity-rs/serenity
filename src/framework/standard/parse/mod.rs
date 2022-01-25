@@ -220,7 +220,7 @@ pub async fn prefix<'a>(
     config: &Configuration,
 ) -> Option<Cow<'a, str>> {
     if let Some(id) = mention(stream, config) {
-        stream.take_while_char(|c| c.is_whitespace());
+        stream.take_while_char(char::is_whitespace);
 
         return Some(Cow::Borrowed(id));
     }
@@ -232,7 +232,7 @@ pub async fn prefix<'a>(
     }
 
     if config.with_whitespace.prefixes {
-        stream.take_while_char(|c| c.is_whitespace());
+        stream.take_while_char(char::is_whitespace);
     }
 
     prefix
@@ -299,7 +299,7 @@ fn try_parse<M: ParseMap>(
     f: impl Fn(&str) -> String,
 ) -> (String, Option<M::Storage>) {
     if by_space {
-        let n = f(stream.peek_until_char(|c| c.is_whitespace()));
+        let n = f(stream.peek_until_char(char::is_whitespace));
 
         let o = map.get(&n);
 
@@ -344,7 +344,7 @@ fn parse_cmd<'a>(
             stream.increment(n.len());
 
             if config.with_whitespace.commands {
-                stream.take_while_char(|c| c.is_whitespace());
+                stream.take_while_char(char::is_whitespace);
             }
 
             check_discrepancy(ctx, msg, config, &cmd.options).await.map_err(|e| {
@@ -383,7 +383,7 @@ fn parse_group<'a>(
             stream.increment(n.len());
 
             if config.with_whitespace.groups {
-                stream.take_while_char(|c| c.is_whitespace());
+                stream.take_while_char(char::is_whitespace);
             }
 
             check_discrepancy(ctx, msg, config, &group.options).await.map_err(|e| {
@@ -490,7 +490,7 @@ pub async fn command(
             if name == &n {
                 stream.increment(n.len());
 
-                stream.take_while_char(|c| c.is_whitespace());
+                stream.take_while_char(char::is_whitespace);
 
                 return Ok(Invoke::Help(name));
             }

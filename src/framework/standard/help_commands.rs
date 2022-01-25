@@ -817,7 +817,7 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
                         .options
                         .description
                         .as_ref()
-                        .map(|s| s.to_string())
+                        .map(ToString::to_string)
                         .unwrap_or_default(),
                     groups: vec![single_group],
                 });

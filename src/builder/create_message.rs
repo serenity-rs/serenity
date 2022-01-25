@@ -186,7 +186,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.2.extend(files.into_iter().map(|f| f.into()));
+        self.2.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -199,7 +199,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.2 = files.into_iter().map(|f| f.into()).collect();
+        self.2 = files.into_iter().map(Into::into).collect();
         self
     }
 

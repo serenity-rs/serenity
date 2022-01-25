@@ -120,7 +120,7 @@ fn try_resolve(
 
             if let Some(user) = resolved.users.get(&UserId(id)) {
                 let user = user.to_owned();
-                let member = resolved.members.get(&UserId(id)).map(|m| m.to_owned());
+                let member = resolved.members.get(&UserId(id)).map(ToOwned::to_owned);
 
                 Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
             } else {

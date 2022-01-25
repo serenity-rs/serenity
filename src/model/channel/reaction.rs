@@ -434,7 +434,7 @@ impl ReactionType {
                 ref name,
                 ..
             } => {
-                format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id)
+                format!("{}:{}", name.as_ref().map_or("", String::as_str), id)
             },
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
@@ -659,7 +659,7 @@ impl fmt::Display for ReactionType {
                 } else {
                     f.write_str("<:")?;
                 }
-                f.write_str(name.as_ref().map_or("", |s| s.as_str()))?;
+                f.write_str(name.as_ref().map_or("", String::as_str))?;
                 f.write_char(':')?;
                 fmt::Display::fmt(&id, f)?;
                 f.write_char('>')

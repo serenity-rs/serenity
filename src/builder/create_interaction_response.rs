@@ -81,7 +81,7 @@ impl<'a> CreateInteractionResponseData<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1.extend(files.into_iter().map(|f| f.into()));
+        self.1.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -93,7 +93,7 @@ impl<'a> CreateInteractionResponseData<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1 = files.into_iter().map(|f| f.into()).collect();
+        self.1 = files.into_iter().map(Into::into).collect();
         self
     }
 
