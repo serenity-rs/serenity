@@ -852,9 +852,9 @@ impl User {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
+    pub async fn direct_message<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where
-        for<'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
     {
         self.create_dm_channel(&cache_http).await?.send_message(&cache_http.http(), f).await
     }
@@ -862,9 +862,9 @@ impl User {
     /// This is an alias of [`Self::direct_message`].
     #[allow(clippy::missing_errors_doc)]
     #[inline]
-    pub async fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
+    pub async fn dm<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where
-        for<'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
     {
         self.direct_message(cache_http, f).await
     }
