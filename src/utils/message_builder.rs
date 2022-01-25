@@ -995,13 +995,13 @@ impl EmbedMessageBuilding for MessageBuilder {
         self.0.push('[');
         {
             let mut c = name.into();
-            c.inner = normalize(&c.inner).replace("]", " ");
+            c.inner = normalize(&c.inner).replace(']', " ");
             self.0.push_str(&c.to_string());
         }
         self.0.push_str("](");
         {
             let mut c = url.into();
-            c.inner = normalize(&c.inner).replace(")", " ");
+            c.inner = normalize(&c.inner).replace(')', " ");
             self.0.push_str(&c.to_string());
         }
         self.0.push(')');
