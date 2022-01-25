@@ -895,13 +895,13 @@ pub async fn create_customised_help_data<'a>(
     }
 
     let strikethrough_command_tip = if msg.is_private() {
-        &help_options.strikethrough_commands_tip_in_dm
+        help_options.strikethrough_commands_tip_in_dm
     } else {
-        &help_options.strikethrough_commands_tip_in_guild
+        help_options.strikethrough_commands_tip_in_guild
     };
 
-    let description = if let Some(ref strikethrough_command_text) = strikethrough_command_tip {
-        format!("{}\n{}", &help_options.individual_command_tip, &strikethrough_command_text)
+    let description = if let Some(strikethrough_command_text) = strikethrough_command_tip {
+        format!("{}\n{}", help_options.individual_command_tip, strikethrough_command_text)
     } else {
         help_options.individual_command_tip.to_string()
     };
@@ -1064,11 +1064,11 @@ async fn send_single_command_embed(
                 embed.title(&command.name);
                 embed.colour(colour);
 
-                if let Some(ref desc) = command.description {
+                if let Some(desc) = command.description {
                     embed.description(desc);
                 }
 
-                if let Some(ref usage) = command.usage {
+                if let Some(usage) = command.usage {
                     let full_usage_text = if let Some(first_prefix) = command.group_prefixes.get(0)
                     {
                         format!("`{} {} {}`", first_prefix, command.name, usage)
@@ -1306,11 +1306,11 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
         );
     }
 
-    if let Some(ref description) = command.description {
+    if let Some(description) = command.description {
         let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
     };
 
-    if let Some(ref usage) = command.usage {
+    if let Some(usage) = command.usage {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
             let _ = writeln!(
                 result,
