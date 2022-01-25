@@ -1621,6 +1621,32 @@
 <span id="1616">1616</span>
 <span id="1617">1617</span>
 <span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Example</span>
@@ -1675,7 +1701,6 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Borrow</span>,
     <span class="ident">collections::HashSet</span>,
     <span class="ident">fmt::Write</span>,
     <span class="ident">ops</span>::{<span class="ident">Index</span>, <span class="ident">IndexMut</span>},
@@ -1776,24 +1801,22 @@
 
     <span class="doccomment">/// Concats names of suggestions with a given `separator`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">separator</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_vec</span>().<span class="ident">iter</span>();
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_vec</span>().<span class="ident">as_slice</span>() {
+            [] =&gt; <span class="ident">String::new</span>(),
+            [<span class="ident">one</span>] =&gt; <span class="ident">one</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+            [<span class="ident">first</span>, <span class="ident">rest</span> @ ..] =&gt; {
+                <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">first</span>.<span class="ident">name</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">rest</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">name</span>.<span class="ident">len</span>()).<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>();
+                <span class="kw">let</span> <span class="ident">sep_size</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">separator</span>.<span class="ident">len</span>();
 
-        <span class="kw">let</span> <span class="ident">first_iter_element</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">first_iter_element</span>) =&gt; <span class="ident">first_iter_element</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">String::new</span>(),
-        };
-
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_vec</span>().<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">total_size</span>, <span class="ident">size</span><span class="op">|</span> <span class="ident">total_size</span> <span class="op">+</span> <span class="ident">size</span>.<span class="ident">name</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="ident">byte_len_of_sep</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_vec</span>().<span class="ident">len</span>().<span class="ident">saturating_sub</span>(<span class="number">1</span>) <span class="op">*</span> <span class="ident">separator</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">size</span> <span class="op">+</span> <span class="ident">byte_len_of_sep</span>);
-        <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">first_iter_element</span>.<span class="ident">name</span>.<span class="ident">borrow</span>());
-
-        <span class="kw">for</span> <span class="ident">element</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">separator</span>);
-            <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">element</span>.<span class="ident">name</span>.<span class="ident">borrow</span>());
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joined</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">size</span> <span class="op">+</span> <span class="ident">sep_size</span>);
+                <span class="ident">joined</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">first</span>.<span class="ident">name</span>);
+                <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">rest</span> {
+                    <span class="ident">joined</span>.<span class="ident">push_str</span>(<span class="ident">separator</span>);
+                    <span class="ident">joined</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">name</span>);
+                }
+                <span class="ident">joined</span>
+            },
         }
-
-        <span class="ident">result</span>
     }
 }
 
@@ -3154,6 +3177,35 @@
     };
 
     <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">result</span>).<span class="kw">await</span>
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">SuggestedCommandName</span>, <span class="ident">Suggestions</span>};
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">suggestions_join</span>() {
+        <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="macro">vec!</span>[
+            <span class="ident">SuggestedCommandName</span> {
+                <span class="ident">name</span>: <span class="string">&quot;aa&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">levenshtein_distance</span>: <span class="number">0</span>,
+            },
+            <span class="ident">SuggestedCommandName</span> {
+                <span class="ident">name</span>: <span class="string">&quot;bbb&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">levenshtein_distance</span>: <span class="number">0</span>,
+            },
+            <span class="ident">SuggestedCommandName</span> {
+                <span class="ident">name</span>: <span class="string">&quot;cccc&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">levenshtein_distance</span>: <span class="number">0</span>,
+            },
+        ];
+
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">Suggestions</span>(<span class="ident">names</span>).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+
+        <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="string">&quot;aa, bbb, cccc&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">actual</span>.<span class="ident">capacity</span>(), <span class="number">13</span>);
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
