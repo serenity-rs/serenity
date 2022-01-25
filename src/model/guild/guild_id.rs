@@ -326,9 +326,9 @@ impl GuildId {
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
     #[inline]
-    pub async fn create_sticker<F>(self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
+    pub async fn create_sticker<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Sticker>
     where
-        for<'a, 'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
+        for<'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
     {
         let mut create_sticker = CreateSticker::default();
         f(&mut create_sticker);
