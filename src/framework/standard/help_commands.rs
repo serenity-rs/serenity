@@ -431,9 +431,8 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                     .await
                 {
                     return Some(command);
-                } else {
-                    break;
                 }
+                break;
             }
         }
 

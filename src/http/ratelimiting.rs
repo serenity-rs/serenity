@@ -204,29 +204,29 @@ impl Ratelimiter {
             // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
             if route == Route::None {
                 return Ok(response);
+            }
+
+            let redo = if response.headers().get("x-ratelimit-global").is_some() {
+                let _ = self.global.lock().await;
+
+                Ok(
+                    if let Some(retry_after) =
+                        parse_header::<f64>(response.headers(), "retry-after")?
+                    {
+                        debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
+                        sleep(Duration::from_secs_f64(retry_after)).await;
+
+                        true
+                    } else {
+                        false
+                    },
+                )
             } else {
-                let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                    let _ = self.global.lock().await;
+                bucket.lock().await.post_hook(&response, &route).await
+            };
 
-                    Ok(
-                        if let Some(retry_after) =
-                            parse_header::<f64>(response.headers(), "retry-after")?
-                        {
-                            debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
-                            sleep(Duration::from_secs_f64(retry_after)).await;
-
-                            true
-                        } else {
-                            false
-                        },
-                    )
-                } else {
-                    bucket.lock().await.post_hook(&response, &route).await
-                };
-
-                if !redo.unwrap_or(true) {
-                    return Ok(response);
-                }
+            if !redo.unwrap_or(true) {
+                return Ok(response);
             }
         }
     }

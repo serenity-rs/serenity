@@ -219,14 +219,13 @@ impl Message {
                 if self.author.id != cache.current_user_id() {
                     if self.is_private() {
                         return Err(Error::Model(ModelError::NotAuthor));
-                    } else {
-                        utils::user_has_perms_cache(
-                            cache,
-                            self.channel_id,
-                            self.guild_id,
-                            Permissions::MANAGE_MESSAGES,
-                        )?;
                     }
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )?;
                 }
             }
         }

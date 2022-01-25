@@ -297,15 +297,13 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
                 for y in mention[from..].chars() {
                     if y == '>' {
                         break;
-                    } else {
-                        id.push(y);
                     }
+                    id.push(y);
                 }
 
                 break;
-            } else {
-                name.push(x);
             }
+            name.push(x);
         }
 
         match id.parse::<u64>() {

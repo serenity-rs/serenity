@@ -361,14 +361,13 @@ impl Shard {
                 self.stage = ConnectionStage::Identifying;
 
                 return ShardAction::Identify;
-            } else {
-                warn!(
-                    "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
-                    self.shard_info
-                );
-
-                return ShardAction::Reconnect(self.reconnection_type());
             }
+            warn!(
+                "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
+                self.shard_info
+            );
+
+            return ShardAction::Reconnect(self.reconnection_type());
         }
 
         ShardAction::Heartbeat
