@@ -320,7 +320,7 @@
             <span class="ident">AttachmentType::Bytes</span> {
                 <span class="ident">data</span>,
                 <span class="ident">filename</span>: <span class="kw">_</span>,
-            } =&gt; <span class="string">&quot;data:image/png;base64,&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">into_owned</span>()),
+            } =&gt; <span class="string">&quot;data:image/png;base64,&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">base64::encode</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>),
             <span class="ident">AttachmentType::File</span> {
                 <span class="ident">file</span>,
                 <span class="ident">filename</span>: <span class="kw">_</span>,

@@ -2559,13 +2559,13 @@
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;[&#39;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-            <span class="ident">c</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">inner</span>).<span class="ident">replace</span>(<span class="string">&quot;]&quot;</span>, <span class="string">&quot; &quot;</span>);
+            <span class="ident">c</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">inner</span>).<span class="ident">replace</span>(<span class="string">&#39;]&#39;</span>, <span class="string">&quot; &quot;</span>);
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">to_string</span>());
         }
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="string">&quot;](&quot;</span>);
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">into</span>();
-            <span class="ident">c</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">inner</span>).<span class="ident">replace</span>(<span class="string">&quot;)&quot;</span>, <span class="string">&quot; &quot;</span>);
+            <span class="ident">c</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">inner</span>).<span class="ident">replace</span>(<span class="string">&#39;)&#39;</span>, <span class="string">&quot; &quot;</span>);
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">to_string</span>());
         }
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="string">&#39;)&#39;</span>);

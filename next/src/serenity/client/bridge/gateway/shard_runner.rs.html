@@ -1094,7 +1094,7 @@
                     <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">chunk_guild</span>(<span class="ident">guild_id</span>, <span class="ident">limit</span>, <span class="ident">filter</span>, <span class="ident">nonce</span>.<span class="ident">as_deref</span>()).<span class="kw">await</span>.<span class="ident">is_ok</span>()
                 },
                 <span class="ident">ShardClientMessage::Runner</span>(<span class="ident">ShardRunnerMessage::Close</span>(<span class="ident">code</span>, <span class="ident">reason</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">reason</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>);
+                    <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">reason</span>.<span class="ident">unwrap_or_default</span>();
                     <span class="kw">let</span> <span class="ident">close</span> <span class="op">=</span> <span class="ident">CloseFrame</span> {
                         <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">into</span>(),
                         <span class="ident">reason</span>: <span class="ident">Cow::from</span>(<span class="ident">reason</span>),

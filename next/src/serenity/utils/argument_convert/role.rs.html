@@ -68,12 +68,14 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model::prelude</span>::<span class="kw-2">*</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>};
 
 <span class="doccomment">/// Error that can be returned from [`Role::convert`].</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RoleParseError</span> {
     <span class="doccomment">/// When the operation was invoked outside a guild.</span>
     <span class="ident">NotInGuild</span>,
