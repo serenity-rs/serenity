@@ -37,13 +37,12 @@ fn permissions_in(
         return Permissions::all();
     }
 
-    let everyone = match roles.get(&RoleId(guild_id.0)) {
-        Some(everyone) => everyone,
-        None => {
-            tracing::error!("@everyone role is missing in guild {}", guild_id);
+    let everyone = if let Some(everyone) = roles.get(&RoleId(guild_id.0)) {
+        everyone
+    } else {
+        tracing::error!("@everyone role is missing in guild {}", guild_id);
 
-            return Permissions::empty();
-        },
+        return Permissions::empty();
     };
 
     let mut permissions = everyone.permissions;

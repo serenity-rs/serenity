@@ -221,20 +221,19 @@ impl Reaction {
     /// Returns [`Error::Http`] if the user that made the reaction is unable to be
     /// retrieved from the API.
     pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
-        match self.user_id {
-            Some(id) => id.to_user(cache_http).await,
-            None => {
-                // This can happen if only Http was passed to Message::react, even though
-                // "cache" was enabled.
-                #[cfg(feature = "cache")]
-                {
-                    if let Some(cache) = cache_http.cache() {
-                        return Ok(User::from(&cache.current_user()));
-                    }
+        if let Some(id) = self.user_id {
+            id.to_user(cache_http).await
+        } else {
+            // This can happen if only Http was passed to Message::react, even though
+            // "cache" was enabled.
+            #[cfg(feature = "cache")]
+            {
+                if let Some(cache) = cache_http.cache() {
+                    return Ok(User::from(&cache.current_user()));
                 }
+            }
 
-                Ok(cache_http.http().get_current_user().await?.into())
-            },
+            Ok(cache_http.http().get_current_user().await?.into())
         }
     }
 

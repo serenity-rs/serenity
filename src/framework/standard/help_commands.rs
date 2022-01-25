@@ -635,14 +635,11 @@ async fn fill_eligible_commands<'a>(
         let options = &command.options;
         let name = &options.names[0];
 
-        match &group_behaviour {
-            HelpBehaviour::Nothing => (),
-            _ => {
-                let name = format_command_name!(&group_behaviour, &name);
-                to_fill.command_names.push(name);
+        if group_behaviour != HelpBehaviour::Nothing {
+            let name = format_command_name!(&group_behaviour, &name);
+            to_fill.command_names.push(name);
 
-                continue;
-            },
+            continue;
         }
 
         let command_behaviour = check_command_behaviour(

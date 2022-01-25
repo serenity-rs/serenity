@@ -279,14 +279,11 @@ pub fn append_line(desc: &mut AsOption<String>, mut line: String) {
 
     let desc = desc.0.get_or_insert_with(String::default);
 
-    match line.rfind("\\$") {
-        Some(i) => {
-            desc.push_str(line[..i].trim_end());
-            desc.push(' ');
-        },
-        None => {
-            desc.push_str(&line);
-            desc.push('\n');
-        },
+    if let Some(i) = line.rfind("\\$") {
+        desc.push_str(line[..i].trim_end());
+        desc.push(' ');
+    } else {
+        desc.push_str(&line);
+        desc.push('\n');
     }
 }

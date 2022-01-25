@@ -261,26 +261,23 @@ impl Ratelimit {
             return;
         }
 
-        let reset = match self.reset {
-            Some(reset) => reset,
-            None => {
-                // We're probably in the past.
-                self.remaining = self.limit;
+        let reset = if let Some(reset) = self.reset {
+            reset
+        } else {
+            // We're probably in the past.
+            self.remaining = self.limit;
 
-                return;
-            },
+            return;
         };
 
-        let delay = match reset.duration_since(SystemTime::now()) {
-            Ok(delay) => delay,
-
+        let delay = if let Ok(delay) = reset.duration_since(SystemTime::now()) {
+            delay
+        } else {
             // if duration is negative (i.e. adequate time has passed since last call to this api)
-            Err(_) => {
-                if self.remaining() != 0 {
-                    self.remaining -= 1;
-                }
-                return;
-            },
+            if self.remaining() != 0 {
+                self.remaining -= 1;
+            }
+            return;
         };
 
         if self.remaining() == 0 {

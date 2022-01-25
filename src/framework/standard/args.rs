@@ -779,12 +779,11 @@ impl Args {
         let before = self.offset;
         self.restore();
 
-        let pos = match self.iter::<T>().quoted().position(|res| res.is_ok()) {
-            Some(p) => p,
-            None => {
-                self.offset = before;
-                return Err(Error::Eos);
-            },
+        let pos = if let Some(p) = self.iter::<T>().quoted().position(|res| res.is_ok()) {
+            p
+        } else {
+            self.offset = before;
+            return Err(Error::Eos);
         };
 
         self.offset = pos;
@@ -827,12 +826,11 @@ impl Args {
         let before = self.offset;
         self.restore();
 
-        let pos = match self.iter::<T>().quoted().position(|res| res.is_ok()) {
-            Some(p) => p,
-            None => {
-                self.offset = before;
-                return Err(Error::Eos);
-            },
+        let pos = if let Some(p) = self.iter::<T>().quoted().position(|res| res.is_ok()) {
+            p
+        } else {
+            self.offset = before;
+            return Err(Error::Eos);
         };
 
         self.offset = pos;
