@@ -589,9 +589,9 @@ impl PartialGuild {
     /// if the current user does not have permission to manage roles.
     ///
     /// [Manage Emojis and Stickers]: crate::model::permissions::Permissions::MANAGE_EMOJIS_AND_STICKERS
-    pub async fn create_sticker<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Sticker>
+    pub async fn create_sticker<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Sticker>
     where
-        for<'a, 'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
+        for<'b> F: FnOnce(&'b mut CreateSticker<'a>) -> &'b mut CreateSticker<'a>,
     {
         #[cfg(feature = "cache")]
         {

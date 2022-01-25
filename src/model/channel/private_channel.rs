@@ -156,14 +156,14 @@ impl PrivateChannel {
     ///
     /// [`the limit`]: crate::builder::EditMessage::content
     #[inline]
-    pub async fn edit_message<F>(
+    pub async fn edit_message<'a, F>(
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
         f: F,
     ) -> Result<Message>
     where
-        F: for<'a, 'b> FnOnce(&'a mut EditMessage<'b>) -> &'a mut EditMessage<'b>,
+        F: for<'b> FnOnce(&'b mut EditMessage<'a>) -> &'b mut EditMessage<'a>,
     {
         self.id.edit_message(&http, message_id, f).await
     }
