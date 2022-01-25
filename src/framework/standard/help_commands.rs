@@ -52,7 +52,6 @@
 
 #[cfg(all(feature = "cache", feature = "http"))]
 use std::{
-    borrow::Borrow,
     collections::HashSet,
     fmt::Write,
     ops::{Index, IndexMut},
@@ -153,24 +152,22 @@ impl Suggestions {
 
     /// Concats names of suggestions with a given `separator`.
     pub fn join(&self, separator: &str) -> String {
-        let mut iter = self.as_vec().iter();
+        match self.as_vec().as_slice() {
+            [] => String::new(),
+            [one] => one.name.clone(),
+            [first, rest @ ..] => {
+                let size = first.name.len() + rest.iter().map(|e| e.name.len()).sum::<usize>();
+                let sep_size = rest.len() * separator.len();
 
-        let first_iter_element = match iter.next() {
-            Some(first_iter_element) => first_iter_element,
-            None => return String::new(),
-        };
-
-        let size = self.as_vec().iter().fold(0, |total_size, size| total_size + size.name.len());
-        let byte_len_of_sep = self.as_vec().len().saturating_sub(1) * separator.len();
-        let mut result = String::with_capacity(size + byte_len_of_sep);
-        result.push_str(first_iter_element.name.borrow());
-
-        for element in iter {
-            result.push_str(&*separator);
-            result.push_str(element.name.borrow());
+                let mut joined = String::with_capacity(size + sep_size);
+                joined.push_str(&first.name);
+                for e in rest {
+                    joined.push_str(separator);
+                    joined.push_str(&e.name);
+                }
+                joined
+            },
         }
-
-        result
     }
 }
 
@@ -1531,6 +1528,35 @@ pub async fn plain(
     };
 
     msg.channel_id.say(&ctx, result).await
+}
+
+#[cfg(test)]
+#[cfg(all(feature = "cache", feature = "http"))]
+mod tests {
+    use super::{SuggestedCommandName, Suggestions};
+
+    #[test]
+    fn suggestions_join() {
+        let names = vec![
+            SuggestedCommandName {
+                name: "aa".to_owned(),
+                levenshtein_distance: 0,
+            },
+            SuggestedCommandName {
+                name: "bbb".to_owned(),
+                levenshtein_distance: 0,
+            },
+            SuggestedCommandName {
+                name: "cccc".to_owned(),
+                levenshtein_distance: 0,
+            },
+        ];
+
+        let actual = Suggestions(names).join(", ");
+
+        assert_eq!(actual, "aa, bbb, cccc");
+        assert_eq!(actual.capacity(), 13);
+    }
 }
 
 #[cfg(test)]
