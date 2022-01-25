@@ -1175,7 +1175,7 @@ impl Http {
         user_id: Option<u64>,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        let user = user_id.map(|uid| uid.to_string()).unwrap_or_else(|| "@me".to_string());
+        let user = user_id.map_or_else(|| "@me".to_string(), |uid| uid.to_string());
 
         self.wind(204, Request {
             body: None,
