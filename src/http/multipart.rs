@@ -42,7 +42,7 @@ impl<'a> Multipart<'a> {
             if let AttachmentType::Path(_) | AttachmentType::Image(_) = file {
                 *file = AttachmentType::Bytes {
                     data: data.clone().into(),
-                    filename: filename.clone().unwrap_or_else(String::new),
+                    filename: filename.clone().unwrap_or_default(),
                 };
             }
 
