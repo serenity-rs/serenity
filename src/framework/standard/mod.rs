@@ -391,7 +391,7 @@ impl StandardFramework {
     /// it's not intended to be chained as the other commands are.
     pub fn group_remove(&mut self, group: &'static CommandGroup) {
         // Iterates through the vector and if a given group _doesn't_ match, we retain it
-        self.groups.retain(|&(g, _)| g != group)
+        self.groups.retain(|&(g, _)| g != group);
     }
 
     /// Specify the function that's called in case a command wasn't executed for one reason or

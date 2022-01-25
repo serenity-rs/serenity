@@ -288,7 +288,7 @@ impl ShardManager {
             },
             Ok(None) => (),
             Err(why) => {
-                warn!("Failed to cleanly shutdown shard {}, reached timeout: {:?}", shard_id, why,)
+                warn!("Failed to cleanly shutdown shard {}, reached timeout: {:?}", shard_id, why);
             },
         }
 

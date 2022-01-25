@@ -95,7 +95,7 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
                     NestedMeta::Meta(m) => match m {
                         Meta::Path(path) => {
                             let i = to_ident(path)?;
-                            lits.push(Lit::Str(LitStr::new(&i.to_string(), i.span())))
+                            lits.push(Lit::Str(LitStr::new(&i.to_string(), i.span())));
                         }
                         Meta::List(_) | Meta::NameValue(_) => {
                             return Err(Error::new(attr.span(), "cannot nest a list; only accept literals and identifiers at this level"))

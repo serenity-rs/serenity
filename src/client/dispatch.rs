@@ -308,7 +308,7 @@ pub(crate) fn dispatch<'rec>(
                     },
                     other => {
                         handle_event(other, data, handler, runner_tx, shard_id, cache_and_http)
-                            .await
+                            .await;
                     },
                 }
             },

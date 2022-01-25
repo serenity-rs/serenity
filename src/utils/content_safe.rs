@@ -306,7 +306,7 @@ fn clean_users(
                 let code_start = if has_exclamation { "<@!" } else { "<@" };
                 let to_replace = format!("{}{}>", code_start, &s[mention_start..mention_end]);
 
-                *s = s.replace(&to_replace, &replacement)
+                *s = s.replace(&to_replace, &replacement);
             } else {
                 let id = &s[mention_start..mention_end].to_string();
 

@@ -358,7 +358,7 @@ impl<'de> Deserialize<'de> for ReactionType {
                             }
 
                             if let Ok(emoji_id) = map.next_value::<EmojiId>() {
-                                id = Some(emoji_id)
+                                id = Some(emoji_id);
                             }
                         },
                         Field::Name => {

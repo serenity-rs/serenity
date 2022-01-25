@@ -444,7 +444,7 @@ impl Future for ClientBuilder {
                     voice_manager,
                     cache_and_http,
                 })
-            }))
+            }));
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)

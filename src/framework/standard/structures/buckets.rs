@@ -88,7 +88,7 @@ impl Bucket {
             Self::User(counter) => counter.give(ctx, msg, msg.author.id.0).await,
             Self::Guild(counter) => {
                 if let Some(guild_id) = msg.guild_id {
-                    counter.give(ctx, msg, guild_id.0).await
+                    counter.give(ctx, msg, guild_id.0).await;
                 }
             },
             Self::Channel(counter) => counter.give(ctx, msg, msg.channel_id.0).await,
@@ -97,7 +97,7 @@ impl Bucket {
             #[cfg(feature = "cache")]
             Self::Category(counter) => {
                 if let Some(category_id) = msg.category_id(ctx) {
-                    counter.give(ctx, msg, category_id.0).await
+                    counter.give(ctx, msg, category_id.0).await;
                 }
             },
         }
