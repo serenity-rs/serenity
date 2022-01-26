@@ -75,9 +75,9 @@ use super::{
     HelpOptions,
     OnlyIn,
 };
-use crate::builder;
 #[cfg(all(feature = "cache", feature = "http"))]
 use crate::{
+    builder,
     cache::Cache,
     client::Context,
     framework::standard::CommonOptions,
