@@ -346,12 +346,12 @@ impl Cache {
 
     /// Retrieves a [`Channel`] from the cache based on the given Id.
     ///
-    /// This will search the [`Self::channels`] map, then the [`Self::private_channels`] map.
+    /// This will search the `channels` map, then the [`Self::private_channels`] map.
     ///
     /// If you know what type of channel you're looking for, you should instead
-    /// manually retrieve from one of the respective maps or methods:
+    /// manually retrieve from one of the respective methods:
     ///
-    /// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::channels`]
+    /// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::guild_channels`]
     /// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]
     #[inline]
     pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
