@@ -1566,12 +1566,12 @@
 
     <span class="doccomment">/// Retrieves a [`Channel`] from the cache based on the given Id.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will search the [`Self::channels`] map, then the [`Self::private_channels`] map.</span>
+    <span class="doccomment">/// This will search the `channels` map, then the [`Self::private_channels`] map.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If you know what type of channel you&#39;re looking for, you should instead</span>
-    <span class="doccomment">/// manually retrieve from one of the respective maps or methods:</span>
+    <span class="doccomment">/// manually retrieve from one of the respective methods:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::channels`]</span>
+    <span class="doccomment">/// - [`GuildChannel`]: [`Self::guild_channel`] or [`Self::guild_channels`]</span>
     <span class="doccomment">/// - [`PrivateChannel`]: [`Self::private_channel`] or [`Self::private_channels`]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
