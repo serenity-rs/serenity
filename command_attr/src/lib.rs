@@ -1,5 +1,4 @@
 #![deny(rust_2018_idioms)]
-#![deny(broken_intra_doc_links)]
 
 use proc_macro::TokenStream;
 use proc_macro2::Span;
