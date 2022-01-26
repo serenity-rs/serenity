@@ -5,11 +5,11 @@ use crate::model::prelude::*;
 pub mod map;
 
 use std::borrow::Cow;
+#[cfg(feature = "cache")]
 use std::collections::HashMap;
 
 use futures::future::{BoxFuture, FutureExt};
 use map::{CommandMap, GroupMap, ParseMap};
-use tracing::{error, warn};
 use uwl::Stream;
 
 // FIXME: Add the `http` parameter to `Guild::user_permissions_in`.
@@ -40,7 +40,7 @@ fn permissions_in(
     let everyone = match roles.get(&RoleId(guild_id.0)) {
         Some(everyone) => everyone,
         None => {
-            error!("@everyone role is missing in guild {}", guild_id);
+            tracing::error!("@everyone role is missing in guild {}", guild_id);
 
             return Permissions::empty();
         },
@@ -52,7 +52,7 @@ fn permissions_in(
         if let Some(role) = roles.get(&role) {
             permissions |= role.permissions;
         } else {
-            warn!("{} on {} has non-existent role {:?}", member.user.id, guild_id, role);
+            tracing::warn!("{} on {} has non-existent role {:?}", member.user.id, guild_id, role);
         }
     }
 
@@ -101,7 +101,7 @@ fn permissions_in(
             permissions = (permissions & !overwrite.deny) | overwrite.allow;
         }
     } else {
-        warn!("Guild {} does not contain channel {}", guild_id, channel_id);
+        tracing::warn!("Guild {} does not contain channel {}", guild_id, channel_id);
     }
 
     if channel_id.0 == guild_id.0 {
