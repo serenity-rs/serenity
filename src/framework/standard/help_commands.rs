@@ -51,14 +51,12 @@
 //! with the [`plain`] function.
 
 #[cfg(all(feature = "cache", feature = "http"))]
-use std::{
-    collections::HashSet,
-    fmt::Write,
-    ops::{Index, IndexMut},
-};
+use std::{collections::HashSet, fmt::Write};
 
 #[cfg(all(feature = "cache", feature = "http"))]
 use futures::future::{BoxFuture, FutureExt};
+#[cfg(all(feature = "cache", feature = "http"))]
+use levenshtein::levenshtein;
 #[cfg(all(feature = "cache", feature = "http"))]
 use tracing::warn;
 
@@ -185,75 +183,6 @@ pub enum CustomisedHelpData<'a> {
     SingleCommand { command: Command<'a> },
     /// To display failure in finding a fitting command.
     NoCommandFound { help_error_message: &'a str },
-}
-
-/// Wraps around a `Vec<Vec<T>>` and provides access
-/// via indexing of tuples representing x and y.
-#[derive(Debug)]
-#[cfg(all(feature = "cache", feature = "http"))]
-struct Matrix {
-    vec: Vec<usize>,
-    width: usize,
-}
-
-#[cfg(all(feature = "cache", feature = "http"))]
-impl Matrix {
-    fn new(columns: usize, rows: usize) -> Matrix {
-        Matrix {
-            vec: vec![0; columns * rows],
-            width: rows,
-        }
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "http"))]
-impl Index<(usize, usize)> for Matrix {
-    type Output = usize;
-
-    fn index(&self, matrix_entry: (usize, usize)) -> &usize {
-        &self.vec[matrix_entry.1 * self.width + matrix_entry.0]
-    }
-}
-
-#[cfg(all(feature = "cache", feature = "http"))]
-impl IndexMut<(usize, usize)> for Matrix {
-    fn index_mut(&mut self, matrix_entry: (usize, usize)) -> &mut usize {
-        &mut self.vec[matrix_entry.1 * self.width + matrix_entry.0]
-    }
-}
-
-/// Calculates and returns levenshtein distance between
-/// two passed words.
-#[cfg(all(feature = "cache", feature = "http"))]
-pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
-    let len_a = word_a.chars().count();
-    let len_b = word_b.chars().count();
-
-    if len_a == 0 {
-        return len_b;
-    } else if len_b == 0 {
-        return len_a;
-    }
-
-    let mut matrix = Matrix::new(len_b + 1, len_a + 1);
-
-    for x in 0..len_a {
-        matrix[(x + 1, 0)] = matrix[(x, 0)] + 1;
-    }
-
-    for y in 0..len_b {
-        matrix[(0, y + 1)] = matrix[(0, y)] + 1;
-    }
-
-    for (x, char_a) in word_a.chars().enumerate() {
-        for (y, char_b) in word_b.chars().enumerate() {
-            matrix[(x + 1, y + 1)] = (matrix[(x, y + 1)] + 1)
-                .min(matrix[(x + 1, y)] + 1)
-                .min(matrix[(x, y)] + if char_a == char_b { 0 } else { 1 });
-        }
-    }
-
-    matrix[(len_a, len_b)]
 }
 
 /// Checks whether a user is member of required roles
@@ -414,7 +343,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                         }
 
                         if help_options.max_levenshtein_distance > 0 {
-                            let levenshtein_distance = levenshtein_distance(command_name, name);
+                            let levenshtein_distance = levenshtein(command_name, name);
 
                             if levenshtein_distance <= help_options.max_levenshtein_distance
                                 && HelpBehaviour::Nothing
@@ -1556,89 +1485,5 @@ mod tests {
 
         assert_eq!(actual, "aa, bbb, cccc");
         assert_eq!(actual.capacity(), 13);
-    }
-}
-
-#[cfg(test)]
-#[cfg(all(feature = "cache", feature = "http"))]
-mod levenshtein_tests {
-    use super::levenshtein_distance;
-
-    #[test]
-    fn reflexive() {
-        let word_a = "rusty ferris";
-        let word_b = "rusty ferris";
-        assert_eq!(0, levenshtein_distance(word_a, word_b));
-
-        let word_a = "";
-        let word_b = "";
-        assert_eq!(0, levenshtein_distance(word_a, word_b));
-
-        let word_a = "rusty ferris";
-        let word_b = "RuSty FerriS";
-        assert_eq!(4, levenshtein_distance(word_a, word_b));
-    }
-
-    #[test]
-    fn symmetric() {
-        let word_a = "ferris";
-        let word_b = "rusty ferris";
-        assert_eq!(6, levenshtein_distance(word_a, word_b));
-
-        let word_a = "rusty ferris";
-        let word_b = "ferris";
-        assert_eq!(6, levenshtein_distance(word_a, word_b));
-
-        let word_a = "";
-        let word_b = "ferris";
-        assert_eq!(6, levenshtein_distance(word_a, word_b));
-
-        let word_a = "ferris";
-        let word_b = "";
-        assert_eq!(6, levenshtein_distance(word_a, word_b));
-    }
-
-    #[test]
-    fn transitive() {
-        let word_a = "ferris";
-        let word_b = "turbo fish";
-        let word_c = "unsafe";
-
-        let distance_of_a_c = levenshtein_distance(word_a, word_c);
-        let distance_of_a_b = levenshtein_distance(word_a, word_b);
-        let distance_of_b_c = levenshtein_distance(word_b, word_c);
-
-        assert!(distance_of_a_c <= (distance_of_a_b + distance_of_b_c));
-    }
-}
-
-#[cfg(test)]
-#[cfg(all(feature = "cache", feature = "http"))]
-mod matrix_tests {
-    use super::Matrix;
-
-    #[test]
-    fn index_mut() {
-        let mut matrix = Matrix::new(5, 5);
-        assert_eq!(matrix[(1, 1)], 0);
-
-        matrix[(1, 1)] = 10;
-        assert_eq!(matrix[(1, 1)], 10);
-    }
-
-    #[test]
-    #[allow(clippy::no_effect)]
-    #[should_panic(expected = "the len is 4 but the index is 9")]
-    fn panic_index_too_high() {
-        let matrix = Matrix::new(2, 2);
-        matrix[(3, 3)];
-    }
-
-    #[test]
-    #[allow(clippy::no_effect)]
-    #[should_panic(expected = "the len is 0 but the index is 0")]
-    fn panic_indexing_when_empty() {
-        let matrix = Matrix::new(0, 0);
-        matrix[(0, 0)];
     }
 }
