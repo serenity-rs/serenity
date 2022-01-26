@@ -1567,9 +1567,9 @@
     <span class="ident">HelpOptions</span>,
     <span class="ident">OnlyIn</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">builder</span>,
     <span class="ident">cache::Cache</span>,
     <span class="ident">client::Context</span>,
     <span class="ident">framework::standard::CommonOptions</span>,
