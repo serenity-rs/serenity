@@ -5,7 +5,9 @@
 use std::collections::HashMap;
 use std::hash::{BuildHasher, Hash};
 
-use serde::de::{Deserialize, DeserializeOwned};
+#[cfg(feature = "gateway")]
+use serde::de::Deserialize;
+use serde::de::DeserializeOwned;
 use serde::ser::Serialize;
 
 use crate::Result;
@@ -43,7 +45,7 @@ where
     map.into_iter().map(|(k, v)| (k.to_string(), v)).collect()
 }
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(all(feature = "http", not(feature = "simd-json")))]
 pub(crate) fn to_vec<T>(v: &T) -> Result<Vec<u8>>
 where
     T: Serialize,
@@ -51,7 +53,7 @@ where
     Ok(serde_json::to_vec(v)?)
 }
 
-#[cfg(feature = "simd-json")]
+#[cfg(all(feature = "http", feature = "simd-json"))]
 pub(crate) fn to_vec<T>(v: &T) -> Result<Vec<u8>>
 where
     T: Serialize,
@@ -75,14 +77,15 @@ where
     Ok(simd_json::to_string(v)?)
 }
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(all(feature = "gateway", not(feature = "simd-json")))]
 pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
 {
     Ok(serde_json::from_str(s)?)
 }
-#[cfg(feature = "simd-json")]
+
+#[cfg(all(feature = "gateway", feature = "simd-json"))]
 pub(crate) fn from_str<'a, T>(s: &'a mut str) -> Result<T>
 where
     T: Deserialize<'a>,
@@ -90,7 +93,7 @@ where
     Ok(simd_json::from_str(s)?)
 }
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(all(feature = "gateway", not(feature = "simd-json")))]
 pub(crate) fn from_reader<R, T>(r: R) -> Result<T>
 where
     T: DeserializeOwned,
@@ -98,7 +101,8 @@ where
 {
     Ok(serde_json::from_reader(r)?)
 }
-#[cfg(feature = "simd-json")]
+
+#[cfg(all(feature = "gateway", feature = "simd-json"))]
 pub(crate) fn from_reader<R, T>(r: R) -> Result<T>
 where
     T: DeserializeOwned,
@@ -106,6 +110,7 @@ where
 {
     Ok(simd_json::from_reader(r)?)
 }
+
 #[cfg(not(feature = "simd-json"))]
 pub(crate) fn from_value<T>(v: Value) -> Result<T>
 where
@@ -122,7 +127,7 @@ where
     Ok(simd_json::serde::from_owned_value(v)?)
 }
 
-#[cfg(not(feature = "simd-json"))]
+#[cfg(all(any(feature = "builder", feature = "http"), not(feature = "simd-json")))]
 pub(crate) fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
@@ -130,7 +135,7 @@ where
     Ok(serde_json::to_value(value)?)
 }
 
-#[cfg(feature = "simd-json")]
+#[cfg(all(any(feature = "builder", feature = "http"), feature = "simd-json"))]
 pub(crate) fn to_value<T>(value: T) -> Result<Value>
 where
     T: Serialize,
