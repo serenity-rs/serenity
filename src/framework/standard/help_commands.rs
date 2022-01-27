@@ -358,7 +358,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                                     .await
                             {
                                 similar_commands.push(SuggestedCommandName {
-                                    name: command_name.to_string(),
+                                    name: (*command_name).to_string(),
                                     levenshtein_distance,
                                 });
                             }
@@ -1423,7 +1423,7 @@ pub async fn plain(
             ref suggestions,
         } => help_description.replace("{}", &suggestions.join("`, `")),
         CustomisedHelpData::NoCommandFound {
-            ref help_error_message,
+            help_error_message,
         } => help_error_message.to_string(),
         CustomisedHelpData::GroupedCommands {
             ref help_description,
