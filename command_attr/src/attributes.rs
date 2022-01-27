@@ -34,7 +34,7 @@ impl fmt::Display for ValueKind {
     }
 }
 
-fn to_ident(p: Path) -> Result<Ident> {
+fn to_ident(p: &Path) -> Result<Ident> {
     if p.segments.is_empty() {
         return Err(Error::new(p.span(), "cannot convert an empty path to an identifier"));
     }
@@ -75,12 +75,12 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
 
     match meta {
         Meta::Path(path) => {
-            let name = to_ident(path)?;
+            let name = to_ident(&path)?;
 
             Ok(Values::new(name, ValueKind::Name, Vec::new(), attr.span()))
         },
         Meta::List(meta) => {
-            let name = to_ident(meta.path)?;
+            let name = to_ident(&meta.path)?;
             let nested = meta.nested;
 
             if nested.is_empty() {
@@ -94,7 +94,7 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
                     NestedMeta::Lit(l) => lits.push(l),
                     NestedMeta::Meta(m) => match m {
                         Meta::Path(path) => {
-                            let i = to_ident(path)?;
+                            let i = to_ident(&path)?;
                             lits.push(Lit::Str(LitStr::new(&i.to_string(), i.span())));
                         }
                         Meta::List(_) | Meta::NameValue(_) => {
@@ -109,7 +109,7 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
             Ok(Values::new(name, kind, lits, attr.span()))
         },
         Meta::NameValue(meta) => {
-            let name = to_ident(meta.path)?;
+            let name = to_ident(&meta.path)?;
             let lit = meta.lit;
 
             Ok(Values::new(name, ValueKind::Equals, vec![lit], attr.span()))

@@ -172,7 +172,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Command));
 
     let res = parse_quote!(serenity::framework::standard::CommandResult);
-    create_return_type_validation(&mut fun, res);
+    create_return_type_validation(&mut fun, &res);
 
     let visibility = fun.visibility;
     let name = fun.name.clone();
@@ -457,7 +457,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Help));
 
     let res = parse_quote!(serenity::framework::standard::CommandResult);
-    create_return_type_validation(&mut fun, res);
+    create_return_type_validation(&mut fun, &res);
 
     let options = fun.name.with_suffix(HELP_OPTIONS);
 
@@ -772,7 +772,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Check));
 
     let res = parse_quote!(std::result::Result<(), serenity::framework::standard::Reason>);
-    create_return_type_validation(&mut fun, res);
+    create_return_type_validation(&mut fun, &res);
 
     let n = fun.name.clone();
     let n2 = name.clone();
