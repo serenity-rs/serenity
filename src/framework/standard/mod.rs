@@ -887,7 +887,7 @@ pub(crate) fn has_correct_roles(
         options
             .allowed_roles()
             .iter()
-            .flat_map(|r| roles.values().find(|role| *r == role.name))
+            .filter_map(|r| roles.values().find(|role| *r == role.name))
             .any(|g| member.roles.contains(&g.id))
     }
 }
