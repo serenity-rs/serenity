@@ -283,7 +283,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         sticker_ids: It,
     ) -> &mut Self {
-        for sticker_id in sticker_ids.into_iter() {
+        for sticker_id in sticker_ids {
             self.add_sticker_id(sticker_id);
         }
 
