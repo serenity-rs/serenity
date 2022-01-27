@@ -373,7 +373,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                         .sub_commands
                         .iter()
                         .find(|n| n.options.names.contains(&name_str))
-                        .cloned();
+                        .copied();
 
                     // If we found a sub-command, we replace the parent with
                     // it. This allows the help-system to extract information

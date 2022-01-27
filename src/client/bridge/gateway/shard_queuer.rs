@@ -225,7 +225,7 @@ impl ShardQueuer {
                 return;
             }
 
-            runners.keys().cloned().collect::<Vec<_>>()
+            runners.keys().copied().collect::<Vec<_>>()
         };
 
         info!("Shutting down all shards");

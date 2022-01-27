@@ -256,7 +256,7 @@ impl ShardManager {
     /// [`ShardRunner`]: super::ShardRunner
     #[instrument(skip(self))]
     pub async fn shards_instantiated(&self) -> Vec<ShardId> {
-        self.runners.lock().await.keys().cloned().collect()
+        self.runners.lock().await.keys().copied().collect()
     }
 
     /// Attempts to shut down the shard runner by Id.
@@ -310,7 +310,7 @@ impl ShardManager {
                 return;
             }
 
-            runners.keys().cloned().collect::<Vec<_>>()
+            runners.keys().copied().collect::<Vec<_>>()
         };
 
         info!("Shutting down all shards");
