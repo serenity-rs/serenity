@@ -1,5 +1,3 @@
-use std::convert::TryFrom;
-
 use serde::de::Error as DeError;
 use serde::{Serialize, Serializer};
 #[cfg(feature = "simd-json")]
@@ -421,71 +419,6 @@ pub struct MessageComponentInteractionData {
     pub values: Vec<String>,
 }
 
-// A component.
-#[derive(Clone, Debug)]
-#[non_exhaustive]
-pub enum Component {
-    ActionRow(ActionRow),
-    Button(Button),
-    SelectMenu(SelectMenu),
-}
-
-impl<'de> Deserialize<'de> for Component {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let map = JsonMap::deserialize(deserializer)?;
-
-        let kind = map
-            .get("type")
-            .ok_or_else(|| DeError::custom("expected type"))
-            .and_then(ComponentType::deserialize)
-            .map_err(DeError::custom)?;
-
-        match kind {
-            ComponentType::ActionRow => from_value::<ActionRow>(Value::from(map))
-                .map(Component::ActionRow)
-                .map_err(DeError::custom),
-            ComponentType::Button => from_value::<Button>(Value::from(map))
-                .map(Component::Button)
-                .map_err(DeError::custom),
-            ComponentType::SelectMenu => from_value::<SelectMenu>(Value::from(map))
-                .map(Component::SelectMenu)
-                .map_err(DeError::custom),
-            ComponentType::Unknown => Err(DeError::custom("Unknown component type")),
-        }
-    }
-}
-
-impl Serialize for Component {
-    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        match self {
-            Component::ActionRow(c) => ActionRow::serialize(c, serializer),
-            Component::Button(c) => Button::serialize(c, serializer),
-            Component::SelectMenu(c) => SelectMenu::serialize(c, serializer),
-        }
-    }
-}
-
-impl From<ActionRow> for Component {
-    fn from(component: ActionRow) -> Self {
-        Component::ActionRow(component)
-    }
-}
-
-impl From<Button> for Component {
-    fn from(component: Button) -> Self {
-        Component::Button(component)
-    }
-}
-
-impl From<SelectMenu> for Component {
-    fn from(component: SelectMenu) -> Self {
-        Component::SelectMenu(component)
-    }
-}
-
 /// The type of a component
 #[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
@@ -552,27 +485,6 @@ impl Serialize for ActionRowComponent {
         match self {
             ActionRowComponent::Button(c) => Button::serialize(c, serializer),
             ActionRowComponent::SelectMenu(c) => SelectMenu::serialize(c, serializer),
-        }
-    }
-}
-
-impl From<ActionRowComponent> for Component {
-    fn from(component: ActionRowComponent) -> Self {
-        match component {
-            ActionRowComponent::Button(b) => Component::Button(b),
-            ActionRowComponent::SelectMenu(s) => Component::SelectMenu(s),
-        }
-    }
-}
-
-impl TryFrom<Component> for ActionRowComponent {
-    type Error = Error;
-
-    fn try_from(value: Component) -> Result<Self> {
-        match value {
-            Component::ActionRow(_) => Err(Error::Model(ModelError::InvalidComponentType)),
-            Component::Button(b) => Ok(ActionRowComponent::Button(b)),
-            Component::SelectMenu(s) => Ok(ActionRowComponent::SelectMenu(s)),
         }
     }
 }
