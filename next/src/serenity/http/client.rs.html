@@ -3806,8 +3806,14 @@
 <span id="3801">3801</span>
 <span id="3802">3802</span>
 <span id="3803">3803</span>
+<span id="3804">3804</span>
+<span id="3805">3805</span>
+<span id="3806">3806</span>
+<span id="3807">3807</span>
+<span id="3808">3808</span>
+<span id="3809">3809</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">use</span> <span class="ident">percent_encoding</span>::{<span class="ident">utf8_percent_encode</span>, <span class="ident">NON_ALPHANUMERIC</span>};
 <span class="kw">use</span> <span class="ident">reqwest</span>::{
@@ -6048,12 +6054,14 @@
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;scheduled_maintenances&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Maintenance</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]),
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">StatusResponse</span> {
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+            <span class="ident">scheduled_maintenances</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Maintenance</span><span class="op">&gt;</span>,
         }
+
+        <span class="kw">let</span> <span class="ident">status</span>: <span class="ident">StatusResponse</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">json</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">status</span>.<span class="ident">scheduled_maintenances</span>)
     }
 
     <span class="doccomment">/// Gets all the users that are banned in specific guild.</span>
@@ -7000,12 +7008,14 @@
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;incidents&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Incident</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]),
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">StatusResponse</span> {
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+            <span class="ident">incidents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Incident</span><span class="op">&gt;</span>,
         }
+
+        <span class="kw">let</span> <span class="ident">status</span>: <span class="ident">StatusResponse</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">json</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">status</span>.<span class="ident">incidents</span>)
     }
 
     <span class="doccomment">/// Gets the upcoming (planned) maintenances from Discord&#39;s Status API.</span>
@@ -7021,12 +7031,14 @@
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;scheduled_maintenances&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Maintenance</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]),
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">StatusResponse</span> {
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+            <span class="ident">scheduled_maintenances</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Maintenance</span><span class="op">&gt;</span>,
         }
+
+        <span class="kw">let</span> <span class="ident">status</span>: <span class="ident">StatusResponse</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">json</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">status</span>.<span class="ident">scheduled_maintenances</span>)
     }
 
     <span class="doccomment">/// Gets a user by Id.</span>
