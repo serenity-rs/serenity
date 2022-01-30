@@ -1,5 +1,5 @@
 #![allow(clippy::missing_errors_doc)]
-use std::{borrow::Cow, collections::BTreeMap, fmt, str::FromStr, sync::Arc};
+use std::{borrow::Cow, fmt, str::FromStr, sync::Arc};
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::{
@@ -2270,12 +2270,14 @@ impl Http {
             })
             .await?;
 
-        let mut map: BTreeMap<String, Value> = response.json::<BTreeMap<String, Value>>().await?;
-
-        match map.remove("scheduled_maintenances") {
-            Some(v) => from_value::<Vec<Maintenance>>(v).map_err(From::from),
-            None => Ok(vec![]),
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            scheduled_maintenances: Vec<Maintenance>,
         }
+
+        let status: StatusResponse = response.json().await?;
+        Ok(status.scheduled_maintenances)
     }
 
     /// Gets all the users that are banned in specific guild.
@@ -3222,12 +3224,14 @@ impl Http {
             })
             .await?;
 
-        let mut map = response.json::<BTreeMap<String, Value>>().await?;
-
-        match map.remove("incidents") {
-            Some(v) => from_value::<Vec<Incident>>(v).map_err(From::from),
-            None => Ok(vec![]),
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            incidents: Vec<Incident>,
         }
+
+        let status: StatusResponse = response.json().await?;
+        Ok(status.incidents)
     }
 
     /// Gets the upcoming (planned) maintenances from Discord's Status API.
@@ -3243,12 +3247,14 @@ impl Http {
             })
             .await?;
 
-        let mut map = response.json::<BTreeMap<String, Value>>().await?;
-
-        match map.remove("scheduled_maintenances") {
-            Some(v) => from_value::<Vec<Maintenance>>(v).map_err(From::from),
-            None => Ok(vec![]),
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            scheduled_maintenances: Vec<Maintenance>,
         }
+
+        let status: StatusResponse = response.json().await?;
+        Ok(status.scheduled_maintenances)
     }
 
     /// Gets a user by Id.
