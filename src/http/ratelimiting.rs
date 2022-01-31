@@ -83,7 +83,7 @@ use crate::internal::prelude::*;
 /// [`remaining`]: Ratelimit::remaining
 /// [`reset`]: Ratelimit::reset
 pub struct Ratelimiter {
-    client: Arc<Client>,
+    client: Client,
     global: Arc<Mutex<()>>,
     // When futures is implemented, make tasks clear out their respective entry
     // when the 'reset' passes.
@@ -107,11 +107,11 @@ impl Ratelimiter {
     ///
     /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not
     /// prefix it.
-    pub fn new(client: Arc<Client>, token: impl Into<String>) -> Self {
+    pub fn new(client: Client, token: impl Into<String>) -> Self {
         Self::_new(client, token.into())
     }
 
-    fn _new(client: Arc<Client>, token: String) -> Self {
+    fn _new(client: Client, token: String) -> Self {
         Self {
             client,
             global: Default::default(),
