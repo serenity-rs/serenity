@@ -138,7 +138,11 @@ impl CreateButton {
     }
 
     /// Sets emoji of the button.
-    pub fn emoji(&mut self, emoji: ReactionType) -> &mut Self {
+    pub fn emoji<R: Into<ReactionType>>(&mut self, emoji: R) -> &mut Self {
+        self._emoji(emoji.into())
+    }
+
+    fn _emoji(&mut self, emoji: ReactionType) -> &mut Self {
         let mut map = JsonMap::new();
 
         match emoji {
@@ -302,7 +306,11 @@ impl CreateSelectMenuOption {
     }
 
     /// Sets emoji of the option.
-    pub fn emoji(&mut self, emoji: ReactionType) -> &mut Self {
+    pub fn emoji<R: Into<ReactionType>>(&mut self, emoji: R) -> &mut Self {
+        self._emoji(emoji.into())
+    }
+
+    fn _emoji(&mut self, emoji: ReactionType) -> &mut Self {
         let mut map = JsonMap::new();
 
         match emoji {
