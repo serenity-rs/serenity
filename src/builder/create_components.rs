@@ -109,8 +109,17 @@ impl CreateActionRow {
 /// A builder for creating a [`Button`].
 ///
 /// [`Button`]: crate::model::interactions::message_component::Button
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct CreateButton(pub HashMap<&'static str, Value>);
+
+impl Default for CreateButton {
+    /// Creates a primary button.
+    fn default() -> Self {
+        let mut btn = Self(HashMap::new());
+        btn.style(ButtonStyle::Primary);
+        btn
+    }
+}
 
 impl CreateButton {
     /// Sets the style of the button.
@@ -287,6 +296,13 @@ impl CreateSelectMenuOptions {
 pub struct CreateSelectMenuOption(pub HashMap<&'static str, Value>);
 
 impl CreateSelectMenuOption {
+    /// Creates an option.
+    pub fn new<L: ToString, V: ToString>(label: L, value: V) -> Self {
+        let mut opt = Self::default();
+        opt.label(label).value(value);
+        opt
+    }
+
     /// Sets the label of this option.
     pub fn label<D: ToString>(&mut self, label: D) -> &mut Self {
         self.0.insert("label", Value::from(label.to_string()));
