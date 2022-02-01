@@ -561,7 +561,7 @@
 <span class="doccomment">/// [`remaining`]: Ratelimit::remaining</span>
 <span class="doccomment">/// [`reset`]: Ratelimit::reset</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ratelimiter</span> {
-    <span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
+    <span class="ident">client</span>: <span class="ident">Client</span>,
     <span class="ident">global</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="comment">// When futures is implemented, make tasks clear out their respective entry</span>
     <span class="comment">// when the &#39;reset&#39; passes.</span>
@@ -585,11 +585,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The bot token must be prefixed with `&quot;Bot &quot;`. The ratelimiter does not</span>
     <span class="doccomment">/// prefix it.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>, <span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">client</span>, <span class="ident">token</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>, <span class="ident">token</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">_new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">token</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">client</span>,
             <span class="ident">global</span>: <span class="ident">Default::default</span>(),

@@ -3811,7 +3811,6 @@
 <span id="3806">3806</span>
 <span id="3807">3807</span>
 <span id="3808">3808</span>
-<span id="3809">3809</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 
@@ -3868,7 +3867,7 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HttpBuilder</span> {
-    <span class="ident">client</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">client</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
     <span class="ident">ratelimiter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ratelimiter</span><span class="op">&gt;</span>,
     <span class="ident">ratelimiter_disabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
     <span class="ident">token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -3919,7 +3918,7 @@
 
     <span class="doccomment">/// Sets the [`reqwest::Client`]. If one isn&#39;t provided, a default one will</span>
     <span class="doccomment">/// be used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">client</span>: <span class="ident">Client</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">client</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>);
 
         <span class="self">self</span>
@@ -3982,11 +3981,11 @@
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
-            <span class="ident">Arc::new</span>(<span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>))
+            <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>)
         });
 
         <span class="kw">let</span> <span class="ident">ratelimiter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ratelimiter</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>);
+            <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
             <span class="ident">Ratelimiter::new</span>(<span class="ident">client</span>, <span class="ident">token</span>.<span class="ident">to_string</span>())
         });
 
@@ -4020,7 +4019,7 @@
 <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
 <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Http</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">client</span>: <span class="ident">Client</span>,
     <span class="kw">pub</span> <span class="ident">ratelimiter</span>: <span class="ident">Ratelimiter</span>,
     <span class="kw">pub</span> <span class="ident">ratelimiter_disabled</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">proxy</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
@@ -4041,8 +4040,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Http</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">client2</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">client2</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
 
         <span class="ident">Http</span> {
             <span class="ident">client</span>,
@@ -4060,7 +4059,7 @@
         <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
         <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">Arc::new</span>(<span class="ident">built</span>), <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">built</span>, <span class="string">&quot;&quot;</span>);
 
         <span class="ident">data</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="ident">application_id</span>;
 
@@ -4078,7 +4077,7 @@
             <span class="macro">format!</span>(<span class="string">&quot;Bot {}&quot;</span>, <span class="ident">token</span>)
         };
 
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">Arc::new</span>(<span class="ident">built</span>), <span class="kw-2">&amp;</span><span class="ident">token</span>)
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">built</span>, <span class="kw-2">&amp;</span><span class="ident">token</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -7606,9 +7605,8 @@
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Http</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">Client::builder</span>().<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build Reqwest::Client.&quot;</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">built</span>);
-        <span class="kw">let</span> <span class="ident">client2</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>);
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::builder</span>().<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build Reqwest::Client.&quot;</span>);
+        <span class="kw">let</span> <span class="ident">client2</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
 
         <span class="self">Self</span> {
             <span class="ident">client</span>,
