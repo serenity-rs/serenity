@@ -54,7 +54,7 @@ use crate::utils;
 /// # }
 /// ```
 pub struct HttpBuilder {
-    client: Option<Arc<Client>>,
+    client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: Option<bool>,
     token: Option<String>,
@@ -105,7 +105,7 @@ impl HttpBuilder {
 
     /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
     /// be used.
-    pub fn client(mut self, client: Arc<Client>) -> Self {
+    pub fn client(mut self, client: Client) -> Self {
         self.client = Some(client);
 
         self
@@ -168,11 +168,11 @@ impl HttpBuilder {
 
         let client = self.client.unwrap_or_else(|| {
             let builder = configure_client_backend(Client::builder());
-            Arc::new(builder.build().expect("Cannot build reqwest::Client"))
+            builder.build().expect("Cannot build reqwest::Client")
         });
 
         let ratelimiter = self.ratelimiter.unwrap_or_else(|| {
-            let client = Arc::clone(&client);
+            let client = client.clone();
             Ratelimiter::new(client, token.to_string())
         });
 
@@ -206,7 +206,7 @@ fn reason_into_header(reason: &str) -> Headers {
 /// [`Error::Http`]: crate::error::Error::Http
 /// [`Error::Json`]: crate::error::Error::Json
 pub struct Http {
-    pub(crate) client: Arc<Client>,
+    pub(crate) client: Client,
     pub ratelimiter: Ratelimiter,
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
@@ -227,8 +227,8 @@ impl fmt::Debug for Http {
 }
 
 impl Http {
-    pub fn new(client: Arc<Client>, token: &str) -> Self {
-        let client2 = Arc::clone(&client);
+    pub fn new(client: Client, token: &str) -> Self {
+        let client2 = client.clone();
 
         Http {
             client,
@@ -246,7 +246,7 @@ impl Http {
         let builder = configure_client_backend(Client::builder());
         let built = builder.build().expect("Cannot build reqwest::Client");
 
-        let mut data = Self::new(Arc::new(built), "");
+        let mut data = Self::new(built, "");
 
         data.application_id = application_id;
 
@@ -264,7 +264,7 @@ impl Http {
             format!("Bot {}", token)
         };
 
-        Self::new(Arc::new(built), &token)
+        Self::new(built, &token)
     }
 
     #[cfg(feature = "unstable_discord_api")]
@@ -3822,9 +3822,8 @@ impl AsRef<Http> for Http {
 
 impl Default for Http {
     fn default() -> Self {
-        let built = Client::builder().build().expect("Cannot build Reqwest::Client.");
-        let client = Arc::new(built);
-        let client2 = Arc::clone(&client);
+        let client = Client::builder().build().expect("Cannot build Reqwest::Client.");
+        let client2 = client.clone();
 
         Self {
             client,
