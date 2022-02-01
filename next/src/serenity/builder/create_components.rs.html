@@ -346,6 +346,22 @@
 <span id="341">341</span>
 <span id="342">342</span>
 <span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
@@ -457,8 +473,17 @@
 <span class="doccomment">/// A builder for creating a [`Button`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Button`]: crate::model::interactions::message_component::Button</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateButton</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">CreateButton</span> {
+    <span class="doccomment">/// Creates a primary button.</span>
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">btn</span> <span class="op">=</span> <span class="self">Self</span>(<span class="ident">HashMap::new</span>());
+        <span class="ident">btn</span>.<span class="ident">style</span>(<span class="ident">ButtonStyle::Primary</span>);
+        <span class="ident">btn</span>
+    }
+}
 
 <span class="kw">impl</span> <span class="ident">CreateButton</span> {
     <span class="doccomment">/// Sets the style of the button.</span>
@@ -635,6 +660,13 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateSelectMenuOption</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">CreateSelectMenuOption</span> {
+    <span class="doccomment">/// Creates an option.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">ToString</span>, <span class="ident">V</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="ident">label</span>: <span class="ident">L</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opt</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
+        <span class="ident">opt</span>.<span class="ident">label</span>(<span class="ident">label</span>).<span class="ident">value</span>(<span class="ident">value</span>);
+        <span class="ident">opt</span>
+    }
+
     <span class="doccomment">/// Sets the label of this option.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">label</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">label</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;label&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">label</span>.<span class="ident">to_string</span>()));
