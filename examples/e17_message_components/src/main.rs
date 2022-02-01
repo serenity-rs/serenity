@@ -13,7 +13,7 @@ use serenity::{
     client::{Context, EventHandler},
     futures::StreamExt,
     model::{
-        channel::{Message, ReactionType},
+        channel::Message,
         interactions::{
             message_component::ButtonStyle,
             InteractionApplicationCommandCallbackDataFlags,
@@ -68,12 +68,12 @@ impl FromStr for Animal {
 }
 
 impl Animal {
-    fn emoji(&self) -> &str {
+    fn emoji(&self) -> char {
         match self {
-            Self::Cat => "🐈",
-            Self::Dog => "🐕",
-            Self::Horse => "🐎",
-            Self::Alpaca => "🦙",
+            Self::Cat => '🐈',
+            Self::Dog => '🐕',
+            Self::Horse => '🐎',
+            Self::Alpaca => '🦙',
         }
     }
 
@@ -127,7 +127,7 @@ impl Display for Sound {
 }
 
 impl Sound {
-    fn emoji(&self) -> &str {
+    fn emoji(&self) -> char {
         match self {
             Self::Meow => Animal::Cat.emoji(),
             Self::Woof => Animal::Dog.emoji(),
@@ -139,7 +139,7 @@ impl Sound {
     fn button(&self) -> CreateButton {
         let mut b = CreateButton::default();
         b.custom_id(self.to_string().to_ascii_lowercase());
-        b.emoji(ReactionType::Unicode(self.emoji().to_string()));
+        b.emoji(self.emoji());
         b.label(self);
         b.style(ButtonStyle::Primary);
         b
