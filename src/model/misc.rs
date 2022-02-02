@@ -137,7 +137,7 @@ impl Display for Mention {
             MentionableImpl::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
             MentionableImpl::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
             MentionableImpl::Emoji(id, animated) => {
-                f.write_fmt(format_args!("<{}:_:{}>", if animated { "a" } else { "" }, id.0,))
+                f.write_fmt(format_args!("<{}:omitted:{}>", if animated { "a" } else { "" }, id.0,))
             },
         }
     }
