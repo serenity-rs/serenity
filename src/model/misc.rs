@@ -137,7 +137,7 @@ impl Display for Mention {
             MentionableImpl::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
             MentionableImpl::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
             MentionableImpl::Emoji(id, animated) => {
-                f.write_fmt(format_args!("<{}:_:{}>", if animated { "a" } else { "" }, id.0,))
+                f.write_fmt(format_args!("<{}:omitted:{}>", if animated { "a" } else { "" }, id.0,))
             },
         }
     }
@@ -467,7 +467,7 @@ mod test {
 
             assert_eq!(ChannelId(1).mention().to_string(), "<#1>");
             assert_eq!(channel.mention().to_string(), "<#4>");
-            assert_eq!(emoji.mention().to_string(), "<:_:5>");
+            assert_eq!(emoji.mention().to_string(), "<:omitted:5>");
             assert_eq!(member.mention().to_string(), "<@6>");
             assert_eq!(role.mention().to_string(), "<@&2>");
             assert_eq!(role.id.mention().to_string(), "<@&2>");
