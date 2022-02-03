@@ -16,7 +16,8 @@ pub enum ParseValue {
 }
 
 /// A builder to manage the allowed mentions on a message,
-/// used by the [`ChannelId::send_message`] method.
+/// used by the [`ChannelId::send_message`] and
+/// [`ChannelId::edit_message`] methods.
 ///
 /// # Examples
 ///
@@ -60,6 +61,7 @@ pub enum ParseValue {
 /// ```
 ///
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+/// [`ChannelId::edit_message`]: crate::model::id::ChannelId::edit_message
 #[derive(Clone, Debug)]
 pub struct CreateAllowedMentions(pub HashMap<&'static str, Value>);
 

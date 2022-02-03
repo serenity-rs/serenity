@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::CreateEmbed;
+use super::{CreateAllowedMentions, CreateEmbed};
 #[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
@@ -128,6 +128,20 @@ impl EditMessage {
         let flags = if suppress { 1 << 2 } else { 0 };
         self.0.insert("flags", serde_json::Value::Number(serde_json::Number::from(flags)));
 
+        self
+    }
+
+    /// Set the allowed mentions for the message.
+    pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
+    {
+        let mut allowed_mentions = CreateAllowedMentions::default();
+        f(&mut allowed_mentions);
+        let map = utils::hashmap_to_json_map(allowed_mentions.0);
+        let allowed_mentions = Value::Object(map);
+
+        self.0.insert("allowed_mentions", allowed_mentions);
         self
     }
 
