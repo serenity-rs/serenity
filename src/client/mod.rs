@@ -1056,15 +1056,15 @@ pub struct TokenComponents {
 /// token generation timestamp
 pub fn parse_token(token: impl AsRef<str>) -> Option<TokenComponents> {
     // The token consists of three base64-encoded parts
-    let parts: Vec<&str> = token.as_ref().split('.').collect();
+    let mut parts = token.as_ref().split('.');
     let base64_config = base64::Config::new(base64::CharacterSet::UrlSafe, true);
 
     // First part must be a base64-encoded stringified user ID
-    let user_id = base64::decode_config(parts.get(0)?, base64_config).ok()?;
+    let user_id = base64::decode_config(parts.next()?, base64_config).ok()?;
     let user_id = UserId(std::str::from_utf8(&user_id).ok()?.parse().ok()?);
 
     // Second part must be a base64-encoded token generation timestamp
-    let timestamp_base64 = parts.get(1)?;
+    let timestamp_base64 = parts.next()?;
     // The base64-encoded timestamp must be at least 6 characters
     if timestamp_base64.len() < 6 {
         return None;
@@ -1082,7 +1082,7 @@ pub fn parse_token(token: impl AsRef<str>) -> Option<TokenComponents> {
     let timestamp = chrono::NaiveDateTime::from_timestamp_opt(timestamp as i64, 0)?;
 
     // Third part is a base64-encoded HMAC that's not interesting on its own
-    let _ = base64::decode_config(parts.get(2)?, base64_config).ok()?;
+    let _ = base64::decode_config(parts.next()?, base64_config).ok()?;
 
     Some(TokenComponents {
         bot_user_id: user_id,

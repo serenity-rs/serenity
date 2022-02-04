@@ -45,10 +45,8 @@ impl CreateApplicationCommandsPermissions {
         &mut self,
         application_commands: Vec<CreateApplicationCommandPermissions>,
     ) -> &mut Self {
-        let new_application_commands = application_commands
-            .into_iter()
-            .map(|f| Value::from(json::hashmap_to_json_map(f.0)))
-            .collect::<Vec<Value>>();
+        let new_application_commands =
+            application_commands.into_iter().map(|f| Value::from(json::hashmap_to_json_map(f.0)));
 
         for application_command in new_application_commands {
             self.0.push(application_command);
