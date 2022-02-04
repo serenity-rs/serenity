@@ -323,7 +323,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
                     avatar: self.avatar.clone(),
-                    communication_disabled_until: None,
+                    communication_disabled_until: self.communication_disabled_until,
                 });
             }
 

@@ -80,6 +80,7 @@ pub(crate) struct InterimMember {
     #[cfg(feature = "unstable_discord_api")]
     pub permissions: Option<Permissions>,
     pub avatar: Option<String>,
+    pub communication_disabled_until: Option<Timestamp>,
 }
 
 impl From<InterimMember> for Member {
@@ -97,7 +98,7 @@ impl From<InterimMember> for Member {
             #[cfg(feature = "unstable_discord_api")]
             permissions: m.permissions,
             avatar: m.avatar,
-            communication_disabled_until: None,
+            communication_disabled_until: m.communication_disabled_until,
         }
     }
 }
