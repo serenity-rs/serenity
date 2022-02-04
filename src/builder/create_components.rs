@@ -42,7 +42,7 @@ impl CreateComponents {
 
     /// Sets all the action rows.
     pub fn set_action_rows(&mut self, rows: Vec<CreateActionRow>) -> &mut Self {
-        let new_rows = rows.into_iter().map(|mut f| f.build()).collect::<Vec<Value>>();
+        let new_rows = rows.into_iter().map(|mut f| f.build());
 
         for row in new_rows {
             self.0.push(row);
@@ -308,10 +308,8 @@ impl CreateSelectMenuOptions {
 
     /// Sets all the options.
     pub fn set_options(&mut self, options: Vec<CreateSelectMenuOption>) -> &mut Self {
-        let new_options = options
-            .into_iter()
-            .map(|option| json::hashmap_to_json_map(option.0).into())
-            .collect::<Vec<Value>>();
+        let new_options =
+            options.into_iter().map(|option| json::hashmap_to_json_map(option.0).into());
 
         for option in new_options {
             self.0.push(option);
