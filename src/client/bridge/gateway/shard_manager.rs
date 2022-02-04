@@ -272,11 +272,12 @@ impl ShardManager {
     #[instrument(skip(self))]
     #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
+        const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
+
         info!("Shutting down shard {}", shard_id);
 
         let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code));
 
-        const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
         match timeout(TIMEOUT, self.shard_shutdown.next()).await {
             Ok(Some(shutdown_shard_id)) => {
                 if shutdown_shard_id != shard_id {

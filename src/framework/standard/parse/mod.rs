@@ -514,6 +514,7 @@ pub async fn command(
                     last = res;
                 }
             },
+            #[allow(clippy::items_after_statements)]
             Map::Prefixless(subgroups, commands) => {
                 is_prefixless = true;
 
