@@ -293,10 +293,8 @@ impl CreateApplicationCommands {
         &mut self,
         commands: Vec<CreateApplicationCommand>,
     ) -> &mut Self {
-        let new_application_command = commands
-            .into_iter()
-            .map(|f| Value::from(json::hashmap_to_json_map(f.0)))
-            .collect::<Vec<Value>>();
+        let new_application_command =
+            commands.into_iter().map(|f| Value::from(json::hashmap_to_json_map(f.0)));
 
         for application_command in new_application_command {
             self.0.push(application_command);
