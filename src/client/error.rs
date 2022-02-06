@@ -37,12 +37,4 @@ impl Display for Error {
     }
 }
 
-impl StdError for Error {
-    fn description(&self) -> &str {
-        match *self {
-            Error::InvalidToken => "The provided token was invalid",
-            Error::ShardBootFailure => "Failed to (re-)boot a shard",
-            Error::Shutdown => "The clients shards shutdown",
-        }
-    }
-}
+impl StdError for Error {}
