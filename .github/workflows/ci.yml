@@ -17,7 +17,6 @@ jobs:
           - stable
           - beta
           - nightly
-          - macOS
           - Windows
           - no default features
           - no cache
@@ -33,8 +32,6 @@ jobs:
             toolchain: beta
           - name: nightly
             toolchain: nightly
-          - name: macOS
-            os: macOS-latest
           - name: Windows
             os: windows-latest
           - name: no default features
@@ -88,6 +85,36 @@ jobs:
       - name: Test some features
         if: ${{ !matrix.dont-test && matrix.features }}
         run: cargo test --no-default-features --features "${{ matrix.features }}"
+
+
+  macOS:
+    name: Test (macOS)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        run: |
+          rustup install --profile minimal stable
+          rustup override set stable
+
+      - name: Add problem matchers
+        shell: bash
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Remove cargo build config
+        run: rm .cargo/config.toml
+
+      - name: Build
+        run: cargo build
+
+      - name: Test
+        run: cargo test
 
   MSRV:
     runs-on: ubuntu-latest
