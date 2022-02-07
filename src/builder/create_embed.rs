@@ -476,17 +476,13 @@ pub struct Timestamp {
 
 impl From<String> for Timestamp {
     fn from(ts: String) -> Self {
-        Self {
-            ts,
-        }
+        Self { ts }
     }
 }
 
 impl<'a> From<&'a str> for Timestamp {
     fn from(ts: &'a str) -> Self {
-        Self {
-            ts: ts.to_string(),
-        }
+        Self { ts: ts.to_string() }
     }
 }
 
@@ -495,9 +491,7 @@ where
     Tz::Offset: Display,
 {
     fn from(dt: DateTime<Tz>) -> Self {
-        Self {
-            ts: dt.to_rfc3339(),
-        }
+        Self { ts: dt.to_rfc3339() }
     }
 }
 
@@ -506,9 +500,7 @@ where
     Tz::Offset: Display,
 {
     fn from(dt: &'a DateTime<Tz>) -> Self {
-        Self {
-            ts: dt.to_rfc3339(),
-        }
+        Self { ts: dt.to_rfc3339() }
     }
 }
 
@@ -529,16 +521,8 @@ mod test {
             colour: Colour::new(0xFF0011),
             description: Some("This is a test description".to_string()),
             fields: vec![
-                EmbedField {
-                    inline: false,
-                    name: "a".to_string(),
-                    value: "b".to_string(),
-                },
-                EmbedField {
-                    inline: true,
-                    name: "c".to_string(),
-                    value: "z".to_string(),
-                },
+                EmbedField { inline: false, name: "a".to_string(), value: "b".to_string() },
+                EmbedField { inline: true, name: "c".to_string(), value: "z".to_string() },
             ],
             footer: Some(EmbedFooter {
                 icon_url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
@@ -546,21 +530,22 @@ mod test {
                 text: "This is a hakase footer".to_string(),
             }),
             image: Some(EmbedImage {
-                height: 213,
-                proxy_url: "a".to_string(),
                 url: "https://i.imgur.com/XfWpfCV.gif".to_string(),
-                width: 224,
+                proxy_url: Some("a".to_string()),
+                height: Some(213),
+                width: Some(224),
             }),
-            kind: "rich".to_string(),
+            kind: Some("rich".to_string()),
             provider: None,
             thumbnail: None,
             timestamp: None,
             title: Some("hakase".to_string()),
             url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
             video: Some(EmbedVideo {
-                height: 213,
                 url: "https://i.imgur.com/XfWpfCV.mp4".to_string(),
-                width: 224,
+                proxy_url: Some("a".to_string()),
+                height: Some(213),
+                width: Some(224),
             }),
         };
 
