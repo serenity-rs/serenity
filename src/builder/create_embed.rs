@@ -485,38 +485,31 @@ mod test {
             colour: Some(Colour::new(0xFF0011)),
             description: Some("This is a test description".to_string()),
             fields: vec![
-                EmbedField {
-                    inline: false,
-                    name: "a".to_string(),
-                    value: "b".to_string(),
-                },
-                EmbedField {
-                    inline: true,
-                    name: "c".to_string(),
-                    value: "z".to_string(),
-                },
+                EmbedField { inline: false, name: "a".to_string(), value: "b".to_string() },
+                EmbedField { inline: true, name: "c".to_string(), value: "z".to_string() },
             ],
             footer: Some(EmbedFooter {
+                text: "This is a hakase footer".to_string(),
                 icon_url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
                 proxy_icon_url: None,
-                text: "This is a hakase footer".to_string(),
             }),
             image: Some(EmbedImage {
-                height: 213,
-                proxy_url: "a".to_string(),
                 url: "https://i.imgur.com/XfWpfCV.gif".to_string(),
-                width: 224,
+                proxy_url: Some("a".to_string()),
+                height: Some(213),
+                width: Some(224),
             }),
-            kind: "rich".to_string(),
+            kind: Some("rich".to_string()),
             provider: None,
             thumbnail: None,
             timestamp: None,
             title: Some("hakase".to_string()),
             url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
             video: Some(EmbedVideo {
-                height: 213,
                 url: "https://i.imgur.com/XfWpfCV.mp4".to_string(),
-                width: 224,
+                proxy_url: Some("a".to_string()),
+                height: Some(213),
+                width: Some(224),
             }),
         };
 
