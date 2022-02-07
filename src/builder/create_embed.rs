@@ -476,13 +476,17 @@ pub struct Timestamp {
 
 impl From<String> for Timestamp {
     fn from(ts: String) -> Self {
-        Self { ts }
+        Self {
+            ts,
+        }
     }
 }
 
 impl<'a> From<&'a str> for Timestamp {
     fn from(ts: &'a str) -> Self {
-        Self { ts: ts.to_string() }
+        Self {
+            ts: ts.to_string(),
+        }
     }
 }
 
@@ -491,7 +495,9 @@ where
     Tz::Offset: Display,
 {
     fn from(dt: DateTime<Tz>) -> Self {
-        Self { ts: dt.to_rfc3339() }
+        Self {
+            ts: dt.to_rfc3339(),
+        }
     }
 }
 
@@ -500,7 +506,9 @@ where
     Tz::Offset: Display,
 {
     fn from(dt: &'a DateTime<Tz>) -> Self {
-        Self { ts: dt.to_rfc3339() }
+        Self {
+            ts: dt.to_rfc3339(),
+        }
     }
 }
 
@@ -521,8 +529,16 @@ mod test {
             colour: Colour::new(0xFF0011),
             description: Some("This is a test description".to_string()),
             fields: vec![
-                EmbedField { inline: false, name: "a".to_string(), value: "b".to_string() },
-                EmbedField { inline: true, name: "c".to_string(), value: "z".to_string() },
+                EmbedField {
+                    inline: false,
+                    name: "a".to_string(),
+                    value: "b".to_string(),
+                },
+                EmbedField {
+                    inline: true,
+                    name: "c".to_string(),
+                    value: "z".to_string(),
+                },
             ],
             footer: Some(EmbedFooter {
                 icon_url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
