@@ -4,8 +4,6 @@ use std::fs::File;
 use std::path::{Path, PathBuf};
 
 #[cfg(feature = "http")]
-use bytes::buf::Buf;
-#[cfg(feature = "http")]
 use reqwest::Client;
 #[cfg(feature = "http")]
 use tokio::{fs::File, io::AsyncReadExt};
@@ -52,10 +50,7 @@ impl<'a> AttachmentType<'a> {
             },
             AttachmentType::Image(url) => {
                 let response = client.get(url.clone()).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = Vec::with_capacity(bytes.len());
-                bytes.copy_to_slice(&mut picture);
-                picture
+                response.bytes().await?.to_vec()
             },
         };
         Ok(data)
