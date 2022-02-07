@@ -564,6 +564,7 @@
 <span id="559">559</span>
 <span id="560">560</span>
 <span id="561">561</span>
+<span id="562">562</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is a set of embed builders for rich embeds.</span>
@@ -1063,26 +1064,27 @@
                 },
             ],
             <span class="ident">footer</span>: <span class="prelude-val">Some</span>(<span class="ident">EmbedFooter</span> {
+                <span class="ident">text</span>: <span class="string">&quot;This is a hakase footer&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">icon_url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.<span class="ident">to_string</span>()),
                 <span class="ident">proxy_icon_url</span>: <span class="prelude-val">None</span>,
-                <span class="ident">text</span>: <span class="string">&quot;This is a hakase footer&quot;</span>.<span class="ident">to_string</span>(),
             }),
             <span class="ident">image</span>: <span class="prelude-val">Some</span>(<span class="ident">EmbedImage</span> {
-                <span class="ident">height</span>: <span class="number">213</span>,
-                <span class="ident">proxy_url</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">url</span>: <span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">width</span>: <span class="number">224</span>,
+                <span class="ident">proxy_url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>()),
+                <span class="ident">height</span>: <span class="prelude-val">Some</span>(<span class="number">213</span>),
+                <span class="ident">width</span>: <span class="prelude-val">Some</span>(<span class="number">224</span>),
             }),
-            <span class="ident">kind</span>: <span class="string">&quot;rich&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;rich&quot;</span>.<span class="ident">to_string</span>()),
             <span class="ident">provider</span>: <span class="prelude-val">None</span>,
             <span class="ident">thumbnail</span>: <span class="prelude-val">None</span>,
             <span class="ident">timestamp</span>: <span class="prelude-val">None</span>,
             <span class="ident">title</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;hakase&quot;</span>.<span class="ident">to_string</span>()),
             <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.<span class="ident">to_string</span>()),
             <span class="ident">video</span>: <span class="prelude-val">Some</span>(<span class="ident">EmbedVideo</span> {
-                <span class="ident">height</span>: <span class="number">213</span>,
                 <span class="ident">url</span>: <span class="string">&quot;https://i.imgur.com/XfWpfCV.mp4&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">width</span>: <span class="number">224</span>,
+                <span class="ident">proxy_url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>()),
+                <span class="ident">height</span>: <span class="prelude-val">Some</span>(<span class="number">213</span>),
+                <span class="ident">width</span>: <span class="prelude-val">Some</span>(<span class="number">224</span>),
             }),
         };
 
