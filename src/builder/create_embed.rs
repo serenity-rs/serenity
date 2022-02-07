@@ -485,8 +485,16 @@ mod test {
             colour: Some(Colour::new(0xFF0011)),
             description: Some("This is a test description".to_string()),
             fields: vec![
-                EmbedField { inline: false, name: "a".to_string(), value: "b".to_string() },
-                EmbedField { inline: true, name: "c".to_string(), value: "z".to_string() },
+                EmbedField {
+                    inline: false,
+                    name: "a".to_string(),
+                    value: "b".to_string(),
+                },
+                EmbedField {
+                    inline: true,
+                    name: "c".to_string(),
+                    value: "z".to_string(),
+                },
             ],
             footer: Some(EmbedFooter {
                 text: "This is a hakase footer".to_string(),
