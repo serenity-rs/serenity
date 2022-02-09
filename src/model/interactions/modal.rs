@@ -349,11 +349,15 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             false => member.as_ref().expect("expected user or member").user.clone(),
         };
 
-        let message = map
-            .remove("message")
-            .ok_or_else(|| DeError::custom("expected message"))
-            .and_then(Message::deserialize)
-            .map_err(DeError::custom)?;
+        let message = match map.contains_key("message") {
+            true => Some(
+                map.remove("message")
+                    .ok_or_else(|| DeError::custom("expected message"))
+                    .and_then(Message::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
 
         let token = map
             .remove("token")
