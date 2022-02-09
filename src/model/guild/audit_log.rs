@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt, mem::transmute};
 
-use serde::de::{self, Deserialize, Deserializer, MapAccess, Visitor};
+use serde::de::{self, Deserializer, Visitor};
 use serde::ser::Serializer;
 
 use crate::internal::prelude::*;
@@ -315,12 +315,30 @@ pub struct Change {
     pub new: Option<Value>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct AuditLogs {
+    #[serde(with = "entries", rename = "audit_log_entries")]
     pub entries: HashMap<AuditLogEntryId, AuditLogEntry>,
     pub webhooks: Vec<Webhook>,
     pub users: Vec<User>,
+}
+
+mod entries {
+    use std::collections::HashMap;
+
+    use serde::Deserializer;
+
+    use super::{AuditLogEntry, AuditLogEntryId};
+    use crate::model::utils::SequenceToMapVisitor;
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<HashMap<AuditLogEntryId, AuditLogEntry>, D::Error> {
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|e: &AuditLogEntry| e.id))
+    }
+
+    pub use crate::model::utils::serialize_map_values as serialize;
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -457,93 +475,5 @@ mod action_handler {
 
     pub fn serialize<S: Serializer>(action: &Action, serializer: S) -> StdResult<S::Ok, S::Error> {
         serializer.serialize_u8(action.num())
-    }
-}
-impl<'de> Deserialize<'de> for AuditLogs {
-    fn deserialize<D: Deserializer<'de>>(de: D) -> StdResult<Self, D::Error> {
-        #[derive(Deserialize)]
-        #[serde(field_identifier)]
-        enum Field {
-            #[serde(rename = "audit_log_entries")]
-            Entries,
-            #[serde(rename = "webhooks")]
-            Webhooks,
-            #[serde(rename = "users")]
-            Users,
-            // TODO(field added by Discord, undocumented) #[serde(rename = "integrations")] Integrations,
-        }
-
-        struct EntriesVisitor;
-
-        impl<'de> Visitor<'de> for EntriesVisitor {
-            type Value = AuditLogs;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("audit log entries")
-            }
-
-            fn visit_map<V: MapAccess<'de>>(self, mut map: V) -> StdResult<AuditLogs, V::Error> {
-                let mut audit_log_entries = None;
-                let mut users = None;
-                let mut webhooks = None;
-
-                loop {
-                    match map.next_key() {
-                        Ok(Some(Field::Entries)) => {
-                            if audit_log_entries.is_some() {
-                                return Err(de::Error::duplicate_field("entries"));
-                            }
-
-                            audit_log_entries = Some(map.next_value::<Vec<AuditLogEntry>>()?);
-                        },
-                        Ok(Some(Field::Webhooks)) => {
-                            if webhooks.is_some() {
-                                return Err(de::Error::duplicate_field("webhooks"));
-                            }
-
-                            webhooks = Some(map.next_value::<Vec<Webhook>>()?);
-                        },
-                        Ok(Some(Field::Users)) => {
-                            if users.is_some() {
-                                return Err(de::Error::duplicate_field("users"));
-                            }
-
-                            users = Some(map.next_value::<Vec<User>>()?);
-                        },
-                        Ok(None) => break, // No more keys
-                        Err(e) => {
-                            if e.to_string().contains("unknown field") {
-                                // e is of type <V as MapAccess>::Error, which is a macro-defined trait, ultimately
-                                // implemented by serde::de::value::Error. Seeing as every error is a simple string and not
-                                // using a proper Error num, the best we can do here is to check if the string contains
-                                // this error. This was added because Discord randomly started sending new fields.
-                                // But no JSON deserializer should ever error over this.
-                                map.next_value::<crate::json::Value>()?; // Actually read the value to avoid syntax errors
-                            } else {
-                                return Err(e);
-                            }
-                        },
-                    }
-                }
-
-                let entries = audit_log_entries
-                    .ok_or_else(|| de::Error::missing_field("audit_log_entries"))?
-                    .into_iter()
-                    .map(|entry| (entry.id, entry))
-                    .collect::<HashMap<AuditLogEntryId, AuditLogEntry>>();
-
-                let webhooks = webhooks.ok_or_else(|| de::Error::missing_field("webhooks"))?;
-                let users = users.ok_or_else(|| de::Error::missing_field("users"))?;
-
-                Ok(AuditLogs {
-                    entries,
-                    webhooks,
-                    users,
-                })
-            }
-        }
-
-        const FIELD: &[&str] = &["audit_log_entries"];
-        de.deserialize_struct("AuditLogs", FIELD, EntriesVisitor)
     }
 }
