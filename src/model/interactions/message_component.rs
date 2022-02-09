@@ -526,6 +526,9 @@ impl<'de> Deserialize<'de> for ActionRowComponent {
             ComponentType::SelectMenu => serde_json::from_value::<SelectMenu>(Value::Object(map))
                 .map(ActionRowComponent::SelectMenu)
                 .map_err(DeError::custom),
+            ComponentType::InputText => serde_json::from_value::<InputText>(Value::Object(map))
+                .map(ActionRowComponent::InputText)
+                .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown component type")),
         }
     }
@@ -664,19 +667,7 @@ pub struct InputText {
     pub kind: ComponentType,
     /// An identifier defined by the developer for the select menu.
     pub custom_id: String,
-    /// The style of the input text
-    pub style: InputTextStyle,
-    /// The text that appears on top of the input text field, max 80 characters
-    pub label: String,
-    /// placeholder for the text input
-    pub placeholder: Option<String>,
-    /// Minimal length of text input
-    pub min_length: Option<u64>,
-    /// Maximal length of text input
-    pub max_length: Option<u64>,
-    /// Whether this text input is required
-    pub required: Option<bool>,
-    /// The pre-filled value
+    /// The Input from the user
     pub value: Option<String>,
 }
 

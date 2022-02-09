@@ -1,6 +1,7 @@
 use serde::de::Error as DeError;
 use serde::Serialize;
 
+use super::message_component::ActionRow;
 use super::prelude::*;
 use crate::builder::{
     CreateInteractionResponse,
@@ -384,8 +385,8 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ModalSubmitInteractionData {
-    /// The custom id of the component.
+    /// The custom id of the modal
     pub custom_id: String,
     /// The components.
-    pub components: Vec<serde_json::Value>, // TODO
+    pub components: Vec<ActionRow>,
 }
