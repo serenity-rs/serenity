@@ -668,7 +668,7 @@ pub struct InputText {
     /// An identifier defined by the developer for the select menu.
     pub custom_id: String,
     /// The Input from the user
-    pub value: Option<String>,
+    pub value: String,
 }
 
 /// The style of the input text
