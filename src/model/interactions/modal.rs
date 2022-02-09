@@ -25,9 +25,11 @@ pub struct ModalSubmitInteraction {
     pub kind: InteractionType,
     /// The data of the interaction which was triggered.
     pub data: ModalSubmitInteractionData,
-    /// The message this interaction was triggered by, if
-    /// it is a component.
-    pub message: Message,
+    /// The message this interaction was triggered by
+    /// **Note**: Does not exist if the modal interaction originates from
+    /// an application command interaction
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<Message>,
     /// The guild Id this interaction was sent from, if there is one.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
