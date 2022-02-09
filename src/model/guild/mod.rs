@@ -39,6 +39,7 @@ pub use self::system_channel::*;
 use super::utils::*;
 #[cfg(feature = "model")]
 use crate::builder::{
+    AddMember,
     CreateChannel,
     EditGuild,
     EditGuildWelcomeScreen,
@@ -453,6 +454,24 @@ impl Guild {
         }
 
         self.id.bans(cache_http.http()).await
+    }
+
+    /// Adds a [`User`] to this guild with a valid OAuth2 access token.
+    ///
+    /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid values are set.
+    #[inline]
+    pub async fn add_member(
+        &self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+        f: impl FnOnce(&mut AddMember) -> &mut AddMember,
+    ) -> Result<Option<Member>> {
+        self.id.add_member(http, user_id, f).await
     }
 
     /// Retrieves a list of [`AuditLogs`] for the guild.
