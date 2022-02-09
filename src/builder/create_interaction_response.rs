@@ -148,6 +148,18 @@ impl CreateInteractionResponseData {
         self.0.insert("components", Value::Array(components.0));
         self
     }
+
+    /// Sets the custom id for modal interactions
+    pub fn custom_id<D: ToString>(&mut self, id: D) -> &mut Self {
+        self.0.insert("custom_id", Value::String(id.to_string()));
+        self
+    }
+
+    /// Sets the titel for modal interactions
+    pub fn title<D: ToString>(&mut self, title: D) -> &mut Self {
+        self.0.insert("title", Value::String(title.to_string()));
+        self
+    }
 }
 
 #[derive(Clone, Debug)]
