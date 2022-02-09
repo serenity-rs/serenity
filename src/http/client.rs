@@ -56,30 +56,26 @@ use crate::utils;
 pub struct HttpBuilder {
     client: Option<Client>,
     ratelimiter: Option<Ratelimiter>,
-    ratelimiter_disabled: Option<bool>,
-    token: Option<String>,
+    ratelimiter_disabled: bool,
+    token: String,
     proxy: Option<Url>,
     #[cfg(feature = "unstable_discord_api")]
     application_id: Option<u64>,
 }
 
 impl HttpBuilder {
-    fn _new() -> Self {
+    /// Construct a new builder to call methods on for the HTTP construction.
+    /// The `token` will automatically be prefixed "Bot " if not already.
+    pub fn new(token: impl AsRef<str>) -> Self {
         Self {
             client: None,
             ratelimiter: None,
-            ratelimiter_disabled: Some(false),
-            token: None,
+            ratelimiter_disabled: false,
+            token: parse_token(token),
             proxy: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: None,
         }
-    }
-
-    /// Construct a new builder to call methods on for the HTTP construction.
-    /// The `token` will automatically be prefixed "Bot " if not already.
-    pub fn new(token: impl AsRef<str>) -> Self {
-        Self::_new().token(token)
     }
 
     /// Sets the application_id to use interactions.
@@ -93,12 +89,7 @@ impl HttpBuilder {
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
     /// method will automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        let token = token.as_ref().trim();
-
-        let token =
-            if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
-
-        self.token = Some(token);
+        self.token = parse_token(token);
 
         self
     }
@@ -128,7 +119,7 @@ impl HttpBuilder {
     /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
     /// instead of the current process.
     pub fn ratelimiter_disabled(mut self, ratelimiter_disabled: bool) -> Self {
-        self.ratelimiter_disabled = Some(ratelimiter_disabled);
+        self.ratelimiter_disabled = ratelimiter_disabled;
 
         self
     }
@@ -157,9 +148,8 @@ impl HttpBuilder {
     }
 
     /// Use the given configuration to build the `Http` client.
-    #[allow(clippy::unwrap_used)]
     pub fn build(self) -> Http {
-        let token = self.token.unwrap();
+        let token = self.token;
 
         #[cfg(feature = "unstable_discord_api")]
         let application_id = self
@@ -176,7 +166,7 @@ impl HttpBuilder {
             Ratelimiter::new(client, token.to_string())
         });
 
-        let ratelimiter_disabled = self.ratelimiter_disabled.unwrap();
+        let ratelimiter_disabled = self.ratelimiter_disabled;
 
         Http {
             client,
@@ -187,6 +177,16 @@ impl HttpBuilder {
             #[cfg(feature = "unstable_discord_api")]
             application_id,
         }
+    }
+}
+
+fn parse_token(token: impl AsRef<str>) -> String {
+    let token = token.as_ref().trim();
+
+    if token.starts_with("Bot ") {
+        token.to_string()
+    } else {
+        format!("Bot {}", token)
     }
 }
 
