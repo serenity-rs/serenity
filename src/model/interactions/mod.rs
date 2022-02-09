@@ -2,11 +2,13 @@ pub mod application_command;
 pub mod autocomplete;
 pub mod message_component;
 pub mod ping;
+pub mod modal;
 
 use application_command::ApplicationCommandInteraction;
 use autocomplete::AutocompleteInteraction;
 use bitflags::__impl_bitflags;
 use message_component::MessageComponentInteraction;
+use modal::ModalSubmitInteraction;
 use ping::PingInteraction;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
@@ -21,8 +23,7 @@ pub enum Interaction {
     ApplicationCommand(ApplicationCommandInteraction),
     MessageComponent(MessageComponentInteraction),
     Autocomplete(AutocompleteInteraction),
-    // TODO This should probably become a new struct
-    ModalSubmit(MessageComponentInteraction),
+    ModalSubmit(ModalSubmitInteraction),
 }
 
 impl Interaction {
@@ -133,8 +134,8 @@ impl<'de> Deserialize<'de> for Interaction {
                     .map_err(DeError::custom)
             },
             InteractionType::ModalSubmit => {
-                serde_json::from_value::<MessageComponentInteraction>(Value::Object(map))
-                    .map(Interaction::MessageComponent)
+                serde_json::from_value::<ModalSubmitInteraction>(Value::Object(map))
+                    .map(Interaction::ModalSubmit)
                     .map_err(DeError::custom)
             },
             InteractionType::Unknown => Err(DeError::custom("Unknown interaction type")),
@@ -156,7 +157,7 @@ impl Serialize for Interaction {
                 MessageComponentInteraction::serialize(i, serializer)
             },
             Interaction::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
-            Interaction::ModalSubmit(i) => MessageComponentInteraction::serialize(i, serializer),
+            Interaction::ModalSubmit(i) => ModalSubmitInteraction::serialize(i, serializer),
         }
     }
 }
