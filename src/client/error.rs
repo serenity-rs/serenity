@@ -14,11 +14,6 @@ use std::{
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 pub enum Error {
-    /// When the token provided is invalid. This is returned when validating a
-    /// token through the [`validate_token`] function.
-    ///
-    /// [`validate_token`]: super::validate_token
-    InvalidToken,
     /// When a shard has completely failed to reboot after resume and/or
     /// reconnect attempts.
     ShardBootFailure,
@@ -30,7 +25,6 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
-            Error::InvalidToken => f.write_str("The provided token was invalid"),
             Error::ShardBootFailure => f.write_str("Failed to (re-)boot a shard"),
             Error::Shutdown => f.write_str("The clients shards shutdown"),
         }

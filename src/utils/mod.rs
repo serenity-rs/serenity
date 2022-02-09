@@ -9,12 +9,17 @@ mod content_safe;
 mod custom_message;
 mod message_builder;
 
+pub mod token;
+
+#[cfg(all(feature = "client", feature = "cache"))]
 pub use argument_convert::*;
 #[cfg(feature = "cache")]
 pub use content_safe::*;
 #[cfg(feature = "url")]
 use url::Url;
 
+#[doc(inline)]
+pub use self::token::{parse as parse_token, validate as validate_token};
 pub use self::{
     colour::{colours, Colour},
     custom_message::CustomMessage,

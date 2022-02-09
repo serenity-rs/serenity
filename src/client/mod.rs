@@ -71,7 +71,6 @@ use crate::internal::prelude::*;
 use crate::model::gateway::GatewayIntents;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::id::ApplicationId;
-use crate::model::id::UserId;
 pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
@@ -1007,85 +1006,4 @@ impl Client {
 
         Ok(())
     }
-}
-
-/// Validates that a token is likely in a valid format.
-///
-/// This performs the following checks on a given token:
-///
-/// - At least one character long;
-/// - Contains 3 parts (split by the period char `'.'`);
-/// - The second part of the token is at least 6 characters long;
-/// - The token does not contain any whitespace prior to or after the token.
-///
-/// # Examples
-///
-/// Validate that a token is valid and that a number of invalid tokens are
-/// actually invalid:
-///
-/// ```rust,no_run
-/// use serenity::client::validate_token;
-///
-/// // ensure a valid token is in fact valid:
-/// assert!(validate_token("Mjg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_ok());
-///
-/// // helpful to prevent typos
-/// assert!(validate_token("Njg4NzYwMjQxMzYzODc3ODg4.C_ikow.j3VupLBuE1QWZng3TMGH0z_UAwg").is_err());
-/// ```
-///
-/// # Errors
-///
-/// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.
-/// The type of failure is not specified.
-pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
-    if parse_token(token.as_ref()).is_some() {
-        Ok(())
-    } else {
-        Err(Error::Client(ClientError::InvalidToken))
-    }
-}
-
-/// Part of the data contained within a Discord bot token. Returned by [`parse_token`].
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TokenComponents {
-    pub bot_user_id: UserId,
-    pub creation_time: chrono::NaiveDateTime,
-}
-
-/// Verifies that the token adheres to the Discord token format and extracts the bot user ID and the
-/// token generation timestamp
-pub fn parse_token(token: impl AsRef<str>) -> Option<TokenComponents> {
-    // The token consists of three base64-encoded parts
-    let mut parts = token.as_ref().split('.');
-    let base64_config = base64::Config::new(base64::CharacterSet::UrlSafe, true);
-
-    // First part must be a base64-encoded stringified user ID
-    let user_id = base64::decode_config(parts.next()?, base64_config).ok()?;
-    let user_id = UserId(std::str::from_utf8(&user_id).ok()?.parse().ok()?);
-
-    // Second part must be a base64-encoded token generation timestamp
-    let timestamp_base64 = parts.next()?;
-    // The base64-encoded timestamp must be at least 6 characters
-    if timestamp_base64.len() < 6 {
-        return None;
-    }
-    let timestamp_bytes = base64::decode_config(timestamp_base64, base64_config).ok()?;
-    let mut timestamp = 0;
-    for byte in timestamp_bytes {
-        timestamp *= 256;
-        timestamp += byte as u64;
-    }
-    // Some timestamps are based on the Discord epoch. Convert to Unix epoch
-    if timestamp < 1293840000 {
-        timestamp += 1293840000;
-    }
-    let timestamp = chrono::NaiveDateTime::from_timestamp_opt(timestamp as i64, 0)?;
-
-    // Third part is a base64-encoded HMAC that's not interesting on its own
-    let _ = base64::decode_config(parts.next()?, base64_config).ok()?;
-
-    Some(TokenComponents {
-        bot_user_id: user_id,
-        creation_time: timestamp,
-    })
 }
