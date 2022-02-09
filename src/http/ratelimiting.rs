@@ -110,8 +110,8 @@ impl Ratelimiter {
     fn _new(client: Client, token: String) -> Self {
         Self {
             client,
-            global: Default::default(),
-            routes: Default::default(),
+            global: Arc::default(),
+            routes: Arc::default(),
             token,
         }
     }

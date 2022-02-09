@@ -315,6 +315,6 @@ impl<'a> Default for CreateMessage<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::from(false));
 
-        CreateMessage(map, None, Default::default())
+        CreateMessage(map, None, Vec::default())
     }
 }

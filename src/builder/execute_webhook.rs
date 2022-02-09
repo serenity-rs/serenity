@@ -307,6 +307,6 @@ impl<'a> Default for ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::from(false));
 
-        ExecuteWebhook(map, Default::default())
+        ExecuteWebhook(map, Vec::default())
     }
 }
