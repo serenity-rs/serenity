@@ -7,7 +7,7 @@ use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Determines the action that was done on a target.
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 pub enum Action {
     GuildUpdate,
@@ -26,28 +26,26 @@ pub enum Action {
 }
 
 impl Action {
-    pub fn num(&self) -> u8 {
-        use self::Action::*;
-
-        match *self {
-            GuildUpdate => 1,
-            Action::Channel(ref x) => x.num(),
-            Action::ChannelOverwrite(ref x) => x.num(),
-            Action::Member(ref x) => x.num(),
-            Action::Role(ref x) => x.num(),
-            Action::Invite(ref x) => x.num(),
-            Action::Webhook(ref x) => x.num(),
-            Action::Emoji(ref x) => x.num(),
-            Action::Message(ref x) => x.num(),
-            Action::Integration(ref x) => x.num(),
-            Action::StageInstance(ref x) => x.num(),
-            Action::Sticker(ref x) => x.num(),
-            Action::Thread(ref x) => x.num(),
+    pub fn num(self) -> u8 {
+        match self {
+            Action::GuildUpdate => 1,
+            Action::Channel(x) => x as u8,
+            Action::ChannelOverwrite(x) => x as u8,
+            Action::Member(x) => x as u8,
+            Action::Role(x) => x as u8,
+            Action::Invite(x) => x as u8,
+            Action::Webhook(x) => x as u8,
+            Action::Emoji(x) => x as u8,
+            Action::Message(x) => x as u8,
+            Action::Integration(x) => x as u8,
+            Action::StageInstance(x) => x as u8,
+            Action::Sticker(x) => x as u8,
+            Action::Thread(x) => x as u8,
         }
     }
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionChannel {
@@ -56,17 +54,7 @@ pub enum ActionChannel {
     Delete = 12,
 }
 
-impl ActionChannel {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionChannel::Create => 10,
-            ActionChannel::Update => 11,
-            ActionChannel::Delete => 12,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionChannelOverwrite {
@@ -75,17 +63,7 @@ pub enum ActionChannelOverwrite {
     Delete = 15,
 }
 
-impl ActionChannelOverwrite {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionChannelOverwrite::Create => 13,
-            ActionChannelOverwrite::Update => 14,
-            ActionChannelOverwrite::Delete => 15,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionMember {
@@ -100,23 +78,7 @@ pub enum ActionMember {
     BotAdd = 28,
 }
 
-impl ActionMember {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionMember::Kick => 20,
-            ActionMember::Prune => 21,
-            ActionMember::BanAdd => 22,
-            ActionMember::BanRemove => 23,
-            ActionMember::Update => 24,
-            ActionMember::RoleUpdate => 25,
-            ActionMember::MemberMove => 26,
-            ActionMember::MemberDisconnect => 27,
-            ActionMember::BotAdd => 28,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionRole {
@@ -125,17 +87,7 @@ pub enum ActionRole {
     Delete = 32,
 }
 
-impl ActionRole {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionRole::Create => 30,
-            ActionRole::Update => 31,
-            ActionRole::Delete => 32,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionInvite {
@@ -144,17 +96,7 @@ pub enum ActionInvite {
     Delete = 42,
 }
 
-impl ActionInvite {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionInvite::Create => 40,
-            ActionInvite::Update => 41,
-            ActionInvite::Delete => 42,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionWebhook {
@@ -163,36 +105,16 @@ pub enum ActionWebhook {
     Delete = 52,
 }
 
-impl ActionWebhook {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionWebhook::Create => 50,
-            ActionWebhook::Update => 51,
-            ActionWebhook::Delete => 52,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionEmoji {
     Create = 60,
-    Delete = 61,
-    Update = 62,
+    Update = 61,
+    Delete = 62,
 }
 
-impl ActionEmoji {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionEmoji::Create => 60,
-            ActionEmoji::Update => 61,
-            ActionEmoji::Delete => 62,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionMessage {
@@ -202,18 +124,7 @@ pub enum ActionMessage {
     Unpin = 75,
 }
 
-impl ActionMessage {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionMessage::Delete => 72,
-            ActionMessage::BulkDelete => 73,
-            ActionMessage::Pin => 74,
-            ActionMessage::Unpin => 75,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionIntegration {
@@ -222,17 +133,7 @@ pub enum ActionIntegration {
     Delete = 82,
 }
 
-impl ActionIntegration {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionIntegration::Create => 80,
-            ActionIntegration::Update => 81,
-            ActionIntegration::Delete => 82,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionStageInstance {
@@ -241,17 +142,7 @@ pub enum ActionStageInstance {
     Delete = 85,
 }
 
-impl ActionStageInstance {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionStageInstance::Create => 83,
-            ActionStageInstance::Update => 84,
-            ActionStageInstance::Delete => 85,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionSticker {
@@ -260,33 +151,13 @@ pub enum ActionSticker {
     Delete = 92,
 }
 
-impl ActionSticker {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionSticker::Create => 90,
-            ActionSticker::Update => 91,
-            ActionSticker::Delete => 92,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ActionThread {
     Create = 110,
     Update = 111,
     Delete = 112,
-}
-
-impl ActionThread {
-    pub fn num(&self) -> u8 {
-        match *self {
-            ActionThread::Create => 110,
-            ActionThread::Update => 111,
-            ActionThread::Delete => 112,
-        }
-    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -457,5 +328,64 @@ mod action_handler {
 
     pub fn serialize<S: Serializer>(action: &Action, serializer: S) -> StdResult<S::Ok, S::Error> {
         serializer.serialize_u8(action.num())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn action_value() {
+        macro_rules! assert_action {
+            ($action:expr, $num:literal) => {{
+                assert_eq!($action.num(), $num);
+            }};
+        }
+
+        assert_action!(Action::GuildUpdate, 1);
+        assert_action!(Action::Channel(ActionChannel::Create), 10);
+        assert_action!(Action::Channel(ActionChannel::Update), 11);
+        assert_action!(Action::Channel(ActionChannel::Delete), 12);
+        assert_action!(Action::ChannelOverwrite(ActionChannelOverwrite::Create), 13);
+        assert_action!(Action::ChannelOverwrite(ActionChannelOverwrite::Update), 14);
+        assert_action!(Action::ChannelOverwrite(ActionChannelOverwrite::Delete), 15);
+        assert_action!(Action::Member(ActionMember::Kick), 20);
+        assert_action!(Action::Member(ActionMember::Prune), 21);
+        assert_action!(Action::Member(ActionMember::BanAdd), 22);
+        assert_action!(Action::Member(ActionMember::BanRemove), 23);
+        assert_action!(Action::Member(ActionMember::Update), 24);
+        assert_action!(Action::Member(ActionMember::RoleUpdate), 25);
+        assert_action!(Action::Member(ActionMember::MemberMove), 26);
+        assert_action!(Action::Member(ActionMember::MemberDisconnect), 27);
+        assert_action!(Action::Member(ActionMember::BotAdd), 28);
+        assert_action!(Action::Role(ActionRole::Create), 30);
+        assert_action!(Action::Role(ActionRole::Update), 31);
+        assert_action!(Action::Role(ActionRole::Delete), 32);
+        assert_action!(Action::Invite(ActionInvite::Create), 40);
+        assert_action!(Action::Invite(ActionInvite::Update), 41);
+        assert_action!(Action::Invite(ActionInvite::Delete), 42);
+        assert_action!(Action::Webhook(ActionWebhook::Create), 50);
+        assert_action!(Action::Webhook(ActionWebhook::Update), 51);
+        assert_action!(Action::Webhook(ActionWebhook::Delete), 52);
+        assert_action!(Action::Emoji(ActionEmoji::Create), 60);
+        assert_action!(Action::Emoji(ActionEmoji::Update), 61);
+        assert_action!(Action::Emoji(ActionEmoji::Delete), 62);
+        assert_action!(Action::Message(ActionMessage::Delete), 72);
+        assert_action!(Action::Message(ActionMessage::BulkDelete), 73);
+        assert_action!(Action::Message(ActionMessage::Pin), 74);
+        assert_action!(Action::Message(ActionMessage::Unpin), 75);
+        assert_action!(Action::Integration(ActionIntegration::Create), 80);
+        assert_action!(Action::Integration(ActionIntegration::Update), 81);
+        assert_action!(Action::Integration(ActionIntegration::Delete), 82);
+        assert_action!(Action::StageInstance(ActionStageInstance::Create), 83);
+        assert_action!(Action::StageInstance(ActionStageInstance::Update), 84);
+        assert_action!(Action::StageInstance(ActionStageInstance::Delete), 85);
+        assert_action!(Action::Sticker(ActionSticker::Create), 90);
+        assert_action!(Action::Sticker(ActionSticker::Update), 91);
+        assert_action!(Action::Sticker(ActionSticker::Delete), 92);
+        assert_action!(Action::Thread(ActionThread::Create), 110);
+        assert_action!(Action::Thread(ActionThread::Update), 111);
+        assert_action!(Action::Thread(ActionThread::Delete), 112);
     }
 }
