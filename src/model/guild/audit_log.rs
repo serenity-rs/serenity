@@ -6,21 +6,6 @@ use serde::ser::Serializer;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// Determines to what entity an action was used on.
-#[derive(Debug)]
-#[non_exhaustive]
-#[repr(u8)]
-pub enum Target {
-    Guild = 10,
-    Channel = 20,
-    User = 30,
-    Role = 40,
-    Invite = 50,
-    Webhook = 60,
-    Emoji = 70,
-    Integration = 80,
-}
-
 /// Determines the action that was done on a target.
 #[derive(Debug)]
 #[non_exhaustive]
