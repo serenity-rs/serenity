@@ -915,13 +915,13 @@
 }
 
 <span class="doccomment">/// Deserializes a sequence and builds a `HashMap` with the key extraction function.</span>
-<span class="kw">struct</span> <span class="ident">SequenceToMapVisitor</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::model</span>) <span class="kw">struct</span> <span class="ident">SequenceToMapVisitor</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="ident">key</span>: <span class="ident">F</span>,
     <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">SequenceToMapVisitor</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">key</span>,
             <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
