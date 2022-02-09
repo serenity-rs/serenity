@@ -464,21 +464,6 @@
 <span id="459">459</span>
 <span id="460">460</span>
 <span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">fmt</span>, <span class="ident">mem::transmute</span>};
 
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="self">self</span>, <span class="ident">Deserializer</span>, <span class="ident">Visitor</span>};
@@ -486,21 +471,6 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-
-<span class="doccomment">/// Determines to what entity an action was used on.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Target</span> {
-    <span class="ident">Guild</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="ident">Channel</span> <span class="op">=</span> <span class="number">20</span>,
-    <span class="ident">User</span> <span class="op">=</span> <span class="number">30</span>,
-    <span class="ident">Role</span> <span class="op">=</span> <span class="number">40</span>,
-    <span class="ident">Invite</span> <span class="op">=</span> <span class="number">50</span>,
-    <span class="ident">Webhook</span> <span class="op">=</span> <span class="number">60</span>,
-    <span class="ident">Emoji</span> <span class="op">=</span> <span class="number">70</span>,
-    <span class="ident">Integration</span> <span class="op">=</span> <span class="number">80</span>,
-}
 
 <span class="doccomment">/// Determines the action that was done on a target.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
