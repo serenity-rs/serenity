@@ -289,6 +289,35 @@ impl Http {
         base
     }
 
+    /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
+    ///
+    /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
+    pub async fn add_guild_member(
+        &self,
+        guild_id: u64,
+        user_id: u64,
+        map: &JsonMap,
+    ) -> Result<Option<Member>> {
+        let body = serde_json::to_vec(map)?;
+
+        let response = self
+            .request(Request {
+                body: Some(&body),
+                headers: None,
+                route: RouteInfo::AddGuildMember {
+                    guild_id,
+                    user_id,
+                },
+            })
+            .await?;
+
+        if response.status() == 204 {
+            Ok(None)
+        } else {
+            Ok(Some(response.json().await?))
+        }
+    }
+
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
     ///
     /// **Note**: Requires the [Manage Roles] permission and respect of role

@@ -1001,6 +1001,10 @@ impl Route {
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum RouteInfo<'a> {
+    AddGuildMember {
+        guild_id: u64,
+        user_id: u64,
+    },
     AddMemberRole {
         guild_id: u64,
         role_id: u64,
@@ -1530,6 +1534,14 @@ pub enum RouteInfo<'a> {
 impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
+            RouteInfo::AddGuildMember {
+                guild_id,
+                user_id,
+            } => (
+                LightMethod::Put,
+                Route::GuildsIdMembersId(guild_id),
+                Cow::from(Route::guild_member(guild_id, user_id)),
+            ),
             RouteInfo::AddMemberRole {
                 guild_id,
                 role_id,
