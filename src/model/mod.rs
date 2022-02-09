@@ -21,7 +21,6 @@
 
 #[macro_use]
 mod utils;
-mod timestamp;
 
 pub mod application;
 pub mod channel;
@@ -39,6 +38,7 @@ pub mod oauth2;
 pub mod permissions;
 pub mod prelude;
 pub mod sticker;
+pub mod timestamp;
 pub mod user;
 pub mod voice;
 pub mod webhook;

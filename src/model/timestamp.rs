@@ -1,5 +1,37 @@
+//! Utilities for parsing and formatting RFC 3339 timestamps.
+//!
+//! The [`Timestamp`] newtype wraps `chrono::DateTime<Utc>` or `time::OffsetDateTime` if the `time`
+//! feature is enabled.
+//!
+//! # Formatting
+//! ```
+//! # use serenity::model::id::GuildId;
+//! # use serenity::model::Timestamp;
+//! #
+//! let timestamp: Timestamp = GuildId(175928847299117063).created_at();
+//! assert_eq!(timestamp.unix_timestamp(), 1462015105);
+//! assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.796Z");
+//! ```
+//!
+//! # Parsing RFC 3339 string
+//! ```
+//! # use serenity::model::Timestamp;
+//! #
+//! let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
+//! let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
+//! let timestamp = Timestamp::parse("2016-04-30T11:18:25.796Z").unwrap();
+//!
+//! let timestamp: Timestamp = "2016-04-30T11:18:25Z".parse().unwrap();
+//! let timestamp: Timestamp = "2016-04-30T11:18:25+00:00".parse().unwrap();
+//! let timestamp: Timestamp = "2016-04-30T11:18:25.796Z".parse().unwrap();
+//!
+//! assert!(Timestamp::parse("2016-04-30T11:18:25").is_err());
+//! assert!(Timestamp::parse("2016-04-30T11:18").is_err());
+//! ```
+
 use std::fmt;
 use std::ops::Deref;
+use std::str::FromStr;
 
 #[cfg(not(feature = "time"))]
 use chrono::{DateTime, TimeZone, Utc};
@@ -69,8 +101,25 @@ impl Timestamp {
         self.0.unix_timestamp()
     }
 
-    fn parse(input: &str) -> Result<Timestamp, ParseError> {
-        OffsetDateTime::parse(input, &Rfc3339).map(Self).map_err(|_| ParseError)
+    /// Parse a timestamp from an RFC 3339 date and time string.
+    ///
+    /// # Examples
+    /// ```
+    /// # use serenity::model::Timestamp;
+    /// #
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25.796Z").unwrap();
+    ///
+    /// assert!(Timestamp::parse("2016-04-30T11:18:25").is_err());
+    /// assert!(Timestamp::parse("2016-04-30T11:18").is_err());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
+    pub fn parse(input: &str) -> Result<Timestamp, ParseError> {
+        OffsetDateTime::parse(input, &Rfc3339).map(Self).map_err(ParseError)
     }
 }
 
@@ -90,22 +139,42 @@ impl Timestamp {
         self.0.timestamp()
     }
 
-    fn parse(input: &str) -> Result<Timestamp, ParseError> {
-        DateTime::parse_from_rfc3339(input)
-            .map(|d| Self(d.with_timezone(&Utc)))
-            .map_err(|_| ParseError)
+    /// Parse a timestamp from an RFC 3339 date and time string.
+    ///
+    /// # Examples
+    /// ```
+    /// # use serenity::model::Timestamp;
+    /// #
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25Z").unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25+00:00").unwrap();
+    /// let timestamp = Timestamp::parse("2016-04-30T11:18:25.796Z").unwrap();
+    ///
+    /// assert!(Timestamp::parse("2016-04-30T11:18:25").is_err());
+    /// assert!(Timestamp::parse("2016-04-30T11:18").is_err());
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
+    pub fn parse(input: &str) -> Result<Timestamp, ParseError> {
+        DateTime::parse_from_rfc3339(input).map(|d| Self(d.with_timezone(&Utc))).map_err(ParseError)
     }
 }
 
+#[cfg(not(feature = "time"))]
+use chrono::ParseError as InnerError;
+#[cfg(feature = "time")]
+use time::error::Parse as InnerError;
+
 /// Signifies the failure to parse the `Timestamp` from an RFC 3339 string.
 #[derive(Debug)]
-pub struct ParseError;
+pub struct ParseError(InnerError);
 
 impl std::error::Error for ParseError {}
 
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str("invalid rfc3339 string")
+        fmt::Display::fmt(&self.0, f)
     }
 }
 
@@ -141,6 +210,14 @@ impl Deref for Timestamp {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl FromStr for Timestamp {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Timestamp::parse(s)
     }
 }
 
