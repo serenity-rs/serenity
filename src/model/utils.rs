@@ -435,13 +435,13 @@ pub fn user_has_perms(
 }
 
 /// Deserializes a sequence and builds a `HashMap` with the key extraction function.
-struct SequenceToMapVisitor<F, V> {
+pub(in crate::model) struct SequenceToMapVisitor<F, V> {
     key: F,
     marker: PhantomData<V>,
 }
 
 impl<F, V> SequenceToMapVisitor<F, V> {
-    fn new(key: F) -> Self {
+    pub fn new(key: F) -> Self {
         Self {
             key,
             marker: PhantomData,
