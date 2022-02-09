@@ -2629,6 +2629,18 @@
 <span id="2624">2624</span>
 <span id="2625">2625</span>
 <span id="2626">2626</span>
+<span id="2627">2627</span>
+<span id="2628">2628</span>
+<span id="2629">2629</span>
+<span id="2630">2630</span>
+<span id="2631">2631</span>
+<span id="2632">2632</span>
+<span id="2633">2633</span>
+<span id="2634">2634</span>
+<span id="2635">2635</span>
+<span id="2636">2636</span>
+<span id="2637">2637</span>
+<span id="2638">2638</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -3632,6 +3644,10 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RouteInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">AddGuildMember</span> {
+        <span class="ident">guild_id</span>: <span class="ident">u64</span>,
+        <span class="ident">user_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">AddMemberRole</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">role_id</span>: <span class="ident">u64</span>,
@@ -4161,6 +4177,14 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RouteInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deconstruct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">LightMethod</span>, <span class="ident">Route</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">RouteInfo::AddGuildMember</span> {
+                <span class="ident">guild_id</span>,
+                <span class="ident">user_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Put</span>,
+                <span class="ident">Route::GuildsIdMembersId</span>(<span class="ident">guild_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::guild_member</span>(<span class="ident">guild_id</span>, <span class="ident">user_id</span>)),
+            ),
             <span class="ident">RouteInfo::AddMemberRole</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">role_id</span>,
@@ -5256,5 +5280,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (f624427f8 2022-02-06)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (0c292c966 2022-02-08)" ></div>
 </body></html>
