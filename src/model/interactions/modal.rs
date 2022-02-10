@@ -408,7 +408,7 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
     }
 }
 
-/// A message component interaction data, provided by [`ModalSubmitInteraction::data`]
+/// A modal submit interaction data, provided by [`ModalSubmitInteraction::data`]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ModalSubmitInteractionData {
