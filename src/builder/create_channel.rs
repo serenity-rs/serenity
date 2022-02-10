@@ -76,8 +76,23 @@ impl CreateChannel {
     ///
     /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
     /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
+    #[deprecated(note = "replaced by `rate_limit_per_user`")]
     pub fn rate_limit(&mut self, limit: u64) -> &mut Self {
-        self.0.insert("rate_limit_per_user", Value::Number(Number::from(limit)));
+        self.rate_limit_per_user(limit)
+    }
+
+    /// How many seconds must a user wait before sending another message.
+    ///
+    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt
+    /// from this restriction.
+    ///
+    /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
+    ///
+    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
+    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
+    #[doc(alias = "slowmode")]
+    pub fn rate_limit_per_user(&mut self, seconds: u64) -> &mut Self {
+        self.0.insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
 
         self
     }

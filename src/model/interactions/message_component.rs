@@ -45,6 +45,10 @@ pub struct MessageComponentInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
+    /// The selected language of the invoking user.
+    pub locale: String,
 }
 
 impl MessageComponentInteraction {
@@ -222,6 +226,21 @@ impl MessageComponentInteraction {
     ) -> Result<()> {
         http.as_ref().delete_followup_message(&self.token, message_id.into().into()).await
     }
+
+    /// Gets a followup message.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was deleted.
+    pub async fn get_followup_message<M: Into<MessageId>>(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: M,
+    ) -> Result<Message> {
+        http.as_ref().get_followup_message(&self.token, message_id.into().into()).await
+    }
+
     /// Helper function to defer an interaction
     ///
     /// # Errors
@@ -365,6 +384,22 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
+        let guild_locale = match map.contains_key("guild_locale") {
+            true => Some(
+                map.remove("guild_locale")
+                    .ok_or_else(|| DeError::custom("expected guild_locale"))
+                    .and_then(String::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let locale = map
+            .remove("locale")
+            .ok_or_else(|| DeError::custom("expected locale"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
         Ok(Self {
             id,
             application_id,
@@ -377,6 +412,8 @@ impl<'de> Deserialize<'de> for MessageComponentInteraction {
             user,
             token,
             version,
+            guild_locale,
+            locale,
         })
     }
 }

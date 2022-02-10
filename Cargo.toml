@@ -8,30 +8,12 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.10.9"
+version = "0.10.10"
 edition = "2018"
 include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
 
 [workspace]
-members = [
-    "examples/e01_basic_ping_bot",
-    "examples/e02_transparent_guild_sharding",
-    "examples/e03_struct_utilities",
-    "examples/e04_message_builder",
-    "examples/e05_command_framework",
-    "examples/e06_sample_bot_structure",
-    "examples/e07_env_logging",
-    "examples/e08_shard_manager",
-    "examples/e09_create_message_builder",
-    "examples/e10_collectors",
-    "examples/e11_gateway_intents",
-    "examples/e12_global_data",
-    "examples/e13_parallel_loops",
-    "examples/e14_slash_commands",
-    "examples/e15_simple_dashboard",
-    "examples/e16_sqlite_database",
-    "examples/e17_message_components"
-]
+members = ["examples/*"]
 
 [dependencies]
 bitflags = "1.1"
@@ -44,7 +26,7 @@ features = ["log"]
 
 [dependencies.command_attr]
 path = "./command_attr"
-version = "0.3.7"
+version = "0.3.8"
 optional = true
 
 [dependencies.serde]
@@ -84,7 +66,7 @@ version = "0.10"
 
 [dependencies.serenity-voice-model]
 path = "./voice-model"
-version = "0.1"
+version = "0.1.1"
 optional = true
 
 [dependencies.static_assertions]

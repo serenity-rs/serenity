@@ -1,5 +1,8 @@
 //! Models pertaining to the gateway.
 
+// TODO: Remove after `GuildStatus` was replaced
+#![allow(deprecated)]
+
 use bitflags::bitflags;
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
@@ -478,17 +481,23 @@ bitflags! {
     #[derive(Deserialize, Serialize)]
     pub struct ActivityFlags: u64 {
         /// Whether the activity is an instance activity.
-        const INSTANCE = 0b001;
+        const INSTANCE = 1 << 0;
         /// Whether the activity is joinable.
-        const JOIN = 0b010;
+        const JOIN = 1 << 1;
         /// Whether the activity can be spectated.
-        const SPECTATE = 0b011;
+        const SPECTATE = 1 << 2;
         /// Whether a request can be sent to join the user's party.
-        const JOIN_REQUEST = 0b100;
+        const JOIN_REQUEST = 1 << 3;
         /// Whether the activity can be synced.
-        const SYNC = 0b101;
+        const SYNC = 1 << 4;
         /// Whether the activity can be played.
-        const PLAY = 0b110;
+        const PLAY = 1 << 5;
+        /// Whether the activity party is friend only.
+        const PARTY_PRIVACY_FRIENDS = 1 << 6;
+        /// Whether the activity party is in a voice channel.
+        const PARTY_PRIVACY_VOICE_CHANNEL = 1 << 7;
+        /// Whether the activity can be embedded.
+        const EMBEDDED = 1 << 8;
     }
 }
 

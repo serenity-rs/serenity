@@ -289,6 +289,35 @@ impl Http {
         base
     }
 
+    /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
+    ///
+    /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
+    pub async fn add_guild_member(
+        &self,
+        guild_id: u64,
+        user_id: u64,
+        map: &JsonMap,
+    ) -> Result<Option<Member>> {
+        let body = serde_json::to_vec(map)?;
+
+        let response = self
+            .request(Request {
+                body: Some(&body),
+                headers: None,
+                route: RouteInfo::AddGuildMember {
+                    guild_id,
+                    user_id,
+                },
+            })
+            .await?;
+
+        if response.status() == 204 {
+            Ok(None)
+        } else {
+            Ok(Some(response.json().await?))
+        }
+    }
+
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
     ///
     /// **Note**: Requires the [Manage Roles] permission and respect of role
@@ -1169,6 +1198,29 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::EditFollowupMessage {
+                application_id: self.application_id,
+                interaction_token,
+                message_id,
+            },
+        })
+        .await
+    }
+
+    /// Get a follow-up message for an interaction.
+    ///
+    /// Refer to Discord's [docs] for Get Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#get-webhook-message
+    #[cfg(feature = "unstable_discord_api")]
+    pub async fn get_followup_message(
+        &self,
+        interaction_token: &str,
+        message_id: u64,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetFollowupMessage {
                 application_id: self.application_id,
                 interaction_token,
                 message_id,

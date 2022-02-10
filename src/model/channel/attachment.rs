@@ -1,6 +1,7 @@
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
 
+use crate::internal::is_false;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 use crate::model::id::AttachmentId;
@@ -30,6 +31,14 @@ pub struct Attachment {
     ///
     /// [media type]: https://en.wikipedia.org/wiki/Media_type
     pub content_type: Option<String>,
+    /// Whether this attachment is ephemeral.
+    ///
+    /// Ephemeral attachments will automatically be removed after a set period of time.
+    ///
+    /// Ephemeral attachments on messages are guaranteed to be available as long as
+    /// the message itself exists.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub ephemeral: bool,
 }
 
 #[cfg(feature = "model")]
@@ -122,7 +131,7 @@ impl Attachment {
     /// [`Message`]: super::Message
     pub async fn download(&self) -> Result<Vec<u8>> {
         let reqwest = ReqwestClient::new();
-
-        Ok(reqwest.get(&self.url).send().await?.bytes().await?.into_iter().collect::<Vec<u8>>())
+        let bytes = reqwest.get(&self.url).send().await?.bytes().await?;
+        Ok(bytes.to_vec())
     }
 }

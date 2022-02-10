@@ -788,6 +788,7 @@ async fn handle_event(
             });
         },
         #[cfg(feature = "unstable_discord_api")]
+        #[allow(deprecated)]
         DispatchEvent::Model(Event::ApplicationCommandCreate(event)) => {
             let event_handler = Arc::clone(event_handler);
 
@@ -796,6 +797,7 @@ async fn handle_event(
             });
         },
         #[cfg(feature = "unstable_discord_api")]
+        #[allow(deprecated)]
         DispatchEvent::Model(Event::ApplicationCommandUpdate(event)) => {
             let event_handler = Arc::clone(event_handler);
 
@@ -804,6 +806,7 @@ async fn handle_event(
             });
         },
         #[cfg(feature = "unstable_discord_api")]
+        #[allow(deprecated)]
         DispatchEvent::Model(Event::ApplicationCommandDelete(event)) => {
             let event_handler = Arc::clone(event_handler);
 

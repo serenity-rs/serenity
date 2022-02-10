@@ -856,6 +856,8 @@ mod test {
             discriminator: 0000,
             name: "Crab".to_string(),
             public_flags: None,
+            banner: None,
+            accent_colour: None,
         };
 
         #[allow(deprecated)]
@@ -940,6 +942,8 @@ mod test {
             permissions: Permissions::all(),
             position: 0,
             tags: RoleTags::default(),
+            icon: None,
+            unicode_emoji: None,
         };
 
         let channel = GuildChannel {

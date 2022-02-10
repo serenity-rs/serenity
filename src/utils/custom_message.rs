@@ -247,6 +247,8 @@ fn dummy_message() -> Message {
             discriminator: 0x0000,
             name: String::new(),
             public_flags: None,
+            banner: None,
+            accent_colour: None,
         },
         channel_id: ChannelId::default(),
         content: String::new(),

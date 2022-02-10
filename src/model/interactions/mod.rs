@@ -71,6 +71,16 @@ impl Interaction {
         }
     }
 
+    /// Gets the invoked guild locale.
+    pub fn guild_locale(&self) -> Option<&str> {
+        match self {
+            Interaction::Ping(i) => i.guild_locale.as_ref().map(String::as_str),
+            Interaction::ApplicationCommand(i) => i.guild_locale.as_ref().map(String::as_str),
+            Interaction::MessageComponent(i) => i.guild_locale.as_ref().map(String::as_str),
+            Interaction::Autocomplete(i) => i.guild_locale.as_ref().map(String::as_str),
+        }
+    }
+
     /// Converts this to a [`PingInteraction`]
     pub fn ping(self) -> Option<PingInteraction> {
         match self {
@@ -180,7 +190,7 @@ enum_number!(InteractionType {
     MessageComponent,
     ApplicationCommand,
     Autocomplete,
-    ModalSubmit,
+    ModalSubmit
 });
 
 /// The flags for an interaction response.

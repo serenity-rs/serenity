@@ -104,7 +104,7 @@ impl CreateEmbed {
 
     /// Set the description of the embed.
     ///
-    /// **Note**: This can't be longer than 2048 characters.
+    /// **Note**: This can't be longer than 4096 characters.
     #[inline]
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
         self.0.insert("description", Value::String(description.to_string()));

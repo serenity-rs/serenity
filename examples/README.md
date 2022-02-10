@@ -73,4 +73,3 @@ If you add a new example also add it to the following files:
 - `.github/workflows/ci.yml`
 - `Makefile.toml`
 - `examples/README.md`
-- `Cargo.toml` -> `workspace.members`

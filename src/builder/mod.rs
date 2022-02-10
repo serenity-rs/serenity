@@ -13,6 +13,7 @@ mod create_application_command;
 #[cfg(feature = "unstable_discord_api")]
 mod create_application_command_permission;
 
+mod add_member;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
 #[cfg(feature = "unstable_discord_api")]
@@ -43,6 +44,7 @@ mod execute_webhook;
 mod get_messages;
 
 pub use self::{
+    add_member::AddMember,
     bot_auth_parameters::CreateBotAuthParameters,
     create_allowed_mentions::CreateAllowedMentions,
     create_allowed_mentions::ParseValue,

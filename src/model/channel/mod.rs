@@ -37,6 +37,7 @@ use crate::cache::Cache;
 use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
+use crate::internal::is_false;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::model::misc::ChannelParseError;
 use crate::model::prelude::*;
@@ -479,6 +480,15 @@ pub struct ThreadMetadata {
     /// When a thread is locked, only users with `MANAGE_THREADS` permission can unarchive it.
     #[serde(default)]
     pub locked: bool,
+    /// Timestamp when the thread was created.
+    ///
+    /// **Note**: only populated for threads created after 2022-01-09
+    pub create_timestamp: Option<DateTime<Utc>>,
+    /// Whether non-moderators can add other non-moderators to a thread.
+    ///
+    /// **Note**: Only available on private threads.
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub invitable: bool,
 }
 
 /// A response to getting several threads channels.
@@ -539,6 +549,8 @@ mod test {
                     discriminator: 1,
                     name: "ab".to_string(),
                     public_flags: None,
+                    banner: None,
+                    accent_colour: None,
                 },
             }
         }

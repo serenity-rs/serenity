@@ -25,6 +25,22 @@ impl CreateThread {
         self
     }
 
+    /// How many seconds must a user wait before sending another message.
+    ///
+    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are exempt
+    /// from this restriction.
+    ///
+    /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
+    ///
+    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
+    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
+    #[doc(alias = "slowmode")]
+    pub fn rate_limit_per_user(&mut self, seconds: u64) -> &mut Self {
+        self.0.insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
+
+        self
+    }
+
     /// The thread type, which can be [`ChannelType::PublicThread`] or [`ChannelType::PrivateThread`].
     ///
     /// **Note**: This defaults to [`ChannelType::PrivateThread`] in order to match the behavior

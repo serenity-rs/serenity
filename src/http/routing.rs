@@ -1001,6 +1001,10 @@ impl Route {
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum RouteInfo<'a> {
+    AddGuildMember {
+        guild_id: u64,
+        user_id: u64,
+    },
     AddMemberRole {
         guild_id: u64,
         role_id: u64,
@@ -1352,6 +1356,12 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         emoji_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    GetFollowupMessage {
+        application_id: u64,
+        interaction_token: &'a str,
+        message_id: u64,
+    },
     GetGateway,
     #[cfg(feature = "unstable_discord_api")]
     GetGlobalApplicationCommands {
@@ -1524,6 +1534,14 @@ pub enum RouteInfo<'a> {
 impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
+            RouteInfo::AddGuildMember {
+                guild_id,
+                user_id,
+            } => (
+                LightMethod::Put,
+                Route::GuildsIdMembersId(guild_id),
+                Cow::from(Route::guild_member(guild_id, user_id)),
+            ),
             RouteInfo::AddMemberRole {
                 guild_id,
                 role_id,
@@ -2202,6 +2220,20 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::ChannelsIdMeJoindedArchivedPrivateThreads(channel_id),
                 Cow::from(Route::channel_joined_private_threads(channel_id, before, limit)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetFollowupMessage {
+                application_id,
+                interaction_token,
+                message_id,
+            } => (
+                LightMethod::Get,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_followup_message(
+                    application_id,
+                    interaction_token,
+                    message_id,
+                )),
             ),
             RouteInfo::GetGuildActiveThreads {
                 guild_id,

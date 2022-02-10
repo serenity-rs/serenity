@@ -6,7 +6,14 @@ use serde_json::json;
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditGuildWelcomeScreen, EditGuildWidget, EditMember, EditRole};
+use crate::builder::{
+    AddMember,
+    EditGuild,
+    EditGuildWelcomeScreen,
+    EditGuildWidget,
+    EditMember,
+    EditRole,
+};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -38,6 +45,29 @@ use crate::{
 
 #[cfg(feature = "model")]
 impl GuildId {
+    /// Adds a [`User`] to this guild with a valid OAuth2 access token.
+    ///
+    /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid values are set.
+    #[inline]
+    pub async fn add_member(
+        self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+        f: impl FnOnce(&mut AddMember) -> &mut AddMember,
+    ) -> Result<Option<Member>> {
+        let mut builder = AddMember::default();
+        f(&mut builder);
+
+        let map = utils::hashmap_to_json_map(builder.0);
+
+        http.as_ref().add_guild_member(self.0, user_id.into().0, &map).await
+    }
+
     /// Ban a [`User`] from the guild, deleting a number of
     /// days' worth of messages (`dmd`) between the range 0 and 7.
     ///
