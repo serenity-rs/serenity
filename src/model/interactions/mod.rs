@@ -1,8 +1,8 @@
 pub mod application_command;
 pub mod autocomplete;
 pub mod message_component;
-pub mod ping;
 pub mod modal;
+pub mod ping;
 
 use application_command::ApplicationCommandInteraction;
 use autocomplete::AutocompleteInteraction;
