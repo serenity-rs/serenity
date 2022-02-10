@@ -78,6 +78,7 @@ impl Interaction {
             Interaction::ApplicationCommand(i) => i.guild_locale.as_ref().map(String::as_str),
             Interaction::MessageComponent(i) => i.guild_locale.as_ref().map(String::as_str),
             Interaction::Autocomplete(i) => i.guild_locale.as_ref().map(String::as_str),
+            Interaction::ModalSubmit(i) => i.guild_locale.as_ref().map(String::as_str),
         }
     }
 

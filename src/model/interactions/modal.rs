@@ -12,7 +12,7 @@ use crate::http::Http;
 use crate::model::interactions::InteractionType;
 use crate::utils;
 
-/// An interaction triggered by a message component.
+/// An interaction triggered by a modal submit.
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct ModalSubmitInteraction {
@@ -46,9 +46,12 @@ pub struct ModalSubmitInteraction {
     pub token: String,
     /// Always `1`.
     pub version: u8,
+    /// The guild's preferred locale.
+    pub guild_locale: Option<String>,
+    /// The selected language of the invoking user.
+    pub locale: String,
 }
 
-//FIXME documentation
 impl ModalSubmitInteraction {
     /// Gets the interaction response.
     ///
@@ -98,7 +101,7 @@ impl ModalSubmitInteraction {
     ///
     /// Refer to Discord's docs for Edit Webhook Message for field information.
     ///
-    /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
+    /// **Note**:   Message contents must be under 2000 unicode code points.
     ///
     /// [`UserId`]: crate::model::id::UserId
     ///
@@ -371,6 +374,22 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
+        let guild_locale = match map.contains_key("guild_locale") {
+            true => Some(
+                map.remove("guild_locale")
+                    .ok_or_else(|| DeError::custom("expected guild_locale"))
+                    .and_then(String::deserialize)
+                    .map_err(DeError::custom)?,
+            ),
+            false => None,
+        };
+
+        let locale = map
+            .remove("locale")
+            .ok_or_else(|| DeError::custom("expected locale"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+
         Ok(Self {
             id,
             application_id,
@@ -383,11 +402,13 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             user,
             token,
             version,
+            guild_locale,
+            locale,
         })
     }
 }
 
-/// A message component interaction data, provided by [`MessageComponentInteraction::data`]
+/// A message component interaction data, provided by [`ModalSubmitInteraction::data`]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ModalSubmitInteractionData {
