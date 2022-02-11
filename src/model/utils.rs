@@ -89,6 +89,13 @@ pub fn deserialize_messages_map<'de, D: Deserializer<'de>>(
 }
 
 #[cfg(feature = "unstable_discord_api")]
+pub fn deserialize_attachments_map<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<AttachmentId, Attachment>, D::Error> {
+    HashMap::deserialize(deserializer)
+}
+
+#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_options<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
@@ -168,6 +175,13 @@ fn try_resolve(
         },
         ApplicationCommandOptionType::Number => {
             Some(ApplicationCommandInteractionDataOptionValue::Number(value.as_f64()?))
+        },
+        ApplicationCommandOptionType::Attachment => {
+            let id = &AttachmentId(string?.parse().ok()?);
+
+            let attachment = resolved.attachments.get(id)?.to_owned();
+
+            Some(ApplicationCommandInteractionDataOptionValue::Attachment(attachment))
         },
         _ => None,
     }
