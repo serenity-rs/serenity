@@ -365,6 +365,9 @@ pub struct Options {
     /// Type of overwritten entity ("member" or "role").
     #[serde(default, rename = "type")]
     pub kind: Option<String>,
+    /// Message that was pinned or unpinned.
+    #[serde(default)]
+    pub message_id: Option<MessageId>,
     /// Name of the role if type is "role"
     #[serde(default)]
     pub role_name: Option<String>,
