@@ -44,6 +44,27 @@ impl EventHandler for Handler {
                         "Please provide a valid user".to_string()
                     }
                 },
+                "attachmentinput" => {
+                    let options = command
+                        .data
+                        .options
+                        .get(0)
+                        .expect("Expected attachment option")
+                        .resolved
+                        .as_ref()
+                        .expect("Expected attachment object");
+
+                    if let ApplicationCommandInteractionDataOptionValue::Attachment(attachment) =
+                        options
+                    {
+                        format!(
+                            "Attachment name: {}, attachment size: {}",
+                            attachment.filename, attachment.size
+                        )
+                    } else {
+                        "Please provide a valid attachment".to_string()
+                    }
+                },
                 _ => "not implemented :(".to_string(),
             };
 
@@ -136,6 +157,18 @@ impl EventHandler for Handler {
                                 .kind(ApplicationCommandOptionType::Number)
                                 .min_number_value(-3.3)
                                 .max_number_value(234.5)
+                                .required(true)
+                        })
+                })
+                .create_application_command(|command| {
+                    command
+                        .name("attachmentinput")
+                        .description("Test command for attachment input")
+                        .create_option(|option| {
+                            option
+                                .name("attachment")
+                                .description("A file")
+                                .kind(ApplicationCommandOptionType::Attachment)
                                 .required(true)
                         })
                 })
