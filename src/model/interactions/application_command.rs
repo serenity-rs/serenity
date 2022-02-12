@@ -18,7 +18,7 @@ use crate::builder::{
 use crate::http::Http;
 use crate::internal::prelude::StdResult;
 use crate::json::{self, from_number, JsonMap, Value};
-use crate::model::channel::{ChannelType, PartialChannel};
+use crate::model::channel::{Attachment, ChannelType, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
     ApplicationId,
@@ -33,6 +33,7 @@ use crate::model::interactions::InteractionType;
 use crate::model::prelude::User;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::utils::{
+    deserialize_attachments_map,
     deserialize_channels_map,
     deserialize_messages_map,
     deserialize_options,
@@ -567,6 +568,8 @@ pub struct ApplicationCommandInteractionDataResolved {
     pub channels: HashMap<ChannelId, PartialChannel>,
     /// The resolved messages.
     pub messages: HashMap<MessageId, Message>,
+    /// The resolved attachments.
+    pub attachments: HashMap<AttachmentId, Attachment>,
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
@@ -608,12 +611,20 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
             .map_err(DeError::custom)?
             .unwrap_or_default();
 
+        let attachments = map
+            .remove("attachments")
+            .map(deserialize_attachments_map)
+            .transpose()
+            .map_err(DeError::custom)?
+            .unwrap_or_default();
+
         Ok(Self {
             users,
             members,
             roles,
             channels,
             messages,
+            attachments,
         })
     }
 }
@@ -703,6 +714,7 @@ pub enum ApplicationCommandInteractionDataOptionValue {
     Channel(PartialChannel),
     Role(Role),
     Number(f64),
+    Attachment(Attachment),
 }
 
 fn default_permission_value() -> bool {
@@ -1124,6 +1136,7 @@ pub enum ApplicationCommandOptionType {
     Role = 8,
     Mentionable = 9,
     Number = 10,
+    Attachment = 11,
     Unknown = !0,
 }
 
@@ -1137,7 +1150,8 @@ enum_number!(ApplicationCommandOptionType {
     Channel,
     Role,
     Mentionable,
-    Number
+    Number,
+    Attachment
 });
 
 /// The type of an [`ApplicationCommandPermissionData`].
