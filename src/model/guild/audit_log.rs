@@ -1,9 +1,8 @@
 use std::{collections::HashMap, fmt, mem::transmute};
 
 use serde::de::{self, Deserializer, Visitor};
-use serde::ser::Serializer;
+use serde::ser::{Serialize, Serializer};
 
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Determines the action that was done on a target.
@@ -42,6 +41,41 @@ impl Action {
             Action::Sticker(x) => x as u8,
             Action::Thread(x) => x as u8,
         }
+    }
+
+    pub fn from_value(value: u8) -> Option<Action> {
+        let action = match value {
+            1 => Action::GuildUpdate,
+            10..=12 => Action::Channel(unsafe { transmute(value) }),
+            13..=15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
+            20..=28 => Action::Member(unsafe { transmute(value) }),
+            30..=32 => Action::Role(unsafe { transmute(value) }),
+            40..=42 => Action::Invite(unsafe { transmute(value) }),
+            50..=52 => Action::Webhook(unsafe { transmute(value) }),
+            60..=62 => Action::Emoji(unsafe { transmute(value) }),
+            72..=75 => Action::Message(unsafe { transmute(value) }),
+            80..=82 => Action::Integration(unsafe { transmute(value) }),
+            83..=85 => Action::StageInstance(unsafe { transmute(value) }),
+            90..=92 => Action::Sticker(unsafe { transmute(value) }),
+            110..=112 => Action::Thread(unsafe { transmute(value) }),
+            _ => return None,
+        };
+
+        Some(action)
+    }
+}
+
+impl<'de> Deserialize<'de> for Action {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let value = u8::deserialize(deserializer)?;
+        Action::from_value(value)
+            .ok_or_else(|| de::Error::custom(format!("Unexpected action number: {}", value)))
+    }
+}
+
+impl Serialize for Action {
+    fn serialize<S: Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        serializer.serialize_u8(self.num())
     }
 }
 
@@ -204,7 +238,7 @@ pub struct AuditLogEntry {
     #[serde(with = "option_u64_handler")]
     pub target_id: Option<u64>,
     /// Determines what action was done on a [`Self::target_id`]
-    #[serde(with = "action_handler", rename = "action_type")]
+    #[serde(rename = "action_type")]
     pub action: Action,
     /// What was the reasoning by doing an action on a target? If there was one.
     pub reason: Option<String>,
@@ -284,53 +318,7 @@ mod option_u64_handler {
     }
 
     pub fn serialize<S: Serializer>(num: &Option<u64>, s: S) -> StdResult<S::Ok, S::Error> {
-        use serde::Serialize;
-
         Option::serialize(num, s)
-    }
-}
-
-mod action_handler {
-    use super::*;
-
-    pub fn deserialize<'de, D: Deserializer<'de>>(de: D) -> StdResult<Action, D::Error> {
-        struct ActionVisitor;
-
-        impl<'de> Visitor<'de> for ActionVisitor {
-            type Value = Action;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("an integer between 1 to 72")
-            }
-
-            // NOTE: Serde internally delegates number types below `u64` to it.
-            fn visit_u64<E: de::Error>(self, value: u64) -> StdResult<Action, E> {
-                let value = value as u8;
-
-                Ok(match value {
-                    1 => Action::GuildUpdate,
-                    10..=12 => Action::Channel(unsafe { transmute(value) }),
-                    13..=15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
-                    20..=28 => Action::Member(unsafe { transmute(value) }),
-                    30..=32 => Action::Role(unsafe { transmute(value) }),
-                    40..=42 => Action::Invite(unsafe { transmute(value) }),
-                    50..=52 => Action::Webhook(unsafe { transmute(value) }),
-                    60..=62 => Action::Emoji(unsafe { transmute(value) }),
-                    72..=75 => Action::Message(unsafe { transmute(value) }),
-                    80..=82 => Action::Integration(unsafe { transmute(value) }),
-                    83..=85 => Action::StageInstance(unsafe { transmute(value) }),
-                    90..=92 => Action::Sticker(unsafe { transmute(value) }),
-                    110..=112 => Action::Thread(unsafe { transmute(value) }),
-                    _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
-                })
-            }
-        }
-
-        de.deserialize_any(ActionVisitor)
-    }
-
-    pub fn serialize<S: Serializer>(action: &Action, serializer: S) -> StdResult<S::Ok, S::Error> {
-        serializer.serialize_u8(action.num())
     }
 }
 
@@ -341,8 +329,10 @@ mod tests {
     #[test]
     fn action_value() {
         macro_rules! assert_action {
-            ($action:expr, $num:literal) => {{
-                assert_eq!($action.num(), $num);
+            ($action:pat, $num:literal) => {{
+                let a = Action::from_value($num).expect("invalid action value");
+                assert!(matches!(a, $action), "{:?} didn't match the variant", a);
+                assert_eq!(a.num(), $num);
             }};
         }
 
