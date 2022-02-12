@@ -55,7 +55,7 @@ will be received over a <a href="../../gateway/struct.Shard.html"><code>Shard</c
 <p><strong>Note</strong>: This endpoint is currently limited to 10 active guilds. The
 limits are raised for whitelisted <a href="https://discord.com/developers/docs/topics/gamebridge">GameBridge</a> applications. See the
 <a href="https://discord.com/developers/docs/resources/guild#create-guild">documentation on this endpoint</a> for more info.</p>
-<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
+<h5 id="examples"><a href="#examples">Examples</a></h5>
 <p>Create a guild called <code>&quot;test&quot;</code> in the [US West region]:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::json::json</span>;
@@ -94,7 +94,7 @@ the given data.</p>
 <li><strong>name</strong>: the name of the webhook, limited to between 2 and 100 characters
 long.</li>
 </ul>
-<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
+<h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
 <p>Creating a webhook named <code>test</code>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::json::json</span>;
@@ -117,7 +117,7 @@ long.</li>
 specific permissions.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.delete_messages" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#1041-1051">source</a></span><a href="#method.delete_messages" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.delete_messages" class="fnname">delete_messages</a>(&amp;self, channel_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, map: &amp;<a class="type" href="../../json/type.Value.html" title="type serenity::json::Value">Value</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Deletes a bunch of messages, only works for bots.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.delete_message_reactions" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#1071-1082">source</a></span><a href="#method.delete_message_reactions" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.delete_message_reactions" class="fnname">delete_message_reactions</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;channel_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;message_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Deletes all of the <a href="../../model/channel/struct.Reaction.html" title="Reaction"><code>Reaction</code></a>s associated with a <a href="../../model/channel/struct.Message.html" title="Message"><code>Message</code></a>.</p>
-<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
+<h5 id="examples-2"><a href="#examples-2">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">MessageId</span>};
 
 <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">ChannelId</span>(<span class="number">7</span>);
@@ -135,7 +135,7 @@ we have specific permissions.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.delete_webhook" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#1220-1230">source</a></span><a href="#method.delete_webhook" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.delete_webhook" class="fnname">delete_webhook</a>(&amp;self, webhook_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Deletes a <a href="../../model/webhook/struct.Webhook.html" title="Webhook"><code>Webhook</code></a> given its Id.</p>
 <p>This method requires authentication, whereas <a href="struct.Http.html#method.delete_webhook_with_token" title="Self::delete_webhook_with_token"><code>Self::delete_webhook_with_token</code></a>
 does not.</p>
-<h5 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h5>
+<h5 id="examples-3"><a href="#examples-3">Examples</a></h5>
 <p>Deletes a webhook given its Id:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::http::Http</span>;
@@ -148,7 +148,7 @@ does not.</p>
 <span class="prelude-val">Ok</span>(())</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.delete_webhook_with_token" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#1252-1263">source</a></span><a href="#method.delete_webhook_with_token" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.delete_webhook_with_token" class="fnname">delete_webhook_with_token</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;webhook_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Deletes a <a href="../../model/webhook/struct.Webhook.html" title="Webhook"><code>Webhook</code></a> given its Id and unique token.</p>
 <p>This method does <em>not</em> require authentication.</p>
-<h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>
+<h5 id="examples-4"><a href="#examples-4">Examples</a></h5>
 <p>Deletes a webhook given its Id and unique token:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="number">245037420704169985</span>;
@@ -207,7 +207,7 @@ does not.</p>
 <li><strong>supress</strong>: Bool which toggles user’s suppressed state. Setting this
 to <code>false</code> will invite the user to speak.</li>
 </ul>
-<h5 id="example" class="section-header"><a href="#example">Example</a></h5>
+<h5 id="example"><a href="#example">Example</a></h5>
 <p>Suppress a user</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity</span>::{
@@ -236,7 +236,7 @@ to <code>false</code> will invite the user to speak.</li>
 <li><strong>request_to_speak_timestamp</strong>: ISO8601 timestamp to set the user’s
 request to speak. This can be any present or future time.</li>
 </ul>
-<h5 id="example-1" class="section-header"><a href="#example-1">Example</a></h5>
+<h5 id="example-1"><a href="#example-1">Example</a></h5>
 <p>Unsuppress the current bot user</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity</span>::{
@@ -266,7 +266,7 @@ long.</li>
 <p>Note that, unlike with <a href="struct.Http.html#method.create_webhook" title="Self::create_webhook"><code>Self::create_webhook</code></a>, <em>all</em> values are optional.</p>
 <p>This method requires authentication, whereas <a href="struct.Http.html#method.edit_webhook_with_token" title="Self::edit_webhook_with_token"><code>Self::edit_webhook_with_token</code></a>
 does not.</p>
-<h5 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h5>
+<h5 id="examples-5"><a href="#examples-5">Examples</a></h5>
 <p>Edit the image of a webhook given its Id and unique token:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::json::json</span>;
@@ -282,7 +282,7 @@ does not.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.edit_webhook_with_token" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#2052-2070">source</a></span><a href="#method.edit_webhook_with_token" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.edit_webhook_with_token" class="fnname">edit_webhook_with_token</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;webhook_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;map: &amp;<a class="type" href="../../json/type.JsonMap.html" title="type serenity::json::JsonMap">JsonMap</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;</h4></section></summary><div class="docblock"><p>Edits the webhook with the given data.</p>
 <p>Refer to the documentation for <a href="struct.Http.html#method.edit_webhook" title="Self::edit_webhook"><code>Self::edit_webhook</code></a> for more information.</p>
 <p>This method does <em>not</em> require authentication.</p>
-<h5 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h5>
+<h5 id="examples-6"><a href="#examples-6">Examples</a></h5>
 <p>Edit the name of a webhook given its Id and unique token:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::json::prelude</span>::<span class="kw-2">*</span>;
@@ -319,7 +319,7 @@ not saved does not return an error)</p>
 <p><strong>Note</strong>: For embed objects, all fields are registered by Discord except for
 <code>height</code>, <code>provider</code>, <code>proxy_url</code>, <code>type</code> (it will always be <code>rich</code>),
 <code>video</code>, and <code>width</code>. The rest will be determined by Discord.</p>
-<h5 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h5>
+<h5 id="examples-7"><a href="#examples-7">Examples</a></h5>
 <p>Sending a webhook with message content of <code>test</code>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::json::prelude</span>::<span class="kw-2">*</span>;
@@ -332,7 +332,7 @@ not saved does not return an error)</p>
 
 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">execute_webhook</span>(<span class="ident">id</span>, <span class="ident">token</span>, <span class="bool-val">true</span>, <span class="ident">map</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.execute_webhook_with_files" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#2159-2185">source</a></span><a href="#method.execute_webhook_with_files" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.execute_webhook_with_files" class="fnname">execute_webhook_with_files</a>&lt;'a, T, It:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.IntoIterator.html" title="trait core::iter::traits::collect::IntoIterator">IntoIterator</a>&lt;Item = T&gt;&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;webhook_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;wait: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;files: It, <br>&nbsp;&nbsp;&nbsp;&nbsp;map: &amp;<a class="type" href="../../json/type.JsonMap.html" title="type serenity::json::JsonMap">JsonMap</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="../../model/channel/enum.AttachmentType.html" title="enum serenity::model::channel::AttachmentType">AttachmentType</a>&lt;'a&gt;&gt;,&nbsp;</span></h4></section></summary><div class="docblock"><p>Send file(s) over a webhook.</p>
-<h5 id="errors" class="section-header"><a href="#errors">Errors</a></h5>
+<h5 id="errors"><a href="#errors">Errors</a></h5>
 <p>Returns an
 <a href="../error/enum.Error.html#variant.UnsuccessfulRequest" title="HttpError::UnsuccessfulRequest"><code>HttpError::UnsuccessfulRequest(ErrorResponse)</code></a>
 if the files are too large to send.</p>
@@ -355,7 +355,7 @@ if the files are too large to send.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.remove_thread_channel_member" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#2441-2452">source</a></span><a href="#method.remove_thread_channel_member" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.remove_thread_channel_member" class="fnname">remove_thread_channel_member</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;channel_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;user_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Removes a member from a thread channel.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_channel_webhooks" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#2473-2483">source</a></span><a href="#method.get_channel_webhooks" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.get_channel_webhooks" class="fnname">get_channel_webhooks</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;channel_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Retrieves the webhooks for the given <a href="../../model/channel/struct.GuildChannel.html" title="GuildChannel">channel</a>’s Id.</p>
 <p>This method requires authentication.</p>
-<h5 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h5>
+<h5 id="examples-8"><a href="#examples-8">Examples</a></h5>
 <p>Retrieve all of the webhooks owned by a channel:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="number">81384788765712384</span>;
@@ -394,7 +394,7 @@ enabled, then additional VIP-only regions are returned.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_guild_sticker" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#2938-2958">source</a></span><a href="#method.get_guild_sticker" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.get_guild_sticker" class="fnname">get_guild_sticker</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;guild_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;sticker_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../../model/sticker/struct.Sticker.html" title="struct serenity::model::sticker::Sticker">Sticker</a>&gt;</h4></section></summary><div class="docblock"><p>Retrieves a single sticker in a <a href="../../model/guild/struct.Guild.html" title="Guild"><code>Guild</code></a>.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_guild_webhooks" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#2979-2989">source</a></span><a href="#method.get_guild_webhooks" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.get_guild_webhooks" class="fnname">get_guild_webhooks</a>(&amp;self, guild_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Retrieves the webhooks for the given <a href="../../model/guild/struct.Guild.html" title="Guild">guild</a>’s Id.</p>
 <p>This method requires authentication.</p>
-<h5 id="examples-9" class="section-header"><a href="#examples-9">Examples</a></h5>
+<h5 id="examples-9"><a href="#examples-9">Examples</a></h5>
 <p>Retrieve all of the webhooks owned by a guild:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="number">81384788765712384</span>;
@@ -403,7 +403,7 @@ enabled, then additional VIP-only regions are returned.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_guilds" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#3016-3040">source</a></span><a href="#method.get_guilds" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.get_guilds" class="fnname">get_guilds</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;target: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="enum" href="../enum.GuildPagination.html" title="enum serenity::http::GuildPagination">GuildPagination</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;limit: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>&gt;<br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../model/guild/struct.GuildInfo.html" title="struct serenity::model::guild::GuildInfo">GuildInfo</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Gets a paginated list of the current user’s guilds.</p>
 <p>The <code>limit</code> has a maximum value of 100.</p>
 <p><a href="https://discord.com/developers/docs/resources/user#get-current-user-guilds">Discord’s documentation</a></p>
-<h5 id="examples-10" class="section-header"><a href="#examples-10">Examples</a></h5>
+<h5 id="examples-10"><a href="#examples-10">Examples</a></h5>
 <p>Get the first 10 guilds after a certain guild’s Id:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity</span>::{<span class="ident">http::GuildPagination</span>, <span class="ident">model::id::GuildId</span>};
@@ -432,14 +432,14 @@ enabled, then additional VIP-only regions are returned.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_webhook" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#3300-3310">source</a></span><a href="#method.get_webhook" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.get_webhook" class="fnname">get_webhook</a>(&amp;self, webhook_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;</h4></section></summary><div class="docblock"><p>Retrieves a webhook given its Id.</p>
 <p>This method requires authentication, whereas <a href="struct.Http.html#method.get_webhook_with_token" title="Self::get_webhook_with_token"><code>Self::get_webhook_with_token</code></a> and
 <a href="struct.Http.html#method.get_webhook_from_url" title="Self::get_webhook_from_url"><code>Self::get_webhook_from_url</code></a> do not.</p>
-<h5 id="examples-11" class="section-header"><a href="#examples-11">Examples</a></h5>
+<h5 id="examples-11"><a href="#examples-11">Examples</a></h5>
 <p>Retrieve a webhook by Id:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="number">245037420704169985</span>;
 <span class="kw">let</span> <span class="ident">webhook</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">get_webhook</span>(<span class="ident">id</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_webhook_with_token" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#3332-3343">source</a></span><a href="#method.get_webhook_with_token" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.get_webhook_with_token" class="fnname">get_webhook_with_token</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;webhook_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;token: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;</h4></section></summary><div class="docblock"><p>Retrieves a webhook given its Id and unique token.</p>
 <p>This method does <em>not</em> require authentication.</p>
-<h5 id="examples-12" class="section-header"><a href="#examples-12">Examples</a></h5>
+<h5 id="examples-12"><a href="#examples-12">Examples</a></h5>
 <p>Retrieve a webhook by Id and its unique token:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="number">245037420704169985</span>;
@@ -448,7 +448,7 @@ enabled, then additional VIP-only regions are returned.</p>
 <span class="kw">let</span> <span class="ident">webhook</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">get_webhook_with_token</span>(<span class="ident">id</span>, <span class="ident">token</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_webhook_from_url" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#3364-3377">source</a></span><a href="#method.get_webhook_from_url" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.get_webhook_from_url" class="fnname">get_webhook_from_url</a>(&amp;self, url: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../../model/webhook/struct.Webhook.html" title="struct serenity::model::webhook::Webhook">Webhook</a>&gt;</h4></section></summary><div class="docblock"><p>Retrieves a webhook given its url.</p>
 <p>This method does <em>not</em> require authentication</p>
-<h5 id="examples-13" class="section-header"><a href="#examples-13">Examples</a></h5>
+<h5 id="examples-13"><a href="#examples-13">Examples</a></h5>
 <p>Retrieve a webhook by url:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="string">&quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>;
@@ -457,7 +457,7 @@ enabled, then additional VIP-only regions are returned.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.kick_member_with_reason" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#3385-3403">source</a></span><a href="#method.kick_member_with_reason" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.kick_member_with_reason" class="fnname">kick_member_with_reason</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;guild_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;user_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;reason: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;audit_log_reason: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;<br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Kicks a member from a guild with a provided reason.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.leave_guild" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#3406-3416">source</a></span><a href="#method.leave_guild" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.leave_guild" class="fnname">leave_guild</a>(&amp;self, guild_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Leaves a guild.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.send_files" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#3425-3447">source</a></span><a href="#method.send_files" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.send_files" class="fnname">send_files</a>&lt;'a, T, It:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/iter/traits/collect/trait.IntoIterator.html" title="trait core::iter::traits::collect::IntoIterator">IntoIterator</a>&lt;Item = T&gt;&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;channel_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;files: It, <br>&nbsp;&nbsp;&nbsp;&nbsp;map: &amp;<a class="type" href="../../json/type.JsonMap.html" title="type serenity::json::JsonMap">JsonMap</a><br>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="../../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="../../model/channel/enum.AttachmentType.html" title="enum serenity::model::channel::AttachmentType">AttachmentType</a>&lt;'a&gt;&gt;,&nbsp;</span></h4></section></summary><div class="docblock"><p>Sends file(s) to a channel.</p>
-<h5 id="errors-1" class="section-header"><a href="#errors-1">Errors</a></h5>
+<h5 id="errors-1"><a href="#errors-1">Errors</a></h5>
 <p>Returns an
 <a href="../error/enum.Error.html#variant.UnsuccessfulRequest" title="HttpError::UnsuccessfulRequest"><code>HttpError::UnsuccessfulRequest(ErrorResponse)</code></a>
 if the files are too large to send.</p>
@@ -480,7 +480,7 @@ Typing is also stopped when the struct is dropped.</p>
 of time and then resume again until either <a href="../typing/struct.Typing.html#method.stop" title="Typing::stop"><code>Typing::stop</code></a> is called or the struct is dropped.</p>
 <p>This should rarely be used for bots, although it is a good indicator that a
 long-running command is still being processed.</p>
-<h6 id="examples-14" class="section-header"><a href="#examples-14">Examples</a></h6>
+<h6 id="examples-14"><a href="#examples-14">Examples</a></h6>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Initiate typing (assuming http is `Arc&lt;Http&gt;`)</span>
 <span class="kw">let</span> <span class="ident">typing</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">start_typing</span>(<span class="number">7</span>)<span class="question-mark">?</span>;
 
@@ -494,7 +494,7 @@ long-running command is still being processed.</p>
 bound.</p>
 <p>If you don’t need to deserialize the response and want the response instance
 itself, use <a href="struct.Http.html#method.request" title="Self::request"><code>Self::request</code></a>.</p>
-<h5 id="examples-15" class="section-header"><a href="#examples-15">Examples</a></h5>
+<h5 id="examples-15"><a href="#examples-15">Examples</a></h5>
 <p>Create a new message via the <a href="../routing/enum.RouteInfo.html#variant.CreateMessage" title="RouteInfo::CreateMessage"><code>RouteInfo::CreateMessage</code></a> endpoint and
 deserialize the response into a <a href="../../model/channel/struct.Message.html" title="Message"><code>Message</code></a>:</p>
 
@@ -518,12 +518,12 @@ deserialize the response into a <a href="../../model/channel/struct.Message.html
 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">fire</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>(<span class="ident">request</span>.<span class="ident">build</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="macro">println!</span>(<span class="string">&quot;Message content: {}&quot;</span>, <span class="ident">message</span>.<span class="ident">content</span>);</code></pre></div>
-<h5 id="errors-2" class="section-header"><a href="#errors-2">Errors</a></h5>
+<h5 id="errors-2"><a href="#errors-2">Errors</a></h5>
 <p>If there is an error, it will be either <a href="../../prelude/enum.SerenityError.html#variant.Http"><code>Error::Http</code></a> or <a href="../../prelude/enum.SerenityError.html#variant.Json"><code>Error::Json</code></a>.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.request" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/http/client.rs.html#3740">source</a></span><a href="#method.request" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.request" class="fnname">request</a>(&amp;self, req: <a class="struct" href="../request/struct.Request.html" title="struct serenity::http::request::Request">Request</a>&lt;'_&gt;) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://docs.rs/reqwest/0.11.9/reqwest/async_impl/response/struct.Response.html" title="struct reqwest::async_impl::response::Response">ReqwestResponse</a>&gt;</h4></section></summary><div class="docblock"><p>Performs a request, ratelimiting it if necessary.</p>
 <p>Returns the raw reqwest Response. Use <a href="struct.Http.html#method.fire" title="Self::fire"><code>Self::fire</code></a> to deserialize the response
 into some type.</p>
-<h5 id="examples-16" class="section-header"><a href="#examples-16">Examples</a></h5>
+<h5 id="examples-16"><a href="#examples-16">Examples</a></h5>
 <p>Send a body of bytes over the <a href="../routing/enum.RouteInfo.html#variant.CreateMessage" title="RouteInfo::CreateMessage"><code>RouteInfo::CreateMessage</code></a> endpoint:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::http</span>::{
@@ -567,5 +567,5 @@ into some type.</p>
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_subscriber">Read more</a></p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_current_subscriber" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/tracing/0.1.30/src/tracing/instrument.rs.html#221">source</a></span><a href="#method.with_current_subscriber" class="anchor"></a><h4 class="code-header">fn <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber" class="fnname">with_current_subscriber</a>(self) -&gt; <a class="struct" href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="struct tracing::instrument::WithDispatch">WithDispatch</a>&lt;Self&gt;</h4></section></summary><div class='docblock'><p>Attaches the current <a href="https://docs.rs/tracing/0.1.30/tracing/dispatcher/index.html#setting-the-default-subscriber">default</a> <a href="https://docs.rs/tracing-core/0.1.22/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> to this type, returning a
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber">Read more</a></p>
-</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

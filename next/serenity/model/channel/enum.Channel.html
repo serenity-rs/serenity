@@ -18,7 +18,7 @@ channel. For multi-user “private channels”, use a group.</p>
 <p>Converts <code>self</code> into an <code>Option&lt;GuildChannel&gt;</code>, consuming
 <code>self</code>, and discarding a <a href="struct.PrivateChannel.html" title="PrivateChannel"><code>PrivateChannel</code></a>, or
 <a href="struct.ChannelCategory.html" title="ChannelCategory"><code>ChannelCategory</code></a>, if any.</p>
-<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
+<h5 id="examples"><a href="#examples">Examples</a></h5>
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">guild</span>() {
@@ -33,7 +33,7 @@ channel. For multi-user “private channels”, use a group.</p>
 <p>Converts <code>self</code> into an <code>Option&lt;PrivateChannel&gt;</code>, consuming
 <code>self</code>, and discarding a <a href="struct.GuildChannel.html" title="GuildChannel"><code>GuildChannel</code></a>, or <a href="struct.ChannelCategory.html" title="ChannelCategory"><code>ChannelCategory</code></a>,
 if any.</p>
-<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
+<h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">private</span>() {
@@ -48,7 +48,7 @@ if any.</p>
 <p>Converts <code>self</code> into an <code>Option&lt;ChannelCategory&gt;</code>,
 consuming <code>self</code>, and discarding a <a href="struct.GuildChannel.html" title="GuildChannel"><code>GuildChannel</code></a>, or
 <a href="struct.PrivateChannel.html" title="PrivateChannel"><code>PrivateChannel</code></a>, if any.</p>
-<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
+<h5 id="examples-2"><a href="#examples-2">Examples</a></h5>
 <p>Basic usage:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">match</span> <span class="ident">channel</span>.<span class="ident">category</span>() {
@@ -60,7 +60,7 @@ consuming <code>self</code>, and discarding a <a href="struct.GuildChannel.html"
     },
 }</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.delete" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../../src/serenity/model/channel/mod.rs.html#184-198">source</a></span><a href="#method.delete" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.delete" class="fnname">delete</a>(&amp;self, cache_http: impl <a class="trait" href="../../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Deletes the inner channel.</p>
-<h5 id="errors" class="section-header"><a href="#errors">Errors</a></h5>
+<h5 id="errors"><a href="#errors">Errors</a></h5>
 <p>If the <code>cache</code> is enabled, returns <a href="../error/enum.Error.html#variant.InvalidPermissions" title="ModelError::InvalidPermissions"><code>ModelError::InvalidPermissions</code></a>,
 if the current user lacks permission.</p>
 <p>Otherwise will return <a href="../../prelude/enum.SerenityError.html#variant.Http" title="Error::Http"><code>Error::Http</code></a> if the current user does not
@@ -121,5 +121,5 @@ item. <a href="../misc/trait.Mentionable.html#tymethod.mention">Read more</a></p
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_subscriber">Read more</a></p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_current_subscriber" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/tracing/0.1.30/src/tracing/instrument.rs.html#221">source</a></span><a href="#method.with_current_subscriber" class="anchor"></a><h4 class="code-header">fn <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber" class="fnname">with_current_subscriber</a>(self) -&gt; <a class="struct" href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="struct tracing::instrument::WithDispatch">WithDispatch</a>&lt;Self&gt;</h4></section></summary><div class='docblock'><p>Attaches the current <a href="https://docs.rs/tracing/0.1.30/tracing/dispatcher/index.html#setting-the-default-subscriber">default</a> <a href="https://docs.rs/tracing-core/0.1.22/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> to this type, returning a
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber">Read more</a></p>
-</div></details></div></details><section id="impl-DeserializeOwned" class="impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/serde/1.0.136/src/serde/de/mod.rs.html#605">source</a></span><a href="#impl-DeserializeOwned" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="trait" href="https://docs.rs/serde/1.0.136/serde/de/trait.DeserializeOwned.html" title="trait serde::de::DeserializeOwned">DeserializeOwned</a> for T <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: for&lt;'de&gt; <a class="trait" href="https://docs.rs/serde/1.0.136/serde/de/trait.Deserialize.html" title="trait serde::de::Deserialize">Deserialize</a>&lt;'de&gt;,&nbsp;</span></h3></section></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></details></div></details><section id="impl-DeserializeOwned" class="impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/serde/1.0.136/src/serde/de/mod.rs.html#605">source</a></span><a href="#impl-DeserializeOwned" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="trait" href="https://docs.rs/serde/1.0.136/serde/de/trait.DeserializeOwned.html" title="trait serde::de::DeserializeOwned">DeserializeOwned</a> for T <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: for&lt;'de&gt; <a class="trait" href="https://docs.rs/serde/1.0.136/serde/de/trait.Deserialize.html" title="trait serde::de::Deserialize">Deserialize</a>&lt;'de&gt;,&nbsp;</span></h3></section></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

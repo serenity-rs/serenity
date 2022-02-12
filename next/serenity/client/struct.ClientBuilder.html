@@ -66,13 +66,13 @@ You can provide a clone and keep the original to manually dispatch.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.intents" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/mod.rs.html#341-345">source</a></span><a href="#method.intents" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.intents" class="fnname">intents</a>(self, intents: <a class="struct" href="../model/gateway/struct.GatewayIntents.html" title="struct serenity::model::gateway::GatewayIntents">GatewayIntents</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Sets all intents directly, replacing already set intents.
 Intents are a bitflag, you can combine them by performing the
 <code>|</code>-operator.</p>
-<h5 id="what-are-intents" class="section-header"><a href="#what-are-intents">What are Intents</a></h5>
+<h5 id="what-are-intents"><a href="#what-are-intents">What are Intents</a></h5>
 <p>A <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents">gateway intent</a> sets the types of gateway events
 (e.g. member joins, guild integrations, guild emoji updates, …) the
 bot shall receive. Carefully picking the needed intents greatly helps
 the bot to scale, as less intents will result in less events to be
 received hence less processed by the bot.</p>
-<h5 id="privileged-intents" class="section-header"><a href="#privileged-intents">Privileged Intents</a></h5>
+<h5 id="privileged-intents"><a href="#privileged-intents">Privileged Intents</a></h5>
 <p>The intents <a href="../model/gateway/struct.GatewayIntents.html#associatedconstant.GUILD_PRESENCES" title="GatewayIntents::GUILD_PRESENCES"><code>GatewayIntents::GUILD_PRESENCES</code></a> and <a href="../model/gateway/struct.GatewayIntents.html#associatedconstant.GUILD_MEMBERS" title="GatewayIntents::GUILD_MEMBERS"><code>GatewayIntents::GUILD_MEMBERS</code></a>
 are <em>privileged</em>.
 <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents">Privileged intents</a> need to be enabled in the <em>developer portal</em>.
@@ -171,5 +171,5 @@ future types. <a href="#method.try_poll_unpin">Read more</a></p>
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_subscriber">Read more</a></p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_current_subscriber" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/tracing/0.1.30/src/tracing/instrument.rs.html#221">source</a></span><a href="#method.with_current_subscriber" class="anchor"></a><h4 class="code-header">fn <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber" class="fnname">with_current_subscriber</a>(self) -&gt; <a class="struct" href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="struct tracing::instrument::WithDispatch">WithDispatch</a>&lt;Self&gt;</h4></section></summary><div class='docblock'><p>Attaches the current <a href="https://docs.rs/tracing/0.1.30/tracing/dispatcher/index.html#setting-the-default-subscriber">default</a> <a href="https://docs.rs/tracing-core/0.1.22/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> to this type, returning a
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber">Read more</a></p>
-</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

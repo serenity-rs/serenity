@@ -25,7 +25,7 @@ information.</p>
 </div><span id="structfield.shard_id" class="structfield small-section-header"><a href="#structfield.shard_id" class="anchor field"></a><code>shard_id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a></code></span><div class="docblock"><p>The ID of the shard this context is related to.</p>
 </div><span id="structfield.http" class="structfield small-section-header"><a href="#structfield.http" class="anchor field"></a><code>http: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../http/client/struct.Http.html" title="struct serenity::http::client::Http">Http</a>&gt;</code></span><span id="structfield.cache" class="structfield small-section-header"><a href="#structfield.cache" class="anchor field"></a><code>cache: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../cache/struct.Cache.html" title="struct serenity::cache::Cache">Cache</a>&gt;</code></span><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><section id="impl" class="impl has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#50-411">source</a></span><a href="#impl" class="anchor"></a><h3 class="code-header in-band">impl <a class="struct" href="struct.Context.html" title="struct serenity::prelude::Context">Context</a></h3></section></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><section id="method.online" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#127-129">source</a></span><a href="#method.online" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.online" class="fnname">online</a>(&amp;self)</h4></section></summary><div class="docblock"><p>Sets the current user as being <a href="../model/user/enum.OnlineStatus.html#variant.Online"><code>Online</code></a>. This maintains the current
 activity.</p>
-<h5 id="examples" class="section-header"><a href="#examples">Examples</a></h5>
+<h5 id="examples"><a href="#examples">Examples</a></h5>
 <p>Set the current user to being online on the shard:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">struct</span> <span class="ident">Handler</span>;
@@ -44,7 +44,7 @@ activity.</p>
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.idle" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#164-166">source</a></span><a href="#method.idle" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.idle" class="fnname">idle</a>(&amp;self)</h4></section></summary><div class="docblock"><p>Sets the current user as being <a href="../model/user/enum.OnlineStatus.html#variant.Idle"><code>Idle</code></a>. This maintains the current
 activity.</p>
-<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
+<h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
 <p>Set the current user to being idle on the shard:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">struct</span> <span class="ident">Handler</span>;
@@ -63,7 +63,7 @@ activity.</p>
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.dnd" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#201-203">source</a></span><a href="#method.dnd" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.dnd" class="fnname">dnd</a>(&amp;self)</h4></section></summary><div class="docblock"><p>Sets the current user as being <a href="../model/user/enum.OnlineStatus.html#variant.DoNotDisturb"><code>DoNotDisturb</code></a>. This maintains the
 current activity.</p>
-<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
+<h5 id="examples-2"><a href="#examples-2">Examples</a></h5>
 <p>Set the current user to being Do Not Disturb on the shard:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">struct</span> <span class="ident">Handler</span>;
@@ -82,7 +82,7 @@ current activity.</p>
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.invisible" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#238-240">source</a></span><a href="#method.invisible" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.invisible" class="fnname">invisible</a>(&amp;self)</h4></section></summary><div class="docblock"><p>Sets the current user as being <a href="../model/user/enum.OnlineStatus.html#variant.Invisible"><code>Invisible</code></a>. This maintains the current
 activity.</p>
-<h5 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h5>
+<h5 id="examples-3"><a href="#examples-3">Examples</a></h5>
 <p>Set the current user to being invisible on the shard when an
 <a href="../model/event/enum.Event.html#variant.Ready"><code>Event::Ready</code></a> is received:</p>
 
@@ -101,7 +101,7 @@ activity.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.reset_presence" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#276-278">source</a></span><a href="#method.reset_presence" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.reset_presence" class="fnname">reset_presence</a>(&amp;self)</h4></section></summary><div class="docblock"><p>“Resets” the current user’s presence, by setting the activity to <a href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html#variant.None" title="None"><code>None</code></a>
 and the online status to <a href="../model/user/enum.OnlineStatus.html#variant.Online"><code>Online</code></a>.</p>
 <p>Use <a href="struct.Context.html#method.set_presence" title="Self::set_presence"><code>Self::set_presence</code></a> for fine-grained control over individual details.</p>
-<h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>
+<h5 id="examples-4"><a href="#examples-4">Examples</a></h5>
 <p>Reset the presence when an <a href="../model/event/enum.Event.html#variant.Resumed"><code>Event::Resumed</code></a> is received:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">struct</span> <span class="ident">Handler</span>;
@@ -117,7 +117,7 @@ and the online status to <a href="../model/user/enum.OnlineStatus.html#variant.O
 
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.set_activity" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#317-319">source</a></span><a href="#method.set_activity" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.set_activity" class="fnname">set_activity</a>(&amp;self, activity: <a class="struct" href="../model/gateway/struct.Activity.html" title="struct serenity::model::gateway::Activity">Activity</a>)</h4></section></summary><div class="docblock"><p>Sets the current activity, defaulting to an online status of <a href="../model/user/enum.OnlineStatus.html#variant.Online"><code>Online</code></a>.</p>
-<h5 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h5>
+<h5 id="examples-5"><a href="#examples-5">Examples</a></h5>
 <p>Create a command named <code>~setgame</code> that accepts a name of a game to be
 playing:</p>
 
@@ -140,7 +140,7 @@ playing:</p>
 
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.set_presence" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/context.rs.html#384-386">source</a></span><a href="#method.set_presence" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.set_presence" class="fnname">set_presence</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;activity: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../model/gateway/struct.Activity.html" title="struct serenity::model::gateway::Activity">Activity</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;status: <a class="enum" href="../model/user/enum.OnlineStatus.html" title="enum serenity::model::user::OnlineStatus">OnlineStatus</a><br>)</h4></section></summary><div class="docblock"><p>Sets the current user’s presence, providing all fields to be passed.</p>
-<h5 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h5>
+<h5 id="examples-6"><a href="#examples-6">Examples</a></h5>
 <p>Setting the current user as having no activity and being <a href="../model/user/enum.OnlineStatus.html#variant.Idle"><code>Idle</code></a>:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">struct</span> <span class="ident">Handler</span>;
@@ -212,5 +212,5 @@ sent back to <code>filter</code>’s paired receiver.</p>
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_subscriber">Read more</a></p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_current_subscriber" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/tracing/0.1.30/src/tracing/instrument.rs.html#221">source</a></span><a href="#method.with_current_subscriber" class="anchor"></a><h4 class="code-header">fn <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber" class="fnname">with_current_subscriber</a>(self) -&gt; <a class="struct" href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="struct tracing::instrument::WithDispatch">WithDispatch</a>&lt;Self&gt;</h4></section></summary><div class='docblock'><p>Attaches the current <a href="https://docs.rs/tracing/0.1.30/tracing/dispatcher/index.html#setting-the-default-subscriber">default</a> <a href="https://docs.rs/tracing-core/0.1.22/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> to this type, returning a
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber">Read more</a></p>
-</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

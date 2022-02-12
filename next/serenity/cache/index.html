@@ -9,7 +9,7 @@
 where possible. Issuing too many requests will lead to ratelimits.</p>
 <p>Following a policy to never hand out locks, the cache will clone all values
 when calling its methods.</p>
-<h2 id="use-by-models" class="section-header"><a href="#use-by-models">Use by Models</a></h2>
+<h2 id="use-by-models"><a href="#use-by-models">Use by Models</a></h2>
 <p>Most models of Discord objects, such as the <a href="../model/channel/struct.Message.html" title="Message"><code>Message</code></a>, <a href="../model/channel/struct.GuildChannel.html" title="GuildChannel"><code>GuildChannel</code></a>,
 or <a href="../model/guild/struct.Emoji.html" title="Emoji"><code>Emoji</code></a>, have methods for interacting with that single instance. This
 feature is only compiled if the <code>methods</code> feature is enabled. An example of
@@ -19,7 +19,7 @@ request. The cache is involved due to the function’s use of unlocking the
 cache and retrieving the Id of the current user, and comparing it to the Id
 of the user that owns the guild. This is an inexpensive method of being able
 to access data required by these sugary methods.</p>
-<h2 id="do-i-need-the-cache" class="section-header"><a href="#do-i-need-the-cache">Do I need the Cache?</a></h2>
+<h2 id="do-i-need-the-cache"><a href="#do-i-need-the-cache">Do I need the Cache?</a></h2>
 <p>If you’re asking this, the answer is likely “definitely yes” or
 “definitely no”; any in-between tends to be “yes”. If you are low on RAM,
 and need to run on only a couple MB, then the answer is “definitely no”. If
@@ -32,5 +32,5 @@ is “yes”.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Settings.html" title="serenity::cache::Settings struct">Settings</a></div><div class="item-right docblock-short"><p>Settings for the cache.</p>
 </div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.CacheUpdate.html" title="serenity::cache::CacheUpdate trait">CacheUpdate</a></div><div class="item-right docblock-short"><p>Trait used for updating the cache with a type.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FromStrAndCache.html" title="serenity::cache::FromStrAndCache trait">FromStrAndCache</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.StrExt.html" title="serenity::cache::StrExt trait">StrExt</a></div><div class="item-right docblock-short"></div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FromStrAndCache.html" title="serenity::cache::FromStrAndCache trait">FromStrAndCache</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.StrExt.html" title="serenity::cache::StrExt trait">StrExt</a></div><div class="item-right docblock-short"></div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

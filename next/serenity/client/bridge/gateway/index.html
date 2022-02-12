@@ -8,26 +8,26 @@
 <p>This is made available for user use if one wishes to be lower-level or avoid
 the higher functionality of the <a href="../../index.html"><code>Client</code></a>.</p>
 <p>Of interest are three pieces:</p>
-<h4 id="shardmanager" class="section-header"><a href="#shardmanager"><code>ShardManager</code></a></h4>
+<h4 id="shardmanager"><a href="#shardmanager"><code>ShardManager</code></a></h4>
 <p>The shard manager is responsible for being a clean interface between the
 user and the shard runners, providing essential functions such as
 <a href="struct.ShardManager.html#method.shutdown" title="ShardManager::shutdown"><code>ShardManager::shutdown</code></a> to shutdown a shard and <a href="struct.ShardManager.html#method.restart" title="ShardManager::restart"><code>ShardManager::restart</code></a>
 to restart a shard.</p>
 <p>If you are using the <code>Client</code>, this is likely the only piece of interest to
 you. Refer to <a href="struct.ShardManager.html" title="ShardManager">its documentation</a> for more information.</p>
-<h4 id="shardqueuer" class="section-header"><a href="#shardqueuer"><code>ShardQueuer</code></a></h4>
+<h4 id="shardqueuer"><a href="#shardqueuer"><code>ShardQueuer</code></a></h4>
 <p>The shard queuer is a light wrapper around an mpsc receiver that receives
 <a href="enum.ShardManagerMessage.html" title="ShardManagerMessage"><code>ShardManagerMessage</code></a>s. It should be run in its own thread so it can
 receive messages to start shards in a queue.</p>
 <p>Refer to <a href="struct.ShardQueuer.html" title="ShardQueuer">its documentation</a> for more information.</p>
-<h4 id="shardrunner" class="section-header"><a href="#shardrunner"><code>ShardRunner</code></a></h4>
+<h4 id="shardrunner"><a href="#shardrunner"><code>ShardRunner</code></a></h4>
 <p>The shard runner is responsible for actually running a shard and
 communicating with its respective WebSocket client.</p>
 <p>It is performs all actions such as sending a presence update over the client
 and, with the help of the <a href="../../../gateway/struct.Shard.html"><code>Shard</code></a>, will be able to determine what to do.
 This is, for example, whether to reconnect, resume, or identify with the
 gateway.</p>
-<h4 id="in-conclusion" class="section-header"><a href="#in-conclusion">In Conclusion</a></h4>
+<h4 id="in-conclusion"><a href="#in-conclusion">In Conclusion</a></h4>
 <p>For almost every - if not every - use case, you only need to <em>possibly</em> be
 concerned about the <a href="struct.ShardManager.html" title="ShardManager"><code>ShardManager</code></a> in this module.</p>
 </div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
@@ -51,5 +51,5 @@ startup of shards.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ShardManagerError.html" title="serenity::client::bridge::gateway::ShardManagerError enum">ShardManagerError</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ShardManagerMessage.html" title="serenity::client::bridge::gateway::ShardManagerMessage enum">ShardManagerMessage</a></div><div class="item-right docblock-short"><p>A message for a <a href="struct.ShardManager.html" title="ShardManager"><code>ShardManager</code></a> relating to an operation with a shard.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ShardQueuerMessage.html" title="serenity::client::bridge::gateway::ShardQueuerMessage enum">ShardQueuerMessage</a></div><div class="item-right docblock-short"><p>A message to be sent to the <a href="struct.ShardQueuer.html" title="ShardQueuer"><code>ShardQueuer</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ShardRunnerMessage.html" title="serenity::client::bridge::gateway::ShardRunnerMessage enum">ShardRunnerMessage</a></div><div class="item-right docblock-short"><p>A message to send from a shard over a WebSocket.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

@@ -15,13 +15,13 @@
 over the REST API, as well as initializing a WebSocket connection through
 <a href="../gateway/struct.Shard.html"><code>Shard</code></a>s. Refer to the <a href="../gateway/index.html#sharding">documentation on using sharding</a>
 for more information.</p>
-<h2 id="event-handlers" class="section-header"><a href="#event-handlers">Event Handlers</a></h2>
+<h2 id="event-handlers"><a href="#event-handlers">Event Handlers</a></h2>
 <p>Event handlers can be configured. For example, the event handler
 <a href="../prelude/trait.EventHandler.html#method.message" title="EventHandler::message"><code>EventHandler::message</code></a> will be dispatched to whenever a
 <a href="../model/event/enum.Event.html#variant.MessageCreate"><code>Event::MessageCreate</code></a> is received over the connection.</p>
 <p>Note that you do not need to manually handle events, as they are handled
 internally and then dispatched to your event handlers.</p>
-<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
+<h2 id="examples"><a href="#examples">Examples</a></h2>
 <p>Creating a Client instance and adding a handler on every message
 receive, acting as a “ping-pong” bot is simple:</p>
 
@@ -52,7 +52,7 @@ useful for anything that should “live” through the program: counters,
 database connections, custom user caches, etc.</p>
 <p>In the meaning of a context, this data can be accessed through
 <a href="../prelude/struct.Context.html#structfield.data" title="Context::data"><code>Context::data</code></a>.</p>
-<h3 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h3>
+<h3 id="examples-1"><a href="#examples-1">Examples</a></h3>
 <p>Create a <code>MessageEventCounter</code> to track the following events:</p>
 <ul>
 <li><a href="../model/event/enum.Event.html#variant.MessageCreate"><code>Event::MessageCreate</code></a></li>
@@ -115,7 +115,7 @@ database connections, custom user caches, etc.</p>
 <p>Refer to <a href="https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework">example 05</a> for an example on using the <a href="struct.Client.html#structfield.data" title="Self::data"><code>Self::data</code></a> field.</p>
 </div><span id="structfield.shard_manager" class="structfield small-section-header"><a href="#structfield.shard_manager" class="anchor field"></a><code>shard_manager: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../prelude/struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;<a class="struct" href="bridge/gateway/struct.ShardManager.html" title="struct serenity::client::bridge::gateway::ShardManager">ShardManager</a>&gt;&gt;</code></span><div class="docblock"><p>A HashMap of all shards instantiated by the Client.</p>
 <p>The key is the shard ID and the value is the shard itself.</p>
-<h3 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h3>
+<h3 id="examples-2"><a href="#examples-2">Examples</a></h3>
 <p>If you call <a href="struct.Client.html#method.start_shard" title="Client::start_shard"><code>client.start_shard(3, 5)</code></a>, this
 HashMap will only ever contain a single key of <code>3</code>, as that’s the only
 Shard the client is responsible for.</p>
@@ -188,7 +188,7 @@ less than 2500 guilds. If you have a reason for sharding and/or are in
 more than 2500 guilds, use one of these depending on your use case:</p>
 <p>Refer to the <a href="../gateway/index.html#sharding">Gateway documentation</a> for more information
 on effectively using sharding.</p>
-<h5 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h5>
+<h5 id="examples-3"><a href="#examples-3">Examples</a></h5>
 <p>Starting a Client with only 1 shard, out of 1 total:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
@@ -211,7 +211,7 @@ from the API - determined by Discord - and then open a number of shards
 equivalent to that amount.</p>
 <p>Refer to the <a href="../gateway/index.html#sharding">Gateway documentation</a> for more information
 on effectively using sharding.</p>
-<h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>
+<h5 id="examples-4"><a href="#examples-4">Examples</a></h5>
 <p>Start as many shards as needed using autosharding:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
@@ -226,7 +226,7 @@ on effectively using sharding.</p>
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_autosharded</span>().<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</code></pre></div>
-<h5 id="errors" class="section-header"><a href="#errors">Errors</a></h5>
+<h5 id="errors"><a href="#errors">Errors</a></h5>
 <p>Returns a <a href="../prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
 an error.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.start_shard" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/mod.rs.html#847">source</a></span><a href="#method.start_shard" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.start_shard" class="fnname">start_shard</a>(&amp;mut self, shard: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, shards: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Establish a sharded connection and start listening for events.</p>
@@ -237,7 +237,7 @@ you will need to start other processes with the other shard IDs in some
 way.</p>
 <p>Refer to the <a href="../gateway/index.html#sharding">Gateway documentation</a> for more information
 on effectively using sharding.</p>
-<h5 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h5>
+<h5 id="examples-5"><a href="#examples-5">Examples</a></h5>
 <p>Start shard 3 of 5:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
@@ -267,7 +267,7 @@ on effectively using sharding.</p>
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shard</span>(<span class="number">0</span>, <span class="number">1</span>).<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</code></pre></div>
-<h5 id="errors-1" class="section-header"><a href="#errors-1">Errors</a></h5>
+<h5 id="errors-1"><a href="#errors-1">Errors</a></h5>
 <p>Returns a <a href="../prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
 an error.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.start_shards" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/mod.rs.html#894">source</a></span><a href="#method.start_shards" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.start_shards" class="fnname">start_shards</a>(&amp;mut self, total_shards: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Establish sharded connections and start listening for events.</p>
@@ -278,7 +278,7 @@ you only need to start a single shard within the process, or a range of
 shards, use <a href="struct.Client.html#method.start_shard" title="Self::start_shard"><code>Self::start_shard</code></a> or <a href="struct.Client.html#method.start_shard_range" title="Self::start_shard_range"><code>Self::start_shard_range</code></a>, respectively.</p>
 <p>Refer to the <a href="../gateway/index.html#sharding">Gateway documentation</a> for more information
 on effectively using sharding.</p>
-<h5 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h5>
+<h5 id="examples-6"><a href="#examples-6">Examples</a></h5>
 <p>Start all of 8 shards:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
@@ -293,7 +293,7 @@ on effectively using sharding.</p>
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shards</span>(<span class="number">8</span>).<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</code></pre></div>
-<h5 id="errors-2" class="section-header"><a href="#errors-2">Errors</a></h5>
+<h5 id="errors-2"><a href="#errors-2">Errors</a></h5>
 <p>Returns a <a href="../prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
 an error.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.start_shard_range" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/serenity/client/mod.rs.html#942">source</a></span><a href="#method.start_shard_range" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.start_shard_range" class="fnname">start_shard_range</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;mut self, <br>&nbsp;&nbsp;&nbsp;&nbsp;range: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">; 2]</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;total_shards: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><br>) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Establish a range of sharded connections and start listening for events.</p>
@@ -305,7 +305,7 @@ process, or all shards within the process, use <a href="struct.Client.html#metho
 <a href="struct.Client.html#method.start_shards" title="Self::start_shards"><code>Self::start_shards</code></a>, respectively.</p>
 <p>Refer to the <a href="../gateway/index.html#sharding">Gateway documentation</a> for more
 information on effectively using sharding.</p>
-<h5 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h5>
+<h5 id="examples-7"><a href="#examples-7">Examples</a></h5>
 <p>For a bot using a total of 10 shards, initialize shards 4 through 7:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">serenity::Client</span>;
@@ -320,7 +320,7 @@ information on effectively using sharding.</p>
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">start_shard_range</span>([<span class="number">4</span>, <span class="number">7</span>], <span class="number">10</span>).<span class="kw">await</span> {
     <span class="macro">println!</span>(<span class="string">&quot;Err with client: {:?}&quot;</span>, <span class="ident">why</span>);
 }</code></pre></div>
-<h5 id="errors-3" class="section-header"><a href="#errors-3">Errors</a></h5>
+<h5 id="errors-3"><a href="#errors-3">Errors</a></h5>
 <p>Returns a <a href="../prelude/enum.ClientError.html#variant.Shutdown" title="ClientError::Shutdown"><code>ClientError::Shutdown</code></a> when all shards have shutdown due to
 an error.</p>
 </div></details></div></details><h2 id="synthetic-implementations" class="small-section-header">Auto Trait Implementations<a href="#synthetic-implementations" class="anchor"></a></h2><div id="synthetic-implementations-list"><section id="impl-RefUnwindSafe" class="impl has-srclink"><a href="#impl-RefUnwindSafe" class="anchor"></a><h3 class="code-header in-band">impl !<a class="trait" href="https://doc.rust-lang.org/nightly/core/panic/unwind_safe/trait.RefUnwindSafe.html" title="trait core::panic::unwind_safe::RefUnwindSafe">RefUnwindSafe</a> for <a class="struct" href="struct.Client.html" title="struct serenity::client::Client">Client</a></h3></section><section id="impl-Send" class="impl has-srclink"><a href="#impl-Send" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> for <a class="struct" href="struct.Client.html" title="struct serenity::client::Client">Client</a></h3></section><section id="impl-Sync" class="impl has-srclink"><a href="#impl-Sync" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> for <a class="struct" href="struct.Client.html" title="struct serenity::client::Client">Client</a></h3></section><section id="impl-Unpin" class="impl has-srclink"><a href="#impl-Unpin" class="anchor"></a><h3 class="code-header in-band">impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Unpin.html" title="trait core::marker::Unpin">Unpin</a> for <a class="struct" href="struct.Client.html" title="struct serenity::client::Client">Client</a></h3></section><section id="impl-UnwindSafe" class="impl has-srclink"><a href="#impl-UnwindSafe" class="anchor"></a><h3 class="code-header in-band">impl !<a class="trait" href="https://doc.rust-lang.org/nightly/core/panic/unwind_safe/trait.UnwindSafe.html" title="trait core::panic::unwind_safe::UnwindSafe">UnwindSafe</a> for <a class="struct" href="struct.Client.html" title="struct serenity::client::Client">Client</a></h3></section></div><h2 id="blanket-implementations" class="small-section-header">Blanket Implementations<a href="#blanket-implementations" class="anchor"></a></h2><div id="blanket-implementations-list"><details class="rustdoc-toggle implementors-toggle" open><summary><section id="impl-Any" class="impl has-srclink"><span class="rightside"><a class="srclink" href="https://doc.rust-lang.org/nightly/src/core/any.rs.html#132-136">source</a></span><a href="#impl-Any" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="trait" href="https://doc.rust-lang.org/nightly/core/any/trait.Any.html" title="trait core::any::Any">Any</a> for T <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: 'static + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h3></section></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><section id="method.type_id" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://doc.rust-lang.org/nightly/src/core/any.rs.html#133">source</a></span><a href="#method.type_id" class="anchor"></a><h4 class="code-header">pub fn <a href="https://doc.rust-lang.org/nightly/core/any/trait.Any.html#tymethod.type_id" class="fnname">type_id</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/core/any/struct.TypeId.html" title="struct core::any::TypeId">TypeId</a></h4></section></summary><div class='docblock'><p>Gets the <code>TypeId</code> of <code>self</code>. <a href="https://doc.rust-lang.org/nightly/core/any/trait.Any.html#tymethod.type_id">Read more</a></p>
@@ -341,5 +341,5 @@ an error.</p>
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_subscriber">Read more</a></p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_current_subscriber" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/tracing/0.1.30/src/tracing/instrument.rs.html#221">source</a></span><a href="#method.with_current_subscriber" class="anchor"></a><h4 class="code-header">fn <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber" class="fnname">with_current_subscriber</a>(self) -&gt; <a class="struct" href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="struct tracing::instrument::WithDispatch">WithDispatch</a>&lt;Self&gt;</h4></section></summary><div class='docblock'><p>Attaches the current <a href="https://docs.rs/tracing/0.1.30/tracing/dispatcher/index.html#setting-the-default-subscriber">default</a> <a href="https://docs.rs/tracing-core/0.1.22/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> to this type, returning a
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber">Read more</a></p>
-</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

@@ -8,7 +8,7 @@
 <p>This type acts similarly to <a href="https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html"><code>std::sync::Mutex</code></a>, with two major
 differences: <a href="struct.Mutex.html#method.lock"><code>lock</code></a> is an async method so does not block, and the lock
 guard is designed to be held across <code>.await</code> points.</p>
-<h2 id="which-kind-of-mutex-should-you-use" class="section-header"><a href="#which-kind-of-mutex-should-you-use">Which kind of mutex should you use?</a></h2>
+<h2 id="which-kind-of-mutex-should-you-use"><a href="#which-kind-of-mutex-should-you-use">Which kind of mutex should you use?</a></h2>
 <p>Contrary to popular belief, it is ok and often preferred to use the ordinary
 <a href="https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html"><code>Mutex</code></a> from the standard library in asynchronous code.</p>
 <p>The feature that the async mutex offers over the blocking mutex is the
@@ -30,7 +30,7 @@ illustration of this pattern.</p>
 <p>Additionally, when you <em>do</em> want shared access to an IO resource, it is
 often better to spawn a task to manage the IO resource, and to use message
 passing to communicate with that task.</p>
-<h2 id="examples" class="section-header"><a href="#examples">Examples:</a></h2>
+<h2 id="examples"><a href="#examples">Examples:</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -95,18 +95,18 @@ poison the mutex when a thread holding the <a href="struct@MutexGuard"><code>Mut
 case, the mutex will be unlocked. If the panic is caught, this might leave
 the data protected by the mutex in an inconsistent state.</p>
 </div></details><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><section id="impl" class="impl has-srclink"><a href="#impl" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="struct" href="struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h3></section></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><section id="method.new" class="method has-srclink"><a href="#method.new" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new" class="fnname">new</a>(t: T) -&gt; <a class="struct" href="struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;T&gt;</h4></section></summary><div class="docblock"><p>Creates a new lock in an unlocked state ready for use.</p>
-<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
+<h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 
 <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="number">5</span>);</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.lock" class="method has-srclink"><a href="#method.lock" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.lock" class="fnname">lock</a>(&amp;'_ self) -&gt; MutexGuard&lt;'_, T&gt;</h4></section></summary><div class="docblock"><p>Locks this mutex, causing the current task to yield until the lock has
 been acquired.  When the lock has been acquired, function returns a
 [<code>MutexGuard</code>].</p>
-<h5 id="cancel-safety" class="section-header"><a href="#cancel-safety">Cancel safety</a></h5>
+<h5 id="cancel-safety"><a href="#cancel-safety">Cancel safety</a></h5>
 <p>This method uses a queue to fairly distribute locks in the order they
 were requested. Cancelling a call to <code>lock</code> makes you lose your place in
 the queue.</p>
-<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
+<h5 id="examples-2"><a href="#examples-2">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -120,7 +120,7 @@ the queue.</p>
 [<code>MutexGuard</code>].</p>
 <p>This method is intended for use cases where you
 need to use this mutex in asynchronous code as well as in synchronous code.</p>
-<h5 id="panics" class="section-header"><a href="#panics">Panics</a></h5>
+<h5 id="panics"><a href="#panics">Panics</a></h5>
 <p>This function panics if called within an asynchronous execution context.</p>
 <ul>
 <li>If you find yourself in an asynchronous execution context and needing
@@ -129,7 +129,7 @@ to call some (synchronous) function which performs one of these
 [<code>spawn_blocking()</code>][crate::runtime::Handle::spawn_blocking]
 (or [<code>block_in_place()</code>][crate::task::block_in_place]).</li>
 </ul>
-<h5 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h5>
+<h5 id="examples-3"><a href="#examples-3">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 
@@ -165,11 +165,11 @@ guard references the <code>Mutex</code> with an <a href="https://doc.rust-lang.o
 it. Therefore, the <code>Mutex</code> must be wrapped in an <code>Arc</code> to call this
 method, and the guard will live for the <code>'static</code> lifetime, as it keeps
 the <code>Mutex</code> alive by holding an <code>Arc</code>.</p>
-<h5 id="cancel-safety-1" class="section-header"><a href="#cancel-safety-1">Cancel safety</a></h5>
+<h5 id="cancel-safety-1"><a href="#cancel-safety-1">Cancel safety</a></h5>
 <p>This method uses a queue to fairly distribute locks in the order they
 were requested. Cancelling a call to <code>lock_owned</code> makes you lose your
 place in the queue.</p>
-<h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>
+<h5 id="examples-4"><a href="#examples-4">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -182,7 +182,7 @@ place in the queue.</p>
 }</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.try_lock" class="method has-srclink"><a href="#method.try_lock" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.try_lock" class="fnname">try_lock</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;MutexGuard&lt;'_, T&gt;, TryLockError&gt;</h4></section></summary><div class="docblock"><p>Attempts to acquire the lock, and returns <a href="TryLockError"><code>TryLockError</code></a> if the
 lock is currently held somewhere else.</p>
-<h5 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h5>
+<h5 id="examples-5"><a href="#examples-5">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 
 <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="number">1</span>);
@@ -192,7 +192,7 @@ lock is currently held somewhere else.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_mut" class="method has-srclink"><a href="#method.get_mut" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.get_mut" class="fnname">get_mut</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>T</h4></section></summary><div class="docblock"><p>Returns a mutable reference to the underlying data.</p>
 <p>Since this call borrows the <code>Mutex</code> mutably, no actual locking needs to
 take place – the mutable borrow statically guarantees no locks exist.</p>
-<h5 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h5>
+<h5 id="examples-6"><a href="#examples-6">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -208,7 +208,7 @@ returned  guard references the <code>Mutex</code> with an <a href="https://doc.r
 borrowing it. Therefore, the <code>Mutex</code> must be wrapped in an <code>Arc</code> to call
 this method, and the guard will live for the <code>'static</code> lifetime, as it
 keeps the <code>Mutex</code> alive by holding an <code>Arc</code>.</p>
-<h5 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h5>
+<h5 id="examples-7"><a href="#examples-7">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
@@ -217,7 +217,7 @@ keeps the <code>Mutex</code> alive by holding an <code>Arc</code>.</p>
 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">clone</span>().<span class="ident">try_lock_owned</span>()<span class="question-mark">?</span>;
 <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">n</span>, <span class="number">1</span>);</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.into_inner" class="method has-srclink"><a href="#method.into_inner" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.into_inner" class="fnname">into_inner</a>(self) -&gt; T</h4></section></summary><div class="docblock"><p>Consumes the mutex, returning the underlying data.</p>
-<h5 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h5>
+<h5 id="examples-8"><a href="#examples-8">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -249,5 +249,5 @@ keeps the <code>Mutex</code> alive by holding an <code>Arc</code>.</p>
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_subscriber">Read more</a></p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_current_subscriber" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/tracing/0.1.30/src/tracing/instrument.rs.html#221">source</a></span><a href="#method.with_current_subscriber" class="anchor"></a><h4 class="code-header">fn <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber" class="fnname">with_current_subscriber</a>(self) -&gt; <a class="struct" href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="struct tracing::instrument::WithDispatch">WithDispatch</a>&lt;Self&gt;</h4></section></summary><div class='docblock'><p>Attaches the current <a href="https://docs.rs/tracing/0.1.30/tracing/dispatcher/index.html#setting-the-default-subscriber">default</a> <a href="https://docs.rs/tracing-core/0.1.22/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> to this type, returning a
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber">Read more</a></p>
-</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

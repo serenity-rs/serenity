@@ -26,7 +26,7 @@ required that <code>T</code> satisfies <a href="https://doc.rust-lang.org/nightl
 returned from the locking methods implement <a href="https://doc.rust-lang.org/nightly/core/ops/deref/trait.Deref.html"><code>Deref</code></a>
 (and <a href="https://doc.rust-lang.org/nightly/core/ops/deref/trait.DerefMut.html"><code>DerefMut</code></a>
 for the <code>write</code> methods) to allow access to the content of the lock.</p>
-<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
+<h2 id="examples"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -49,17 +49,17 @@ for the <code>write</code> methods) to allow access to the content of the lock.<
     } <span class="comment">// write lock is dropped here</span>
 }</code></pre></div>
 </div></details><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><section id="impl" class="impl has-srclink"><a href="#impl" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span></h3></section></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><section id="method.new" class="method has-srclink"><a href="#method.new" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new" class="fnname">new</a>(value: T) -&gt; <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;</h4></section></summary><div class="docblock"><p>Creates a new instance of an <code>RwLock&lt;T&gt;</code> which is unlocked.</p>
-<h5 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h5>
+<h5 id="examples-1"><a href="#examples-1">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="number">5</span>);</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_max_readers" class="method has-srclink"><a href="#method.with_max_readers" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.with_max_readers" class="fnname">with_max_readers</a>(value: T, max_reads: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>) -&gt; <a class="struct" href="struct.RwLock.html" title="struct serenity::prelude::RwLock">RwLock</a>&lt;T&gt;</h4></section></summary><div class="docblock"><p>Creates a new instance of an <code>RwLock&lt;T&gt;</code> which is unlocked
 and allows a maximum of <code>max_reads</code> concurrent readers.</p>
-<h5 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h5>
+<h5 id="examples-2"><a href="#examples-2">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::with_max_readers</span>(<span class="number">5</span>, <span class="number">1024</span>);</code></pre></div>
-<h5 id="panics" class="section-header"><a href="#panics">Panics</a></h5>
+<h5 id="panics"><a href="#panics">Panics</a></h5>
 <p>Panics if <code>max_reads</code> is more than <code>u32::MAX &gt;&gt; 3</code>.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.read" class="method has-srclink"><a href="#method.read" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.read" class="fnname">read</a>(&amp;'_ self) -&gt; RwLockReadGuard&lt;'_, T&gt;</h4></section></summary><div class="docblock"><p>Locks this <code>RwLock</code> with shared read access, causing the current task
 to yield until the lock has been acquired.</p>
@@ -72,11 +72,11 @@ lock attempt is made, and then a subsequent read lock attempt is made
 by the current task.</p>
 <p>Returns an RAII guard which will drop this read access of the <code>RwLock</code>
 when dropped.</p>
-<h5 id="cancel-safety" class="section-header"><a href="#cancel-safety">Cancel safety</a></h5>
+<h5 id="cancel-safety"><a href="#cancel-safety">Cancel safety</a></h5>
 <p>This method uses a queue to fairly distribute locks in the order they
 were requested. Cancelling a call to <code>read</code> makes you lose your place in
 the queue.</p>
-<h5 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h5>
+<h5 id="examples-3"><a href="#examples-3">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
@@ -101,7 +101,7 @@ the queue.</p>
 <p>This method is intended for use cases where you
 need to use this rwlock in asynchronous code as well as in synchronous code.</p>
 <p>Returns an RAII guard which will drop the read access of this <code>RwLock</code> when dropped.</p>
-<h5 id="panics-1" class="section-header"><a href="#panics-1">Panics</a></h5>
+<h5 id="panics-1"><a href="#panics-1">Panics</a></h5>
 <p>This function panics if called within an asynchronous execution context.</p>
 <ul>
 <li>If you find yourself in an asynchronous execution context and needing
@@ -110,7 +110,7 @@ to call some (synchronous) function which performs one of these
 [<code>spawn_blocking()</code>][crate::runtime::Handle::spawn_blocking]
 (or [<code>block_in_place()</code>][crate::task::block_in_place]).</li>
 </ul>
-<h5 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h5>
+<h5 id="examples-4"><a href="#examples-4">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
@@ -153,11 +153,11 @@ lock attempt is made, and then a subsequent read lock attempt is made
 by the current task.</p>
 <p>Returns an RAII guard which will drop this read access of the <code>RwLock</code>
 when dropped.</p>
-<h5 id="cancel-safety-1" class="section-header"><a href="#cancel-safety-1">Cancel safety</a></h5>
+<h5 id="cancel-safety-1"><a href="#cancel-safety-1">Cancel safety</a></h5>
 <p>This method uses a queue to fairly distribute locks in the order they
 were requested. Cancelling a call to <code>read_owned</code> makes you lose your
 place in the queue.</p>
-<h5 id="examples-5" class="section-header"><a href="#examples-5">Examples</a></h5>
+<h5 id="examples-5"><a href="#examples-5">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
@@ -182,7 +182,7 @@ place in the queue.</p>
 <p>If the access couldn’t be acquired immediately, returns <a href="TryLockError"><code>TryLockError</code></a>.
 Otherwise, an RAII guard is returned which will release read access
 when dropped.</p>
-<h5 id="examples-6" class="section-header"><a href="#examples-6">Examples</a></h5>
+<h5 id="examples-6"><a href="#examples-6">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
@@ -212,7 +212,7 @@ returned guard references the <code>RwLock</code> with an <a href="https://doc.r
 borrowing it. Therefore, the <code>RwLock</code> must be wrapped in an <code>Arc</code> to
 call this method, and the guard will live for the <code>'static</code> lifetime,
 as it keeps the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
-<h5 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h5>
+<h5 id="examples-7"><a href="#examples-7">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
@@ -239,11 +239,11 @@ task to yield until the lock has been acquired.</p>
 have access to the lock.</p>
 <p>Returns an RAII guard which will drop the write access of this <code>RwLock</code>
 when dropped.</p>
-<h5 id="cancel-safety-2" class="section-header"><a href="#cancel-safety-2">Cancel safety</a></h5>
+<h5 id="cancel-safety-2"><a href="#cancel-safety-2">Cancel safety</a></h5>
 <p>This method uses a queue to fairly distribute locks in the order they
 were requested. Cancelling a call to <code>write</code> makes you lose your place
 in the queue.</p>
-<h5 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h5>
+<h5 id="examples-8"><a href="#examples-8">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -257,7 +257,7 @@ in the queue.</p>
 <p>This method is intended for use cases where you
 need to use this rwlock in asynchronous code as well as in synchronous code.</p>
 <p>Returns an RAII guard which will drop the write access of this <code>RwLock</code> when dropped.</p>
-<h5 id="panics-2" class="section-header"><a href="#panics-2">Panics</a></h5>
+<h5 id="panics-2"><a href="#panics-2">Panics</a></h5>
 <p>This function panics if called within an asynchronous execution context.</p>
 <ul>
 <li>If you find yourself in an asynchronous execution context and needing
@@ -266,7 +266,7 @@ to call some (synchronous) function which performs one of these
 [<code>spawn_blocking()</code>][crate::runtime::Handle::spawn_blocking]
 (or [<code>block_in_place()</code>][crate::task::block_in_place]).</li>
 </ul>
-<h5 id="examples-9" class="section-header"><a href="#examples-9">Examples</a></h5>
+<h5 id="examples-9"><a href="#examples-9">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">sync::RwLock</span>};
 
@@ -306,11 +306,11 @@ method, and the guard will live for the <code>'static</code> lifetime, as it kee
 the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
 <p>Returns an RAII guard which will drop the write access of this <code>RwLock</code>
 when dropped.</p>
-<h5 id="cancel-safety-3" class="section-header"><a href="#cancel-safety-3">Cancel safety</a></h5>
+<h5 id="cancel-safety-3"><a href="#cancel-safety-3">Cancel safety</a></h5>
 <p>This method uses a queue to fairly distribute locks in the order they
 were requested. Cancelling a call to <code>write_owned</code> makes you lose your
 place in the queue.</p>
-<h5 id="examples-10" class="section-header"><a href="#examples-10">Examples</a></h5>
+<h5 id="examples-10"><a href="#examples-10">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
@@ -325,7 +325,7 @@ place in the queue.</p>
 <p>If the access couldn’t be acquired immediately, returns <a href="TryLockError"><code>TryLockError</code></a>.
 Otherwise, an RAII guard is returned which will release write access
 when dropped.</p>
-<h5 id="examples-11" class="section-header"><a href="#examples-11">Examples</a></h5>
+<h5 id="examples-11"><a href="#examples-11">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio::main</span>]</span>
@@ -346,7 +346,7 @@ returned guard references the <code>RwLock</code> with an <a href="https://doc.r
 borrowing it. Therefore, the <code>RwLock</code> must be wrapped in an <code>Arc</code> to
 call this method, and the guard will live for the <code>'static</code> lifetime,
 as it keeps the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
-<h5 id="examples-12" class="section-header"><a href="#examples-12">Examples</a></h5>
+<h5 id="examples-12"><a href="#examples-12">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
@@ -362,7 +362,7 @@ as it keeps the <code>RwLock</code> alive by holding an <code>Arc</code>.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.get_mut" class="method has-srclink"><a href="#method.get_mut" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.get_mut" class="fnname">get_mut</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>T</h4></section></summary><div class="docblock"><p>Returns a mutable reference to the underlying data.</p>
 <p>Since this call borrows the <code>RwLock</code> mutably, no actual locking needs to
 take place – the mutable borrow statically guarantees no locks exist.</p>
-<h5 id="examples-13" class="section-header"><a href="#examples-13">Examples</a></h5>
+<h5 id="examples-13"><a href="#examples-13">Examples</a></h5>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -394,5 +394,5 @@ take place – the mutable borrow statically guarantees no locks exist.</p>
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_subscriber">Read more</a></p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_current_subscriber" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/tracing/0.1.30/src/tracing/instrument.rs.html#221">source</a></span><a href="#method.with_current_subscriber" class="anchor"></a><h4 class="code-header">fn <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber" class="fnname">with_current_subscriber</a>(self) -&gt; <a class="struct" href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="struct tracing::instrument::WithDispatch">WithDispatch</a>&lt;Self&gt;</h4></section></summary><div class='docblock'><p>Attaches the current <a href="https://docs.rs/tracing/0.1.30/tracing/dispatcher/index.html#setting-the-default-subscriber">default</a> <a href="https://docs.rs/tracing-core/0.1.22/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> to this type, returning a
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber">Read more</a></p>
-</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>

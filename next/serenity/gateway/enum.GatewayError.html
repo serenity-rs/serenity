@@ -31,13 +31,13 @@ you manually handle these.</p>
 </div><h3 id="variant.InvalidHandshake" class="variant small-section-header"><a href="#variant.InvalidHandshake" class="anchor field"></a><code>InvalidHandshake</code></h3><div class="docblock"><p>Expected a Ready or an InvalidateSession</p>
 </div><h3 id="variant.InvalidOpCode" class="variant small-section-header"><a href="#variant.InvalidOpCode" class="anchor field"></a><code>InvalidOpCode</code></h3><div class="docblock"><p>An indicator that an unknown opcode was received from the gateway.</p>
 </div><h3 id="variant.InvalidShardData" class="variant small-section-header"><a href="#variant.InvalidShardData" class="anchor field"></a><code>InvalidShardData</code></h3><div class="docblock"><p>When invalid sharding data was sent in the IDENTIFY.</p>
-<h4 id="examples" class="section-header"><a href="#examples">Examples</a></h4>
+<h4 id="examples"><a href="#examples">Examples</a></h4>
 <p>Sending a shard ID of 5 when sharding with 3 total is considered
 invalid.</p>
 </div><h3 id="variant.NoAuthentication" class="variant small-section-header"><a href="#variant.NoAuthentication" class="anchor field"></a><code>NoAuthentication</code></h3><div class="docblock"><p>When no authentication was sent in the IDENTIFY.</p>
 </div><h3 id="variant.NoSessionId" class="variant small-section-header"><a href="#variant.NoSessionId" class="anchor field"></a><code>NoSessionId</code></h3><div class="docblock"><p>When a session Id was expected (for resuming), but was not present.</p>
 </div><h3 id="variant.OverloadedShard" class="variant small-section-header"><a href="#variant.OverloadedShard" class="anchor field"></a><code>OverloadedShard</code></h3><div class="docblock"><p>When a shard would have too many guilds assigned to it.</p>
-<h4 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h4>
+<h4 id="examples-1"><a href="#examples-1">Examples</a></h4>
 <p>When sharding 5500 guilds on 2 shards, at least one of the shards will
 have over the maximum number of allowed guilds per shard.</p>
 <p>This limit is currently 2500 guilds per shard.</p>
@@ -77,5 +77,5 @@ were provided without enabling them prior.</p>
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_subscriber">Read more</a></p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.with_current_subscriber" class="method trait-impl has-srclink"><span class="rightside"><a class="srclink" href="https://docs.rs/tracing/0.1.30/src/tracing/instrument.rs.html#221">source</a></span><a href="#method.with_current_subscriber" class="anchor"></a><h4 class="code-header">fn <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber" class="fnname">with_current_subscriber</a>(self) -&gt; <a class="struct" href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="struct tracing::instrument::WithDispatch">WithDispatch</a>&lt;Self&gt;</h4></section></summary><div class='docblock'><p>Attaches the current <a href="https://docs.rs/tracing/0.1.30/tracing/dispatcher/index.html#setting-the-default-subscriber">default</a> <a href="https://docs.rs/tracing-core/0.1.22/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> to this type, returning a
 <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/struct.WithDispatch.html" title="WithDispatch"><code>WithDispatch</code></a> wrapper. <a href="https://docs.rs/tracing/0.1.30/tracing/instrument/trait.WithSubscriber.html#method.with_current_subscriber">Read more</a></p>
-</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e7aca8959 2022-02-09)" ></div>
+</div></details></div></details></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e789f3a3a 2022-02-11)" ></div>
 </body></html>
