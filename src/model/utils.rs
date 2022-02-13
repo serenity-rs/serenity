@@ -73,55 +73,6 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
 }
 
 #[cfg(feature = "unstable_discord_api")]
-pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<UserId, PartialMember>, D::Error> {
-    HashMap::deserialize(deserializer)
-}
-
-#[cfg(feature = "unstable_discord_api")]
-pub fn deserialize_users<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<UserId, User>, D::Error> {
-    HashMap::deserialize(deserializer)
-}
-
-#[cfg(feature = "unstable_discord_api")]
-pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<RoleId, Role>, D::Error> {
-    HashMap::deserialize(deserializer)
-}
-
-#[cfg(feature = "unstable_discord_api")]
-pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<ChannelId, PartialChannel>, D::Error> {
-    HashMap::deserialize(deserializer)
-}
-
-#[cfg(feature = "unstable_discord_api")]
-pub fn deserialize_messages_map<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<MessageId, Message>, D::Error> {
-    HashMap::deserialize(deserializer)
-}
-
-#[cfg(feature = "unstable_discord_api")]
-pub fn deserialize_attachments_map<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<HashMap<AttachmentId, Attachment>, D::Error> {
-    HashMap::deserialize(deserializer)
-}
-
-#[cfg(feature = "unstable_discord_api")]
-pub fn deserialize_options<'de, D: Deserializer<'de>>(
-    deserializer: D,
-) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
-    Vec::deserialize(deserializer)
-}
-
-#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
     deserializer: D,
     resolved: &ApplicationCommandInteractionDataResolved,
