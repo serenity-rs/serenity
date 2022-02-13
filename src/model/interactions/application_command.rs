@@ -32,16 +32,7 @@ use crate::model::id::{
 use crate::model::interactions::InteractionType;
 use crate::model::prelude::User;
 #[cfg(feature = "unstable_discord_api")]
-use crate::model::utils::{
-    deserialize_attachments_map,
-    deserialize_channels_map,
-    deserialize_messages_map,
-    deserialize_options,
-    deserialize_options_with_resolved,
-    deserialize_partial_members_map,
-    deserialize_roles_map,
-    deserialize_users,
-};
+use crate::model::utils::deserialize_options_with_resolved;
 
 /// An interaction when a user invokes a slash command.
 #[derive(Clone, Debug, Serialize)]
@@ -578,42 +569,42 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
 
         let members = map
             .remove("members")
-            .map(deserialize_partial_members_map)
+            .map(HashMap::deserialize)
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
 
         let users = map
             .remove("users")
-            .map(deserialize_users)
+            .map(HashMap::deserialize)
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
 
         let roles = map
             .remove("roles")
-            .map(deserialize_roles_map)
+            .map(HashMap::deserialize)
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
 
         let channels = map
             .remove("channels")
-            .map(deserialize_channels_map)
+            .map(HashMap::deserialize)
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
 
         let messages = map
             .remove("messages")
-            .map(deserialize_messages_map)
+            .map(HashMap::deserialize)
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
 
         let attachments = map
             .remove("attachments")
-            .map(deserialize_attachments_map)
+            .map(HashMap::deserialize)
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
@@ -681,7 +672,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
 
         let options = map
             .remove("options")
-            .map(deserialize_options)
+            .map(Vec::deserialize)
             .transpose()
             .map_err(DeError::custom)?
             .unwrap_or_default();
