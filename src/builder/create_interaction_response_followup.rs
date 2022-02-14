@@ -110,6 +110,18 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         self
     }
 
+    /// Sets a single embed to include in the message
+    ///
+    /// Calling this will overwrite the embed list.
+    /// To append embeds, call [`Self::add_embed`] instead.
+    pub fn embed(&mut self, embed: CreateEmbed) -> &mut Self {
+        let map = utils::hashmap_to_json_map(embed.0);
+        let embed = Value::Object(map);
+        self.0.insert("embeds", Value::Array(vec![embed]));
+
+        self
+    }
+
     /// Sets a list of embeds to include in the message.
     ///
     /// Calling this multiple times will overwrite the embed list.
