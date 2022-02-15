@@ -16,18 +16,18 @@ use crate::model::prelude::*;
 #[non_exhaustive]
 pub enum Action {
     GuildUpdate,
-    Channel(ActionChannel),
-    ChannelOverwrite(ActionChannelOverwrite),
-    Member(ActionMember),
-    Role(ActionRole),
-    Invite(ActionInvite),
-    Webhook(ActionWebhook),
-    Emoji(ActionEmoji),
-    Message(ActionMessage),
-    Integration(ActionIntegration),
-    StageInstance(ActionStageInstance),
-    Sticker(ActionSticker),
-    Thread(ActionThread),
+    Channel(ChannelAction),
+    ChannelOverwrite(ChannelOverwriteAction),
+    Member(MemberAction),
+    Role(RoleAction),
+    Invite(InviteAction),
+    Webhook(WebhookAction),
+    Emoji(EmojiAction),
+    Message(MessageAction),
+    Integration(IntegrationAction),
+    StageInstance(StageInstanceAction),
+    Sticker(StickerAction),
+    Thread(ThreadAction),
 }
 
 impl Action {
@@ -85,28 +85,37 @@ impl Serialize for Action {
     }
 }
 
+#[deprecated(note = "use `ChannelAction`")]
+pub type ActionChannel = ChannelAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionChannel {
+pub enum ChannelAction {
     Create = 10,
     Update = 11,
     Delete = 12,
 }
 
+#[deprecated(note = "use `ChannelOverwriteAction`")]
+pub type ActionChannelOverwrite = ChannelOverwriteAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionChannelOverwrite {
+pub enum ChannelOverwriteAction {
     Create = 13,
     Update = 14,
     Delete = 15,
 }
 
+#[deprecated(note = "use `MemberAction`")]
+pub type ActionMember = MemberAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionMember {
+pub enum MemberAction {
     Kick = 20,
     Prune = 21,
     BanAdd = 22,
@@ -118,83 +127,110 @@ pub enum ActionMember {
     BotAdd = 28,
 }
 
+#[deprecated(note = "use `RoleAction`")]
+pub type ActionRole = RoleAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionRole {
+pub enum RoleAction {
     Create = 30,
     Update = 31,
     Delete = 32,
 }
 
+#[deprecated(note = "use `InviteAction`")]
+pub type ActionInvite = InviteAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionInvite {
+pub enum InviteAction {
     Create = 40,
     Update = 41,
     Delete = 42,
 }
 
+#[deprecated(note = "use `WebhookAction`")]
+pub type ActionWebhook = WebhookAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionWebhook {
+pub enum WebhookAction {
     Create = 50,
     Update = 51,
     Delete = 52,
 }
 
+#[deprecated(note = "use `EmojiAction`")]
+pub type ActionEmoji = EmojiAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionEmoji {
+pub enum EmojiAction {
     Create = 60,
     Update = 61,
     Delete = 62,
 }
 
+#[deprecated(note = "use `MessageAction`")]
+pub type ActionMessage = MessageAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionMessage {
+pub enum MessageAction {
     Delete = 72,
     BulkDelete = 73,
     Pin = 74,
     Unpin = 75,
 }
 
+#[deprecated(note = "use `IntegrationAction`")]
+pub type ActionIntegration = IntegrationAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionIntegration {
+pub enum IntegrationAction {
     Create = 80,
     Update = 81,
     Delete = 82,
 }
 
+#[deprecated(note = "use `StageInstanceAction`")]
+pub type ActionStageInstance = StageInstanceAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionStageInstance {
+pub enum StageInstanceAction {
     Create = 83,
     Update = 84,
     Delete = 85,
 }
 
+#[deprecated(note = "use `StickerAction`")]
+pub type ActionSticker = StickerAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionSticker {
+pub enum StickerAction {
     Create = 90,
     Update = 91,
     Delete = 92,
 }
 
+#[deprecated(note = "use `ThreadAction`")]
+pub type ActionThread = ThreadAction;
+
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 #[repr(u8)]
-pub enum ActionThread {
+pub enum ThreadAction {
     Create = 110,
     Update = 111,
     Delete = 112,
@@ -276,48 +312,48 @@ mod tests {
         }
 
         assert_action!(Action::GuildUpdate, 1);
-        assert_action!(Action::Channel(ActionChannel::Create), 10);
-        assert_action!(Action::Channel(ActionChannel::Update), 11);
-        assert_action!(Action::Channel(ActionChannel::Delete), 12);
-        assert_action!(Action::ChannelOverwrite(ActionChannelOverwrite::Create), 13);
-        assert_action!(Action::ChannelOverwrite(ActionChannelOverwrite::Update), 14);
-        assert_action!(Action::ChannelOverwrite(ActionChannelOverwrite::Delete), 15);
-        assert_action!(Action::Member(ActionMember::Kick), 20);
-        assert_action!(Action::Member(ActionMember::Prune), 21);
-        assert_action!(Action::Member(ActionMember::BanAdd), 22);
-        assert_action!(Action::Member(ActionMember::BanRemove), 23);
-        assert_action!(Action::Member(ActionMember::Update), 24);
-        assert_action!(Action::Member(ActionMember::RoleUpdate), 25);
-        assert_action!(Action::Member(ActionMember::MemberMove), 26);
-        assert_action!(Action::Member(ActionMember::MemberDisconnect), 27);
-        assert_action!(Action::Member(ActionMember::BotAdd), 28);
-        assert_action!(Action::Role(ActionRole::Create), 30);
-        assert_action!(Action::Role(ActionRole::Update), 31);
-        assert_action!(Action::Role(ActionRole::Delete), 32);
-        assert_action!(Action::Invite(ActionInvite::Create), 40);
-        assert_action!(Action::Invite(ActionInvite::Update), 41);
-        assert_action!(Action::Invite(ActionInvite::Delete), 42);
-        assert_action!(Action::Webhook(ActionWebhook::Create), 50);
-        assert_action!(Action::Webhook(ActionWebhook::Update), 51);
-        assert_action!(Action::Webhook(ActionWebhook::Delete), 52);
-        assert_action!(Action::Emoji(ActionEmoji::Create), 60);
-        assert_action!(Action::Emoji(ActionEmoji::Update), 61);
-        assert_action!(Action::Emoji(ActionEmoji::Delete), 62);
-        assert_action!(Action::Message(ActionMessage::Delete), 72);
-        assert_action!(Action::Message(ActionMessage::BulkDelete), 73);
-        assert_action!(Action::Message(ActionMessage::Pin), 74);
-        assert_action!(Action::Message(ActionMessage::Unpin), 75);
-        assert_action!(Action::Integration(ActionIntegration::Create), 80);
-        assert_action!(Action::Integration(ActionIntegration::Update), 81);
-        assert_action!(Action::Integration(ActionIntegration::Delete), 82);
-        assert_action!(Action::StageInstance(ActionStageInstance::Create), 83);
-        assert_action!(Action::StageInstance(ActionStageInstance::Update), 84);
-        assert_action!(Action::StageInstance(ActionStageInstance::Delete), 85);
-        assert_action!(Action::Sticker(ActionSticker::Create), 90);
-        assert_action!(Action::Sticker(ActionSticker::Update), 91);
-        assert_action!(Action::Sticker(ActionSticker::Delete), 92);
-        assert_action!(Action::Thread(ActionThread::Create), 110);
-        assert_action!(Action::Thread(ActionThread::Update), 111);
-        assert_action!(Action::Thread(ActionThread::Delete), 112);
+        assert_action!(Action::Channel(ChannelAction::Create), 10);
+        assert_action!(Action::Channel(ChannelAction::Update), 11);
+        assert_action!(Action::Channel(ChannelAction::Delete), 12);
+        assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Create), 13);
+        assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Update), 14);
+        assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Delete), 15);
+        assert_action!(Action::Member(MemberAction::Kick), 20);
+        assert_action!(Action::Member(MemberAction::Prune), 21);
+        assert_action!(Action::Member(MemberAction::BanAdd), 22);
+        assert_action!(Action::Member(MemberAction::BanRemove), 23);
+        assert_action!(Action::Member(MemberAction::Update), 24);
+        assert_action!(Action::Member(MemberAction::RoleUpdate), 25);
+        assert_action!(Action::Member(MemberAction::MemberMove), 26);
+        assert_action!(Action::Member(MemberAction::MemberDisconnect), 27);
+        assert_action!(Action::Member(MemberAction::BotAdd), 28);
+        assert_action!(Action::Role(RoleAction::Create), 30);
+        assert_action!(Action::Role(RoleAction::Update), 31);
+        assert_action!(Action::Role(RoleAction::Delete), 32);
+        assert_action!(Action::Invite(InviteAction::Create), 40);
+        assert_action!(Action::Invite(InviteAction::Update), 41);
+        assert_action!(Action::Invite(InviteAction::Delete), 42);
+        assert_action!(Action::Webhook(WebhookAction::Create), 50);
+        assert_action!(Action::Webhook(WebhookAction::Update), 51);
+        assert_action!(Action::Webhook(WebhookAction::Delete), 52);
+        assert_action!(Action::Emoji(EmojiAction::Create), 60);
+        assert_action!(Action::Emoji(EmojiAction::Update), 61);
+        assert_action!(Action::Emoji(EmojiAction::Delete), 62);
+        assert_action!(Action::Message(MessageAction::Delete), 72);
+        assert_action!(Action::Message(MessageAction::BulkDelete), 73);
+        assert_action!(Action::Message(MessageAction::Pin), 74);
+        assert_action!(Action::Message(MessageAction::Unpin), 75);
+        assert_action!(Action::Integration(IntegrationAction::Create), 80);
+        assert_action!(Action::Integration(IntegrationAction::Update), 81);
+        assert_action!(Action::Integration(IntegrationAction::Delete), 82);
+        assert_action!(Action::StageInstance(StageInstanceAction::Create), 83);
+        assert_action!(Action::StageInstance(StageInstanceAction::Update), 84);
+        assert_action!(Action::StageInstance(StageInstanceAction::Delete), 85);
+        assert_action!(Action::Sticker(StickerAction::Create), 90);
+        assert_action!(Action::Sticker(StickerAction::Update), 91);
+        assert_action!(Action::Sticker(StickerAction::Delete), 92);
+        assert_action!(Action::Thread(ThreadAction::Create), 110);
+        assert_action!(Action::Thread(ThreadAction::Update), 111);
+        assert_action!(Action::Thread(ThreadAction::Delete), 112);
     }
 }
