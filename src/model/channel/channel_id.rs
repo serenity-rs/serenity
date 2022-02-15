@@ -537,6 +537,7 @@ impl ChannelId {
             Channel::Guild(channel) => channel.name().to_string(),
             Channel::Category(category) => category.name().to_string(),
             Channel::Private(channel) => channel.name(),
+            Channel::Group(group) => group.name(), // FIXME!
         })
     }
 
@@ -897,7 +898,7 @@ impl ChannelId {
             AttachmentType::Bytes {
                 data,
                 filename: _,
-            } => "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned()),
+            } => "data:image/png;base64,".to_string() + &base64::encode(&data),
             AttachmentType::File {
                 file,
                 filename: _,

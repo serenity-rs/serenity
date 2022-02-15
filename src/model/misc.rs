@@ -117,6 +117,7 @@ mention!(value:
     MentionableImpl, Mention(value);
     ChannelId, MentionableImpl::Channel(value);
     &'_ ChannelCategory, value.id;
+    &'_ Group, value.id;
     &'_ GuildChannel, value.id;
     &'_ PrivateChannel, value.id;
     &'_ CurrentUser, value.id;
@@ -173,6 +174,7 @@ mentionable!(v = v,
     PrivateChannel;
     Role;
     User;
+    Group;
     GuildChannel;
 );
 

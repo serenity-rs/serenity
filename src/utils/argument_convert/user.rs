@@ -4,6 +4,7 @@ use crate::{model::prelude::*, prelude::*};
 /// Error that can be returned from [`User::convert`].
 #[non_exhaustive]
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+#[allow(clippy::enum_variant_names)]
 pub enum UserParseError {
     /// The provided user string failed to parse, or the parsed result cannot be found in the
     /// guild cache data.

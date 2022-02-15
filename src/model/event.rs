@@ -111,6 +111,9 @@ impl CacheUpdate for ChannelCreateEvent {
                 .await
                 .insert(category.id, category.clone())
                 .map(Channel::Category),
+            Channel::Group(ref group) => {
+                cache.groups.write().await.insert(group.id, group.clone()).map(Channel::Group)
+            },
         }
     }
 }
@@ -149,6 +152,11 @@ impl CacheUpdate for ChannelDeleteEvent {
                 let id = { channel.id };
 
                 cache.private_channels.write().await.remove(&id);
+            },
+            Channel::Group(ref group) => {
+                let id = { group.id };
+
+                cache.groups.write().await.remove(&id);
             },
         };
 
@@ -239,6 +247,11 @@ impl CacheUpdate for ChannelUpdateEvent {
             Channel::Category(ref category) => {
                 if let Some(c) = cache.categories.write().await.get_mut(&category.id) {
                     c.clone_from(category);
+                }
+            },
+            Channel::Group(ref group) => {
+                if let Some(c) = cache.groups.write().await.get_mut(&group.id) {
+                    c.clone_from(group);
                 }
             },
         }
@@ -526,7 +539,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
                     avatar: self.avatar.clone(),
-                    communication_disabled_until: self.communication_disabled_until.clone(),
+                    communication_disabled_until: self.communication_disabled_until,
                 });
             }
 
@@ -1245,8 +1258,30 @@ impl CacheUpdate for ReadyEvent {
             }
         }
 
-        // `ready.private_channels` will always be empty, and possibly be removed in the future.
-        // So don't handle it at all.
+        // // `ready.private_channels` will always be empty, and possibly be removed in the future.
+        // // So don't handle it at all.
+        // The private channels sent in the READY contains both the actual
+        // private channels and the groups.
+        for (channel_id, channel) in ready.private_channels {
+            match channel {
+                Channel::Group(group) => {
+                    cache.groups.write().await.insert(channel_id, group);
+                },
+                Channel::Private(channel) => {
+                    cache.private_channels.write().await.insert(channel_id, channel);
+                },
+                Channel::Guild(guild) => {
+                    unimplemented!("received guild channel in DMs: {guild:?}")
+                },
+                Channel::Category(category) => {
+                    unimplemented!("received category in DMs: {category:?}")
+                },
+            }
+        }
+
+        for guild in ready.user_guild_settings {
+            cache.guild_settings.write().await.insert(guild.guild_id, guild);
+        }
 
         for (user_id, presence) in &mut ready.presences {
             if let Some(ref user) = presence.user {

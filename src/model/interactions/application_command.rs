@@ -545,6 +545,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
 /// The resolved value of a [`ApplicationCommandInteractionData::target_id`].
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
+#[allow(clippy::large_enum_variant)]
 #[repr(u8)]
 pub enum ResolvedTarget {
     User(User, Option<PartialMember>),

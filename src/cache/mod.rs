@@ -38,6 +38,7 @@ use async_trait::async_trait;
 use tokio::sync::RwLock;
 use tracing::instrument;
 
+use crate::model::prelude::users::{Relationship, UserGuildSettings, UserSettings};
 use crate::model::prelude::*;
 
 mod cache_update;
@@ -126,6 +127,14 @@ pub struct Cache {
     pub(crate) categories: RwLock<HashMap<ChannelId, ChannelCategory>>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
+    /// A map of the groups that the current user is in.
+    ///
+    /// For bot users this will always be empty.
+    pub(crate) groups: RwLock<HashMap<ChannelId, Group>>,
+    /// Settings specific to a guild.
+    ///
+    /// This will always be empty for bot users.
+    pub(crate) guild_settings: RwLock<HashMap<Option<GuildId>, UserGuildSettings>>,
     pub(crate) guilds: RwLock<HashMap<GuildId, Guild>>,
     pub(crate) messages: RwLock<MessageCache>,
     /// A map of users' presences. This is updated in real-time. Note that
@@ -135,6 +144,12 @@ pub struct Cache {
     /// A map of direct message channels that the current user has open with
     /// other users.
     pub(crate) private_channels: RwLock<HashMap<ChannelId, PrivateChannel>>,
+    /// A map of relationships that the current user has with other users.
+    ///
+    /// For bot users this will always be empty.
+    pub(crate) relationships: RwLock<HashMap<UserId, Relationship>>,
+    /// Account-specific settings for a user account.
+    pub(crate) user_settings: RwLock<Option<UserSettings>>,
     /// The total number of shards being used by the bot.
     pub(crate) shard_count: RwLock<u64>,
     /// A list of guilds which are "unavailable". Refer to the documentation for
@@ -989,18 +1004,9 @@ impl Cache {
 impl Default for Cache {
     fn default() -> Cache {
         Cache {
-            channels: RwLock::new(HashMap::default()),
-            categories: RwLock::new(HashMap::default()),
-            guilds: RwLock::new(HashMap::default()),
-            messages: RwLock::new(HashMap::default()),
-            presences: RwLock::new(HashMap::default()),
             private_channels: RwLock::new(HashMap::with_capacity(128)),
-            settings: RwLock::new(Settings::default()),
             shard_count: RwLock::new(1),
-            unavailable_guilds: RwLock::new(HashSet::default()),
-            user: RwLock::new(CurrentUser::default()),
-            users: RwLock::new(HashMap::default()),
-            message_queue: RwLock::new(HashMap::default()),
+            ..Default::default()
         }
     }
 }

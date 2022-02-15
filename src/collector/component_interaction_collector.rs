@@ -33,7 +33,7 @@ macro_rules! impl_component_interaction_collector {
                 ///
                 /// The filter checks whether the message has been sent
                 /// in the right guild, channel, and by the right author.
-                pub fn filter_limit(mut self, limit: u32) -> Self {
+                #[must_use]pub fn filter_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().filter_limit = Some(limit);
 
                     self
@@ -43,7 +43,7 @@ macro_rules! impl_component_interaction_collector {
                 ///
                 /// An interaction is considered *collected*, if the interaction
                 /// passes all the requirements.
-                pub fn collect_limit(mut self, limit: u32) -> Self {
+                #[must_use]pub fn collect_limit(mut self, limit: u32) -> Self {
                     self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
                     self
@@ -54,7 +54,7 @@ macro_rules! impl_component_interaction_collector {
                 /// This is the last instance to pass for an interaction to count as *collected*.
                 ///
                 /// This function is intended to be an interaction filter.
-                pub fn filter<F: Fn(&Arc<MessageComponentInteraction>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
+                #[must_use]pub fn filter<F: Fn(&Arc<MessageComponentInteraction>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
                     self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
 
                     self
@@ -62,7 +62,7 @@ macro_rules! impl_component_interaction_collector {
 
                 /// Sets the required author ID of an interaction.
                 /// If an interaction is not triggered by a user with this ID, it won't be received.
-                pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
+                #[must_use]pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().author_id = Some(author_id.into());
 
                     self
@@ -70,7 +70,7 @@ macro_rules! impl_component_interaction_collector {
 
                 /// Sets the message on which the interaction must occur.
                 /// If an interaction is not on a message with this ID, it won't be received.
-                pub fn message_id(mut self, message_id: impl Into<u64>) -> Self {
+                #[must_use]pub fn message_id(mut self, message_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().message_id = Some(message_id.into());
 
                     self
@@ -78,7 +78,7 @@ macro_rules! impl_component_interaction_collector {
 
                 /// Sets the guild in which the interaction must occur.
                 /// If an interaction is not on a message with this guild ID, it won't be received.
-                pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
+                #[must_use]pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().guild_id = Some(guild_id.into());
 
                     self
@@ -86,7 +86,7 @@ macro_rules! impl_component_interaction_collector {
 
                 /// Sets the channel on which the interaction must occur.
                 /// If an interaction is not on a message with this channel ID, it won't be received.
-                pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
+                #[must_use]pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().channel_id = Some(channel_id.into());
 
                     self
@@ -94,7 +94,7 @@ macro_rules! impl_component_interaction_collector {
 
                 /// Sets a `duration` for how long the collector shall receive
                 /// interactions.
-                pub fn timeout(mut self, duration: Duration) -> Self {
+                #[must_use]pub fn timeout(mut self, duration: Duration) -> Self {
                     self.timeout = Some(Box::pin(sleep(duration)));
 
                     self

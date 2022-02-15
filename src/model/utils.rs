@@ -270,6 +270,7 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
             Channel::Private(ref channel) => channel.id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
+            Channel::Group(_) => unreachable!("Group private channel decode"),
         };
 
         private_channels.insert(id, private_channel);
@@ -424,12 +425,21 @@ pub async fn user_has_perms(
     //
     // Since serenity can't _reasonably_ check and keep track of these,
     // just assume that all permissions are granted and return `true`.
+
+    use prelude::users::Relationship;
+
+    use super::users::RelationshipType;
     let (guild_id, guild_channel) = match channel {
         Channel::Guild(channel) => (channel.guild_id, channel),
-        Channel::Category(_) => return Ok(true),
-        Channel::Private(_) => match guild_id {
-            Some(_) => return Err(Error::Model(ModelError::InvalidChannelType)),
-            None => return Ok(true),
+        Channel::Category(_) | Channel::Group(_) => return Ok(true),
+        Channel::Private(channel) => {
+            let user_id = channel.recipient.id;
+            return match cache.relationships.read().await.get(&user_id) {
+                Some(Relationship {
+                    kind: RelationshipType::Blocked, ..
+                }) => Ok(false),
+                _ => Ok(true),
+            };
         },
     };
 

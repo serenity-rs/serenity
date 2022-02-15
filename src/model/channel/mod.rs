@@ -4,6 +4,7 @@ mod attachment;
 mod channel_category;
 mod channel_id;
 mod embed;
+mod group;
 mod guild_channel;
 mod message;
 mod partial_channel;
@@ -24,6 +25,7 @@ pub use self::attachment::*;
 pub use self::channel_category::*;
 pub use self::channel_id::*;
 pub use self::embed::*;
+pub use self::group::*;
 pub use self::guild_channel::*;
 pub use self::message::*;
 pub use self::partial_channel::*;
@@ -59,6 +61,8 @@ pub enum Channel {
     Private(PrivateChannel),
     /// A category of [`GuildChannel`]s
     Category(ChannelCategory),
+    /// A [`Group`] channel containing one or multiple users
+    Group(Group),
 }
 
 #[cfg(feature = "model")]
@@ -195,6 +199,9 @@ impl Channel {
             Channel::Category(category) => {
                 category.delete(cache_http).await?;
             },
+            Channel::Group(group) => {
+                group.delete(cache_http.http()).await?;
+            },
         }
 
         Ok(())
@@ -206,7 +213,7 @@ impl Channel {
         match self {
             Channel::Guild(channel) => channel.is_nsfw(),
             Channel::Category(category) => category.is_nsfw(),
-            Channel::Private(_) => false,
+            Channel::Private(_) | Channel::Group(_) => false,
         }
     }
 
@@ -218,6 +225,7 @@ impl Channel {
             Channel::Guild(ch) => ch.id,
             Channel::Private(ch) => ch.id,
             Channel::Category(ch) => ch.id,
+            Channel::Group(ch) => ch.id,
         }
     }
 
@@ -278,6 +286,7 @@ impl Serialize for Channel {
             Channel::Category(c) => ChannelCategory::serialize(c, serializer),
             Channel::Guild(c) => GuildChannel::serialize(c, serializer),
             Channel::Private(c) => PrivateChannel::serialize(c, serializer),
+            Channel::Group(c) => Group::serialize(c, serializer),
         }
     }
 }
@@ -295,6 +304,7 @@ impl Display for Channel {
             Channel::Guild(ch) => Display::fmt(&ch.id.mention(), f),
             Channel::Private(ch) => Display::fmt(&ch.recipient.name, f),
             Channel::Category(ch) => Display::fmt(&ch.name, f),
+            Channel::Group(ch) => Display::fmt(&ch.id.mention(), f),
         }
     }
 }

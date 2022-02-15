@@ -75,6 +75,7 @@ pub struct HttpBuilder<'a> {
 }
 
 impl<'a> HttpBuilder<'a> {
+    #[must_use]
     fn _new() -> Self {
         Self {
             client: None,
@@ -90,12 +91,14 @@ impl<'a> HttpBuilder<'a> {
 
     /// Construct a new builder to call methods on for the HTTP construction.
     /// The `token` will automatically be prefixed "Bot " if not already.
+    #[must_use]
     pub fn new(token: impl AsRef<str>) -> Self {
         Self::_new().token(token)
     }
 
     /// Sets the application_id to use interactions.
     #[cfg(feature = "unstable_discord_api")]
+    #[must_use]
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(application_id);
 
@@ -104,6 +107,7 @@ impl<'a> HttpBuilder<'a> {
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
     /// method will automatically do so.
+    #[must_use]
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         let token = token.as_ref().trim();
 
@@ -117,6 +121,7 @@ impl<'a> HttpBuilder<'a> {
 
     /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
     /// be used.
+    #[must_use]
     pub fn client(mut self, client: Arc<Client>) -> Self {
         self.client = Some(client);
 
@@ -125,6 +130,7 @@ impl<'a> HttpBuilder<'a> {
 
     /// Sets the ratelimiter to be used. If one isn't provided, a default one
     /// will be used.
+    #[must_use]
     pub fn ratelimiter(mut self, ratelimiter: Ratelimiter) -> Self {
         self.ratelimiter = Some(ratelimiter);
 
@@ -139,6 +145,7 @@ impl<'a> HttpBuilder<'a> {
     /// another form of rate limiting. Disabling the ratelimiter has the main
     /// purpose of delegating rate limiting to an API proxy via [`Self::proxy`]
     /// instead of the current process.
+    #[must_use]
     pub fn ratelimiter_disabled(mut self, ratelimiter_disabled: bool) -> Self {
         self.ratelimiter_disabled = Some(ratelimiter_disabled);
 
@@ -1177,6 +1184,20 @@ impl Http {
             route: RouteInfo::EditEmoji {
                 guild_id,
                 emoji_id,
+            },
+        })
+        .await
+    }
+
+    /// Changes group information.
+    pub async fn edit_group(&self, channel_id: u64, map: &JsonMap) -> Result<Group> {
+        let body = serde_json::to_vec(map).expect("impossible");
+
+        self.fire(Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::EditChannel {
+                channel_id,
             },
         })
         .await

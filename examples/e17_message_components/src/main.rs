@@ -203,7 +203,7 @@ impl EventHandler for Handler {
         // data.custom_id contains the id of the component (here "animal_select")
         // and should be used to identify if a message has multiple components.
         // data.values contains the selected values from the menu
-        let animal = Animal::from_str(&mci.data.values.get(0).unwrap()).unwrap();
+        let animal = Animal::from_str(mci.data.values.get(0).unwrap()).unwrap();
 
         // Acknowledge the interaction and edit the message
         mci.create_interaction_response(&ctx, |r| {

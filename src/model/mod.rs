@@ -38,6 +38,7 @@ pub mod oauth2;
 pub mod permissions;
 pub mod prelude;
 pub mod user;
+pub mod users;
 pub mod voice;
 pub mod webhook;
 

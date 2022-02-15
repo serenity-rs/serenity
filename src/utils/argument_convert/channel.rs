@@ -34,7 +34,7 @@ fn channel_belongs_to_guild(channel: &Channel, guild: GuildId) -> bool {
     match channel {
         Channel::Guild(channel) => channel.guild_id == guild,
         Channel::Category(channel) => channel.guild_id == guild,
-        Channel::Private(_channel) => false,
+        Channel::Private(_) | Channel::Group(_) => false,
     }
 }
 

@@ -60,6 +60,16 @@ pub trait EventHandler: Send + Sync {
     #[cfg(not(feature = "cache"))]
     async fn channel_update(&self, _ctx: Context, _new_data: Channel) {}
 
+    /// Dispatched when a group is created.
+    ///
+    /// Provides said group's data.
+    async fn group_create(&self, _ctx: Context, _group: &Group) {}
+
+    /// Dispatched when a group is deleted.
+    ///
+    /// Provides said group's data.
+    async fn group_delete(&self, _ctx: Context, _group: &Group) {}
+
     /// Dispatched when a user is banned from a guild.
     ///
     /// Provides the guild's id and the banned user's data.
@@ -321,6 +331,17 @@ pub trait EventHandler: Send + Sync {
     /// Provides the new data of the message.
     #[cfg(not(feature = "cache"))]
     async fn message_update(&self, _ctx: Context, _new_data: MessageUpdateEvent) {}
+
+    /// Dispatched when a private channel is created.
+    ///
+    /// Provides said channel's data.
+    async fn private_channel_create(&self, _ctx: Context, _channel: &PrivateChannel) {}
+
+    /// Dispatched when a private channel is deleted.
+    ///
+    /// Provides said channel's data.
+    async fn private_channel_delete(&self, _ctx: Context, _channel: &PrivateChannel) {}
+
 
     /// Dispatched when a new reaction is attached to a message.
     ///

@@ -139,7 +139,7 @@ impl EditRole {
             AttachmentType::Bytes {
                 data,
                 filename: _,
-            } => "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned()),
+            } => "data:image/png;base64,".to_string() + &base64::encode(&data),
             AttachmentType::File {
                 file,
                 filename: _,

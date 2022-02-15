@@ -364,15 +364,33 @@ async fn handle_event(
                         event_handler.category_create(context, &channel).await;
                     });
                 },
-                // Private channel create events are no longer sent to bots in the v8 gateway.
-                _ => {},
+                Channel::Private(private) => {
+                    let event_handler = Arc::clone(event_handler);
+
+                    spawn_named("dispatch::event_handler::private_channel_create", async move {
+                        event_handler.private_channel_create(context, &private).await;
+                    });
+                },
+                Channel::Group(group) => {
+                    let event_handler = Arc::clone(event_handler);
+
+                    spawn_named("dispatch::event_handler::group_create", async move {
+                        event_handler.group_create(context, &group).await;
+                    });
+                },
             }
         },
         DispatchEvent::Model(Event::ChannelDelete(mut event)) => {
             update(&cache_and_http, &mut event).await;
 
             match event.channel {
-                Channel::Private(_) => {},
+                Channel::Private(private) => {
+                    let event_handler = Arc::clone(event_handler);
+
+                    spawn_named("dispatch::event_handler::private_channel_delete", async move {
+                        event_handler.private_channel_delete(context, &private).await;
+                    });
+                },
                 Channel::Guild(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
@@ -385,6 +403,13 @@ async fn handle_event(
 
                     spawn_named("dispatch::event_handler::category_delete", async move {
                         event_handler.category_delete(context, &channel).await;
+                    });
+                },
+                Channel::Group(group) => {
+                    let event_handler = Arc::clone(event_handler);
+
+                    spawn_named("dispatch::event_handler::channel_delete", async move {
+                        event_handler.group_delete(context, &group).await
                     });
                 },
             }

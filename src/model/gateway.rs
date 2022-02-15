@@ -8,6 +8,7 @@ use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use super::prelude::*;
+use super::users::{ReadState, Relationship, Tutorial, UserGuildSettings, UserSettings};
 use super::utils::*;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
@@ -694,8 +695,14 @@ impl Serialize for Presence {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Ready {
+    #[serde(default)]
+    pub analytics_token: Option<String>,
     pub application: PartialCurrentApplicationInfo,
+    pub experiments: Vec<Vec<u64>>,
+    pub friend_suggestion_count: Option<u64>,
     pub guilds: Vec<GuildStatus>,
+    #[serde(default)]
+    pub notes: HashMap<UserId, String>,
     #[serde(
         default,
         serialize_with = "serialize_presences",
@@ -708,11 +715,21 @@ pub struct Ready {
         deserialize_with = "deserialize_private_channels"
     )]
     pub private_channels: HashMap<ChannelId, Channel>,
+    #[serde(default)]
+    pub read_state: HashMap<ChannelId, ReadState>,
+    #[serde(default)]
+    pub relationships: HashMap<UserId, Relationship>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,
     #[serde(default, rename = "_trace")]
     pub trace: Vec<String>,
+    #[serde(default)]
+    pub tutorial: Option<Tutorial>,
     pub user: CurrentUser,
+    #[serde(default)]
+    pub user_guild_settings: Vec<UserGuildSettings>,
+    #[serde(default)]
+    pub user_settings: Option<UserSettings>,
     #[serde(rename = "v")]
     pub version: u64,
 }

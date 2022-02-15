@@ -127,8 +127,8 @@ impl ShardManager {
 
         let mut shard_queuer = ShardQueuer {
             data: Arc::clone(opt.data),
-            event_handler: opt.event_handler.as_ref().map(|h| Arc::clone(h)),
-            raw_event_handler: opt.raw_event_handler.as_ref().map(|rh| Arc::clone(rh)),
+            event_handler: opt.event_handler.as_ref().map(Arc::clone),
+            raw_event_handler: opt.raw_event_handler.as_ref().map(Arc::clone),
             #[cfg(feature = "framework")]
             framework: Arc::clone(opt.framework),
             last_start: None,

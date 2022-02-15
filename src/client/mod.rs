@@ -144,6 +144,7 @@ impl<'a> ClientBuilder<'a> {
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ",
     /// this method will automatically do so.
+    #[must_use]
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         self.http = Http::new_with_token(token.as_ref());
 
@@ -159,6 +160,7 @@ impl<'a> ClientBuilder<'a> {
 
     /// Sets the application id.
     #[cfg(feature = "unstable_discord_api")]
+    #[must_use]
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(ApplicationId(application_id));
 
@@ -176,6 +178,7 @@ impl<'a> ClientBuilder<'a> {
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
     /// A [`TypeMap`] must not be constructed manually: [`Self::type_map_insert`]
     /// can be used to insert one type at a time.
+    #[must_use]
     pub fn type_map(mut self, type_map: TypeMap) -> Self {
         self.data = Some(type_map);
 
@@ -191,6 +194,7 @@ impl<'a> ClientBuilder<'a> {
     /// be available in [`Context::data`].
     /// This method can be called multiple times in order to populate the
     /// [`TypeMap`] with `value`s.
+    #[must_use]
     pub fn type_map_insert<T: TypeMapKey>(mut self, value: T::Value) -> Self {
         self.data.get_or_insert_with(TypeMap::new).insert::<T>(value);
 
@@ -205,6 +209,7 @@ impl<'a> ClientBuilder<'a> {
     /// cause a deadlock.
     /// A timeout however, will invalidate the cache.
     #[cfg(feature = "cache")]
+    #[must_use]
     pub fn cache_update_timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
 
@@ -223,6 +228,7 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// [`Settings`]: self::CacheSettings
     #[cfg(feature = "cache")]
+    #[must_use]
     pub fn cache_settings<F>(mut self, f: F) -> Self
     where
         F: FnOnce(&mut CacheSettings) -> &mut CacheSettings,
@@ -251,6 +257,7 @@ impl<'a> ClientBuilder<'a> {
     /// If a reference to the framework is required for manual dispatch,
     /// use the [`Self::framework_arc`]-method instead.
     #[cfg(feature = "framework")]
+    #[must_use]
     pub fn framework<F>(mut self, framework: F) -> Self
     where
         F: Framework + Send + Sync + 'static,
@@ -265,6 +272,7 @@ impl<'a> ClientBuilder<'a> {
     /// extra control.
     /// You can provide a clone and keep the original to manually dispatch.
     #[cfg(feature = "framework")]
+    #[must_use]
     pub fn framework_arc(
         mut self,
         framework: Arc<Box<dyn Framework + Send + Sync + 'static>>,
@@ -344,6 +352,7 @@ impl<'a> ClientBuilder<'a> {
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
     /// [`GatewayIntents::GUILD_PRESENCES`]: crate::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES
     /// [`GatewayIntents::GUILD_MEMBERS`]: crate::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS
+    #[must_use]
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
         self.intents = intents;
 
@@ -356,6 +365,7 @@ impl<'a> ClientBuilder<'a> {
     }
 
     /// Sets an event handler with multiple methods for each possible event.
+    #[must_use]
     pub fn event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
         self.event_handler = Some(Arc::new(event_handler));
 
@@ -369,6 +379,7 @@ impl<'a> ClientBuilder<'a> {
 
     /// Sets an event handler with a single method where all received gateway
     /// events will be dispatched.
+    #[must_use]
     pub fn raw_event_handler<H: RawEventHandler + 'static>(mut self, raw_event_handler: H) -> Self {
         self.raw_event_handler = Some(Arc::new(raw_event_handler));
 
