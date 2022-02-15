@@ -1,6 +1,6 @@
 //! Models relating to guilds and types that it owns.
 
-mod audit_log;
+pub mod audit_log;
 mod emoji;
 mod guild_id;
 mod guild_preview;
@@ -22,6 +22,8 @@ use tracing::error;
 #[cfg(all(feature = "model", feature = "cache"))]
 use tracing::warn;
 
+#[doc(hidden)]
+#[deprecated(note = "import the types from the `audit_log` module")]
 pub use self::audit_log::*;
 pub use self::emoji::*;
 pub use self::guild_id::*;
