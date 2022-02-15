@@ -76,7 +76,7 @@ impl CreateInteractionResponseData {
     }
 
     /// Create an embed for the message.
-    pub fn create_embed<F>(&mut self, f: F) -> &mut Self
+    pub fn embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
@@ -103,7 +103,7 @@ impl CreateInteractionResponseData {
     ///
     /// Calling this will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn embed(&mut self, embed: CreateEmbed) -> &mut Self {
+    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
         self.0.insert("embeds", Value::Array(vec![embed]));
@@ -115,7 +115,7 @@ impl CreateInteractionResponseData {
     ///
     /// Calling this multiple times will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
+    pub fn set_embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
         let embeds =
             embeds.into_iter().map(|embed| utils::hashmap_to_json_map(embed.0).into()).collect();
 
