@@ -32,6 +32,14 @@ impl CreateComponents {
         self
     }
 
+    /// Set a single action row.
+    /// Calling this will overwrite all action rows.
+    pub fn set_action_row(&mut self, mut row: CreateActionRow) -> &mut Self {
+        self.0 = vec![row.build()];
+
+        self
+    }
+
     /// Sets all the action rows.
     pub fn set_action_rows(&mut self, rows: Vec<CreateActionRow>) -> &mut Self {
         let new_rows = rows.into_iter().map(|mut f| f.build()).collect::<Vec<Value>>();
