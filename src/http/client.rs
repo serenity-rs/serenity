@@ -318,7 +318,6 @@ impl Http {
         delete_message_days: u8,
         reason: &str,
     ) -> Result<()> {
-
         self.wind(204, Request {
             body: None,
             multipart: None,

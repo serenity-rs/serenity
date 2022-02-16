@@ -682,17 +682,8 @@ impl Route {
         api!("/guilds/{}/bans/{}", guild_id, user_id)
     }
 
-    pub fn guild_ban_optioned(
-        guild_id: u64,
-        user_id: u64,
-        delete_message_days: u8,
-    ) -> String {
-        api!(
-            "/guilds/{}/bans/{}?delete_message_days={}",
-            guild_id,
-            user_id,
-            delete_message_days,
-        )
+    pub fn guild_ban_optioned(guild_id: u64, user_id: u64, delete_message_days: u8) -> String {
+        api!("/guilds/{}/bans/{}?delete_message_days={}", guild_id, user_id, delete_message_days)
     }
 
     pub fn guild_kick_optioned(guild_id: u64, user_id: u64) -> String {
