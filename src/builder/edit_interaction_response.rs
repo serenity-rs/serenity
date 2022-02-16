@@ -49,6 +49,27 @@ impl EditInteractionResponse {
         self
     }
 
+    /// Adds multiple embeds to the message.
+    pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        for embed in embeds {
+            self.add_embed(embed);
+        }
+
+        self
+    }
+
+    /// Sets a single embed to include in the message
+    ///
+    /// Calling this will overwrite the embed list.
+    /// To append embeds, call [`Self::add_embed`] instead.
+    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+        let map = utils::hashmap_to_json_map(embed.0);
+        let embed = Value::Object(map);
+        self.0.insert("embeds", Value::Array(vec![embed]));
+
+        self
+    }
+
     /// Sets the embeds for the message.
     ///
     /// **Note**: You can only have up to 10 embeds per message.

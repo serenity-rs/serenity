@@ -110,6 +110,15 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         self
     }
 
+    /// Adds multiple embeds to the message.
+    pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        for embed in embeds {
+            self.add_embed(embed);
+        }
+
+        self
+    }
+
     /// Sets a single embed to include in the message
     ///
     /// Calling this will overwrite the embed list.
