@@ -696,7 +696,7 @@ pub struct SelectMenuOption {
     pub default: bool,
 }
 
-/// A input text component for modal interactions
+/// An input text component for modal interactions
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InputText {
     /// The component type, it will always be [`ComponentType::InputText`].
