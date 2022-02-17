@@ -704,7 +704,7 @@ pub struct InputText {
     pub kind: ComponentType,
     /// An identifier defined by the developer for the select menu.
     pub custom_id: String,
-    /// The Input from the user
+    /// The input from the user
     pub value: String,
 }
 
