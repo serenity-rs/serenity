@@ -2260,7 +2260,9 @@ macro_rules! with_related_ids_for_event_types {
                     Interaction::ApplicationCommand(_) => None,
                     Interaction::MessageComponent(i) => Some(i.message.id),
                     Interaction::Autocomplete(i) => None,
-                    Interaction::ModalSubmit(i) => i.message.as_ref().map(|m| m.id),
+                    Interaction::ModalSubmit(i) => {
+                        if let Option::Some(m) = &i.message { Some(m.id) } else { None }
+                    },
                 },
             },
             #[cfg(feature = "unstable_discord_api")]
