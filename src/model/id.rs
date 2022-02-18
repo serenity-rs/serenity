@@ -92,6 +92,12 @@ pub struct ChannelId(#[serde(with = "snowflake")] pub u64);
 )]
 pub struct EmojiId(#[serde(with = "snowflake")] pub u64);
 
+/// An identifier for an unspecific entity.
+#[derive(
+    Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize,
+)]
+pub struct GenericId(#[serde(with = "snowflake")] pub u64);
+
 /// An identifier for a Guild
 #[derive(
     Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize,
@@ -207,6 +213,7 @@ id_u64! {
     ApplicationId;
     ChannelId;
     EmojiId;
+    GenericId;
     GuildId;
     IntegrationId;
     MessageId;
