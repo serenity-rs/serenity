@@ -468,6 +468,12 @@ impl ShardRunner {
 
                     true
                 },
+                #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+                ShardClientMessage::Runner(ShardRunnerMessage::SetModalInteractionFilter(
+                    collector,
+                )) => {
+                    todo!();
+                },
             },
             InterMessage::Json(value) => {
                 // Value must be forwarded over the websocket
