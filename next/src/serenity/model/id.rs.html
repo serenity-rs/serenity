@@ -369,6 +369,13 @@
 <span id="364">364</span>
 <span id="365">365</span>
 <span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>};
@@ -462,6 +469,12 @@
     <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmojiId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
+
+<span class="doccomment">/// An identifier for an unspecific entity.</span>
+<span class="attribute">#[<span class="ident">derive</span>(
+    <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>,
+)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GenericId</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;snowflake&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">u64</span>);
 
 <span class="doccomment">/// An identifier for a Guild</span>
 <span class="attribute">#[<span class="ident">derive</span>(
@@ -578,6 +591,7 @@
     <span class="ident">ApplicationId</span>;
     <span class="ident">ChannelId</span>;
     <span class="ident">EmojiId</span>;
+    <span class="ident">GenericId</span>;
     <span class="ident">GuildId</span>;
     <span class="ident">IntegrationId</span>;
     <span class="ident">MessageId</span>;
@@ -736,5 +750,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (5d8767cb2 2022-02-12)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (30b3f35c4 2022-02-17)" ></div>
 </body></html>
