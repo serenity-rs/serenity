@@ -250,7 +250,7 @@ impl ShardRunner {
                             f.send_interaction(&mut interaction)
                         });
                     },
-                    _ => ()
+                    _ => (),
                 }
             },
             _ => {},

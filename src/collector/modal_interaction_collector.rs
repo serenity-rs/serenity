@@ -156,7 +156,10 @@ impl ModalInteractionFilter {
     ) -> bool {
         // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
-            && self.options.message_id.map_or(true, |id| Some(id) == interaction.message.as_ref().map(|m| m.id.0))
+            && self
+                .options
+                .message_id
+                .map_or(true, |id| Some(id) == interaction.message.as_ref().map(|m| m.id.0))
             && self.options.channel_id.map_or(true, |id| id == interaction.channel_id.as_ref().0)
             && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
             && self.options.filter.as_ref().map_or(true, |f| f(&interaction.as_arc()))
