@@ -3142,6 +3142,10 @@
 <span id="3137">3137</span>
 <span id="3138">3138</span>
 <span id="3139">3139</span>
+<span id="3140">3140</span>
+<span id="3141">3141</span>
+<span id="3142">3142</span>
+<span id="3143">3143</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span> <span class="comment">// This is done beause it can&#39;t be used inside macro definitions.</span>
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -5383,24 +5387,28 @@
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                     <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">user</span>.<span class="ident">id</span>),
+                    <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">user</span>.<span class="ident">id</span>),
                 },
                 <span class="ident">guild_id</span>: <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                     <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
+                    <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_id</span>.<span class="ident">into</span>(),
                 },
                 <span class="ident">channel_id</span>: <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">channel_id</span>),
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">channel_id</span>),
                     <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">channel_id</span>),
+                    <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">channel_id</span>),
                 },
                 <span class="ident">message_id</span>: <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::ApplicationCommand</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">message</span>.<span class="ident">id</span>),
                     <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">None</span>,
+                    <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">message</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">id</span>).<span class="ident">into</span>(),
                 },
             },
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>

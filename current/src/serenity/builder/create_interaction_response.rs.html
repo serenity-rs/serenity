@@ -218,6 +218,18 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
@@ -366,6 +378,18 @@
     <span class="doccomment">/// Sets the components of this message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_components</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::Array</span>(<span class="ident">components</span>.<span class="number">0</span>));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the custom id for modal interactions</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom_id</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;custom_id&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the titel for modal interactions</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">title</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">title</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;title&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">title</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 }
