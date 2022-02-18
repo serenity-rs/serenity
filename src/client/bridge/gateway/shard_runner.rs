@@ -19,7 +19,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::{dispatch, DispatchEvent};
 use crate::client::{EventHandler, RawEventHandler};
 #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-use crate::collector::ComponentInteractionFilter;
+use crate::collector::{ComponentInteractionFilter, ModalInteractionFilter};
 #[cfg(feature = "collector")]
 use crate::collector::{EventFilter, LazyArc, LazyReactionAction, MessageFilter, ReactionFilter};
 #[cfg(feature = "framework")]
@@ -29,7 +29,7 @@ use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
 #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-use crate::model::interactions::{Interaction, InteractionType};
+use crate::model::interactions::Interaction;
 use crate::CacheAndHttp;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
@@ -56,6 +56,8 @@ pub struct ShardRunner {
     reaction_filters: Vec<ReactionFilter>,
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
     component_interaction_filters: Vec<ComponentInteractionFilter>,
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    modal_interaction_filters: Vec<ModalInteractionFilter>,
 }
 
 impl ShardRunner {
@@ -84,6 +86,8 @@ impl ShardRunner {
             reaction_filters: Vec::new(),
             #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
             component_interaction_filters: vec![],
+            #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+            modal_interaction_filters: vec![],
         }
     }
 
@@ -233,15 +237,20 @@ impl ShardRunner {
             },
             #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
             Event::InteractionCreate(ref interaction_event) => {
-                if interaction_event.interaction.kind() == InteractionType::MessageComponent {
-                    if let Interaction::MessageComponent(ref interaction) =
-                        interaction_event.interaction
-                    {
+                match &interaction_event.interaction {
+                    Interaction::MessageComponent(interaction) => {
                         let mut interaction = LazyArc::new(interaction);
                         retain(&mut self.component_interaction_filters, |f| {
                             f.send_interaction(&mut interaction)
                         });
-                    }
+                    },
+                    Interaction::ModalSubmit(interaction) => {
+                        let mut interaction = LazyArc::new(interaction);
+                        retain(&mut self.modal_interaction_filters, |f| {
+                            f.send_interaction(&mut interaction)
+                        });
+                    },
+                    _ => ()
                 }
             },
             _ => {},
@@ -472,7 +481,9 @@ impl ShardRunner {
                 ShardClientMessage::Runner(ShardRunnerMessage::SetModalInteractionFilter(
                     collector,
                 )) => {
-                    todo!();
+                    self.modal_interaction_filters.push(collector);
+
+                    true
                 },
             },
             InterMessage::Json(value) => {

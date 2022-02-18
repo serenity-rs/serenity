@@ -230,8 +230,7 @@ impl<'a> Future for ModalInteractionCollectorBuilder<'a> {
             let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
-                // TODO
-                // shard_messenger.set_component_interaction_filter(filter);
+                shard_messenger.set_modal_interaction_filter(filter);
 
                 ModalInteractionCollector {
                     receiver: Box::pin(receiver),
@@ -272,8 +271,7 @@ impl<'a> Future for CollectModalInteraction<'a> {
             let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
-                // TODO
-                // shard_messenger.set_component_interaction_filter(filter);
+                shard_messenger.set_modal_interaction_filter(filter);
 
                 ModalInteractionCollector {
                     receiver: Box::pin(receiver),
