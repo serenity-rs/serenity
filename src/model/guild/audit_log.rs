@@ -268,8 +268,8 @@ pub struct Options {
     #[serde(default, with = "option_u64_handler")]
     pub count: Option<u64>,
     /// Id of the overwritten entity
-    #[serde(default, with = "option_u64_handler")]
-    pub id: Option<u64>,
+    #[serde(default)]
+    pub id: Option<GenericId>,
     /// Type of overwritten entity ("member" or "role").
     #[serde(default, rename = "type")]
     pub kind: Option<String>,
