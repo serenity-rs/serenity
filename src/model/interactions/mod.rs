@@ -1,12 +1,14 @@
 pub mod application_command;
 pub mod autocomplete;
 pub mod message_component;
+pub mod modal;
 pub mod ping;
 
 use application_command::ApplicationCommandInteraction;
 use autocomplete::AutocompleteInteraction;
 use bitflags::__impl_bitflags;
 use message_component::MessageComponentInteraction;
+use modal::ModalSubmitInteraction;
 use ping::PingInteraction;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
@@ -21,6 +23,7 @@ pub enum Interaction {
     ApplicationCommand(ApplicationCommandInteraction),
     MessageComponent(MessageComponentInteraction),
     Autocomplete(AutocompleteInteraction),
+    ModalSubmit(ModalSubmitInteraction),
 }
 
 impl Interaction {
@@ -31,6 +34,7 @@ impl Interaction {
             Interaction::ApplicationCommand(i) => i.id,
             Interaction::MessageComponent(i) => i.id,
             Interaction::Autocomplete(i) => i.id,
+            Interaction::ModalSubmit(i) => i.id,
         }
     }
 
@@ -41,6 +45,7 @@ impl Interaction {
             Interaction::ApplicationCommand(_) => InteractionType::ApplicationCommand,
             Interaction::MessageComponent(_) => InteractionType::MessageComponent,
             Interaction::Autocomplete(_) => InteractionType::Autocomplete,
+            Interaction::ModalSubmit(_) => InteractionType::ModalSubmit,
         }
     }
 
@@ -51,6 +56,7 @@ impl Interaction {
             Interaction::ApplicationCommand(i) => i.application_id,
             Interaction::MessageComponent(i) => i.application_id,
             Interaction::Autocomplete(i) => i.application_id,
+            Interaction::ModalSubmit(i) => i.application_id,
         }
     }
 
@@ -61,6 +67,7 @@ impl Interaction {
             Interaction::ApplicationCommand(i) => i.token.as_str(),
             Interaction::MessageComponent(i) => i.token.as_str(),
             Interaction::Autocomplete(i) => i.token.as_str(),
+            Interaction::ModalSubmit(i) => i.token.as_str(),
         }
     }
 
@@ -71,6 +78,7 @@ impl Interaction {
             Interaction::ApplicationCommand(i) => i.guild_locale.as_ref().map(String::as_str),
             Interaction::MessageComponent(i) => i.guild_locale.as_ref().map(String::as_str),
             Interaction::Autocomplete(i) => i.guild_locale.as_ref().map(String::as_str),
+            Interaction::ModalSubmit(i) => i.guild_locale.as_ref().map(String::as_str),
         }
     }
 
@@ -136,6 +144,11 @@ impl<'de> Deserialize<'de> for Interaction {
                     .map(Interaction::Autocomplete)
                     .map_err(DeError::custom)
             },
+            InteractionType::ModalSubmit => {
+                serde_json::from_value::<ModalSubmitInteraction>(Value::Object(map))
+                    .map(Interaction::ModalSubmit)
+                    .map_err(DeError::custom)
+            },
             InteractionType::Unknown => Err(DeError::custom("Unknown interaction type")),
         }
     }
@@ -155,6 +168,7 @@ impl Serialize for Interaction {
                 MessageComponentInteraction::serialize(i, serializer)
             },
             Interaction::Autocomplete(i) => AutocompleteInteraction::serialize(i, serializer),
+            Interaction::ModalSubmit(i) => ModalSubmitInteraction::serialize(i, serializer),
         }
     }
 }
@@ -168,6 +182,7 @@ pub enum InteractionType {
     ApplicationCommand = 2,
     MessageComponent = 3,
     Autocomplete = 4,
+    ModalSubmit = 5,
     Unknown = !0,
 }
 
@@ -175,7 +190,8 @@ enum_number!(InteractionType {
     Ping,
     MessageComponent,
     ApplicationCommand,
-    Autocomplete
+    Autocomplete,
+    ModalSubmit
 });
 
 /// The flags for an interaction response.
@@ -234,4 +250,5 @@ pub enum InteractionResponseType {
     DeferredUpdateMessage = 6,
     UpdateMessage = 7,
     Autocomplete = 8,
+    Modal = 9,
 }
