@@ -915,7 +915,7 @@ impl Message {
         ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
-    /// Await a single component interaction on this message.
+    /// Await a single modal submit interaction on this message.
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
     pub fn await_modal_interaction<'a>(
         &self,
@@ -924,7 +924,7 @@ impl Message {
         CollectModalInteraction::new(shard_messenger).message_id(self.id.0)
     }
 
-    /// Returns a stream builder which can be awaited to obtain a stream of component interactions on this message.
+    /// Returns a stream builder which can be awaited to obtain a stream of modal submit interactions on this message.
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
     pub fn await_modal_interactions<'a>(
         &self,
