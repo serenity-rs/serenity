@@ -1227,8 +1227,6 @@
 <span id="1222">1222</span>
 <span id="1223">1223</span>
 <span id="1224">1224</span>
-<span id="1225">1225</span>
-<span id="1226">1226</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1326,9 +1324,7 @@
 
 <span class="doccomment">/// Iterator given to the selector closure in [`Cache::channel_messages_field`].</span>
 <span class="comment">// Wrapper around a specific iterator type to allow swapping out iterators on cache design changes</span>
-<span class="comment">//</span>
-<span class="comment">// Clone impl waiting on this https://github.com/xacrimon/dashmap/pull/152</span>
-<span class="comment">//#[derive(Clone)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span>(
     <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">MessageId</span>, <span class="ident">Message</span>, <span class="ident">S</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 );
@@ -2456,5 +2452,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (30b3f35c4 2022-02-17)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (b17226fcc 2022-02-18)" ></div>
 </body></html>
