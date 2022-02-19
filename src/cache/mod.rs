@@ -95,9 +95,7 @@ impl<F: FromStr> FromStrAndCache for F {
 
 /// Iterator given to the selector closure in [`Cache::channel_messages_field`].
 // Wrapper around a specific iterator type to allow swapping out iterators on cache design changes
-//
-// Clone impl waiting on this https://github.com/xacrimon/dashmap/pull/152
-//#[derive(Clone)]
+#[derive(Clone)]
 pub struct MessageIterator<'a, S: BuildHasher + Clone>(
     Iter<'a, MessageId, Message, S, DashMap<MessageId, Message, S>>,
 );
