@@ -24,7 +24,12 @@ use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-use crate::collector::{CollectComponentInteraction, ComponentInteractionCollectorBuilder};
+use crate::collector::{
+    CollectComponentInteraction,
+    CollectModalInteraction,
+    ComponentInteractionCollectorBuilder,
+    ModalInteractionCollectorBuilder,
+};
 #[cfg(feature = "collector")]
 use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
@@ -908,6 +913,24 @@ impl Message {
         shard_messenger: &'a impl AsRef<ShardMessenger>,
     ) -> ComponentInteractionCollectorBuilder<'a> {
         ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
+    }
+
+    /// Await a single component interaction on this message.
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    pub fn await_modal_interaction<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectModalInteraction<'a> {
+        CollectModalInteraction::new(shard_messenger).message_id(self.id.0)
+    }
+
+    /// Returns a stream builder which can be awaited to obtain a stream of component interactions on this message.
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    pub fn await_modal_interactions<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> ModalInteractionCollectorBuilder<'a> {
+        ModalInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Retrieves the message channel's category ID if the channel has one.
