@@ -418,7 +418,9 @@ impl ChannelId {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                cache.channels.write().await.insert(channel.id(), channel.clone());
+                if let Some(guild_channel) = channel.clone().guild() {
+                    cache.channels.write().await.insert(guild_channel.id, guild_channel);
+                }
             }
         }
         Ok(channel)
