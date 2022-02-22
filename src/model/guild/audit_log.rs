@@ -3,6 +3,10 @@ use std::{collections::HashMap, mem::transmute};
 use serde::de::{self, Deserializer};
 use serde::ser::{Serialize, Serializer};
 
+mod change;
+
+pub use change::{AffectedRole, Change};
+
 use crate::model::prelude::*;
 
 /// Determines the action that was done on a target.
@@ -192,17 +196,6 @@ pub enum ActionThread {
     Create = 110,
     Update = 111,
     Delete = 112,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Change {
-    #[serde(rename = "key")]
-    pub name: String,
-    // TODO: Change these to an actual type.
-    #[serde(rename = "old_value")]
-    pub old: Option<Value>,
-    #[serde(rename = "new_value")]
-    pub new: Option<Value>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

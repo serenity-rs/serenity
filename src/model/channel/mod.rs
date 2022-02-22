@@ -371,7 +371,7 @@ struct PermissionOverwriteData {
 }
 
 /// A channel-specific permission overwrite for a member or role.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PermissionOverwrite {
     pub allow: Permissions,
     pub deny: Permissions,
