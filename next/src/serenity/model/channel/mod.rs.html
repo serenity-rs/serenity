@@ -978,7 +978,7 @@
 }
 
 <span class="doccomment">/// A channel-specific permission overwrite for a member or role.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PermissionOverwrite</span> {
     <span class="kw">pub</span> <span class="ident">allow</span>: <span class="ident">Permissions</span>,
     <span class="kw">pub</span> <span class="ident">deny</span>: <span class="ident">Permissions</span>,
