@@ -26,7 +26,7 @@ impl EditInteractionResponse {
     }
 
     /// Creates an embed for the message.
-    pub fn create_embed<F>(&mut self, f: F) -> &mut Self
+    pub fn embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
@@ -45,6 +45,27 @@ impl EditInteractionResponse {
         if let Some(embeds) = embeds.as_array_mut() {
             embeds.push(embed);
         }
+
+        self
+    }
+
+    /// Adds multiple embeds to the message.
+    pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        for embed in embeds {
+            self.add_embed(embed);
+        }
+
+        self
+    }
+
+    /// Sets a single embed to include in the message
+    ///
+    /// Calling this will overwrite the embed list.
+    /// To append embeds, call [`Self::add_embed`] instead.
+    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+        let map = utils::hashmap_to_json_map(embed.0);
+        let embed = Value::Object(map);
+        self.0.insert("embeds", Value::Array(vec![embed]));
 
         self
     }
