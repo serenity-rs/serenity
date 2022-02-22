@@ -1,6 +1,6 @@
-use std::{collections::HashMap, fmt, mem::transmute};
+use std::{collections::HashMap, mem::transmute};
 
-use serde::de::{self, Deserializer, Visitor};
+use serde::de::{self, Deserializer};
 use serde::ser::{Serialize, Serializer};
 
 use crate::model::prelude::*;
@@ -235,7 +235,7 @@ mod entries {
 #[non_exhaustive]
 pub struct AuditLogEntry {
     /// Determines to what entity an [`Self::action`] was used on.
-    #[serde(with = "option_u64_handler")]
+    #[serde(with = "optional_string")]
     pub target_id: Option<u64>,
     /// Determines what action was done on a [`Self::target_id`]
     #[serde(rename = "action_type")]
@@ -256,16 +256,16 @@ pub struct AuditLogEntry {
 #[non_exhaustive]
 pub struct Options {
     /// Number of days after which inactive members were kicked.
-    #[serde(default, with = "option_u64_handler")]
+    #[serde(default, with = "optional_string")]
     pub delete_member_days: Option<u64>,
     /// Number of members removed by the prune
-    #[serde(default, with = "option_u64_handler")]
+    #[serde(default, with = "optional_string")]
     pub members_removed: Option<u64>,
     /// Channel in which the messages were deleted
     #[serde(default)]
     pub channel_id: Option<ChannelId>,
     /// Number of deleted messages.
-    #[serde(default, with = "option_u64_handler")]
+    #[serde(default, with = "optional_string")]
     pub count: Option<u64>,
     /// Id of the overwritten entity
     #[serde(default)]
@@ -281,44 +281,58 @@ pub struct Options {
     pub role_name: Option<String>,
 }
 
-mod option_u64_handler {
-    use super::*;
+/// Deserializes optional string containing a valid integer as ´Option<u64>`.
+mod optional_string {
+    use std::fmt;
 
-    pub fn deserialize<'de, D: Deserializer<'de>>(des: D) -> StdResult<Option<u64>, D::Error> {
-        struct OptionU64Visitor;
+    use serde::de::{Deserializer, Error, Visitor};
+    use serde::ser::Serializer;
 
-        impl<'de> Visitor<'de> for OptionU64Visitor {
-            type Value = Option<u64>;
-
-            fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-                formatter.write_str("an optional integer or a string with a valid number inside")
-            }
-
-            fn visit_some<D: Deserializer<'de>>(
-                self,
-                deserializer: D,
-            ) -> StdResult<Self::Value, D::Error> {
-                deserializer.deserialize_any(OptionU64Visitor)
-            }
-
-            fn visit_none<E: de::Error>(self) -> StdResult<Self::Value, E> {
-                Ok(None)
-            }
-
-            fn visit_u64<E: de::Error>(self, val: u64) -> StdResult<Option<u64>, E> {
-                Ok(Some(val))
-            }
-
-            fn visit_str<E: de::Error>(self, string: &str) -> StdResult<Option<u64>, E> {
-                string.parse().map(Some).map_err(de::Error::custom)
-            }
-        }
-
-        des.deserialize_option(OptionU64Visitor)
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<Option<u64>, D::Error> {
+        deserializer.deserialize_option(OptionalStringVisitor)
     }
 
-    pub fn serialize<S: Serializer>(num: &Option<u64>, s: S) -> StdResult<S::Ok, S::Error> {
-        Option::serialize(num, s)
+    pub fn serialize<S: Serializer>(value: &Option<u64>, serializer: S) -> Result<S::Ok, S::Error> {
+        match value {
+            Some(value) => serializer.serialize_some(&value.to_string()),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    struct OptionalStringVisitor;
+
+    impl<'de> Visitor<'de> for OptionalStringVisitor {
+        type Value = Option<u64>;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+            formatter.write_str("an optional integer or a string with a valid number inside")
+        }
+
+        fn visit_some<D: Deserializer<'de>>(
+            self,
+            deserializer: D,
+        ) -> Result<Self::Value, D::Error> {
+            deserializer.deserialize_any(OptionalStringVisitor)
+        }
+
+        fn visit_none<E: Error>(self) -> Result<Self::Value, E> {
+            Ok(None)
+        }
+
+        /// Called by the `simd_json` crate
+        fn visit_unit<E: Error>(self) -> Result<Self::Value, E> {
+            Ok(None)
+        }
+
+        fn visit_u64<E: Error>(self, val: u64) -> Result<Option<u64>, E> {
+            Ok(Some(val))
+        }
+
+        fn visit_str<E: Error>(self, string: &str) -> Result<Option<u64>, E> {
+            string.parse().map(Some).map_err(Error::custom)
+        }
     }
 }
 
@@ -380,5 +394,43 @@ mod tests {
         assert_action!(Action::Thread(ActionThread::Create), 110);
         assert_action!(Action::Thread(ActionThread::Update), 111);
         assert_action!(Action::Thread(ActionThread::Delete), 112);
+    }
+
+    #[test]
+    fn optional_string_module() {
+        use serde_test::Token;
+
+        use super::optional_string;
+
+        #[derive(Debug, PartialEq, Deserialize, Serialize)]
+        struct T {
+            #[serde(with = "optional_string")]
+            opt: Option<u64>,
+        }
+
+        let value = T {
+            opt: Some(12345),
+        };
+
+        serde_test::assert_tokens(&value, &[
+            Token::Struct {
+                name: "T",
+                len: 1,
+            },
+            Token::Str("opt"),
+            Token::Some,
+            Token::Str("12345"),
+            Token::StructEnd,
+        ]);
+
+        serde_test::assert_de_tokens(&value, &[
+            Token::Struct {
+                name: "T",
+                len: 1,
+            },
+            Token::Str("opt"),
+            Token::Str("12345"),
+            Token::StructEnd,
+        ]);
     }
 }
