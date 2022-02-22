@@ -362,6 +362,16 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
+    /// Sets an event handler with multiple methods for each possible event. Passed by Arc.
+    pub fn event_handler_arc<H: EventHandler + 'static>(
+        mut self,
+        event_handler_arc: Arc<H>,
+    ) -> Self {
+        self.event_handler = Some(event_handler_arc);
+
+        self
+    }
+
     /// Gets the event handler, if already initialized. See [`Self::event_handler`] for more info.
     pub fn get_event_handler(&self) -> Option<Arc<dyn EventHandler>> {
         self.event_handler.clone()
