@@ -328,6 +328,8 @@ pub enum ChannelType {
     PrivateThread = 12,
     /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
+    /// An indicator that the channel is a forum (haha discord not documenting features go brr)
+    Forum = 15,
     /// An indicator that the channel is of unknown type.
     Unknown = !0,
 }
@@ -342,7 +344,8 @@ enum_number!(ChannelType {
     NewsThread,
     PublicThread,
     PrivateThread,
-    Stage
+    Stage,
+    Forum
 });
 
 impl ChannelType {
@@ -359,6 +362,7 @@ impl ChannelType {
             ChannelType::PublicThread => "public_thread",
             ChannelType::PrivateThread => "private_thread",
             ChannelType::Stage => "stage",
+            ChannelType::Forum => "forum",
             ChannelType::Unknown => "unknown",
         }
     }
