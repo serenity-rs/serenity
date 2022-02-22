@@ -160,8 +160,6 @@ impl<'a> EditMessage<'a> {
     }
 
     /// Add an existing attachment by id.
-    ///
-    /// This can be called multiple times.
     pub fn add_existing_attachment(&mut self, attachment: AttachmentId) -> &mut Self {
         let attachments = self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
@@ -173,8 +171,6 @@ impl<'a> EditMessage<'a> {
     }
 
     /// Remove an existing attachment by id.
-    ///
-    /// This can be called multiple times.
     pub fn remove_existing_attachment(&mut self, attachment: AttachmentId) -> &mut Self {
         let attachments = self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
