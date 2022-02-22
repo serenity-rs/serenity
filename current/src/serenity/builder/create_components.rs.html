@@ -421,6 +421,14 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
@@ -451,6 +459,14 @@
     <span class="doccomment">/// Adds an action row.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_action_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">CreateActionRow</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">push</span>(<span class="ident">row</span>.<span class="ident">build</span>());
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Set a single action row.</span>
+    <span class="doccomment">/// Calling this will overwrite all action rows.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_action_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">CreateActionRow</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">row</span>.<span class="ident">build</span>()];
 
         <span class="self">self</span>
     }
