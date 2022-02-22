@@ -161,7 +161,8 @@ impl<'a> EditMessage<'a> {
 
     /// Add an existing attachment by id.
     pub fn add_existing_attachment(&mut self, attachment: AttachmentId) -> &mut Self {
-        let attachments = self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let attachments =
+            self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
         let mut map = HashMap::new();
         map.insert("id", Value::from(attachment.to_string()));
@@ -172,18 +173,21 @@ impl<'a> EditMessage<'a> {
 
     /// Remove an existing attachment by id.
     pub fn remove_existing_attachment(&mut self, attachment: AttachmentId) -> &mut Self {
-        let attachments = self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let attachments =
+            self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
         let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
         let attachment_string = attachment.to_string();
         let mut found_at = None;
         for (index, value) in attachments_array.iter().enumerate() {
-            if attachment_string == value
-                .as_object()
-                .expect("Attachments must be an array of objects")
-                .get("id")
-                .expect("Attachments must be an array of objects containing ids")
-                .as_str()
-                .expect("Attachments must be an array of objects containing string ids") {
+            if attachment_string
+                == value
+                    .as_object()
+                    .expect("Attachments must be an array of objects")
+                    .get("id")
+                    .expect("Attachments must be an array of objects containing ids")
+                    .as_str()
+                    .expect("Attachments must be an array of objects containing string ids")
+            {
                 found_at = Some(index);
             }
         }
