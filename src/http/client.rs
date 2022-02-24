@@ -296,6 +296,19 @@ impl Http {
         base
     }
 
+    /// Adds a [`User`] to a [`Group`].
+    pub async fn add_recipient(&self, group_id: u64, user_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::AddGroupRecipient {
+                group_id,
+                user_id,
+            },
+        })
+        .await
+    }
+
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
     ///
     /// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.
@@ -3241,6 +3254,21 @@ impl Http {
                 guild_id,
                 user_id,
                 role_id,
+            },
+        })
+        .await
+    }
+
+    /// Removes a [`User`] from a [`Group`].
+    /// 
+    /// **Note**: Requires Account to be group owner.
+    pub async fn remove_recipient(&self, group_id: u64, user_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::RemoveRecipient {
+                group_id,
+                user_id,
             },
         })
         .await

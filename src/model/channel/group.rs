@@ -3,14 +3,11 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
-use tokio::sync::RwLock;
 
 #[cfg(feature = "utils")]
 use crate::builder::EditGuild;
 #[cfg(feature = "model")]
-use crate::builder::{CreateMessage, EditMessage, GetMessages};
-#[cfg(feature = "cache")]
-use crate::cache::Cache;
+use crate::builder::{CreateInvite, CreateMessage, EditMessage, GetMessages};
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
@@ -20,8 +17,6 @@ use crate::collector::{
     MessageCollectorBuilder,
     ReactionCollectorBuilder,
 };
-#[cfg(feature = "model")]
-use crate::http::AttachmentType;
 use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::http::{Http, Typing};
@@ -53,6 +48,29 @@ pub struct Group {
 
 #[cfg(feature = "model")]
 impl Group {
+    /// Adds a user to the group
+    /// 
+    /// # Errors
+    /// 
+    /// Returns [`Error::Http`] when trying to add an already added user
+    /// or someone whose privacy settings do not allow being added
+    /// to a group under current circumstances.
+    #[inline]
+    pub async fn add_user(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
+        http.as_ref().add_recipient(self.id.0, user_id.into().0).await
+    }
+
+    /// Removes a user from the group
+    /// 
+    /// # Errors
+    /// 
+    /// Returns [`Error::Http`] when trying to remove a user from the group,
+    /// which is not in the group or when not group owner.
+    #[inline]
+    pub async fn remove_user(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
+        http.as_ref().remove_recipient(self.id.0, user_id.into().0).await
+    }
+
     /// Broadcasts that the current user is typing to the recipients.
     ///
     /// For bots, this is a good indicator for long-running commands.
@@ -65,77 +83,64 @@ impl Group {
         self.id.broadcast_typing(&http).await
     }
 
-    /// ! FIXME ! TODO ! NOT DONE
-    /// Modifies a channel's settings, such as its position or name.
-    ///
-    /// Refer to [`EditChannel`]s documentation for a full list of methods.
+    /// Creates an invite leading to the given channel.
     ///
     /// # Examples
     ///
-    /// Change a voice channels name and bitrate:
+    /// Create an invite that is valid for one day:
     ///
     /// ```rust,ignore
-    /// channel.edit(&context, |c| c.name("test").bitrate(86400)).await;
+    /// let invite = channel.create_invite(&context, |i| i.max_age(86400)).await;
     /// ```
+    #[inline]
+    #[cfg(feature = "utils")]
+    #[allow(clippy::missing_errors_doc)]
+    pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
+    where
+        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
+    {
+        self.id.create_invite(cache_http.http(), f).await
+    }
+
+    /// Deletes the given [`Reaction`] from the group.
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns [ModelError::InvalidPermissions]
-    /// if the current user lacks permission to edit the channel.
+    /// Returns [`Error::Http`] if attempting to delete another users reaction.
+    #[inline]
+    pub async fn delete_reaction(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+        user_id: Option<UserId>,
+        reaction_type: impl Into<ReactionType>,
+    ) -> Result<()> {
+        self.id.delete_reaction(&http, message_id, user_id, reaction_type).await
+    }
+
+    /// Modifies a group's settings (name).
     ///
-    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
-    // #[cfg(feature = "utils")]
-    // pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-    // where
-    //     F: FnOnce(&mut EditGuild) -> &mut EditGuild,
-    // {
-    //     #[cfg(feature = "cache")]
-    //     {
-    //         // if let Some(cache) = cache_http.cache() {
-    //         //     utils::user_has_perms_cache(
-    //         //         cache,
-    //         //         self.id,
-    //         //         Some(self.guild_id),
-    //         //         Permissions::MANAGE_CHANNELS,
-    //         //     )
-    //         //     .await?;
-    //         // }
-    //     }
-        
-/*json
-{
-    "icon": null,
-    "id": "942940911392927747",
-    "last_message_id": "942946233784352818",
-    "name": "a",
-    "owner_id": "241801234091212802",
-    "recipients": [
-        {
-            "id": "720613853431463977", 
-            "username": "Rob9315", 
-            "avatar": null, 
-            "discriminator": "8286", 
-            "public_flags": 0}
-        }
-    ],
-    "type": 3
-}
-*/
+    /// # Examples
+    ///
+    /// Change a groups name:
+    ///
+    /// ```rust,ignore
+    /// group.edit(&context, |c| c.name("test")).await;
+    /// ```
+    #[cfg(feature = "utils")]
+    #[allow(clippy::missing_errors_doc)]
+    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
+    where
+        F: FnOnce(&mut EditGuild) -> &mut EditGuild,
+    {
+        let mut edit_group = EditGuild::default();
+        f(&mut edit_group);
+        let edited = serenity_utils::hashmap_to_json_map(edit_group.0);
 
-    //     let mut map = HashMap::new();
-    //     map.insert(
-    //         "name",
-    //         if let Some(name) = &self.name { Value::String(name) } else { Value::Null },
-    //     );
+        *self = cache_http.http().edit_group(self.id.0, &edited).await?;
 
-    //     let mut edit_group = EditGuild::default();
-    //     f(&mut edit_group);
-    //     let edited = serenity_utils::hashmap_to_json_map(edit_group.0);
-
-    //     *self = cache_http.http().edit_group(self.id.0, &edited).await?;
-
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     /// Edits a [`Message`] in the channel given its Id.
     ///
@@ -165,6 +170,13 @@ impl Group {
         F: FnOnce(&mut EditMessage) -> &mut EditMessage,
     {
         self.id.edit_message(&http, message_id, f).await
+    }
+
+    /// Gets all of the group's invites.
+    #[inline]
+    #[allow(clippy::missing_errors_doc)]
+    pub async fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
+        self.id.invites(&http).await
     }
 
     /// Gets a message from the channel.
@@ -338,7 +350,9 @@ impl Group {
         self.id.unpin(&http, message_id).await
     }
 
-    /// Deletes the group. This does not delete the contents of the group,
+    /// Deletes the group.
+    ///
+    /// **Note**: This does not delete the contents of the group channel,
     /// and is equivalent to closing a private channel on the client, which can
     /// be re-opened.
     #[inline]

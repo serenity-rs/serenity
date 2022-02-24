@@ -92,6 +92,12 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPinsMessageId(u64),
+    /// Route for the `/channels/:group_id/recipients/:user_id` path
+    /// 
+    /// The data is the relevant [`ChannelId`].
+    /// 
+    /// [`ChannelId`]: crate::model::id::ChannelId
+    ChannelsIdRecipientsId(u64),
     /// Route for the `/channels/:channel_id/message/:message_id/crosspost` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -533,6 +539,10 @@ impl Route {
 
     pub fn channel_pins(channel_id: u64) -> String {
         format!(api!("/channels/{}/pins"), channel_id)
+    }
+
+    pub fn channel_recipient(group_id: u64, user_id: u64) -> String {
+        format!(api!("/channels/{}/recipients/{}"), group_id, user_id)
     }
 
     pub fn channel_typing(channel_id: u64) -> String {
@@ -1001,6 +1011,10 @@ impl Route {
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum RouteInfo<'a> {
+    AddGroupRecipient {
+        group_id: u64,
+        user_id: u64,
+    },
     AddGuildMember {
         guild_id: u64,
         user_id: u64,
@@ -1509,6 +1523,10 @@ pub enum RouteInfo<'a> {
         role_id: u64,
         user_id: u64,
     },
+    RemoveRecipient {
+        group_id: u64,
+        user_id: u64,
+    },
     SearchGuildMembers {
         guild_id: u64,
         query: &'a str,
@@ -1534,6 +1552,14 @@ pub enum RouteInfo<'a> {
 impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
+            RouteInfo::AddGroupRecipient {
+                group_id,
+                user_id,
+            } => (
+                LightMethod::Put,
+                Route::ChannelsIdRecipientsId(group_id),
+                Cow::from(Route::channel_recipient(group_id, user_id))
+            ),
             RouteInfo::AddGuildMember {
                 guild_id,
                 user_id,
@@ -2590,6 +2616,14 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::GuildsIdMembersIdRolesId(guild_id),
                 Cow::from(Route::guild_member_role(guild_id, user_id, role_id)),
+            ),
+            RouteInfo::RemoveRecipient {
+                group_id,
+                user_id,
+            } => (
+                LightMethod::Delete,
+                Route::ChannelsIdRecipientsId(group_id),
+                Cow::from(Route::channel_recipient(group_id, user_id))
             ),
             RouteInfo::SearchGuildMembers {
                 guild_id,

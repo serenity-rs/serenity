@@ -406,7 +406,7 @@ pub async fn user_has_perms_cache(
 pub async fn user_has_perms(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
-    guild_id: Option<GuildId>,
+    _guild_id: Option<GuildId>,
     mut permissions: Permissions,
 ) -> Result<bool> {
     let cache = cache.as_ref();

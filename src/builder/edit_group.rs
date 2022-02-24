@@ -1,12 +1,8 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
+use serde_json::Value;
 
-use crate::internal::prelude::*;
-use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType, VideoQualityMode};
-use crate::model::id::ChannelId;
-
-/// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
+/// A builder to edit a [`Group`] for use via [`Group::edit`]
 ///
 /// Defaults are not directly provided by the builder itself.
 ///
@@ -19,17 +15,17 @@ use crate::model::id::ChannelId;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// #     let http = Http::default();
-/// #     let mut channel = ChannelId(0);
+/// #     let mut group = ChannelId(0);
 /// // assuming a channel has already been bound
-/// if let Err(why) = channel.edit(&http, |c| c.name("new name").topic("a test topic")).await {
+/// if let Err(why) = group.edit(&http, |g| g.name("new name")).await {
 ///     // properly handle the error
 /// }
 /// #     Ok(())
 /// # }
 /// ```
 ///
-/// [`GuildChannel`]: crate::model::channel::GuildChannel
-/// [`GuildChannel::edit`]: crate::model::channel::GuildChannel::edit
+/// [`Group`]: crate::model::channel::Group
+/// [`Group::edit`]: crate::model::channel::Group::edit
 #[derive(Clone, Debug, Default)]
 pub struct EditGroup(pub HashMap<&'static str, Value>);
 

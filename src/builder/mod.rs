@@ -27,6 +27,7 @@ mod create_message;
 mod create_stage_instance;
 mod create_thread;
 mod edit_channel;
+mod edit_group;
 mod edit_guild;
 mod edit_guild_welcome_screen;
 mod edit_guild_widget;
@@ -55,6 +56,7 @@ pub use self::{
     create_stage_instance::CreateStageInstance,
     create_thread::CreateThread,
     edit_channel::EditChannel,
+    edit_group::EditGroup,
     edit_guild::EditGuild,
     edit_guild_welcome_screen::EditGuildWelcomeScreen,
     edit_guild_widget::EditGuildWidget,
