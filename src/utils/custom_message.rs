@@ -242,6 +242,7 @@ fn dummy_message() -> Message {
         attachments: Vec::new(),
         author: User {
             id: UserId::default(),
+            about_me: None,
             avatar: None,
             bot: false,
             discriminator: 0x0000,

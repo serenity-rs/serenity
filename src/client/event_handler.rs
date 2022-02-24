@@ -379,6 +379,16 @@ pub trait EventHandler: Send + Sync {
     /// Provides data about the bot and the guilds it's in.
     async fn ready(&self, _ctx: Context, _data_about_bot: Ready) {}
 
+    /// Dispatched when a relationship has been added.
+    ///
+    /// Note: This event will never trigger for bot users.
+    async fn relationship_add(&self, _ctx: Context, _relationship: Relationship) {}
+
+    /// Dispatched when a relationship has been removed.
+    ///
+    /// Note: This event will never trigger for bot users.
+    async fn relationship_remove(&self, _ctx: Context, _event: RelationshipRemoveEvent) {}
+
     /// Dispatched upon reconnection.
     async fn resume(&self, _ctx: Context, _: ResumedEvent) {}
 

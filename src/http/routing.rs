@@ -93,9 +93,9 @@ pub enum Route {
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPinsMessageId(u64),
     /// Route for the `/channels/:group_id/recipients/:user_id` path
-    /// 
+    ///
     /// The data is the relevant [`ChannelId`].
-    /// 
+    ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdRecipientsId(u64),
     /// Route for the `/channels/:channel_id/message/:message_id/crosspost` path.
@@ -354,6 +354,8 @@ pub enum Route {
     InvitesCode,
     /// Route for the `/users/:user_id` path.
     UsersId,
+    /// Route for the `/users/:user_id/relationships` path
+    UsersIdRelationships,
     /// Route for the `/users/@me` path.
     UsersMe,
     /// Route for the `/users/@me/channels` path.
@@ -364,6 +366,8 @@ pub enum Route {
     UsersMeGuilds,
     /// Route for the `/users/@me/guilds/:guild_id` path.
     UsersMeGuildsId,
+    /// Route for the `/users/@me/notes/:note_id` path.
+    UsersMeNotes,
     /// Route for the `/voice/regions` path.
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
@@ -861,12 +865,20 @@ impl Route {
         format!(api!("/users/{}"), target)
     }
 
+    pub fn user_relationships(user_id: u64) -> String {
+        format!(api!("/users/{}/relationships"), user_id)
+    }
+
     pub fn user_me_connections() -> &'static str {
         api!("/users/@me/connections")
     }
 
     pub fn user_dm_channels<D: Display>(target: D) -> String {
         format!(api!("/users/{}/channels"), target)
+    }
+
+    pub fn user_me_note(user_id: u64) -> String {
+        format!(api!("/users/@me/notes/{}"), user_id)
     }
 
     pub fn user_guild<D: Display>(target: D, guild_id: u64) -> String {
@@ -1491,6 +1503,9 @@ pub enum RouteInfo<'a> {
     },
     GetUserConnections,
     GetUserDmChannels,
+    GetUserNote {
+        user_id: u64,
+    },
     GetVoiceRegions,
     GetWebhook {
         webhook_id: u64,
@@ -1532,6 +1547,9 @@ pub enum RouteInfo<'a> {
         query: &'a str,
         limit: Option<u64>,
     },
+    SetUserNote {
+        user_id: u64,
+    },
     StartGuildPrune {
         days: u64,
         guild_id: u64,
@@ -1558,7 +1576,7 @@ impl<'a> RouteInfo<'a> {
             } => (
                 LightMethod::Put,
                 Route::ChannelsIdRecipientsId(group_id),
-                Cow::from(Route::channel_recipient(group_id, user_id))
+                Cow::from(Route::channel_recipient(group_id, user_id)),
             ),
             RouteInfo::AddGuildMember {
                 guild_id,
@@ -2551,6 +2569,9 @@ impl<'a> RouteInfo<'a> {
                 Route::UsersMeChannels,
                 Cow::from(Route::user_dm_channels("@me")),
             ),
+            RouteInfo::GetUserNote {
+                user_id,
+            } => (LightMethod::Get, Route::UsersMeNotes, Cow::from(Route::user_me_note(user_id))),
             RouteInfo::GetVoiceRegions => {
                 (LightMethod::Get, Route::VoiceRegions, Cow::from(Route::voice_regions()))
             },
@@ -2623,7 +2644,7 @@ impl<'a> RouteInfo<'a> {
             } => (
                 LightMethod::Delete,
                 Route::ChannelsIdRecipientsId(group_id),
-                Cow::from(Route::channel_recipient(group_id, user_id))
+                Cow::from(Route::channel_recipient(group_id, user_id)),
             ),
             RouteInfo::SearchGuildMembers {
                 guild_id,
@@ -2634,6 +2655,9 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdMembersSearch(guild_id),
                 Cow::from(Route::guild_members_search(guild_id, query, limit)),
             ),
+            RouteInfo::SetUserNote {
+                user_id,
+            } => (LightMethod::Put, Route::UsersMeNotes, Cow::from(Route::user_me_note(user_id))),
             RouteInfo::StartGuildPrune {
                 days,
                 guild_id,

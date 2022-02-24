@@ -714,6 +714,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 #[repr(u8)]
+#[allow(clippy::large_enum_variant)]
 pub enum ApplicationCommandInteractionDataOptionValue {
     String(String),
     Integer(i64),

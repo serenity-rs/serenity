@@ -1,3 +1,5 @@
+//! Selfbot specific api parts
+
 use super::{
     id::{ChannelId, GuildId, MessageId, UserId},
     prelude::{OnlineStatus, User},

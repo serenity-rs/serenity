@@ -1041,6 +1041,7 @@ mod test {
                 attachments: vec![],
                 author: User {
                     id: UserId(2),
+                    about_me: None,
                     avatar: None,
                     bot: false,
                     discriminator: 1,

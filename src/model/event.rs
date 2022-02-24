@@ -1317,6 +1317,37 @@ impl Serialize for ReadyEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct RelationshipAddEvent {
+    pub relationship: Relationship,
+}
+
+#[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for RelationshipAddEvent {
+    type Output = Relationship;
+
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        cache.relationships.write().await.insert(self.relationship.id, self.relationship.clone())
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct RelationshipRemoveEvent {
+    pub kind: RelationshipType,
+    pub user_id: UserId,
+}
+
+#[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for RelationshipRemoveEvent {
+    type Output = Relationship;
+
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        cache.relationships.write().await.remove(&self.user_id)
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ResumedEvent {
     #[serde(rename = "_trace")]
@@ -1907,6 +1938,10 @@ pub enum Event {
     ///
     /// May also be received at a later time in the event of a reconnect.
     Ready(ReadyEvent),
+    /// A Relationship has been added.
+    RelationshipAdd(RelationshipAddEvent),
+    /// A Relationship has been removed.
+    RelationshipRemove(RelationshipRemoveEvent),
     /// The connection has successfully resumed after a disconnect.
     Resumed(ResumedEvent),
     /// A user is typing; considered to last 5 seconds
@@ -2166,6 +2201,18 @@ macro_rules! with_related_ids_for_event_types {
                 message_id: Some(e.message_id),
             },
             Self::Ready, Self::Ready(e) => {
+                user_id: Never,
+                guild_id: Never,
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::RelationshipAdd, Self::RelationshipAdd(e) => {
+                user_id: Never,
+                guild_id: Never,
+                channel_id: Never,
+                message_id: Never,
+            },
+            Self::RelationshipRemove, Self::RelationshipRemove(e) => {
                 user_id: Never,
                 guild_id: Never,
                 channel_id: Never,
@@ -2444,6 +2491,8 @@ impl Event {
             Self::ReactionRemove(_) => EventType::ReactionRemove,
             Self::ReactionRemoveAll(_) => EventType::ReactionRemoveAll,
             Self::Ready(_) => EventType::Ready,
+            Self::RelationshipAdd(_) => EventType::RelationshipAdd,
+            Self::RelationshipRemove(_) => EventType::RelationshipRemove,
             Self::Resumed(_) => EventType::Resumed,
             Self::TypingStart(_) => EventType::TypingStart,
             Self::UserUpdate(_) => EventType::UserUpdate,
@@ -2603,6 +2652,8 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::PresenceUpdate => Event::PresenceUpdate(serde_json::from_value(v)?),
         EventType::PresencesReplace => Event::PresencesReplace(serde_json::from_value(v)?),
         EventType::Ready => Event::Ready(serde_json::from_value(v)?),
+        EventType::RelationshipAdd => Event::RelationshipAdd(serde_json::from_value(v)?),
+        EventType::RelationshipRemove => Event::RelationshipRemove(serde_json::from_value(v)?),
         EventType::Resumed => Event::Resumed(serde_json::from_value(v)?),
         EventType::TypingStart => Event::TypingStart(serde_json::from_value(v)?),
         EventType::UserUpdate => Event::UserUpdate(serde_json::from_value(v)?),
@@ -2782,6 +2833,14 @@ pub enum EventType {
     ///
     /// This maps to [`ReadyEvent`].
     Ready,
+    /// Indicator that a relationship add payload was received.
+    ///
+    /// This maps to [`RelationshipAddEvent`].
+    RelationshipAdd,
+    /// Indicator that a relationship remove payload was received.
+    ///
+    /// This maps to [`RelationshipRemoveEvent`].
+    RelationshipRemove,
     /// Indicator that a resumed payload was received.
     ///
     /// This maps to [`ResumedEvent`].
@@ -2982,6 +3041,8 @@ impl EventType {
     const PRESENCE_UPDATE: &'static str = "PRESENCE_UPDATE";
     const PRESENCES_REPLACE: &'static str = "PRESENCES_REPLACE";
     const READY: &'static str = "READY";
+    const RELATIONSHIP_ADD: &'static str = "RELATIONSHIP_ADD";
+    const RELATIONSHIP_REMOVE: &'static str = "RELATIONSHIP_REMOVE";
     const RESUMED: &'static str = "RESUMED";
     const TYPING_START: &'static str = "TYPING_START";
     const USER_UPDATE: &'static str = "USER_UPDATE";
@@ -3047,6 +3108,8 @@ impl EventType {
             Self::PresenceUpdate => Some(Self::PRESENCE_UPDATE),
             Self::PresencesReplace => Some(Self::PRESENCES_REPLACE),
             Self::Ready => Some(Self::READY),
+            Self::RelationshipAdd => Some(Self::RELATIONSHIP_ADD),
+            Self::RelationshipRemove => Some(Self::RELATIONSHIP_REMOVE),
             Self::Resumed => Some(Self::RESUMED),
             Self::TypingStart => Some(Self::TYPING_START),
             Self::UserUpdate => Some(Self::USER_UPDATE),

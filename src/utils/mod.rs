@@ -858,6 +858,7 @@ mod test {
 
         let user = User {
             id: UserId(100000000000000000),
+            about_me: None,
             avatar: None,
             bot: false,
             discriminator: 0000,

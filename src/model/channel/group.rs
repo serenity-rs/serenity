@@ -49,9 +49,9 @@ pub struct Group {
 #[cfg(feature = "model")]
 impl Group {
     /// Adds a user to the group
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns [`Error::Http`] when trying to add an already added user
     /// or someone whose privacy settings do not allow being added
     /// to a group under current circumstances.
@@ -61,13 +61,17 @@ impl Group {
     }
 
     /// Removes a user from the group
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// Returns [`Error::Http`] when trying to remove a user from the group,
     /// which is not in the group or when not group owner.
     #[inline]
-    pub async fn remove_user(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
+    pub async fn remove_user(
+        &self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+    ) -> Result<()> {
         http.as_ref().remove_recipient(self.id.0, user_id.into().0).await
     }
 

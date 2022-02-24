@@ -443,6 +443,7 @@ mod test {
             };
             let user = User {
                 id: UserId(6),
+                about_me: None,
                 avatar: None,
                 bot: false,
                 discriminator: 4132,

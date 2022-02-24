@@ -426,9 +426,6 @@ pub async fn user_has_perms(
     // Since serenity can't _reasonably_ check and keep track of these,
     // just assume that all permissions are granted and return `true`.
 
-    use prelude::users::Relationship;
-
-    use super::users::RelationshipType;
     let (guild_id, guild_channel) = match channel {
         Channel::Guild(channel) => (channel.guild_id, channel),
         Channel::Category(_) | Channel::Group(_) => return Ok(true),

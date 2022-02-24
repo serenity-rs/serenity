@@ -24,6 +24,7 @@ pub use super::misc::*;
 pub use super::oauth2::*;
 pub use super::permissions::*;
 pub use super::user::*;
+pub use super::users::*;
 pub use super::voice::*;
 pub use super::webhook::*;
 pub use super::*;

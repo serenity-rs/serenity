@@ -2839,6 +2839,18 @@ impl Http {
         .await
     }
 
+    /// Gets the note for specified [`User`]
+    pub async fn get_user_note(&self, user_id: u64) -> Result<String> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetUser {
+                user_id,
+            },
+        })
+        .await
+    }
+
     /// Gets all pins of a channel.
     pub async fn get_pins(&self, channel_id: u64) -> Result<Vec<Message>> {
         self.fire(Request {
@@ -3260,7 +3272,7 @@ impl Http {
     }
 
     /// Removes a [`User`] from a [`Group`].
-    /// 
+    ///
     /// **Note**: Requires Account to be group owner.
     pub async fn remove_recipient(&self, group_id: u64, user_id: u64) -> Result<()> {
         self.wind(204, Request {
@@ -3305,6 +3317,20 @@ impl Http {
         }
 
         serde_json::from_value(value).map_err(From::from)
+    }
+
+    /// Sets the note for specified [`User`]
+    pub async fn set_user_note(&self, user_id: u64, note: &str) -> Result<()> {
+        let mut map = Map::new();
+        map.insert("name".to_string(), Value::String(note.to_string()));
+        self.wind(204, Request {
+            body: Some(&serde_json::to_vec(&map)?),
+            headers: None,
+            route: RouteInfo::SetUserNote {
+                user_id,
+            },
+        })
+        .await
     }
 
     /// Starts removing some members from a guild based on the last time they've been online.

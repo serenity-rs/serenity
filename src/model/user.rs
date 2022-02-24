@@ -493,6 +493,9 @@ pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
     /// creation date.
     pub id: UserId,
+    /// "About me" profile section of a user
+    #[serde(rename = "bio")]
+    pub about_me: Option<String>,
     /// Optional avatar hash.
     pub avatar: Option<String>,
     /// Indicator of whether the user is a bot.
@@ -596,6 +599,7 @@ impl Default for User {
     fn default() -> Self {
         User {
             id: UserId(210),
+            about_me: None,
             avatar: Some("abc".to_string()),
             bot: true,
             discriminator: 1432,
@@ -781,6 +785,17 @@ impl User {
         self.avatar_url().unwrap_or_else(|| self.default_avatar_url())
     }
 
+    /// Gets the note for the user
+    ///
+    /// **Note**: Notes will never work with bot accounts
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] when trying to run this as a bot user
+    pub async fn get_note(&self, cache_http: impl CacheHttp) -> Result<String> {
+        cache_http.http().get_user_note(self.id.0).await
+    }
+
     /// Check if a user has a [`Role`]. This will retrieve the [`Guild`] from
     /// the [`Cache`] if it is available, and then check if that guild has the
     /// given [`Role`].
@@ -874,6 +889,22 @@ impl User {
         *self = self.id.to_user(cache_http).await?;
 
         Ok(())
+    }
+
+    /// Sets the note for the user
+    ///
+    /// **Note**: Notes will never work with bot accounts
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] when trying to run this as a bot user
+    #[inline]
+    pub async fn set_note(
+        &mut self,
+        cache_http: impl CacheHttp,
+        note: impl AsRef<str>,
+    ) -> Result<()> {
+        cache_http.http().set_user_note(self.id.0, note.as_ref()).await
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
@@ -1074,6 +1105,7 @@ impl UserId {
 impl From<CurrentUser> for User {
     fn from(user: CurrentUser) -> Self {
         Self {
+            about_me: None,
             avatar: user.avatar,
             bot: user.bot,
             discriminator: user.discriminator,
@@ -1089,6 +1121,7 @@ impl From<CurrentUser> for User {
 impl<'a> From<&'a CurrentUser> for User {
     fn from(user: &'a CurrentUser) -> Self {
         Self {
+            about_me: None,
             avatar: user.avatar.clone(),
             bot: user.bot,
             discriminator: user.discriminator,

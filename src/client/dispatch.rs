@@ -719,6 +719,22 @@ async fn handle_event(
                 event_handler.ready(context, event.ready).await;
             });
         },
+        DispatchEvent::Model(Event::RelationshipAdd(mut event)) => {
+            update(&cache_and_http, &mut event).await;
+            let event_handler = Arc::clone(event_handler);
+
+            spawn_named("dispatch::event_handler::relationship_add", async move {
+                event_handler.relationship_add(context, event.relationship).await
+            });
+        },
+        DispatchEvent::Model(Event::RelationshipRemove(mut event)) => {
+            update(&cache_and_http, &mut event).await;
+            let event_handler = Arc::clone(event_handler);
+
+            spawn_named("dispatch::event_handler::relationship_remove", async move {
+                event_handler.relationship_remove(context, event).await
+            });
+        },
         DispatchEvent::Model(Event::Resumed(event)) => {
             let event_handler = Arc::clone(event_handler);
 
