@@ -947,8 +947,6 @@ impl GuildChannel {
 
     /// Sends a message to the channel with the given content.
     ///
-    /// **Note**: This will only work when a [`Message`] is received.
-    ///
     /// **Note**: Requires the [Send Messages] permission.
     ///
     /// # Errors

@@ -1,7 +1,7 @@
 use async_tungstenite::tungstenite::Message;
 
 #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-use crate::collector::ComponentInteractionFilter;
+use crate::collector::{ComponentInteractionFilter, ModalInteractionFilter};
 #[cfg(feature = "collector")]
 use crate::collector::{EventFilter, MessageFilter, ReactionFilter};
 use crate::model::{
@@ -73,4 +73,7 @@ pub enum ShardRunnerMessage {
     /// Sends a new filter for component interactions to the shard.
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
     SetComponentInteractionFilter(ComponentInteractionFilter),
+    /// Sends a new filter for modal interactions to the shard.
+    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    SetModalInteractionFilter(ModalInteractionFilter),
 }
