@@ -404,6 +404,14 @@ impl Http {
         .await
     }
 
+    /// Blocks the specified [`User`]
+    ///
+    /// **Note**: This always errors when using a bot account.
+    #[inline]
+    pub async fn block_user(&self, user_id: u64) -> Result<()> {
+        self.set_relationship(user_id, RelationshipType::Blocked).await
+    }
+
     /// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
     ///
     /// Refer to the Discord's [docs] for information on what fields this requires.
@@ -2888,6 +2896,17 @@ impl Http {
         .await
     }
 
+    pub async fn get_relationship(&self, user_id: u64) -> Result<Relationship> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetUserRelationship {
+                user_id,
+            },
+        })
+        .await
+    }
+
     /// Gets the current unresolved incidents from Discord's Status API.
     ///
     /// Does not require authentication.
@@ -3319,7 +3338,42 @@ impl Http {
         serde_json::from_value(value).map_err(From::from)
     }
 
+    /// Sends a friend request to the specified [`User`]
+    #[inline]
+    pub async fn send_friend_request(&self, user_id: u64) -> Result<()> {
+        self.wind(204, Request {
+            body: Some(b"{}"),
+            headers: None,
+            route: RouteInfo::SetUserRelationship {
+                user_id,
+            },
+        })
+        .await
+    }
+
+    /// Attempts to set relationship status as provided by kind
+    ///
+    /// # Errors
+    ///
+    /// - whenever invalid input is provided, as you can't set your
+    ///   status to IncomingRequest
+    /// - whenever used by a bot account
+    #[inline]
+    pub async fn set_relationship(&self, user_id: u64, kind: RelationshipType) -> Result<()> {
+        let mut map = Map::new();
+        map.insert("type".to_string(), Value::Number(Number::from(kind as u64)));
+        self.wind(204, Request {
+            body: Some(&serde_json::to_vec(&map)?),
+            headers: None,
+            route: RouteInfo::SetUserRelationship {
+                user_id,
+            },
+        })
+        .await
+    }
+
     /// Sets the note for specified [`User`]
+    #[inline]
     pub async fn set_user_note(&self, user_id: u64, note: &str) -> Result<()> {
         let mut map = Map::new();
         map.insert("name".to_string(), Value::String(note.to_string()));

@@ -891,6 +891,56 @@ impl User {
         Ok(())
     }
 
+    /// Attempts to set the relationship status
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] when using a bot user
+    /// Returns [`Error::Http`] when providing invalid input
+    #[inline]
+    pub async fn set_relationship(
+        &mut self,
+        cache_http: impl CacheHttp,
+        kind: RelationshipType,
+    ) -> Result<()> {
+        cache_http.http().set_relationship(self.id.0, kind).await
+    }
+
+    /// Looks up the relationship status.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] when using a bot user
+    #[inline]
+    pub async fn get_relationship(&mut self, cache_http: impl CacheHttp) -> Result<Relationship> {
+        #[cfg(feature = "cache")]
+        if let Some(relationship) = cache_http.cache().expect("config").relationship(&self.id).await
+        {
+            return Ok(relationship);
+        };
+        cache_http.http().get_relationship(self.id.0).await
+    }
+
+    /// Sends a friend request to the user.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] when using a bot user
+    #[inline]
+    pub async fn friend(&mut self, cache_http: impl CacheHttp) -> Result<()> {
+        cache_http.http().send_friend_request(self.id.0).await
+    }
+
+    /// Blocks the user.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] when using a bot user
+    #[inline]
+    pub async fn block(&mut self, cache_http: impl CacheHttp) -> Result<()> {
+        cache_http.http().block_user(self.id.0).await
+    }
+
     /// Sets the note for the user
     ///
     /// **Note**: Notes will never work with bot accounts

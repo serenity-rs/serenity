@@ -1506,6 +1506,9 @@ pub enum RouteInfo<'a> {
     GetUserNote {
         user_id: u64,
     },
+    GetUserRelationship {
+        user_id: u64,
+    },
     GetVoiceRegions,
     GetWebhook {
         webhook_id: u64,
@@ -1548,6 +1551,9 @@ pub enum RouteInfo<'a> {
         limit: Option<u64>,
     },
     SetUserNote {
+        user_id: u64,
+    },
+    SetUserRelationship {
         user_id: u64,
     },
     StartGuildPrune {
@@ -2572,6 +2578,13 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::GetUserNote {
                 user_id,
             } => (LightMethod::Get, Route::UsersMeNotes, Cow::from(Route::user_me_note(user_id))),
+            RouteInfo::GetUserRelationship {
+                user_id,
+            } => (
+                LightMethod::Get,
+                Route::UsersIdRelationships,
+                Cow::from(Route::user_relationships(user_id)),
+            ),
             RouteInfo::GetVoiceRegions => {
                 (LightMethod::Get, Route::VoiceRegions, Cow::from(Route::voice_regions()))
             },
@@ -2658,6 +2671,13 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::SetUserNote {
                 user_id,
             } => (LightMethod::Put, Route::UsersMeNotes, Cow::from(Route::user_me_note(user_id))),
+            RouteInfo::SetUserRelationship {
+                user_id,
+            } => (
+                LightMethod::Put,
+                Route::UsersIdRelationships,
+                Cow::from(Route::user_relationships(user_id)),
+            ),
             RouteInfo::StartGuildPrune {
                 days,
                 guild_id,

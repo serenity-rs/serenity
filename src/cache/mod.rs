@@ -908,6 +908,14 @@ impl Cache {
         self.users.read().await.len()
     }
 
+    /// Returns the current user settings.
+    ///
+    /// **Note**: This always returns [`None`] for bot users.
+    #[inline]
+    pub async fn user_settings(&self) -> Option<UserSettings> {
+        self.user_settings.read().await.clone()
+    }
+
     /// Clones a category matching the `channel_id` and returns it.
     #[inline]
     pub async fn category<C: Into<ChannelId>>(&self, channel_id: C) -> Option<ChannelCategory> {
@@ -998,6 +1006,22 @@ impl Cache {
                 e.get_mut().clone_from(user);
             },
         }
+    }
+
+    /// Returns all Relationships of the current user.
+    ///
+    /// **Note**: This is always empty for bot users.
+    #[inline]
+    pub async fn relationships(&self) -> HashMap<UserId, Relationship> {
+        self.relationships.read().await.clone()
+    }
+
+    /// Returns singel Relationship between current and specified user.
+    ///
+    /// **Note**: This always returns [`None`] for bot users.
+    #[inline]
+    pub async fn relationship(&self, user_id: &UserId) -> Option<Relationship> {
+        self.relationships.read().await.get(user_id).map(|r| r.to_owned())
     }
 }
 

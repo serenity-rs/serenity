@@ -2,7 +2,7 @@
 
 use super::{
     id::{ChannelId, GuildId, MessageId, UserId},
-    prelude::{OnlineStatus, User},
+    prelude::OnlineStatus,
 };
 
 /// Summary of messages since last login.
@@ -46,12 +46,11 @@ impl Default for RelationshipType {
 #[serde(default)]
 pub struct Relationship {
     /// Id of the first relationship participant.
+    #[serde(skip_serializing)]
     pub id: UserId,
     /// Type of the relationship such as blocked, friends etc.
     #[serde(rename = "type")]
     pub kind: RelationshipType,
-    /// User struct of the second relationship participant.
-    pub user: User,
 }
 
 /// The current user's progress through the Discord tutorial.
