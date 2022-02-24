@@ -903,7 +903,7 @@ impl User {
         cache_http: impl CacheHttp,
         kind: RelationshipType,
     ) -> Result<()> {
-        cache_http.http().set_relationship(self.id.0, kind).await
+        cache_http.http().edit_relationship(self.id.0, kind).await
     }
 
     /// Looks up the relationship status.
@@ -954,7 +954,7 @@ impl User {
         cache_http: impl CacheHttp,
         note: impl AsRef<str>,
     ) -> Result<()> {
-        cache_http.http().set_user_note(self.id.0, note.as_ref()).await
+        cache_http.http().edit_user_note(self.id.0, note.as_ref()).await
     }
 
     /// Returns a static formatted URL of the user's icon, if one exists.

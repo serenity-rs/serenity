@@ -409,7 +409,7 @@ impl Http {
     /// **Note**: This always errors when using a bot account.
     #[inline]
     pub async fn block_user(&self, user_id: u64) -> Result<()> {
-        self.set_relationship(user_id, RelationshipType::Blocked).await
+        self.edit_relationship(user_id, RelationshipType::Blocked).await
     }
 
     /// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
@@ -3344,7 +3344,7 @@ impl Http {
         self.wind(204, Request {
             body: Some(b"{}"),
             headers: None,
-            route: RouteInfo::SetUserRelationship {
+            route: RouteInfo::EditUserRelationship {
                 user_id,
             },
         })
@@ -3359,13 +3359,13 @@ impl Http {
     ///   status to IncomingRequest
     /// - whenever used by a bot account
     #[inline]
-    pub async fn set_relationship(&self, user_id: u64, kind: RelationshipType) -> Result<()> {
+    pub async fn edit_relationship(&self, user_id: u64, kind: RelationshipType) -> Result<()> {
         let mut map = Map::new();
         map.insert("type".to_string(), Value::Number(Number::from(kind as u64)));
         self.wind(204, Request {
             body: Some(&serde_json::to_vec(&map)?),
             headers: None,
-            route: RouteInfo::SetUserRelationship {
+            route: RouteInfo::EditUserRelationship {
                 user_id,
             },
         })
@@ -3374,13 +3374,13 @@ impl Http {
 
     /// Sets the note for specified [`User`]
     #[inline]
-    pub async fn set_user_note(&self, user_id: u64, note: &str) -> Result<()> {
+    pub async fn edit_user_note(&self, user_id: u64, note: &str) -> Result<()> {
         let mut map = Map::new();
         map.insert("name".to_string(), Value::String(note.to_string()));
         self.wind(204, Request {
             body: Some(&serde_json::to_vec(&map)?),
             headers: None,
-            route: RouteInfo::SetUserNote {
+            route: RouteInfo::EditUserNote {
                 user_id,
             },
         })

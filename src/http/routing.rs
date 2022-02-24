@@ -1550,10 +1550,10 @@ pub enum RouteInfo<'a> {
         query: &'a str,
         limit: Option<u64>,
     },
-    SetUserNote {
+    EditUserNote {
         user_id: u64,
     },
-    SetUserRelationship {
+    EditUserRelationship {
         user_id: u64,
     },
     StartGuildPrune {
@@ -2668,10 +2668,10 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdMembersSearch(guild_id),
                 Cow::from(Route::guild_members_search(guild_id, query, limit)),
             ),
-            RouteInfo::SetUserNote {
+            RouteInfo::EditUserNote {
                 user_id,
             } => (LightMethod::Put, Route::UsersMeNotes, Cow::from(Route::user_me_note(user_id))),
-            RouteInfo::SetUserRelationship {
+            RouteInfo::EditUserRelationship {
                 user_id,
             } => (
                 LightMethod::Put,

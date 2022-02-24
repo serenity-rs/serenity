@@ -39,6 +39,7 @@ mod edit_profile;
 mod edit_role;
 mod edit_stage_instance;
 mod edit_thread;
+mod edit_user_settings;
 mod edit_voice_state;
 mod edit_webhook_message;
 mod execute_webhook;
@@ -66,6 +67,7 @@ pub use self::{
     edit_role::EditRole,
     edit_stage_instance::EditStageInstance,
     edit_thread::EditThread,
+    edit_user_settings::EditUserSettings,
     edit_voice_state::EditVoiceState,
     edit_webhook_message::EditWebhookMessage,
     execute_webhook::ExecuteWebhook,
