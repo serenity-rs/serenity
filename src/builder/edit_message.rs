@@ -145,7 +145,7 @@ impl EditMessage {
         self
     }
 
-    /// Sets the components of this message.
+    /// Creates components for this message.
     #[cfg(feature = "unstable_discord_api")]
     pub fn components<F>(&mut self, f: F) -> &mut Self
     where
@@ -154,6 +154,13 @@ impl EditMessage {
         let mut components = CreateComponents::default();
         f(&mut components);
 
+        self.0.insert("components", Value::Array(components.0));
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
         self.0.insert("components", Value::Array(components.0));
         self
     }
