@@ -342,7 +342,6 @@ pub trait EventHandler: Send + Sync {
     /// Provides said channel's data.
     async fn private_channel_delete(&self, _ctx: Context, _channel: &PrivateChannel) {}
 
-
     /// Dispatched when a new reaction is attached to a message.
     ///
     /// Provides the reaction's data.

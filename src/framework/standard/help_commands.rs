@@ -1462,9 +1462,9 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
     if !command.sub_commands.is_empty() {
         let _ = writeln!(
             result,
-            "**{}**: {}",
+            "**{}**: `{}`",
             help_options.sub_commands_label,
-            format!("`{}`", command.sub_commands.join("`, `"))
+            command.sub_commands.join("`, `")
         );
     }
 

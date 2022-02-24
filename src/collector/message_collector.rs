@@ -186,7 +186,8 @@ impl<'a> MessageCollectorBuilder<'a> {
     /// A message is considered *collected*, if the message
     /// passes all the requirements.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn collect_limit(mut self, limit: u32) -> Self {
+    #[must_use]
+    pub fn collect_limit(mut self, limit: u32) -> Self {
         self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
         self

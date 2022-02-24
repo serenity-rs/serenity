@@ -179,7 +179,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// The filter checks whether the event has the right related guild, channel, user, and message.
     /// Only events with types passed to [`Self::add_event_type`] as counted towards this limit.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn filter_limit(mut self, limit: u32) -> Self {
+    #[must_use]
+    pub fn filter_limit(mut self, limit: u32) -> Self {
         self.filter.as_mut().unwrap().filter_limit = Some(limit);
 
         self
@@ -190,7 +191,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// An event is considered *collected*, if the event
     /// passes all the requirements.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn collect_limit(mut self, limit: u32) -> Self {
+    #[must_use]
+    pub fn collect_limit(mut self, limit: u32) -> Self {
         self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
         self
@@ -201,7 +203,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// process.
     /// This is the last step to pass for a event to count as *collected*.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn filter<F: Fn(&Arc<Event>) -> bool + 'static + Send + Sync>(
+    #[must_use]
+    pub fn filter<F: Fn(&Arc<Event>) -> bool + 'static + Send + Sync>(
         mut self,
         function: F,
     ) -> Self {
@@ -213,7 +216,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Adds an [`EventType`] that this collector will collect.
     /// If an event does not have one of these types, it won't be received.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn add_event_type(mut self, event_type: EventType) -> Self {
+    #[must_use]
+    pub fn add_event_type(mut self, event_type: EventType) -> Self {
         self.filter.as_mut().unwrap().event_types.push(event_type);
 
         self
@@ -222,7 +226,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Sets the required user ID of an event.
     /// If an event does not have this ID, it won't be received.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn add_user_id(mut self, user_id: impl Into<UserId>) -> Self {
+    #[must_use]
+    pub fn add_user_id(mut self, user_id: impl Into<UserId>) -> Self {
         self.filter.as_mut().unwrap().user_id.push(user_id.into());
 
         self
@@ -231,7 +236,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Sets the required channel ID of an event.
     /// If an event does not have this ID, it won't be received.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn add_channel_id(mut self, channel_id: impl Into<ChannelId>) -> Self {
+    #[must_use]
+    pub fn add_channel_id(mut self, channel_id: impl Into<ChannelId>) -> Self {
         self.filter.as_mut().unwrap().channel_id.push(channel_id.into());
 
         self
@@ -240,7 +246,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Sets the required guild ID of an event.
     /// If an event does not have this ID, it won't be received.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn add_guild_id(mut self, guild_id: impl Into<GuildId>) -> Self {
+    #[must_use]
+    pub fn add_guild_id(mut self, guild_id: impl Into<GuildId>) -> Self {
         self.filter.as_mut().unwrap().guild_id.push(guild_id.into());
 
         self
@@ -249,7 +256,8 @@ impl<'a> EventCollectorBuilder<'a> {
     /// Sets the required message ID of an event.
     /// If an event does not have this ID, it won't be received.
     #[allow(clippy::unwrap_used)]
-    #[must_use]pub fn add_message_id(mut self, message_id: impl Into<MessageId>) -> Self {
+    #[must_use]
+    pub fn add_message_id(mut self, message_id: impl Into<MessageId>) -> Self {
         self.filter.as_mut().unwrap().message_id.push(message_id.into());
 
         self
@@ -257,7 +265,8 @@ impl<'a> EventCollectorBuilder<'a> {
 
     /// Sets a `duration` for how long the collector shall receive
     /// events.
-    #[must_use]pub fn timeout(mut self, duration: Duration) -> Self {
+    #[must_use]
+    pub fn timeout(mut self, duration: Duration) -> Self {
         self.timeout = Some(Box::pin(sleep(duration)));
 
         self

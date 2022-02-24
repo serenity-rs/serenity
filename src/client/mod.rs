@@ -373,6 +373,7 @@ impl<'a> ClientBuilder<'a> {
     }
 
     /// Sets an event handler with multiple methods for each possible event. Passed by Arc.
+    #[must_use]
     pub fn event_handler_arc<H: EventHandler + 'static>(
         mut self,
         event_handler_arc: Arc<H>,

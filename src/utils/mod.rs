@@ -502,7 +502,8 @@ impl ContentSafeOptions {
     /// [`content_safe`] will replace role mentions (`<@&{id}>`) with its name
     /// prefixed with `@` (`@rolename`) or with `@deleted-role` if the
     /// identifier is invalid.
-    #[must_use]pub fn clean_role(mut self, b: bool) -> Self {
+    #[must_use]
+    pub fn clean_role(mut self, b: bool) -> Self {
         self.clean_role = b;
 
         self
@@ -511,7 +512,8 @@ impl ContentSafeOptions {
     /// If set to true, [`content_safe`] will replace user mentions
     /// (`<@!{id}>` or `<@{id}>`) with the user's name prefixed with `@`
     /// (`@username`) or with `@invalid-user` if the identifier is invalid.
-    #[must_use]pub fn clean_user(mut self, b: bool) -> Self {
+    #[must_use]
+    pub fn clean_user(mut self, b: bool) -> Self {
         self.clean_user = b;
 
         self
@@ -521,7 +523,8 @@ impl ContentSafeOptions {
     /// (`<#{id}>`) with the channel's name prefixed with `#`
     /// (`#channelname`) or with `#deleted-channel` if the identifier is
     /// invalid.
-    #[must_use]pub fn clean_channel(mut self, b: bool) -> Self {
+    #[must_use]
+    pub fn clean_channel(mut self, b: bool) -> Self {
         self.clean_channel = b;
 
         self
@@ -530,7 +533,8 @@ impl ContentSafeOptions {
     /// If set to true, if [`content_safe`] replaces a user mention it will
     /// add their four digit discriminator with a preceeding `#`,
     /// turning `@username` to `@username#discriminator`.
-    #[must_use]pub fn show_discriminator(mut self, b: bool) -> Self {
+    #[must_use]
+    pub fn show_discriminator(mut self, b: bool) -> Self {
         self.show_discriminator = b;
 
         self
@@ -538,7 +542,8 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace a user mention with the user's
     /// display name in passed `guild`.
-    #[must_use]pub fn display_as_member_from<G: Into<GuildId>>(mut self, guild: G) -> Self {
+    #[must_use]
+    pub fn display_as_member_from<G: Into<GuildId>>(mut self, guild: G) -> Self {
         self.guild_reference = Some(guild.into());
 
         self
@@ -546,7 +551,8 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace `@here` with a non-pinging
     /// alternative.
-    #[must_use]pub fn clean_here(mut self, b: bool) -> Self {
+    #[must_use]
+    pub fn clean_here(mut self, b: bool) -> Self {
         self.clean_here = b;
 
         self
@@ -554,7 +560,8 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace `@everyone` with a non-pinging
     /// alternative.
-    #[must_use]pub fn clean_everyone(mut self, b: bool) -> Self {
+    #[must_use]
+    pub fn clean_everyone(mut self, b: bool) -> Self {
         self.clean_everyone = b;
 
         self
