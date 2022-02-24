@@ -43,4 +43,34 @@ impl EditGroup {
         self.0.insert("name", Value::Null);
         self
     }
+
+    /// Set the icon of the group. Pass [`None`] to remove the icon.
+    ///
+    /// # Examples
+    ///
+    /// Using the utility function - [`utils::read_image`] - to read an image
+    /// from the cwd and encode it in base64 to send to Discord.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::{http::Http, model::Group};
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// #     let mut group: Group = todo!();
+    /// use serenity::utils;
+    ///
+    /// // assuming a `guild` has already been bound
+    ///
+    /// let base64_icon = utils::read_image("./group_icon.png")?;
+    ///
+    /// group.edit(&http, |mut g| g.icon(Some(&base64_icon))).await?;
+    /// #     Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`utils::read_image`]: crate::utils::read_image
+    pub fn icon(&mut self, icon: Option<&str>) -> &mut Self {
+        self.0.insert("icon", icon.map_or_else(|| Value::Null, |x| Value::String(x.to_string())));
+        self
+    }
 }
