@@ -318,16 +318,12 @@ impl Http {
         delete_message_days: u8,
         reason: &str,
     ) -> Result<()> {
-        // Audit log reason and normal ban reason are mutually exclusive so we don't need the audit
-        // log reason parameter here
-
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: None,
+            headers: Some(reason_into_header(reason)),
             route: RouteInfo::GuildBanUser {
                 delete_message_days: Some(delete_message_days),
-                reason: Some(&utf8_percent_encode(reason, NON_ALPHANUMERIC).to_string()),
                 guild_id,
                 user_id,
             },
@@ -3378,7 +3374,7 @@ impl Http {
 
     /// Kicks a member from a guild.
     pub async fn kick_member(&self, guild_id: u64, user_id: u64) -> Result<()> {
-        self.kick_member_with_reason(guild_id, user_id, "", None).await
+        self.kick_member_with_reason(guild_id, user_id, "").await
     }
 
     /// Kicks a member from a guild with a provided reason.
@@ -3387,16 +3383,14 @@ impl Http {
         guild_id: u64,
         user_id: u64,
         reason: &str,
-        audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(204, Request {
             body: None,
             multipart: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: Some(reason_into_header(reason)),
             route: RouteInfo::KickMember {
                 guild_id,
                 user_id,
-                reason: &utf8_percent_encode(reason, NON_ALPHANUMERIC).to_string(),
             },
         })
         .await

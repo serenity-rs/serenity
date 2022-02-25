@@ -6,6 +6,7 @@ use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
 use crate::json::{self, from_number};
 use crate::model::channel::{AttachmentType, MessageFlags};
+use crate::model::id::AttachmentId;
 
 /// A builder to specify the fields to edit in an existing message.
 ///
@@ -155,6 +156,45 @@ impl<'a> EditMessage<'a> {
     /// This can be called multiple times.
     pub fn attachment(&mut self, attachment: impl Into<AttachmentType<'a>>) -> &mut Self {
         self.1.push(attachment.into());
+        self
+    }
+
+    /// Add an existing attachment by id.
+    pub fn add_existing_attachment(&mut self, attachment: AttachmentId) -> &mut Self {
+        let attachments =
+            self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
+        let mut map = HashMap::new();
+        map.insert("id", Value::from(attachment.to_string()));
+        attachments_array.push(Value::from(json::hashmap_to_json_map(map)));
+
+        self
+    }
+
+    /// Remove an existing attachment by id.
+    pub fn remove_existing_attachment(&mut self, attachment: AttachmentId) -> &mut Self {
+        let attachments =
+            self.0.entry("attachments").or_insert_with(|| Value::from(Vec::<Value>::new()));
+        let attachments_array = attachments.as_array_mut().expect("Attachments must be an array");
+        let attachment_string = attachment.to_string();
+        let mut found_at = None;
+        for (index, value) in attachments_array.iter().enumerate() {
+            if attachment_string
+                == value
+                    .as_object()
+                    .expect("Attachments must be an array of objects")
+                    .get("id")
+                    .expect("Attachments must be an array of objects containing ids")
+                    .as_str()
+                    .expect("Attachments must be an array of objects containing string ids")
+            {
+                found_at = Some(index);
+            }
+        }
+        if let Some(index) = found_at {
+            attachments_array.remove(index);
+        }
+
         self
     }
 }

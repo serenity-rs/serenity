@@ -682,23 +682,12 @@ impl Route {
         api!("/guilds/{}/bans/{}", guild_id, user_id)
     }
 
-    pub fn guild_ban_optioned(
-        guild_id: u64,
-        user_id: u64,
-        delete_message_days: u8,
-        reason: &str,
-    ) -> String {
-        api!(
-            "/guilds/{}/bans/{}?delete_message_days={}&reason={}",
-            guild_id,
-            user_id,
-            delete_message_days,
-            reason,
-        )
+    pub fn guild_ban_optioned(guild_id: u64, user_id: u64, delete_message_days: u8) -> String {
+        api!("/guilds/{}/bans/{}?delete_message_days={}", guild_id, user_id, delete_message_days)
     }
 
-    pub fn guild_kick_optioned(guild_id: u64, user_id: u64, reason: &str) -> String {
-        api!("/guilds/{}/members/{}?reason={}", guild_id, user_id, reason)
+    pub fn guild_kick_optioned(guild_id: u64, user_id: u64) -> String {
+        api!("/guilds/{}/members/{}", guild_id, user_id)
     }
 
     pub fn guild_bans(guild_id: u64) -> String {
@@ -1042,7 +1031,6 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         user_id: u64,
         delete_message_days: Option<u8>,
-        reason: Option<&'a str>,
     },
     BroadcastTyping {
         channel_id: u64,
@@ -1535,7 +1523,6 @@ pub enum RouteInfo<'a> {
     KickMember {
         guild_id: u64,
         user_id: u64,
-        reason: &'a str,
     },
     LeaveGroup {
         group_id: u64,
@@ -1593,7 +1580,6 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::GuildBanUser {
                 guild_id,
                 delete_message_days,
-                reason,
                 user_id,
             } => (
                 // TODO
@@ -1603,7 +1589,6 @@ impl<'a> RouteInfo<'a> {
                     guild_id,
                     user_id,
                     delete_message_days.unwrap_or(0),
-                    reason.unwrap_or(""),
                 )),
             ),
             RouteInfo::BroadcastTyping {
@@ -2622,11 +2607,10 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::KickMember {
                 guild_id,
                 user_id,
-                reason,
             } => (
                 LightMethod::Delete,
                 Route::GuildsIdMembersId(guild_id),
-                Cow::from(Route::guild_kick_optioned(guild_id, user_id, reason)),
+                Cow::from(Route::guild_kick_optioned(guild_id, user_id)),
             ),
             RouteInfo::LeaveGroup {
                 group_id,
