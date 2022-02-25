@@ -329,6 +329,7 @@ pub enum ChannelType {
     /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
     /// An indicator that the channel is a forum [`GuildChannel`].
+    #[cfg(feature = "unstable_discord_api")]
     Forum = 15,
     /// An indicator that the channel is of unknown type.
     Unknown = !0,
@@ -345,6 +346,7 @@ enum_number!(ChannelType {
     PublicThread,
     PrivateThread,
     Stage,
+    #[cfg(feature = "unstable_discord_api")]
     Forum,
 });
 
@@ -362,6 +364,7 @@ impl ChannelType {
             ChannelType::PublicThread => "public_thread",
             ChannelType::PrivateThread => "private_thread",
             ChannelType::Stage => "stage",
+            #[cfg(feature = "unstable_discord_api")]
             ChannelType::Forum => "forum",
             ChannelType::Unknown => "unknown",
         }

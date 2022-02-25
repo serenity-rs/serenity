@@ -43,7 +43,7 @@ macro_rules! feature_cache {
 }
 
 macro_rules! enum_number {
-    ($name:ident { $($variant:ident $(,)? )* }) => {
+    ($name:ident { $($(#[$attr:meta])? $variant:ident $(,)? )* }) => {
         impl $name {
             #[inline]
             pub fn num(&self) -> u64 {
@@ -80,7 +80,7 @@ macro_rules! enum_number {
                         // Rust does not come with a simple way of converting a
                         // number to an enum, so use a big `match`.
                         match value {
-                            $( v if v == $name::$variant as u64 => Ok($name::$variant), )*
+                            $( $(#[$attr])? v if v == $name::$variant as u64 => Ok($name::$variant), )*
                             _ => {
                                 tracing::warn!("Unknown {} value: {}", stringify!($name), value);
 
