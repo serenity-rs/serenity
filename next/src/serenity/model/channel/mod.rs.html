@@ -1011,8 +1011,8 @@
         <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
         <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">kind</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">PermissionOverwriteType::Role</span>(<span class="ident">id</span>) =&gt; (<span class="ident">id</span>.<span class="number">0</span>, <span class="number">0</span>),
-            <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">id</span>) =&gt; (<span class="ident">id</span>.<span class="number">0</span>, <span class="number">1</span>),
+            <span class="ident">PermissionOverwriteType::Role</span>(<span class="ident">id</span>) =&gt; (<span class="ident">GenericId</span>(<span class="ident">id</span>.<span class="number">0</span>), <span class="number">0</span>),
+            <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">id</span>) =&gt; (<span class="ident">GenericId</span>(<span class="ident">id</span>.<span class="number">0</span>), <span class="number">1</span>),
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_struct</span>(<span class="string">&quot;PermissionOverwrite&quot;</span>, <span class="number">4</span>)<span class="question-mark">?</span>;
