@@ -404,8 +404,8 @@ impl Serialize for PermissionOverwrite {
         S: Serializer,
     {
         let (id, kind) = match self.kind {
-            PermissionOverwriteType::Role(id) => (id.0, 0),
-            PermissionOverwriteType::Member(id) => (id.0, 1),
+            PermissionOverwriteType::Role(id) => (GenericId(id.0), 0),
+            PermissionOverwriteType::Member(id) => (GenericId(id.0), 1),
         };
 
         let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
