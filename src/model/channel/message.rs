@@ -350,6 +350,10 @@ impl Message {
         let embeds: Vec<_> = self.embeds.iter().map(|e| CreateEmbed::from(e.clone())).collect();
         builder.set_embeds(embeds);
 
+        for attachment in &self.attachments {
+            builder.add_existing_attachment(attachment.id);
+        }
+
         f(&mut builder);
 
         let map = json::hashmap_to_json_map(builder.0);

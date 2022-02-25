@@ -63,6 +63,5 @@ pub struct IntegrationApplication {
     pub name: String,
     pub icon: Option<String>,
     pub description: String,
-    pub summary: String,
     pub bot: Option<User>,
 }

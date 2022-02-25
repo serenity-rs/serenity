@@ -668,6 +668,10 @@ bitflags! {
         ///
         /// - TYPING_START
         const DIRECT_MESSAGE_TYPING = 1 << 14;
+        /// Enable message content in following gateway events:
+        ///
+        /// - MESSAGE_CREATE
+        const MESSAGE_CONTENT = 1 << 15;
     }
 }
 
