@@ -8,7 +8,7 @@ pub use std::result::Result as StdResult;
 
 pub use serde_json::{Map, Number};
 #[cfg(feature = "simd-json")]
-pub use simd_json::{Mutable, Value as ValueTrait};
+pub use simd_json::{Mutable, Value as ValueTrait, ValueAccess};
 
 #[cfg(feature = "client")]
 pub use crate::client::ClientError;

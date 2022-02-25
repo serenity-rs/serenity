@@ -882,7 +882,7 @@ impl GuildId {
         user_id: impl Into<UserId>,
         reason: &str,
     ) -> Result<()> {
-        http.as_ref().kick_member_with_reason(self.0, user_id.into().0, reason, None).await
+        http.as_ref().kick_member_with_reason(self.0, user_id.into().0, reason).await
     }
 
     /// Leaves the guild.
