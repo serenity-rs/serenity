@@ -1268,6 +1268,10 @@
 <span id="1263">1263</span>
 <span id="1264">1264</span>
 <span id="1265">1265</span>
+<span id="1266">1266</span>
+<span id="1267">1267</span>
+<span id="1268">1268</span>
+<span id="1269">1269</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1614,6 +1618,10 @@
 
         <span class="kw">let</span> <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CreateEmbed::from</span>(<span class="ident">e</span>.<span class="ident">clone</span>())).<span class="ident">collect</span>();
         <span class="ident">builder</span>.<span class="ident">set_embeds</span>(<span class="ident">embeds</span>);
+
+        <span class="kw">for</span> <span class="ident">attachment</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attachments</span> {
+            <span class="ident">builder</span>.<span class="ident">add_existing_attachment</span>(<span class="ident">attachment</span>.<span class="ident">id</span>);
+        }
 
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">builder</span>);
 
@@ -2534,5 +2542,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (03a8cc7df 2022-02-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4b043faba 2022-02-24)" ></div>
 </body></html>
