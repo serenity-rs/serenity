@@ -315,7 +315,7 @@ impl Group {
     /// # use serenity::{
     /// #    cache::Cache,
     /// #    http::{Http, Typing},
-    /// #    model::{ModelError, channel::Group, id::ChannelId},
+    /// #    model::{ModelError, channel::{Group,Channel}, id::ChannelId},
     /// #    Result,
     /// # };
     /// # use std::sync::Arc;
@@ -323,9 +323,13 @@ impl Group {
     /// # fn long_process() {}
     /// # let http = Arc::new(Http::default());
     /// # let cache = Cache::default();
-    /// # let group = cache
-    /// #    .group(ChannelId(7))
+    /// # let channel = cache
+    /// #    .channel(ChannelId(7))
     /// #    .await.ok_or(ModelError::ItemMissing)?;
+    /// # let group = match channel {
+    /// #     Channel::Group(g) => g,
+    /// #     _ => panic!("channel not a group"),
+    /// # };
     /// // Initiate typing (assuming http is `Arc<Http>` and `group` is bound)
     /// let typing = group.start_typing(&http)?;
     ///

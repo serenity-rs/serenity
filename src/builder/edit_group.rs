@@ -52,7 +52,7 @@ impl EditGroup {
     /// from the cwd and encode it in base64 to send to Discord.
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::Http, model::Group};
+    /// # use serenity::{http::Http, model::channel::Group};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
