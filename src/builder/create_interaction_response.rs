@@ -176,7 +176,7 @@ impl CreateInteractionResponseData {
         self
     }
 
-    /// Sets the titel for modal interactions
+    /// Sets the title for modal interactions
     pub fn title<D: ToString>(&mut self, title: D) -> &mut Self {
         self.0.insert("title", Value::String(title.to_string()));
         self
