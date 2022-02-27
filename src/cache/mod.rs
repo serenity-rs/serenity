@@ -1030,7 +1030,20 @@ impl Default for Cache {
         Cache {
             private_channels: RwLock::new(HashMap::with_capacity(128)),
             shard_count: RwLock::new(1),
-            ..Default::default()
+            categories: Default::default(),
+            channels: Default::default(),
+            groups: Default::default(),
+            guild_settings: Default::default(),
+            guilds: Default::default(),
+            message_queue: Default::default(),
+            messages: Default::default(),
+            presences: Default::default(),
+            relationships: Default::default(),
+            settings: Default::default(),
+            unavailable_guilds: Default::default(),
+            user: Default::default(),
+            user_settings: Default::default(),
+            users: Default::default(),
         }
     }
 }
