@@ -528,7 +528,7 @@ impl ContentSafeOptions {
     }
 
     /// If set to true, if [`content_safe`] replaces a user mention it will
-    /// add their four digit discriminator with a preceeding `#`,
+    /// add their four digit discriminator with a preceding `#`,
     /// turning `@username` to `@username#discriminator`.
     pub fn show_discriminator(mut self, b: bool) -> Self {
         self.show_discriminator = b;

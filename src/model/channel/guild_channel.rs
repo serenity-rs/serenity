@@ -167,7 +167,7 @@ impl GuildChannel {
 
     /// Creates an invite leading to the given channel.
     ///
-    /// **Note**: Requres the [Create Invite] permission.
+    /// **Note**: Requires the [Create Invite] permission.
     ///
     /// # Examples
     ///
@@ -304,7 +304,7 @@ impl GuildChannel {
 
     /// Deletes this channel, returning the channel on a successful deletion.
     ///
-    /// **Note**: Requres the [Manage Channels] permission.
+    /// **Note**: Requires the [Manage Channels] permission.
     ///
     /// # Errors
     ///

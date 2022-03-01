@@ -229,7 +229,7 @@ impl Channel {
     pub fn position(&self) -> Option<i64> {
         match self {
             Channel::Guild(channel) => Some(channel.position),
-            Channel::Category(catagory) => Some(catagory.position),
+            Channel::Category(category) => Some(category.position),
             _ => None,
         }
     }

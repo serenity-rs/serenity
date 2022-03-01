@@ -127,7 +127,7 @@ pub struct Message {
     #[serde(default)]
     pub stickers: Vec<Sticker>,
     /// The message that was replied to using this message.
-    pub referenced_message: Option<Box<Message>>, // Boxed to avoid recusion
+    pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
     /// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::interactions::Interaction

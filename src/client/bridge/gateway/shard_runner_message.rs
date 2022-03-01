@@ -57,7 +57,7 @@ pub enum ShardRunnerMessage {
     /// Indicates that the client is to update the shard's presence's activity.
     SetActivity(Option<Activity>),
     /// Indicates that the client is to update the shard's presence in its
-    /// entirity.
+    /// entirety.
     SetPresence(OnlineStatus, Option<Activity>),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),

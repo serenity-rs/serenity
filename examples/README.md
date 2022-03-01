@@ -33,7 +33,7 @@ To run an example, you have various options:
     5 => Command Framework: The main example, where it's demonstrated how to use serenity's command framework,
     along with most of its utilities.
     This example also shows how to share data between events and commands, using `Context.data`
-    6 => Simple Bot Stucture: An example showing the recommended file structure to use.
+    6 => Simple Bot Structure: An example showing the recommended file structure to use.
     7 => Env Logging: How to use the tracing crate along with serenity.
     8 => Shard Manager: How to get started with using the shard manager.
     9 => Create Message Builder: How to send embeds and files.

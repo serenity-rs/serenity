@@ -213,7 +213,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// # Examples
     ///
-    /// Supressing an embed on the message.
+    /// Suppressing an embed on the message.
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
