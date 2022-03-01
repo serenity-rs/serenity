@@ -6,7 +6,7 @@ use serde::ser::{Serialize, Serializer};
 mod change;
 mod utils;
 
-pub use change::{AffectedRole, Change};
+pub use change::{AffectedRole, Change, EntityType};
 use utils::{entries, optional_string};
 
 use crate::model::prelude::*;

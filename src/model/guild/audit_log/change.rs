@@ -17,9 +17,18 @@ use crate::model::sticker::StickerFormatType;
 use crate::model::{Permissions, Timestamp};
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct AffectedRole {
     pub id: RoleId,
     pub name: String,
+}
+
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+#[non_exhaustive]
+pub enum EntityType {
+    Int(u64),
+    Str(String),
 }
 
 #[derive(Debug, PartialEq)]
@@ -336,8 +345,8 @@ pub enum Change {
     },
     /// Type of a created entity.
     Type {
-        old: Option<u64>,
-        new: Option<u64>,
+        old: Option<EntityType>,
+        new: Option<EntityType>,
     },
     /// Unicode emoji of a role icon was changed.
     UnicodeEmoji {
@@ -708,7 +717,7 @@ impl<'de> Visitor<'de> for ChangeVisitor {
             Tags: String,
             Temporary: bool,
             Topic: String,
-            Type: u64,
+            Type: EntityType,
             UnicodeEmoji: String,
             UserLimit: u64,
             Uses: u64,
@@ -880,6 +889,29 @@ mod tests {
                 name: "ChannelId",
             },
             Token::Str("1"),
+            Token::StructEnd,
+        ]);
+    }
+
+    #[test]
+    fn entity_type_variant() {
+        let value = Change::Type {
+            old: Some(EntityType::Int(123)),
+            new: Some(EntityType::Str("discord".into())),
+        };
+        assert_tokens(&value, &[
+            Token::Struct {
+                name: "Change",
+                len: 3,
+            },
+            Token::Str("key"),
+            Token::Str("type"),
+            Token::Str("old_value"),
+            Token::Some,
+            Token::U64(123),
+            Token::Str("new_value"),
+            Token::Some,
+            Token::Str("discord"),
             Token::StructEnd,
         ]);
     }
