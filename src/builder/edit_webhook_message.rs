@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use super::CreateAllowedMentions;
+#[cfg(feature = "unstable_discord_api")]
+use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
 use crate::json;
 
@@ -49,6 +51,19 @@ impl EditWebhookMessage {
         let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn components<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
+    {
+        let mut components = CreateComponents::default();
+        f(&mut components);
+
+        self.0.insert("components", Value::from(components.0));
         self
     }
 }
