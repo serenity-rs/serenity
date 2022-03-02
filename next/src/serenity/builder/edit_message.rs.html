@@ -203,9 +203,30 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateEmbed</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateEmbed</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
@@ -337,7 +358,21 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the components of this message.</span>
+    <span class="doccomment">/// Set the allowed mentions for the message.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowed_mentions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateAllowedMentions</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateAllowedMentions</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">CreateAllowedMentions::default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">allowed_mentions</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">json::hashmap_to_json_map</span>(<span class="ident">allowed_mentions</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">allowed_mentions</span> <span class="op">=</span> <span class="ident">Value::from</span>(<span class="ident">map</span>);
+
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;allowed_mentions&quot;</span>, <span class="ident">allowed_mentions</span>);
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Creates components for this message.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
@@ -346,6 +381,13 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">components</span> <span class="op">=</span> <span class="ident">CreateComponents::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">components</span>);
 
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets the components of this message.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_components</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
         <span class="self">self</span>
     }
@@ -404,5 +446,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

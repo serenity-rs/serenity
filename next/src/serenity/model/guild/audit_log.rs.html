@@ -321,6 +321,11 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">mem::transmute</span>};
 
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="self">self</span>, <span class="ident">Deserializer</span>};
@@ -330,7 +335,7 @@
 <span class="kw">mod</span> <span class="ident">utils</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">change</span>::{<span class="ident">AffectedRole</span>, <span class="ident">Change</span>, <span class="ident">EntityType</span>};
-<span class="kw">use</span> <span class="ident">utils</span>::{<span class="ident">entries</span>, <span class="ident">optional_string</span>};
+<span class="kw">use</span> <span class="ident">utils</span>::{<span class="ident">optional_string</span>, <span class="ident">users</span>, <span class="ident">webhooks</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
@@ -526,10 +531,12 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogs</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;entries&quot;</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;audit_log_entries&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">AuditLogEntryId</span>, <span class="ident">AuditLogEntry</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">webhooks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;audit_log_entries&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuditLogEntry</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;users&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">users</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;webhooks&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">webhooks</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">WebhookId</span>, <span class="ident">Webhook</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -574,6 +581,9 @@
     <span class="doccomment">/// Type of overwritten entity (&quot;member&quot; or &quot;role&quot;).</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Message that was pinned or unpinned.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Name of the role if type is &quot;role&quot;</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">role_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -640,5 +650,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

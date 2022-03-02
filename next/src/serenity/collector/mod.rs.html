@@ -53,6 +53,10 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Collectors will receive events from the contextual shard, check if the</span>
 <span class="doccomment">//! filter lets them pass, and collects if the receive, collect, or time limits</span>
 <span class="doccomment">//! are not reached yet.</span>
@@ -66,12 +70,16 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">component_interaction_collector</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event_collector</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_collector</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">modal_interaction_collector</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reaction_collector</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">component_interaction_collector</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">event_collector</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">message_collector</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">modal_interaction_collector</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reaction_collector</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Wraps a &amp;T and clones the value into an Arc&lt;T&gt; lazily. Used with collectors to allow inspecting</span>
@@ -104,5 +112,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

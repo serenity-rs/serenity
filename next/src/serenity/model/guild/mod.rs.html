@@ -3145,6 +3145,25 @@
 <span id="3140">3140</span>
 <span id="3141">3141</span>
 <span id="3142">3142</span>
+<span id="3143">3143</span>
+<span id="3144">3144</span>
+<span id="3145">3145</span>
+<span id="3146">3146</span>
+<span id="3147">3147</span>
+<span id="3148">3148</span>
+<span id="3149">3149</span>
+<span id="3150">3150</span>
+<span id="3151">3151</span>
+<span id="3152">3152</span>
+<span id="3153">3153</span>
+<span id="3154">3154</span>
+<span id="3155">3155</span>
+<span id="3156">3156</span>
+<span id="3157">3157</span>
+<span id="3158">3158</span>
+<span id="3159">3159</span>
+<span id="3160">3160</span>
+<span id="3161">3161</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -3183,6 +3202,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
+    <span class="ident">AddMember</span>,
     <span class="ident">CreateChannel</span>,
     <span class="ident">CreateSticker</span>,
     <span class="ident">EditGuild</span>,
@@ -3604,6 +3624,24 @@
         }
 
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">bans</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>()).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Adds a [`User`] to this guild with a valid OAuth2 access token.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns the created [`Member`] object, or nothing if the user is already a member of the guild.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission,</span>
+    <span class="doccomment">/// or if invalid values are set.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">add_member</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">AddMember</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">AddMember</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">add_member</span>(<span class="ident">http</span>, <span class="ident">user_id</span>, <span class="ident">f</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Retrieves a list of [`AuditLogs`] for the guild.</span>
@@ -6288,5 +6326,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

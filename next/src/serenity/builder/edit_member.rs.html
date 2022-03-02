@@ -236,7 +236,7 @@
     <span class="doccomment">/// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_communication_until</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">String</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;communication_disabled_until&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">time</span>));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;communication_disabled_until&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">time</span>));
         <span class="self">self</span>
     }
 
@@ -248,7 +248,7 @@
     <span class="doccomment">/// [Moderate Members]: crate::model::permissions::Permissions::MODERATE_MEMBERS</span>
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_communication_until_datetime</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Timestamp</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;communication_disabled_until&quot;</span>, <span class="ident">Value::String</span>(<span class="ident">time</span>.<span class="ident">to_string</span>()));
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;communication_disabled_until&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">time</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
     }
 
@@ -264,5 +264,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

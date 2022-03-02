@@ -105,6 +105,9 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
 <span class="doccomment">//!</span>
@@ -120,6 +123,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">create_application_command_permission</span>;
 
+<span class="kw">mod</span> <span class="ident">add_member</span>;
 <span class="kw">mod</span> <span class="ident">bot_auth_parameters</span>;
 <span class="kw">mod</span> <span class="ident">create_allowed_mentions</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -152,6 +156,7 @@
 <span class="kw">mod</span> <span class="ident">get_messages</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
+    <span class="ident">add_member::AddMember</span>,
     <span class="ident">bot_auth_parameters::CreateBotAuthParameters</span>,
     <span class="ident">create_allowed_mentions::CreateAllowedMentions</span>,
     <span class="ident">create_allowed_mentions::ParseValue</span>,
@@ -195,6 +200,7 @@
         <span class="ident">CreateActionRow</span>,
         <span class="ident">CreateButton</span>,
         <span class="ident">CreateComponents</span>,
+        <span class="ident">CreateInputText</span>,
         <span class="ident">CreateSelectMenu</span>,
         <span class="ident">CreateSelectMenuOption</span>,
         <span class="ident">CreateSelectMenuOptions</span>,
@@ -208,5 +214,5 @@
     <span class="ident">edit_interaction_response::EditInteractionResponse</span>,
 };
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

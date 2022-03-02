@@ -582,6 +582,41 @@
 <span id="577">577</span>
 <span id="578">578</span>
 <span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
@@ -1011,13 +1046,15 @@
     <span class="ident">ActionRow</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="ident">Button</span> <span class="op">=</span> <span class="number">2</span>,
     <span class="ident">SelectMenu</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">InputText</span> <span class="op">=</span> <span class="number">4</span>,
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
 <span class="macro">enum_number!</span>(<span class="ident">ComponentType</span> {
     <span class="ident">ActionRow</span>,
     <span class="ident">Button</span>,
-    <span class="ident">SelectMenu</span>
+    <span class="ident">SelectMenu</span>,
+    <span class="ident">InputText</span>
 });
 
 <span class="doccomment">/// An action row.</span>
@@ -1037,6 +1074,7 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionRowComponent</span> {
     <span class="ident">Button</span>(<span class="ident">Button</span>),
     <span class="ident">SelectMenu</span>(<span class="ident">SelectMenu</span>),
+    <span class="ident">InputText</span>(<span class="ident">InputText</span>),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ActionRowComponent</span> {
@@ -1056,6 +1094,9 @@
             <span class="ident">ComponentType::SelectMenu</span> =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">SelectMenu</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))
                 .<span class="ident">map</span>(<span class="ident">ActionRowComponent::SelectMenu</span>)
                 .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
+            <span class="ident">ComponentType::InputText</span> =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">InputText</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))
+                .<span class="ident">map</span>(<span class="ident">ActionRowComponent::InputText</span>)
+                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown component type&quot;</span>)),
         }
     }
@@ -1069,6 +1110,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">ActionRowComponent::Button</span>(<span class="ident">c</span>) =&gt; <span class="ident">Button::serialize</span>(<span class="ident">c</span>, <span class="ident">serializer</span>),
             <span class="ident">ActionRowComponent::SelectMenu</span>(<span class="ident">c</span>) =&gt; <span class="ident">SelectMenu::serialize</span>(<span class="ident">c</span>, <span class="ident">serializer</span>),
+            <span class="ident">ActionRowComponent::InputText</span>(<span class="ident">c</span>) =&gt; <span class="ident">InputText::serialize</span>(<span class="ident">c</span>, <span class="ident">serializer</span>),
         }
     }
 }
@@ -1161,6 +1203,34 @@
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">default</span>: <span class="ident">bool</span>,
 }
+
+<span class="doccomment">/// An input text component for modal interactions</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InputText</span> {
+    <span class="doccomment">/// The component type, it will always be [`ComponentType::InputText`].</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ComponentType</span>,
+    <span class="doccomment">/// An identifier defined by the developer for the select menu.</span>
+    <span class="kw">pub</span> <span class="ident">custom_id</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The input from the user</span>
+    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">String</span>,
+}
+
+<span class="doccomment">/// The style of the input text</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InputTextStyle</span> {
+    <span class="ident">Short</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">Paragraph</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
+}
+
+<span class="macro">enum_number!</span>(<span class="ident">InputTextStyle</span> {
+    <span class="ident">Short</span>,
+    <span class="ident">Paragraph</span>,
+    <span class="ident">Unknown</span>
+});
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

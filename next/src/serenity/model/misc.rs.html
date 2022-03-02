@@ -647,7 +647,7 @@
             <span class="ident">MentionableImpl::User</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
             <span class="ident">MentionableImpl::Role</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@&amp;{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
             <span class="ident">MentionableImpl::Emoji</span>(<span class="ident">id</span>, <span class="ident">animated</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;{}:_:{}&gt;&quot;</span>, <span class="kw">if</span> <span class="ident">animated</span> { <span class="string">&quot;a&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }, <span class="ident">id</span>.<span class="number">0</span>,))
+                <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;{}:omitted:{}&gt;&quot;</span>, <span class="kw">if</span> <span class="ident">animated</span> { <span class="string">&quot;a&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> }, <span class="ident">id</span>.<span class="number">0</span>,))
             },
         }
     }
@@ -993,7 +993,7 @@
 
             <span class="macro">assert_eq!</span>(<span class="ident">ChannelId</span>(<span class="number">1</span>).<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;#1&gt;&quot;</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">channel</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;#4&gt;&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">emoji</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;:_:5&gt;&quot;</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">emoji</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;:omitted:5&gt;&quot;</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">member</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@6&gt;&quot;</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">role</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@&amp;2&gt;&quot;</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">role</span>.<span class="ident">id</span>.<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;@&amp;2&gt;&quot;</span>);
@@ -1014,5 +1014,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

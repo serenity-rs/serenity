@@ -222,14 +222,31 @@
 <span id="217">217</span>
 <span id="218">218</span>
 <span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">application_command</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">autocomplete</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message_component</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">modal</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ping</span>;
 
 <span class="kw">use</span> <span class="ident">application_command::ApplicationCommandInteraction</span>;
 <span class="kw">use</span> <span class="ident">autocomplete::AutocompleteInteraction</span>;
 <span class="kw">use</span> <span class="ident">message_component::MessageComponentInteraction</span>;
+<span class="kw">use</span> <span class="ident">modal::ModalSubmitInteraction</span>;
 <span class="kw">use</span> <span class="ident">ping::PingInteraction</span>;
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
@@ -244,6 +261,7 @@
     <span class="ident">ApplicationCommand</span>(<span class="ident">ApplicationCommandInteraction</span>),
     <span class="ident">MessageComponent</span>(<span class="ident">MessageComponentInteraction</span>),
     <span class="ident">Autocomplete</span>(<span class="ident">AutocompleteInteraction</span>),
+    <span class="ident">ModalSubmit</span>(<span class="ident">ModalSubmitInteraction</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Interaction</span> {
@@ -254,6 +272,7 @@
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
             <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
+            <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">id</span>,
         }
     }
 
@@ -264,6 +283,7 @@
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::ApplicationCommand</span>,
             <span class="ident">Interaction::MessageComponent</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::MessageComponent</span>,
             <span class="ident">Interaction::Autocomplete</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::Autocomplete</span>,
+            <span class="ident">Interaction::ModalSubmit</span>(<span class="kw">_</span>) =&gt; <span class="ident">InteractionType::ModalSubmit</span>,
         }
     }
 
@@ -274,6 +294,7 @@
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
             <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
+            <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">application_id</span>,
         }
     }
 
@@ -284,6 +305,7 @@
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
             <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
+            <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">token</span>.<span class="ident">as_str</span>(),
         }
     }
 
@@ -294,6 +316,7 @@
             <span class="ident">Interaction::ApplicationCommand</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_locale</span>.<span class="ident">as_deref</span>(),
             <span class="ident">Interaction::MessageComponent</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_locale</span>.<span class="ident">as_deref</span>(),
             <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_locale</span>.<span class="ident">as_deref</span>(),
+            <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">guild_locale</span>.<span class="ident">as_deref</span>(),
         }
     }
 
@@ -359,6 +382,9 @@
                     .<span class="ident">map</span>(<span class="ident">Interaction::Autocomplete</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)
             },
+            <span class="ident">InteractionType::ModalSubmit</span> =&gt; <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">ModalSubmitInteraction</span><span class="op">&gt;</span>(<span class="ident">Value::from</span>(<span class="ident">map</span>))
+                .<span class="ident">map</span>(<span class="ident">Interaction::ModalSubmit</span>)
+                .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>),
             <span class="ident">InteractionType::Unknown</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DeError::custom</span>(<span class="string">&quot;Unknown interaction type&quot;</span>)),
         }
     }
@@ -378,6 +404,7 @@
                 <span class="ident">MessageComponentInteraction::serialize</span>(<span class="ident">i</span>, <span class="ident">serializer</span>)
             },
             <span class="ident">Interaction::Autocomplete</span>(<span class="ident">i</span>) =&gt; <span class="ident">AutocompleteInteraction::serialize</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
+            <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">ModalSubmitInteraction::serialize</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
         }
     }
 }
@@ -391,6 +418,7 @@
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">2</span>,
     <span class="ident">MessageComponent</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">ModalSubmit</span> <span class="op">=</span> <span class="number">5</span>,
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>,
 }
 
@@ -398,7 +426,8 @@
     <span class="ident">Ping</span>,
     <span class="ident">MessageComponent</span>,
     <span class="ident">ApplicationCommand</span>,
-    <span class="ident">Autocomplete</span>
+    <span class="ident">Autocomplete</span>,
+    <span class="ident">ModalSubmit</span>
 });
 
 <span class="macro">bitflags!</span> {
@@ -440,7 +469,8 @@
     <span class="ident">DeferredUpdateMessage</span> <span class="op">=</span> <span class="number">6</span>,
     <span class="ident">UpdateMessage</span> <span class="op">=</span> <span class="number">7</span>,
     <span class="ident">Autocomplete</span> <span class="op">=</span> <span class="number">8</span>,
+    <span class="ident">Modal</span> <span class="op">=</span> <span class="number">9</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>

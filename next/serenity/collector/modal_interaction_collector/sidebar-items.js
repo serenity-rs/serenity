@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["CollectModalInteraction",""],["ModalInteractionCollector","A modal interaction collector receives interactions matching a the given filter for a set duration."],["ModalInteractionCollectorBuilder",""],["ModalInteractionFilter","Filters events on the shard’s end and sends them to the collector."]]});

@@ -1272,6 +1272,29 @@
 <span id="1267">1267</span>
 <span id="1268">1268</span>
 <span id="1269">1269</span>
+<span id="1270">1270</span>
+<span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
+<span id="1292">1292</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1289,7 +1312,12 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectComponentInteraction</span>, <span class="ident">ComponentInteractionCollectorBuilder</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
+    <span class="ident">CollectComponentInteraction</span>,
+    <span class="ident">CollectModalInteraction</span>,
+    <span class="ident">ComponentInteractionCollectorBuilder</span>,
+    <span class="ident">ModalInteractionCollectorBuilder</span>,
+};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectReaction</span>, <span class="ident">ReactionCollectorBuilder</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2180,6 +2208,24 @@
         <span class="ident">ComponentInteractionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">message_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
+    <span class="doccomment">/// Await a single modal submit interaction on this message.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_modal_interaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">CollectModalInteraction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">CollectModalInteraction::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">message_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of modal submit interactions on this message.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_modal_interactions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">ModalInteractionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">ModalInteractionCollectorBuilder::new</span>(<span class="ident">shard_messenger</span>).<span class="ident">message_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
+    }
+
     <span class="doccomment">/// Retrieves the message channel&#39;s category ID if the channel has one.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span> {
@@ -2542,5 +2588,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (4ce374923 2022-02-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>
