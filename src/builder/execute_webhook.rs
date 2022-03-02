@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use super::CreateAllowedMentions;
+#[cfg(feature = "unstable_discord_api")]
+use crate::builder::CreateComponents;
 use crate::json::{self, from_number, Value};
 use crate::model::channel::{AttachmentType, MessageFlags};
 
@@ -148,6 +150,26 @@ impl<'a> ExecuteWebhook<'a> {
         let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
+        self
+    }
+
+    /// Creates components for this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn components<F>(&mut self, f: F) -> &mut Self
+    where
+        F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
+    {
+        let mut components = CreateComponents::default();
+        f(&mut components);
+
+        self.0.insert("components", Value::from(components.0));
+        self
+    }
+
+    /// Sets the components of this message.
+    #[cfg(feature = "unstable_discord_api")]
+    pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
+        self.0.insert("components", Value::Array(components.0));
         self
     }
 
