@@ -7,7 +7,7 @@ mod change;
 mod utils;
 
 pub use change::{AffectedRole, Change, EntityType};
-use utils::{entries, optional_string};
+use utils::{optional_string, users, webhooks};
 
 use crate::model::prelude::*;
 
@@ -203,10 +203,12 @@ pub enum ActionThread {
 #[derive(Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct AuditLogs {
-    #[serde(with = "entries", rename = "audit_log_entries")]
-    pub entries: HashMap<AuditLogEntryId, AuditLogEntry>,
-    pub webhooks: Vec<Webhook>,
-    pub users: Vec<User>,
+    #[serde(rename = "audit_log_entries")]
+    pub entries: Vec<AuditLogEntry>,
+    #[serde(with = "users")]
+    pub users: HashMap<UserId, User>,
+    #[serde(with = "webhooks")]
+    pub webhooks: HashMap<WebhookId, Webhook>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
