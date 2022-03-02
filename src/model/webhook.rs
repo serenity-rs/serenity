@@ -340,7 +340,7 @@ impl Webhook {
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
 
-        let map = json::hashmap_to_json_map(execute_webhook.0);
+        let map = self.verify_map(execute_webhook.0)?;
 
         if !execute_webhook.1.is_empty() {
             http.as_ref()
@@ -378,7 +378,7 @@ impl Webhook {
         let mut edit_webhook_message = EditWebhookMessage::default();
         f(&mut edit_webhook_message);
 
-        let map = json::hashmap_to_json_map(edit_webhook_message.0);
+        let map = self.verify_map(edit_webhook_message.0)?;
 
         http.as_ref().edit_webhook_message(self.id.0, token, message_id.0, &map).await
     }
@@ -448,6 +448,21 @@ impl Webhook {
     pub fn url(&self) -> Result<String> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
         Ok(format!("https://discord.com/api/webhooks/{}/{}", self.id, token))
+    }
+
+    fn verify_map(&self, map: HashMap<&'static str, Value>) -> Result<JsonMap> {
+        // Having components is only valid for application-owned webhooks
+        if map.get("components").is_some() {
+            match self.kind {
+                WebhookType::Application => (),
+                _ => {
+                    return Err(Error::Other(
+                        "Only application-owned webhooks can use message components",
+                    ))
+                },
+            }
+        }
+        Ok(json::hashmap_to_json_map(map))
     }
 }
 
