@@ -452,7 +452,7 @@ impl Webhook {
 
     fn verify_map(&self, map: HashMap<&'static str, Value>) -> Result<JsonMap> {
         // Having components is only valid for application-owned webhooks
-        if map.get("components").is_some() {
+        if map.contains_key("components") {
             match self.kind {
                 WebhookType::Application => (),
                 _ => {
