@@ -509,7 +509,6 @@ impl Http {
     ///
     /// Functions the same as [`Self::execute_webhook`]
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_followup_message_with_files(
         &self,
         interaction_token: &str,
