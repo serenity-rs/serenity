@@ -340,7 +340,7 @@ pub struct AuditLogEntry {
     pub changes: Option<Vec<Change>>,
     /// The id of this entry.
     pub id: AuditLogEntryId,
-    /// Some optional data assosiated with this entry.
+    /// Some optional data associated with this entry.
     pub options: Option<Options>,
 }
 

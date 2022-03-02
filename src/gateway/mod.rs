@@ -1,5 +1,5 @@
 //! The gateway module contains the pieces - primarily the `Shard` -
-//! responsible for maintaing a WebSocket connection with Discord.
+//! responsible for maintaining a WebSocket connection with Discord.
 //!
 //! A shard is an interface for the lower-level receiver and sender. It provides
 //! what can otherwise be thought of as "sugar methods". A shard represents a

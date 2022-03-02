@@ -80,7 +80,7 @@ impl ChannelId {
 
     /// Creates an invite leading to the given channel.
     ///
-    /// **Note**: Requres the [Create Invite] permission.
+    /// **Note**: Requires the [Create Invite] permission.
     ///
     /// # Errors
     ///
