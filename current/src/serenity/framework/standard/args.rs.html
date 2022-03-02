@@ -1864,7 +1864,7 @@
     <span class="doccomment">/// # Note</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The value returned is to be assumed to stay static.</span>
-    <span class="doccomment">/// However, if [`Self::find`] was called previously, and was successful, then the value is substracted by one.</span>
+    <span class="doccomment">/// However, if [`Self::find`] was called previously, and was successful, then the value is subtracted by one.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">len</span>()
@@ -1920,7 +1920,7 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Trim leading and trailling whitespace off all arguments.</span>
+    <span class="doccomment">/// Trim leading and trailing whitespace off all arguments.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
@@ -1974,5 +1974,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (10cc7a6d0 2022-02-26)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>
