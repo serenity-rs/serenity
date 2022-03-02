@@ -1,17 +1,36 @@
-/// Used with `#[serde(with = "entries")]`
-pub mod entries {
+/// Used with `#[serde(with = "users")]`
+pub mod users {
     use std::collections::HashMap;
 
     use serde::Deserializer;
 
-    use crate::model::guild::AuditLogEntry;
-    use crate::model::id::AuditLogEntryId;
+    use crate::model::id::UserId;
+    use crate::model::user::User;
     use crate::model::utils::SequenceToMapVisitor;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
-    ) -> Result<HashMap<AuditLogEntryId, AuditLogEntry>, D::Error> {
-        deserializer.deserialize_seq(SequenceToMapVisitor::new(|e: &AuditLogEntry| e.id))
+    ) -> Result<HashMap<UserId, User>, D::Error> {
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|u: &User| u.id))
+    }
+
+    pub use crate::model::utils::serialize_map_values as serialize;
+}
+
+/// Used with `#[serde(with = "webhooks")]`
+pub mod webhooks {
+    use std::collections::HashMap;
+
+    use serde::Deserializer;
+
+    use crate::model::id::WebhookId;
+    use crate::model::utils::SequenceToMapVisitor;
+    use crate::model::webhook::Webhook;
+
+    pub fn deserialize<'de, D: Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<HashMap<WebhookId, Webhook>, D::Error> {
+        deserializer.deserialize_seq(SequenceToMapVisitor::new(|h: &Webhook| h.id))
     }
 
     pub use crate::model::utils::serialize_map_values as serialize;
