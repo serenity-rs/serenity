@@ -838,16 +838,15 @@ impl Route {
         expiration: bool,
         event_id: Option<u64>,
     ) -> String {
-        let event_config = match event_id {
-            Some(id) => &format!("&event_id={}", id),
-            None => "",
-        };
         api!(
             "/invites/{}?with_counts={}&with_expiration={}{}",
             code,
             member_counts,
             expiration,
-            event_config
+            match event_id {
+                Some(id) => format!("&event_id={}", id),
+                None => "".to_string(),
+            }
         )
     }
 

@@ -149,8 +149,8 @@ impl Invite {
     /// * `expiration` - Whether to include information about when the invite expires.
     /// * `event_id` - An optional server event ID to include with the invite.
     ///
-    /// More information about these arguments can be found on Discord's API documentation:
-    /// https://discord.com/developers/docs/resources/invite#get-invite
+    /// More information about these arguments can be found on Discord's
+    /// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).
     ///
     /// # Errors
     ///
