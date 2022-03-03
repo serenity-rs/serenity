@@ -153,7 +153,10 @@ impl<'a> ExecuteWebhook<'a> {
         self
     }
 
-    /// Creates components for this message.
+    /// Creates components for this message. Requires an application-owned webhook, meaning
+    /// the webhook's `kind` field is set to [`WebhookType::Application`].
+    ///
+    /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     #[cfg(feature = "unstable_discord_api")]
     pub fn components<F>(&mut self, f: F) -> &mut Self
     where
@@ -166,7 +169,7 @@ impl<'a> ExecuteWebhook<'a> {
         self
     }
 
-    /// Sets the components of this message.
+    /// Sets the components of this message. Requires an application-owned webhook. See [`ExecuteWebhook::components`] for details.
     #[cfg(feature = "unstable_discord_api")]
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
         self.0.insert("components", Value::Array(components.0));
