@@ -54,7 +54,10 @@ impl EditWebhookMessage {
         self
     }
 
-    /// Sets the components of this message.
+    /// Sets the components of this message. Requires an application-owned webhook, meaning
+    /// the webhook's `kind` field is set to [`WebhookType::Application`].
+    ///
+    /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
     #[cfg(feature = "unstable_discord_api")]
     pub fn components<F>(&mut self, f: F) -> &mut Self
     where
