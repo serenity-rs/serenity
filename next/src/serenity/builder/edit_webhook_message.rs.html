@@ -72,6 +72,9 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateAllowedMentions</span>;
@@ -128,7 +131,10 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the components of this message.</span>
+    <span class="doccomment">/// Sets the components of this message. Requires an application-owned webhook, meaning</span>
+    <span class="doccomment">/// the webhook&#39;s `kind` field is set to [`WebhookType::Application`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`WebhookType::Application`]: crate::model::webhook::WebhookType</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
