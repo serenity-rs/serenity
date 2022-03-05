@@ -2713,6 +2713,24 @@
 <span id="2708">2708</span>
 <span id="2709">2709</span>
 <span id="2710">2710</span>
+<span id="2711">2711</span>
+<span id="2712">2712</span>
+<span id="2713">2713</span>
+<span id="2714">2714</span>
+<span id="2715">2715</span>
+<span id="2716">2716</span>
+<span id="2717">2717</span>
+<span id="2718">2718</span>
+<span id="2719">2719</span>
+<span id="2720">2720</span>
+<span id="2721">2721</span>
+<span id="2722">2722</span>
+<span id="2723">2723</span>
+<span id="2724">2724</span>
+<span id="2725">2725</span>
+<span id="2726">2726</span>
+<span id="2727">2727</span>
+<span id="2728">2728</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -3547,8 +3565,22 @@
         <span class="macro">api!</span>(<span class="string">&quot;/invites/{}&quot;</span>, <span class="ident">code</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invite_optioned</span>(<span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">stats</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">api!</span>(<span class="string">&quot;/invites/{}?with_counts={}&quot;</span>, <span class="ident">code</span>, <span class="ident">stats</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invite_optioned</span>(
+        <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">member_counts</span>: <span class="ident">bool</span>,
+        <span class="ident">expiration</span>: <span class="ident">bool</span>,
+        <span class="ident">event_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">String</span> {
+        <span class="macro">api!</span>(
+            <span class="string">&quot;/invites/{}?with_counts={}&amp;with_expiration={}{}&quot;</span>,
+            <span class="ident">code</span>,
+            <span class="ident">member_counts</span>,
+            <span class="ident">expiration</span>,
+            <span class="kw">match</span> <span class="ident">event_id</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;&amp;event_id={}&quot;</span>, <span class="ident">id</span>),
+                <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+            }
+        )
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">oauth2_application_current</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
@@ -4192,7 +4224,9 @@
     },
     <span class="ident">GetInvite</span> {
         <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">stats</span>: <span class="ident">bool</span>,
+        <span class="ident">member_counts</span>: <span class="ident">bool</span>,
+        <span class="ident">expiration</span>: <span class="ident">bool</span>,
+        <span class="ident">event_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     },
     <span class="ident">GetMember</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -5238,11 +5272,13 @@
             ),
             <span class="ident">RouteInfo::GetInvite</span> {
                 <span class="ident">code</span>,
-                <span class="ident">stats</span>,
+                <span class="ident">member_counts</span>,
+                <span class="ident">expiration</span>,
+                <span class="ident">event_id</span>,
             } =&gt; (
                 <span class="ident">LightMethod::Get</span>,
                 <span class="ident">Route::InvitesCode</span>,
-                <span class="ident">Cow::from</span>(<span class="ident">Route::invite_optioned</span>(<span class="ident">code</span>, <span class="ident">stats</span>)),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::invite_optioned</span>(<span class="ident">code</span>, <span class="ident">member_counts</span>, <span class="ident">expiration</span>, <span class="ident">event_id</span>)),
             ),
             <span class="ident">RouteInfo::GetMember</span> {
                 <span class="ident">guild_id</span>,
@@ -5424,5 +5460,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9fcbc3205 2022-03-04)" ></div>
 </body></html>

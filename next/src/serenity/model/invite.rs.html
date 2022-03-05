@@ -421,6 +421,23 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models for server and channel invites.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
@@ -562,14 +579,31 @@
         <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">as_ref</span>().<span class="ident">delete_invite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">code</span>).<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Gets the information about an invite.</span>
+    <span class="doccomment">/// Gets information about an invite.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Arguments</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `code` - The invite code.</span>
+    <span class="doccomment">/// * `member_counts` - Whether to include information about the current number</span>
+    <span class="doccomment">/// of members in the server that the invite belongs to.</span>
+    <span class="doccomment">/// * `expiration` - Whether to include information about when the invite expires.</span>
+    <span class="doccomment">/// * `event_id` - An optional server event ID to include with the invite.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// More information about these arguments can be found on Discord&#39;s</span>
+    <span class="doccomment">/// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// May return an [`Error::Http`] if the invite is invalid.</span>
     <span class="doccomment">/// Can also return an [`Error::Json`] if there is an error</span>
     <span class="doccomment">/// deserializing the API response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">stats</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invite</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get</span>(
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">member_counts</span>: <span class="ident">bool</span>,
+        <span class="ident">expiration</span>: <span class="ident">bool</span>,
+        <span class="ident">event_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Invite</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">invite</span> <span class="op">=</span> <span class="ident">code</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
@@ -577,7 +611,7 @@
             <span class="ident">invite</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::utils::parse_invite</span>(<span class="ident">invite</span>);
         }
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_invite</span>(<span class="ident">invite</span>, <span class="ident">stats</span>).<span class="kw">await</span>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_invite</span>(<span class="ident">invite</span>, <span class="ident">member_counts</span>, <span class="ident">expiration</span>, <span class="ident">event_id</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Returns a URL to use for the invite.</span>
@@ -840,5 +874,5 @@
     <span class="ident">EmmbeddedApplication</span>,
 });
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9fcbc3205 2022-03-04)" ></div>
 </body></html>
