@@ -3085,7 +3085,24 @@ impl Http {
     }
 
     /// Gets information about a specific invite.
-    pub async fn get_invite(&self, mut code: &str, stats: bool) -> Result<Invite> {
+    ///
+    /// # Arguments
+    ///
+    /// * `code` - The invite code.
+    /// * `member_counts` - Whether to include information about the current number
+    /// of members in the server that the invite belongs to.
+    /// * `expiration` - Whether to include information about when the invite expires.
+    /// * `event_id` - An optional server event ID to include with the invite.
+    ///
+    /// More information about these arguments can be found on Discord's
+    /// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).
+    pub async fn get_invite(
+        &self,
+        mut code: &str,
+        member_counts: bool,
+        expiration: bool,
+        event_id: Option<u64>,
+    ) -> Result<Invite> {
         #[cfg(feature = "utils")]
         {
             code = utils::parse_invite(code);
@@ -3097,7 +3114,9 @@ impl Http {
             headers: None,
             route: RouteInfo::GetInvite {
                 code,
-                stats,
+                member_counts,
+                expiration,
+                event_id,
             },
         })
         .await

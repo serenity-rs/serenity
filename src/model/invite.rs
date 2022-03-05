@@ -139,14 +139,31 @@ impl Invite {
         cache_http.http().as_ref().delete_invite(&self.code).await
     }
 
-    /// Gets the information about an invite.
+    /// Gets information about an invite.
+    ///
+    /// # Arguments
+    ///
+    /// * `code` - The invite code.
+    /// * `member_counts` - Whether to include information about the current number
+    /// of members in the server that the invite belongs to.
+    /// * `expiration` - Whether to include information about when the invite expires.
+    /// * `event_id` - An optional server event ID to include with the invite.
+    ///
+    /// More information about these arguments can be found on Discord's
+    /// [API documentation](https://discord.com/developers/docs/resources/invite#get-invite).
     ///
     /// # Errors
     ///
     /// May return an [`Error::Http`] if the invite is invalid.
     /// Can also return an [`Error::Json`] if there is an error
     /// deserializing the API response.
-    pub async fn get(http: impl AsRef<Http>, code: &str, stats: bool) -> Result<Invite> {
+    pub async fn get(
+        http: impl AsRef<Http>,
+        code: &str,
+        member_counts: bool,
+        expiration: bool,
+        event_id: Option<u64>,
+    ) -> Result<Invite> {
         let mut invite = code;
 
         #[cfg(feature = "utils")]
@@ -154,7 +171,7 @@ impl Invite {
             invite = crate::utils::parse_invite(invite);
         }
 
-        http.as_ref().get_invite(invite, stats).await
+        http.as_ref().get_invite(invite, member_counts, expiration, event_id).await
     }
 
     /// Returns a URL to use for the invite.
