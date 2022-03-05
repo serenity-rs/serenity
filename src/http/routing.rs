@@ -832,8 +832,22 @@ impl Route {
         api!("/invites/{}", code)
     }
 
-    pub fn invite_optioned(code: &str, stats: bool) -> String {
-        api!("/invites/{}?with_counts={}", code, stats)
+    pub fn invite_optioned(
+        code: &str,
+        member_counts: bool,
+        expiration: bool,
+        event_id: Option<u64>,
+    ) -> String {
+        api!(
+            "/invites/{}?with_counts={}&with_expiration={}{}",
+            code,
+            member_counts,
+            expiration,
+            match event_id {
+                Some(id) => format!("&event_id={}", id),
+                None => "".to_string(),
+            }
+        )
     }
 
     pub fn oauth2_application_current() -> &'static str {
@@ -1477,7 +1491,9 @@ pub enum RouteInfo<'a> {
     },
     GetInvite {
         code: &'a str,
-        stats: bool,
+        member_counts: bool,
+        expiration: bool,
+        event_id: Option<u64>,
     },
     GetMember {
         guild_id: u64,
@@ -2537,11 +2553,13 @@ impl<'a> RouteInfo<'a> {
             ),
             RouteInfo::GetInvite {
                 code,
-                stats,
+                member_counts,
+                expiration,
+                event_id,
             } => (
                 LightMethod::Get,
                 Route::InvitesCode,
-                Cow::from(Route::invite_optioned(code, stats)),
+                Cow::from(Route::invite_optioned(code, member_counts, expiration, event_id)),
             ),
             RouteInfo::GetMember {
                 guild_id,
