@@ -113,6 +113,14 @@ impl Interaction {
             _ => None,
         }
     }
+
+    /// Converts this to a [`ModalSubmitInteraction`]
+    pub fn modal_submit(self) -> Option<ModalSubmitInteraction> {
+        match self {
+            Interaction::ModalSubmit(i) => Some(i),
+            _ => None,
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for Interaction {
