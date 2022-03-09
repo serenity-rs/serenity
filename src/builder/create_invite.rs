@@ -92,10 +92,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #
-    /// let invite = channel.create_invite(context, |i| {
-    ///     i.max_age(3600)
-    /// })
-    /// .await?;
+    /// let invite = channel.create_invite(context, |i| i.max_age(3600)).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -126,10 +123,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #
-    /// let invite = channel.create_invite(context, |i| {
-    ///     i.max_uses(5)
-    /// })
-    /// .await?;
+    /// let invite = channel.create_invite(context, |i| i.max_uses(5)).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -158,10 +152,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #
-    /// let invite = channel.create_invite(context, |i| {
-    ///     i.temporary(true)
-    /// })
-    /// .await?;
+    /// let invite = channel.create_invite(context, |i| i.temporary(true)).await?;
     /// #     Ok(())
     /// # }
     /// #
@@ -192,10 +183,7 @@ impl CreateInvite {
     /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #
-    /// let invite = channel.create_invite(context, |i| {
-    ///     i.unique(true)
-    /// })
-    /// .await?;
+    /// let invite = channel.create_invite(context, |i| i.unique(true)).await?;
     /// #     Ok(())
     /// # }
     /// ```
