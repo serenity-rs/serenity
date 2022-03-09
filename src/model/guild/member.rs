@@ -265,8 +265,7 @@ impl Member {
         match self
             .guild_id
             .edit_member(http, self.user.id, |member| {
-                member.disable_communication_until_datetime(time);
-                member
+                member.disable_communication_until_datetime(time)
             })
             .await
         {
@@ -325,10 +324,7 @@ impl Member {
     pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
         match self
             .guild_id
-            .edit_member(&http, self.user.id, |member| {
-                member.enable_communication();
-                member
-            })
+            .edit_member(&http, self.user.id, |member| member.enable_communication())
             .await
         {
             Ok(_) => {

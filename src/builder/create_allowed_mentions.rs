@@ -28,39 +28,24 @@ pub enum ParseValue {
 /// use serenity::builder::ParseValue;
 ///
 /// // Mention only the user 110372470472613888
-/// m.allowed_mentions(|am| {
-///     am.empty_parse();
-///     am.users(vec![110372470472613888])
-/// });
+/// m.allowed_mentions(|am| am.empty_parse().users(vec![110372470472613888]));
 ///
 /// // Mention all users and the role 182894738100322304
-/// m.allowed_mentions(|am| {
-///     am.parse(ParseValue::Users);
-///     am.roles(vec![182894738100322304])
-/// });
+/// m.allowed_mentions(|am| am.parse(ParseValue::Users).roles(vec![182894738100322304]));
 ///
 /// // Mention all roles and nothing else
-/// m.allowed_mentions(|am| {
-///     am.parse(ParseValue::Roles)
-/// });
+/// m.allowed_mentions(|am| am.parse(ParseValue::Roles));
 ///
 /// // Mention all roles and users, but not everyone
-/// m.allowed_mentions(|am| {
-///     am.parse(ParseValue::Users);
-///     am.parse(ParseValue::Roles)
-/// });
+/// m.allowed_mentions(|am| am.parse(ParseValue::Users).parse(ParseValue::Roles));
 ///
 /// // Mention everyone and the users 182891574139682816, 110372470472613888
 /// m.allowed_mentions(|am| {
-///     am.parse(ParseValue::Everyone);
-///     am.users(vec![182891574139682816, 110372470472613888])
+///     am.parse(ParseValue::Everyone).users(vec![182891574139682816, 110372470472613888])
 /// });
 ///
 /// // Mention everyone and the message author.
-/// m.allowed_mentions(|am| {
-///     am.parse(ParseValue::Everyone);
-///     am.users(vec![msg.author.id])
-/// });
+/// m.allowed_mentions(|am| am.parse(ParseValue::Everyone).users(vec![msg.author.id]));
 /// ```
 ///
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message

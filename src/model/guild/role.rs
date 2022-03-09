@@ -154,14 +154,9 @@ impl Role {
     /// # use serenity::model::id::RoleId;
     /// # let role = RoleId(7).to_role_cached(&cache).unwrap();
     /// // assuming a `role` has already been bound
-    //
-    /// role.edit(|mut r| {
-    ///     r.hoist(true);
-    ///
-    ///     r
-    /// });
+    /// role.edit(|r| r.hoist(true));
     /// ```
-    /// 
+    ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user does not
