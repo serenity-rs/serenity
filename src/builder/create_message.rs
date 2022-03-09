@@ -42,17 +42,9 @@ use crate::model::id::StickerId;
 /// let channel_id = ChannelId(7);
 ///
 /// let _ = channel_id.send_message(&http, |m| {
-///     m.content("test");
-///     m.tts(true);
-///
-///     m.embed(|mut e| {
-///         e.title("This is an embed");
-///         e.description("With a description");
-///
-///         e
-///     });
-///
-///     m
+///     m.content("test")
+///         .tts(true)
+///         .embed(|e| e.title("This is an embed").description("With a description"))
 /// });
 /// ```
 ///

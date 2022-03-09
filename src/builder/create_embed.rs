@@ -230,9 +230,7 @@ impl CreateEmbed {
     ///             let _ = msg
     ///                 .channel_id
     ///                 .send_message(&context.http, |m| {
-    ///                     m.embed(|e| e.title("hello").timestamp("2004-06-08T16:04:23"));
-    ///
-    ///                     m
+    ///                     m.embed(|e| e.title("hello").timestamp("2004-06-08T16:04:23"))
     ///                 })
     ///                 .await;
     ///         }
@@ -274,14 +272,11 @@ impl CreateEmbed {
     ///                 let _ = channel
     ///                     .send_message(&context, |m| {
     ///                         m.embed(|e| {
-    ///                             e.author(|a| a.icon_url(&user.face()).name(&user.name));
-    ///                             e.title("Member Join");
-    ///
     ///                             if let Some(ref joined_at) = member.joined_at {
     ///                                 e.timestamp(joined_at);
     ///                             }
-    ///
-    ///                             e
+    ///                             e.author(|a| a.icon_url(&user.face()).name(&user.name))
+    ///                                 .title("Member Join")
     ///                         })
     ///                     })
     ///                     .await;
@@ -403,13 +398,10 @@ impl From<Embed> for CreateEmbed {
 
         if let Some(footer) = embed.footer {
             b.footer(move |f| {
-                f.text(&footer.text);
-
                 if let Some(icon_url) = footer.icon_url {
                     f.icon_url(&icon_url);
                 }
-
-                f
+                f.text(&footer.text)
             });
         }
 

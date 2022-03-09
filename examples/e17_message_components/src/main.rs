@@ -91,10 +91,10 @@ impl Animal {
         menu.custom_id("animal_select");
         menu.placeholder("No animal selected");
         menu.options(|f| {
-            f.add_option(Self::Cat.menu_option());
-            f.add_option(Self::Dog.menu_option());
-            f.add_option(Self::Horse.menu_option());
-            f.add_option(Self::Alpaca.menu_option())
+            f.add_option(Self::Cat.menu_option())
+                .add_option(Self::Dog.menu_option())
+                .add_option(Self::Horse.menu_option())
+                .add_option(Self::Alpaca.menu_option())
         });
         menu
     }
@@ -183,9 +183,8 @@ impl EventHandler for Handler {
         let m = msg
             .channel_id
             .send_message(&ctx, |m| {
-                m.content("Please select your favorite animal");
-                m.components(|c| c.add_action_row(Animal::action_row()));
-                m
+                m.content("Please select your favorite animal")
+                    .components(|c| c.add_action_row(Animal::action_row()))
             })
             .await
             .unwrap();
@@ -207,10 +206,9 @@ impl EventHandler for Handler {
 
         // Acknowledge the interaction and edit the message
         mci.create_interaction_response(&ctx, |r| {
-            r.kind(InteractionResponseType::UpdateMessage);
-            r.interaction_response_data(|d| {
-                d.content(format!("You chose: **{}**\nNow choose a sound!", animal));
-                d.components(|c| c.add_action_row(Sound::action_row()))
+            r.kind(InteractionResponseType::UpdateMessage).interaction_response_data(|d| {
+                d.content(format!("You chose: **{}**\nNow choose a sound!", animal))
+                    .components(|c| c.add_action_row(Sound::action_row()))
             })
         })
         .await
@@ -226,12 +224,13 @@ impl EventHandler for Handler {
             // Acknowledge the interaction and send a reply
             mci.create_interaction_response(&ctx, |r| {
                 // This time we dont edit the message but reply to it
-                r.kind(InteractionResponseType::ChannelMessageWithSource);
-                r.interaction_response_data(|d| {
-                    // Make the message hidden for other users
-                    d.flags(InteractionApplicationCommandCallbackDataFlags::EPHEMERAL);
-                    d.content(format!("The **{}** says __{}__", animal, sound))
-                })
+                r.kind(InteractionResponseType::ChannelMessageWithSource).interaction_response_data(
+                    |d| {
+                        // Make the message hidden for other users
+                        d.flags(InteractionApplicationCommandCallbackDataFlags::EPHEMERAL)
+                            .content(format!("The **{}** says __{}__", animal, sound))
+                    },
+                )
             })
             .await
             .unwrap();
