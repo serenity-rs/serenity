@@ -64,7 +64,7 @@ impl EditGuild {
     ///
     /// let base64_icon = utils::read_image("./guild_icon.png")?;
     ///
-    /// guild.edit(&http, |mut g| g.icon(Some(&base64_icon))).await?;
+    /// guild.edit(&http, |g| g.icon(Some(&base64_icon))).await?;
     /// #     Ok(())
     /// # }
     /// ```

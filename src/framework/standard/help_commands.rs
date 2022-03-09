@@ -1145,16 +1145,7 @@ async fn send_suggestion_embed(
 ) -> Result<Message, Error> {
     let text = help_description.replace("{}", &suggestions.join("`, `"));
 
-    channel_id
-        .send_message(&http, |m| {
-            m.embed(|e| {
-                e.colour(colour);
-                e.description(text);
-                e
-            });
-            m
-        })
-        .await
+    channel_id.send_message(&http, |m| m.embed(|e| e.colour(colour).description(text))).await
 }
 
 /// Sends an embed explaining fetching commands failed.
@@ -1165,16 +1156,7 @@ async fn send_error_embed(
     input: &str,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id
-        .send_message(&http, |m| {
-            m.embed(|e| {
-                e.colour(colour);
-                e.description(input);
-                e
-            });
-            m
-        })
-        .await
+    channel_id.send_message(&http, |m| m.embed(|e| e.colour(colour).description(input))).await
 }
 
 /// Posts an embed showing each individual command group and its commands.

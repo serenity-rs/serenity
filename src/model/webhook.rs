@@ -269,12 +269,7 @@ impl Webhook {
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
-    /// webhook
-    ///     .execute(&http, false, |mut w| {
-    ///         w.content("test");
-    ///         w
-    ///     })
-    ///     .await?;
+    /// webhook.execute(&http, false, |w| w.content("test")).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -292,24 +287,18 @@ impl Webhook {
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
-    /// let embed = Embed::fake(|mut e| {
-    ///     e.title("Rust's website");
-    ///     e.description(
-    ///         "Rust is a systems programming language that runs
+    /// let embed = Embed::fake(|e| {
+    ///     e.title("Rust's website")
+    ///         .description(
+    ///             "Rust is a systems programming language that runs
     ///                    blazingly fast, prevents segfaults, and guarantees
     ///                    thread safety.",
-    ///     );
-    ///     e.url("https://rust-lang.org");
-    ///     e
+    ///         )
+    ///         .url("https://rust-lang.org")
     /// });
     ///
     /// webhook
-    ///     .execute(&http, false, |mut w| {
-    ///         w.content("test");
-    ///         w.username("serenity");
-    ///         w.embeds(vec![embed]);
-    ///         w
-    ///     })
+    ///     .execute(&http, false, |w| w.content("test").username("serenity").embeds(vec![embed]))
     ///     .await?;
     /// #     Ok(())
     /// # }
