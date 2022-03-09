@@ -40,7 +40,7 @@ use crate::model::id::StickerId;
 /// let _ = channel_id.send_message(&http, |m| {
 ///     m.content("test")
 ///         .tts(true)
-///         .embed(|e| e.title("This is an embed").description("With a description"));
+///         .embed(|e| e.title("This is an embed").description("With a description"))
 /// });
 /// ```
 ///
