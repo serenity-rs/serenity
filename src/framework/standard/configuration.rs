@@ -333,16 +333,12 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     ///
     /// let framework = StandardFramework::new().configure(|c| {
-    ///     c
-    ///        .dynamic_prefix(|_, msg| Box::pin(async move {
-    ///             Some(if msg.channel_id.0 % 5 == 0 {
-    ///                 "!"
-    ///             } else {
-    ///                 "*"
-    ///             }.to_string())
-    ///         }))
-    ///         // This disables the default prefix "~"
-    ///         .prefix("")
+    ///     c.dynamic_prefix(|_, msg| {
+    ///         Box::pin(
+    ///             async move { Some(if msg.channel_id.0 % 5 == 0 { "!" } else { "*" }.to_string()) },
+    ///         )
+    ///     })
+    ///     .prefix("") // This disables the default prefix "~"
     /// });
     /// ```
     ///
