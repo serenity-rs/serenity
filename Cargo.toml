@@ -65,8 +65,8 @@ optional = true
 version = "0.10"
 
 [dependencies.serenity-voice-model]
-path = "./voice-model"
-version = "0.1.1"
+git = "https://github.com/nxg-org/serenity-voice-model"
+rev = "9fadcfec6e1ccff3973e63f9d7c225ac66ba4d0b"
 optional = true
 
 [dependencies.static_assertions]
