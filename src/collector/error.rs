@@ -24,7 +24,7 @@ pub enum Error {
     ///     EventCollectorBuilder::new(&ctx)
     ///         .add_event_type(EventType::GuildCreate)
     ///         .add_user_id(UserId::default())
-    ///         .await,
+    ///         .build(),
     ///     Err(SerenityError::Collector(CollectorError::InvalidEventIdFilters)),
     /// ));
     /// # });
