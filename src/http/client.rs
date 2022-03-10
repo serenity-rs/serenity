@@ -90,7 +90,8 @@ impl<'a> HttpBuilder<'a> {
     }
 
     /// Construct a new builder to call methods on for the HTTP construction.
-    /// The `token` will automatically be prefixed "Bot " if not already.
+    /// The `token` will not automatically be prefixed "Bot " in case you
+    /// want to start a user connection.
     #[must_use]
     pub fn new(token: impl AsRef<str>) -> Self {
         Self::_new().token(token)
@@ -111,10 +112,7 @@ impl<'a> HttpBuilder<'a> {
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         let token = token.as_ref().trim();
 
-        let token =
-            if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
-
-        self.token = Some(token);
+        self.token = Some(token.to_string());
 
         self
     }
@@ -277,12 +275,12 @@ impl Http {
         let builder = configure_client_backend(Client::builder());
         let built = builder.build().expect("Cannot build reqwest::Client");
 
-        let trimmed = token.trim();
-        let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
-            token.to_string()
-        } else {
-            format!("Bot {}", token)
-        };
+        // let trimmed = token.trim();
+        // let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
+        //     token.to_string()
+        // } else {
+        //     format!("Bot {}", token)
+        // };
 
         Self::new(Arc::new(built), &token)
     }
