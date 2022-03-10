@@ -2123,6 +2123,16 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsId(channel_id),
                 Cow::from(Route::channel(channel_id)),
             ),
+            RouteInfo::EditUserNote {
+                user_id,
+            } => (LightMethod::Put, Route::UsersMeNotes, Cow::from(Route::user_me_note(user_id))),
+            RouteInfo::EditUserRelationship {
+                user_id,
+            } => (
+                LightMethod::Put,
+                Route::UsersIdRelationships,
+                Cow::from(Route::user_relationships(user_id)),
+            ),
             RouteInfo::EditVoiceState {
                 guild_id,
                 user_id,
@@ -2667,16 +2677,6 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::GuildsIdMembersSearch(guild_id),
                 Cow::from(Route::guild_members_search(guild_id, query, limit)),
-            ),
-            RouteInfo::EditUserNote {
-                user_id,
-            } => (LightMethod::Put, Route::UsersMeNotes, Cow::from(Route::user_me_note(user_id))),
-            RouteInfo::EditUserRelationship {
-                user_id,
-            } => (
-                LightMethod::Put,
-                Route::UsersIdRelationships,
-                Cow::from(Route::user_relationships(user_id)),
             ),
             RouteInfo::StartGuildPrune {
                 days,
