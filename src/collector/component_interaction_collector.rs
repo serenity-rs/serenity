@@ -28,7 +28,7 @@ use crate::model::interactions::message_component::MessageComponentInteraction;
 macro_rules! impl_component_interaction_collector {
     ($($name:ident;)*) => {
         $(
-            impl<'a> $name<'a> {
+            impl $name {
                 /// Limits how many interactions will attempt to be filtered.
                 ///
                 /// The filter checks whether the message has been sent
@@ -202,55 +202,44 @@ impl_component_interaction_collector! {
     ComponentInteractionCollectorBuilder;
 }
 
-pub struct ComponentInteractionCollectorBuilder<'a> {
+pub struct ComponentInteractionCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, ComponentInteractionCollector>>,
 }
 
-impl<'a> ComponentInteractionCollectorBuilder<'a> {
+impl ComponentInteractionCollectorBuilder {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
             shard: Some(shard_messenger.as_ref().clone()),
             timeout: None,
-            fut: None,
         }
     }
-}
 
-impl<'a> Future for ComponentInteractionCollectorBuilder<'a> {
-    type Output = ComponentInteractionCollector;
     #[allow(clippy::unwrap_used)]
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = ComponentInteractionFilter::new(self.filter.take().unwrap());
-            let timeout = self.timeout.take();
+    pub fn build(self) -> ComponentInteractionCollector {
+        let shard_messenger = self.shard.unwrap();
+        let (filter, receiver) = ComponentInteractionFilter::new(self.filter.unwrap());
+        let timeout = self.timeout;
 
-            self.fut = Some(Box::pin(async move {
-                shard_messenger.set_component_interaction_filter(filter);
+        shard_messenger.set_component_interaction_filter(filter);
 
-                ComponentInteractionCollector {
-                    receiver: Box::pin(receiver),
-                    timeout,
-                }
-            }))
+        ComponentInteractionCollector {
+            receiver: Box::pin(receiver),
+            timeout,
         }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
     }
 }
 
-pub struct CollectComponentInteraction<'a> {
+pub struct CollectComponentInteraction {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, Option<Arc<MessageComponentInteraction>>>>,
+    fut: Option<BoxFuture<'static, Option<Arc<MessageComponentInteraction>>>>,
 }
 
-impl<'a> CollectComponentInteraction<'a> {
+impl CollectComponentInteraction {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
@@ -261,7 +250,7 @@ impl<'a> CollectComponentInteraction<'a> {
     }
 }
 
-impl<'a> Future for CollectComponentInteraction<'a> {
+impl Future for CollectComponentInteraction {
     type Output = Option<Arc<MessageComponentInteraction>>;
     #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {

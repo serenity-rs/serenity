@@ -877,55 +877,52 @@ impl Message {
 
     /// Await a single reaction on this message.
     #[cfg(feature = "collector")]
-    pub fn await_reaction<'a>(
-        &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> CollectReaction<'a> {
+    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> CollectReaction {
         CollectReaction::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions on this message.
     #[cfg(feature = "collector")]
-    pub fn await_reactions<'a>(
+    pub fn await_reactions(
         &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> ReactionCollectorBuilder<'a> {
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ReactionCollectorBuilder {
         ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Await a single component interaction on this message.
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-    pub fn await_component_interaction<'a>(
+    pub fn await_component_interaction(
         &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> CollectComponentInteraction<'a> {
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> CollectComponentInteraction {
         CollectComponentInteraction::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of component interactions on this message.
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-    pub fn await_component_interactions<'a>(
+    pub fn await_component_interactions(
         &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> ComponentInteractionCollectorBuilder<'a> {
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ComponentInteractionCollectorBuilder {
         ComponentInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Await a single modal submit interaction on this message.
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-    pub fn await_modal_interaction<'a>(
+    pub fn await_modal_interaction(
         &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> CollectModalInteraction<'a> {
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> CollectModalInteraction {
         CollectModalInteraction::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of modal submit interactions on this message.
     #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-    pub fn await_modal_interactions<'a>(
+    pub fn await_modal_interactions(
         &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> ModalInteractionCollectorBuilder<'a> {
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ModalInteractionCollectorBuilder {
         ModalInteractionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
