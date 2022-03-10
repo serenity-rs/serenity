@@ -28,6 +28,8 @@ fn deserialize_identify_json() {
         token: "my_token".into(),
         server_id: GuildId(41771983423143937),
         user_id: UserId(104694319306248192),
+        streams: vec![],
+        video: false,
     };
 
     assert!(matches!(event, Ok(Event::Identify(i)) if i == ident));
@@ -49,8 +51,7 @@ fn deserialize_select_protocol_json() {
 
     let event = serde_json::from_str(json_data);
 
-    let proto = SelectProtocol {
-        protocol: "udp".into(),
+    let proto = SelectProtocol::UDP {
         data: ProtocolData {
             address: Ipv4Addr::new(127, 0, 0, 1).into(),
             port: 1337,
@@ -87,6 +88,8 @@ fn deserialize_ready_json() {
             "xsalsa20_poly1305_suffix".into(),
             "xsalsa20_poly1305_lite".into(),
         ],
+        experiments: vec![],
+        streams: vec![],
     };
 
     assert!(matches!(event, Ok(Event::Ready(i)) if i == ready));
@@ -119,7 +122,7 @@ fn deserialize_session_description_json() {
     }"#;
     let event = serde_json::from_str(json_data);
 
-    let sd = SessionDescription {
+    let sd = SessionDescription::UDP {
         mode: "xsalsa20_poly1305_lite".into(),
         secret_key: vec![251, 100, 11],
     };
@@ -238,6 +241,8 @@ fn deserialize_client_connect_json() {
         audio_ssrc: 5678,
         user_id: UserId(1234),
         video_ssrc: 9012,
+        rtx_ssrc: None,
+        streams: vec![],
     };
 
     assert!(matches!(event, Ok(Event::ClientConnect(i)) if i == conn));
@@ -268,6 +273,8 @@ fn serialize_identify() {
         session_id: "56f88a86dce65c65b9".into(),
         token: "56f88a86dce65c65b8".into(),
         user_id: UserId(2),
+        streams: vec![],
+        video: false,
     }
     .into();
 
@@ -303,8 +310,7 @@ fn serialize_identify() {
 
 #[test]
 fn serialize_select_protocol() {
-    let value: Event = SelectProtocol {
-        protocol: "udp".into(),
+    let value: Event = SelectProtocol::UDP {
         data: ProtocolData {
             address: Ipv4Addr::new(192, 168, 0, 141).into(),
             port: 40404,
@@ -358,6 +364,8 @@ fn serialize_ready() {
         ip: Ipv4Addr::new(127, 0, 0, 1).into(),
         port: 12345,
         ssrc: 0xcafe_d00d,
+        experiments: vec![],
+        streams: vec![],
     }
     .into();
 
@@ -415,7 +423,7 @@ fn serialize_heartbeat() {
 
 #[test]
 fn serialize_session_description() {
-    let value: Event = SessionDescription {
+    let value: Event = SessionDescription::UDP {
         mode: "xsalsa20_poly1305_suffix".into(),
         secret_key: vec![1, 2, 3, 4, 5],
     }
@@ -601,6 +609,8 @@ fn serialize_client_connect() {
         audio_ssrc: 12345,
         user_id: UserId(56),
         video_ssrc: 67890,
+        rtx_ssrc: None,
+        streams: vec![],
     }
     .into();
 
