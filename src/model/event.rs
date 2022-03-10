@@ -1333,7 +1333,8 @@ impl CacheUpdate for RelationshipAddEvent {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct RelationshipRemoveEvent {
-    pub kind: RelationshipType,
+    // todo: add code to fetch previous kind when receiving this
+    // pub kind: RelationshipType,
     pub user_id: UserId,
 }
 
@@ -3202,6 +3203,8 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::PRESENCE_UPDATE => EventType::PresenceUpdate,
                     EventType::PRESENCES_REPLACE => EventType::PresencesReplace,
                     EventType::READY => EventType::Ready,
+                    EventType::RELATIONSHIP_ADD => EventType::RelationshipAdd,
+                    EventType::RELATIONSHIP_REMOVE => EventType::RelationshipRemove,
                     EventType::RESUMED => EventType::Resumed,
                     EventType::TYPING_START => EventType::TypingStart,
                     EventType::USER_UPDATE => EventType::UserUpdate,

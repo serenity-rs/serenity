@@ -697,8 +697,10 @@ impl Serialize for Presence {
 pub struct Ready {
     #[serde(default)]
     pub analytics_token: Option<String>,
-    pub application: PartialCurrentApplicationInfo,
-    pub experiments: Vec<Vec<u64>>,
+    #[serde(default)]
+    pub application: Option<PartialCurrentApplicationInfo>,
+    // no one wanted to read experiments anyways...
+    // pub experiments: Vec<Vec<i64>>,
     pub friend_suggestion_count: Option<u64>,
     pub guilds: Vec<GuildStatus>,
     #[serde(default)]
@@ -715,9 +717,17 @@ pub struct Ready {
         deserialize_with = "deserialize_private_channels"
     )]
     pub private_channels: HashMap<ChannelId, Channel>,
-    #[serde(default)]
+    #[serde(
+        default,
+        serialize_with = "serialize_read_state",
+        deserialize_with = "deserialize_read_state"
+    )]
     pub read_state: HashMap<ChannelId, ReadState>,
-    #[serde(default)]
+    #[serde(
+        default,
+        serialize_with = "serialize_relationships",
+        deserialize_with = "deserialize_relationships"
+    )]
     pub relationships: HashMap<UserId, Relationship>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,

@@ -292,6 +292,58 @@ pub fn serialize_private_channels<S: Serializer>(
     seq.end()
 }
 
+pub fn deserialize_read_state<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<ChannelId, ReadState>, D::Error> {
+    let vec: Vec<ReadState> = Deserialize::deserialize(deserializer)?;
+    let mut read_states = HashMap::new();
+
+    for read_state in vec {
+        read_states.insert(read_state.id, read_state);
+    }
+
+    Ok(read_states)
+}
+
+pub fn serialize_read_state<S: Serializer>(
+    read_states: &HashMap<ChannelId, ReadState>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(read_states.len()))?;
+
+    for read_state in read_states.values() {
+        seq.serialize_element(read_state)?;
+    }
+
+    seq.end()
+}
+
+pub fn deserialize_relationships<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> StdResult<HashMap<UserId, Relationship>, D::Error> {
+    let vec: Vec<Relationship> = Deserialize::deserialize(deserializer)?;
+    let mut relationships = HashMap::new();
+
+    for relationship in vec {
+        relationships.insert(relationship.id, relationship);
+    }
+
+    Ok(relationships)
+}
+
+pub fn serialize_relationships<S: Serializer>(
+    relationships: &HashMap<UserId, Relationship>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(relationships.len()))?;
+
+    for relationship in relationships.values() {
+        seq.serialize_element(relationship)?;
+    }
+
+    seq.end()
+}
+
 pub fn deserialize_roles<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<RoleId, Role>, D::Error> {
