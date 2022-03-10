@@ -1,3 +1,5 @@
+//! EditUserSettings are encoded, so this is disabled for now
+
 use std::collections::HashMap;
 
 use serde_json::Value;
