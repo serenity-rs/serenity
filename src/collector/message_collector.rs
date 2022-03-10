@@ -190,6 +190,7 @@ impl MessageCollectorBuilder {
         self
     }
 
+    /// Use the given configuration to build the [`MessageCollector`].
     #[allow(clippy::unwrap_used)]
     pub fn build(self) -> MessageCollector {
         let shard_messenger = self.shard.unwrap();

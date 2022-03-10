@@ -313,6 +313,7 @@ impl ReactionCollectorBuilder {
         }
     }
 
+    /// Use the given configuration to build the [`ReactionCollector`].
     #[allow(clippy::unwrap_used)]
     pub fn build(self) -> ReactionCollector {
         let shard_messenger = self.shard.unwrap();

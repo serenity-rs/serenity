@@ -220,6 +220,7 @@ impl ModalInteractionCollectorBuilder {
         }
     }
 
+    /// Use the given configuration to build the [`ModalInteractionCollector`].
     #[allow(clippy::unwrap_used)]
     pub fn build(self) -> ModalInteractionCollector {
         let shard_messenger = self.shard.unwrap();

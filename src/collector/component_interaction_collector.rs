@@ -217,6 +217,7 @@ impl ComponentInteractionCollectorBuilder {
         }
     }
 
+    /// Use the given configuration to build the [`ComponentInteractionCollector`].
     #[allow(clippy::unwrap_used)]
     pub fn build(self) -> ComponentInteractionCollector {
         let shard_messenger = self.shard.unwrap();

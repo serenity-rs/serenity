@@ -262,6 +262,11 @@ impl EventCollectorBuilder {
         self
     }
 
+    /// Use the given configuration to build the [`EventCollector`].
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the filter option validation fails.
     #[allow(clippy::unwrap_used)]
     pub fn build(self) -> Result<EventCollector> {
         let shard_messenger = self.shard.unwrap();
