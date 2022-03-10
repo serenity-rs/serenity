@@ -1,0 +1,3 @@
+[submodule "voice-model"]
+	path = voice-model
+	url = https://github.com/nxg-org/serenity-voice-model
