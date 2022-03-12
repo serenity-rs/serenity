@@ -26,7 +26,7 @@ use crate::{client::bridge::gateway::ShardMessenger, collector::LazyArc, model::
 macro_rules! impl_message_collector {
     ($($name:ident;)*) => {
         $(
-            impl<'a> $name<'a> {
+            impl $name {
                 /// Limits how many messages will attempt to be filtered.
                 ///
                 /// The filter checks whether the message has been sent
@@ -163,21 +163,19 @@ impl_message_collector! {
 }
 
 /// Future building a stream of messages.
-pub struct MessageCollectorBuilder<'a> {
+pub struct MessageCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, MessageCollector>>,
 }
 
-impl<'a> MessageCollectorBuilder<'a> {
+impl MessageCollectorBuilder {
     /// A future that builds a [`MessageCollector`] based on the settings.
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
             shard: Some(shard_messenger.as_ref().clone()),
             timeout: None,
-            fut: None,
         }
     }
 
@@ -191,39 +189,31 @@ impl<'a> MessageCollectorBuilder<'a> {
 
         self
     }
-}
 
-impl<'a> Future for MessageCollectorBuilder<'a> {
-    type Output = MessageCollector;
+    /// Use the given configuration to build the [`MessageCollector`].
     #[allow(clippy::unwrap_used)]
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = MessageFilter::new(self.filter.take().unwrap());
-            let timeout = self.timeout.take();
+    pub fn build(self) -> MessageCollector {
+        let shard_messenger = self.shard.unwrap();
+        let (filter, receiver) = MessageFilter::new(self.filter.unwrap());
+        let timeout = self.timeout;
 
-            self.fut = Some(Box::pin(async move {
-                shard_messenger.set_message_filter(filter);
+        shard_messenger.set_message_filter(filter);
 
-                MessageCollector {
-                    receiver: Box::pin(receiver),
-                    timeout,
-                }
-            }))
+        MessageCollector {
+            receiver: Box::pin(receiver),
+            timeout,
         }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
     }
 }
 
-pub struct CollectReply<'a> {
+pub struct CollectReply {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, Option<Arc<Message>>>>,
+    fut: Option<BoxFuture<'static, Option<Arc<Message>>>>,
 }
 
-impl<'a> CollectReply<'a> {
+impl CollectReply {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
@@ -234,7 +224,7 @@ impl<'a> CollectReply<'a> {
     }
 }
 
-impl<'a> Future for CollectReply<'a> {
+impl Future for CollectReply {
     type Output = Option<Arc<Message>>;
     #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {

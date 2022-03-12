@@ -31,7 +31,7 @@ use crate::{
 macro_rules! impl_reaction_collector {
     ($($name:ident;)*) => {
         $(
-            impl<'a> $name<'a> {
+            impl $name {
                 /// Limits how many messages will attempt to be filtered.
                 ///
                 /// The filter checks whether the message has been sent
@@ -298,55 +298,45 @@ impl_reaction_collector! {
     ReactionCollectorBuilder;
 }
 
-pub struct ReactionCollectorBuilder<'a> {
+pub struct ReactionCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, ReactionCollector>>,
 }
 
-impl<'a> ReactionCollectorBuilder<'a> {
+impl ReactionCollectorBuilder {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
             shard: Some(shard_messenger.as_ref().clone()),
             timeout: None,
-            fut: None,
         }
     }
-}
 
-impl<'a> Future for ReactionCollectorBuilder<'a> {
-    type Output = ReactionCollector;
+    /// Use the given configuration to build the [`ReactionCollector`].
     #[allow(clippy::unwrap_used)]
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = ReactionFilter::new(self.filter.take().unwrap());
-            let timeout = self.timeout.take();
+    pub fn build(self) -> ReactionCollector {
+        let shard_messenger = self.shard.unwrap();
+        let (filter, receiver) = ReactionFilter::new(self.filter.unwrap());
+        let timeout = self.timeout;
 
-            self.fut = Some(Box::pin(async move {
-                shard_messenger.set_reaction_filter(filter);
+        shard_messenger.set_reaction_filter(filter);
 
-                ReactionCollector {
-                    receiver: Box::pin(receiver),
-                    timeout,
-                }
-            }))
+        ReactionCollector {
+            receiver: Box::pin(receiver),
+            timeout,
         }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
     }
 }
 
-pub struct CollectReaction<'a> {
+pub struct CollectReaction {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, Option<Arc<ReactionAction>>>>,
+    fut: Option<BoxFuture<'static, Option<Arc<ReactionAction>>>>,
 }
 
-impl<'a> CollectReaction<'a> {
+impl CollectReaction {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
@@ -357,7 +347,7 @@ impl<'a> CollectReaction<'a> {
     }
 }
 
-impl<'a> Future for CollectReaction<'a> {
+impl Future for CollectReaction {
     type Output = Option<Arc<ReactionAction>>;
     #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {

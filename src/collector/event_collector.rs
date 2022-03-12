@@ -7,7 +7,7 @@ use std::{
     time::Duration,
 };
 
-use futures::{future::BoxFuture, stream::Stream};
+use futures::stream::Stream;
 use tokio::sync::mpsc::{
     unbounded_channel,
     UnboundedReceiver as Receiver,
@@ -157,21 +157,19 @@ struct FilterOptions {
 }
 
 /// Future building a stream of events.
-pub struct EventCollectorBuilder<'a> {
+pub struct EventCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, Result<EventCollector>>>,
 }
 
-impl<'a> EventCollectorBuilder<'a> {
+impl EventCollectorBuilder {
     /// A future that builds an [`EventCollector`] based on the settings.
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
             shard: Some(shard_messenger.as_ref().clone()),
             timeout: None,
-            fut: None,
         }
     }
 
@@ -263,31 +261,24 @@ impl<'a> EventCollectorBuilder<'a> {
 
         self
     }
-}
 
-impl<'a> Future for EventCollectorBuilder<'a> {
-    type Output = Result<EventCollector>;
+    /// Use the given configuration to build the [`EventCollector`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Collector`] if the filter option validation fails.
     #[allow(clippy::unwrap_used)]
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = match EventFilter::new(self.filter.take().unwrap()) {
-                Ok(ret) => ret,
-                Err(err) => return Poll::Ready(Err(err)),
-            };
-            let timeout = self.timeout.take();
+    pub fn build(self) -> Result<EventCollector> {
+        let shard_messenger = self.shard.unwrap();
+        let (filter, receiver) = EventFilter::new(self.filter.unwrap())?;
+        let timeout = self.timeout;
 
-            self.fut = Some(Box::pin(async move {
-                shard_messenger.set_event_filter(filter);
+        shard_messenger.set_event_filter(filter);
 
-                Ok(EventCollector {
-                    receiver: Box::pin(receiver),
-                    timeout,
-                })
-            }))
-        }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
+        Ok(EventCollector {
+            receiver: Box::pin(receiver),
+            timeout,
+        })
     }
 }
 
@@ -336,22 +327,22 @@ mod test {
     use super::*;
     use crate::client::bridge::gateway::ShardMessenger;
 
-    #[tokio::test]
-    async fn test_no_event_types() {
+    #[test]
+    fn test_no_event_types() {
         let (sender, _) = unbounded();
         let msg = ShardMessenger::new(sender);
         assert!(matches!(
-            EventCollectorBuilder::new(&msg).await,
+            EventCollectorBuilder::new(&msg).build(),
             Err(Error::Collector(CollectorError::NoEventTypes))
         ));
         assert!(matches!(
-            EventCollectorBuilder::new(&msg).add_channel_id(ChannelId::default()).await,
+            EventCollectorBuilder::new(&msg).add_channel_id(ChannelId::default()).build(),
             Err(Error::Collector(CollectorError::NoEventTypes))
         ));
     }
 
-    #[tokio::test]
-    async fn test_build_with_single_id_filter() {
+    #[test]
+    fn test_build_with_single_id_filter() {
         let (sender, _) = unbounded();
         let msg = ShardMessenger::new(sender);
 
@@ -359,7 +350,7 @@ mod test {
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::GuildCreate)
                 .add_user_id(UserId::default())
-                .await,
+                .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
         assert!(matches!(
@@ -367,7 +358,7 @@ mod test {
                 .add_event_type(EventType::GuildCreate)
                 .add_event_type(EventType::GuildRoleCreate)
                 .add_user_id(UserId::default())
-                .await,
+                .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
 
@@ -375,7 +366,7 @@ mod test {
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::GuildBanAdd)
                 .add_user_id(UserId::default())
-                .await,
+                .build(),
             Ok(_)
         ));
         assert!(matches!(
@@ -383,13 +374,13 @@ mod test {
                 .add_event_type(EventType::GuildBanAdd)
                 .add_event_type(EventType::GuildCreate)
                 .add_user_id(UserId::default())
-                .await,
+                .build(),
             Ok(_)
         ));
     }
 
-    #[tokio::test]
-    async fn test_build_with_multiple_id_filters() {
+    #[test]
+    fn test_build_with_multiple_id_filters() {
         let (sender, _) = unbounded();
         let msg = ShardMessenger::new(sender);
 
@@ -398,20 +389,20 @@ mod test {
                 .add_event_type(EventType::UserUpdate)
                 .add_user_id(UserId::default())
                 .add_guild_id(GuildId::default())
-                .await,
+                .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
         assert!(matches!(
             EventCollectorBuilder::new(&msg)
                 .add_event_type(EventType::UserUpdate)
                 .add_user_id(UserId::default())
-                .await,
+                .build(),
             Ok(_)
         ));
     }
 
-    #[tokio::test]
-    async fn test_build_with_multiple_event_types() {
+    #[test]
+    fn test_build_with_multiple_event_types() {
         let (sender, _) = unbounded();
         let msg = ShardMessenger::new(sender);
 
@@ -422,7 +413,7 @@ mod test {
                 .add_event_type(EventType::GuildCreate)
                 .add_event_type(EventType::GuildMemberAdd)
                 .add_user_id(UserId::default())
-                .await,
+                .build(),
             Ok(_)
         ));
         // But if none of the events have that ID type, that's an error.
@@ -431,7 +422,7 @@ mod test {
                 .add_event_type(EventType::GuildCreate)
                 .add_event_type(EventType::UserUpdate)
                 .add_channel_id(ChannelId::default())
-                .await,
+                .build(),
             Err(Error::Collector(CollectorError::InvalidEventIdFilters))
         ));
     }

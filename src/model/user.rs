@@ -1049,37 +1049,31 @@ impl User {
 
     /// Returns a future that will await one message by this user.
     #[cfg(feature = "collector")]
-    pub fn await_reply<'a>(
-        &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> CollectReply<'a> {
+    pub fn await_reply(&self, shard_messenger: impl AsRef<ShardMessenger>) -> CollectReply {
         CollectReply::new(shard_messenger).author_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of messages sent by this user.
     #[cfg(feature = "collector")]
-    pub fn await_replies<'a>(
+    pub fn await_replies(
         &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> MessageCollectorBuilder<'a> {
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> MessageCollectorBuilder {
         MessageCollectorBuilder::new(shard_messenger).author_id(self.id.0)
     }
 
     /// Await a single reaction by this user.
     #[cfg(feature = "collector")]
-    pub fn await_reaction<'a>(
-        &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> CollectReaction<'a> {
+    pub fn await_reaction(&self, shard_messenger: impl AsRef<ShardMessenger>) -> CollectReaction {
         CollectReaction::new(shard_messenger).author_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this user.
     #[cfg(feature = "collector")]
-    pub fn await_reactions<'a>(
+    pub fn await_reactions(
         &self,
-        shard_messenger: &'a impl AsRef<ShardMessenger>,
-    ) -> ReactionCollectorBuilder<'a> {
+        shard_messenger: impl AsRef<ShardMessenger>,
+    ) -> ReactionCollectorBuilder {
         ReactionCollectorBuilder::new(shard_messenger).author_id(self.id.0)
     }
 }
