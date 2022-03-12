@@ -28,7 +28,7 @@ use crate::model::interactions::modal::ModalSubmitInteraction;
 macro_rules! impl_modal_interaction_collector {
     ($($name:ident;)*) => {
         $(
-            impl<'a> $name<'a> {
+            impl $name {
                 /// Limits how many interactions will attempt to be filtered.
                 ///
                 /// The filter checks whether the message has been sent
@@ -205,55 +205,45 @@ impl_modal_interaction_collector! {
     ModalInteractionCollectorBuilder;
 }
 
-pub struct ModalInteractionCollectorBuilder<'a> {
+pub struct ModalInteractionCollectorBuilder {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, ModalInteractionCollector>>,
 }
 
-impl<'a> ModalInteractionCollectorBuilder<'a> {
+impl ModalInteractionCollectorBuilder {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
             shard: Some(shard_messenger.as_ref().clone()),
             timeout: None,
-            fut: None,
         }
     }
-}
 
-impl<'a> Future for ModalInteractionCollectorBuilder<'a> {
-    type Output = ModalInteractionCollector;
+    /// Use the given configuration to build the [`ModalInteractionCollector`].
     #[allow(clippy::unwrap_used)]
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = ModalInteractionFilter::new(self.filter.take().unwrap());
-            let timeout = self.timeout.take();
+    pub fn build(self) -> ModalInteractionCollector {
+        let shard_messenger = self.shard.unwrap();
+        let (filter, receiver) = ModalInteractionFilter::new(self.filter.unwrap());
+        let timeout = self.timeout;
 
-            self.fut = Some(Box::pin(async move {
-                shard_messenger.set_modal_interaction_filter(filter);
+        shard_messenger.set_modal_interaction_filter(filter);
 
-                ModalInteractionCollector {
-                    receiver: Box::pin(receiver),
-                    timeout,
-                }
-            }))
+        ModalInteractionCollector {
+            receiver: Box::pin(receiver),
+            timeout,
         }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
     }
 }
 
-pub struct CollectModalInteraction<'a> {
+pub struct CollectModalInteraction {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, Option<Arc<ModalSubmitInteraction>>>>,
+    fut: Option<BoxFuture<'static, Option<Arc<ModalSubmitInteraction>>>>,
 }
 
-impl<'a> CollectModalInteraction<'a> {
+impl CollectModalInteraction {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
@@ -264,7 +254,7 @@ impl<'a> CollectModalInteraction<'a> {
     }
 }
 
-impl<'a> Future for CollectModalInteraction<'a> {
+impl Future for CollectModalInteraction {
     type Output = Option<Arc<ModalSubmitInteraction>>;
     #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {

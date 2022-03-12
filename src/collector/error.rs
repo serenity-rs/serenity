@@ -19,15 +19,13 @@ pub enum Error {
     /// # use serenity::{prelude::*, collector::{CollectorError, EventCollectorBuilder}, model::prelude::*};
     /// # let (sender, _) = futures::channel::mpsc::unbounded();
     /// # let ctx = serenity::client::bridge::gateway::ShardMessenger::new(sender);
-    /// # tokio_test::block_on(async move {
     /// assert!(matches!(
     ///     EventCollectorBuilder::new(&ctx)
     ///         .add_event_type(EventType::GuildCreate)
     ///         .add_user_id(UserId::default())
-    ///         .await,
+    ///         .build(),
     ///     Err(SerenityError::Collector(CollectorError::InvalidEventIdFilters)),
     /// ));
-    /// # });
     /// ```
     /// [EventCollectorBuilder]: crate::collector::EventCollectorBuilder
     InvalidEventIdFilters,
