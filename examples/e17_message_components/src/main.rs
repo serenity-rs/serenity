@@ -217,7 +217,7 @@ impl EventHandler for Handler {
         // Wait for multiple interactions
 
         let mut cib =
-            m.await_component_interactions(&ctx).timeout(Duration::from_secs(60 * 3)).await;
+            m.await_component_interactions(&ctx).timeout(Duration::from_secs(60 * 3)).build();
 
         while let Some(mci) = cib.next().await {
             let sound = Sound::from_str(&mci.data.custom_id).unwrap();

@@ -141,7 +141,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         .collect_limit(5u32)
         .timeout(Duration::from_secs(10))
     // Build the collector.
-        .await;
+        .build();
 
     // Let's acquire borrow HTTP to send a message inside the `async move`.
     let http = &ctx.http;
@@ -173,7 +173,8 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         .add_event_type(EventType::MessageUpdate)
         .timeout(Duration::from_secs(20));
     // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
-    let mut collector = collected.iter().fold(builder, |b, msg| b.add_message_id(msg.id)).await?;
+    let mut collector =
+        collected.iter().fold(builder, |b, msg| b.add_message_id(msg.id)).build()?;
 
     let _ = msg.reply(ctx, "Edit each of those 5 messages in 20 seconds").await;
     let mut edited = HashSet::new();
