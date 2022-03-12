@@ -432,15 +432,6 @@
 <span id="427">427</span>
 <span id="428">428</span>
 <span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
-<span id="438">438</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">boxed::Box</span>,
     <span class="ident">future::Future</span>,
@@ -450,7 +441,7 @@
     <span class="ident">time::Duration</span>,
 };
 
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">future::BoxFuture</span>, <span class="ident">stream::Stream</span>};
+<span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::mpsc</span>::{
     <span class="ident">unbounded_channel</span>,
     <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>,
@@ -600,21 +591,19 @@
 }
 
 <span class="doccomment">/// Future building a stream of events.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EventCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EventCollectorBuilder</span> {
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterOptions</span><span class="op">&gt;</span>,
     <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EventCollector</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EventCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">EventCollectorBuilder</span> {
     <span class="doccomment">/// A future that builds an [`EventCollector`] based on the settings.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">filter</span>: <span class="prelude-val">Some</span>(<span class="ident">FilterOptions::default</span>()),
             <span class="ident">shard</span>: <span class="prelude-val">Some</span>(<span class="ident">shard_messenger</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>()),
             <span class="ident">timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">fut</span>: <span class="prelude-val">None</span>,
         }
     }
 
@@ -706,31 +695,24 @@
 
         <span class="self">self</span>
     }
-}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">EventCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EventCollector</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Use the given configuration to build the [`EventCollector`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Collector`] if the filter option validation fails.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unwrap_used</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
-            <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">EventFilter::new</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()) {
-                <span class="prelude-val">Ok</span>(<span class="ident">ret</span>) =&gt; <span class="ident">ret</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
-            };
-            <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span>.<span class="ident">take</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EventCollector</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="ident">filter</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">EventFilter::new</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">unwrap</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span>;
 
-            <span class="self">self</span>.<span class="ident">fut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">shard_messenger</span>.<span class="ident">set_event_filter</span>(<span class="ident">filter</span>);
+        <span class="ident">shard_messenger</span>.<span class="ident">set_event_filter</span>(<span class="ident">filter</span>);
 
-                <span class="prelude-val">Ok</span>(<span class="ident">EventCollector</span> {
-                    <span class="ident">receiver</span>: <span class="ident">Box::pin</span>(<span class="ident">receiver</span>),
-                    <span class="ident">timeout</span>,
-                })
-            }))
-        }
-
-        <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">ctx</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">EventCollector</span> {
+            <span class="ident">receiver</span>: <span class="ident">Box::pin</span>(<span class="ident">receiver</span>),
+            <span class="ident">timeout</span>,
+        })
     }
 }
 
@@ -779,22 +761,22 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_no_event_types</span>() {
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_no_event_types</span>() {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">unbounded</span>();
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardMessenger::new</span>(<span class="ident">sender</span>);
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-            <span class="ident">EventCollectorBuilder::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>,
+            <span class="ident">EventCollectorBuilder::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="ident">build</span>(),
             <span class="prelude-val">Err</span>(<span class="ident">Error::Collector</span>(<span class="ident">CollectorError::NoEventTypes</span>))
         ));
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-            <span class="ident">EventCollectorBuilder::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="ident">add_channel_id</span>(<span class="ident">ChannelId::default</span>()).<span class="kw">await</span>,
+            <span class="ident">EventCollectorBuilder::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="ident">add_channel_id</span>(<span class="ident">ChannelId::default</span>()).<span class="ident">build</span>(),
             <span class="prelude-val">Err</span>(<span class="ident">Error::Collector</span>(<span class="ident">CollectorError::NoEventTypes</span>))
         ));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_build_with_single_id_filter</span>() {
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_build_with_single_id_filter</span>() {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">unbounded</span>();
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardMessenger::new</span>(<span class="ident">sender</span>);
 
@@ -802,7 +784,7 @@
             <span class="ident">EventCollectorBuilder::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>)
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildCreate</span>)
                 .<span class="ident">add_user_id</span>(<span class="ident">UserId::default</span>())
-                .<span class="kw">await</span>,
+                .<span class="ident">build</span>(),
             <span class="prelude-val">Err</span>(<span class="ident">Error::Collector</span>(<span class="ident">CollectorError::InvalidEventIdFilters</span>))
         ));
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
@@ -810,7 +792,7 @@
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildCreate</span>)
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildRoleCreate</span>)
                 .<span class="ident">add_user_id</span>(<span class="ident">UserId::default</span>())
-                .<span class="kw">await</span>,
+                .<span class="ident">build</span>(),
             <span class="prelude-val">Err</span>(<span class="ident">Error::Collector</span>(<span class="ident">CollectorError::InvalidEventIdFilters</span>))
         ));
 
@@ -818,7 +800,7 @@
             <span class="ident">EventCollectorBuilder::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>)
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildBanAdd</span>)
                 .<span class="ident">add_user_id</span>(<span class="ident">UserId::default</span>())
-                .<span class="kw">await</span>,
+                .<span class="ident">build</span>(),
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>)
         ));
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
@@ -826,13 +808,13 @@
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildBanAdd</span>)
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildCreate</span>)
                 .<span class="ident">add_user_id</span>(<span class="ident">UserId::default</span>())
-                .<span class="kw">await</span>,
+                .<span class="ident">build</span>(),
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>)
         ));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_build_with_multiple_id_filters</span>() {
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_build_with_multiple_id_filters</span>() {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">unbounded</span>();
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardMessenger::new</span>(<span class="ident">sender</span>);
 
@@ -841,20 +823,20 @@
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::UserUpdate</span>)
                 .<span class="ident">add_user_id</span>(<span class="ident">UserId::default</span>())
                 .<span class="ident">add_guild_id</span>(<span class="ident">GuildId::default</span>())
-                .<span class="kw">await</span>,
+                .<span class="ident">build</span>(),
             <span class="prelude-val">Err</span>(<span class="ident">Error::Collector</span>(<span class="ident">CollectorError::InvalidEventIdFilters</span>))
         ));
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
             <span class="ident">EventCollectorBuilder::new</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>)
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::UserUpdate</span>)
                 .<span class="ident">add_user_id</span>(<span class="ident">UserId::default</span>())
-                .<span class="kw">await</span>,
+                .<span class="ident">build</span>(),
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>)
         ));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_build_with_multiple_event_types</span>() {
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_build_with_multiple_event_types</span>() {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">unbounded</span>();
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">ShardMessenger::new</span>(<span class="ident">sender</span>);
 
@@ -865,7 +847,7 @@
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildCreate</span>)
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildMemberAdd</span>)
                 .<span class="ident">add_user_id</span>(<span class="ident">UserId::default</span>())
-                .<span class="kw">await</span>,
+                .<span class="ident">build</span>(),
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>)
         ));
         <span class="comment">// But if none of the events have that ID type, that&#39;s an error.</span>
@@ -874,11 +856,11 @@
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::GuildCreate</span>)
                 .<span class="ident">add_event_type</span>(<span class="ident">EventType::UserUpdate</span>)
                 .<span class="ident">add_channel_id</span>(<span class="ident">ChannelId::default</span>())
-                .<span class="kw">await</span>,
+                .<span class="ident">build</span>(),
             <span class="prelude-val">Err</span>(<span class="ident">Error::Collector</span>(<span class="ident">CollectorError::InvalidEventIdFilters</span>))
         ));
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (1eb72580d 2022-03-08)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (335ffbfa5 2022-03-11)" ></div>
 </body></html>
