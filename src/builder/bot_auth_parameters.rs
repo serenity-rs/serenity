@@ -1,6 +1,8 @@
 use url::Url;
 
+#[cfg(feature = "http")]
 use crate::http::client::Http;
+#[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -64,6 +66,7 @@ impl CreateBotAuthParameters {
     /// If the user is not authorized for this endpoint.
     ///
     /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
+    #[cfg(feature = "http")]
     pub async fn auto_client_id(&mut self, http: impl AsRef<Http>) -> Result<&mut Self> {
         self.client_id = http.as_ref().get_current_application_info().await.map(|v| v.id)?;
         Ok(self)

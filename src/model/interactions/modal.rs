@@ -3,13 +3,16 @@ use serde::Serialize;
 
 use super::message_component::ActionRow;
 use super::prelude::*;
+#[cfg(feature = "model")]
 use crate::builder::{
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
+#[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::interactions::InteractionType;
+#[cfg(feature = "model")]
 use crate::utils;
 
 /// An interaction triggered by a modal submit.
@@ -52,6 +55,7 @@ pub struct ModalSubmitInteraction {
     pub locale: String,
 }
 
+#[cfg(feature = "model")]
 impl ModalSubmitInteraction {
     /// Gets the interaction response.
     ///
