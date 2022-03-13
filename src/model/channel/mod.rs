@@ -253,7 +253,7 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 | 5 | 6 | 10 | 11 | 12 | 13 => {
+            0 | 2 | 5 | 6 | 10 | 11 | 12 | 13 | 15 => {
                 serde_json::from_value::<GuildChannel>(Value::Object(v))
                     .map(Channel::Guild)
                     .map_err(DeError::custom)
@@ -322,12 +322,15 @@ pub enum ChannelType {
     Store = 6,
     /// An indicator that the channel is a news thread [`GuildChannel`].
     NewsThread = 10,
-    /// An indicator that the channel is a news thread [`GuildChannel`].
+    /// An indicator that the channel is a public thread [`GuildChannel`].
     PublicThread = 11,
-    /// An indicator that the channel is a news thread [`GuildChannel`].
+    /// An indicator that the channel is a private thread [`GuildChannel`].
     PrivateThread = 12,
     /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
+    /// An indicator that the channel is a forum [`GuildChannel`].
+    #[cfg(feature = "unstable_discord_api")]
+    Forum = 15,
     /// An indicator that the channel is of unknown type.
     Unknown = !0,
 }
@@ -342,7 +345,9 @@ enum_number!(ChannelType {
     NewsThread,
     PublicThread,
     PrivateThread,
-    Stage
+    Stage,
+    #[cfg(feature = "unstable_discord_api")]
+    Forum,
 });
 
 impl ChannelType {
@@ -359,6 +364,8 @@ impl ChannelType {
             ChannelType::PublicThread => "public_thread",
             ChannelType::PrivateThread => "private_thread",
             ChannelType::Stage => "stage",
+            #[cfg(feature = "unstable_discord_api")]
+            ChannelType::Forum => "forum",
             ChannelType::Unknown => "unknown",
         }
     }
