@@ -6,7 +6,7 @@ use std::{
     pin::Pin,
     str::FromStr,
     sync::Arc,
-    task::{Context as FutContext, Poll}, borrow::Borrow,
+    task::{Context as FutContext, Poll},
 };
 
 use bytes::buf::Buf;
@@ -181,25 +181,6 @@ impl<'a> HttpBuilder<'a> {
 
         self
     }
-
-    pub fn cookies(mut self, cookies: &String) -> Self {
-        self.user_ctx =  Some(self.user_ctx.unwrap_or_default().set_cookies(cookies));
-
-        self
-    }
-
-    pub fn x_fingerprint(mut self, x_fingerprint: &String) -> Self {
-        self.user_ctx =  Some(self.user_ctx.unwrap_or_default().set_x_fingerprint(x_fingerprint));
-
-        self
-    }
-
-
-    pub fn x_super_properties(mut self, x_super_properties: &String) -> Self {
-        self.user_ctx =  Some(self.user_ctx.unwrap_or_default().set_x_super_properties(x_super_properties));
-
-        self
-    }
 }
 
 impl<'a> Future for HttpBuilder<'a> {
@@ -279,24 +260,6 @@ impl UserRequestContext {
         self.headers.insert(USER_AGENT, HeaderValue::from_str(user_agent).unwrap());
         self.headers.insert("x-super-properties", HeaderValue::from_str(&build_super_properties(user_agent)).unwrap());
 
-        self
-    }
-
-    pub fn set_cookies(mut self, cookies: &String) -> Self {
-        self.headers.insert("cookie", HeaderValue::from_str(cookies).unwrap());
-        
-        self
-    }
-
-    pub fn set_x_fingerprint(mut self, x_fingerprint: &String) -> Self {
-        self.headers.insert("x-fingerprint", HeaderValue::from_str(x_fingerprint).unwrap());
-        
-        self
-    }
-
-    pub fn set_x_super_properties(mut self, x_super_properties: &String) -> Self {
-        self.headers.insert("x-super-properties", HeaderValue::from_str(x_super_properties).unwrap());
-        
         self
     }
 }
@@ -388,17 +351,10 @@ impl Http {
     }
 
     pub fn set_user_agent(mut self, user_agent: &String) ->  Self {
-        if self.token[..3].contains("Bot") {
+        if &self.token[..3] == "Bot" {
             self.user_ctx = Some(self.user_ctx.unwrap_or_default().set_user_agent(user_agent));
         }
 
-        self
-    }
-
-    pub fn set_discord_cookies(&mut self, cookies: &String) -> &mut Self {
-        if &self.token[..3] == "Bot" {
-            self.user_ctx = Some(self.user_ctx.take().unwrap_or_default().set_cookies(cookies));
-        }
         self
     }
 
