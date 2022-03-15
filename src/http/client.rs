@@ -33,6 +33,7 @@ use super::{
     HttpError,
 };
 use crate::constants;
+use crate::http::generators::*;
 use crate::http::routing::Route;
 use crate::internal::prelude::*;
 #[cfg(feature = "unstable_discord_api")]
@@ -68,6 +69,7 @@ pub struct HttpBuilder<'a> {
     ratelimiter: Option<Ratelimiter>,
     ratelimiter_disabled: Option<bool>,
     token: Option<String>,
+    user_ctx: Option<UserRequestContext>,
     proxy: Option<Url>,
     fut: Option<BoxFuture<'a, Result<Http>>>,
     #[cfg(feature = "unstable_discord_api")]
@@ -82,6 +84,7 @@ impl<'a> HttpBuilder<'a> {
             ratelimiter: None,
             ratelimiter_disabled: Some(false),
             token: None,
+            user_ctx: None,
             proxy: None,
             fut: None,
             #[cfg(feature = "unstable_discord_api")]
@@ -106,8 +109,8 @@ impl<'a> HttpBuilder<'a> {
         self
     }
 
-    /// Sets a token for the bot. If the token is not prefixed "Bot ", this
-    /// method will automatically do so.
+    /// Sets a token for the bot.
+    /// Prefix the token with "Bot " to use a bot token.
     #[must_use]
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         let token = token.as_ref().trim();
@@ -172,6 +175,18 @@ impl<'a> HttpBuilder<'a> {
 
         Ok(self)
     }
+
+    pub fn user_agent(mut self, user_agent: String) -> Self {
+        self.user_ctx = Some(UserRequestContext::new(user_agent));
+
+        self
+    }
+
+    pub fn cookies(mut self, cookies: String) -> Self {
+        self.user_ctx.cookies = Some(cookies);
+
+        self
+    }
 }
 
 impl<'a> Future for HttpBuilder<'a> {
@@ -200,6 +215,10 @@ impl<'a> Future for HttpBuilder<'a> {
 
             let ratelimiter_disabled = self.ratelimiter_disabled.take().unwrap();
             let proxy = self.proxy.take();
+            let super_properties = self.user_ctx.take();
+            let cookies = self.cookies.take();
+
+            let bot = token[..3].contains("Bot");
 
             self.fut = Some(Box::pin(async move {
                 Ok(Http {
@@ -208,6 +227,8 @@ impl<'a> Future for HttpBuilder<'a> {
                     ratelimiter_disabled,
                     proxy,
                     token,
+                    custom_headers,
+                    cookies,
                     #[cfg(feature = "unstable_discord_api")]
                     application_id,
                 })
@@ -229,9 +250,14 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
+    pub custom_headers: UserRequestContext,
     #[cfg(feature = "unstable_discord_api")]
     pub application_id: u64,
 }
+
+#[repr(transparent)]
+#[derive(Default)]
+pub struct UserRequestContext (reqwest::header::HeaderMap);
 
 impl fmt::Debug for Http {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -247,13 +273,14 @@ impl fmt::Debug for Http {
 impl Http {
     pub fn new(client: Arc<Client>, token: &str) -> Self {
         let client2 = Arc::clone(&client);
-
+ 
         Http {
             client,
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
             ratelimiter_disabled: false,
             proxy: None,
             token: token.to_string(),
+            custom_headers: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
@@ -292,6 +319,31 @@ impl Http {
         base.application_id = application_id;
 
         base
+    }
+
+    #[inline]
+    pub fn set_user_agent(&mut self, user_agent: String) -> &mut Self {
+        if self.token[..3].contains("Bot") {
+            self.custom_headers = Some(UserRequestContext::new(user_agent));
+        }
+
+        self
+    }
+
+    #[inline]
+    pub fn set_super_properties(&mut self, super_properties: Option<UserRequestContext>) -> &mut Self {
+        self.custom_headers = super_properties;
+
+        self
+    }
+
+    #[inline]
+    pub fn set_discord_cookies(&mut self, cookies: impl AsRef<str>) -> &mut Self {
+        if self.token[..3].contains("Bot") {
+            self.cookies = Some(build_cookies());
+        }
+
+        self
     }
 
     /// Adds a [`User`] to a [`Group`].
@@ -3581,6 +3633,31 @@ impl Http {
     /// This is a function that performs a light amount of work and returns an
     /// empty tuple, so it's called "self.wind" to denote that it's lightweight.
     pub(super) async fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
+        if self.custom_headers {
+            if let Some(headers) = req.headers_ref() {
+                headers.insert("accept", HeaderValue::from_static("*/*"));
+
+                headers.insert("connecton", HeaderValue::from_static("keep-alive"));
+                headers.insert("content-type", HeaderValue::from_static("application/json"));
+                headers.insert("cookie", HeaderValue::from_str(&self.cookies).unwrap());
+                headers.insert("host", HeaderValue::from_static("discord.com"));
+
+                headers.insert("user-agent", HeaderValue::from_str(&self.user_agent).unwrap());
+                headers.insert(
+                    "x-debug-options",
+                    HeaderValue::from_static("bugReporterEnabled"),v
+                );
+                headers.insert(
+                    "x-fingerprint",
+                    HeaderValue::from_str(&self.x_fingerprint).unwrap(),
+                );
+                headers.insert(
+                    "x-super-properties",
+                    HeaderValue::from_str(&self.x_super_properties).unwrap(),
+                );
+            }
+        }
+
         let response = self.request(req).await?;
 
         if response.status().as_u16() == expected {
@@ -3622,6 +3699,8 @@ impl Default for Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
+            custom_headers: None,
+            
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
