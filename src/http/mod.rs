@@ -25,12 +25,12 @@
 
 pub mod client;
 pub mod error;
+pub mod generators;
 pub mod ratelimiting;
 pub mod request;
 pub mod routing;
 pub mod typing;
 pub mod utils;
-pub mod generators;
 
 use std::{
     borrow::Cow,

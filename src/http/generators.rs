@@ -1,37 +1,35 @@
-use hex::encode as h_encode;
 use base64::encode;
+use hex::encode as h_encode;
 use rand::random;
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SuperProperties<'a> {
-    pub os:                         &'a str,
-    pub browser:                     &'a str,
-    pub device:                      &'a str,
-    pub system_locale:               &'a str,
-    pub browser_user_agent:          &'a str,
-    pub browser_version:            &'a str,
-    pub os_version:                 &'a str,
-    pub referrer:                    &'a str,
-    pub referring_domain:           &'a str,
-    pub referrer_current:            &'a str,
-    pub referring_domain_current:    &'a str,
-    pub release_channel:             &'a str,
-    pub client_build_number:        i32,
-    pub client_event_source:        Option< &'a str>,
+    pub os: &'a str,
+    pub browser: &'a str,
+    pub device: &'a str,
+    pub system_locale: &'a str,
+    pub browser_user_agent: &'a str,
+    pub browser_version: &'a str,
+    pub os_version: &'a str,
+    pub referrer: &'a str,
+    pub referring_domain: &'a str,
+    pub referrer_current: &'a str,
+    pub referring_domain_current: &'a str,
+    pub release_channel: &'a str,
+    pub client_build_number: i32,
+    pub client_event_source: Option<&'a str>,
 }
 
-impl core::fmt::Display for SuperProperties<'_>  {
+impl core::fmt::Display for SuperProperties<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(&encode(match serde_json::to_string(&self) {
             Ok(a) => a,
-            Err(_) => return Err(core::fmt::Error)
+            Err(_) => return Err(core::fmt::Error),
         }))?;
 
         Ok(())
     }
 }
-
 
 impl Default for SuperProperties<'_> {
     fn default() -> SuperProperties<'static> {
@@ -49,7 +47,7 @@ impl Default for SuperProperties<'_> {
             referring_domain_current:   "",
             release_channel:            "stable",
             client_build_number:        105691,
-            client_event_source:        None,   
+            client_event_source:        None,
         }
     }
 }
@@ -87,7 +85,6 @@ pub fn build_super_properties(browser_user_agent: impl AsRef<str>) -> String {
     let return_val = encode(strsuper);
     return return_val;
 }
-
 
 pub fn build_cookies() -> String {
     let first = dcfduid();

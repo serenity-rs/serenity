@@ -13,7 +13,16 @@ use bytes::buf::Buf;
 use futures::future::BoxFuture;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::{
-    header::{HeaderMap as Headers, HeaderValue,  AUTHORIZATION, CONTENT_TYPE, USER_AGENT, HOST, CONNECTION, ACCEPT},
+    header::{
+        HeaderMap as Headers,
+        HeaderValue,
+        ACCEPT,
+        AUTHORIZATION,
+        CONNECTION,
+        CONTENT_TYPE,
+        HOST,
+        USER_AGENT,
+    },
     StatusCode,
     Url,
 };
@@ -177,7 +186,7 @@ impl<'a> HttpBuilder<'a> {
     }
 
     pub fn user_agent(mut self, user_agent: &String) -> Self {
-        self.user_ctx =  Some(self.user_ctx.unwrap_or_default().set_user_agent(user_agent));
+        self.user_ctx = Some(self.user_ctx.unwrap_or_default().set_user_agent(user_agent));
 
         self
     }
@@ -229,16 +238,17 @@ impl<'a> Future for HttpBuilder<'a> {
     }
 }
 
-
 #[repr(transparent)]
 #[derive(Default)]
 pub struct UserRequestContext {
-    headers: reqwest::header::HeaderMap
+    headers: reqwest::header::HeaderMap,
 }
 
 impl From<Headers> for UserRequestContext {
     fn from(headers: Headers) -> Self {
-        Self { headers }
+        Self {
+            headers,
+        }
     }
 }
 
@@ -263,22 +273,25 @@ impl UserRequestContext {
         headers.insert("cookie", HeaderValue::from_str(&cookies).unwrap());
         headers.insert("x-debug-options", HeaderValue::from_static("bugReporterEnabled"));
 
-        /// This is bad. Fix later.
+        // This is bad. Fix later.
         headers.insert("x-discord-locale", HeaderValue::from_static("en-US"));
         headers.insert("x-super-properties", HeaderValue::from_str(&props).unwrap());
-      
 
-        UserRequestContext { headers }
+        UserRequestContext {
+            headers,
+        }
     }
 
     pub fn set_user_agent(mut self, user_agent: &String) -> Self {
         self.headers.insert(USER_AGENT, HeaderValue::from_str(user_agent).unwrap());
-        self.headers.insert("x-super-properties", HeaderValue::from_str(&build_super_properties(user_agent)).unwrap());
+        self.headers.insert(
+            "x-super-properties",
+            HeaderValue::from_str(&build_super_properties(user_agent)).unwrap(),
+        );
 
         self
     }
 }
-
 
 /// **Note**: For all member functions that return a [`Result`], the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
@@ -310,7 +323,7 @@ impl fmt::Debug for Http {
 impl Http {
     pub fn new(client: Arc<Client>, token: &str) -> Self {
         let client2 = Arc::clone(&client);
- 
+
         Http {
             client,
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
@@ -358,14 +371,13 @@ impl Http {
         base
     }
 
-
-    pub fn set_user_ctx(mut self, super_properties: Option<UserRequestContext>) ->  Self {
+    pub fn set_user_ctx(mut self, super_properties: Option<UserRequestContext>) -> Self {
         self.user_ctx = super_properties;
 
         self
     }
 
-    pub fn set_user_agent(mut self, user_agent: &String) ->  Self {
+    pub fn set_user_agent(mut self, user_agent: &String) -> Self {
         if &self.token[..3] == "Bot" {
             self.user_ctx = Some(self.user_ctx.unwrap_or_default().set_user_agent(user_agent));
         }
@@ -3639,22 +3651,26 @@ impl Http {
     /// ```
     #[instrument]
     pub async fn request(&self, mut req: Request<'_>) -> Result<ReqwestResponse> {
-            // if let Some(user_ctx) = &self.user_ctx {
-            //     if let Some(org) = &mut req.headers {
-            //         for (key, value) in &user_ctx.headers {
-            //             org.insert(`, *value.borrow());
-            //         }
-            //     } else {
-            //         req.headers = Some(user_ctx.headers);
-            //     }
-            // }
+        // if let Some(user_ctx) = &self.user_ctx {
+        //     if let Some(org) = &mut req.headers {
+        //         for (key, value) in &user_ctx.headers {
+        //             org.insert(`, *value.borrow());
+        //         }
+        //     } else {
+        //         req.headers = Some(user_ctx.headers);
+        //     }
+        // }
 
-            if let Some(user_ctx) = &self.user_ctx {
-                let mut headers = req.headers.take().unwrap_or_default();
-                user_ctx.headers.clone().into_iter().for_each(|(k,v)| drop(headers.insert(k.unwrap(),v)));
-                req.headers = Some(headers);
-            }
-    
+        if let Some(user_ctx) = &self.user_ctx {
+            let mut headers = req.headers.take().unwrap_or_default();
+            user_ctx
+                .headers
+                .clone()
+                .into_iter()
+                .for_each(|(k, v)| drop(headers.insert(k.unwrap(), v)));
+            req.headers = Some(headers);
+        }
+
         let response = if self.ratelimiter_disabled {
             let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
             self.client.execute(request).await?
@@ -3718,7 +3734,7 @@ impl Default for Http {
             proxy: None,
             token: "".to_string(),
             user_ctx: None,
-            
+
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
