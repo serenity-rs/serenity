@@ -6,14 +6,14 @@ use std::{
     pin::Pin,
     str::FromStr,
     sync::Arc,
-    task::{Context as FutContext, Poll},
+    task::{Context as FutContext, Poll}, borrow::Borrow,
 };
 
 use bytes::buf::Buf;
 use futures::future::BoxFuture;
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::{
-    header::{HeaderMap as Headers, HeaderValue, AUTHORIZATION, CONTENT_TYPE, USER_AGENT},
+    header::{HeaderMap as Headers, HeaderValue,  AUTHORIZATION, CONTENT_TYPE, USER_AGENT, HOST, CONNECTION, ACCEPT},
     StatusCode,
     Url,
 };
@@ -176,14 +176,27 @@ impl<'a> HttpBuilder<'a> {
         Ok(self)
     }
 
-    pub fn user_agent(mut self, user_agent: String) -> Self {
-        self.user_ctx = Some(UserRequestContext::new(user_agent));
+    pub fn user_agent(mut self, user_agent: &String) -> Self {
+        self.user_ctx =  Some(self.user_ctx.unwrap_or_default().set_user_agent(user_agent));
 
         self
     }
 
-    pub fn cookies(mut self, cookies: String) -> Self {
-        self.user_ctx.cookies = Some(cookies);
+    pub fn cookies(mut self, cookies: &String) -> Self {
+        self.user_ctx =  Some(self.user_ctx.unwrap_or_default().set_cookies(cookies));
+
+        self
+    }
+
+    pub fn x_fingerprint(mut self, x_fingerprint: &String) -> Self {
+        self.user_ctx =  Some(self.user_ctx.unwrap_or_default().set_x_fingerprint(x_fingerprint));
+
+        self
+    }
+
+
+    pub fn x_super_properties(mut self, x_super_properties: &String) -> Self {
+        self.user_ctx =  Some(self.user_ctx.unwrap_or_default().set_x_super_properties(x_super_properties));
 
         self
     }
@@ -215,10 +228,7 @@ impl<'a> Future for HttpBuilder<'a> {
 
             let ratelimiter_disabled = self.ratelimiter_disabled.take().unwrap();
             let proxy = self.proxy.take();
-            let super_properties = self.user_ctx.take();
-            let cookies = self.cookies.take();
-
-            let bot = token[..3].contains("Bot");
+            let user_ctx = self.user_ctx.take();
 
             self.fut = Some(Box::pin(async move {
                 Ok(Http {
@@ -227,8 +237,7 @@ impl<'a> Future for HttpBuilder<'a> {
                     ratelimiter_disabled,
                     proxy,
                     token,
-                    custom_headers,
-                    cookies,
+                    user_ctx,
                     #[cfg(feature = "unstable_discord_api")]
                     application_id,
                 })
@@ -238,6 +247,60 @@ impl<'a> Future for HttpBuilder<'a> {
         self.fut.as_mut().unwrap().as_mut().poll(ctx)
     }
 }
+
+
+#[repr(transparent)]
+#[derive(Default)]
+pub struct UserRequestContext {
+    headers: reqwest::header::HeaderMap
+}
+
+
+impl UserRequestContext {
+    pub fn new(user_agent: &String) -> UserRequestContext {
+        let mut headers = reqwest::header::HeaderMap::new();
+        let props = build_super_properties(user_agent);
+        let cookies = build_cookies();
+
+        headers.insert(ACCEPT, HeaderValue::from_static("*/*"));
+        headers.insert(CONNECTION, HeaderValue::from_static("keep-alive"));
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+        headers.insert(HOST, HeaderValue::from_static("discord.com"));
+        headers.insert(USER_AGENT, HeaderValue::from_str(user_agent).unwrap());
+
+        headers.insert("cookie", HeaderValue::from_str(&cookies).unwrap());
+        headers.insert("x-debug-options", HeaderValue::from_static("bugReporterEnabled"));
+        headers.insert("x-super-properties", HeaderValue::from_str(&props).unwrap());
+
+        UserRequestContext { headers }
+    }
+
+    pub fn set_user_agent(mut self, user_agent: &String) -> Self {
+        self.headers.insert(USER_AGENT, HeaderValue::from_str(user_agent).unwrap());
+        self.headers.insert("x-super-properties", HeaderValue::from_str(&build_super_properties(user_agent)).unwrap());
+
+        self
+    }
+
+    pub fn set_cookies(mut self, cookies: &String) -> Self {
+        self.headers.insert("cookie", HeaderValue::from_str(cookies).unwrap());
+        
+        self
+    }
+
+    pub fn set_x_fingerprint(mut self, x_fingerprint: &String) -> Self {
+        self.headers.insert("x-fingerprint", HeaderValue::from_str(x_fingerprint).unwrap());
+        
+        self
+    }
+
+    pub fn set_x_super_properties(mut self, x_super_properties: &String) -> Self {
+        self.headers.insert("x-super-properties", HeaderValue::from_str(x_super_properties).unwrap());
+        
+        self
+    }
+}
+
 
 /// **Note**: For all member functions that return a [`Result`], the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
@@ -250,14 +313,10 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
-    pub custom_headers: UserRequestContext,
+    pub user_ctx: Option<UserRequestContext>,
     #[cfg(feature = "unstable_discord_api")]
     pub application_id: u64,
 }
-
-#[repr(transparent)]
-#[derive(Default)]
-pub struct UserRequestContext (reqwest::header::HeaderMap);
 
 impl fmt::Debug for Http {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -280,7 +339,7 @@ impl Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: token.to_string(),
-            custom_headers: None,
+            user_ctx: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
@@ -321,28 +380,25 @@ impl Http {
         base
     }
 
-    #[inline]
-    pub fn set_user_agent(&mut self, user_agent: String) -> &mut Self {
+
+    pub fn set_user_ctx(mut self, super_properties: Option<UserRequestContext>) ->  Self {
+        self.user_ctx = super_properties;
+
+        self
+    }
+
+    pub fn set_user_agent(mut self, user_agent: &String) ->  Self {
         if self.token[..3].contains("Bot") {
-            self.custom_headers = Some(UserRequestContext::new(user_agent));
+            self.user_ctx = Some(self.user_ctx.unwrap_or_default().set_user_agent(user_agent));
         }
 
         self
     }
 
-    #[inline]
-    pub fn set_super_properties(&mut self, super_properties: Option<UserRequestContext>) -> &mut Self {
-        self.custom_headers = super_properties;
-
-        self
-    }
-
-    #[inline]
-    pub fn set_discord_cookies(&mut self, cookies: impl AsRef<str>) -> &mut Self {
-        if self.token[..3].contains("Bot") {
-            self.cookies = Some(build_cookies());
+    pub fn set_discord_cookies(&mut self, cookies: &String) -> &mut Self {
+        if &self.token[..3] == "Bot" {
+            self.user_ctx = Some(self.user_ctx.take().unwrap_or_default().set_cookies(cookies));
         }
-
         self
     }
 
@@ -3611,7 +3667,23 @@ impl Http {
     /// # }
     /// ```
     #[instrument]
-    pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
+    pub async fn request(&self, mut req: Request<'_>) -> Result<ReqwestResponse> {
+            // if let Some(user_ctx) = &self.user_ctx {
+            //     if let Some(org) = &mut req.headers {
+            //         for (key, value) in &user_ctx.headers {
+            //             org.insert(`, *value.borrow());
+            //         }
+            //     } else {
+            //         req.headers = Some(user_ctx.headers);
+            //     }
+            // }
+
+            if let Some(user_ctx) = &self.user_ctx {
+                let mut headers = req.headers.take().unwrap_or_default();
+                user_ctx.headers.clone().into_iter().for_each(|(k,v)| drop(headers.insert(k.unwrap(),v)));
+                req.headers = Some(headers);
+            }
+    
         let response = if self.ratelimiter_disabled {
             let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
             self.client.execute(request).await?
@@ -3633,31 +3705,6 @@ impl Http {
     /// This is a function that performs a light amount of work and returns an
     /// empty tuple, so it's called "self.wind" to denote that it's lightweight.
     pub(super) async fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
-        if self.custom_headers {
-            if let Some(headers) = req.headers_ref() {
-                headers.insert("accept", HeaderValue::from_static("*/*"));
-
-                headers.insert("connecton", HeaderValue::from_static("keep-alive"));
-                headers.insert("content-type", HeaderValue::from_static("application/json"));
-                headers.insert("cookie", HeaderValue::from_str(&self.cookies).unwrap());
-                headers.insert("host", HeaderValue::from_static("discord.com"));
-
-                headers.insert("user-agent", HeaderValue::from_str(&self.user_agent).unwrap());
-                headers.insert(
-                    "x-debug-options",
-                    HeaderValue::from_static("bugReporterEnabled"),v
-                );
-                headers.insert(
-                    "x-fingerprint",
-                    HeaderValue::from_str(&self.x_fingerprint).unwrap(),
-                );
-                headers.insert(
-                    "x-super-properties",
-                    HeaderValue::from_str(&self.x_super_properties).unwrap(),
-                );
-            }
-        }
-
         let response = self.request(req).await?;
 
         if response.status().as_u16() == expected {
@@ -3699,7 +3746,7 @@ impl Default for Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
-            custom_headers: None,
+            user_ctx: None,
             
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
