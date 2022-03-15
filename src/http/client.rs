@@ -262,7 +262,11 @@ impl UserRequestContext {
 
         headers.insert("cookie", HeaderValue::from_str(&cookies).unwrap());
         headers.insert("x-debug-options", HeaderValue::from_static("bugReporterEnabled"));
+
+        /// This is bad. Fix later.
+        headers.insert("x-discord-locale", HeaderValue::from_static("en-US"));
         headers.insert("x-super-properties", HeaderValue::from_str(&props).unwrap());
+      
 
         UserRequestContext { headers }
     }
