@@ -4,20 +4,20 @@ use rand::random;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SuperProperties<'a> {
-    pub os: &'a str,
-    pub browser: &'a str,
-    pub device: &'a str,
-    pub system_locale: &'a str,
-    pub browser_user_agent: &'a str,
-    pub browser_version: &'a str,
-    pub os_version: &'a str,
-    pub referrer: &'a str,
-    pub referring_domain: &'a str,
-    pub referrer_current: &'a str,
-    pub referring_domain_current: &'a str,
-    pub release_channel: &'a str,
-    pub client_build_number: i32,
-    pub client_event_source: Option<&'a str>,
+    os: &'a str,
+    browser: &'a str,
+    device: &'a str,
+    system_locale: &'a str,
+    browser_user_agent: &'a str,
+    browser_version: &'a str,
+    os_version: &'a str,
+    referrer: &'a str,
+    referring_domain: &'a str,
+    referrer_current: &'a str,
+    referring_domain_current: &'a str,
+    release_channel: &'a str,
+    client_build_number: i32,
+    client_event_source: Option<&'a str>,
 }
 
 impl core::fmt::Display for SuperProperties<'_> {
