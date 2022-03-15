@@ -47,11 +47,23 @@ pub fn serialize_emojis<S: Serializer>(
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
-    let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
+    struct TryDeserialize<T>(StdResult<T, String>);
+    impl<'de, T: Deserialize<'de>> Deserialize<'de> for TryDeserialize<T> {
+        fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+            Ok(Self(T::deserialize(deserializer).map_err(|e| e.to_string())))
+        }
+    }
+
+    let vec: Vec<TryDeserialize<GuildChannel>> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
 
     for channel in vec {
-        map.insert(channel.id, channel);
+        match channel.0 {
+            Ok(channel) => {
+                map.insert(channel.id, channel);
+            },
+            Err(e) => tracing::warn!("skipping guild channel due to deserialization error: {}", e),
+        }
     }
 
     Ok(map)

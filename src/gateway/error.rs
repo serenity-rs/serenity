@@ -52,7 +52,7 @@ pub enum Error {
     InvalidGatewayIntents,
     /// When disallowed gatewax intents are provided.
     ///
-    /// If an connection has been established but priviliged gateway intents
+    /// If an connection has been established but privileged gateway intents
     /// were provided without enabling them prior.
     DisallowedGatewayIntents,
 }

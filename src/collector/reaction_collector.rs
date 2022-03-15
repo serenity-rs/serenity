@@ -222,7 +222,7 @@ impl ReactionFilter {
 
     /// Checks if the `reaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit reactions to
-    /// be sent by a specific author or in a specifc guild.
+    /// be sent by a specific author or in a specific guild.
     fn is_passing_constraints(&self, reaction: &mut LazyReactionAction<'_>) -> bool {
         let reaction = match (reaction.added, &mut reaction.reaction) {
             (true, reaction) => {

@@ -154,7 +154,7 @@ pub struct Team {
     pub owner_user_id: UserId,
 }
 
-/// Infromation about a Member on a Team.
+/// Information about a Member on a Team.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TeamMember {
     /// The member's membership state.

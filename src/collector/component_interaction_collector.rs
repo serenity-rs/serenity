@@ -149,7 +149,7 @@ impl ComponentInteractionFilter {
 
     /// Checks if the `interaction` passes set constraints.
     /// Constraints are optional, as it is possible to limit interactions to
-    /// be sent by a specific author or in a specifc guild.
+    /// be sent by a specific author or in a specific guild.
     fn is_passing_constraints(
         &self,
         interaction: &mut LazyArc<'_, MessageComponentInteraction>,

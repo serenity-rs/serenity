@@ -1297,7 +1297,7 @@ async fn send_error_embed(
 ///     Ok(())
 /// }
 ///
-/// let framwork = StandardFramework::new().help(&MY_HELP);
+/// let framework = StandardFramework::new().help(&MY_HELP);
 /// ```
 ///
 /// [`StandardFramework::help`]: crate::framework::standard::StandardFramework::help

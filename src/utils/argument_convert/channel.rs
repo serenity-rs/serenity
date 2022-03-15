@@ -198,7 +198,7 @@ impl ArgumentConvert for ChannelCategory {
     ) -> Result<Self, Self::Err> {
         match Channel::convert(ctx, guild_id, channel_id, s).await {
             Ok(Channel::Category(channel)) => Ok(channel),
-            // TODO: accomodate issue #1352 somehow
+            // TODO: accommodate issue #1352 somehow
             Ok(_) => Err(ChannelCategoryParseError::NotAChannelCategory),
             Err(ChannelParseError::Http(e)) => Err(ChannelCategoryParseError::Http(e)),
             Err(ChannelParseError::NotFoundOrMalformed) => {

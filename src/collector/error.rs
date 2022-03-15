@@ -3,7 +3,7 @@ use std::{
     fmt::{Display, Formatter, Result as FmtResult},
 };
 
-/// An error that occured while working with a collector.
+/// An error that occurred while working with a collector.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Error {

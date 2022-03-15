@@ -875,7 +875,7 @@ impl Args {
     /// # Note
     ///
     /// The value returned is to be assumed to stay static.
-    /// However, if [`Self::find`] was called previously, and was successful, then the value is substracted by one.
+    /// However, if [`Self::find`] was called previously, and was successful, then the value is subtracted by one.
     #[inline]
     pub fn len(&self) -> usize {
         self.args.len()
@@ -931,7 +931,7 @@ impl<'a, T: FromStr> Iter<'a, T> {
         self
     }
 
-    /// Trim leading and trailling whitespace off all arguments.
+    /// Trim leading and trailing whitespace off all arguments.
     #[inline]
     pub fn trimmed(&mut self) -> &mut Self {
         match self.state {

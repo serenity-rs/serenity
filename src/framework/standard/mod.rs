@@ -174,7 +174,7 @@ impl StandardFramework {
     /// # Examples
     ///
     /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
-    /// a 2 second delay inbetween invocations:
+    /// a 2 second delay in between invocations:
     ///
     /// ```rust,no_run
     /// use serenity::framework::standard::macros::command;
@@ -557,7 +557,7 @@ impl StandardFramework {
     ///     unrecognised_command_name: &str,
     /// ) {
     ///     println!(
-    ///         "A user named {:?} tried to executute an unknown command: {}",
+    ///         "A user named {:?} tried to execute an unknown command: {}",
     ///         msg.author.name, unrecognised_command_name
     ///     );
     /// }

@@ -47,7 +47,7 @@ const PACKAGE: &str = "Bot Dashboards";
 // for cache status, and another one to configure features or trigger actions on the bot.
 const DASHBOARD_STATS: &str = "Statistics";
 const DASHBOARD_CONFIG: &str = "Config Dashboard";
-// This are collapsable menus inside the dashboard, you can use them to group specific sets
+// This are collapsible menus inside the dashboard, you can use them to group specific sets
 // of data inside the same dashboard.
 // If you are using constants for this, make sure they don't end in _GROUP or _COMMAND, because
 // serenity's command framework uses these internally.
@@ -246,7 +246,7 @@ impl EventHandler for Handler {
                 // Get the REST GET latency by counting how long it takes to do a GET request.
                 let get_latency = {
                     let now = Instant::now();
-                    // `let _` to supress any errors. If they are a timeout, that will  be
+                    // `let _` to suppress any errors. If they are a timeout, that will  be
                     // reflected in the plotted graph.
                     let _ = reqwest::get("https://discordapp.com/api/v6/gateway").await;
                     now.elapsed().as_millis() as f64
@@ -401,7 +401,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     let mut command_usage_values = HashMap::new();
 
-    // Iterate over the commands of the General grop and add them to the table.
+    // Iterate over the commands of the General group and add them to the table.
     for (idx, i) in GENERAL_GROUP.options.commands.iter().enumerate() {
         command_usage_table.add_row(Row(idx as u64));
         command_usage_table.set_cell(Row(idx as u64), Col(0), i.options.names[0]);

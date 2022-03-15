@@ -304,11 +304,11 @@ impl TicketCounter {
             }
 
             let delay = self.ratelimit.delay;
-            // Substract one step of time that would have to pass.
+            // Subtract one step of time that would have to pass.
             // This tries to bypass a problem of keeping track of when tickets
             // were taken.
             // When a ticket is taken, the bucket sets `last_time`, by
-            // substracting the delay, once a ticket is allowed to be
+            // subtracting the delay, once a ticket is allowed to be
             // taken.
             // If the value is set to `None` this could possibly reset the
             // bucket.

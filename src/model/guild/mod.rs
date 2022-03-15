@@ -148,7 +148,7 @@ pub struct Guild {
     pub icon: Option<String>,
     /// The unique Id identifying the guild.
     ///
-    /// This is equivilant to the Id of the default role (`@everyone`) and also
+    /// This is equivalent to the Id of the default role (`@everyone`) and also
     /// that of the default channel (typically `#general`).
     pub id: GuildId,
     /// The date that the current user joined the guild.
@@ -1762,7 +1762,7 @@ impl Guild {
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
-    /// **Note**: Instead of panicing, when sorting does not find
+    /// **Note**: Instead of panicking, when sorting does not find
     /// a nick, the username will be used (this should never happen).
     ///
     /// **Locking**:

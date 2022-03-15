@@ -1744,7 +1744,7 @@ impl Http {
     ///
     /// - **channel_id**: ID of the channel the user is currently in
     ///   (**required**)
-    /// - **supress**: Bool which toggles user's suppressed state. Setting this
+    /// - **suppress**: Bool which toggles user's suppressed state. Setting this
     ///   to `false` will invite the user to speak.
     ///
     /// # Example
@@ -1791,7 +1791,7 @@ impl Http {
     ///
     /// - **channel_id**: ID of the channel the user is currently in
     ///   (**required**)
-    /// - **supress**: Bool which toggles user's suppressed state. Setting this
+    /// - **suppress**: Bool which toggles user's suppressed state. Setting this
     ///   to `false` will invite the user to speak.
     /// - **request_to_speak_timestamp**: ISO8601 timestamp to set the user's
     ///   request to speak. This can be any present or future time.
@@ -2113,7 +2113,7 @@ impl Http {
         .await
     }
 
-    /// Deletes a webhook's messsage by Id.
+    /// Deletes a webhook's message by Id.
     pub async fn delete_webhook_message(
         &self,
         webhook_id: u64,

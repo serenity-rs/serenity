@@ -130,7 +130,7 @@ impl MessageFilter {
 
     /// Checks if the `message` passes set constraints.
     /// Constraints are optional, as it is possible to limit messages to
-    /// be sent by a specific author or in a specifc guild.
+    /// be sent by a specific author or in a specific guild.
     fn is_passing_constraints(&self, message: &Message) -> bool {
         self.options.guild_id.map_or(true, |g| Some(g) == message.guild_id.map(|g| g.0))
             && self.options.channel_id.map_or(true, |g| g == message.channel_id.0)

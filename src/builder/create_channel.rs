@@ -30,7 +30,7 @@ impl CreateChannel {
         self
     }
 
-    /// Specifiy the category, the "parent" of this channel.
+    /// Specify the category, the "parent" of this channel.
     pub fn category<I: Into<ChannelId>>(&mut self, id: I) -> &mut Self {
         self.0.insert("parent_id", Value::Number(Number::from(id.into().0)));
 
@@ -109,7 +109,7 @@ impl CreateChannel {
     ///
     /// # Example
     ///
-    /// Inheriting permissions from an exisiting channel:
+    /// Inheriting permissions from an existing channel:
     ///
     /// ```rust,no_run
     /// # use serenity::{http::Http, model::id::GuildId};
