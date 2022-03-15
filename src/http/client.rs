@@ -236,6 +236,17 @@ pub struct UserRequestContext {
     headers: reqwest::header::HeaderMap
 }
 
+impl From<Headers> for UserRequestContext {
+    fn from(headers: Headers) -> Self {
+        Self { headers }
+    }
+}
+
+impl Into<Headers> for UserRequestContext {
+    fn into(self) -> Headers {
+        self.headers
+    }
+}
 
 impl UserRequestContext {
     pub fn new(user_agent: &String) -> UserRequestContext {
