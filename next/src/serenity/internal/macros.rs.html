@@ -196,7 +196,7 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">enum_number</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">ident</span> $(,)<span class="question-mark">?</span> )<span class="op">*</span> }) =&gt; {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> { $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">ident</span> $(,)<span class="question-mark">?</span> )<span class="op">*</span> }) =&gt; {
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
@@ -233,7 +233,7 @@
                         <span class="comment">// Rust does not come with a simple way of converting a</span>
                         <span class="comment">// number to an enum, so use a big `match`.</span>
                         <span class="kw">match</span> <span class="ident">value</span> {
-                            $( <span class="ident">v</span> <span class="kw">if</span> <span class="ident">v</span> <span class="op">==</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="kw">as</span> <span class="ident">u64</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>), )<span class="op">*</span>
+                            $( $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="question-mark">?</span> <span class="ident">v</span> <span class="kw">if</span> <span class="ident">v</span> <span class="op">==</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> <span class="kw">as</span> <span class="ident">u64</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>), )<span class="op">*</span>
                             <span class="kw">_</span> =&gt; {
                                 <span class="macro">tracing::warn!</span>(<span class="string">&quot;Unknown {} value: {}&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>), <span class="ident">value</span>);
 
@@ -300,5 +300,5 @@
     () =&gt; {};
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (335ffbfa5 2022-03-11)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (285fa7ecd 2022-03-14)" ></div>
 </body></html>
