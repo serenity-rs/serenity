@@ -1,3 +1,4 @@
+#[cfg(feature = "url")]
 use url::Url;
 
 #[cfg(feature = "http")]
@@ -18,6 +19,7 @@ pub struct CreateBotAuthParameters {
 
 impl CreateBotAuthParameters {
     /// Builds the url with the provided data.
+    #[cfg(feature = "url")]
     pub fn build(self) -> String {
         let mut valid_data = vec![];
         let bits = self.permissions.bits();
