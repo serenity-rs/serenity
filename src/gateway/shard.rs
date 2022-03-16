@@ -22,6 +22,7 @@ use super::{
 };
 use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, close_codes};
+use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "native_tls_backend_marker")]
 use crate::internal::ws_impl::create_native_tls_client;
@@ -79,6 +80,7 @@ pub struct Shard {
     /// [`latency`]: fn@Self::latency
     heartbeat_instants: (Option<Instant>, Option<Instant>),
     heartbeat_interval: Option<u64>,
+    http: Arc<Http>,
     /// This is used by the heartbeater to determine whether the last
     /// heartbeat was sent without an acknowledgement, and whether to reconnect.
     // This _must_ be set to `true` in `Shard::handle_event`'s
@@ -92,7 +94,6 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason -
     // not started within a decent amount of time.
     pub started: Instant,
-    pub token: String,
     ws_url: Arc<Mutex<String>>,
     pub intents: GatewayIntents,
 }
@@ -136,7 +137,7 @@ impl Shard {
     /// [`Error::Gateway`]: crate::Error::Gateway
     pub async fn new(
         ws_url: Arc<Mutex<String>>,
-        token: &str,
+        http: Arc<Http>,
         shard_info: [u64; 2],
         intents: GatewayIntents,
     ) -> Result<Shard> {
@@ -156,11 +157,11 @@ impl Shard {
             current_presence,
             heartbeat_instants,
             heartbeat_interval,
+            http,
             last_heartbeat_acknowledged,
             seq,
             stage,
             started: Instant::now(),
-            token: token.to_string(),
             session_id,
             shard_info,
             ws_url,
@@ -330,6 +331,8 @@ impl Shard {
 
                 self.session_id = Some(ready.ready.session_id.clone());
                 self.stage = ConnectionStage::Connected;
+
+                self.http.set_application_id(ready.ready.application.id.0);
             },
             Event::Resumed(_) => {
                 info!("[Shard {:?}] Resumed", self.shard_info);
@@ -732,7 +735,7 @@ impl Shard {
     /// - the `stage` to [`ConnectionStage::Identifying`]
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token, self.intents).await?;
+        self.client.send_identify(&self.shard_info, &self.http.token, self.intents).await?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
@@ -784,7 +787,9 @@ impl Shard {
 
         match self.session_id.as_ref() {
             Some(session_id) => {
-                self.client.send_resume(&self.shard_info, session_id, self.seq, &self.token).await
+                self.client
+                    .send_resume(&self.shard_info, session_id, self.seq, &self.http.token)
+                    .await
             },
             None => Err(Error::Gateway(GatewayError::NoSessionId)),
         }

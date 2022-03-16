@@ -180,7 +180,7 @@ impl ShardQueuer {
 
         let shard = Shard::new(
             Arc::clone(&self.ws_url),
-            &self.cache_and_http.http.token,
+            Arc::clone(&self.cache_and_http.http),
             shard_info,
             self.intents,
         )
