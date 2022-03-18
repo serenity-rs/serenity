@@ -328,6 +328,42 @@
 <span id="323">323</span>
 <span id="324">324</span>
 <span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Audit log types for administrative actions within guilds.</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">mem::transmute</span>};
@@ -348,18 +384,18 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Action</span> {
     <span class="ident">GuildUpdate</span>,
-    <span class="ident">Channel</span>(<span class="ident">ActionChannel</span>),
-    <span class="ident">ChannelOverwrite</span>(<span class="ident">ActionChannelOverwrite</span>),
-    <span class="ident">Member</span>(<span class="ident">ActionMember</span>),
-    <span class="ident">Role</span>(<span class="ident">ActionRole</span>),
-    <span class="ident">Invite</span>(<span class="ident">ActionInvite</span>),
-    <span class="ident">Webhook</span>(<span class="ident">ActionWebhook</span>),
-    <span class="ident">Emoji</span>(<span class="ident">ActionEmoji</span>),
-    <span class="ident">Message</span>(<span class="ident">ActionMessage</span>),
-    <span class="ident">Integration</span>(<span class="ident">ActionIntegration</span>),
-    <span class="ident">StageInstance</span>(<span class="ident">ActionStageInstance</span>),
-    <span class="ident">Sticker</span>(<span class="ident">ActionSticker</span>),
-    <span class="ident">Thread</span>(<span class="ident">ActionThread</span>),
+    <span class="ident">Channel</span>(<span class="ident">ChannelAction</span>),
+    <span class="ident">ChannelOverwrite</span>(<span class="ident">ChannelOverwriteAction</span>),
+    <span class="ident">Member</span>(<span class="ident">MemberAction</span>),
+    <span class="ident">Role</span>(<span class="ident">RoleAction</span>),
+    <span class="ident">Invite</span>(<span class="ident">InviteAction</span>),
+    <span class="ident">Webhook</span>(<span class="ident">WebhookAction</span>),
+    <span class="ident">Emoji</span>(<span class="ident">EmojiAction</span>),
+    <span class="ident">Message</span>(<span class="ident">MessageAction</span>),
+    <span class="ident">Integration</span>(<span class="ident">IntegrationAction</span>),
+    <span class="ident">StageInstance</span>(<span class="ident">StageInstanceAction</span>),
+    <span class="ident">Sticker</span>(<span class="ident">StickerAction</span>),
+    <span class="ident">Thread</span>(<span class="ident">ThreadAction</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Action</span> {
@@ -417,28 +453,37 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `ChannelAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionChannel</span> <span class="op">=</span> <span class="ident">ChannelAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionChannel</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">10</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">11</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">12</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `ChannelOverwriteAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionChannelOverwrite</span> <span class="op">=</span> <span class="ident">ChannelOverwriteAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionChannelOverwrite</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelOverwriteAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">13</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">14</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">15</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `MemberAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionMember</span> <span class="op">=</span> <span class="ident">MemberAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionMember</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MemberAction</span> {
     <span class="ident">Kick</span> <span class="op">=</span> <span class="number">20</span>,
     <span class="ident">Prune</span> <span class="op">=</span> <span class="number">21</span>,
     <span class="ident">BanAdd</span> <span class="op">=</span> <span class="number">22</span>,
@@ -450,83 +495,110 @@
     <span class="ident">BotAdd</span> <span class="op">=</span> <span class="number">28</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `RoleAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionRole</span> <span class="op">=</span> <span class="ident">RoleAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionRole</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RoleAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">30</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">31</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">32</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `InviteAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionInvite</span> <span class="op">=</span> <span class="ident">InviteAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionInvite</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InviteAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">40</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">41</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">42</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `WebhookAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionWebhook</span> <span class="op">=</span> <span class="ident">WebhookAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionWebhook</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WebhookAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">50</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">51</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">52</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `EmojiAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionEmoji</span> <span class="op">=</span> <span class="ident">EmojiAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionEmoji</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EmojiAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">60</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">61</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">62</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `MessageAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionMessage</span> <span class="op">=</span> <span class="ident">MessageAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionMessage</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageAction</span> {
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">72</span>,
     <span class="ident">BulkDelete</span> <span class="op">=</span> <span class="number">73</span>,
     <span class="ident">Pin</span> <span class="op">=</span> <span class="number">74</span>,
     <span class="ident">Unpin</span> <span class="op">=</span> <span class="number">75</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `IntegrationAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionIntegration</span> <span class="op">=</span> <span class="ident">IntegrationAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionIntegration</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IntegrationAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">80</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">81</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">82</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `StageInstanceAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionStageInstance</span> <span class="op">=</span> <span class="ident">StageInstanceAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionStageInstance</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StageInstanceAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">83</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">84</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">85</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `StickerAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionSticker</span> <span class="op">=</span> <span class="ident">StickerAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionSticker</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StickerAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">90</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">91</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">92</span>,
 }
 
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use `ThreadAction`&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ActionThread</span> <span class="op">=</span> <span class="ident">ThreadAction</span>;
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionThread</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ThreadAction</span> {
     <span class="ident">Create</span> <span class="op">=</span> <span class="number">110</span>,
     <span class="ident">Update</span> <span class="op">=</span> <span class="number">111</span>,
     <span class="ident">Delete</span> <span class="op">=</span> <span class="number">112</span>,
@@ -608,49 +680,49 @@
         }
 
         <span class="macro">assert_action!</span>(<span class="ident">Action::GuildUpdate</span>, <span class="number">1</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ActionChannel::Create</span>), <span class="number">10</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ActionChannel::Update</span>), <span class="number">11</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ActionChannel::Delete</span>), <span class="number">12</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ActionChannelOverwrite::Create</span>), <span class="number">13</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ActionChannelOverwrite::Update</span>), <span class="number">14</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ActionChannelOverwrite::Delete</span>), <span class="number">15</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::Kick</span>), <span class="number">20</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::Prune</span>), <span class="number">21</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::BanAdd</span>), <span class="number">22</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::BanRemove</span>), <span class="number">23</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::Update</span>), <span class="number">24</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::RoleUpdate</span>), <span class="number">25</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::MemberMove</span>), <span class="number">26</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::MemberDisconnect</span>), <span class="number">27</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">ActionMember::BotAdd</span>), <span class="number">28</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">ActionRole::Create</span>), <span class="number">30</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">ActionRole::Update</span>), <span class="number">31</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">ActionRole::Delete</span>), <span class="number">32</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">ActionInvite::Create</span>), <span class="number">40</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">ActionInvite::Update</span>), <span class="number">41</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">ActionInvite::Delete</span>), <span class="number">42</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">ActionWebhook::Create</span>), <span class="number">50</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">ActionWebhook::Update</span>), <span class="number">51</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">ActionWebhook::Delete</span>), <span class="number">52</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">ActionEmoji::Create</span>), <span class="number">60</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">ActionEmoji::Update</span>), <span class="number">61</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">ActionEmoji::Delete</span>), <span class="number">62</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">ActionMessage::Delete</span>), <span class="number">72</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">ActionMessage::BulkDelete</span>), <span class="number">73</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">ActionMessage::Pin</span>), <span class="number">74</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">ActionMessage::Unpin</span>), <span class="number">75</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">ActionIntegration::Create</span>), <span class="number">80</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">ActionIntegration::Update</span>), <span class="number">81</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">ActionIntegration::Delete</span>), <span class="number">82</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">ActionStageInstance::Create</span>), <span class="number">83</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">ActionStageInstance::Update</span>), <span class="number">84</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">ActionStageInstance::Delete</span>), <span class="number">85</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">ActionSticker::Create</span>), <span class="number">90</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">ActionSticker::Update</span>), <span class="number">91</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">ActionSticker::Delete</span>), <span class="number">92</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ActionThread::Create</span>), <span class="number">110</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ActionThread::Update</span>), <span class="number">111</span>);
-        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ActionThread::Delete</span>), <span class="number">112</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ChannelAction::Create</span>), <span class="number">10</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ChannelAction::Update</span>), <span class="number">11</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Channel</span>(<span class="ident">ChannelAction::Delete</span>), <span class="number">12</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ChannelOverwriteAction::Create</span>), <span class="number">13</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ChannelOverwriteAction::Update</span>), <span class="number">14</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::ChannelOverwrite</span>(<span class="ident">ChannelOverwriteAction::Delete</span>), <span class="number">15</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::Kick</span>), <span class="number">20</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::Prune</span>), <span class="number">21</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::BanAdd</span>), <span class="number">22</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::BanRemove</span>), <span class="number">23</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::Update</span>), <span class="number">24</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::RoleUpdate</span>), <span class="number">25</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::MemberMove</span>), <span class="number">26</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::MemberDisconnect</span>), <span class="number">27</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Member</span>(<span class="ident">MemberAction::BotAdd</span>), <span class="number">28</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">RoleAction::Create</span>), <span class="number">30</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">RoleAction::Update</span>), <span class="number">31</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Role</span>(<span class="ident">RoleAction::Delete</span>), <span class="number">32</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">InviteAction::Create</span>), <span class="number">40</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">InviteAction::Update</span>), <span class="number">41</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Invite</span>(<span class="ident">InviteAction::Delete</span>), <span class="number">42</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">WebhookAction::Create</span>), <span class="number">50</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">WebhookAction::Update</span>), <span class="number">51</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Webhook</span>(<span class="ident">WebhookAction::Delete</span>), <span class="number">52</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">EmojiAction::Create</span>), <span class="number">60</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">EmojiAction::Update</span>), <span class="number">61</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Emoji</span>(<span class="ident">EmojiAction::Delete</span>), <span class="number">62</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">MessageAction::Delete</span>), <span class="number">72</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">MessageAction::BulkDelete</span>), <span class="number">73</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">MessageAction::Pin</span>), <span class="number">74</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Message</span>(<span class="ident">MessageAction::Unpin</span>), <span class="number">75</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">IntegrationAction::Create</span>), <span class="number">80</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">IntegrationAction::Update</span>), <span class="number">81</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Integration</span>(<span class="ident">IntegrationAction::Delete</span>), <span class="number">82</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">StageInstanceAction::Create</span>), <span class="number">83</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">StageInstanceAction::Update</span>), <span class="number">84</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::StageInstance</span>(<span class="ident">StageInstanceAction::Delete</span>), <span class="number">85</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Create</span>), <span class="number">90</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Update</span>), <span class="number">91</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Sticker</span>(<span class="ident">StickerAction::Delete</span>), <span class="number">92</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Create</span>), <span class="number">110</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Update</span>), <span class="number">111</span>);
+        <span class="macro">assert_action!</span>(<span class="ident">Action::Thread</span>(<span class="ident">ThreadAction::Delete</span>), <span class="number">112</span>);
     }
 }
 </code></pre></div>
