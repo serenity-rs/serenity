@@ -15,6 +15,7 @@ pub use super::channel::*;
 pub use super::connection::*;
 pub use super::event::*;
 pub use super::gateway::*;
+pub use super::guild::audit_log::*;
 pub use super::guild::*;
 pub use super::id::*;
 #[cfg(feature = "unstable_discord_api")]
