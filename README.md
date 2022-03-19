@@ -96,7 +96,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.10"
+serenity = "0.11"
 ```
 
 Serenity supports a minimum of Rust 1.53.
@@ -110,7 +110,7 @@ Cargo.toml:
 [dependencies.serenity]
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
-version = "0.10"
+version = "0.11"
 ```
 
 The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
@@ -182,7 +182,7 @@ features = [
     "utils",
     "rustls_backend",
 ]
-version = "0.10"
+version = "0.11"
 ```
 
 # Dependencies
