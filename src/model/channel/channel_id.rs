@@ -419,9 +419,7 @@ impl ChannelId {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Channel::Guild(guild_channel) = &channel {
-                    cache
-                        .temp_channels
-                        .insert(guild_channel.id, guild_channel.clone());
+                    cache.temp_channels.insert(guild_channel.id, guild_channel.clone());
                 }
             }
         }
