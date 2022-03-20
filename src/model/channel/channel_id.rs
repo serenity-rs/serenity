@@ -421,8 +421,6 @@ impl ChannelId {
                 if let Channel::Guild(guild_channel) = &channel {
                     cache
                         .temp_channels
-                        .write()
-                        .await
                         .insert(guild_channel.id, guild_channel.clone());
                 }
             }

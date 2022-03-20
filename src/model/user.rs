@@ -1071,7 +1071,7 @@ impl UserId {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                cache.temp_users.write().await.insert(user.id, user.clone());
+                cache.temp_users.insert(user.id, user.clone());
             }
         }
         Ok(user)

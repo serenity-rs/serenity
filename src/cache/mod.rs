@@ -127,7 +127,7 @@ pub struct Cache {
     /// Cache of channels that have been fetched via to_channel.
     ///
     /// Each value has a maximum TTL of 1 hour.
-    pub(crate) temp_channels: RwLock<DashCache<ChannelId, GuildChannel>>,
+    pub(crate) temp_channels: DashCache<ChannelId, GuildChannel>,
     /// A map of channel categories.
     pub(crate) categories: RwLock<HashMap<ChannelId, ChannelCategory>>,
     /// A map of guilds with full data available. This includes data like
@@ -182,7 +182,7 @@ pub struct Cache {
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// Each value has a max TTL of 1 hour.
-    pub(crate) temp_users: RwLock<DashCache<UserId, User>>,
+    pub(crate) temp_users: DashCache<UserId, User>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
 }
@@ -351,7 +351,7 @@ impl Cache {
         if let Some(channel) = self.channels.read().await.get(&id) {
             let channel = channel.clone();
             return Some(Channel::Guild(channel));
-        } else if let Some(channel) = self.temp_channels.read().await.get_if_present(&id) {
+        } else if let Some(channel) = self.temp_channels.get_if_present(&id) {
             let channel = channel.clone();
             return Some(Channel::Guild(channel));
         }
@@ -894,7 +894,7 @@ impl Cache {
         if let Some(user) = self.users.read().await.get(&user_id) {
             Some(user.clone())
         } else {
-            self.temp_users.read().await.get_if_present(&user_id)
+            self.temp_users.get_if_present(&user_id)
         }
     }
 
@@ -1007,9 +1007,7 @@ impl Default for Cache {
     fn default() -> Cache {
         Cache {
             channels: RwLock::new(HashMap::default()),
-            temp_channels: RwLock::new(
-                DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
-            ),
+            temp_channels: DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
             categories: RwLock::new(HashMap::default()),
             guilds: RwLock::new(HashMap::default()),
             messages: RwLock::new(HashMap::default()),
@@ -1020,9 +1018,7 @@ impl Default for Cache {
             unavailable_guilds: RwLock::new(HashSet::default()),
             user: RwLock::new(CurrentUser::default()),
             users: RwLock::new(HashMap::default()),
-            temp_users: RwLock::new(
-                DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
-            ),
+            temp_users: DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
             message_queue: RwLock::new(HashMap::default()),
         }
     }
