@@ -52,11 +52,7 @@ use std::{
 use reqwest::{header::HeaderMap, StatusCode};
 use reqwest::{Client, Response};
 use tokio::sync::{Mutex, RwLock};
-#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::delay_for as sleep;
-#[cfg(feature = "tokio")]
-use tokio::time::sleep;
-use tokio::time::Duration;
+use tokio::time::{sleep, Duration};
 use tracing::{debug, instrument};
 
 pub use super::routing::Route;

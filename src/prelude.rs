@@ -14,7 +14,7 @@
 //!
 //! [`serenity::Error`]: crate::Error
 
-#[cfg(any(feature = "tokio", feature = "tokio_compat"))]
+#[cfg(feature = "tokio")]
 pub use tokio::sync::{Mutex, RwLock};
 #[cfg(feature = "client")]
 pub use typemap_rev::{TypeMap, TypeMapKey};

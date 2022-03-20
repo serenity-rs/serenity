@@ -23,8 +23,6 @@ jobs:
           - no gateway
           - time
           - unstable Discord API features
-          - rustls tokio 0.2
-          - native-tls tokio 0.2
           - simd-json
 
         include:
@@ -46,12 +44,6 @@ jobs:
             features: time
           - name: unstable Discord API features
             features: default unstable_discord_api
-            dont-test: true
-          - name: rustls tokio 0.2
-            features: default_tokio_0_2
-            dont-test: true
-          - name: native-tls tokio 0.2
-            features: default_native_tls_tokio_0_2
             dont-test: true
 
     steps:
