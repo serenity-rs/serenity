@@ -152,7 +152,7 @@ features = ["serde"]
 optional = true
 
 [dependencies.parking_lot]
-version = "0.11"
+version = "0.12"
 optional = true
 
 [dev-dependencies.http_crate]
