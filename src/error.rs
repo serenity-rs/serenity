@@ -104,7 +104,7 @@ pub enum Error {
     /// [`http`]: crate::http
     #[cfg(feature = "http")]
     Http(Box<HttpError>),
-    /// An error occuring in rustls
+    /// An error occurring in rustls
     #[cfg(all(
         feature = "gateway",
         feature = "rustls_backend_marker",

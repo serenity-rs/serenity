@@ -14,7 +14,7 @@ use crate::model::interactions::{
 use crate::model::prelude::User;
 use crate::utils;
 
-/// An interaction recieved when the user fills in an autocomplete option
+/// An interaction received when the user fills in an autocomplete option
 #[derive(Clone, Debug, Serialize)]
 #[non_exhaustive]
 pub struct AutocompleteInteraction {

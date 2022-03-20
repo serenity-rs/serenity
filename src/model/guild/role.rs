@@ -92,7 +92,7 @@ impl Role {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the curent user lacks permission to
+    /// Returns [`Error::Http`] if the current user lacks permission to
     /// delete this role.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES

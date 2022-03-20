@@ -76,7 +76,7 @@ impl CreateInteractionResponseData {
     }
 
     /// Create an embed for the message.
-    pub fn create_embed<F>(&mut self, f: F) -> &mut Self
+    pub fn embed<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
     {
@@ -99,11 +99,32 @@ impl CreateInteractionResponseData {
         self
     }
 
+    /// Adds multiple embeds for the message.
+    pub fn add_embeds(&mut self, embeds: Vec<CreateEmbed>) -> &mut Self {
+        for embed in embeds {
+            self.add_embed(embed);
+        }
+
+        self
+    }
+
+    /// Sets a single embed to include in the message
+    ///
+    /// Calling this will overwrite the embed list.
+    /// To append embeds, call [`Self::add_embed`] instead.
+    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
+        let map = utils::hashmap_to_json_map(embed.0);
+        let embed = Value::Object(map);
+        self.0.insert("embeds", Value::Array(vec![embed]));
+
+        self
+    }
+
     /// Sets a list of embeds to include in the message.
     ///
     /// Calling this multiple times will overwrite the embed list.
     /// To append embeds, call [`Self::add_embed`] instead.
-    pub fn embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
+    pub fn set_embeds(&mut self, embeds: impl IntoIterator<Item = CreateEmbed>) -> &mut Self {
         let embeds =
             embeds.into_iter().map(|embed| utils::hashmap_to_json_map(embed.0).into()).collect();
 
@@ -155,7 +176,7 @@ impl CreateInteractionResponseData {
         self
     }
 
-    /// Sets the titel for modal interactions
+    /// Sets the title for modal interactions
     pub fn title<D: ToString>(&mut self, title: D) -> &mut Self {
         self.0.insert("title", Value::String(title.to_string()));
         self

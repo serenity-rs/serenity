@@ -130,7 +130,7 @@ pub struct EmbedField {
     pub name: String,
     /// The value of the field.
     ///
-    /// The maxiumum length of this field is 1024 unicode codepoints.
+    /// The maximum length of this field is 1024 unicode codepoints.
     pub value: String,
 }
 

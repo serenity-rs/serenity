@@ -94,7 +94,7 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
     })
 }
 
-/// An error that occured while connecting over rustls
+/// An error that occurred while connecting over rustls
 #[derive(Debug)]
 #[non_exhaustive]
 #[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]

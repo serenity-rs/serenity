@@ -134,7 +134,7 @@ async fn main() {
     // https://doc.rust-lang.org/book/ch16-03-shared-state.html
     //
     // All of this means that we have to keep locks open for the least time possible, so we put
-    // them inside a block, so they get closed automatically when droped.
+    // them inside a block, so they get closed automatically when dropped.
     // If we don't do this, we would never be able to open the data lock anywhere else.
     //
     // Alternatively, you can also use `ClientBuilder::type_map_insert` or

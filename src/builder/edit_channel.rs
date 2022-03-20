@@ -164,7 +164,7 @@ impl EditChannel {
     ///
     /// # Example
     ///
-    /// Inheriting permissions from an exisiting channel:
+    /// Inheriting permissions from an existing channel:
     ///
     /// ```rust,no_run
     /// # use serenity::{http::Http, model::id::ChannelId};

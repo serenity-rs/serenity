@@ -23,9 +23,9 @@ use tokio::time::{sleep, Sleep};
 
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::LazyArc;
-use crate::model::interactions::message_component::MessageComponentInteraction;
+use crate::model::interactions::modal::ModalSubmitInteraction;
 
-macro_rules! impl_component_interaction_collector {
+macro_rules! impl_modal_interaction_collector {
     ($($name:ident;)*) => {
         $(
             impl<'a> $name<'a> {
@@ -54,7 +54,7 @@ macro_rules! impl_component_interaction_collector {
                 /// This is the last instance to pass for an interaction to count as *collected*.
                 ///
                 /// This function is intended to be an interaction filter.
-                pub fn filter<F: Fn(&Arc<MessageComponentInteraction>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
+                pub fn filter<F: Fn(&Arc<ModalSubmitInteraction>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
                     self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
 
                     self
@@ -106,16 +106,16 @@ macro_rules! impl_component_interaction_collector {
 
 /// Filters events on the shard's end and sends them to the collector.
 #[derive(Clone, Debug)]
-pub struct ComponentInteractionFilter {
+pub struct ModalInteractionFilter {
     filtered: u32,
     collected: u32,
     options: FilterOptions,
-    sender: Sender<Arc<MessageComponentInteraction>>,
+    sender: Sender<Arc<ModalSubmitInteraction>>,
 }
 
-impl ComponentInteractionFilter {
+impl ModalInteractionFilter {
     /// Creates a new filter
-    fn new(options: FilterOptions) -> (Self, Receiver<Arc<MessageComponentInteraction>>) {
+    fn new(options: FilterOptions) -> (Self, Receiver<Arc<ModalSubmitInteraction>>) {
         let (sender, receiver) = unbounded_channel();
 
         let filter = Self {
@@ -132,7 +132,7 @@ impl ComponentInteractionFilter {
     /// to the constraints and the limits are not reached yet.
     pub(crate) fn send_interaction(
         &mut self,
-        interaction: &mut LazyArc<'_, MessageComponentInteraction>,
+        interaction: &mut LazyArc<'_, ModalSubmitInteraction>,
     ) -> bool {
         if self.is_passing_constraints(interaction) {
             self.collected += 1;
@@ -152,11 +152,14 @@ impl ComponentInteractionFilter {
     /// be sent by a specific author or in a specific guild.
     fn is_passing_constraints(
         &self,
-        interaction: &mut LazyArc<'_, MessageComponentInteraction>,
+        interaction: &mut LazyArc<'_, ModalSubmitInteraction>,
     ) -> bool {
         // TODO: On next branch, switch filter arg to &T so this as_arc() call can be removed.
         self.options.guild_id.map_or(true, |id| Some(id) == interaction.guild_id.map(|g| g.0))
-            && self.options.message_id.map_or(true, |id| interaction.message.id.0 == id)
+            && self
+                .options
+                .message_id
+                .map_or(true, |id| Some(id) == interaction.message.as_ref().map(|m| m.id.0))
             && self.options.channel_id.map_or(true, |id| id == interaction.channel_id.as_ref().0)
             && self.options.author_id.map_or(true, |id| id == interaction.user.id.0)
             && self.options.filter.as_ref().map_or(true, |f| f(&interaction.as_arc()))
@@ -175,7 +178,7 @@ impl ComponentInteractionFilter {
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Arc<dyn Fn(&Arc<MessageComponentInteraction>) -> bool + 'static + Send + Sync>>,
+    filter: Option<Arc<dyn Fn(&Arc<ModalSubmitInteraction>) -> bool + 'static + Send + Sync>>,
     channel_id: Option<u64>,
     guild_id: Option<u64>,
     author_id: Option<u64>,
@@ -184,7 +187,7 @@ struct FilterOptions {
 
 impl std::fmt::Debug for FilterOptions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("ComponentInteractionFilter")
+        f.debug_struct("ModalInteractionFilter")
             .field("collect_limit", &self.collect_limit)
             .field("filter", &"Option<Arc<dyn Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>>")
             .field("channel_id", &self.channel_id)
@@ -194,22 +197,22 @@ impl std::fmt::Debug for FilterOptions {
     }
 }
 
-// Implement the common setters for all component interaction collector types.
+// Implement the common setters for all modal interaction collector types.
 // This avoids using a trait that the user would need to import in
 // order to use any of these methods.
-impl_component_interaction_collector! {
-    CollectComponentInteraction;
-    ComponentInteractionCollectorBuilder;
+impl_modal_interaction_collector! {
+    CollectModalInteraction;
+    ModalInteractionCollectorBuilder;
 }
 
-pub struct ComponentInteractionCollectorBuilder<'a> {
+pub struct ModalInteractionCollectorBuilder<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, ComponentInteractionCollector>>,
+    fut: Option<BoxFuture<'a, ModalInteractionCollector>>,
 }
 
-impl<'a> ComponentInteractionCollectorBuilder<'a> {
+impl<'a> ModalInteractionCollectorBuilder<'a> {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
@@ -220,19 +223,19 @@ impl<'a> ComponentInteractionCollectorBuilder<'a> {
     }
 }
 
-impl<'a> Future for ComponentInteractionCollectorBuilder<'a> {
-    type Output = ComponentInteractionCollector;
+impl<'a> Future for ModalInteractionCollectorBuilder<'a> {
+    type Output = ModalInteractionCollector;
     #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = ComponentInteractionFilter::new(self.filter.take().unwrap());
+            let (filter, receiver) = ModalInteractionFilter::new(self.filter.take().unwrap());
             let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
-                shard_messenger.set_component_interaction_filter(filter);
+                shard_messenger.set_modal_interaction_filter(filter);
 
-                ComponentInteractionCollector {
+                ModalInteractionCollector {
                     receiver: Box::pin(receiver),
                     timeout,
                 }
@@ -243,14 +246,14 @@ impl<'a> Future for ComponentInteractionCollectorBuilder<'a> {
     }
 }
 
-pub struct CollectComponentInteraction<'a> {
+pub struct CollectModalInteraction<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Pin<Box<Sleep>>>,
-    fut: Option<BoxFuture<'a, Option<Arc<MessageComponentInteraction>>>>,
+    fut: Option<BoxFuture<'a, Option<Arc<ModalSubmitInteraction>>>>,
 }
 
-impl<'a> CollectComponentInteraction<'a> {
+impl<'a> CollectModalInteraction<'a> {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
@@ -261,19 +264,19 @@ impl<'a> CollectComponentInteraction<'a> {
     }
 }
 
-impl<'a> Future for CollectComponentInteraction<'a> {
-    type Output = Option<Arc<MessageComponentInteraction>>;
+impl<'a> Future for CollectModalInteraction<'a> {
+    type Output = Option<Arc<ModalSubmitInteraction>>;
     #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = ComponentInteractionFilter::new(self.filter.take().unwrap());
+            let (filter, receiver) = ModalInteractionFilter::new(self.filter.take().unwrap());
             let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
-                shard_messenger.set_component_interaction_filter(filter);
+                shard_messenger.set_modal_interaction_filter(filter);
 
-                ComponentInteractionCollector {
+                ModalInteractionCollector {
                     receiver: Box::pin(receiver),
                     timeout,
                 }
@@ -286,14 +289,14 @@ impl<'a> Future for CollectComponentInteraction<'a> {
     }
 }
 
-/// A component interaction collector receives interactions matching a the given filter for a
+/// A modal interaction collector receives interactions matching a the given filter for a
 /// set duration.
-pub struct ComponentInteractionCollector {
-    receiver: Pin<Box<Receiver<Arc<MessageComponentInteraction>>>>,
+pub struct ModalInteractionCollector {
+    receiver: Pin<Box<Receiver<Arc<ModalSubmitInteraction>>>>,
     timeout: Option<Pin<Box<Sleep>>>,
 }
 
-impl ComponentInteractionCollector {
+impl ModalInteractionCollector {
     /// Stops collecting, this will implicitly be done once the
     /// collector drops.
     /// In case the drop does not appear until later, it is preferred to
@@ -303,8 +306,8 @@ impl ComponentInteractionCollector {
     }
 }
 
-impl Stream for ComponentInteractionCollector {
-    type Item = Arc<MessageComponentInteraction>;
+impl Stream for ModalInteractionCollector {
+    type Item = Arc<ModalSubmitInteraction>;
     fn poll_next(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Option<Self::Item>> {
         if let Some(ref mut timeout) = self.timeout {
             match timeout.as_mut().poll(ctx) {
@@ -319,7 +322,7 @@ impl Stream for ComponentInteractionCollector {
     }
 }
 
-impl Drop for ComponentInteractionCollector {
+impl Drop for ModalInteractionCollector {
     fn drop(&mut self) {
         self.receiver.close();
     }

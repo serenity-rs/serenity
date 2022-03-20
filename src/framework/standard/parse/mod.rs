@@ -461,7 +461,7 @@ fn is_unrecognised<T>(res: &Result<T, ParseError>) -> bool {
 ///
 /// The "command" may be:
 /// 1. A *help command* that provides a friendly browsing interface of all groups and commands,
-/// explaining what each of them are, how they are layed out and how to invoke them.
+/// explaining what each of them are, how they are laid out and how to invoke them.
 /// There can only one help command registered, but might have many names defined for invocation of itself.
 ///
 /// 2. A command defined under another command or a group, which may also belong to another group and so on.
