@@ -23,7 +23,7 @@ features = ["derive"]
 
 [dependencies.serde_json]
 features = ["raw_value"]
-version = "1"
+version = "1.0.29"
 
 [dev-dependencies]
 criterion = "0.3"
