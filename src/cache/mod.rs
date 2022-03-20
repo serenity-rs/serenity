@@ -33,8 +33,11 @@
 use std::collections::{hash_map::Entry, HashMap, HashSet, VecDeque};
 use std::default::Default;
 use std::str::FromStr;
+use std::time::Duration;
 
 use async_trait::async_trait;
+#[cfg(feature = "cache")]
+use moka::dash::Cache as DashCache;
 use tokio::sync::RwLock;
 use tracing::instrument;
 
@@ -122,6 +125,10 @@ pub struct Cache {
     /// received and processed by the cache, the relevant channels are also
     /// removed from this map.
     pub(crate) channels: RwLock<HashMap<ChannelId, GuildChannel>>,
+    /// Cache of channels that have been fetched via to_channel.
+    ///
+    /// Each value has a maximum TTL of 1 hour.
+    pub(crate) temp_channels: RwLock<DashCache<ChannelId, GuildChannel>>,
     /// A map of channel categories.
     pub(crate) categories: RwLock<HashMap<ChannelId, ChannelCategory>>,
     /// A map of guilds with full data available. This includes data like
@@ -173,6 +180,10 @@ pub struct Cache {
     /// inserted into the cache. When a maximum number of messages are in a
     /// channel's cache, we can pop the front and remove that ID from the cache.
     pub(crate) message_queue: RwLock<HashMap<ChannelId, VecDeque<MessageId>>>,
+    /// Cache of users who have been fetched from `to_user`.
+    ///
+    /// Each value has a max TTL of 1 hour.
+    pub(crate) temp_users: RwLock<DashCache<UserId, User>>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
 }
@@ -339,6 +350,9 @@ impl Cache {
 
     async fn _channel(&self, id: ChannelId) -> Option<Channel> {
         if let Some(channel) = self.channels.read().await.get(&id) {
+            let channel = channel.clone();
+            return Some(Channel::Guild(channel));
+        } else if let Some(channel) = self.temp_channels.read().await.get_if_present(&id) {
             let channel = channel.clone();
             return Some(Channel::Guild(channel));
         }
@@ -878,7 +892,11 @@ impl Cache {
     }
 
     async fn _user(&self, user_id: UserId) -> Option<User> {
-        self.users.read().await.get(&user_id).cloned()
+        if let Some(user) = self.users.read().await.get(&user_id) {
+            Some(user.clone())
+        } else {
+            self.temp_users.read().await.get_if_present(&user_id)
+        }
     }
 
     /// Clones all users and returns them.
@@ -990,6 +1008,9 @@ impl Default for Cache {
     fn default() -> Cache {
         Cache {
             channels: RwLock::new(HashMap::default()),
+            temp_channels: RwLock::new(
+                DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
+            ),
             categories: RwLock::new(HashMap::default()),
             guilds: RwLock::new(HashMap::default()),
             messages: RwLock::new(HashMap::default()),
@@ -1000,6 +1021,9 @@ impl Default for Cache {
             unavailable_guilds: RwLock::new(HashSet::default()),
             user: RwLock::new(CurrentUser::default()),
             users: RwLock::new(HashMap::default()),
+            temp_users: RwLock::new(
+                DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
+            ),
             message_queue: RwLock::new(HashMap::default()),
         }
     }

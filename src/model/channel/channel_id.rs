@@ -419,7 +419,7 @@ impl ChannelId {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Some(guild_channel) = channel.clone().guild() {
-                    cache.channels.write().await.insert(guild_channel.id, guild_channel);
+                    cache.temp_channels.write().await.insert(guild_channel.id, guild_channel);
                 }
             }
         }

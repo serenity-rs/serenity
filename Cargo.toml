@@ -126,6 +126,12 @@ features = ["std"]
 [dependencies.percent-encoding]
 version = "2.1"
 
+[dependencies.moka]
+git = "https://github.com/moka-rs/moka"
+branch = "master"
+features = ["dash"]
+optional = true
+
 [dev-dependencies.http_crate]
 version = "0.2"
 package = "http"
@@ -144,7 +150,7 @@ default_native_tls_tokio_0_2 = ["default_no_backend", "native_tls_tokio_0_2_back
 default_no_backend = ["builder", "cache", "client", "framework", "gateway", "model", "http", "standard_framework", "utils"]
 
 builder = ["utils"]
-cache = []
+cache = ["moka"]
 collector = ["gateway", "model"]
 client = ["http", "typemap_rev"]
 extras = []
