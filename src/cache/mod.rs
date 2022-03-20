@@ -36,7 +36,6 @@ use std::str::FromStr;
 use std::time::Duration;
 
 use async_trait::async_trait;
-#[cfg(feature = "cache")]
 use moka::dash::Cache as DashCache;
 use tokio::sync::RwLock;
 use tracing::instrument;
