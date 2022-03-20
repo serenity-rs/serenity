@@ -672,6 +672,14 @@ bitflags! {
         ///
         /// - MESSAGE_CREATE
         const MESSAGE_CONTENT = 1 << 15;
+        /// Enable following gateway events:
+        ///
+        /// - GUILD_SCHEDULED_EVENT_CREATE
+        /// - GUILD_SCHEDULED_EVENT_UPDATE
+        /// - GUILD_SCHEDULED_EVENT_DELETE
+        /// - GUILD_SCHEDULED_EVENT_USER_ADD
+        /// - GUILD_SCHEDULED_EVENT_USER_REMOVE
+        const GUILD_SCHEDULED_EVENTS = 1 << 16;
     }
 }
 
@@ -689,7 +697,7 @@ impl GatewayIntents {
     pub const fn privileged() -> GatewayIntents {
         // bitflags don't support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
-        Self::from_bits_truncate(Self::GUILD_MEMBERS.bits() | Self::GUILD_PRESENCES.bits())
+        Self::GUILD_MEMBERS.union(Self::GUILD_PRESENCES).union(Self::MESSAGE_CONTENT)
     }
 
     /// Checks if any of the included intents are privileged
@@ -697,7 +705,7 @@ impl GatewayIntents {
     /// [GUILD_MEMBERS]: #associatedconstant.GUILD_MEMBERS
     /// [GUILD_PRESENCES]: #associatedconstant.GUILD_PRESENCES
     pub fn is_privileged(self) -> bool {
-        self.guild_members() || self.guild_presences()
+        self.guild_members() || self.guild_presences() || self.message_content()
     }
 
     /// Shorthand for checking that the set of intents contains the
@@ -810,5 +818,21 @@ impl GatewayIntents {
     /// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING
     pub fn direct_message_typing(self) -> bool {
         self.contains(Self::DIRECT_MESSAGE_TYPING)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [MESSAGE_CONTENT] intent.
+    ///
+    /// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT
+    pub fn message_content(self) -> bool {
+        self.contains(Self::MESSAGE_CONTENT)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_SCHEDULED_EVENTS] intent.
+    ///
+    /// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS
+    pub fn guild_scheduled_events(self) -> bool {
+        self.contains(Self::GUILD_SCHEDULED_EVENTS)
     }
 }
