@@ -417,8 +417,14 @@ impl ChannelId {
         let channel = cache_http.http().get_channel(self.0).await?;
         #[cfg(feature = "cache")]
         {
-            if let Channel::Guild(guild_channel) = &channel {
-                    cache.temp_channels.write().await.insert(guild_channel.id, guild_channel);
+            if let Some(cache) = cache_http.cache() {
+                if let Channel::Guild(guild_channel) = &channel {
+                    cache
+                        .temp_channels
+                        .write()
+                        .await
+                        .insert(guild_channel.id, guild_channel.clone());
+                }
             }
         }
         Ok(channel)
