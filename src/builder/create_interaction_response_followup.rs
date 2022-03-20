@@ -6,9 +6,9 @@ use serde_json::Value;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 #[cfg(feature = "http")]
 use crate::http::AttachmentType;
+use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 use crate::utils;
 
 #[derive(Clone, Debug, Default)]
