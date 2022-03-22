@@ -685,11 +685,11 @@ bitflags! {
 
 #[cfg(feature = "model")]
 impl GatewayIntents {
-    /// Gets all of the intents that don't are considered privileged by Discord.
+    /// Gets all of the intents that aren't considered privileged by Discord.
     pub const fn non_privileged() -> GatewayIntents {
         // bitflags don't support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
-        Self::from_bits_truncate(Self::all().bits() & !Self::privileged().bits())
+        Self::privileged().complement()
     }
 
     /// Gets all of the intents that are considered privileged by Discord.
@@ -700,12 +700,9 @@ impl GatewayIntents {
         Self::GUILD_MEMBERS.union(Self::GUILD_PRESENCES).union(Self::MESSAGE_CONTENT)
     }
 
-    /// Checks if any of the included intents are privileged
-    ///
-    /// [GUILD_MEMBERS]: #associatedconstant.GUILD_MEMBERS
-    /// [GUILD_PRESENCES]: #associatedconstant.GUILD_PRESENCES
+    /// Checks if any of the included intents are privileged.
     pub fn is_privileged(self) -> bool {
-        self.guild_members() || self.guild_presences() || self.message_content()
+        self.intersects(Self::privileged())
     }
 
     /// Shorthand for checking that the set of intents contains the
