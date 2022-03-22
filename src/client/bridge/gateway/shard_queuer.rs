@@ -8,11 +8,7 @@ use futures::{
     StreamExt,
 };
 use tokio::sync::{Mutex, RwLock};
-#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::delay_for as sleep;
-#[cfg(feature = "tokio")]
-use tokio::time::sleep;
-use tokio::time::{timeout, Duration, Instant};
+use tokio::time::{sleep, timeout, Duration, Instant};
 use tracing::{debug, info, instrument, warn};
 use typemap_rev::TypeMap;
 
