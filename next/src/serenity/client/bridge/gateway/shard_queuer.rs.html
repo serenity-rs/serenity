@@ -265,10 +265,6 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
     <span class="ident">sync::Arc</span>,
@@ -279,11 +275,7 @@
     <span class="ident">StreamExt</span>,
 };
 <span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::sleep</span>;
-<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">timeout</span>, <span class="ident">Duration</span>, <span class="ident">Instant</span>};
+<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">timeout</span>, <span class="ident">Duration</span>, <span class="ident">Instant</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">typemap_rev::TypeMap</span>;
 

@@ -896,9 +896,6 @@
 <span id="891">891</span>
 <span id="892">892</span>
 <span id="893">893</span>
-<span id="894">894</span>
-<span id="895">895</span>
-<span id="896">896</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">check</span>, <span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">hook</span>};
@@ -922,9 +919,6 @@
 <span class="kw">use</span> <span class="ident">structures::buckets</span>::{<span class="ident">Bucket</span>, <span class="ident">RateLimitAction</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio::time::sleep</span>;
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 <span class="kw">use</span> <span class="ident">uwl::Stream</span>;

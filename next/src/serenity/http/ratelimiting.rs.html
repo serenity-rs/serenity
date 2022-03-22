@@ -472,10 +472,6 @@
 <span id="467">467</span>
 <span id="468">468</span>
 <span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the</span>
 <span class="doccomment">//! different _types_ of routes - such as getting the current user&#39;s channels -</span>
 <span class="doccomment">//! for the most part, with the exception being major parameters.</span>
@@ -530,11 +526,7 @@
 <span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">header::HeaderMap</span>, <span class="ident">StatusCode</span>};
 <span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">Response</span>};
 <span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::sleep</span>;
-<span class="kw">use</span> <span class="ident">tokio::time::Duration</span>;
+<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Duration</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routing::Route</span>;
