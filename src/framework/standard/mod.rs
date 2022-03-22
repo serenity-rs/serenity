@@ -21,9 +21,6 @@ pub use structures::buckets::BucketBuilder;
 use structures::buckets::{Bucket, RateLimitAction};
 pub use structures::*;
 use tokio::sync::Mutex;
-#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::delay_for as sleep;
-#[cfg(feature = "tokio")]
 use tokio::time::sleep;
 use tracing::instrument;
 use uwl::Stream;
