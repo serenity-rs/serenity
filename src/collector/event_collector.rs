@@ -13,9 +13,6 @@ use tokio::sync::mpsc::{
     UnboundedReceiver as Receiver,
     UnboundedSender as Sender,
 };
-#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::{delay_for as sleep, Delay as Sleep};
-#[cfg(feature = "tokio")]
 use tokio::time::{sleep, Sleep};
 
 use crate::{

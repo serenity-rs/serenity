@@ -1,8 +1,5 @@
 use std::sync::Arc;
 
-#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::delay_for as sleep;
-#[cfg(feature = "tokio")]
 use tokio::time::sleep;
 use tokio::{
     sync::oneshot::{self, error::TryRecvError, Sender},
