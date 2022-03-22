@@ -83,9 +83,8 @@ pub fn parse_invite(code: &str) -> &str {
 /// assert_eq!(parse_user_tag("kangalioo#10108"), None);
 /// ```
 pub fn parse_user_tag(s: &str) -> Option<(&str, u16)> {
-    let pound_sign = s.find('#')?;
-    let name = &s[..pound_sign];
-    let discrim = s[(pound_sign + 1)..].parse::<u16>().ok()?;
+    let (name, discrim) = s.split_once('#')?;
+    let discrim = discrim.parse().ok()?;
     if discrim > 9999 {
         return None;
     }
@@ -447,10 +446,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
 /// ```
 pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
-    let path = url.path().strip_prefix("/api/webhooks/")?;
-    let split_idx = path.find('/')?;
-    let webhook_id = &path[..split_idx];
-    let token = &path[split_idx + 1..];
+    let (webhook_id, token) = url.path().strip_prefix("/api/webhooks/")?.split_once('/')?;
     if !["http", "https"].contains(&url.scheme())
         || !["discord.com", "discordapp.com"].contains(&url.domain()?)
         || !(17..=20).contains(&webhook_id.len())
