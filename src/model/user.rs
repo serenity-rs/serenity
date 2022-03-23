@@ -1067,7 +1067,14 @@ impl UserId {
             }
         }
 
-        cache_http.http().get_user(self.0).await
+        let user = cache_http.http().get_user(self.0).await?;
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                cache.temp_users.insert(user.id, user.clone());
+            }
+        }
+        Ok(user)
     }
 }
 

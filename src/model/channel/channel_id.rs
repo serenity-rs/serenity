@@ -414,7 +414,16 @@ impl ChannelId {
             }
         }
 
-        cache_http.http().get_channel(self.0).await
+        let channel = cache_http.http().get_channel(self.0).await?;
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Channel::Guild(guild_channel) = &channel {
+                    cache.temp_channels.insert(guild_channel.id, guild_channel.clone());
+                }
+            }
+        }
+        Ok(channel)
     }
 
     /// Gets all of the channel's invites.
