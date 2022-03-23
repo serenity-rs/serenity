@@ -1564,7 +1564,7 @@
 <span id="1559">1559</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">default::Default</span>,
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Write</span>},
+    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
     <span class="ident">ops::Add</span>,
 };
 
@@ -2446,7 +2446,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">MessageBuilder</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">MessageBuilder</span> {
     <span class="doccomment">/// Formats the message builder into a string.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is done by simply taking the internal value of the tuple-struct and</span>

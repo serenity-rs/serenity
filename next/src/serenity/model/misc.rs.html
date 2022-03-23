@@ -508,6 +508,10 @@
 <span id="503">503</span>
 <span id="504">504</span>
 <span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
@@ -530,6 +534,8 @@
     <span class="doccomment">/// [`Mention`] implements [`Display`], so [`ToString::to_string()`] can</span>
     <span class="doccomment">/// be called on it, or inserted directly into a [`format_args!`] type of</span>
     <span class="doccomment">/// macro.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Display`]: fmt::Display</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -584,6 +590,8 @@
 <span class="doccomment">/// [`format_args!`] type of macro or with [`ToString::to_string()`]. A</span>
 <span class="doccomment">/// [`Mention`] is created using [`Mentionable::mention()`], or with</span>
 <span class="doccomment">/// [`From`]/[`Into`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`Display`]: fmt::Display</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
@@ -640,8 +648,8 @@
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">Emoji</span>, <span class="ident">MentionableImpl::Emoji</span>(<span class="ident">value</span>.<span class="ident">id</span>, <span class="ident">value</span>.<span class="ident">animated</span>);
 );
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Mention</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Mention</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
             <span class="ident">MentionableImpl::Channel</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;#{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
             <span class="ident">MentionableImpl::User</span>(<span class="ident">id</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;&lt;@{}&gt;&quot;</span>, <span class="ident">id</span>.<span class="number">0</span>)),
@@ -809,8 +817,8 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">EmojiIdentifierParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">EmojiIdentifierParseError</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;`{}` is not a valid emoji identifier&quot;</span>, <span class="self">self</span>.<span class="ident">parsed_string</span>)
     }
 }
