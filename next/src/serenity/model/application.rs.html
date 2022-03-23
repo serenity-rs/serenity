@@ -193,18 +193,6 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models about OAuth2 applications.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -234,9 +222,7 @@
     <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">String</span>,
     <span class="doccomment">/// A set of bitflags assigned to the application, which represent gated</span>
     <span class="doccomment">/// feature flags that have been enabled for the application.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You can get a usable value from this by using [`ApplicationFlags::from_u64`]</span>
-    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationFlags</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A hash pointing to the application&#39;s icon.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is not necessarily equivalent to the bot user&#39;s avatar.</span>
@@ -320,9 +306,7 @@
     <span class="doccomment">/// The unique Id of the user.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ApplicationId</span>,
     <span class="doccomment">/// The flags associated with the application.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You can get a usable value from this by using [`ApplicationFlags::from_u64`]</span>
-    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">ApplicationFlags</span>,
 }
 
 <span class="doccomment">/// Information about the current application and its owner.</span>
@@ -397,14 +381,6 @@
         <span class="kw">const</span> <span class="ident">EMBEDDED</span> <span class="op">=</span> <span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
         <span class="kw">const</span> <span class="ident">GATEWAY_MESSAGE_CONTENT</span> <span class="op">=</span> <span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
         <span class="kw">const</span> <span class="ident">GATEWAY_MESSAGE_CONTENT_LIMITED</span> <span class="op">=</span> <span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">19</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ApplicationFlags</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">bits</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">bits</span>,
-        }
     }
 }
 </code></pre></div>
