@@ -21,6 +21,8 @@ pub trait Mentionable {
     /// be called on it, or inserted directly into a [`format_args!`] type of
     /// macro.
     ///
+    /// [`Display`]: fmt::Display
+    ///
     /// # Examples
     ///
     /// ```
@@ -74,6 +76,8 @@ pub trait Mentionable {
 /// [`format_args!`] type of macro or with [`ToString::to_string()`]. A
 /// [`Mention`] is created using [`Mentionable::mention()`], or with
 /// [`From`]/[`Into`].
+///
+/// [`Display`]: fmt::Display
 ///
 /// # Examples
 ///
@@ -130,8 +134,8 @@ mention!(value:
     &'_ Emoji, MentionableImpl::Emoji(value.id, value.animated);
 );
 
-impl Display for Mention {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+impl fmt::Display for Mention {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.0 {
             MentionableImpl::Channel(id) => f.write_fmt(format_args!("<#{}>", id.0)),
             MentionableImpl::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
@@ -299,8 +303,8 @@ pub struct EmojiIdentifierParseError {
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
-impl Display for EmojiIdentifierParseError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+impl fmt::Display for EmojiIdentifierParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "`{}` is not a valid emoji identifier", self.parsed_string)
     }
 }

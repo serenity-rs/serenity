@@ -11,8 +11,7 @@ mod partial_channel;
 mod private_channel;
 mod reaction;
 
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt;
 
 use serde::de::{Error as DeError, Unexpected};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
@@ -278,7 +277,7 @@ impl Serialize for Channel {
     }
 }
 
-impl Display for Channel {
+impl fmt::Display for Channel {
     /// Formats the channel into a "mentioned" string.
     ///
     /// This will return a different format for each type of channel:
@@ -286,11 +285,11 @@ impl Display for Channel {
     /// - [`PrivateChannel`]s: the recipient's name;
     /// - [`GuildChannel`]s: a string mentioning the channel that users who can
     /// see the channel can click on.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Channel::Guild(ch) => Display::fmt(&ch.id.mention(), f),
-            Channel::Private(ch) => Display::fmt(&ch.recipient.name, f),
-            Channel::Category(ch) => Display::fmt(&ch.name, f),
+            Channel::Guild(ch) => fmt::Display::fmt(&ch.id.mention(), f),
+            Channel::Private(ch) => fmt::Display::fmt(&ch.recipient.name, f),
+            Channel::Category(ch) => fmt::Display::fmt(&ch.name, f),
         }
     }
 }

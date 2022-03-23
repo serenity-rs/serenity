@@ -51,10 +51,7 @@ mod shard_queuer;
 mod shard_runner;
 mod shard_runner_message;
 
-use std::{
-    fmt::{Display, Formatter, Result as FmtResult},
-    time::Duration as StdDuration,
-};
+use std::{fmt, time::Duration as StdDuration};
 
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
 pub use self::shard_manager_monitor::{ShardManagerError, ShardManagerMonitor};
@@ -132,8 +129,8 @@ pub enum ShardQueuerMessage {
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct ShardId(pub u64);
 
-impl Display for ShardId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for ShardId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
     }
 }

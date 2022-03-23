@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::ArgumentConvert;
 use crate::{model::prelude::*, prelude::*};
 
@@ -16,8 +18,8 @@ pub enum MemberParseError {
 
 impl std::error::Error for MemberParseError {}
 
-impl std::fmt::Display for MemberParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for MemberParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::OutsideGuild => f.write_str("Tried to find member outside a guild"),
             Self::GuildNotInCache => f.write_str("Guild is not in cache"),

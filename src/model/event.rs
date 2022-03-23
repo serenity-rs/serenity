@@ -1869,7 +1869,7 @@ impl<'de> Deserialize<'de> for EventType {
         impl<'de> Visitor<'de> for EventTypeVisitor {
             type Value = EventType;
 
-            fn expecting(&self, f: &mut Formatter<'_>) -> FmtResult {
+            fn expecting(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 f.write_str("event type str")
             }
 
