@@ -817,6 +817,27 @@
 <span id="812">812</span>
 <span id="813">813</span>
 <span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -1491,16 +1512,24 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// - MESSAGE_CREATE</span>
         <span class="kw">const</span> <span class="ident">MESSAGE_CONTENT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
+        <span class="doccomment">/// Enable following gateway events:</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_CREATE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_UPDATE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_DELETE</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_USER_ADD</span>
+        <span class="doccomment">/// - GUILD_SCHEDULED_EVENT_USER_REMOVE</span>
+        <span class="kw">const</span> <span class="ident">GUILD_SCHEDULED_EVENTS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">GatewayIntents</span> {
-    <span class="doccomment">/// Gets all of the intents that don&#39;t are considered privileged by Discord.</span>
+    <span class="doccomment">/// Gets all of the intents that aren&#39;t considered privileged by Discord.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">non_privileged</span>() -&gt; <span class="ident">GatewayIntents</span> {
         <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
         <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
-        <span class="ident"><span class="self">Self</span>::from_bits_truncate</span>(<span class="ident"><span class="self">Self</span>::all</span>().<span class="ident">bits</span>() <span class="op">&amp;</span> <span class="op">!</span><span class="ident"><span class="self">Self</span>::privileged</span>().<span class="ident">bits</span>())
+        <span class="ident"><span class="self">Self</span>::privileged</span>().<span class="ident">complement</span>()
     }
 
     <span class="doccomment">/// Gets all of the intents that are considered privileged by Discord.</span>
@@ -1508,15 +1537,12 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">privileged</span>() -&gt; <span class="ident">GatewayIntents</span> {
         <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
         <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
-        <span class="ident"><span class="self">Self</span>::from_bits_truncate</span>(<span class="ident"><span class="self">Self</span>::GUILD_MEMBERS</span>.<span class="ident">bits</span>() <span class="op">|</span> <span class="ident"><span class="self">Self</span>::GUILD_PRESENCES</span>.<span class="ident">bits</span>())
+        <span class="ident"><span class="self">Self</span>::GUILD_MEMBERS</span>.<span class="ident">union</span>(<span class="ident"><span class="self">Self</span>::GUILD_PRESENCES</span>).<span class="ident">union</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CONTENT</span>)
     }
 
-    <span class="doccomment">/// Checks if any of the included intents are privileged</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_MEMBERS]: #associatedconstant.GUILD_MEMBERS</span>
-    <span class="doccomment">/// [GUILD_PRESENCES]: #associatedconstant.GUILD_PRESENCES</span>
+    <span class="doccomment">/// Checks if any of the included intents are privileged.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_privileged</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">guild_members</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">guild_presences</span>()
+        <span class="self">self</span>.<span class="ident">intersects</span>(<span class="ident"><span class="self">Self</span>::privileged</span>())
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
@@ -1630,7 +1656,23 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_typing</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::DIRECT_MESSAGE_TYPING</span>)
     }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [MESSAGE_CONTENT] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [MESSAGE_CONTENT]: Self::MESSAGE_CONTENT</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_content</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MESSAGE_CONTENT</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS] intent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_SCHEDULED_EVENTS]: Self::GUILD_SCHEDULED_EVENTS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_scheduled_events</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::GUILD_SCHEDULED_EVENTS</span>)
+    }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f3700105 2022-03-22)" ></div>
 </body></html>
