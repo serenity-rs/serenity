@@ -1292,6 +1292,8 @@
 <span id="1287">1287</span>
 <span id="1288">1288</span>
 <span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2544,6 +2546,8 @@
         <span class="kw">const</span> <span class="ident">EPHEMERAL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
         <span class="doccomment">/// This message is an Interaction Response and the bot is &quot;thinking&quot;.</span>
         <span class="kw">const</span> <span class="ident">LOADING</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+        <span class="doccomment">/// This message failed to mention some roles and add their members to the thread.</span>
+        <span class="kw">const</span> <span class="ident">FAILED_TO_MENTION_SOME_ROLES_IN_THREAD</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
     }
 }
 
