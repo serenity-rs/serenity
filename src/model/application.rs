@@ -27,9 +27,7 @@ pub struct ApplicationInfo {
     pub description: String,
     /// A set of bitflags assigned to the application, which represent gated
     /// feature flags that have been enabled for the application.
-    ///
-    /// You can get a usable value from this by using [`ApplicationFlags::from_u64`]
-    pub flags: Option<u64>,
+    pub flags: Option<ApplicationFlags>,
     /// A hash pointing to the application's icon.
     ///
     /// This is not necessarily equivalent to the bot user's avatar.
@@ -113,9 +111,7 @@ pub struct PartialCurrentApplicationInfo {
     /// The unique Id of the user.
     pub id: ApplicationId,
     /// The flags associated with the application.
-    ///
-    /// You can get a usable value from this by using [`ApplicationFlags::from_u64`]
-    pub flags: u64,
+    pub flags: ApplicationFlags,
 }
 
 /// Information about the current application and its owner.
@@ -190,13 +186,5 @@ bitflags! {
         const EMBEDDED = 2 << 17;
         const GATEWAY_MESSAGE_CONTENT = 2 << 18;
         const GATEWAY_MESSAGE_CONTENT_LIMITED = 2 << 19;
-    }
-}
-
-impl ApplicationFlags {
-    pub fn from_u64(bits: u64) -> Self {
-        Self {
-            bits,
-        }
     }
 }
