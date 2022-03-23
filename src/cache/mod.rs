@@ -893,7 +893,7 @@ impl Cache {
         if let Some(user) = self.users.read().await.get(&user_id) {
             Some(user.clone())
         } else {
-            self.temp_users.get_if_present(&user_id)
+            self.temp_users.get(&user_id)
         }
     }
 
