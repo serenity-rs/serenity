@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[cfg(feature = "model")]
 use futures::stream::Stream;
 
@@ -1686,8 +1688,8 @@ pub enum GuildWidgetStyle {
     Banner4,
 }
 
-impl Display for GuildWidgetStyle {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+impl fmt::Display for GuildWidgetStyle {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             GuildWidgetStyle::Shield => f.write_str("shield"),
             GuildWidgetStyle::Banner1 => f.write_str("banner1"),

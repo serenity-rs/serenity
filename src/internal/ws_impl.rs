@@ -1,9 +1,5 @@
 #[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
-use std::{
-    error::Error as StdError,
-    fmt::{Display, Formatter, Result as FmtResult},
-    io::Error as IoError,
-};
+use std::{error::Error as StdError, fmt, io::Error as IoError};
 
 use async_trait::async_trait;
 use async_tungstenite::tungstenite::Message;
@@ -106,14 +102,14 @@ impl From<IoError> for RustlsError {
 }
 
 #[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
-impl Display for RustlsError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for RustlsError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             RustlsError::WebPKI => f.write_str("Failed to validate X.509 certificate"),
             RustlsError::HandshakeError => {
                 f.write_str("TLS handshake failed when making the websocket connection")
             },
-            RustlsError::Io(inner) => Display::fmt(&inner, f),
+            RustlsError::Io(inner) => fmt::Display::fmt(&inner, f),
         }
     }
 }

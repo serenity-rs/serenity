@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::ArgumentConvert;
 use crate::{model::prelude::*, prelude::*};
 
@@ -17,8 +19,8 @@ pub enum RoleParseError {
 
 impl std::error::Error for RoleParseError {}
 
-impl std::fmt::Display for RoleParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for RoleParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NotInGuild => f.write_str("Must invoke this operation in a guild"),
             Self::NotInCache => f.write_str("Guild's roles were not found in cache"),

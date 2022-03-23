@@ -1,6 +1,6 @@
 use std::{
     default::Default,
-    fmt::{self, Display, Write},
+    fmt::{self, Write},
     ops::Add,
 };
 
@@ -882,7 +882,7 @@ impl MessageBuilder {
     }
 }
 
-impl Display for MessageBuilder {
+impl fmt::Display for MessageBuilder {
     /// Formats the message builder into a string.
     ///
     /// This is done by simply taking the internal value of the tuple-struct and

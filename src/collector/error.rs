@@ -1,7 +1,4 @@
-use std::{
-    error::Error as StdError,
-    fmt::{Display, Formatter, Result as FmtResult},
-};
+use std::{error::Error as StdError, fmt};
 
 /// An error that occurred while working with a collector.
 #[derive(Clone, Debug)]
@@ -31,8 +28,8 @@ pub enum Error {
     InvalidEventIdFilters,
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::NoEventTypes => f.write_str("No event types provided"),
             Error::InvalidEventIdFilters => {

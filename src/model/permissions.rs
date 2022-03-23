@@ -41,8 +41,7 @@
 //! [Manage Roles]: Permissions::MANAGE_ROLES
 //! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
 
-#[cfg(feature = "model")]
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt;
 
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
@@ -669,8 +668,6 @@ impl Permissions {
 
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        use std::fmt;
-
         struct StringVisitor;
 
         impl<'de> serde::de::Visitor<'de> for StringVisitor {
@@ -702,8 +699,8 @@ impl Serialize for Permissions {
 }
 
 #[cfg(feature = "model")]
-impl Display for Permissions {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for Permissions {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let names = self.get_permission_names();
 
         let total = names.len();

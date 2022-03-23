@@ -1,5 +1,6 @@
 use std::{
     boxed::Box,
+    fmt,
     future::Future,
     pin::Pin,
     sync::Arc,
@@ -369,8 +370,8 @@ impl Future for CollectReaction {
     }
 }
 
-impl std::fmt::Debug for FilterOptions {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Debug for FilterOptions {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("ReactionFilter")
             .field("collect_limit", &self.collect_limit)
             .field("filter", &"Option<Arc<dyn Fn(&Arc<Reaction>) -> bool + 'static + Send + Sync>>")

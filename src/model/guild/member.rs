@@ -2,7 +2,7 @@
 use std::borrow::Cow;
 #[cfg(feature = "cache")]
 use std::cmp::Reverse;
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt;
 
 #[cfg(feature = "model")]
 use crate::builder::EditMember;
@@ -637,7 +637,7 @@ impl Member {
     }
 }
 
-impl Display for Member {
+impl fmt::Display for Member {
     /// Mentions the user so that they receive a notification.
     ///
     /// # Examples
@@ -648,8 +648,8 @@ impl Display for Member {
     /// ```
     ///
     /// This is in the format of `<@USER_ID>`.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        Display::fmt(&self.user.mention(), f)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.user.mention(), f)
     }
 }
 

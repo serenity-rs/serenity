@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::ArgumentConvert;
 use crate::{model::prelude::*, prelude::*};
 
@@ -23,8 +25,8 @@ impl std::error::Error for MessageParseError {
     }
 }
 
-impl std::fmt::Display for MessageParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for MessageParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Malformed => {
                 f.write_str("Provided string did not adhere to any known guild message format")

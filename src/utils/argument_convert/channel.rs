@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::ArgumentConvert;
 use crate::{model::prelude::*, prelude::*};
 
@@ -21,8 +23,8 @@ impl std::error::Error for ChannelParseError {
     }
 }
 
-impl std::fmt::Display for ChannelParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ChannelParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Http(_) => f.write_str("Failed to request channel via HTTP"),
             Self::NotFoundOrMalformed => f.write_str("Channel not found or unknown format"),
@@ -116,8 +118,8 @@ impl std::error::Error for GuildChannelParseError {
     }
 }
 
-impl std::fmt::Display for GuildChannelParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for GuildChannelParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Http(_) => f.write_str("Failed to request channel via HTTP"),
             Self::NotFoundOrMalformed => f.write_str("Channel not found or unknown format"),
@@ -176,8 +178,8 @@ impl std::error::Error for ChannelCategoryParseError {
     }
 }
 
-impl std::fmt::Display for ChannelCategoryParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ChannelCategoryParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Http(_) => f.write_str("Failed to request channel via HTTP"),
             Self::NotFoundOrMalformed => f.write_str("Channel not found or unknown format"),

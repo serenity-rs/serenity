@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::fmt;
 
 #[cfg(feature = "model")]
 use crate::builder::EditRole;
@@ -193,11 +194,11 @@ impl Role {
     }
 }
 
-impl Display for Role {
+impl fmt::Display for Role {
     /// Format a mention for the role, pinging its members.
     // This is in the format of: `<@&ROLE_ID>`.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        Display::fmt(&self.mention(), f)
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.mention(), f)
     }
 }
 

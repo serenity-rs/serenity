@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::ArgumentConvert;
 use crate::{model::prelude::*, prelude::*};
 
@@ -12,8 +14,8 @@ pub enum GuildParseError {
 
 impl std::error::Error for GuildParseError {}
 
-impl std::fmt::Display for GuildParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for GuildParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NotFoundOrMalformed => f.write_str("Guild not found or unknown format"),
         }

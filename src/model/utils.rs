@@ -1,3 +1,4 @@
+use std::fmt;
 use std::marker::PhantomData;
 use std::{collections::HashMap, hash::Hash};
 
@@ -441,7 +442,7 @@ where
 {
     type Value = HashMap<K, V>;
 
-    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str("sequence")
     }
 

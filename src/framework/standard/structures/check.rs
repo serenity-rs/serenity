@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::fmt::{self, Debug, Display};
+use std::fmt;
 
 use futures::future::BoxFuture;
 
@@ -54,7 +54,7 @@ pub struct Check {
     pub display_in_help: bool,
 }
 
-impl Debug for Check {
+impl fmt::Debug for Check {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Check")
             .field("name", &self.name)
@@ -65,7 +65,7 @@ impl Debug for Check {
     }
 }
 
-impl Display for Reason {
+impl fmt::Display for Reason {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Unknown => f.write_str("Unknown"),

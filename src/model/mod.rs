@@ -43,11 +43,7 @@ pub mod user;
 pub mod voice;
 pub mod webhook;
 
-use std::{
-    collections::HashMap,
-    fmt::{Display, Formatter, Result as FmtResult},
-    result::Result as StdResult,
-};
+use std::{collections::HashMap, result::Result as StdResult};
 
 use serde::de::Visitor;
 use serde::{Deserialize, Deserializer};

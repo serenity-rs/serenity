@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 use std::time::{Duration, Instant};
 
 use futures::future::BoxFuture;
@@ -322,8 +323,8 @@ impl TicketCounter {
 #[derive(Debug)]
 pub struct RevertBucket;
 
-impl std::fmt::Display for RevertBucket {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for RevertBucket {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("RevertBucket")
     }
 }
