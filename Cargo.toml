@@ -127,8 +127,7 @@ features = ["std"]
 version = "2.1"
 
 [dependencies.moka]
-git = "https://github.com/moka-rs/moka"
-branch = "master"
+version = "0.8"
 features = ["dash"]
 optional = true
 
