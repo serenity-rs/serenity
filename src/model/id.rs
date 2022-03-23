@@ -1,6 +1,6 @@
 //! A collection of newtypes defining type-strong IDs.
 
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt;
 
 use super::Timestamp;
 
@@ -53,9 +53,9 @@ macro_rules! id_u64 {
                 }
             }
 
-            impl Display for $name {
-                fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-                    Display::fmt(&self.0, f)
+            impl fmt::Display for $name {
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    fmt::Display::fmt(&self.0, f)
                 }
             }
 

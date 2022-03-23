@@ -1,9 +1,6 @@
 //! Error enum definition wrapping potential model implementation errors.
 
-use std::{
-    error::Error as StdError,
-    fmt::{Display, Formatter, Result as FmtResult},
-};
+use std::{error::Error as StdError, fmt};
 
 use super::Permissions;
 
@@ -188,8 +185,8 @@ impl Error {
     }
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::BulkDeleteAmount => f.write_str("Too few/many messages to bulk delete."),
             Error::DeleteMessageDaysAmount(_) => f.write_str("Invalid delete message days."),

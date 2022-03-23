@@ -1,10 +1,4 @@
-use std::{
-    env,
-    error::Error as StdError,
-    fmt::{Display, Formatter, Result as FmtResult},
-    str::FromStr,
-    time::Duration,
-};
+use std::{env, error::Error as StdError, fmt, str::FromStr, time::Duration};
 
 use dotenv::dotenv;
 use serenity::{
@@ -34,16 +28,16 @@ enum Animal {
 #[derive(Debug)]
 struct ParseComponentError(String);
 
-impl Display for ParseComponentError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for ParseComponentError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Failed to parse {} as component", self.0)
     }
 }
 
 impl StdError for ParseComponentError {}
 
-impl Display for Animal {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for Animal {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Cat => write!(f, "Cat"),
             Self::Dog => write!(f, "Dog"),
@@ -115,8 +109,8 @@ enum Sound {
     Honk,
 }
 
-impl Display for Sound {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for Sound {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Meow => write!(f, "meow"),
             Self::Woof => write!(f, "woof"),

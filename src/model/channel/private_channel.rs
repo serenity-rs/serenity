@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
@@ -269,11 +269,7 @@ impl PrivateChannel {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     #[inline]
-    pub async fn say(
-        &self,
-        http: impl AsRef<Http>,
-        content: impl std::fmt::Display,
-    ) -> Result<Message> {
+    pub async fn say(&self, http: impl AsRef<Http>, content: impl fmt::Display) -> Result<Message> {
         self.id.say(&http, content).await
     }
 
@@ -394,9 +390,9 @@ impl PrivateChannel {
     }
 }
 
-impl Display for PrivateChannel {
+impl fmt::Display for PrivateChannel {
     /// Formats the private channel, displaying the recipient's username.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.recipient.name)
     }
 }

@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::ArgumentConvert;
 use crate::{model::prelude::*, prelude::*};
 
@@ -13,8 +15,8 @@ pub enum UserParseError {
 
 impl std::error::Error for UserParseError {}
 
-impl std::fmt::Display for UserParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for UserParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::NotFoundOrMalformed => f.write_str("User not found or unknown format"),
         }

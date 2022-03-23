@@ -1,7 +1,4 @@
-use std::{
-    error::Error as StdError,
-    fmt::{Display, Formatter, Result as FmtResult},
-};
+use std::{error::Error as StdError, fmt};
 
 use async_tungstenite::tungstenite::protocol::CloseFrame;
 
@@ -57,8 +54,8 @@ pub enum Error {
     DisallowedGatewayIntents,
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::BuildingUrl => f.write_str("Error building url"),
             Error::Closed(_) => f.write_str("Connection closed"),

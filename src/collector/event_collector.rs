@@ -1,5 +1,6 @@
 use std::{
     boxed::Box,
+    fmt,
     future::Future,
     pin::Pin,
     sync::Arc,
@@ -135,8 +136,8 @@ impl EventFilter {
 #[derive(Clone)]
 struct FilterFn(Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>);
 
-impl std::fmt::Debug for FilterFn {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Debug for FilterFn {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str("Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>")
     }
 }
