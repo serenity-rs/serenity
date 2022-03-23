@@ -1250,6 +1250,8 @@ bitflags! {
         const EPHEMERAL = 1 << 6;
         /// This message is an Interaction Response and the bot is "thinking".
         const LOADING = 1 << 7;
+        /// This message failed to mention some roles and add their members to the thread.
+        const FAILED_TO_MENTION_SOME_ROLES_IN_THREAD = 1 << 8;
     }
 }
 
