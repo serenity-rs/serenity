@@ -351,7 +351,7 @@ impl Cache {
         if let Some(channel) = self.channels.read().await.get(&id) {
             let channel = channel.clone();
             return Some(Channel::Guild(channel));
-        } else if let Some(channel) = self.temp_channels.get_if_present(&id) {
+        } else if let Some(channel) = self.temp_channels.get(&id) {
             return Some(Channel::Guild(channel));
         }
 
