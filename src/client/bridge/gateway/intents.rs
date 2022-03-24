@@ -200,16 +200,15 @@ impl GatewayIntents {
     pub const fn privileged() -> GatewayIntents {
         // bitflags don't support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
-        Self::from_bits_truncate(Self::GUILD_MEMBERS.bits() | Self::GUILD_PRESENCES.bits() | Self::GUILD_MESSAGES.bits())
+        Self::from_bits_truncate(Self::GUILD_MEMBERS.bits() | Self::GUILD_PRESENCES.bits())
     }
 
     /// Checks if any of the included intents are privileged
     ///
     /// [GUILD_MEMBERS]: #associatedconstant.GUILD_MEMBERS
     /// [GUILD_PRESENCES]: #associatedconstant.GUILD_PRESENCES
-    /// [GUILD_MESSAGES]: #associatedconstant.GUILD_MESSAGES
     pub fn is_privileged(self) -> bool {
-        self.guild_members() || self.guild_presences() || self.guild_messages()
+        self.guild_members() || self.guild_presences()
     }
 
     /// Shorthand for checking that the set of intents contains the
