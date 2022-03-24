@@ -8,19 +8,14 @@
 mod create_channel;
 mod create_embed;
 
-#[cfg(feature = "unstable_discord_api")]
 mod create_application_command;
-#[cfg(feature = "unstable_discord_api")]
 mod create_application_command_permission;
 
 mod add_member;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
-#[cfg(feature = "unstable_discord_api")]
 mod create_components;
-#[cfg(feature = "unstable_discord_api")]
 mod create_interaction_response;
-#[cfg(feature = "unstable_discord_api")]
 mod create_interaction_response_followup;
 mod create_invite;
 mod create_message;
@@ -31,7 +26,6 @@ mod edit_channel;
 mod edit_guild;
 mod edit_guild_welcome_screen;
 mod edit_guild_widget;
-#[cfg(feature = "unstable_discord_api")]
 mod edit_interaction_response;
 mod edit_member;
 mod edit_message;
@@ -73,7 +67,6 @@ pub use self::{
     execute_webhook::ExecuteWebhook,
     get_messages::GetMessages,
 };
-#[cfg(feature = "unstable_discord_api")]
 pub use self::{
     create_application_command::{
         CreateApplicationCommand,

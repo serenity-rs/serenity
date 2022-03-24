@@ -11,7 +11,6 @@ use super::prelude::*;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
-#[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::application_command::*;
 
 pub fn default_true() -> bool {
@@ -73,7 +72,6 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     deserializer.deserialize_seq(SequenceToMapVisitor::new(|member: &Member| member.user.id))
 }
 
-#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
     deserializer: D,
     resolved: &ApplicationCommandInteractionDataResolved,
@@ -87,7 +85,6 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
     Ok(options)
 }
 
-#[cfg(feature = "unstable_discord_api")]
 fn try_resolve(
     value: &Value,
     kind: ApplicationCommandOptionType,
@@ -158,7 +155,6 @@ fn try_resolve(
     }
 }
 
-#[cfg(feature = "unstable_discord_api")]
 fn loop_resolved(
     options: &mut ApplicationCommandInteractionDataOption,
     resolved: &ApplicationCommandInteractionDataResolved,

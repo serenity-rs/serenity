@@ -26,7 +26,6 @@ use super::{
 use crate::constants;
 use crate::internal::prelude::*;
 use crate::json::{from_number, from_value, json, to_value, to_vec};
-#[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::application_command::{
     ApplicationCommand,
     ApplicationCommandPermission,
@@ -59,7 +58,6 @@ pub struct HttpBuilder {
     ratelimiter_disabled: bool,
     token: String,
     proxy: Option<Url>,
-    #[cfg(feature = "unstable_discord_api")]
     application_id: Option<u64>,
 }
 
@@ -73,13 +71,11 @@ impl HttpBuilder {
             ratelimiter_disabled: false,
             token: parse_token(token),
             proxy: None,
-            #[cfg(feature = "unstable_discord_api")]
             application_id: None,
         }
     }
 
     /// Sets the application_id to use interactions.
-    #[cfg(feature = "unstable_discord_api")]
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(application_id);
 
@@ -151,7 +147,7 @@ impl HttpBuilder {
     pub fn build(self) -> Http {
         let token = self.token;
 
-        #[cfg(feature = "unstable_discord_api")]
+        // TODO: It should not be required for all users of serenity to set the application_id or get a panic.
         let application_id = self
             .application_id
             .expect("Expected application Id in order to use interacions features");
@@ -174,7 +170,6 @@ impl HttpBuilder {
             ratelimiter_disabled,
             proxy: self.proxy,
             token,
-            #[cfg(feature = "unstable_discord_api")]
             application_id,
         }
     }
@@ -211,7 +206,6 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
-    #[cfg(feature = "unstable_discord_api")]
     pub application_id: u64,
 }
 
@@ -236,12 +230,10 @@ impl Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: token.to_string(),
-            #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
     }
 
-    #[cfg(feature = "unstable_discord_api")]
     pub fn new_with_application_id(application_id: u64) -> Self {
         let builder = configure_client_backend(Client::builder());
         let built = builder.build().expect("Cannot build reqwest::Client");
@@ -267,7 +259,6 @@ impl Http {
         Self::new(built, &token)
     }
 
-    #[cfg(feature = "unstable_discord_api")]
     pub fn new_with_token_application_id(token: &str, application_id: u64) -> Self {
         let mut base = Self::new_with_token(token);
 
@@ -487,7 +478,6 @@ impl Http {
     /// Create a follow-up message for an Interaction.
     ///
     /// Functions the same as [`Self::execute_webhook`]
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_followup_message(
         &self,
         interaction_token: &str,
@@ -508,7 +498,6 @@ impl Http {
     /// Create a follow-up message with attachments for an Interaction.
     ///
     /// Functions the same as [`Self::execute_webhook`]
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_followup_message_with_files(
         &self,
         interaction_token: &str,
@@ -542,7 +531,6 @@ impl Http {
     /// application will overwrite the old command.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_global_application_command(
         &self,
         map: &Value,
@@ -559,7 +547,6 @@ impl Http {
     }
 
     /// Creates new global application commands.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_global_application_commands(
         &self,
         map: &Value,
@@ -576,7 +563,6 @@ impl Http {
     }
 
     /// Creates new guild application commands.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_guild_application_commands(
         &self,
         guild_id: u64,
@@ -644,7 +630,6 @@ impl Http {
     /// Refer to Discord's [docs] for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_guild_application_command(
         &self,
         guild_id: u64,
@@ -694,7 +679,6 @@ impl Http {
     /// Refer to Discord's [docs] for the object it takes.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_interaction_response(
         &self,
         interaction_id: u64,
@@ -953,7 +937,6 @@ impl Http {
     }
 
     /// Deletes a follow-up message for an interaction.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn delete_followup_message(
         &self,
         interaction_token: &str,
@@ -973,7 +956,6 @@ impl Http {
     }
 
     /// Deletes a global command.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn delete_global_application_command(&self, command_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1001,7 +983,6 @@ impl Http {
     }
 
     /// Deletes a guild command.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn delete_guild_application_command(
         &self,
         guild_id: u64,
@@ -1127,7 +1108,6 @@ impl Http {
     }
 
     /// Deletes the initial interaction response.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn delete_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -1347,7 +1327,6 @@ impl Http {
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_followup_message(
         &self,
         interaction_token: &str,
@@ -1372,7 +1351,6 @@ impl Http {
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_followup_message_and_attachments(
         &self,
         interaction_token: &str,
@@ -1402,7 +1380,6 @@ impl Http {
     /// Refer to Discord's [docs] for Get Webhook Message for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/resources/webhook#get-webhook-message
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_followup_message(
         &self,
         interaction_token: &str,
@@ -1428,7 +1405,6 @@ impl Http {
     /// Refer to Discord's [docs] for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_global_application_command(
         &self,
         command_id: u64,
@@ -1473,7 +1449,6 @@ impl Http {
     /// Refer to Discord's [docs] for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_guild_application_command(
         &self,
         guild_id: u64,
@@ -1500,7 +1475,6 @@ impl Http {
     /// Refer to Discord's [documentation] for field information.
     ///
     /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_guild_application_command_permissions(
         &self,
         guild_id: u64,
@@ -1527,7 +1501,6 @@ impl Http {
     /// Refer to Discord's [documentation] for field information.
     ///
     /// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_guild_application_commands_permissions(
         &self,
         guild_id: u64,
@@ -1724,7 +1697,6 @@ impl Http {
     }
 
     /// Gets the initial interaction response.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -1746,7 +1718,6 @@ impl Http {
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
     ///
     /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_original_interaction_response(
         &self,
         interaction_token: &str,
@@ -2609,7 +2580,6 @@ impl Http {
     }
 
     /// Fetches all of the global commands for your application.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_global_application_commands(&self) -> Result<Vec<ApplicationCommand>> {
         self.fire(Request {
             body: None,
@@ -2623,7 +2593,6 @@ impl Http {
     }
 
     /// Fetches a global commands for your application by its Id.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_global_application_command(
         &self,
         command_id: u64,
@@ -2667,7 +2636,6 @@ impl Http {
     }
 
     /// Fetches all of the guild commands for your application for a specific guild.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_guild_application_commands(
         &self,
         guild_id: u64,
@@ -2685,7 +2653,6 @@ impl Http {
     }
 
     /// Fetches a guild command by its Id.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_guild_application_command(
         &self,
         guild_id: u64,
@@ -2705,7 +2672,6 @@ impl Http {
     }
 
     /// Fetches all of the guild commands permissions for your application for a specific guild.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_guild_application_commands_permissions(
         &self,
         guild_id: u64,
@@ -2723,7 +2689,6 @@ impl Http {
     }
 
     /// Gives the guild command permission for your application for a specific guild.
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_guild_application_command_permissions(
         &self,
         guild_id: u64,
@@ -3843,7 +3808,6 @@ impl Default for Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
-            #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
     }

@@ -38,7 +38,7 @@ use crate::json::json;
 #[cfg(feature = "model")]
 use crate::json::prelude::*;
 use crate::model::prelude::*;
-#[cfg(all(feature = "model", feature = "unstable_discord_api"))]
+#[cfg(feature = "model")]
 use crate::{
     builder::{
         CreateApplicationCommand,
@@ -1282,7 +1282,6 @@ impl GuildId {
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand
     /// [`create_global_application_command`]: crate::model::interactions::application_command::ApplicationCommand::create_global_application_command
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_application_command<F>(
         &self,
         http: impl AsRef<Http>,
@@ -1302,7 +1301,6 @@ impl GuildId {
     /// Returns the same possible errors as [`set_global_application_commands`].
     ///
     /// [`set_global_application_commands`]: crate::model::interactions::application_command::ApplicationCommand::set_global_application_commands
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn set_application_commands<F>(
         &self,
         http: impl AsRef<Http>,
@@ -1330,7 +1328,6 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn create_application_command_permission<F>(
         &self,
         http: impl AsRef<Http>,
@@ -1362,7 +1359,6 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn set_application_commands_permissions<F>(
         &self,
         http: impl AsRef<Http>,
@@ -1387,7 +1383,6 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_commands(
         &self,
         http: impl AsRef<Http>,
@@ -1403,7 +1398,6 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_command(
         &self,
         http: impl AsRef<Http>,
@@ -1420,7 +1414,6 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn edit_application_command<F>(
         &self,
         http: impl AsRef<Http>,
@@ -1444,7 +1437,6 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn delete_application_command(
         &self,
         http: impl AsRef<Http>,
@@ -1461,7 +1453,6 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_commands_permissions(
         &self,
         http: impl AsRef<Http>,
@@ -1477,7 +1468,6 @@ impl GuildId {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    #[cfg(feature = "unstable_discord_api")]
     pub async fn get_application_command_permissions(
         &self,
         http: impl AsRef<Http>,

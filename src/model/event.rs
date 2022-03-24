@@ -8,7 +8,6 @@ use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 use super::prelude::*;
 use super::utils::{emojis, roles, stickers};
 use crate::internal::prelude::*;
-#[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::Interaction;
 use crate::{constants::OpCode, json::prelude::*};
 
@@ -462,7 +461,6 @@ pub struct WebhookUpdateEvent {
     pub guild_id: GuildId,
 }
 
-#[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -470,7 +468,6 @@ pub struct InteractionCreateEvent {
     pub interaction: Interaction,
 }
 
-#[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -478,7 +475,6 @@ pub struct IntegrationCreateEvent {
     pub integration: Integration,
 }
 
-#[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
@@ -486,7 +482,6 @@ pub struct IntegrationUpdateEvent {
     pub integration: Integration,
 }
 
-#[cfg(feature = "unstable_discord_api")]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct IntegrationDeleteEvent {
@@ -771,16 +766,12 @@ pub enum Event {
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     WebhookUpdate(WebhookUpdateEvent),
     /// An interaction was created.
-    #[cfg(feature = "unstable_discord_api")]
     InteractionCreate(InteractionCreateEvent),
     /// A guild integration was created
-    #[cfg(feature = "unstable_discord_api")]
     IntegrationCreate(IntegrationCreateEvent),
     /// A guild integration was updated
-    #[cfg(feature = "unstable_discord_api")]
     IntegrationUpdate(IntegrationUpdateEvent),
     /// A guild integration was deleted
-    #[cfg(feature = "unstable_discord_api")]
     IntegrationDelete(IntegrationDeleteEvent),
     /// A stage instance was created.
     StageInstanceCreate(StageInstanceCreateEvent),
@@ -1108,7 +1099,6 @@ macro_rules! with_related_ids_for_event_types {
                 channel_id: Some(e.channel_id),
                 message_id: Never,
             },
-            #[cfg(feature = "unstable_discord_api")]
             Self::InteractionCreate, Self::InteractionCreate(e) => {
                 user_id: match &e.interaction {
                     Interaction::Ping(_) => None,
@@ -1139,21 +1129,18 @@ macro_rules! with_related_ids_for_event_types {
                     Interaction::ModalSubmit(i) => i.message.as_ref().map(|m| m.id).into(),
                 },
             },
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationCreate, Self::IntegrationCreate(e) => {
                 user_id: e.integration.user.as_ref().map(|u| u.id).into(),
                 guild_id: Some(e.integration.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationUpdate, Self::IntegrationUpdate(e) => {
                 user_id: e.integration.user.as_ref().map(|u| u.id).into(),
                 guild_id: Some(e.integration.guild_id),
                 channel_id: Never,
                 message_id: Never,
             },
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationDelete, Self::IntegrationDelete(e) => {
                 user_id: Never,
                 guild_id: Some(e.guild_id),
@@ -1271,13 +1258,9 @@ impl Event {
             Self::VoiceStateUpdate(_) => EventType::VoiceStateUpdate,
             Self::VoiceServerUpdate(_) => EventType::VoiceServerUpdate,
             Self::WebhookUpdate(_) => EventType::WebhookUpdate,
-            #[cfg(feature = "unstable_discord_api")]
             Self::InteractionCreate(_) => EventType::InteractionCreate,
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationCreate(_) => EventType::IntegrationCreate,
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationUpdate(_) => EventType::IntegrationUpdate,
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationDelete(_) => EventType::IntegrationDelete,
             Self::StageInstanceCreate(_) => EventType::StageInstanceCreate,
             Self::StageInstanceUpdate(_) => EventType::StageInstanceUpdate,
@@ -1420,13 +1403,9 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::VoiceServerUpdate => Event::VoiceServerUpdate(from_value(v)?),
         EventType::VoiceStateUpdate => Event::VoiceStateUpdate(from_value(v)?),
         EventType::WebhookUpdate => Event::WebhookUpdate(from_value(v)?),
-        #[cfg(feature = "unstable_discord_api")]
         EventType::InteractionCreate => Event::InteractionCreate(from_value(v)?),
-        #[cfg(feature = "unstable_discord_api")]
         EventType::IntegrationCreate => Event::IntegrationCreate(from_value(v)?),
-        #[cfg(feature = "unstable_discord_api")]
         EventType::IntegrationUpdate => Event::IntegrationUpdate(from_value(v)?),
-        #[cfg(feature = "unstable_discord_api")]
         EventType::IntegrationDelete => Event::IntegrationDelete(from_value(v)?),
         EventType::StageInstanceCreate => Event::StageInstanceCreate(from_value(v)?),
         EventType::StageInstanceUpdate => Event::StageInstanceUpdate(from_value(v)?),
@@ -1609,22 +1588,18 @@ pub enum EventType {
     /// Indicator that an interaction was created.
     ///
     /// This maps to [`InteractionCreateEvent`].
-    #[cfg(feature = "unstable_discord_api")]
     InteractionCreate,
     /// Indicator that an integration was created.
     ///
     /// This maps to [`IntegrationCreateEvent`].
-    #[cfg(feature = "unstable_discord_api")]
     IntegrationCreate,
     /// Indicator that an integration was created.
     ///
     /// This maps to [`IntegrationUpdateEvent`].
-    #[cfg(feature = "unstable_discord_api")]
     IntegrationUpdate,
     /// Indicator that an integration was created.
     ///
     /// This maps to [`IntegrationDeleteEvent`].
-    #[cfg(feature = "unstable_discord_api")]
     IntegrationDelete,
     /// Indicator that a stage instance was created.
     ///
@@ -1771,13 +1746,9 @@ impl EventType {
     const VOICE_SERVER_UPDATE: &'static str = "VOICE_SERVER_UPDATE";
     const VOICE_STATE_UPDATE: &'static str = "VOICE_STATE_UPDATE";
     const WEBHOOKS_UPDATE: &'static str = "WEBHOOKS_UPDATE";
-    #[cfg(feature = "unstable_discord_api")]
     const INTERACTION_CREATE: &'static str = "INTERACTION_CREATE";
-    #[cfg(feature = "unstable_discord_api")]
     const INTEGRATION_CREATE: &'static str = "INTEGRATION_CREATE";
-    #[cfg(feature = "unstable_discord_api")]
     const INTEGRATION_UPDATE: &'static str = "INTEGRATION_UPDATE";
-    #[cfg(feature = "unstable_discord_api")]
     const INTEGRATION_DELETE: &'static str = "INTEGRATION_DELETE";
     const STAGE_INSTANCE_CREATE: &'static str = "STAGE_INSTANCE_CREATE";
     const STAGE_INSTANCE_UPDATE: &'static str = "STAGE_INSTANCE_UPDATE";
@@ -1831,13 +1802,9 @@ impl EventType {
             Self::VoiceServerUpdate => Some(Self::VOICE_SERVER_UPDATE),
             Self::VoiceStateUpdate => Some(Self::VOICE_STATE_UPDATE),
             Self::WebhookUpdate => Some(Self::WEBHOOKS_UPDATE),
-            #[cfg(feature = "unstable_discord_api")]
             Self::InteractionCreate => Some(Self::INTERACTION_CREATE),
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationCreate => Some(Self::INTEGRATION_CREATE),
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationUpdate => Some(Self::INTEGRATION_UPDATE),
-            #[cfg(feature = "unstable_discord_api")]
             Self::IntegrationDelete => Some(Self::INTEGRATION_DELETE),
             Self::StageInstanceCreate => Some(Self::STAGE_INSTANCE_CREATE),
             Self::StageInstanceUpdate => Some(Self::STAGE_INSTANCE_UPDATE),
@@ -1915,13 +1882,9 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::VOICE_SERVER_UPDATE => EventType::VoiceServerUpdate,
                     EventType::VOICE_STATE_UPDATE => EventType::VoiceStateUpdate,
                     EventType::WEBHOOKS_UPDATE => EventType::WebhookUpdate,
-                    #[cfg(feature = "unstable_discord_api")]
                     EventType::INTERACTION_CREATE => EventType::InteractionCreate,
-                    #[cfg(feature = "unstable_discord_api")]
                     EventType::INTEGRATION_CREATE => EventType::IntegrationCreate,
-                    #[cfg(feature = "unstable_discord_api")]
                     EventType::INTEGRATION_UPDATE => EventType::IntegrationUpdate,
-                    #[cfg(feature = "unstable_discord_api")]
                     EventType::INTEGRATION_DELETE => EventType::IntegrationDelete,
                     EventType::STAGE_INSTANCE_CREATE => EventType::StageInstanceCreate,
                     EventType::STAGE_INSTANCE_UPDATE => EventType::StageInstanceUpdate,

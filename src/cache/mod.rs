@@ -1083,9 +1083,7 @@ mod test {
                 flags: None,
                 sticker_items: vec![],
                 referenced_message: None,
-                #[cfg(feature = "unstable_discord_api")]
                 interaction: None,
-                #[cfg(feature = "unstable_discord_api")]
                 components: vec![],
             },
         };

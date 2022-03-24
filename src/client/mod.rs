@@ -69,7 +69,6 @@ use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "gateway")]
 use crate::model::gateway::GatewayIntents;
-#[cfg(feature = "unstable_discord_api")]
 use crate::model::id::ApplicationId;
 pub use crate::CacheAndHttp;
 
@@ -80,7 +79,6 @@ pub struct ClientBuilder {
     http: Http,
     fut: Option<BoxFuture<'static, Result<Client>>>,
     intents: GatewayIntents,
-    #[cfg(feature = "unstable_discord_api")]
     application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
@@ -103,7 +101,6 @@ impl ClientBuilder {
             http,
             fut: None,
             intents: GatewayIntents::non_privileged(),
-            #[cfg(feature = "unstable_discord_api")]
             application_id: None,
             #[cfg(feature = "cache")]
             timeout: None,
@@ -154,7 +151,6 @@ impl ClientBuilder {
     }
 
     /// Sets the application id.
-    #[cfg(feature = "unstable_discord_api")]
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(ApplicationId(application_id));
 
@@ -164,7 +160,6 @@ impl ClientBuilder {
     }
 
     /// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
-    #[cfg(feature = "unstable_discord_api")]
     pub fn get_application_id(&self) -> Option<ApplicationId> {
         self.application_id
     }
@@ -404,7 +399,7 @@ impl Future for ClientBuilder {
             let intents = self.intents;
             let http = Arc::new(std::mem::take(&mut self.http));
 
-            #[cfg(feature = "unstable_discord_api")]
+            // TODO: It should not be required for all users of serenity to set the application_id or get a panic.
             if http.application_id == 0 {
                 panic!("Please provide an Application Id in order to use interactions features.");
             }

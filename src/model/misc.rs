@@ -479,7 +479,6 @@ mod test {
                 user: user.clone(),
                 pending: false,
                 premium_since: None,
-                #[cfg(feature = "unstable_discord_api")]
                 permissions: None,
                 avatar: None,
                 communication_disabled_until: None,

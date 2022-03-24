@@ -14,7 +14,6 @@ use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json;
-#[cfg(feature = "unstable_discord_api")]
 use crate::model::permissions::Permissions;
 use crate::model::prelude::*;
 use crate::model::Timestamp;
@@ -51,7 +50,6 @@ pub struct Member {
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
     /// [`Interaction`]: crate::model::interactions::Interaction
-    #[cfg(feature = "unstable_discord_api")]
     pub permissions: Option<Permissions>,
     /// The guild avatar hash
     pub avatar: Option<String>,
@@ -77,7 +75,6 @@ pub(crate) struct InterimMember {
     #[serde(default)]
     pub pending: bool,
     pub premium_since: Option<Timestamp>,
-    #[cfg(feature = "unstable_discord_api")]
     pub permissions: Option<Permissions>,
     pub avatar: Option<String>,
     pub communication_disabled_until: Option<Timestamp>,
@@ -95,7 +92,6 @@ impl From<InterimMember> for Member {
             user: m.user,
             pending: m.pending,
             premium_since: m.premium_since,
-            #[cfg(feature = "unstable_discord_api")]
             permissions: m.permissions,
             avatar: m.avatar,
             communication_disabled_until: m.communication_disabled_until,
@@ -687,7 +683,6 @@ pub struct PartialMember {
     /// This is only [`Some`] when returned in an [`Interaction`] object.
     ///
     /// [`Interaction`]: crate::model::interactions::Interaction
-    #[cfg(feature = "unstable_discord_api")]
     pub permissions: Option<Permissions>,
 }
 

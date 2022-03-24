@@ -6,6 +6,7 @@ use serde::{Deserialize, Deserializer};
 use simd_json::ValueAccess;
 
 use super::prelude::*;
+#[cfg(feature = "http")]
 use crate::builder::CreateApplicationCommand;
 #[cfg(feature = "http")]
 use crate::builder::{
@@ -17,7 +18,9 @@ use crate::builder::{
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::internal::prelude::StdResult;
-use crate::json::{self, from_number, JsonMap, Value};
+#[cfg(feature = "http")]
+use crate::json;
+use crate::json::{from_number, JsonMap, Value};
 use crate::model::channel::{Attachment, ChannelType, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
@@ -31,7 +34,6 @@ use crate::model::id::{
 };
 use crate::model::interactions::InteractionType;
 use crate::model::prelude::User;
-#[cfg(feature = "unstable_discord_api")]
 use crate::model::utils::deserialize_options_with_resolved;
 
 /// An interaction when a user invokes a slash command.
@@ -651,7 +653,6 @@ pub struct ApplicationCommandInteractionDataOption {
     pub focused: bool,
 }
 
-#[cfg(feature = "unstable_discord_api")]
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataOption {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
@@ -917,6 +918,7 @@ impl ApplicationCommand {
     }
 }
 
+#[cfg(feature = "http")]
 impl ApplicationCommand {
     #[inline]
     pub(crate) fn build_application_command<F>(f: F) -> JsonMap

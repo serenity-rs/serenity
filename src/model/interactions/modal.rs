@@ -5,13 +5,17 @@ use simd_json::ValueAccess;
 
 use super::message_component::ActionRow;
 use super::prelude::*;
+#[cfg(feature = "model")]
 use crate::builder::{
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
+#[cfg(feature = "model")]
 use crate::http::Http;
-use crate::json::{self, from_number};
+#[cfg(feature = "model")]
+use crate::json;
+use crate::json::from_number;
 use crate::model::interactions::InteractionType;
 
 /// An interaction triggered by a modal submit.
@@ -54,6 +58,7 @@ pub struct ModalSubmitInteraction {
     pub locale: String,
 }
 
+#[cfg(feature = "model")]
 impl ModalSubmitInteraction {
     /// Gets the interaction response.
     ///
