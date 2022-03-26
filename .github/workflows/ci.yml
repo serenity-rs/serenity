@@ -3,7 +3,8 @@ name: CI
 on: [push, pull_request]
 
 env:
-    minrust: 1.53.0
+  rust_min: 1.53.0
+  rust_nightly: nightly-2022-03-22
 
 jobs:
   test:
@@ -16,7 +17,9 @@ jobs:
         name:
           - stable
           - beta
-          - nightly
+          # The build matrix doesn't support the `env` variable in expressions
+          # see: jobs.nightly
+          # - nightly
           - Windows
           - no default features
           - no cache
@@ -28,8 +31,6 @@ jobs:
         include:
           - name: beta
             toolchain: beta
-          - name: nightly
-            toolchain: nightly
           - name: Windows
             os: windows-latest
           - name: no default features
@@ -78,6 +79,31 @@ jobs:
         if: ${{ !matrix.dont-test && matrix.features }}
         run: cargo test --no-default-features --features "${{ matrix.features }}"
 
+  nightly:
+    name: Test (nightly)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain (${{ env.rust_nightly }})
+        run: |
+          rustup install --profile minimal ${{ env.rust_nightly }}
+          rustup override set ${{ env.rust_nightly }}
+
+      - name: Add problem matchers
+        shell: bash
+        run: echo "::add-matcher::.github/matchers/rust.json"
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
+      - name: Build all features
+        run: cargo build --all-features
+
+      - name: Test all features
+        run: cargo test --all-features
 
   macOS:
     name: Test (macOS)
@@ -115,10 +141,10 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install toolchain (${{ env.minrust }})
+      - name: Install toolchain (${{ env.rust_min }})
         run: |
-          rustup install --profile minimal ${{ env.minrust }}
-          rustup override set ${{ env.minrust }}
+          rustup install --profile minimal ${{ env.rust_min }}
+          rustup override set ${{ env.rust_min }}
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
@@ -137,10 +163,10 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install toolchain (nightly)
+      - name: Install toolchain (${{ env.rust_nightly }})
         run: |
-          rustup install --profile minimal nightly
-          rustup override set nightly
+          rustup install --profile minimal ${{ env.rust_nightly }}
+          rustup override set ${{ env.rust_nightly }}
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
@@ -161,10 +187,10 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install toolchain
+      - name: Install toolchain (${{ env.rust_nightly }})
         run: |
-          rustup install --profile minimal nightly
-          rustup override set nightly
+          rustup install --profile minimal ${{ env.rust_nightly }}
+          rustup override set ${{ env.rust_nightly }}
 
       - name: Add problem matchers
         run: echo "::add-matcher::.github/matchers/rust.json"
