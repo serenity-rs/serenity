@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 #[cfg(feature = "simd-json")]
-use simd_json::Mutable;
+use simd_json::{Mutable, ValueAccess};
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
@@ -150,6 +150,23 @@ impl CreateInteractionResponseData {
     /// Sets the flags for the message.
     pub fn flags(&mut self, flags: InteractionApplicationCommandCallbackDataFlags) -> &mut Self {
         self.0.insert("flags", from_number(flags.bits()));
+        self
+    }
+
+    /// Adds or removes the ephemeral flag
+    pub fn ephemeral(&mut self, ephemeral: bool) -> &mut Self {
+        let flags = self.0
+            .get("flags")
+            .map(|f| f.as_u64().expect("Interaction response flag was not a number"))
+            .unwrap_or(0);
+
+        let flags = match ephemeral {
+            true => flags | InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits(),
+            false => flags & !InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits(),
+        };
+
+        self.0.insert("flags", from_number(flags));
+
         self
     }
 
