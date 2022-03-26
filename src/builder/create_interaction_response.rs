@@ -155,7 +155,8 @@ impl CreateInteractionResponseData {
 
     /// Adds or removes the ephemeral flag
     pub fn ephemeral(&mut self, ephemeral: bool) -> &mut Self {
-        let flags = self.0
+        let flags = self
+            .0
             .get("flags")
             .map(|f| f.as_u64().expect("Interaction response flag was not a number"))
             .unwrap_or(0);
