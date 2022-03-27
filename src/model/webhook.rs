@@ -316,6 +316,30 @@ impl Webhook {
         }
     }
 
+    /// Gets a previously sent message from the webhook.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].
+    ///
+    /// May also return [`Error::Http`] if the webhook's token is invalid, or
+    /// the given message Id does not belong to the current webhook.
+    ///
+    /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
+    pub async fn get_message(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: MessageId,
+    ) -> Result<Message> {
+        let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
+
+        http.as_ref().get_webhook_message(self.id.0, token, message_id.0).await
+    }
+
     /// Edits a webhook message with the fields set via the given builder.
     ///
     /// # Errors

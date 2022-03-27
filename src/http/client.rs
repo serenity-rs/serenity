@@ -1960,6 +1960,25 @@ impl Http {
         response.json::<Message>().await.map(Some).map_err(From::from)
     }
 
+    // Gets a webhook's message by Id
+    pub async fn get_webhook_message(
+        &self,
+        webhook_id: u64,
+        token: &str,
+        message_id: u64,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetWebhookMessage {
+                token,
+                webhook_id,
+                message_id,
+            },
+        })
+        .await
+    }
+
     /// Edits a webhook's message by Id.
     pub async fn edit_webhook_message(
         &self,
