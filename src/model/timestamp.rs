@@ -34,7 +34,7 @@ use std::ops::Deref;
 use std::str::FromStr;
 
 #[cfg(not(feature = "time"))]
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "time")]
 use time::format_description::well_known::Rfc3339;
@@ -96,6 +96,15 @@ impl Timestamp {
         Self(OffsetDateTime::now_utc())
     }
 
+    /// Create a new `Timestamp` from a UNIX timestamp.
+    ///
+    /// Returns `Err` if the value is invalid. The valid range of the value may vary depending on
+    /// the feature flags enabled (`time` with `large-dates`).
+    pub fn from_unix_timestamp(secs: i64) -> Result<Self, InvalidTimestamp> {
+        let dt = OffsetDateTime::from_unix_timestamp(secs).map_err(|_| InvalidTimestamp)?;
+        Ok(Self(dt))
+    }
+
     /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
     pub fn unix_timestamp(&self) -> i64 {
         self.0.unix_timestamp()
@@ -134,6 +143,16 @@ impl Timestamp {
         Self(Utc::now())
     }
 
+    /// Create a new `Timestamp` from a UNIX timestamp.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` if the value is invalid.
+    pub fn from_unix_timestamp(secs: i64) -> Result<Self, InvalidTimestamp> {
+        let dt = NaiveDateTime::from_timestamp_opt(secs, 0).ok_or(InvalidTimestamp)?;
+        Ok(Self(DateTime::from_utc(dt, Utc)))
+    }
+
     /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
     pub fn unix_timestamp(&self) -> i64 {
         self.0.timestamp()
@@ -158,6 +177,17 @@ impl Timestamp {
     /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
     pub fn parse(input: &str) -> Result<Timestamp, ParseError> {
         DateTime::parse_from_rfc3339(input).map(|d| Self(d.with_timezone(&Utc))).map_err(ParseError)
+    }
+}
+
+#[derive(Debug)]
+pub struct InvalidTimestamp;
+
+impl std::error::Error for InvalidTimestamp {}
+
+impl fmt::Display for InvalidTimestamp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("invalid UNIX timestamp value")
     }
 }
 
@@ -258,5 +288,20 @@ impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp {
 impl From<OffsetDateTime> for Timestamp {
     fn from(dt: OffsetDateTime) -> Self {
         Self(dt)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Timestamp;
+
+    #[test]
+    fn from_unix_timestamp() {
+        let timestamp = Timestamp::from_unix_timestamp(1462015105).unwrap();
+        assert_eq!(timestamp.unix_timestamp(), 1462015105);
+        #[cfg(not(feature = "time"))]
+        assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.000Z");
+        #[cfg(feature = "time")]
+        assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25Z");
     }
 }
