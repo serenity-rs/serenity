@@ -161,9 +161,10 @@ impl CreateInteractionResponseData {
             .map(|f| f.as_u64().expect("Interaction response flag was not a number"))
             .unwrap_or(0);
 
-        let flags = match ephemeral {
-            true => flags | InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits(),
-            false => flags & !InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits(),
+        let flags = if ephemeral {
+            flags | InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits()
+        } else {
+            flags & !InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits()
         };
 
         self.0.insert("flags", from_number(flags));
