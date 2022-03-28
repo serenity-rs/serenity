@@ -1591,28 +1591,15 @@ impl Guild {
     /// search all members in the guild via the Http API, use
     /// [`Self::search_members`].
     pub fn member_named(&self, name: &str) -> Option<&Member> {
-        let (name, discrim) = if let Some(pos) = name.rfind('#') {
-            let split = name.split_at(pos + 1);
-
-            let split2 = (split.0.get(0..split.0.len() - 1).unwrap_or(""), split.1);
-
-            match split2.1.parse::<u16>() {
-                Ok(discrim_int) => (split2.0, Some(discrim_int)),
-                Err(_) => (name, None),
-            }
-        } else {
-            (name, None)
+        let (username, discrim) = match crate::utils::parse_user_tag(name) {
+            Some((username, discrim)) => (username, Some(discrim)),
+            None => (name, None),
         };
 
         for member in self.members.values() {
-            let name_matches = member.user.name == name;
-
-            let discrim_matches = match discrim {
-                Some(discrim) => member.user.discriminator == discrim,
-                None => true,
-            };
-
-            if name_matches && discrim_matches {
+            if member.user.name == username
+                && discrim.map_or(true, |d| member.user.discriminator == d)
+            {
                 return Some(member);
             }
         }
