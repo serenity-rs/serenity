@@ -265,6 +265,51 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Utilities for parsing and formatting RFC 3339 timestamps.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The [`Timestamp`] newtype wraps `chrono::DateTime&lt;Utc&gt;` or `time::OffsetDateTime` if the `time`</span>
@@ -301,7 +346,7 @@
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
+<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">NaiveDateTime</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">time::format_description::well_known::Rfc3339</span>;
@@ -363,6 +408,15 @@
         <span class="self">Self</span>(<span class="ident">OffsetDateTime::now_utc</span>())
     }
 
+    <span class="doccomment">/// Create a new `Timestamp` from a UNIX timestamp.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns `Err` if the value is invalid. The valid range of the value may vary depending on</span>
+    <span class="doccomment">/// the feature flags enabled (`time` with `large-dates`).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unix_timestamp</span>(<span class="ident">secs</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidTimestamp</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">OffsetDateTime::from_unix_timestamp</span>(<span class="ident">secs</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InvalidTimestamp</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">dt</span>))
+    }
+
     <span class="doccomment">/// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">unix_timestamp</span>()
@@ -401,6 +455,16 @@
         <span class="self">Self</span>(<span class="ident">Utc::now</span>())
     }
 
+    <span class="doccomment">/// Create a new `Timestamp` from a UNIX timestamp.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns `Err` if the value is invalid.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unix_timestamp</span>(<span class="ident">secs</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidTimestamp</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">NaiveDateTime::from_timestamp_opt</span>(<span class="ident">secs</span>, <span class="number">0</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidTimestamp</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">DateTime::from_utc</span>(<span class="ident">dt</span>, <span class="ident">Utc</span>)))
+    }
+
     <span class="doccomment">/// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unix_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">timestamp</span>()
@@ -425,6 +489,17 @@
     <span class="doccomment">/// Returns `Err` if the string is not a valid RFC 3339 date and time string.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Timestamp</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
         <span class="ident">DateTime::parse_from_rfc3339</span>(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="self">Self</span>(<span class="ident">d</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>))).<span class="ident">map_err</span>(<span class="ident">ParseError</span>)
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidTimestamp</span>;
+
+<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">InvalidTimestamp</span> {}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidTimestamp</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid UNIX timestamp value&quot;</span>)
     }
 }
 
@@ -527,6 +602,21 @@
         <span class="self">Self</span>(<span class="ident">dt</span>)
     }
 }
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Timestamp</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">from_unix_timestamp</span>() {
+        <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">Timestamp::from_unix_timestamp</span>(<span class="number">1462015105</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">timestamp</span>.<span class="ident">unix_timestamp</span>(), <span class="number">1462015105</span>);
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>))]</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">timestamp</span>.<span class="ident">to_string</span>(), <span class="string">&quot;2016-04-30T11:18:25.000Z&quot;</span>);
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>)]</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">timestamp</span>.<span class="ident">to_string</span>(), <span class="string">&quot;2016-04-30T11:18:25Z&quot;</span>);
+    }
+}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f3700105 2022-03-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>

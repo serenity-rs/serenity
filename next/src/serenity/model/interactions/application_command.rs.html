@@ -1123,57 +1123,6 @@
 <span id="1118">1118</span>
 <span id="1119">1119</span>
 <span id="1120">1120</span>
-<span id="1121">1121</span>
-<span id="1122">1122</span>
-<span id="1123">1123</span>
-<span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
-<span id="1143">1143</span>
-<span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-<span id="1163">1163</span>
-<span id="1164">1164</span>
-<span id="1165">1165</span>
-<span id="1166">1166</span>
-<span id="1167">1167</span>
-<span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
-<span id="1171">1171</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1722,78 +1671,27 @@
 
 <span class="doccomment">/// The resolved data of a command data interaction payload.</span>
 <span class="doccomment">/// It contains the objects of [`ApplicationCommandInteractionDataOption`]s.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationCommandInteractionDataResolved</span> {
     <span class="doccomment">/// The resolved users.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">users</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The resolved partial members.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">PartialMember</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The resolved roles.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The resolved partial channels.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">channels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PartialChannel</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The resolved messages.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">messages</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">MessageId</span>, <span class="ident">Message</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The resolved attachments.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;HashMap::is_empty&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">attachments</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">AttachmentId</span>, <span class="ident">Attachment</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplicationCommandInteractionDataResolved</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;members&quot;</span>)
-            .<span class="ident">map</span>(<span class="ident">HashMap::deserialize</span>)
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">unwrap_or_default</span>();
-
-        <span class="kw">let</span> <span class="ident">users</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;users&quot;</span>)
-            .<span class="ident">map</span>(<span class="ident">HashMap::deserialize</span>)
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">unwrap_or_default</span>();
-
-        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;roles&quot;</span>)
-            .<span class="ident">map</span>(<span class="ident">HashMap::deserialize</span>)
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">unwrap_or_default</span>();
-
-        <span class="kw">let</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;channels&quot;</span>)
-            .<span class="ident">map</span>(<span class="ident">HashMap::deserialize</span>)
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">unwrap_or_default</span>();
-
-        <span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;messages&quot;</span>)
-            .<span class="ident">map</span>(<span class="ident">HashMap::deserialize</span>)
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">unwrap_or_default</span>();
-
-        <span class="kw">let</span> <span class="ident">attachments</span> <span class="op">=</span> <span class="ident">map</span>
-            .<span class="ident">remove</span>(<span class="string">&quot;attachments&quot;</span>)
-            .<span class="ident">map</span>(<span class="ident">HashMap::deserialize</span>)
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">unwrap_or_default</span>();
-
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">users</span>,
-            <span class="ident">members</span>,
-            <span class="ident">roles</span>,
-            <span class="ident">channels</span>,
-            <span class="ident">messages</span>,
-            <span class="ident">attachments</span>,
-        })
-    }
 }
 
 <span class="doccomment">/// A set of a parameter and a value from the user.</span>
@@ -2346,5 +2244,5 @@
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f3700105 2022-03-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (3c17c84a3 2022-03-21)" ></div>
 </body></html>
