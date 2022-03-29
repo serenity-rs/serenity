@@ -252,10 +252,29 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">simd_json::Mutable</span>;
+<span class="kw">use</span> <span class="ident">simd_json</span>::{<span class="ident">Mutable</span>, <span class="ident">ValueAccess</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CreateAllowedMentions</span>, <span class="ident">CreateEmbed</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
@@ -404,6 +423,25 @@
     <span class="doccomment">/// Sets the flags for the message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">InteractionApplicationCommandCallbackDataFlags</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">from_number</span>(<span class="ident">flags</span>.<span class="ident">bits</span>()));
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Adds or removes the ephemeral flag</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ephemeral</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ephemeral</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="number">0</span>
+            .<span class="ident">get</span>(<span class="string">&quot;flags&quot;</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_u64</span>().<span class="ident">expect</span>(<span class="string">&quot;Interaction response flag was not a number&quot;</span>))
+            .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
+
+        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ephemeral</span> {
+            <span class="ident">flags</span> <span class="op">|</span> <span class="ident">InteractionApplicationCommandCallbackDataFlags::EPHEMERAL</span>.<span class="ident">bits</span>()
+        } <span class="kw">else</span> {
+            <span class="ident">flags</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">InteractionApplicationCommandCallbackDataFlags::EPHEMERAL</span>.<span class="ident">bits</span>()
+        };
+
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;flags&quot;</span>, <span class="ident">from_number</span>(<span class="ident">flags</span>));
+
         <span class="self">self</span>
     }
 
