@@ -113,7 +113,15 @@ Improper commit summaries are:
 The first letter of the summary must be capitalised. The summary should also
 preferably fit into 50 characters, but this is not actively enforced.
 
+# Noisy commits
+
+Set `blame.ignoreRevsFile` to ignore [noise commits][noise-commits] in `git blame`:
+```
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
 [test_ci]: .github/workflows/ci.yml
+[noise-commits]: https://github.com/serenity-rs/serenity/commit/9bbb25aac4d651804286f333eb503a72d41e473b
 [make]: https://github.com/sagiegurari/cargo-make
 [`rustup`]: https://rustup.rs
 [in-links]: https://github.com/rust-lang/rfcs/blob/master/text/1946-intra-rustdoc-links.md
