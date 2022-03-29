@@ -546,78 +546,27 @@ pub enum ResolvedTarget {
 
 /// The resolved data of a command data interaction payload.
 /// It contains the objects of [`ApplicationCommandInteractionDataOption`]s.
-#[derive(Clone, Debug, Serialize, Default)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataResolved {
     /// The resolved users.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub users: HashMap<UserId, User>,
     /// The resolved partial members.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub members: HashMap<UserId, PartialMember>,
     /// The resolved roles.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub roles: HashMap<RoleId, Role>,
     /// The resolved partial channels.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub channels: HashMap<ChannelId, PartialChannel>,
     /// The resolved messages.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub messages: HashMap<MessageId, Message>,
     /// The resolved attachments.
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
     pub attachments: HashMap<AttachmentId, Attachment>,
-}
-
-impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let members = map
-            .remove("members")
-            .map(HashMap::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        let users = map
-            .remove("users")
-            .map(HashMap::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        let roles = map
-            .remove("roles")
-            .map(HashMap::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        let channels = map
-            .remove("channels")
-            .map(HashMap::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        let messages = map
-            .remove("messages")
-            .map(HashMap::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        let attachments = map
-            .remove("attachments")
-            .map(HashMap::deserialize)
-            .transpose()
-            .map_err(DeError::custom)?
-            .unwrap_or_default();
-
-        Ok(Self {
-            users,
-            members,
-            roles,
-            channels,
-            messages,
-            attachments,
-        })
-    }
 }
 
 /// A set of a parameter and a value from the user.
