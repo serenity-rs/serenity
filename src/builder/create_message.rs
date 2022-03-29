@@ -1,9 +1,12 @@
 use std::collections::HashMap;
+#[cfg(not(feature = "http"))]
+use std::marker::PhantomData;
 
 use super::CreateAllowedMentions;
 use super::CreateEmbed;
 #[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
+#[cfg(feature = "http")]
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
 use crate::model::channel::{MessageFlags, MessageReference, ReactionType};
@@ -57,7 +60,8 @@ use crate::utils;
 pub struct CreateMessage<'a>(
     pub HashMap<&'static str, Value>,
     pub Option<Vec<ReactionType>>,
-    pub Vec<AttachmentType<'a>>,
+    #[cfg(feature = "http")] pub Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "http"))] PhantomData<&'a ()>,
 );
 
 impl<'a> CreateMessage<'a> {
@@ -176,12 +180,14 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Appends a file to the message.
+    #[cfg(feature = "http")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
         self.2.push(file.into());
         self
     }
 
     /// Appends a list of files to the message.
+    #[cfg(feature = "http")]
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -194,6 +200,7 @@ impl<'a> CreateMessage<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
+    #[cfg(feature = "http")]
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -259,6 +266,6 @@ impl<'a> Default for CreateMessage<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
-        CreateMessage(map, None, Vec::new())
+        CreateMessage(map, None, Default::default())
     }
 }

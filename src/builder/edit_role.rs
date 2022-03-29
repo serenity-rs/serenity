@@ -1,9 +1,13 @@
 use std::collections::HashMap;
 
+#[cfg(feature = "http")]
 use bytes::buf::Buf;
+#[cfg(feature = "http")]
 use reqwest::Url;
+#[cfg(feature = "http")]
 use tokio::{fs::File, io::AsyncReadExt};
 
+#[cfg(feature = "http")]
 use crate::http::{AttachmentType, Http};
 use crate::internal::prelude::*;
 use crate::model::{guild::Role, Permissions};
@@ -130,6 +134,7 @@ impl EditRole {
     ///
     /// May error if the icon is a URL and the HTTP request fails, or if the icon is a file
     /// on a path that doesn't exist.
+    #[cfg(feature = "http")]
     pub async fn icon<'a>(
         &mut self,
         http: impl AsRef<Http>,
