@@ -7,7 +7,7 @@ on:
       - next
 
 env:
-  rust-nightly: nightly-2022-03-22
+  rust_nightly: nightly-2022-03-22
 
 jobs:
   docs:
