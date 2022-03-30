@@ -4,6 +4,7 @@ use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
 
 use super::prelude::*;
+#[cfg(feature = "model")]
 use crate::builder::{
     CreateApplicationCommand,
     CreateApplicationCommands,
@@ -11,6 +12,7 @@ use crate::builder::{
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
+#[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::{JsonMap, StdResult, Value};
 use crate::model::channel::{ChannelType, PartialChannel};
@@ -35,6 +37,7 @@ use crate::model::utils::{
     deserialize_roles_map,
     deserialize_users,
 };
+#[cfg(feature = "model")]
 use crate::utils;
 
 /// An interaction when a user invokes a slash command.
@@ -72,6 +75,7 @@ pub struct ApplicationCommandInteraction {
     pub locale: String,
 }
 
+#[cfg(feature = "model")]
 impl ApplicationCommandInteraction {
     /// Gets the interaction response.
     ///
@@ -757,6 +761,7 @@ pub struct ApplicationCommand {
     pub version: CommandVersionId,
 }
 
+#[cfg(feature = "model")]
 impl ApplicationCommand {
     /// Creates a global [`ApplicationCommand`],
     /// overriding an existing one with the same name if it exists.

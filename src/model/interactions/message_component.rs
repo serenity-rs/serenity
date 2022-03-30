@@ -4,13 +4,16 @@ use serde::de::Error as DeError;
 use serde::{Serialize, Serializer};
 
 use super::prelude::*;
+#[cfg(feature = "model")]
 use crate::builder::{
     CreateInteractionResponse,
     CreateInteractionResponseFollowup,
     EditInteractionResponse,
 };
+#[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::interactions::InteractionType;
+#[cfg(feature = "model")]
 use crate::utils;
 
 /// An interaction triggered by a message component.
@@ -51,6 +54,7 @@ pub struct MessageComponentInteraction {
     pub locale: String,
 }
 
+#[cfg(feature = "model")]
 impl MessageComponentInteraction {
     /// Gets the interaction response.
     ///

@@ -9,7 +9,8 @@ mod message_builder;
 
 #[cfg(all(feature = "client", feature = "cache"))]
 pub use argument_convert::*;
-use reqwest::Url;
+#[cfg(feature = "url")]
+use url::Url;
 
 pub use self::{
     colour::{colours, Colour},
@@ -433,7 +434,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
     args
 }
 
-/// Parses the id and token from a webhook url. Expects a [`reqwest::Url`] object rather than a [`&str`].
+/// Parses the id and token from a webhook url. Expects a [`url::Url`] object rather than a [`&str`].
 ///
 /// # Examples
 ///
@@ -447,6 +448,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// assert_eq!(id, 245037420704169985);
 /// assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
 /// ```
+#[cfg(feature = "url")]
 pub fn parse_webhook(url: &Url) -> Option<(u64, &str)> {
     let path = url.path().strip_prefix("/api/webhooks/")?;
     let split_idx = path.find('/')?;
@@ -832,6 +834,7 @@ mod test {
         assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
     }
 
+    #[cfg(feature = "url")]
     #[test]
     fn test_webhook_parser() {
         let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV".parse().unwrap();

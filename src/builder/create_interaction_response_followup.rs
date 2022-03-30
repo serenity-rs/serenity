@@ -1,16 +1,21 @@
 use std::collections::HashMap;
+#[cfg(not(feature = "http"))]
+use std::marker::PhantomData;
 
 use serde_json::Value;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
+#[cfg(feature = "http")]
+use crate::http::AttachmentType;
 use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
-use crate::{http::AttachmentType, utils};
+use crate::utils;
 
 #[derive(Clone, Debug, Default)]
 pub struct CreateInteractionResponseFollowup<'a>(
     pub HashMap<&'static str, Value>,
-    pub Vec<AttachmentType<'a>>,
+    #[cfg(feature = "http")] pub Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "http"))] PhantomData<&'a ()>,
 );
 
 impl<'a> CreateInteractionResponseFollowup<'a> {
@@ -59,12 +64,14 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     }
 
     /// Appends a file to the message.
+    #[cfg(feature = "http")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
         self.1.push(file.into());
         self
     }
 
     /// Appends a list of files to the message.
+    #[cfg(feature = "http")]
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -77,6 +84,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
+    #[cfg(feature = "http")]
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,

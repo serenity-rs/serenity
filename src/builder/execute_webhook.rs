@@ -1,7 +1,10 @@
 use std::collections::HashMap;
+#[cfg(not(feature = "http"))]
+use std::marker::PhantomData;
 
 use serde_json::Value;
 
+#[cfg(feature = "http")]
 use crate::http::AttachmentType;
 use crate::model::channel::MessageFlags;
 
@@ -56,7 +59,11 @@ use crate::model::channel::MessageFlags;
 /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
 /// [`execute_webhook`]: crate::http::client::Http::execute_webhook
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
+pub struct ExecuteWebhook<'a>(
+    pub HashMap<&'static str, Value>,
+    #[cfg(feature = "http")] pub Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "http"))] PhantomData<&'a ()>,
+);
 
 impl<'a> ExecuteWebhook<'a> {
     /// Override the default avatar of the webhook with an image URL.
@@ -113,12 +120,14 @@ impl<'a> ExecuteWebhook<'a> {
     }
 
     /// Appends a file to the webhook message.
+    #[cfg(feature = "http")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
         self.1.push(file.into());
         self
     }
 
     /// Appends a list of files to the webhook message.
+    #[cfg(feature = "http")]
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -131,6 +140,7 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
+    #[cfg(feature = "http")]
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -262,6 +272,6 @@ impl<'a> Default for ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
-        ExecuteWebhook(map, vec![])
+        ExecuteWebhook(map, Default::default())
     }
 }

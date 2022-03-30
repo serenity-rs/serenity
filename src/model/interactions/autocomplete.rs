@@ -1,9 +1,12 @@
 use serde::de::Error as DeError;
 use serde::{Deserialize, Deserializer};
+#[cfg(feature = "model")]
 use serde_json::json;
 
 use super::prelude::*;
+#[cfg(feature = "model")]
 use crate::builder::CreateAutocompleteResponse;
+#[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::{JsonMap, StdResult, Value};
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
@@ -12,6 +15,7 @@ use crate::model::interactions::{
     InteractionType,
 };
 use crate::model::prelude::User;
+#[cfg(feature = "model")]
 use crate::utils;
 
 /// An interaction received when the user fills in an autocomplete option
@@ -49,6 +53,7 @@ pub struct AutocompleteInteraction {
     pub locale: String,
 }
 
+#[cfg(feature = "model")]
 impl AutocompleteInteraction {
     /// Creates a response to an autocomplete interaction.
     ///

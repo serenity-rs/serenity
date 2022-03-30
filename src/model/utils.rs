@@ -11,7 +11,7 @@ use super::prelude::*;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::internal::prelude::*;
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::application_command::*;
 
 pub fn default_true() -> bool {
@@ -84,7 +84,7 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     Ok(members)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, PartialMember>, D::Error> {
@@ -93,7 +93,7 @@ pub fn deserialize_partial_members_map<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_users<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<UserId, User>, D::Error> {
@@ -102,7 +102,7 @@ pub fn deserialize_users<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<RoleId, Role>, D::Error> {
@@ -111,7 +111,7 @@ pub fn deserialize_roles_map<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<ChannelId, PartialChannel>, D::Error> {
@@ -120,7 +120,7 @@ pub fn deserialize_channels_map<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_messages_map<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<HashMap<MessageId, Message>, D::Error> {
@@ -129,7 +129,7 @@ pub fn deserialize_messages_map<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_options<'de, D: Deserializer<'de>>(
     deserializer: D,
 ) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
@@ -139,7 +139,7 @@ pub fn deserialize_options<'de, D: Deserializer<'de>>(
     Ok(options)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
     deserializer: D,
     resolved: &ApplicationCommandInteractionDataResolved,
@@ -154,7 +154,7 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
     Ok(options)
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 fn try_resolve(
     value: &Value,
     kind: ApplicationCommandOptionType,
@@ -215,7 +215,7 @@ fn try_resolve(
     }
 }
 
-#[cfg(all(feature = "unstable_discord_api", feature = "model"))]
+#[cfg(feature = "unstable_discord_api")]
 fn loop_resolved(
     options: &mut ApplicationCommandInteractionDataOption,
     resolved: &ApplicationCommandInteractionDataResolved,

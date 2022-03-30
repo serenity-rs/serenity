@@ -466,6 +466,7 @@ mod test {
             };
 
             assert_eq!(ChannelId(1).mention().to_string(), "<#1>");
+            #[cfg(feature = "model")]
             assert_eq!(channel.mention().to_string(), "<#4>");
             assert_eq!(emoji.mention().to_string(), "<:omitted:5>");
             assert_eq!(member.mention().to_string(), "<@6>");
@@ -475,6 +476,7 @@ mod test {
             assert_eq!(user.id.mention().to_string(), "<@6>");
         }
 
+        #[cfg(feature = "model")]
         #[test]
         #[allow(clippy::unwrap_used)]
         fn parse_mentions() {
