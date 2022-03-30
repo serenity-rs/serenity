@@ -183,6 +183,11 @@ pub enum Change {
         old: Option<String>,
         new: Option<String>,
     },
+    /// Guild scheduled event cover image was changed.
+    ImageHash {
+        old: Option<String>,
+        new: Option<String>,
+    },
     /// ID of the changed entity.
     Id {
         old: Option<GenericId>,
@@ -433,6 +438,7 @@ impl Change {
             GuildId: "guild_id",
             Hoist: "hoist",
             IconHash: "icon_hash",
+            ImageHash: "image_hash",
             Id: "id",
             Invitable: "invitable",
             InviterId: "inviter_id",
@@ -539,6 +545,7 @@ impl Serialize for Change {
             GuildId: "guild_id",
             Hoist: "hoist",
             IconHash: "icon_hash",
+            ImageHash: "image_hash",
             Id: "id",
             Invitable: "invitable",
             InviterId: "inviter_id",
@@ -685,6 +692,7 @@ impl<'de> Visitor<'de> for ChangeVisitor {
             GuildId: GuildId,
             Hoist: bool,
             IconHash: String,
+            ImageHash: String,
             Id: GenericId,
             Invitable: bool,
             InviterId: UserId,
@@ -772,6 +780,7 @@ enum Key {
     GuildId,
     Hoist,
     IconHash,
+    ImageHash,
     Id,
     Invitable,
     InviterId,
