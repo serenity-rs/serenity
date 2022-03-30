@@ -93,9 +93,6 @@ fn try_resolve(
     kind: ApplicationCommandOptionType,
     resolved: &ApplicationCommandInteractionDataResolved,
 ) -> Option<ApplicationCommandInteractionDataOptionValue> {
-    #[cfg(feature = "simd-json")]
-    use simd_json::ValueAccess;
-
     let string = value.as_str();
 
     match kind {
