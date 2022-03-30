@@ -615,8 +615,6 @@
 <span id="610">610</span>
 <span id="611">611</span>
 <span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
@@ -697,8 +695,6 @@
     <span class="doccomment">/// May also return an [`Error::Http`] if the API returns an error,</span>
     <span class="doccomment">/// or an [`Error::Json`] if there is an error in deserializing the</span>
     <span class="doccomment">/// API response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
