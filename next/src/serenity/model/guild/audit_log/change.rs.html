@@ -944,6 +944,15 @@
 <span id="939">939</span>
 <span id="940">940</span>
 <span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
@@ -1126,6 +1135,11 @@
     },
     <span class="doccomment">/// Guild icon was changed.</span>
     <span class="ident">IconHash</span> {
+        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    },
+    <span class="doccomment">/// Guild scheduled event cover image was changed.</span>
+    <span class="ident">ImageHash</span> {
         <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     },
@@ -1379,6 +1393,7 @@
             <span class="ident">GuildId</span>: <span class="string">&quot;guild_id&quot;</span>,
             <span class="ident">Hoist</span>: <span class="string">&quot;hoist&quot;</span>,
             <span class="ident">IconHash</span>: <span class="string">&quot;icon_hash&quot;</span>,
+            <span class="ident">ImageHash</span>: <span class="string">&quot;image_hash&quot;</span>,
             <span class="ident">Id</span>: <span class="string">&quot;id&quot;</span>,
             <span class="ident">Invitable</span>: <span class="string">&quot;invitable&quot;</span>,
             <span class="ident">InviterId</span>: <span class="string">&quot;inviter_id&quot;</span>,
@@ -1485,6 +1500,7 @@
             <span class="ident">GuildId</span>: <span class="string">&quot;guild_id&quot;</span>,
             <span class="ident">Hoist</span>: <span class="string">&quot;hoist&quot;</span>,
             <span class="ident">IconHash</span>: <span class="string">&quot;icon_hash&quot;</span>,
+            <span class="ident">ImageHash</span>: <span class="string">&quot;image_hash&quot;</span>,
             <span class="ident">Id</span>: <span class="string">&quot;id&quot;</span>,
             <span class="ident">Invitable</span>: <span class="string">&quot;invitable&quot;</span>,
             <span class="ident">InviterId</span>: <span class="string">&quot;inviter_id&quot;</span>,
@@ -1631,6 +1647,7 @@
             <span class="ident">GuildId</span>: <span class="ident">GuildId</span>,
             <span class="ident">Hoist</span>: <span class="ident">bool</span>,
             <span class="ident">IconHash</span>: <span class="ident">String</span>,
+            <span class="ident">ImageHash</span>: <span class="ident">String</span>,
             <span class="ident">Id</span>: <span class="ident">GenericId</span>,
             <span class="ident">Invitable</span>: <span class="ident">bool</span>,
             <span class="ident">InviterId</span>: <span class="ident">UserId</span>,
@@ -1718,6 +1735,7 @@
     <span class="ident">GuildId</span>,
     <span class="ident">Hoist</span>,
     <span class="ident">IconHash</span>,
+    <span class="ident">ImageHash</span>,
     <span class="ident">Id</span>,
     <span class="ident">Invitable</span>,
     <span class="ident">InviterId</span>,
