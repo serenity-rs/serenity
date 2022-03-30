@@ -93,10 +93,7 @@ pub trait Mentionable {
 /// )
 /// ```
 #[derive(Debug, Clone, Copy)]
-pub struct Mention(MentionableImpl);
-
-#[derive(Debug, Clone, Copy)]
-enum MentionableImpl {
+pub enum Mention {
     Channel(ChannelId),
     User(UserId),
     Role(RoleId),
@@ -108,47 +105,45 @@ macro_rules! mention {
         impl From<$t> for Mention {
             #[inline(always)]
             fn from($i: $t) -> Self {
-                $e.into()
+                $e
             }
         }
     )*};
 }
 
-#[cfg(feature = "model")]
-mention!(value: &'_ Channel, value.id(););
-
 mention!(value:
-    MentionableImpl, Mention(value);
-    ChannelId, MentionableImpl::Channel(value);
-    &'_ ChannelCategory, value.id;
-    &'_ GuildChannel, value.id;
-    &'_ PrivateChannel, value.id;
-    &'_ CurrentUser, value.id;
-    &'_ Member, value.user.id;
-    UserId, MentionableImpl::User(value);
-    &'_ User, value.id;
-    RoleId, MentionableImpl::Role(value);
-    &'_ Role, value.id;
-    EmojiId, MentionableImpl::Emoji(value, false);
-    (EmojiId, bool), MentionableImpl::Emoji(value.0, value.1);
-    &'_ Emoji, MentionableImpl::Emoji(value.id, value.animated);
+    ChannelId, Mention::Channel(value);
+    UserId, Mention::User(value);
+    RoleId, Mention::Role(value);
+    EmojiId, Mention::Emoji(value, false);
+    (EmojiId, bool), Mention::Emoji(value.0, value.1);
 );
 
 impl fmt::Display for Mention {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self.0 {
-            MentionableImpl::Channel(id) => f.write_fmt(format_args!("<#{}>", id.0)),
-            MentionableImpl::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
-            MentionableImpl::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
-            MentionableImpl::Emoji(id, animated) => {
+        match *self {
+            Mention::Channel(id) => f.write_fmt(format_args!("<#{}>", id.0)),
+            Mention::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
+            Mention::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
+            Mention::Emoji(id, animated) => {
                 f.write_fmt(format_args!("<{}:omitted:{}>", if animated { "a" } else { "" }, id.0,))
             },
         }
     }
 }
 
+impl<T> Mentionable for T
+where
+    T: Into<Mention> + Copy,
+{
+    #[inline(always)]
+    fn mention(&self) -> Mention {
+        (*self).into()
+    }
+}
+
 macro_rules! mentionable {
-    ($i:ident = $e:expr, $($t:ty;)* ) => {$(
+    ($i:ident: $($t:ty, $e:expr;)*) => {$(
         impl Mentionable for $t {
             #[inline(always)]
             fn mention(&self) -> Mention {
@@ -159,25 +154,18 @@ macro_rules! mentionable {
     )*};
 }
 
-mentionable!(v = *v,
-    ChannelId;
-    RoleId;
-    UserId;
-    Mention;
-);
-
 #[cfg(feature = "model")]
-mentionable!(v = v, Channel;);
+mentionable!(value: Channel, value.id(););
 
-mentionable!(v = v,
-    ChannelCategory;
-    CurrentUser;
-    Emoji;
-    Member;
-    PrivateChannel;
-    Role;
-    User;
-    GuildChannel;
+mentionable!(value:
+    ChannelCategory, value.id;
+    GuildChannel, value.id;
+    PrivateChannel, value.id;
+    CurrentUser, value.id;
+    Member, value.user.id;
+    User, value.id;
+    Role, value.id;
+    Emoji, (value.id, value.animated);
 );
 
 #[cfg(all(feature = "model", feature = "utils"))]
