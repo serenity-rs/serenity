@@ -1275,11 +1275,6 @@ pub enum RouteInfo<'a> {
         token: &'a str,
         webhook_id: u64,
     },
-    GetWebhookMessage {
-        token: &'a str,
-        webhook_id: u64,
-        message_id: u64,
-    },
     EditWebhookMessage {
         token: &'a str,
         webhook_id: u64,
@@ -1489,6 +1484,11 @@ pub enum RouteInfo<'a> {
     GetWebhookWithToken {
         token: &'a str,
         webhook_id: u64,
+    },
+    GetWebhookMessage {
+        token: &'a str,
+        webhook_id: u64,
+        message_id: u64,
     },
     KickMember {
         guild_id: u64,
