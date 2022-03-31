@@ -82,9 +82,14 @@ impl ModalSubmitInteraction {
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
+    pub async fn create_interaction_response<'a, F>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<()>
     where
-        F: FnOnce(&mut CreateInteractionResponse) -> &mut CreateInteractionResponse,
+        for<'b> F:
+            FnOnce(&'b mut CreateInteractionResponse<'a>) -> &'b mut CreateInteractionResponse<'a>,
     {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
@@ -94,7 +99,20 @@ impl ModalSubmitInteraction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
+        if interaction_response.1.is_empty() {
+            http.as_ref()
+                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
+                .await
+        } else {
+            http.as_ref()
+                .create_interaction_response_with_files(
+                    self.id.0,
+                    &self.token,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
     }
 
     /// Edits the initial interaction response.
