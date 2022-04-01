@@ -311,10 +311,6 @@ pub enum ChannelType {
     ///
     /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
     News = 5,
-    /// An indicator that the channel is a `StoreChannel`
-    ///
-    /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
-    Store = 6,
     /// An indicator that the channel is a news thread [`GuildChannel`].
     NewsThread = 10,
     /// An indicator that the channel is a public thread [`GuildChannel`].
@@ -336,7 +332,6 @@ enum_number!(ChannelType {
     Voice,
     Category,
     News,
-    Store,
     NewsThread,
     PublicThread,
     PrivateThread,
@@ -354,7 +349,6 @@ impl ChannelType {
             ChannelType::Voice => "voice",
             ChannelType::Category => "category",
             ChannelType::News => "news",
-            ChannelType::Store => "store",
             ChannelType::NewsThread => "news_thread",
             ChannelType::PublicThread => "public_thread",
             ChannelType::PrivateThread => "private_thread",
