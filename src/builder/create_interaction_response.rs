@@ -6,15 +6,19 @@ use simd_json::{Mutable, ValueAccess};
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
 use crate::json::{self, from_number, json, Value};
+use crate::model::channel::AttachmentType;
 use crate::model::interactions::{
     InteractionApplicationCommandCallbackDataFlags,
     InteractionResponseType,
 };
 
 #[derive(Clone, Debug)]
-pub struct CreateInteractionResponse(pub HashMap<&'static str, Value>);
+pub struct CreateInteractionResponse<'a>(
+    pub HashMap<&'static str, Value>,
+    pub Vec<AttachmentType<'a>>,
+);
 
-impl CreateInteractionResponse {
+impl<'a> CreateInteractionResponse<'a> {
     /// Sets the InteractionResponseType of the message.
     ///
     /// Defaults to `ChannelMessageWithSource`.
@@ -26,31 +30,36 @@ impl CreateInteractionResponse {
     /// Sets the `InteractionApplicationCommandCallbackData` for the message.
     pub fn interaction_response_data<F>(&mut self, f: F) -> &mut Self
     where
-        F: FnOnce(&mut CreateInteractionResponseData) -> &mut CreateInteractionResponseData,
+        for<'b, 'c> F: FnOnce(
+            &'b mut CreateInteractionResponseData<'c>,
+        ) -> &'b mut CreateInteractionResponseData<'c>,
     {
         let mut data = CreateInteractionResponseData::default();
         f(&mut data);
         let map = json::hashmap_to_json_map(data.0);
-        let data = Value::from(map);
 
-        self.0.insert("data", data);
+        self.0.insert("data", Value::from(map));
+        self.1 = data.1;
         self
     }
 }
 
-impl<'a> Default for CreateInteractionResponse {
-    fn default() -> CreateInteractionResponse {
+impl<'a> Default for CreateInteractionResponse<'a> {
+    fn default() -> CreateInteractionResponse<'a> {
         let mut map = HashMap::new();
         map.insert("type", from_number(4));
 
-        CreateInteractionResponse(map)
+        CreateInteractionResponse(map, Vec::new())
     }
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct CreateInteractionResponseData(pub HashMap<&'static str, Value>);
+pub struct CreateInteractionResponseData<'a>(
+    pub HashMap<&'static str, Value>,
+    pub Vec<AttachmentType<'a>>,
+);
 
-impl CreateInteractionResponseData {
+impl<'a> CreateInteractionResponseData<'a> {
     /// Set whether the message is text-to-speech.
     ///
     /// Think carefully before setting this to `true`.
@@ -58,6 +67,33 @@ impl CreateInteractionResponseData {
     /// Defaults to `false`.
     pub fn tts(&mut self, tts: bool) -> &mut Self {
         self.0.insert("tts", Value::from(tts));
+        self
+    }
+
+    /// Appends a file to the message.
+    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
+        self.1.push(file.into());
+        self
+    }
+
+    /// Appends a list of files to the message.
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
+        &mut self,
+        files: It,
+    ) -> &mut Self {
+        self.1.extend(files.into_iter().map(|f| f.into()));
+        self
+    }
+
+    /// Sets a list of files to include in the message.
+    ///
+    /// Calling this multiple times will overwrite the file list.
+    /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
+        &mut self,
+        files: It,
+    ) -> &mut Self {
+        self.1 = files.into_iter().map(|f| f.into()).collect();
         self
     }
 
