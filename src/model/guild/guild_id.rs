@@ -1146,15 +1146,13 @@ impl GuildId {
     /// use serenity::model::id::GuildId;
     /// use serenity::utils;
     ///
-    /// # async fn run() {
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// assert_eq!(guild_id.shard_id(17).await, 7);
-    /// # }
+    /// assert_eq!(guild_id.shard_id(17), 7);
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub async fn shard_id(self, shard_count: u64) -> u64 {
+    pub fn shard_id(self, shard_count: u64) -> u64 {
         crate::utils::shard_id(self.0, shard_count)
     }
 
