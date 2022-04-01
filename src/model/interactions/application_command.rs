@@ -447,11 +447,31 @@ pub struct ApplicationCommandInteractionData {
     /// [`User`]: ApplicationCommandType::User
     /// [`Message`]: ApplicationCommandType::Message
     pub target_id: Option<TargetId>,
+}
+
+impl ApplicationCommandInteractionData {
     /// The target resolved data of [`target_id`]
     ///
     /// [`target_id`]: Self::target_id
-    #[serde(skip_serializing)]
-    pub target: Option<ResolvedTarget>,
+    pub fn target(&self) -> Option<ResolvedTarget> {
+        match (self.kind, self.target_id) {
+            (ApplicationCommandType::User, Some(id)) => {
+                let user_id = id.to_user_id();
+
+                let user = self.resolved.users.get(&user_id).cloned()?;
+                let member = self.resolved.members.get(&user_id).cloned();
+
+                Some(ResolvedTarget::User(user, member))
+            },
+            (ApplicationCommandType::Message, Some(id)) => {
+                let message_id = id.to_message_id();
+                let message = self.resolved.messages.get(&message_id).cloned()?;
+
+                Some(ResolvedTarget::Message(message))
+            },
+            _ => None,
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
@@ -501,28 +521,6 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             None
         };
 
-        let target = match target_id {
-            Some(id) => {
-                if kind == ApplicationCommandType::Message {
-                    let resolved = resolved
-                        .messages
-                        .get(&id.to_message_id())
-                        .expect("expected message object")
-                        .to_owned();
-
-                    Some(ResolvedTarget::Message(resolved))
-                } else {
-                    let user_id = id.to_user_id();
-
-                    let user = resolved.users.get(&user_id).expect("expected user").to_owned();
-                    let member = resolved.members.get(&user_id).map(|m| m.to_owned());
-
-                    Some(ResolvedTarget::User(user, member))
-                }
-            },
-            None => None,
-        };
-
         Ok(Self {
             name,
             id,
@@ -530,7 +528,6 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             options,
             resolved,
             target_id,
-            target,
         })
     }
 }
