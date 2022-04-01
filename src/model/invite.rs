@@ -280,8 +280,8 @@ impl InviteGuild {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub async fn shard_id(&self, shard_count: u64) -> u64 {
-        self.id.shard_id(shard_count).await
+    pub fn shard_id(&self, shard_count: u64) -> u64 {
+        self.id.shard_id(shard_count)
     }
 }
 
