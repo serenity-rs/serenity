@@ -1702,8 +1702,6 @@
 <span id="1697">1697</span>
 <span id="1698">1698</span>
 <span id="1699">1699</span>
-<span id="1700">1700</span>
-<span id="1701">1701</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -2852,15 +2850,13 @@
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">/// use serenity::utils;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// let guild_id = GuildId(81384788765712384);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(guild_id.shard_id(17).await, 7);</span>
-    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// assert_eq!(guild_id.shard_id(17), 7);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
         <span class="ident"><span class="kw">crate</span>::utils::shard_id</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">shard_count</span>)
     }
 
