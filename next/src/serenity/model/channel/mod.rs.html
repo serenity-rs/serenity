@@ -605,12 +605,6 @@
 <span id="600">600</span>
 <span id="601">601</span>
 <span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -924,10 +918,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note: `NewsChannel` is serialized into a [`GuildChannel`]</span>
     <span class="ident">News</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// An indicator that the channel is a `StoreChannel`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: `StoreChannel` is serialized into a [`GuildChannel`]</span>
-    <span class="ident">Store</span> <span class="op">=</span> <span class="number">6</span>,
     <span class="doccomment">/// An indicator that the channel is a news thread [`GuildChannel`].</span>
     <span class="ident">NewsThread</span> <span class="op">=</span> <span class="number">10</span>,
     <span class="doccomment">/// An indicator that the channel is a public thread [`GuildChannel`].</span>
@@ -949,7 +939,6 @@
     <span class="ident">Voice</span>,
     <span class="ident">Category</span>,
     <span class="ident">News</span>,
-    <span class="ident">Store</span>,
     <span class="ident">NewsThread</span>,
     <span class="ident">PublicThread</span>,
     <span class="ident">PrivateThread</span>,
@@ -967,7 +956,6 @@
             <span class="ident">ChannelType::Voice</span> =&gt; <span class="string">&quot;voice&quot;</span>,
             <span class="ident">ChannelType::Category</span> =&gt; <span class="string">&quot;category&quot;</span>,
             <span class="ident">ChannelType::News</span> =&gt; <span class="string">&quot;news&quot;</span>,
-            <span class="ident">ChannelType::Store</span> =&gt; <span class="string">&quot;store&quot;</span>,
             <span class="ident">ChannelType::NewsThread</span> =&gt; <span class="string">&quot;news_thread&quot;</span>,
             <span class="ident">ChannelType::PublicThread</span> =&gt; <span class="string">&quot;public_thread&quot;</span>,
             <span class="ident">ChannelType::PrivateThread</span> =&gt; <span class="string">&quot;private_thread&quot;</span>,
