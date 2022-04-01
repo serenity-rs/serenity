@@ -8,11 +8,7 @@ use serenity::{
     futures::StreamExt,
     model::{
         channel::Message,
-        interactions::{
-            message_component::ButtonStyle,
-            InteractionApplicationCommandCallbackDataFlags,
-            InteractionResponseType,
-        },
+        interactions::{message_component::ButtonStyle, InteractionResponseType},
     },
     Client,
 };
@@ -220,9 +216,8 @@ impl EventHandler for Handler {
                 // This time we dont edit the message but reply to it
                 r.kind(InteractionResponseType::ChannelMessageWithSource).interaction_response_data(
                     |d| {
-                        // Make the message hidden for other users
-                        d.flags(InteractionApplicationCommandCallbackDataFlags::EPHEMERAL)
-                            .content(format!("The **{}** says __{}__", animal, sound))
+                        // Make the message hidden for other users by setting `ephemeral(true)`.
+                        d.ephemeral(true).content(format!("The **{}** says __{}__", animal, sound))
                     },
                 )
             })
