@@ -615,6 +615,24 @@
 <span id="610">610</span>
 <span id="611">611</span>
 <span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
@@ -699,9 +717,14 @@
     <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">f</span>: <span class="ident">F</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateInteractionResponse</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateInteractionResponse</span>,
+        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>:
+            <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponse::default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">interaction_response</span>);
@@ -711,7 +734,20 @@
         <span class="ident">Message::check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
         <span class="ident">Message::check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_interaction_response</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>)).<span class="kw">await</span>
+        <span class="kw">if</span> <span class="ident">interaction_response</span>.<span class="number">1</span>.<span class="ident">is_empty</span>() {
+            <span class="ident">http</span>.<span class="ident">as_ref</span>()
+                .<span class="ident">create_interaction_response</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>))
+                .<span class="kw">await</span>
+        } <span class="kw">else</span> {
+            <span class="ident">http</span>.<span class="ident">as_ref</span>()
+                .<span class="ident">create_interaction_response_with_files</span>(
+                    <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>,
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">Value::from</span>(<span class="ident">map</span>),
+                    <span class="ident">interaction_response</span>.<span class="number">1</span>,
+                )
+                .<span class="kw">await</span>
+        }
     }
 
     <span class="doccomment">/// Edits the initial interaction response.</span>
