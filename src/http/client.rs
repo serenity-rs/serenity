@@ -713,6 +713,35 @@ impl Http {
         .await
     }
 
+    /// Creates a response to an [`Interaction`] from the gateway with files.
+    ///
+    /// Refer to Discord's [docs] for the object it takes.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
+    #[cfg(feature = "unstable_discord_api")]
+    pub async fn create_interaction_response_with_files(
+        &self,
+        interaction_id: u64,
+        interaction_token: &str,
+        map: &Value,
+        files: impl IntoIterator<Item = AttachmentType<'_>>,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            multipart: Some(Multipart {
+                files: files.into_iter().map(Into::into).collect(),
+                payload_json: Some(to_value(map)?),
+                fields: vec![],
+            }),
+            headers: None,
+            route: RouteInfo::CreateInteractionResponse {
+                interaction_id,
+                interaction_token,
+            },
+        })
+        .await
+    }
+
     /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
     ///
     /// Refer to Discord's [docs] for field information.

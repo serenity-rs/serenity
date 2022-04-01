@@ -98,7 +98,8 @@ impl ApplicationCommandInteraction {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
     where
-        F: FnOnce(&mut CreateInteractionResponse) -> &mut CreateInteractionResponse,
+        for<'a, 'b> F:
+            FnOnce(&'a mut CreateInteractionResponse<'b>) -> &'a mut CreateInteractionResponse<'b>,
     {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
@@ -107,7 +108,20 @@ impl ApplicationCommandInteraction {
 
         Message::check_lengths(&map)?;
 
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
+        if interaction_response.1.is_empty() {
+            http.as_ref()
+                .create_interaction_response(self.id.0, &self.token, &Value::from(map))
+                .await
+        } else {
+            http.as_ref()
+                .create_interaction_response_with_files(
+                    self.id.0,
+                    &self.token,
+                    &Value::from(map),
+                    interaction_response.1,
+                )
+                .await
+        }
     }
 
     /// Edits the initial interaction response.
