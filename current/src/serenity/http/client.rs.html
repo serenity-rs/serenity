@@ -3505,6 +3505,25 @@
 <span id="3500">3500</span>
 <span id="3501">3501</span>
 <span id="3502">3502</span>
+<span id="3503">3503</span>
+<span id="3504">3504</span>
+<span id="3505">3505</span>
+<span id="3506">3506</span>
+<span id="3507">3507</span>
+<span id="3508">3508</span>
+<span id="3509">3509</span>
+<span id="3510">3510</span>
+<span id="3511">3511</span>
+<span id="3512">3512</span>
+<span id="3513">3513</span>
+<span id="3514">3514</span>
+<span id="3515">3515</span>
+<span id="3516">3516</span>
+<span id="3517">3517</span>
+<span id="3518">3518</span>
+<span id="3519">3519</span>
+<span id="3520">3520</span>
+<span id="3521">3521</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
@@ -5467,6 +5486,25 @@
         <span class="ident">response</span>.<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>().<span class="kw">await</span>.<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">map_err</span>(<span class="ident">From::from</span>)
     }
 
+    <span class="comment">// Gets a webhook&#39;s message by Id</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_webhook_message</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">message_id</span>: <span class="ident">u64</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
+            <span class="ident">body</span>: <span class="prelude-val">None</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">route</span>: <span class="ident">RouteInfo::GetWebhookMessage</span> {
+                <span class="ident">token</span>,
+                <span class="ident">webhook_id</span>,
+                <span class="ident">message_id</span>,
+            },
+        })
+        .<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Edits a webhook&#39;s message by Id.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_webhook_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -7008,5 +7046,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (ee915c34e 2022-03-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (0677edc86 2022-03-31)" ></div>
 </body></html>

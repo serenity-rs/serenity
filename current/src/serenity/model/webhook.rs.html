@@ -442,6 +442,30 @@
 <span id="437">437</span>
 <span id="438">438</span>
 <span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Webhook model and implementations.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -760,6 +784,30 @@
         }
     }
 
+    <span class="doccomment">/// Gets a previously sent message from the webhook.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the [`Self::token`] is [`None`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May also return [`Error::Http`] if the webhook&#39;s token is invalid, or</span>
+    <span class="doccomment">/// the given message Id does not belong to the current webhook.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Or may return an [`Error::Json`] if there is an error deserialising Discord&#39;s response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_message</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">ModelError::NoTokenSet</span>)<span class="question-mark">?</span>;
+
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook_message</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="ident">token</span>, <span class="ident">message_id</span>.<span class="number">0</span>).<span class="kw">await</span>
+    }
+
     <span class="doccomment">/// Edits a webhook message with the fields set via the given builder.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
@@ -882,5 +930,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (ee915c34e 2022-03-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (0677edc86 2022-03-31)" ></div>
 </body></html>

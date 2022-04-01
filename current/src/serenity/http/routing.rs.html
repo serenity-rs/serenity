@@ -2641,6 +2641,20 @@
 <span id="2636">2636</span>
 <span id="2637">2637</span>
 <span id="2638">2638</span>
+<span id="2639">2639</span>
+<span id="2640">2640</span>
+<span id="2641">2641</span>
+<span id="2642">2642</span>
+<span id="2643">2643</span>
+<span id="2644">2644</span>
+<span id="2645">2645</span>
+<span id="2646">2646</span>
+<span id="2647">2647</span>
+<span id="2648">2648</span>
+<span id="2649">2649</span>
+<span id="2650">2650</span>
+<span id="2651">2651</span>
+<span id="2652">2652</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -4128,6 +4142,11 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">GetWebhookMessage</span> {
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">message_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">KickMember</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
@@ -4746,6 +4765,15 @@
                 <span class="ident">Route::WebhooksId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_with_token</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>)),
             ),
+            <span class="ident">RouteInfo::GetWebhookMessage</span> {
+                <span class="ident">token</span>,
+                <span class="ident">webhook_id</span>,
+                <span class="ident">message_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::WebhooksIdMessagesId</span>(<span class="ident">webhook_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_message</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)),
+            ),
             <span class="ident">RouteInfo::EditWebhookMessage</span> {
                 <span class="ident">token</span>,
                 <span class="ident">webhook_id</span>,
@@ -5280,5 +5308,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (ee915c34e 2022-03-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serenity" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (0677edc86 2022-03-31)" ></div>
 </body></html>
