@@ -1485,6 +1485,11 @@ pub enum RouteInfo<'a> {
         token: &'a str,
         webhook_id: u64,
     },
+    GetWebhookMessage {
+        token: &'a str,
+        webhook_id: u64,
+        message_id: u64,
+    },
     KickMember {
         guild_id: u64,
         user_id: u64,
@@ -2102,6 +2107,15 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::WebhooksId(webhook_id),
                 Cow::from(Route::webhook_with_token(webhook_id, token)),
+            ),
+            RouteInfo::GetWebhookMessage {
+                token,
+                webhook_id,
+                message_id,
+            } => (
+                LightMethod::Get,
+                Route::WebhooksIdMessagesId(webhook_id),
+                Cow::from(Route::webhook_message(webhook_id, token, message_id)),
             ),
             RouteInfo::EditWebhookMessage {
                 token,
