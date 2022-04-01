@@ -96,15 +96,10 @@ impl ApplicationCommandInteraction {
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
-    pub async fn create_interaction_response<F>(
-        &self,
-        http: impl AsRef<Http>,
-        f: F,
-    ) -> Result<()>
+    pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
     where
-        for<'a, 'b> F: FnOnce(
-            &'a mut CreateInteractionResponse<'b>
-        ) -> &'a mut CreateInteractionResponse<'b>,
+        for<'a, 'b> F:
+            FnOnce(&'a mut CreateInteractionResponse<'b>) -> &'a mut CreateInteractionResponse<'b>,
     {
         let mut interaction_response = CreateInteractionResponse::default();
         f(&mut interaction_response);
