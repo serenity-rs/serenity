@@ -24,8 +24,6 @@ mod dispatch;
 mod error;
 #[cfg(feature = "gateway")]
 mod event_handler;
-#[cfg(feature = "gateway")]
-mod extras;
 
 #[cfg(all(feature = "cache", feature = "gateway"))]
 use std::time::Duration;
@@ -51,12 +49,9 @@ use self::bridge::gateway::{
 };
 #[cfg(feature = "voice")]
 use self::bridge::voice::VoiceGatewayManager;
-pub use self::{context::Context, error::Error as ClientError};
 #[cfg(feature = "gateway")]
-pub use self::{
-    event_handler::{EventHandler, RawEventHandler},
-    extras::Extras,
-};
+pub use self::event_handler::{EventHandler, RawEventHandler};
+pub use self::{context::Context, error::Error as ClientError};
 #[cfg(feature = "gateway")]
 use super::gateway::GatewayError;
 #[cfg(feature = "cache")]
