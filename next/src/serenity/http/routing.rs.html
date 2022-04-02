@@ -2665,6 +2665,20 @@
 <span id="2660">2660</span>
 <span id="2661">2661</span>
 <span id="2662">2662</span>
+<span id="2663">2663</span>
+<span id="2664">2664</span>
+<span id="2665">2665</span>
+<span id="2666">2666</span>
+<span id="2667">2667</span>
+<span id="2668">2668</span>
+<span id="2669">2669</span>
+<span id="2670">2670</span>
+<span id="2671">2671</span>
+<span id="2672">2672</span>
+<span id="2673">2673</span>
+<span id="2674">2674</span>
+<span id="2675">2675</span>
+<span id="2676">2676</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -4165,6 +4179,11 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
     },
+    <span class="ident">GetWebhookMessage</span> {
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">message_id</span>: <span class="ident">u64</span>,
+    },
     <span class="ident">KickMember</span> {
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">user_id</span>: <span class="ident">u64</span>,
@@ -4785,6 +4804,15 @@
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::WebhooksId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_with_token</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>)),
+            ),
+            <span class="ident">RouteInfo::GetWebhookMessage</span> {
+                <span class="ident">token</span>,
+                <span class="ident">webhook_id</span>,
+                <span class="ident">message_id</span>,
+            } =&gt; (
+                <span class="ident">LightMethod::Get</span>,
+                <span class="ident">Route::WebhooksIdMessagesId</span>(<span class="ident">webhook_id</span>),
+                <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_message</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">message_id</span>)),
             ),
             <span class="ident">RouteInfo::EditWebhookMessage</span> {
                 <span class="ident">token</span>,
