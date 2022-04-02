@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-#[cfg(not(feature = "http"))]
+#[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
 #[cfg(feature = "simd-json")]
@@ -7,17 +7,16 @@ use simd_json::Mutable;
 
 use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
-#[cfg(feature = "http")]
-use crate::http::AttachmentType;
 use crate::json::{self, from_number, Value};
+#[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
 use crate::model::interactions::InteractionApplicationCommandCallbackDataFlags;
 
 #[derive(Clone, Debug, Default)]
 pub struct CreateInteractionResponseFollowup<'a>(
     pub HashMap<&'static str, Value>,
-    #[cfg(feature = "http")] pub Vec<AttachmentType<'a>>,
-    #[cfg(not(feature = "http"))] PhantomData<&'a ()>,
+    #[cfg(feature = "model")] pub Vec<AttachmentType<'a>>,
+    #[cfg(not(feature = "model"))] PhantomData<&'a ()>,
 );
 
 impl<'a> CreateInteractionResponseFollowup<'a> {
@@ -66,14 +65,14 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     }
 
     /// Appends a file to the message.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
         self.1.push(file.into());
         self
     }
 
     /// Appends a list of files to the message.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
@@ -86,7 +85,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call [`Self::add_file`] or [`Self::add_files`] instead.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "model")]
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
         &mut self,
         files: It,
