@@ -124,7 +124,7 @@ impl Default for ContentSafeOptions {
 /// # }
 /// ```
 ///
-/// # Filtering out mentions from a message.
+/// Filtering out mentions from a message.
 ///
 /// ```rust
 /// use serenity::client::Cache;
