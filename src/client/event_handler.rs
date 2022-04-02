@@ -5,7 +5,6 @@ use async_trait::async_trait;
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use crate::json::Value;
-#[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::Interaction;
 use crate::model::prelude::*;
 
@@ -430,25 +429,21 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when an interaction is created (e.g a slash command was used or a button was clicked).
     ///
     /// Provides the created interaction.
-    #[cfg(feature = "unstable_discord_api")]
     async fn interaction_create(&self, _ctx: Context, _interaction: Interaction) {}
 
     /// Dispatched when a guild integration is created.
     ///
     /// Provides the created integration.
-    #[cfg(feature = "unstable_discord_api")]
     async fn integration_create(&self, _ctx: Context, _integration: Integration) {}
 
     /// Dispatched when a guild integration is updated.
     ///
     /// Provides the updated integration.
-    #[cfg(feature = "unstable_discord_api")]
     async fn integration_update(&self, _ctx: Context, _integration: Integration) {}
 
     /// Dispatched when a guild integration is deleted.
     ///
     /// Provides the integration's id, the id of the guild it belongs to, and its associated application id
-    #[cfg(feature = "unstable_discord_api")]
     async fn integration_delete(
         &self,
         _ctx: Context,

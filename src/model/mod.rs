@@ -30,7 +30,6 @@ pub mod event;
 pub mod gateway;
 pub mod guild;
 pub mod id;
-#[cfg(feature = "unstable_discord_api")]
 pub mod interactions;
 pub mod invite;
 pub mod misc;

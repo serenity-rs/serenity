@@ -14,21 +14,20 @@ use crate::builder::{CreateEmbed, EditMessage};
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+#[cfg(feature = "collector")]
 use crate::collector::{
     CollectComponentInteraction,
     CollectModalInteraction,
+    CollectReaction,
     ComponentInteractionCollectorBuilder,
     ModalInteractionCollectorBuilder,
+    ReactionCollectorBuilder,
 };
-#[cfg(feature = "collector")]
-use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
 #[cfg(feature = "model")]
 use crate::json;
 use crate::json::Value;
-#[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::{message_component::ActionRow, MessageInteraction};
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
@@ -127,10 +126,8 @@ pub struct Message {
     /// Sent if the message is a response to an [`Interaction`].
     ///
     /// [`Interaction`]: crate::model::interactions::Interaction
-    #[cfg(feature = "unstable_discord_api")]
     pub interaction: Option<MessageInteraction>,
     /// The components of this message
-    #[cfg(feature = "unstable_discord_api")]
     #[serde(default)]
     pub components: Vec<ActionRow>,
 }
@@ -891,7 +888,7 @@ impl Message {
     }
 
     /// Await a single component interaction on this message.
-    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg(feature = "collector")]
     pub fn await_component_interaction(
         &self,
         shard_messenger: impl AsRef<ShardMessenger>,
@@ -900,7 +897,7 @@ impl Message {
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of component interactions on this message.
-    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg(feature = "collector")]
     pub fn await_component_interactions(
         &self,
         shard_messenger: impl AsRef<ShardMessenger>,
@@ -909,7 +906,7 @@ impl Message {
     }
 
     /// Await a single modal submit interaction on this message.
-    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg(feature = "collector")]
     pub fn await_modal_interaction(
         &self,
         shard_messenger: impl AsRef<ShardMessenger>,
@@ -918,7 +915,7 @@ impl Message {
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of modal submit interactions on this message.
-    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg(feature = "collector")]
     pub fn await_modal_interactions(
         &self,
         shard_messenger: impl AsRef<ShardMessenger>,

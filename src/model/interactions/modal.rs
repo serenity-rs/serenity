@@ -13,7 +13,9 @@ use crate::builder::{
 };
 #[cfg(feature = "model")]
 use crate::http::Http;
-use crate::json::{self, from_number};
+#[cfg(feature = "model")]
+use crate::json;
+use crate::json::from_number;
 use crate::model::interactions::InteractionType;
 
 /// An interaction triggered by a modal submit.
