@@ -870,10 +870,6 @@
 <span id="865">865</span>
 <span id="866">866</span>
 <span id="867">867</span>
-<span id="868">868</span>
-<span id="869">869</span>
-<span id="870">870</span>
-<span id="871">871</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -1643,7 +1639,6 @@
                 <span class="ident">event_handler</span>.<span class="ident">webhook_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>).<span class="kw">await</span>;
             });
         },
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::InteractionCreate</span>(<span class="ident">event</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
@@ -1651,7 +1646,6 @@
                 <span class="ident">event_handler</span>.<span class="ident">interaction_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">interaction</span>).<span class="kw">await</span>;
             });
         },
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::IntegrationCreate</span>(<span class="ident">event</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
@@ -1659,7 +1653,6 @@
                 <span class="ident">event_handler</span>.<span class="ident">integration_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">integration</span>).<span class="kw">await</span>;
             });
         },
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::IntegrationUpdate</span>(<span class="ident">event</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 
@@ -1667,7 +1660,6 @@
                 <span class="ident">event_handler</span>.<span class="ident">integration_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">integration</span>).<span class="kw">await</span>;
             });
         },
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">DispatchEvent::Model</span>(<span class="ident">Event::IntegrationDelete</span>(<span class="ident">event</span>)) =&gt; {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="ident">event_handler</span>);
 

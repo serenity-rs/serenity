@@ -1291,9 +1291,6 @@
 <span id="1286">1286</span>
 <span id="1287">1287</span>
 <span id="1288">1288</span>
-<span id="1289">1289</span>
-<span id="1290">1290</span>
-<span id="1291">1291</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1310,21 +1307,20 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
     <span class="ident">CollectComponentInteraction</span>,
     <span class="ident">CollectModalInteraction</span>,
+    <span class="ident">CollectReaction</span>,
     <span class="ident">ComponentInteractionCollectorBuilder</span>,
     <span class="ident">ModalInteractionCollectorBuilder</span>,
+    <span class="ident">ReactionCollectorBuilder</span>,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectReaction</span>, <span class="ident">ReactionCollectorBuilder</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions</span>::{<span class="ident">message_component::ActionRow</span>, <span class="ident">MessageInteraction</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1423,10 +1419,8 @@
     <span class="doccomment">/// Sent if the message is a response to an [`Interaction`].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Interaction`]: crate::model::interactions::Interaction</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">interaction</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageInteraction</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The components of this message</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">components</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ActionRow</span><span class="op">&gt;</span>,
 }
@@ -2187,7 +2181,7 @@
     }
 
     <span class="doccomment">/// Await a single component interaction on this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_component_interaction</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
@@ -2196,7 +2190,7 @@
     }
 
     <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of component interactions on this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_component_interactions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
@@ -2205,7 +2199,7 @@
     }
 
     <span class="doccomment">/// Await a single modal submit interaction on this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_modal_interaction</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
@@ -2214,7 +2208,7 @@
     }
 
     <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of modal submit interactions on this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_modal_interactions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">shard_messenger</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,

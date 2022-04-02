@@ -1007,11 +1007,6 @@
 <span id="1002">1002</span>
 <span id="1003">1003</span>
 <span id="1004">1004</span>
-<span id="1005">1005</span>
-<span id="1006">1006</span>
-<span id="1007">1007</span>
-<span id="1008">1008</span>
-<span id="1009">1009</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1083,7 +1078,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::GatewayIntents</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ApplicationId</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CacheAndHttp</span>;
 
@@ -1094,7 +1088,6 @@
     <span class="ident">http</span>: <span class="ident">Http</span>,
     <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
@@ -1117,7 +1110,6 @@
             <span class="ident">http</span>,
             <span class="ident">fut</span>: <span class="prelude-val">None</span>,
             <span class="ident">intents</span>: <span class="ident">GatewayIntents::non_privileged</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident">timeout</span>: <span class="prelude-val">None</span>,
@@ -1168,7 +1160,6 @@
     }
 
     <span class="doccomment">/// Sets the application id.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ApplicationId</span>(<span class="ident">application_id</span>));
 
@@ -1178,7 +1169,6 @@
     }
 
     <span class="doccomment">/// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">application_id</span>
     }
@@ -1418,7 +1408,7 @@
             <span class="kw">let</span> <span class="ident">intents</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intents</span>;
             <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">http</span>));
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="comment">// TODO: It should not be required for all users of serenity to set the application_id or get a panic.</span>
             <span class="kw">if</span> <span class="ident">http</span>.<span class="ident">application_id</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="macro">panic!</span>(<span class="string">&quot;Please provide an Application Id in order to use interactions features.&quot;</span>);
             }

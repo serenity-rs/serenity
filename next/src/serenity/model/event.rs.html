@@ -1905,43 +1905,6 @@
 <span id="1900">1900</span>
 <span id="1901">1901</span>
 <span id="1902">1902</span>
-<span id="1903">1903</span>
-<span id="1904">1904</span>
-<span id="1905">1905</span>
-<span id="1906">1906</span>
-<span id="1907">1907</span>
-<span id="1908">1908</span>
-<span id="1909">1909</span>
-<span id="1910">1910</span>
-<span id="1911">1911</span>
-<span id="1912">1912</span>
-<span id="1913">1913</span>
-<span id="1914">1914</span>
-<span id="1915">1915</span>
-<span id="1916">1916</span>
-<span id="1917">1917</span>
-<span id="1918">1918</span>
-<span id="1919">1919</span>
-<span id="1920">1920</span>
-<span id="1921">1921</span>
-<span id="1922">1922</span>
-<span id="1923">1923</span>
-<span id="1924">1924</span>
-<span id="1925">1925</span>
-<span id="1926">1926</span>
-<span id="1927">1927</span>
-<span id="1928">1928</span>
-<span id="1929">1929</span>
-<span id="1930">1930</span>
-<span id="1931">1931</span>
-<span id="1932">1932</span>
-<span id="1933">1933</span>
-<span id="1934">1934</span>
-<span id="1935">1935</span>
-<span id="1936">1936</span>
-<span id="1937">1937</span>
-<span id="1938">1938</span>
-<span id="1939">1939</span>
 </pre><pre class="rust"><code><span class="doccomment">//! All the events this library handles.</span>
 
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
@@ -1952,7 +1915,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils</span>::{<span class="ident">emojis</span>, <span class="ident">roles</span>, <span class="ident">stickers</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants::OpCode</span>, <span class="ident">json::prelude</span>::<span class="kw-2">*</span>};
 
@@ -2406,7 +2368,6 @@
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2414,7 +2375,6 @@
     <span class="kw">pub</span> <span class="ident">interaction</span>: <span class="ident">Interaction</span>,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2422,7 +2382,6 @@
     <span class="kw">pub</span> <span class="ident">integration</span>: <span class="ident">Integration</span>,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -2430,7 +2389,6 @@
     <span class="kw">pub</span> <span class="ident">integration</span>: <span class="ident">Integration</span>,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntegrationDeleteEvent</span> {
@@ -2715,16 +2673,12 @@
     <span class="doccomment">/// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].</span>
     <span class="ident">WebhookUpdate</span>(<span class="ident">WebhookUpdateEvent</span>),
     <span class="doccomment">/// An interaction was created.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">InteractionCreate</span>(<span class="ident">InteractionCreateEvent</span>),
     <span class="doccomment">/// A guild integration was created</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">IntegrationCreate</span>(<span class="ident">IntegrationCreateEvent</span>),
     <span class="doccomment">/// A guild integration was updated</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">IntegrationUpdate</span>(<span class="ident">IntegrationUpdateEvent</span>),
     <span class="doccomment">/// A guild integration was deleted</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">IntegrationDelete</span>(<span class="ident">IntegrationDeleteEvent</span>),
     <span class="doccomment">/// A stage instance was created.</span>
     <span class="ident">StageInstanceCreate</span>(<span class="ident">StageInstanceCreateEvent</span>),
@@ -3052,7 +3006,6 @@
                 <span class="ident">channel_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">channel_id</span>),
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::InteractionCreate</span>, <span class="ident"><span class="self">Self</span>::InteractionCreate</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">user_id</span>: <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">interaction</span> {
                     <span class="ident">Interaction::Ping</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
@@ -3083,21 +3036,18 @@
                     <span class="ident">Interaction::ModalSubmit</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">message</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">id</span>).<span class="ident">into</span>(),
                 },
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationCreate</span>, <span class="ident"><span class="self">Self</span>::IntegrationCreate</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">integration</span>.<span class="ident">user</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span>).<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">integration</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationUpdate</span>, <span class="ident"><span class="self">Self</span>::IntegrationUpdate</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">user_id</span>: <span class="ident">e</span>.<span class="ident">integration</span>.<span class="ident">user</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span>).<span class="ident">into</span>(),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">integration</span>.<span class="ident">guild_id</span>),
                 <span class="ident">channel_id</span>: <span class="ident">Never</span>,
                 <span class="ident">message_id</span>: <span class="ident">Never</span>,
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationDelete</span>, <span class="ident"><span class="self">Self</span>::IntegrationDelete</span>(<span class="ident">e</span>) =&gt; {
                 <span class="ident">user_id</span>: <span class="ident">Never</span>,
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="ident">guild_id</span>),
@@ -3215,13 +3165,9 @@
             <span class="ident"><span class="self">Self</span>::VoiceStateUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::VoiceStateUpdate</span>,
             <span class="ident"><span class="self">Self</span>::VoiceServerUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::VoiceServerUpdate</span>,
             <span class="ident"><span class="self">Self</span>::WebhookUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::WebhookUpdate</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::InteractionCreate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::InteractionCreate</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationCreate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::IntegrationCreate</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::IntegrationUpdate</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationDelete</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::IntegrationDelete</span>,
             <span class="ident"><span class="self">Self</span>::StageInstanceCreate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::StageInstanceCreate</span>,
             <span class="ident"><span class="self">Self</span>::StageInstanceUpdate</span>(<span class="kw">_</span>) =&gt; <span class="ident">EventType::StageInstanceUpdate</span>,
@@ -3364,13 +3310,9 @@
         <span class="ident">EventType::VoiceServerUpdate</span> =&gt; <span class="ident">Event::VoiceServerUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::VoiceStateUpdate</span> =&gt; <span class="ident">Event::VoiceStateUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::WebhookUpdate</span> =&gt; <span class="ident">Event::WebhookUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">EventType::InteractionCreate</span> =&gt; <span class="ident">Event::InteractionCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">EventType::IntegrationCreate</span> =&gt; <span class="ident">Event::IntegrationCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">EventType::IntegrationUpdate</span> =&gt; <span class="ident">Event::IntegrationUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">EventType::IntegrationDelete</span> =&gt; <span class="ident">Event::IntegrationDelete</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::StageInstanceCreate</span> =&gt; <span class="ident">Event::StageInstanceCreate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType::StageInstanceUpdate</span> =&gt; <span class="ident">Event::StageInstanceUpdate</span>(<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
@@ -3553,22 +3495,18 @@
     <span class="doccomment">/// Indicator that an interaction was created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`InteractionCreateEvent`].</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">InteractionCreate</span>,
     <span class="doccomment">/// Indicator that an integration was created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`IntegrationCreateEvent`].</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">IntegrationCreate</span>,
     <span class="doccomment">/// Indicator that an integration was created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`IntegrationUpdateEvent`].</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">IntegrationUpdate</span>,
     <span class="doccomment">/// Indicator that an integration was created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This maps to [`IntegrationDeleteEvent`].</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">IntegrationDelete</span>,
     <span class="doccomment">/// Indicator that a stage instance was created.</span>
     <span class="doccomment">///</span>
@@ -3715,13 +3653,9 @@
     <span class="kw">const</span> <span class="ident">VOICE_SERVER_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;VOICE_SERVER_UPDATE&quot;</span>;
     <span class="kw">const</span> <span class="ident">VOICE_STATE_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;VOICE_STATE_UPDATE&quot;</span>;
     <span class="kw">const</span> <span class="ident">WEBHOOKS_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;WEBHOOKS_UPDATE&quot;</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">const</span> <span class="ident">INTERACTION_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;INTERACTION_CREATE&quot;</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">const</span> <span class="ident">INTEGRATION_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;INTEGRATION_CREATE&quot;</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">const</span> <span class="ident">INTEGRATION_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;INTEGRATION_UPDATE&quot;</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">const</span> <span class="ident">INTEGRATION_DELETE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;INTEGRATION_DELETE&quot;</span>;
     <span class="kw">const</span> <span class="ident">STAGE_INSTANCE_CREATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;STAGE_INSTANCE_CREATE&quot;</span>;
     <span class="kw">const</span> <span class="ident">STAGE_INSTANCE_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;STAGE_INSTANCE_UPDATE&quot;</span>;
@@ -3775,13 +3709,9 @@
             <span class="ident"><span class="self">Self</span>::VoiceServerUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::VOICE_SERVER_UPDATE</span>),
             <span class="ident"><span class="self">Self</span>::VoiceStateUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::VOICE_STATE_UPDATE</span>),
             <span class="ident"><span class="self">Self</span>::WebhookUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::WEBHOOKS_UPDATE</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::InteractionCreate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTERACTION_CREATE</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationCreate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTEGRATION_CREATE</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTEGRATION_UPDATE</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident"><span class="self">Self</span>::IntegrationDelete</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::INTEGRATION_DELETE</span>),
             <span class="ident"><span class="self">Self</span>::StageInstanceCreate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::STAGE_INSTANCE_CREATE</span>),
             <span class="ident"><span class="self">Self</span>::StageInstanceUpdate</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::STAGE_INSTANCE_UPDATE</span>),
@@ -3859,13 +3789,9 @@
                     <span class="ident">EventType::VOICE_SERVER_UPDATE</span> =&gt; <span class="ident">EventType::VoiceServerUpdate</span>,
                     <span class="ident">EventType::VOICE_STATE_UPDATE</span> =&gt; <span class="ident">EventType::VoiceStateUpdate</span>,
                     <span class="ident">EventType::WEBHOOKS_UPDATE</span> =&gt; <span class="ident">EventType::WebhookUpdate</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">EventType::INTERACTION_CREATE</span> =&gt; <span class="ident">EventType::InteractionCreate</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">EventType::INTEGRATION_CREATE</span> =&gt; <span class="ident">EventType::IntegrationCreate</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">EventType::INTEGRATION_UPDATE</span> =&gt; <span class="ident">EventType::IntegrationUpdate</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                     <span class="ident">EventType::INTEGRATION_DELETE</span> =&gt; <span class="ident">EventType::IntegrationDelete</span>,
                     <span class="ident">EventType::STAGE_INSTANCE_CREATE</span> =&gt; <span class="ident">EventType::StageInstanceCreate</span>,
                     <span class="ident">EventType::STAGE_INSTANCE_UPDATE</span> =&gt; <span class="ident">EventType::StageInstanceUpdate</span>,

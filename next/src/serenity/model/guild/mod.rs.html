@@ -3149,17 +3149,6 @@
 <span id="3144">3144</span>
 <span id="3145">3145</span>
 <span id="3146">3146</span>
-<span id="3147">3147</span>
-<span id="3148">3148</span>
-<span id="3149">3149</span>
-<span id="3150">3150</span>
-<span id="3151">3151</span>
-<span id="3152">3152</span>
-<span id="3153">3153</span>
-<span id="3154">3154</span>
-<span id="3155">3155</span>
-<span id="3156">3156</span>
-<span id="3157">3157</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -3227,7 +3216,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">builder</span>::{
         <span class="ident">CreateApplicationCommand</span>,
@@ -3820,7 +3809,6 @@
     <span class="doccomment">/// Returns the same possible errors as `create_global_application_command`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::application_command::ApplicationCommand</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -3844,7 +3832,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -3868,7 +3855,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_application_command_permission</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -3891,7 +3877,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_application_commands_permissions</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -3913,7 +3898,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -3929,7 +3913,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -3946,7 +3929,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -3967,7 +3949,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -3984,7 +3965,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_commands_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -4000,7 +3980,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
     <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_application_command_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -6224,7 +6203,6 @@
                 <span class="ident">user</span>: <span class="ident">u</span>,
                 <span class="ident">pending</span>: <span class="bool-val">false</span>,
                 <span class="ident">premium_since</span>: <span class="prelude-val">None</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
                 <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
                 <span class="ident">avatar</span>: <span class="prelude-val">None</span>,
                 <span class="ident">communication_disabled_until</span>: <span class="prelude-val">None</span>,

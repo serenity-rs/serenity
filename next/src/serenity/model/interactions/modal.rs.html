@@ -442,6 +442,11 @@
 <span id="437">437</span>
 <span id="438">438</span>
 <span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simdjson&quot;</span>)]</span>
@@ -449,13 +454,17 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::message_component::ActionRow</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder</span>::{
     <span class="ident">CreateInteractionResponse</span>,
     <span class="ident">CreateInteractionResponseFollowup</span>,
     <span class="ident">EditInteractionResponse</span>,
 };
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::InteractionType</span>;
 
 <span class="doccomment">/// An interaction triggered by a modal submit.</span>
@@ -498,6 +507,7 @@
     <span class="kw">pub</span> <span class="ident">locale</span>: <span class="ident">String</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">ModalSubmitInteraction</span> {
     <span class="doccomment">/// Gets the interaction response.</span>
     <span class="doccomment">///</span>

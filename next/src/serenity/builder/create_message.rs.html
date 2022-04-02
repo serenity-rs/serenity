@@ -315,14 +315,10 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateAllowedMentions</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateEmbed</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::CreateComponents</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="self">self</span>, <span class="ident">from_number</span>, <span class="ident">to_value</span>};
@@ -538,7 +534,6 @@
     }
 
     <span class="doccomment">/// Creates components for this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>,
@@ -551,7 +546,6 @@
     }
 
     <span class="doccomment">/// Sets the components of this message.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_components</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">components</span>: <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;components&quot;</span>, <span class="ident">Value::from</span>(<span class="ident">components</span>.<span class="number">0</span>));
         <span class="self">self</span>

@@ -3846,42 +3846,6 @@
 <span id="3841">3841</span>
 <span id="3842">3842</span>
 <span id="3843">3843</span>
-<span id="3844">3844</span>
-<span id="3845">3845</span>
-<span id="3846">3846</span>
-<span id="3847">3847</span>
-<span id="3848">3848</span>
-<span id="3849">3849</span>
-<span id="3850">3850</span>
-<span id="3851">3851</span>
-<span id="3852">3852</span>
-<span id="3853">3853</span>
-<span id="3854">3854</span>
-<span id="3855">3855</span>
-<span id="3856">3856</span>
-<span id="3857">3857</span>
-<span id="3858">3858</span>
-<span id="3859">3859</span>
-<span id="3860">3860</span>
-<span id="3861">3861</span>
-<span id="3862">3862</span>
-<span id="3863">3863</span>
-<span id="3864">3864</span>
-<span id="3865">3865</span>
-<span id="3866">3866</span>
-<span id="3867">3867</span>
-<span id="3868">3868</span>
-<span id="3869">3869</span>
-<span id="3870">3870</span>
-<span id="3871">3871</span>
-<span id="3872">3872</span>
-<span id="3873">3873</span>
-<span id="3874">3874</span>
-<span id="3875">3875</span>
-<span id="3876">3876</span>
-<span id="3877">3877</span>
-<span id="3878">3878</span>
-<span id="3879">3879</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 
@@ -3910,7 +3874,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">json</span>, <span class="ident">to_value</span>, <span class="ident">to_vec</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command</span>::{
     <span class="ident">ApplicationCommand</span>,
     <span class="ident">ApplicationCommandPermission</span>,
@@ -3943,7 +3906,6 @@
     <span class="ident">ratelimiter_disabled</span>: <span class="ident">bool</span>,
     <span class="ident">token</span>: <span class="ident">String</span>,
     <span class="ident">proxy</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
 }
 
@@ -3957,13 +3919,11 @@
             <span class="ident">ratelimiter_disabled</span>: <span class="bool-val">false</span>,
             <span class="ident">token</span>: <span class="ident">parse_token</span>(<span class="ident">token</span>),
             <span class="ident">proxy</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
         }
     }
 
     <span class="doccomment">/// Sets the application_id to use interactions.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">application_id</span>);
 
@@ -4035,7 +3995,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Http</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="comment">// TODO: It should not be required for all users of serenity to set the application_id or get a panic.</span>
         <span class="kw">let</span> <span class="ident">application_id</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">application_id</span>
             .<span class="ident">expect</span>(<span class="string">&quot;Expected application Id in order to use interacions features&quot;</span>);
@@ -4058,7 +4018,6 @@
             <span class="ident">ratelimiter_disabled</span>,
             <span class="ident">proxy</span>: <span class="self">self</span>.<span class="ident">proxy</span>,
             <span class="ident">token</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">application_id</span>,
         }
     }
@@ -4095,7 +4054,6 @@
     <span class="kw">pub</span> <span class="ident">ratelimiter_disabled</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">proxy</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">u64</span>,
 }
 
@@ -4120,12 +4078,10 @@
             <span class="ident">ratelimiter_disabled</span>: <span class="bool-val">false</span>,
             <span class="ident">proxy</span>: <span class="prelude-val">None</span>,
             <span class="ident">token</span>: <span class="ident">token</span>.<span class="ident">to_string</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">application_id</span>: <span class="number">0</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_application_id</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
         <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>);
@@ -4151,7 +4107,6 @@
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">built</span>, <span class="kw-2">&amp;</span><span class="ident">token</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_token_application_id</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_with_token</span>(<span class="ident">token</span>);
 
@@ -4371,7 +4326,6 @@
     <span class="doccomment">/// Create a follow-up message for an Interaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Functions the same as [`Self::execute_webhook`]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -4392,7 +4346,6 @@
     <span class="doccomment">/// Create a follow-up message with attachments for an Interaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Functions the same as [`Self::execute_webhook`]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message_with_files</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -4426,7 +4379,6 @@
     <span class="doccomment">/// application will overwrite the old command.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
@@ -4443,7 +4395,6 @@
     }
 
     <span class="doccomment">/// Creates new global application commands.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_commands</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>,
@@ -4460,7 +4411,6 @@
     }
 
     <span class="doccomment">/// Creates new guild application commands.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild_application_commands</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -4528,7 +4478,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -4578,7 +4527,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for the object it takes.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_id</span>: <span class="ident">u64</span>,
@@ -4866,7 +4814,6 @@
     }
 
     <span class="doccomment">/// Deletes a follow-up message for an interaction.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_followup_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -4886,7 +4833,6 @@
     }
 
     <span class="doccomment">/// Deletes a global command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_global_application_command</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">command_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -4914,7 +4860,6 @@
     }
 
     <span class="doccomment">/// Deletes a guild command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_guild_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -5040,7 +4985,6 @@
     }
 
     <span class="doccomment">/// Deletes the initial interaction response.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_original_interaction_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -5260,7 +5204,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for Edit Webhook Message for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_followup_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -5285,7 +5228,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for Edit Webhook Message for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_followup_message_and_attachments</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -5315,7 +5257,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for Get Webhook Message for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/resources/webhook#get-webhook-message</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_followup_message</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -5341,7 +5282,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_global_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
@@ -5386,7 +5326,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_guild_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -5413,7 +5352,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [documentation] for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_guild_application_command_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -5440,7 +5378,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [documentation] for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [documentation]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_guild_application_commands_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -5637,7 +5574,6 @@
     }
 
     <span class="doccomment">/// Gets the initial interaction response.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_original_interaction_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -5659,7 +5595,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for Edit Webhook Message for field information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_original_interaction_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -6522,7 +6457,6 @@
     }
 
     <span class="doccomment">/// Fetches all of the global commands for your application.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_global_application_commands</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -6536,7 +6470,6 @@
     }
 
     <span class="doccomment">/// Fetches a global commands for your application by its Id.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_global_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>,
@@ -6580,7 +6513,6 @@
     }
 
     <span class="doccomment">/// Fetches all of the guild commands for your application for a specific guild.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_application_commands</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -6598,7 +6530,6 @@
     }
 
     <span class="doccomment">/// Fetches a guild command by its Id.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_application_command</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -6618,7 +6549,6 @@
     }
 
     <span class="doccomment">/// Fetches all of the guild commands permissions for your application for a specific guild.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_application_commands_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -6636,7 +6566,6 @@
     }
 
     <span class="doccomment">/// Gives the guild command permission for your application for a specific guild.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_guild_application_command_permissions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
@@ -7756,7 +7685,6 @@
             <span class="ident">ratelimiter_disabled</span>: <span class="bool-val">false</span>,
             <span class="ident">proxy</span>: <span class="prelude-val">None</span>,
             <span class="ident">token</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
             <span class="ident">application_id</span>: <span class="number">0</span>,
         }
     }

@@ -521,11 +521,6 @@
 <span id="516">516</span>
 <span id="517">517</span>
 <span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
@@ -533,7 +528,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::context::Context</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::event</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::Interaction</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
@@ -958,25 +952,21 @@
     <span class="doccomment">/// Dispatched when an interaction is created (e.g a slash command was used or a button was clicked).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the created interaction.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">interaction_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_interaction</span>: <span class="ident">Interaction</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild integration is created.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the created integration.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">integration_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_integration</span>: <span class="ident">Integration</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild integration is updated.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the updated integration.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">integration_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_integration</span>: <span class="ident">Integration</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild integration is deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the integration&#39;s id, the id of the guild it belongs to, and its associated application id</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">integration_delete</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_ctx</span>: <span class="ident">Context</span>,

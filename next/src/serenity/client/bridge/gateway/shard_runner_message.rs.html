@@ -82,12 +82,20 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">ComponentInteractionFilter</span>, <span class="ident">ModalInteractionFilter</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">EventFilter</span>, <span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{
+    <span class="ident">ComponentInteractionFilter</span>,
+    <span class="ident">EventFilter</span>,
+    <span class="ident">MessageFilter</span>,
+    <span class="ident">ModalInteractionFilter</span>,
+    <span class="ident">ReactionFilter</span>,
+};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
     <span class="ident">gateway::Activity</span>,
     <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
@@ -155,10 +163,10 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">SetReactionFilter</span>(<span class="ident">ReactionFilter</span>),
     <span class="doccomment">/// Sends a new filter for component interactions to the shard.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">SetComponentInteractionFilter</span>(<span class="ident">ComponentInteractionFilter</span>),
     <span class="doccomment">/// Sends a new filter for modal interactions to the shard.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="ident">SetModalInteractionFilter</span>(<span class="ident">ModalInteractionFilter</span>),
 }
 </code></pre></div>
