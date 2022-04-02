@@ -515,9 +515,6 @@
 <span id="510">510</span>
 <span id="511">511</span>
 <span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -535,7 +532,6 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">argument_convert</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">content_safe</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;url&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
@@ -946,7 +942,6 @@
 <span class="doccomment">/// assert_eq!(id, 245037420704169985);</span>
 <span class="doccomment">/// assert_eq!(token, &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;);</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;url&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_webhook</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">Url</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">strip_prefix</span>(<span class="string">&quot;/api/webhooks/&quot;</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">split_idx</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">find</span>(<span class="string">&#39;/&#39;</span>)<span class="question-mark">?</span>;
@@ -1024,7 +1019,6 @@
         <span class="macro">assert_eq!</span>(<span class="ident">parsed</span>, [<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e f&quot;</span>, <span class="string">&quot;g&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;url&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_webhook_parser</span>() {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="string">&quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();

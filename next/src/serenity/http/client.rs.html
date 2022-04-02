@@ -3865,7 +3865,6 @@
 <span id="3860">3860</span>
 <span id="3861">3861</span>
 <span id="3862">3862</span>
-<span id="3863">3863</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 
@@ -7206,7 +7205,7 @@
     <span class="doccomment">/// Retrieves a webhook given its Id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method requires authentication, whereas [`Self::get_webhook_with_token`] and</span>
-    <span class="doccomment">/// `get_webhook_from_url` do not.</span>
+    <span class="doccomment">/// [`Self::get_webhook_from_url`] do not.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -7286,7 +7285,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;url&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_webhook_from_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="ident">HttpError::Url</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> (<span class="ident">webhook_id</span>, <span class="ident">token</span>) <span class="op">=</span> <span class="ident">utils::parse_webhook</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">ok_or</span>(<span class="ident">HttpError::InvalidWebhook</span>)<span class="question-mark">?</span>;
