@@ -321,7 +321,6 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     user: self.user.clone(),
                     pending: self.pending,
                     premium_since: self.premium_since,
-                    #[cfg(feature = "unstable_discord_api")]
                     permissions: None,
                     avatar: self.avatar.clone(),
                     communication_disabled_until: self.communication_disabled_until,
@@ -560,7 +559,6 @@ impl CacheUpdate for PresenceUpdateEvent {
                         roles: vec![],
                         pending: false,
                         premium_since: None,
-                        #[cfg(feature = "unstable_discord_api")]
                         permissions: None,
                         avatar: None,
                         communication_disabled_until: None,

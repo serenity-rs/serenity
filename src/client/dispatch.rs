@@ -767,7 +767,6 @@ async fn handle_event(
                 event_handler.webhook_update(context, event.guild_id, event.channel_id).await;
             });
         },
-        #[cfg(feature = "unstable_discord_api")]
         DispatchEvent::Model(Event::InteractionCreate(event)) => {
             let event_handler = Arc::clone(event_handler);
 
@@ -775,7 +774,6 @@ async fn handle_event(
                 event_handler.interaction_create(context, event.interaction).await;
             });
         },
-        #[cfg(feature = "unstable_discord_api")]
         DispatchEvent::Model(Event::IntegrationCreate(event)) => {
             let event_handler = Arc::clone(event_handler);
 
@@ -783,7 +781,6 @@ async fn handle_event(
                 event_handler.integration_create(context, event.integration).await;
             });
         },
-        #[cfg(feature = "unstable_discord_api")]
         DispatchEvent::Model(Event::IntegrationUpdate(event)) => {
             let event_handler = Arc::clone(event_handler);
 
@@ -791,7 +788,6 @@ async fn handle_event(
                 event_handler.integration_update(context, event.integration).await;
             });
         },
-        #[cfg(feature = "unstable_discord_api")]
         DispatchEvent::Model(Event::IntegrationDelete(event)) => {
             let event_handler = Arc::clone(event_handler);
 

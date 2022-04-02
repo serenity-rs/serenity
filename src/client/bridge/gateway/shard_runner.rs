@@ -18,17 +18,23 @@ use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage
 use crate::client::bridge::voice::VoiceGatewayManager;
 use crate::client::dispatch::{dispatch, DispatchEvent};
 use crate::client::{EventHandler, RawEventHandler};
-#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-use crate::collector::{ComponentInteractionFilter, ModalInteractionFilter};
 #[cfg(feature = "collector")]
-use crate::collector::{EventFilter, LazyArc, LazyReactionAction, MessageFilter, ReactionFilter};
+use crate::collector::{
+    ComponentInteractionFilter,
+    EventFilter,
+    LazyArc,
+    LazyReactionAction,
+    MessageFilter,
+    ModalInteractionFilter,
+    ReactionFilter,
+};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 use crate::gateway::{GatewayError, InterMessage, ReconnectType, Shard, ShardAction};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
-#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+#[cfg(feature = "collector")]
 use crate::model::interactions::Interaction;
 use crate::CacheAndHttp;
 
@@ -54,9 +60,9 @@ pub struct ShardRunner {
     message_filters: Vec<MessageFilter>,
     #[cfg(feature = "collector")]
     reaction_filters: Vec<ReactionFilter>,
-    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg(feature = "collector")]
     component_interaction_filters: Vec<ComponentInteractionFilter>,
-    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg(feature = "collector")]
     modal_interaction_filters: Vec<ModalInteractionFilter>,
 }
 
@@ -84,9 +90,9 @@ impl ShardRunner {
             message_filters: Vec::new(),
             #[cfg(feature = "collector")]
             reaction_filters: Vec::new(),
-            #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+            #[cfg(feature = "collector")]
             component_interaction_filters: vec![],
-            #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+            #[cfg(feature = "collector")]
             modal_interaction_filters: vec![],
         }
     }
@@ -235,7 +241,7 @@ impl ShardRunner {
                 let mut reaction = LazyReactionAction::new(&reaction_event.reaction, false);
                 retain(&mut self.reaction_filters, |f| f.send_reaction(&mut reaction));
             },
-            #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+            #[cfg(feature = "collector")]
             Event::InteractionCreate(ref interaction_event) => {
                 match &interaction_event.interaction {
                     Interaction::MessageComponent(interaction) => {
@@ -469,7 +475,7 @@ impl ShardRunner {
 
                     true
                 },
-                #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+                #[cfg(feature = "collector")]
                 ShardClientMessage::Runner(ShardRunnerMessage::SetComponentInteractionFilter(
                     collector,
                 )) => {
@@ -477,7 +483,7 @@ impl ShardRunner {
 
                     true
                 },
-                #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+                #[cfg(feature = "collector")]
                 ShardClientMessage::Runner(ShardRunnerMessage::SetModalInteractionFilter(
                     collector,
                 )) => {

@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use super::CreateAllowedMentions;
-#[cfg(feature = "unstable_discord_api")]
 use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
 use crate::json;
@@ -58,7 +57,6 @@ impl EditWebhookMessage {
     /// the webhook's `kind` field is set to [`WebhookType::Application`].
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
-    #[cfg(feature = "unstable_discord_api")]
     pub fn components<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,

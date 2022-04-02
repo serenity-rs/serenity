@@ -8,10 +8,8 @@ use typemap_rev::TypeMap;
 pub use crate::cache::Cache;
 #[cfg(feature = "gateway")]
 use crate::client::bridge::gateway::ShardMessenger;
-#[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
-use crate::collector::ComponentInteractionFilter;
 #[cfg(feature = "collector")]
-use crate::collector::{MessageFilter, ReactionFilter};
+use crate::collector::{ComponentInteractionFilter, MessageFilter, ReactionFilter};
 #[cfg(feature = "gateway")]
 use crate::gateway::InterMessage;
 use crate::http::Http;
@@ -404,7 +402,7 @@ impl Context {
     /// Sets a new `filter` for the shard to check if an interaction event shall be
     /// sent back to `filter`'s paired receiver.
     #[inline]
-    #[cfg(all(feature = "unstable_discord_api", feature = "collector"))]
+    #[cfg(feature = "collector")]
     pub async fn set_component_interaction_filter(&self, filter: ComponentInteractionFilter) {
         self.shard.set_component_interaction_filter(filter);
     }
