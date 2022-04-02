@@ -220,6 +220,14 @@ impl GatewayIntents {
     }
 
     /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_MESSAGES] intent.
+    ///
+    /// [GUILD_MESSAGES]: Self::GUILD_MESSAGES
+    pub fn guild_messages(self) -> bool {
+        self.contains(Self::GUILD_MESSAGES)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
     /// [GUILD_MEMBERS] intent.
     ///
     /// [GUILD_MEMBERS]: Self::GUILD_MEMBERS
