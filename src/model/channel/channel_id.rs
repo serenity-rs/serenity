@@ -407,7 +407,7 @@ impl ChannelId {
         }
 
         let channel = cache_http.http().get_channel(self.0).await?;
-        #[cfg(feature = "cache")]
+        #[cfg(all(feature = "cache", feature = "tempcaching"))]
         {
             if let Some(cache) = cache_http.cache() {
                 if let Channel::Guild(guild_channel) = &channel {
