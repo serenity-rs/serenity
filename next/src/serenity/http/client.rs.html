@@ -3845,7 +3845,6 @@
 <span id="3840">3840</span>
 <span id="3841">3841</span>
 <span id="3842">3842</span>
-<span id="3843">3843</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 
@@ -4550,7 +4549,6 @@
     <span class="doccomment">/// Refer to Discord&#39;s [docs] for the object it takes.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response_with_files</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">interaction_id</span>: <span class="ident">u64</span>,
