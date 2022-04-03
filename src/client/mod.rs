@@ -73,7 +73,7 @@ pub struct ClientBuilder {
     data: Option<TypeMap>,
     http: Http,
     fut: Option<BoxFuture<'static, Result<Client>>>,
-    intents: GatewayIntents,
+    intents: Option<GatewayIntents>,
     application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
@@ -95,7 +95,7 @@ impl ClientBuilder {
             data: Some(TypeMap::new()),
             http,
             fut: None,
-            intents: GatewayIntents::non_privileged(),
+            intents: None,
             application_id: None,
             #[cfg(feature = "cache")]
             timeout: None,
@@ -329,13 +329,13 @@ impl ClientBuilder {
     /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
-        self.intents = intents;
+        self.intents = Some(intents);
 
         self
     }
 
     /// Gets the intents. See [`Self::intents`] for more info.
-    pub fn get_intents(&self) -> GatewayIntents {
+    pub fn get_intents(&self) -> Option<GatewayIntents> {
         self.intents
     }
 
@@ -391,7 +391,10 @@ impl Future for ClientBuilder {
                 If you don't want to use the command framework, disable default features and specify all features you want to use.");
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
-            let intents = self.intents;
+            let intents = self.intents.expect(
+                "No gateway intents were provided. \
+                Please set gateway intents using `.intents()` on `ClientBuilder`",
+            );
             let http = Arc::new(std::mem::take(&mut self.http));
 
             // TODO: It should not be required for all users of serenity to set the application_id or get a panic.

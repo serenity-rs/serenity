@@ -18,7 +18,10 @@ use serenity::{
         CommandResult,
         StandardFramework,
     },
-    model::{channel::Message, gateway::Ready},
+    model::{
+        channel::Message,
+        gateway::{GatewayIntents, Ready},
+    },
     prelude::*,
 };
 use tokio::sync::RwLock;
@@ -119,6 +122,11 @@ async fn main() {
     let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
+        .intents(
+            GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::DIRECT_MESSAGES
+                | GatewayIntents::MESSAGE_CONTENT,
+        )
         .await
         .expect("Err creating client");
 

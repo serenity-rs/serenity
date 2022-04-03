@@ -24,7 +24,11 @@
 //! update, depending on how often Discord tells the client to send a heartbeat.
 use std::{env, time::Duration};
 
-use serenity::{async_trait, model::gateway::Ready, prelude::*};
+use serenity::{
+    async_trait,
+    model::gateway::{GatewayIntents, Ready},
+    prelude::*,
+};
 use tokio::time::sleep;
 
 struct Handler;
@@ -46,8 +50,15 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    let mut client =
-        Client::builder(&token).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(&token)
+        .event_handler(Handler)
+        .intents(
+            GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::DIRECT_MESSAGES
+                | GatewayIntents::MESSAGE_CONTENT,
+        )
+        .await
+        .expect("Err creating client");
 
     // Here we clone a lock to the Shard Manager, and then move it into a new
     // thread. The thread will unlock the manager and print shards' status on a

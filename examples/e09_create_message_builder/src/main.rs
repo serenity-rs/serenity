@@ -3,7 +3,10 @@ use std::env;
 use serenity::{
     async_trait,
     model::Timestamp,
-    model::{channel::Message, gateway::Ready},
+    model::{
+        channel::Message,
+        gateway::{GatewayIntents, Ready},
+    },
     prelude::*,
 };
 
@@ -54,8 +57,15 @@ impl EventHandler for Handler {
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-    let mut client =
-        Client::builder(&token).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(&token)
+        .event_handler(Handler)
+        .intents(
+            GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::DIRECT_MESSAGES
+                | GatewayIntents::MESSAGE_CONTENT,
+        )
+        .await
+        .expect("Err creating client");
 
     if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);

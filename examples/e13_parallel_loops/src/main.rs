@@ -12,7 +12,7 @@ use serenity::{
     async_trait,
     model::{
         channel::Message,
-        gateway::{Activity, Ready},
+        gateway::{Activity, GatewayIntents, Ready},
         id::{ChannelId, GuildId},
     },
     prelude::*,
@@ -123,6 +123,11 @@ async fn main() {
         .event_handler(Handler {
             is_loop_running: AtomicBool::new(false),
         })
+        .intents(
+            GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::DIRECT_MESSAGES
+                | GatewayIntents::MESSAGE_CONTENT,
+        )
         .await
         .expect("Error creating client");
 

@@ -2,7 +2,10 @@ use std::env;
 
 use serenity::{
     async_trait,
-    model::{channel::Message, gateway::Ready},
+    model::{
+        channel::Message,
+        gateway::{GatewayIntents, Ready},
+    },
     prelude::*,
 };
 
@@ -46,8 +49,15 @@ async fn main() {
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
-    let mut client =
-        Client::builder(&token).event_handler(Handler).await.expect("Err creating client");
+    let mut client = Client::builder(&token)
+        .event_handler(Handler)
+        .intents(
+            GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::DIRECT_MESSAGES
+                | GatewayIntents::MESSAGE_CONTENT,
+        )
+        .await
+        .expect("Err creating client");
 
     // Finally, start a single shard, and start listening to events.
     //

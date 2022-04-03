@@ -18,7 +18,10 @@ use serenity::{
     client::bridge::gateway::ShardManager,
     framework::{standard::macros::group, StandardFramework},
     http::Http,
-    model::{event::ResumedEvent, gateway::Ready},
+    model::{
+        event::ResumedEvent,
+        gateway::{GatewayIntents, Ready},
+    },
     prelude::*,
 };
 use tracing::{error, info};
@@ -80,6 +83,11 @@ async fn main() {
     let mut client = Client::builder(&token)
         .framework(framework)
         .event_handler(Handler)
+        .intents(
+            GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::DIRECT_MESSAGES
+                | GatewayIntents::MESSAGE_CONTENT,
+        )
         .await
         .expect("Err creating client");
 

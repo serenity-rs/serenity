@@ -39,7 +39,7 @@ async fn main() {
         .event_handler(Handler)
         // Intents are a bitflag, bitwise operations can be used to dictate which intents to use
         // By default, GatewayIntents::non_privileged() is used.
-        .intents(GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES)
+        .intents(GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES | GatewayIntents::MESSAGE_CONTENT)
         .await
         .expect("Error creating client");
 

@@ -7,7 +7,11 @@ use serenity::{
         CommandResult,
         StandardFramework,
     },
-    model::{channel::Message, event::ResumedEvent, gateway::Ready},
+    model::{
+        channel::Message,
+        event::ResumedEvent,
+        gateway::{GatewayIntents, Ready},
+    },
     prelude::*,
 };
 use tracing::{debug, error, info, instrument};
@@ -75,6 +79,11 @@ async fn main() {
     let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
+        .intents(
+            GatewayIntents::GUILD_MESSAGES
+                | GatewayIntents::DIRECT_MESSAGES
+                | GatewayIntents::MESSAGE_CONTENT,
+        )
         .await
         .expect("Err creating client");
 

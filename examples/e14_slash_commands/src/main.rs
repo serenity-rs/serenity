@@ -3,7 +3,7 @@ use std::env;
 use serenity::{
     async_trait,
     model::{
-        gateway::Ready,
+        gateway::{GatewayIntents, Ready},
         id::GuildId,
         interactions::{
             application_command::{
@@ -192,16 +192,10 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    // The Application Id is usually the Bot User Id.
-    let application_id: u64 = env::var("APPLICATION_ID")
-        .expect("Expected an application id in the environment")
-        .parse()
-        .expect("application id is not a valid id");
-
     // Build our client.
     let mut client = Client::builder(token)
         .event_handler(Handler)
-        .application_id(application_id)
+        .intents(GatewayIntents::empty())
         .await
         .expect("Error creating client");
 
