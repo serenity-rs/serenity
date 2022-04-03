@@ -276,6 +276,10 @@ impl Http {
         }
     }
 
+    fn try_application_id(&self) -> Result<u64> {
+        self.application_id().ok_or_else(|| HttpError::ApplicationIdMissing.into())
+    }
+
     pub fn set_application_id(&self, application_id: u64) {
         self.application_id.store(application_id, Ordering::Relaxed);
     }
@@ -501,7 +505,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -526,7 +530,7 @@ impl Http {
             }),
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -553,7 +557,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommand {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -569,7 +573,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommands {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -586,7 +590,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommands {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -653,7 +657,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommand {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -988,7 +992,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteFollowupMessage {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1003,7 +1007,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteGlobalApplicationCommand {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -1034,7 +1038,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteGuildApplicationCommand {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1158,7 +1162,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteOriginalInteractionResponse {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -1379,7 +1383,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1408,7 +1412,7 @@ impl Http {
             }),
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1431,7 +1435,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetFollowupMessage {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1456,7 +1460,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGlobalApplicationCommand {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -1501,7 +1505,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommand {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1527,7 +1531,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandPermission {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1552,7 +1556,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandsPermissions {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -1747,7 +1751,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetOriginalInteractionResponse {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -1769,7 +1773,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -2647,7 +2651,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommands {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -2663,7 +2667,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommand {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -2706,7 +2710,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommands {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -2724,7 +2728,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommand {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -2742,7 +2746,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommandsPermissions {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -2760,7 +2764,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommandPermissions {
-                application_id: self.application_id().ok_or(HttpError::ApplicationIdMissing)?,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
