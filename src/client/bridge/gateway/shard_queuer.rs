@@ -178,13 +178,15 @@ impl ShardQueuer {
     async fn start(&mut self, shard_id: u64, shard_total: u64) -> Result<()> {
         let shard_info = [shard_id, shard_total];
 
-        let shard = Shard::new(
+        let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
-            Arc::clone(&self.cache_and_http.http),
+            &self.cache_and_http.http.token,
             shard_info,
             self.intents,
         )
         .await?;
+
+        shard.set_http(Arc::clone(&self.cache_and_http.http));
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
