@@ -172,7 +172,7 @@ impl Shard {
     }
 
     /// Sets the associated [`Http`] client.
-    /// 
+    ///
     /// This will update the client's application id after the shard receives a READY payload.
     pub fn set_http(&mut self, http: Arc<Http>) {
         self.http = Some(http);
