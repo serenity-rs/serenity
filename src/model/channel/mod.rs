@@ -11,6 +11,8 @@ mod partial_channel;
 mod private_channel;
 mod reaction;
 
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use std::error::Error as StdError;
 use std::fmt;
 
 use serde::de::{Error as DeError, Unexpected};
@@ -32,8 +34,6 @@ use crate::cache::Cache;
 use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::model::misc::ChannelParseError;
 use crate::model::utils::is_false;
 use crate::model::Timestamp;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
@@ -582,6 +582,26 @@ mod test {
         }
     }
 }
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+#[derive(Debug)]
+pub enum ChannelParseError {
+    NotPresentInCache,
+    InvalidChannel,
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl fmt::Display for ChannelParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ChannelParseError::NotPresentInCache => f.write_str("not present in cache"),
+            ChannelParseError::InvalidChannel => f.write_str("invalid channel"),
+        }
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl StdError for ChannelParseError {}
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 impl FromStrAndCache for Channel {

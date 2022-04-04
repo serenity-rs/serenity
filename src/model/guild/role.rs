@@ -1,4 +1,6 @@
 use std::cmp::Ordering;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use std::error::Error as StdError;
 use std::fmt;
 
 #[cfg(feature = "model")]
@@ -11,8 +13,6 @@ use crate::cache::FromStrAndCache;
 use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::model::misc::RoleParseError;
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
@@ -260,6 +260,26 @@ impl<'a> From<&'a Role> for RoleId {
         role.id
     }
 }
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+#[derive(Debug)]
+pub enum RoleParseError {
+    NotPresentInCache,
+    InvalidRole,
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl fmt::Display for RoleParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            RoleParseError::NotPresentInCache => f.write_str("not present in cache"),
+            RoleParseError::InvalidRole => f.write_str("invalid role"),
+        }
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl StdError for RoleParseError {}
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 impl FromStrAndCache for Role {
