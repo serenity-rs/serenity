@@ -392,8 +392,10 @@ impl ChannelId {
     /// First attempts to find a [`Channel`] by its Id in the cache,
     /// upon failure requests it via the REST API.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
-    /// owning the required permissions the HTTP-request will be issued.
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
+    /// required permissions the HTTP-request will be issued. Additionally, you might want to
+    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
+    /// short duration.
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
@@ -407,7 +409,8 @@ impl ChannelId {
         }
 
         let channel = cache_http.http().get_channel(self.0).await?;
-        #[cfg(feature = "cache")]
+
+        #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
                 if let Channel::Guild(guild_channel) = &channel {
@@ -415,6 +418,7 @@ impl ChannelId {
                 }
             }
         }
+
         Ok(channel)
     }
 

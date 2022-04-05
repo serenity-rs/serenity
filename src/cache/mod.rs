@@ -34,6 +34,7 @@ use std::collections::{hash_map::RandomState, HashMap, VecDeque};
 use std::default::Default;
 use std::hash::BuildHasher;
 use std::str::FromStr;
+#[cfg(feature = "temp_cache")]
 use std::time::Duration;
 
 use dashmap::{
@@ -42,6 +43,7 @@ use dashmap::{
     DashMap,
     DashSet,
 };
+#[cfg(feature = "temp_cache")]
 use moka::dash::Cache as DashCache;
 use parking_lot::RwLock;
 use tracing::instrument;
@@ -136,6 +138,7 @@ pub struct Cache {
     /// Cache of channels that have been fetched via to_channel.
     ///
     /// Each value has a maximum TTL of 1 hour.
+    #[cfg(feature = "temp_cache")]
     pub(crate) temp_channels: DashCache<ChannelId, GuildChannel>,
     /// A map of channel categories.
     pub(crate) categories: DashMap<ChannelId, ChannelCategory>,
@@ -191,6 +194,7 @@ pub struct Cache {
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// Each value has a max TTL of 1 hour.
+    #[cfg(feature = "temp_cache")]
     pub(crate) temp_users: DashCache<UserId, User>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
@@ -358,8 +362,13 @@ impl Cache {
         if let Some(channel) = self.channels.get(&id) {
             let channel = channel.clone();
             return Some(Channel::Guild(channel));
-        } else if let Some(channel) = self.temp_channels.get(&id) {
-            return Some(Channel::Guild(channel));
+        }
+
+        #[cfg(feature = "temp_cache")]
+        {
+            if let Some(channel) = self.temp_channels.get(&id) {
+                return Some(Channel::Guild(channel));
+            }
         }
 
         if let Some(private_channel) = self.private_channels.get(&id) {
@@ -882,12 +891,18 @@ impl Cache {
         self._user(user_id.into())
     }
 
+    #[cfg(feature = "temp_cache")]
     fn _user(&self, user_id: UserId) -> Option<User> {
         if let Some(user) = self.users.get(&user_id) {
             Some(user.clone())
         } else {
             self.temp_users.get(&user_id)
         }
+    }
+
+    #[cfg(not(feature = "temp_cache"))]
+    fn _user(&self, user_id: UserId) -> Option<User> {
+        self.users.get(&user_id).map(|u| u.clone())
     }
 
     /// Clones all users and returns them.
@@ -998,6 +1013,7 @@ impl Default for Cache {
     fn default() -> Cache {
         Cache {
             channels: DashMap::default(),
+            #[cfg(feature = "temp_cache")]
             temp_channels: DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
             categories: DashMap::default(),
             guilds: DashMap::default(),
@@ -1009,6 +1025,7 @@ impl Default for Cache {
             unavailable_guilds: DashSet::default(),
             user: RwLock::new(CurrentUser::default()),
             users: DashMap::default(),
+            #[cfg(feature = "temp_cache")]
             temp_users: DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
             message_queue: DashMap::default(),
         }

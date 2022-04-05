@@ -165,7 +165,7 @@ default_no_backend = [
 ]
 
 builder = ["utils"]
-cache = ["moka", "dashmap", "parking_lot"]
+cache = ["dashmap", "parking_lot"]
 collector = ["gateway", "model"]
 client = ["http", "typemap_rev"]
 extras = []
@@ -184,6 +184,9 @@ time = []
 
 # Enables simd accelerated parsing
 simdjson = ["simd-json"]
+
+# Enables temporary caching in functions that retrieve data via the HTTP API.
+temp_cache = ["cache", "moka"]
 
 # Backends to pick from:
 # - Rustls Backends
