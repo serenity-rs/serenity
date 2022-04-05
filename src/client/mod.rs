@@ -322,8 +322,8 @@ impl ClientBuilder {
     ///
     /// # Privileged Intents
     ///
-    /// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]
-    /// are *privileged*.
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]
+    /// and [`GatewayIntents::MESSAGE_CONTENT`] are *privileged*.
     /// [Privileged intents] need to be enabled in the *developer portal*.
     /// Once the bot is in 100 guilds or more, [the bot must be verified] in
     /// order to use privileged intents.
