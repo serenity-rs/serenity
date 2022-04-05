@@ -70,15 +70,16 @@ pub use crate::CacheAndHttp;
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
 pub struct ClientBuilder {
+    // TODO: data, http and cache_settings are Options in order to take() them out in the Future impl.
+    // This should be changed after the stabilization of std::future::IntoFuture.
     data: Option<TypeMap>,
-    http: Http,
+    http: Option<Http>,
     fut: Option<BoxFuture<'static, Result<Client>>>,
     intents: GatewayIntents,
     application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
     #[cfg(feature = "cache")]
-    // Option in order to take() it out in the Future impl
     cache_settings: Option<CacheSettings>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework + Send + Sync + 'static>>,
@@ -93,7 +94,7 @@ impl ClientBuilder {
     fn _new(http: Http) -> Self {
         Self {
             data: Some(TypeMap::new()),
-            http,
+            http: Some(http),
             fut: None,
             intents: GatewayIntents::non_privileged(),
             application_id: None,
@@ -135,21 +136,24 @@ impl ClientBuilder {
     /// Sets a token for the bot. If the token is not prefixed "Bot ",
     /// this method will automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.http = Http::new_with_token(token.as_ref());
+        self.http = Some(Http::new_with_token(token.as_ref()));
 
         self
     }
 
     /// Gets the current token used for the [`Http`] client.
-    pub fn get_token(&self) -> &str {
-        &self.http.token
+    /// This can be unwrapped safely unless used after awaiting the builder.
+    pub fn get_token(&self) -> Option<&str> {
+        self.http.as_ref().map(|http| http.token.as_str())
     }
 
     /// Sets the application id.
     pub fn application_id(mut self, application_id: u64) -> Self {
         self.application_id = Some(ApplicationId(application_id));
 
-        self.http = Http::new_with_token_application_id(self.get_token(), application_id);
+        if let Some(http) = &mut self.http {
+            http.application_id = application_id;
+        }
 
         self
     }
@@ -168,7 +172,8 @@ impl ClientBuilder {
         self
     }
 
-    /// Gets the type map, if already initialized. See [`Self::type_map`] for more info.
+    /// Gets the type map. See [`Self::type_map`] for more info.
+    /// This can be unwrapped safely unless used after awaiting the builder.
     pub fn get_type_map(&self) -> Option<&TypeMap> {
         self.data.as_ref()
     }
@@ -221,12 +226,10 @@ impl ClientBuilder {
     }
 
     /// Gets the cache settings. See [`Self::cache_settings`] for more info.
+    /// This can be unwrapped safely unless used after awaiting the builder.
     #[cfg(feature = "cache")]
-    pub fn get_cache_settings(&self) -> &CacheSettings {
-        // unwrap() is ok because cache_settings will only ever be None in the middle of being
-        // .await'ed
-        #[allow(clippy::unwrap_used)]
-        self.cache_settings.as_ref().unwrap()
+    pub fn get_cache_settings(&self) -> Option<&CacheSettings> {
+        self.cache_settings.as_ref()
     }
 
     /// Sets the command framework to be used. It will receive messages sent
@@ -392,7 +395,7 @@ impl Future for ClientBuilder {
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
             let intents = self.intents;
-            let http = Arc::new(std::mem::take(&mut self.http));
+            let http = Arc::new(self.http.take().unwrap());
 
             // TODO: It should not be required for all users of serenity to set the application_id or get a panic.
             if http.application_id == 0 {
