@@ -543,9 +543,9 @@ bitflags! {
     ///
     /// # Privileged Intents
     ///
-    /// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]
-    /// are [Privileged Intents]. They need to be enabled in the
-    /// *developer portal*.
+    /// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]
+    /// and [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in
+    /// the *developer portal*.
     ///
     /// **Note**:
     /// Once the bot is in 100 guilds or more, [the bot must be verified] in
@@ -671,6 +671,11 @@ bitflags! {
         /// Enable message content in following gateway events:
         ///
         /// - MESSAGE_CREATE
+        ///
+        /// **Info**:
+        /// This intent is *privileged*.
+        /// In order to use it, you must head to your application in the
+        /// Developer Portal and enable the toggle for *Privileged Intents*.
         const MESSAGE_CONTENT = 1 << 15;
         /// Enable following gateway events:
         ///
