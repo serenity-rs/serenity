@@ -24,7 +24,6 @@ impl fmt::Display for PLACEHOLDERParseError {
 /// The lookup strategy is as follows (in order):
 /// 1. Lookup by PLACEHOLDER
 /// 2. [Lookup by PLACEHOLDER](`crate::utils::parse_PLACEHOLDER`).
-#[cfg(feature = "cache")]
 #[async_trait::async_trait]
 impl ArgumentConvert for PLACEHOLDER {
     type Err = PLACEHOLDERParseError;
