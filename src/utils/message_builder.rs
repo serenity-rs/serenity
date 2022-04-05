@@ -3,7 +3,7 @@ use std::ops::Add;
 
 use crate::model::guild::Emoji;
 use crate::model::id::{ChannelId, RoleId, UserId};
-use crate::model::misc::Mentionable;
+use crate::model::mention::Mentionable;
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.

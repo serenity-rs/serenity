@@ -32,6 +32,7 @@ pub mod guild;
 pub mod id;
 pub mod interactions;
 pub mod invite;
+pub mod mention;
 pub mod misc;
 pub mod oauth2;
 pub mod permissions;
