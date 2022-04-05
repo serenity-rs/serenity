@@ -69,14 +69,8 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.guild() {
     ///     Some(guild_channel) => {
@@ -106,14 +100,8 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.private() {
     ///     Some(private) => {
@@ -143,14 +131,8 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.category() {
     ///     Some(category) => {
@@ -160,7 +142,6 @@ impl Channel {
     ///         println!("It's not a category!");
     ///     },
     /// }
-    /// #
     /// # }
     /// ```
     pub fn category(self) -> Option<ChannelCategory> {

@@ -21,19 +21,9 @@ use crate::model::{
 /// value:
 ///
 /// ```rust,no_run
-/// # use serde_json::{json, from_value};
 /// # use serenity::model::prelude::*;
 /// #
-/// # async fn run() {
-/// # let user = UserId(1);
-/// # let emoji = from_value::<Emoji>(json!({
-/// #     "animated": false,
-/// #     "id": EmojiId(2),
-/// #     "name": "test",
-/// #     "managed": false,
-/// #     "require_colons": true,
-/// #     "roles": Vec::<Role>::new(),
-/// # })).unwrap();
+/// # fn run(user: UserId, emoji: Emoji) {
 /// #
 /// use serenity::utils::MessageBuilder;
 ///
@@ -150,28 +140,19 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # use serenity::model::guild::Role;
-    /// #
-    /// # {
-    /// #
     /// # use serde_json::{json, from_value};
     /// # use serenity::model::guild::Emoji;
     /// # use serenity::model::id::EmojiId;
     /// # use serenity::utils::MessageBuilder;
     ///
     /// # let emoji = from_value::<Emoji>(json!({
-    /// #     "animated": false,
     /// #     "id": EmojiId(302516740095606785),
-    /// #     "managed": true,
-    /// #     "name": "smugAnimeFace".to_string(),
-    /// #     "require_colons": true,
-    /// #     "roles": Vec::<Role>::new(),
+    /// #     "name": "smugAnimeFace",
     /// # })).unwrap();
     ///
     /// let message = MessageBuilder::new().push("foo ").emoji(&emoji).push(".").build();
     ///
     /// assert_eq!(message, "foo <:smugAnimeFace:302516740095606785>.");
-    /// # }
     /// ```
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display

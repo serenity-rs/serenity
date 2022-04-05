@@ -297,15 +297,11 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
-    /// # fn run() {
     /// # let cache = Cache::default();
     /// let amount = cache.private_channels().len();
     ///
     /// println!("There are {} private channels", amount);
-    /// # }
     /// ```
     pub fn private_channels(&self) -> DashMap<ChannelId, PrivateChannel> {
         self.private_channels.clone()
@@ -407,17 +403,12 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache = Cache::default();
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(guild) = cache.guild(7) {
     ///     println!("Guild name: {}", guild.name);
     /// }
-    /// #   Ok(())
-    /// # }
     /// ```
     #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Guild> {
@@ -573,13 +564,9 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::{ChannelId, MessageId};
-    /// # use std::sync::Arc;
+    /// # use serenity::model::channel::Message;
     /// #
-    /// # async fn run() {
-    /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
-    /// # let message = ChannelId(0).message(&http, MessageId(1)).await.unwrap();
-    /// # let cache = Cache::default();
+    /// # async fn run(http: Http, cache: Cache, message: Message) {
     /// #
     /// let member = {
     ///     let channel = match cache.guild_channel(message.channel_id) {
@@ -753,21 +740,14 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::id::{ChannelId, MessageId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::model::channel::Message;
     /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
-    /// # let message = ChannelId(0).message(&http, MessageId(1)).await?;
-    /// # let cache = Cache::default();
+    /// # fn run(cache: Cache, message: Message) {
     /// #
     /// match cache.message(message.channel_id, message.id) {
     ///     Some(m) => assert_eq!(message.content, m.content),
     ///     None => println!("No message found in cache."),
     /// };
-    /// #     Ok(())
     /// # }
     /// ```
     ///
@@ -800,18 +780,13 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #   let cache = Cache::default();
+    /// # let cache = Cache::default();
     /// // assuming the cache has been unlocked
     ///
     /// if let Some(channel) = cache.private_channel(7) {
     ///     println!("The recipient is {}", channel.recipient);
     /// }
-    /// #     Ok(())
-    /// # }
     /// ```
     #[inline]
     pub fn private_channel(&self, channel_id: impl Into<ChannelId>) -> Option<PrivateChannel> {
@@ -836,17 +811,12 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache = Cache::default();
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(role) = cache.role(7, 77) {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// }
-    /// #     Ok(())
-    /// # }
     /// ```
     #[inline]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>

@@ -69,17 +69,13 @@ impl Emoji {
     /// # use serde_json::{json, from_value};
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::client::Context;
-    /// # use serenity::model::prelude::{EmojiId, Emoji, Role};
+    /// # use serenity::model::prelude::{EmojiId, Emoji};
     /// #
     /// # #[command]
     /// # async fn example(ctx: &Context) -> CommandResult {
     /// #     let mut emoji = from_value::<Emoji>(json!({
-    /// #         "animated": false,
     /// #         "id": EmojiId(7),
     /// #         "name": "blobface",
-    /// #         "managed": false,
-    /// #         "require_colons": false,
-    /// #         "roles": Vec::<Role>::new(),
     /// #     }))?;
     /// #
     /// // assuming emoji has been set already
@@ -151,22 +147,10 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # use serde_json::{json, from_value};
-    /// # use serenity::{cache::Cache, model::{guild::{Emoji, Role}, id::EmojiId}};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::cache::Cache;
+    /// # use serenity::model::guild::Emoji;
     /// #
-    /// # async fn run() {
-    /// # let cache = Cache::default();
-    /// #
-    /// # let mut emoji = from_value::<Emoji>(json!({
-    /// #     "animated": false,
-    /// #     "id": EmojiId(7),
-    /// #     "name": "blobface",
-    /// #     "managed": false,
-    /// #     "require_colons": false,
-    /// #     "roles": Vec::<Role>::new(),
-    /// # })).unwrap();
+    /// # fn run(cache: Cache, emoji: Emoji) {
     /// #
     /// // assuming emoji has been set already
     /// if let Some(guild_id) = emoji.find_guild_id(&cache) {
@@ -194,18 +178,9 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # use serde_json::{json, from_value};
-    /// # use serenity::model::{guild::{Emoji, Role}, id::EmojiId};
+    /// # use serenity::model::guild::Emoji;
     /// #
-    /// # fn main() {
-    /// # let mut emoji = from_value::<Emoji>(json!({
-    /// #     "animated": false,
-    /// #     "id": EmojiId(7),
-    /// #     "name": "blobface",
-    /// #     "managed": false,
-    /// #     "require_colons": false,
-    /// #     "roles": Vec::<Role>::new(),
-    /// # })).unwrap();
+    /// # fn run(emoji: Emoji) {
     /// #
     /// // assuming emoji has been set already
     /// println!("Direct link to emoji image: {}", emoji.url());
