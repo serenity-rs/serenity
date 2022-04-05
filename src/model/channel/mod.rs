@@ -231,7 +231,7 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 | 5 | 6 | 10 | 11 | 12 | 13 | 15 => from_value::<GuildChannel>(Value::from(v))
+            0 | 2 | 5 | 10 | 11 | 12 | 13 | 15 => from_value::<GuildChannel>(Value::from(v))
                 .map(Channel::Guild)
                 .map_err(DeError::custom),
             1 => from_value::<PrivateChannel>(Value::from(v))
