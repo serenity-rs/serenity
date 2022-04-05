@@ -230,31 +230,6 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
@@ -326,17 +301,13 @@
     <span class="doccomment">/// # use serde_json::{json, from_value};</span>
     <span class="doccomment">/// # use serenity::framework::standard::{CommandResult, macros::command};</span>
     <span class="doccomment">/// # use serenity::client::Context;</span>
-    <span class="doccomment">/// # use serenity::model::prelude::{EmojiId, Emoji, Role};</span>
+    <span class="doccomment">/// # use serenity::model::prelude::{EmojiId, Emoji};</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # #[command]</span>
     <span class="doccomment">/// # async fn example(ctx: &amp;Context) -&gt; CommandResult {</span>
     <span class="doccomment">/// #     let mut emoji = from_value::&lt;Emoji&gt;(json!({</span>
-    <span class="doccomment">/// #         &quot;animated&quot;: false,</span>
     <span class="doccomment">/// #         &quot;id&quot;: EmojiId(7),</span>
     <span class="doccomment">/// #         &quot;name&quot;: &quot;blobface&quot;,</span>
-    <span class="doccomment">/// #         &quot;managed&quot;: false,</span>
-    <span class="doccomment">/// #         &quot;require_colons&quot;: false,</span>
-    <span class="doccomment">/// #         &quot;roles&quot;: Vec::&lt;Role&gt;::new(),</span>
     <span class="doccomment">/// #     }))?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// // assuming emoji has been set already</span>
@@ -408,22 +379,10 @@
     <span class="doccomment">/// Print the guild id that owns this emoji:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serde_json::{json, from_value};</span>
-    <span class="doccomment">/// # use serenity::{cache::Cache, model::{guild::{Emoji, Role}, id::EmojiId}};</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
+    <span class="doccomment">/// # use serenity::cache::Cache;</span>
+    <span class="doccomment">/// # use serenity::model::guild::Emoji;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # let cache = Cache::default();</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let mut emoji = from_value::&lt;Emoji&gt;(json!({</span>
-    <span class="doccomment">/// #     &quot;animated&quot;: false,</span>
-    <span class="doccomment">/// #     &quot;id&quot;: EmojiId(7),</span>
-    <span class="doccomment">/// #     &quot;name&quot;: &quot;blobface&quot;,</span>
-    <span class="doccomment">/// #     &quot;managed&quot;: false,</span>
-    <span class="doccomment">/// #     &quot;require_colons&quot;: false,</span>
-    <span class="doccomment">/// #     &quot;roles&quot;: Vec::&lt;Role&gt;::new(),</span>
-    <span class="doccomment">/// # })).unwrap();</span>
+    <span class="doccomment">/// # fn run(cache: Cache, emoji: Emoji) {</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// // assuming emoji has been set already</span>
     <span class="doccomment">/// if let Some(guild_id) = emoji.find_guild_id(&amp;cache) {</span>
@@ -451,18 +410,9 @@
     <span class="doccomment">/// Print the direct link to the given emoji:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serde_json::{json, from_value};</span>
-    <span class="doccomment">/// # use serenity::model::{guild::{Emoji, Role}, id::EmojiId};</span>
+    <span class="doccomment">/// # use serenity::model::guild::Emoji;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// # let mut emoji = from_value::&lt;Emoji&gt;(json!({</span>
-    <span class="doccomment">/// #     &quot;animated&quot;: false,</span>
-    <span class="doccomment">/// #     &quot;id&quot;: EmojiId(7),</span>
-    <span class="doccomment">/// #     &quot;name&quot;: &quot;blobface&quot;,</span>
-    <span class="doccomment">/// #     &quot;managed&quot;: false,</span>
-    <span class="doccomment">/// #     &quot;require_colons&quot;: false,</span>
-    <span class="doccomment">/// #     &quot;roles&quot;: Vec::&lt;Role&gt;::new(),</span>
-    <span class="doccomment">/// # })).unwrap();</span>
+    <span class="doccomment">/// # fn run(emoji: Emoji) {</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// // assuming emoji has been set already</span>
     <span class="doccomment">/// println!(&quot;Direct link to emoji image: {}&quot;, emoji.url());</span>

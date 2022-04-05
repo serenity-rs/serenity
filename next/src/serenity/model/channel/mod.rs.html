@@ -586,25 +586,6 @@
 <span id="581">581</span>
 <span id="582">582</span>
 <span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to channels and types within channels.</span>
 
 <span class="kw">mod</span> <span class="ident">attachment</span>;
@@ -676,14 +657,8 @@
     <span class="doccomment">/// Basic usage:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;model&quot;, feature = &quot;cache&quot;))]</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # use serenity::{cache::Cache, model::id::ChannelId};</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   let cache = Cache::default();</span>
-    <span class="doccomment">/// #   let channel = ChannelId(0).to_channel_cached(&amp;cache).unwrap();</span>
+    <span class="doccomment">/// # use serenity::model::channel::Channel;</span>
+    <span class="doccomment">/// # fn run(channel: Channel) {</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// match channel.guild() {</span>
     <span class="doccomment">///     Some(guild_channel) =&gt; {</span>
@@ -713,14 +688,8 @@
     <span class="doccomment">/// Basic usage:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;model&quot;, feature = &quot;cache&quot;))]</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # use serenity::{cache::Cache, model::id::ChannelId};</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   let cache = Cache::default();</span>
-    <span class="doccomment">/// #   let channel = ChannelId(0).to_channel_cached(&amp;cache).unwrap();</span>
+    <span class="doccomment">/// # use serenity::model::channel::Channel;</span>
+    <span class="doccomment">/// # fn run(channel: Channel) {</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// match channel.private() {</span>
     <span class="doccomment">///     Some(private) =&gt; {</span>
@@ -750,14 +719,8 @@
     <span class="doccomment">/// Basic usage:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # #[cfg(all(feature = &quot;model&quot;, feature = &quot;cache&quot;))]</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # use serenity::{cache::Cache, model::id::ChannelId};</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   let cache = Cache::default();</span>
-    <span class="doccomment">/// #   let channel = ChannelId(0).to_channel_cached(&amp;cache).unwrap();</span>
+    <span class="doccomment">/// # use serenity::model::channel::Channel;</span>
+    <span class="doccomment">/// # fn run(channel: Channel) {</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// match channel.category() {</span>
     <span class="doccomment">///     Some(category) =&gt; {</span>
@@ -767,7 +730,6 @@
     <span class="doccomment">///         println!(&quot;It&#39;s not a category!&quot;);</span>
     <span class="doccomment">///     },</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelCategory</span><span class="op">&gt;</span> {

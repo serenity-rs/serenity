@@ -1212,36 +1212,6 @@
 <span id="1207">1207</span>
 <span id="1208">1208</span>
 <span id="1209">1209</span>
-<span id="1210">1210</span>
-<span id="1211">1211</span>
-<span id="1212">1212</span>
-<span id="1213">1213</span>
-<span id="1214">1214</span>
-<span id="1215">1215</span>
-<span id="1216">1216</span>
-<span id="1217">1217</span>
-<span id="1218">1218</span>
-<span id="1219">1219</span>
-<span id="1220">1220</span>
-<span id="1221">1221</span>
-<span id="1222">1222</span>
-<span id="1223">1223</span>
-<span id="1224">1224</span>
-<span id="1225">1225</span>
-<span id="1226">1226</span>
-<span id="1227">1227</span>
-<span id="1228">1228</span>
-<span id="1229">1229</span>
-<span id="1230">1230</span>
-<span id="1231">1231</span>
-<span id="1232">1232</span>
-<span id="1233">1233</span>
-<span id="1234">1234</span>
-<span id="1235">1235</span>
-<span id="1236">1236</span>
-<span id="1237">1237</span>
-<span id="1238">1238</span>
-<span id="1239">1239</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1541,15 +1511,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn run() {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// let amount = cache.private_channels().len();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// println!(&quot;There are {} private channels&quot;, amount);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">clone</span>()
@@ -1651,17 +1617,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // assuming the cache is in scope, e.g. via `Context`</span>
     <span class="doccomment">/// if let Some(guild) = cache.guild(7) {</span>
     <span class="doccomment">///     println!(&quot;Guild name: {}&quot;, guild.name);</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #   Ok(())</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
@@ -1817,13 +1778,9 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// # use serenity::model::id::{ChannelId, MessageId};</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
+    <span class="doccomment">/// # use serenity::model::channel::Message;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::new_with_token(&quot;DISCORD_TOKEN&quot;));</span>
-    <span class="doccomment">/// # let message = ChannelId(0).message(&amp;http, MessageId(1)).await.unwrap();</span>
-    <span class="doccomment">/// # let cache = Cache::default();</span>
+    <span class="doccomment">/// # async fn run(http: Http, cache: Cache, message: Message) {</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// let member = {</span>
     <span class="doccomment">///     let channel = match cache.guild_channel(message.channel_id) {</span>
@@ -1997,21 +1954,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
-    <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// # use serenity::model::id::{ChannelId, MessageId};</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
+    <span class="doccomment">/// # use serenity::model::channel::Message;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::new_with_token(&quot;DISCORD_TOKEN&quot;));</span>
-    <span class="doccomment">/// # let message = ChannelId(0).message(&amp;http, MessageId(1)).await?;</span>
-    <span class="doccomment">/// # let cache = Cache::default();</span>
+    <span class="doccomment">/// # fn run(cache: Cache, message: Message) {</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// match cache.message(message.channel_id, message.id) {</span>
     <span class="doccomment">///     Some(m) =&gt; assert_eq!(message.content, m.content),</span>
     <span class="doccomment">///     None =&gt; println!(&quot;No message found in cache.&quot;),</span>
     <span class="doccomment">/// };</span>
-    <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -2044,18 +1994,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #   let cache = Cache::default();</span>
+    <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // assuming the cache has been unlocked</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(channel) = cache.private_channel(7) {</span>
     <span class="doccomment">///     println!(&quot;The recipient is {}&quot;, channel.recipient);</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
@@ -2080,17 +2025,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use serenity::cache::Cache;</span>
-    <span class="doccomment">/// # use tokio::sync::RwLock;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// // assuming the cache is in scope, e.g. via `Context`</span>
     <span class="doccomment">/// if let Some(role) = cache.role(7, 77) {</span>
     <span class="doccomment">///     println!(&quot;Role with Id 77 is called {}&quot;, role.name);</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #     Ok(())</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">G</span>, <span class="ident">role_id</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>

@@ -532,10 +532,6 @@
 <span id="527">527</span>
 <span id="528">528</span>
 <span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
@@ -647,11 +643,8 @@
 <span class="doccomment">/// Sanitise an `@everyone` mention.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use std::sync::Arc;</span>
 <span class="doccomment">/// # use serenity::client::Cache;</span>
-<span class="doccomment">/// # use tokio::sync::RwLock;</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// # fn run() {</span>
 <span class="doccomment">/// # let cache = Cache::default();</span>
 <span class="doccomment">/// use serenity::utils::{content_safe, ContentSafeOptions};</span>
 <span class="doccomment">///</span>
@@ -659,7 +652,6 @@
 <span class="doccomment">/// let without_mention = content_safe(&amp;cache, &amp;with_mention, &amp;ContentSafeOptions::default());</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(&quot;@\u{200B}everyone&quot;.to_string(), without_mention);</span>
-<span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content_safe</span>(
     <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,

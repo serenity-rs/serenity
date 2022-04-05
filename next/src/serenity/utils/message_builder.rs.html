@@ -1524,25 +1524,6 @@
 <span id="1519">1519</span>
 <span id="1520">1520</span>
 <span id="1521">1521</span>
-<span id="1522">1522</span>
-<span id="1523">1523</span>
-<span id="1524">1524</span>
-<span id="1525">1525</span>
-<span id="1526">1526</span>
-<span id="1527">1527</span>
-<span id="1528">1528</span>
-<span id="1529">1529</span>
-<span id="1530">1530</span>
-<span id="1531">1531</span>
-<span id="1532">1532</span>
-<span id="1533">1533</span>
-<span id="1534">1534</span>
-<span id="1535">1535</span>
-<span id="1536">1536</span>
-<span id="1537">1537</span>
-<span id="1538">1538</span>
-<span id="1539">1539</span>
-<span id="1540">1540</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">default::Default</span>,
     <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
@@ -1566,19 +1547,9 @@
 <span class="doccomment">/// value:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use serde_json::{json, from_value};</span>
 <span class="doccomment">/// # use serenity::model::prelude::*;</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// # async fn run() {</span>
-<span class="doccomment">/// # let user = UserId(1);</span>
-<span class="doccomment">/// # let emoji = from_value::&lt;Emoji&gt;(json!({</span>
-<span class="doccomment">/// #     &quot;animated&quot;: false,</span>
-<span class="doccomment">/// #     &quot;id&quot;: EmojiId(2),</span>
-<span class="doccomment">/// #     &quot;name&quot;: &quot;test&quot;,</span>
-<span class="doccomment">/// #     &quot;managed&quot;: false,</span>
-<span class="doccomment">/// #     &quot;require_colons&quot;: true,</span>
-<span class="doccomment">/// #     &quot;roles&quot;: Vec::&lt;Role&gt;::new(),</span>
-<span class="doccomment">/// # })).unwrap();</span>
+<span class="doccomment">/// # fn run(user: UserId, emoji: Emoji) {</span>
 <span class="doccomment">/// #</span>
 <span class="doccomment">/// use serenity::utils::MessageBuilder;</span>
 <span class="doccomment">///</span>
@@ -1695,28 +1666,19 @@
     <span class="doccomment">/// Mention an emoji in a message&#39;s content:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use serenity::model::guild::Role;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// #</span>
     <span class="doccomment">/// # use serde_json::{json, from_value};</span>
     <span class="doccomment">/// # use serenity::model::guild::Emoji;</span>
     <span class="doccomment">/// # use serenity::model::id::EmojiId;</span>
     <span class="doccomment">/// # use serenity::utils::MessageBuilder;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # let emoji = from_value::&lt;Emoji&gt;(json!({</span>
-    <span class="doccomment">/// #     &quot;animated&quot;: false,</span>
     <span class="doccomment">/// #     &quot;id&quot;: EmojiId(302516740095606785),</span>
-    <span class="doccomment">/// #     &quot;managed&quot;: true,</span>
-    <span class="doccomment">/// #     &quot;name&quot;: &quot;smugAnimeFace&quot;.to_string(),</span>
-    <span class="doccomment">/// #     &quot;require_colons&quot;: true,</span>
-    <span class="doccomment">/// #     &quot;roles&quot;: Vec::&lt;Role&gt;::new(),</span>
+    <span class="doccomment">/// #     &quot;name&quot;: &quot;smugAnimeFace&quot;,</span>
     <span class="doccomment">/// # })).unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let message = MessageBuilder::new().push(&quot;foo &quot;).emoji(&amp;emoji).push(&quot;.&quot;).build();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(message, &quot;foo &lt;:smugAnimeFace:302516740095606785&gt;.&quot;);</span>
-    <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Display implementation]: crate::model::guild::Emoji#impl-Display</span>
