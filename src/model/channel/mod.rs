@@ -44,11 +44,12 @@ use crate::{json::prelude::*, model::prelude::*};
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Channel {
-    /// A [text], [voice], or [stage] channel within a [`Guild`].
+    /// A [text], [voice], [stage] or [directory] channel within a [`Guild`].
     ///
     /// [text]: ChannelType::Text
     /// [voice]: ChannelType::Voice
     /// [stage]: ChannelType::Stage
+    /// [directory]: ChannelType::Directory
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
@@ -231,7 +232,7 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 | 5 | 10 | 11 | 12 | 13 | 15 => from_value::<GuildChannel>(Value::from(v))
+            0 | 2 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value::<GuildChannel>(Value::from(v))
                 .map(Channel::Guild)
                 .map_err(DeError::custom),
             1 => from_value::<PrivateChannel>(Value::from(v))
@@ -300,6 +301,10 @@ pub enum ChannelType {
     PrivateThread = 12,
     /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
+    /// An indicator that the channel is a directory [`GuildChannel`] in a [hub].
+    ///
+    /// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
+    Directory = 14,
     /// An indicator that the channel is a forum [`GuildChannel`].
     #[cfg(feature = "unstable_discord_api")]
     Forum = 15,
@@ -317,6 +322,7 @@ enum_number!(ChannelType {
     PublicThread,
     PrivateThread,
     Stage,
+    Directory,
     #[cfg(feature = "unstable_discord_api")]
     Forum,
 });
@@ -334,6 +340,7 @@ impl ChannelType {
             ChannelType::PublicThread => "public_thread",
             ChannelType::PrivateThread => "private_thread",
             ChannelType::Stage => "stage",
+            ChannelType::Directory => "directory",
             #[cfg(feature = "unstable_discord_api")]
             ChannelType::Forum => "forum",
             ChannelType::Unknown => "unknown",
