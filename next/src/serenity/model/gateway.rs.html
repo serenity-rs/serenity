@@ -838,6 +838,11 @@
 <span id="833">833</span>
 <span id="834">834</span>
 <span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models pertaining to the gateway.</span>
 
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -1383,9 +1388,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Privileged Intents</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The intents [`GatewayIntents::GUILD_PRESENCES`] and [`GatewayIntents::GUILD_MEMBERS`]</span>
-    <span class="doccomment">/// are [Privileged Intents]. They need to be enabled in the</span>
-    <span class="doccomment">/// *developer portal*.</span>
+    <span class="doccomment">/// The intents [`GatewayIntents::GUILD_PRESENCES`], [`GatewayIntents::GUILD_MEMBERS`]</span>
+    <span class="doccomment">/// and [`GatewayIntents::MESSAGE_CONTENT`] are [Privileged Intents]. They need to be enabled in</span>
+    <span class="doccomment">/// the *developer portal*.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**:</span>
     <span class="doccomment">/// Once the bot is in 100 guilds or more, [the bot must be verified] in</span>
@@ -1511,6 +1516,11 @@
         <span class="doccomment">/// Enable message content in following gateway events:</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// - MESSAGE_CREATE</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// **Info**:</span>
+        <span class="doccomment">/// This intent is *privileged*.</span>
+        <span class="doccomment">/// In order to use it, you must head to your application in the</span>
+        <span class="doccomment">/// Developer Portal and enable the toggle for *Privileged Intents*.</span>
         <span class="kw">const</span> <span class="ident">MESSAGE_CONTENT</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
         <span class="doccomment">/// Enable following gateway events:</span>
         <span class="doccomment">///</span>
