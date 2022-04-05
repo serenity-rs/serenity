@@ -54,14 +54,15 @@ version = "0.13"
 optional = true
 version = "1.0.5"
 
-[dependencies.time]
-optional = true
+[dependencies.dep_time]
+package = "time"
 version = "0.3.6"
 features = ["formatting", "parsing", "serde-well-known"]
 
 [dependencies.chrono]
 default-features = false
 features = ["clock", "serde"]
+optional = true
 version = "0.4.10"
 
 [dependencies.flate2]
@@ -131,6 +132,9 @@ optional = true
 version = "0.12"
 optional = true
 
+[dependencies.cfg-if]
+version = "1.0.0"
+
 [dev-dependencies.http_crate]
 version = "0.2"
 package = "http"
@@ -150,6 +154,7 @@ default_native_tls = ["default_no_backend", "native_tls_backend"]
 default_no_backend = [
     "builder",
     "cache",
+    "chrono",
     "client",
     "framework",
     "gateway",
@@ -174,6 +179,7 @@ standard_framework = ["framework", "uwl", "levenshtein", "command_attr", "static
 unstable_discord_api = []
 utils = ["base64"]
 voice = ["client", "model"]
+time = []
 
 # Enables simd accelerated parsing
 simdjson = ["simd-json"]

@@ -43,6 +43,8 @@ jobs:
             features: model http rustls_backend
           - name: time
             features: time
+          - name: chrono
+            features: chrono
           - name: unstable Discord API features
             features: default unstable_discord_api
             dont-test: true

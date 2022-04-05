@@ -175,6 +175,7 @@ list all but that:
 default-features = false
 features = [
     "builder",
+    "chrono",
     "client",
     "framework",
     "gateway",
