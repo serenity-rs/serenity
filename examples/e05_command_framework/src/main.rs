@@ -367,7 +367,7 @@ async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         ContentSafeOptions::default().clean_channel(false).clean_role(false)
     };
 
-    let content = content_safe(&ctx.cache, &args.rest(), &settings);
+    let content = content_safe(&ctx.cache, &args.rest(), &settings, &msg.mentions);
 
     msg.channel_id.say(&ctx.http, &content).await?;
 
