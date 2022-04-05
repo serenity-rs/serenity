@@ -20,6 +20,7 @@ pub use super::guild::*;
 pub use super::id::*;
 pub use super::interactions::*;
 pub use super::invite::*;
+pub use super::mention::*;
 pub use super::misc::*;
 pub use super::oauth2::*;
 pub use super::permissions::*;

@@ -32,7 +32,7 @@ use crate::json;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::json::to_string;
-use crate::model::misc::Mentionable;
+use crate::model::mention::Mentionable;
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
