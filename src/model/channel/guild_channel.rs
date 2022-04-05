@@ -224,7 +224,6 @@ impl GuildChannel {
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
-    /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #     let http = Arc::new(Http::default());
@@ -257,7 +256,6 @@ impl GuildChannel {
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
-    /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let http = Arc::new(Http::default());

@@ -109,11 +109,8 @@ impl Default for ContentSafeOptions {
 /// Sanitise an `@everyone` mention.
 ///
 /// ```rust
-/// # use std::sync::Arc;
 /// # use serenity::client::Cache;
-/// # use tokio::sync::RwLock;
 /// #
-/// # fn run() {
 /// # let cache = Cache::default();
 /// use serenity::utils::{content_safe, ContentSafeOptions};
 ///
@@ -121,7 +118,6 @@ impl Default for ContentSafeOptions {
 /// let without_mention = content_safe(&cache, &with_mention, &ContentSafeOptions::default());
 ///
 /// assert_eq!("@\u{200B}everyone".to_string(), without_mention);
-/// # }
 /// ```
 pub fn content_safe(
     cache: impl AsRef<Cache>,

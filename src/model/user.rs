@@ -198,10 +198,8 @@ impl CurrentUser {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
-    /// # async fn run() {
+    /// # fn run() {
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
     /// # let cache = Cache::default();
     /// // assuming the cache has been unlocked
