@@ -71,6 +71,29 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgumentConvert</span>;
@@ -78,25 +101,37 @@
 
 <span class="doccomment">/// Error that can be returned from [`Role::convert`].</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RoleParseError</span> {
     <span class="doccomment">/// When the operation was invoked outside a guild.</span>
     <span class="ident">NotInGuild</span>,
     <span class="doccomment">/// When the guild&#39;s roles were not found in cache.</span>
     <span class="ident">NotInCache</span>,
+    <span class="doccomment">/// HTTP error while retrieving guild roles.</span>
+    <span class="ident">Http</span>(<span class="ident">SerenityError</span>),
     <span class="doccomment">/// The provided channel string failed to parse, or the parsed result cannot be found in the</span>
     <span class="doccomment">/// cache.</span>
     <span class="ident">NotFoundOrMalformed</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">RoleParseError</span> {}
+<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">RoleParseError</span> {
+    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">RoleParseError::NotInGuild</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">RoleParseError::NotInCache</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">RoleParseError::Http</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="ident">RoleParseError::NotFoundOrMalformed</span> =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RoleParseError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident"><span class="self">Self</span>::NotInGuild</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Must invoke this operation in a guild&quot;</span>),
             <span class="ident"><span class="self">Self</span>::NotInCache</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Guild&#39;s roles were not found in cache&quot;</span>),
+            <span class="ident"><span class="self">Self</span>::Http</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Failed to retrieve roles via HTTP&quot;</span>),
             <span class="ident"><span class="self">Self</span>::NotFoundOrMalformed</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role not found or unknown format&quot;</span>),
         }
     }
@@ -110,7 +145,6 @@
 <span class="doccomment">/// 1. Lookup by ID</span>
 <span class="doccomment">/// 2. [Lookup by mention](`crate::utils::parse_role`).</span>
 <span class="doccomment">/// 3. Lookup by name (case-insensitive)</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">ArgumentConvert</span> <span class="kw">for</span> <span class="ident">Role</span> {
     <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">RoleParseError</span>;
@@ -121,19 +155,31 @@
         <span class="ident">_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
         <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">ctx</span>
-            .<span class="ident">cache</span>
-            .<span class="ident">guild_roles</span>(<span class="ident">guild_id</span>.<span class="ident">ok_or</span>(<span class="ident">RoleParseError::NotInGuild</span>)<span class="question-mark">?</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">RoleParseError::NotInCache</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">guild_id</span>.<span class="ident">ok_or</span>(<span class="ident">RoleParseError::NotInGuild</span>)<span class="question-mark">?</span>;
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guild_roles</span>(<span class="ident">guild_id</span>).<span class="ident">ok_or</span>(<span class="ident">RoleParseError::NotInCache</span>)<span class="question-mark">?</span>;
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
+        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">http</span>.<span class="ident">get_guild_roles</span>(<span class="ident">guild_id</span>.<span class="number">0</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">RoleParseError::Http</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role_id</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::utils::parse_role</span>(<span class="ident">s</span>)) {
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">role_id</span>)) {
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">role</span>.<span class="ident">clone</span>());
+            }
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="ident">role</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">role_id</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">role</span>.<span class="ident">clone</span>());
             }
         }
 
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">s</span>)) {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">role</span>.<span class="ident">clone</span>());
+        }
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">s</span>)) {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">role</span>);
         }
 
         <span class="prelude-val">Err</span>(<span class="ident">RoleParseError::NotFoundOrMalformed</span>)
