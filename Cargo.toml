@@ -179,7 +179,7 @@ voice = ["client", "model"]
 simdjson = ["simd-json"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
-tempcaching = ["cache", "moka"]
+temp_cache = ["cache", "moka"]
 
 # Backends to pick from:
 # - Rustls Backends

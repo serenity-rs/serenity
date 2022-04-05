@@ -394,7 +394,7 @@ impl ChannelId {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
     /// required permissions the HTTP-request will be issued. Additionally, you might want to
-    /// enable the `tempcaching` feature to cache channel data retrieved by this function for a
+    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
     /// short duration.
     #[allow(clippy::missing_errors_doc)]
     #[inline]
@@ -409,7 +409,8 @@ impl ChannelId {
         }
 
         let channel = cache_http.http().get_channel(self.0).await?;
-        #[cfg(all(feature = "cache", feature = "tempcaching"))]
+
+        #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
                 if let Channel::Guild(guild_channel) = &channel {
@@ -417,6 +418,7 @@ impl ChannelId {
                 }
             }
         }
+
         Ok(channel)
     }
 

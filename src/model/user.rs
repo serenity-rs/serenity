@@ -1134,7 +1134,7 @@ impl UserId {
     ///
     /// **Note**: If the cache is not enabled, REST API will be used only.
     ///
-    /// **Note**: If the cache is enabled, you might want to enable the `tempcaching` feature to
+    /// **Note**: If the cache is enabled, you might want to enable the `temp_cache` feature to
     /// cache user data retrieved by this function for a short duration.
     ///
     /// # Errors
@@ -1159,12 +1159,14 @@ impl UserId {
         }
 
         let user = cache_http.http().get_user(self.0).await?;
-        #[cfg(all(feature = "cache", feature = "tempcaching"))]
+
+        #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
                 cache.temp_users.insert(user.id, user.clone());
             }
         }
+
         Ok(user)
     }
 }
