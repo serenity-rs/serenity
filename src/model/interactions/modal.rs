@@ -342,15 +342,11 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             .and_then(ModalSubmitInteractionData::deserialize)
             .map_err(DeError::custom)?;
 
-        let guild_id = match map.contains_key("guild_id") {
-            true => Some(
-                map.remove("guild_id")
-                    .ok_or_else(|| DeError::custom("expected guild_id"))
-                    .and_then(GuildId::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let guild_id = map
+            .remove("guild_id")
+            .map(GuildId::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         let channel_id = map
             .remove("channel_id")
@@ -358,34 +354,18 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             .and_then(ChannelId::deserialize)
             .map_err(DeError::custom)?;
 
-        let member = match map.contains_key("member") {
-            true => Some(
-                map.remove("member")
-                    .ok_or_else(|| DeError::custom("expected member"))
-                    .and_then(Member::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let member =
+            map.remove("member").map(Member::deserialize).transpose().map_err(DeError::custom)?;
 
-        let user = match map.contains_key("user") {
-            true => map
-                .remove("user")
-                .ok_or_else(|| DeError::custom("expected user"))
-                .and_then(User::deserialize)
-                .map_err(DeError::custom)?,
-            false => member.as_ref().expect("expected user or member").user.clone(),
-        };
+        let user =
+            map.remove("user").map(User::deserialize).transpose().map_err(DeError::custom)?;
 
-        let message = match map.contains_key("message") {
-            true => Some(
-                map.remove("message")
-                    .ok_or_else(|| DeError::custom("expected message"))
-                    .and_then(Message::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let user = user
+            .or_else(|| member.as_ref().map(|m| m.user.clone()))
+            .ok_or_else(|| DeError::custom("expected user or member"))?;
+
+        let message =
+            map.remove("message").map(Message::deserialize).transpose().map_err(DeError::custom)?;
 
         let token = map
             .remove("token")
@@ -399,15 +379,11 @@ impl<'de> Deserialize<'de> for ModalSubmitInteraction {
             .and_then(u8::deserialize)
             .map_err(DeError::custom)?;
 
-        let guild_locale = match map.contains_key("guild_locale") {
-            true => Some(
-                map.remove("guild_locale")
-                    .ok_or_else(|| DeError::custom("expected guild_locale"))
-                    .and_then(String::deserialize)
-                    .map_err(DeError::custom)?,
-            ),
-            false => None,
-        };
+        let guild_locale = map
+            .remove("guild_locale")
+            .map(String::deserialize)
+            .transpose()
+            .map_err(DeError::custom)?;
 
         let locale = map
             .remove("locale")
