@@ -168,29 +168,8 @@ mentionable!(value:
     Emoji, (value.id, value.animated);
 );
 
-#[cfg(all(feature = "model", feature = "utils"))]
-#[derive(Debug)]
-#[non_exhaustive]
-pub enum UserParseError {
-    InvalidUsername,
-    Rest(Box<Error>),
-}
-
-#[cfg(all(feature = "model", feature = "utils"))]
-impl fmt::Display for UserParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            UserParseError::InvalidUsername => f.write_str("invalid username"),
-            UserParseError::Rest(_) => f.write_str("could not fetch"),
-        }
-    }
-}
-
-#[cfg(all(feature = "model", feature = "utils"))]
-impl StdError for UserParseError {}
-
 macro_rules! impl_from_str {
-    (id: $($id:ident, $err:ident, $parse_function:ident;)*) => {
+    ($($id:ident, $err:ident, $parse_function:ident;)+) => {
         $(
             #[cfg(all(feature = "model", feature = "utils"))]
             #[derive(Debug)]
@@ -201,9 +180,7 @@ macro_rules! impl_from_str {
             #[cfg(all(feature = "model", feature = "utils"))]
             impl fmt::Display for $err {
                 fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    match self {
-                        $err::InvalidFormat => f.write_str("invalid id format"),
-                    }
+                    f.write_str("invalid id format")
                 }
             }
 
@@ -225,41 +202,12 @@ macro_rules! impl_from_str {
             }
         )*
     };
-
-    (struct: $($struct:ty, $id:tt, $err:ident, $invalid_variant:tt, $parse_fn:ident, $desc:expr;)*) => {
-        $(
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            #[derive(Debug)]
-            pub enum $err {
-                NotPresentInCache,
-                $invalid_variant,
-            }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl fmt::Display for $err {
-                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                    match self {
-                        $err::NotPresentInCache => f.write_str("not present in cache"),
-                        $err::$invalid_variant => f.write_str($desc),
-                    }
-                }
-            }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl StdError for $err {}
-        )*
-    };
 }
 
-impl_from_str! { id:
+impl_from_str! {
     UserId, UserIdParseError, parse_username;
     RoleId, RoleIdParseError, parse_role;
     ChannelId, ChannelIdParseError, parse_channel;
-}
-
-impl_from_str! { struct:
-    Channel, ChannelId, ChannelParseError, InvalidChannel, parse_channel, "invalid channel";
-    Role, RoleId, RoleParseError, InvalidRole, parse_role, "invalid role";
 }
 
 /// A version of an emoji used only when solely the animated state, Id, and name are known.
