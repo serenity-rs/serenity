@@ -449,58 +449,6 @@
 <span id="444">444</span>
 <span id="445">445</span>
 <span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
@@ -671,29 +619,8 @@
     <span class="ident">Emoji</span>, (<span class="ident">value</span>.<span class="ident">id</span>, <span class="ident">value</span>.<span class="ident">animated</span>);
 );
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UserParseError</span> {
-    <span class="ident">InvalidUsername</span>,
-    <span class="ident">Rest</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>),
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">UserParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">UserParseError::InvalidUsername</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid username&quot;</span>),
-            <span class="ident">UserParseError::Rest</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;could not fetch&quot;</span>),
-        }
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">UserParseError</span> {}
-
 <span class="macro">macro_rules!</span> <span class="ident">impl_from_str</span> {
-    (<span class="ident">id</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_function</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) =&gt; {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_function</span>:<span class="ident">ident</span>;)<span class="op">+</span>) =&gt; {
         $(
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
             <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -704,9 +631,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
             <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span> {
                 <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                    <span class="kw">match</span> <span class="self">self</span> {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err::InvalidFormat</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid id format&quot;</span>),
-                    }
+                    <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid id format&quot;</span>)
                 }
             }
 
@@ -728,41 +653,12 @@
             }
         )<span class="op">*</span>
     };
-
-    (<span class="kw">struct</span>: $(<span class="macro-nonterminal">$</span><span class="kw">struct</span>:<span class="macro-nonterminal">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">invalid_variant</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_fn</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) =&gt; {
-        $(
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-            <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span> {
-                <span class="ident">NotPresentInCache</span>,
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">invalid_variant</span>,
-            }
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-            <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span> {
-                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                    <span class="kw">match</span> <span class="self">self</span> {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err::NotPresentInCache</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;not present in cache&quot;</span>),
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">invalid_variant</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">desc</span>),
-                    }
-                }
-            }
-
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-            <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">err</span> {}
-        )<span class="op">*</span>
-    };
 }
 
-<span class="macro">impl_from_str!</span> { <span class="ident">id</span>:
+<span class="macro">impl_from_str!</span> {
     <span class="ident">UserId</span>, <span class="ident">UserIdParseError</span>, <span class="ident">parse_username</span>;
     <span class="ident">RoleId</span>, <span class="ident">RoleIdParseError</span>, <span class="ident">parse_role</span>;
     <span class="ident">ChannelId</span>, <span class="ident">ChannelIdParseError</span>, <span class="ident">parse_channel</span>;
-}
-
-<span class="macro">impl_from_str!</span> { <span class="kw">struct</span>:
-    <span class="ident">Channel</span>, <span class="ident">ChannelId</span>, <span class="ident">ChannelParseError</span>, <span class="ident">InvalidChannel</span>, <span class="ident">parse_channel</span>, <span class="string">&quot;invalid channel&quot;</span>;
-    <span class="ident">Role</span>, <span class="ident">RoleId</span>, <span class="ident">RoleParseError</span>, <span class="ident">InvalidRole</span>, <span class="ident">parse_role</span>, <span class="string">&quot;invalid role&quot;</span>;
 }
 
 <span class="doccomment">/// A version of an emoji used only when solely the animated state, Id, and name are known.</span>
