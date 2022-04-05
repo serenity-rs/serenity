@@ -1,7 +1,7 @@
 //! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
-#[cfg(all(feature = "client", feature = "cache"))]
+#[cfg(feature = "client")]
 mod argument_convert;
 mod colour;
 #[cfg(feature = "cache")]
@@ -11,7 +11,7 @@ mod message_builder;
 
 pub mod token;
 
-#[cfg(all(feature = "client", feature = "cache"))]
+#[cfg(feature = "client")]
 pub use argument_convert::*;
 #[cfg(feature = "cache")]
 pub use content_safe::*;
