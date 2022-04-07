@@ -78,7 +78,7 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
 ) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
     let mut options = Vec::deserialize(deserializer)?;
 
-    for option in options.iter_mut() {
+    for option in &mut options {
         loop_resolved(option, resolved);
     }
 
@@ -160,7 +160,7 @@ fn loop_resolved(
         options.resolved = try_resolve(value, options.kind, resolved);
     }
 
-    for option in options.options.iter_mut() {
+    for option in &mut options.options {
         loop_resolved(option, resolved);
     }
 }
