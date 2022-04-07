@@ -551,7 +551,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                 });
             }
 
-            match nested_group_command_search(
+            if let Ok(found) = nested_group_command_search(
                 ctx,
                 msg,
                 group.options.sub_groups,
@@ -562,8 +562,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
             )
             .await
             {
-                Ok(found) => return Ok(found),
-                Err(()) => (),
+                return Ok(found);
             }
         }
 
