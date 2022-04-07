@@ -1130,12 +1130,6 @@
 <span id="1125">1125</span>
 <span id="1126">1126</span>
 <span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1664,15 +1658,9 @@
             .<span class="ident">and_then</span>(<span class="ident">ApplicationCommandType::deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">target_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">kind</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ApplicationCommandType::ChatInput</span> {
-            <span class="prelude-val">Some</span>(
-                <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;target_id&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError::custom</span>(<span class="string">&quot;expected resolved&quot;</span>))
-                    .<span class="ident">and_then</span>(<span class="ident">TargetId::deserialize</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
-            )
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+        <span class="kw">let</span> <span class="ident">target_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;target_id&quot;</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">TargetId</span><span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">id</span>).<span class="ident">map_err</span>(<span class="ident">DeError::custom</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
