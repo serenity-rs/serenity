@@ -526,15 +526,9 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             .and_then(ApplicationCommandType::deserialize)
             .map_err(DeError::custom)?;
 
-        let target_id = if kind != ApplicationCommandType::ChatInput {
-            Some(
-                map.remove("target_id")
-                    .ok_or_else(|| DeError::custom("expected resolved"))
-                    .and_then(TargetId::deserialize)
-                    .map_err(DeError::custom)?,
-            )
-        } else {
-            None
+        let target_id = match map.remove("target_id") {
+            Some(id) => Option::<TargetId>::deserialize(id).map_err(DeError::custom)?,
+            None => None,
         };
 
         Ok(Self {
