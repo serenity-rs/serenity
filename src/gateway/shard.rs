@@ -808,14 +808,14 @@ impl Shard {
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
-    Ok(create_rustls_client(url).await?)
+    create_rustls_client(url).await
 }
 
 #[cfg(feature = "native_tls_backend_marker")]
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
-    Ok(create_native_tls_client(url).await?)
+    create_native_tls_client(url).await
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {
