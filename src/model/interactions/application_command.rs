@@ -477,13 +477,13 @@ impl ApplicationCommandInteractionData {
                 let user = self.resolved.users.get(&user_id).cloned()?;
                 let member = self.resolved.members.get(&user_id).cloned();
 
-                Some(ResolvedTarget::User(user, member))
+                Some(ResolvedTarget::User(user, member.map(Box::new)))
             },
             (ApplicationCommandType::Message, Some(id)) => {
                 let message_id = id.to_message_id();
                 let message = self.resolved.messages.get(&message_id).cloned()?;
 
-                Some(ResolvedTarget::Message(message))
+                Some(ResolvedTarget::Message(Box::new(message)))
             },
             _ => None,
         }
@@ -553,8 +553,8 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ResolvedTarget {
-    User(User, Option<PartialMember>),
-    Message(Message),
+    User(User, Option<Box<PartialMember>>),
+    Message(Box<Message>),
 }
 
 /// The resolved data of a command data interaction payload.
