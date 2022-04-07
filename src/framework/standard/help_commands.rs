@@ -1464,7 +1464,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
             result,
             "**{}**: {}",
             help_options.sub_commands_label,
-            format!("`{}`", command.sub_commands.join("`, `"))
+            format_args!("`{}`", command.sub_commands.join("`, `"))
         );
     }
 

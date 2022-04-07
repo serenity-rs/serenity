@@ -84,14 +84,14 @@ impl EventFilter {
     /// to the constraints and the limits are not reached yet.
     pub(crate) fn send_event(&mut self, event: &mut LazyArc<'_, Event>) -> bool {
         // Only events with matching types count towwards the filtered limit.
-        if !self.is_matching_event_type(&event) {
+        if !self.is_matching_event_type(event) {
             return !self.sender.is_closed();
         }
 
         if self.is_passing_constraints(event) {
             self.collected += 1;
 
-            if let Err(_) = self.sender.send(event.as_arc()) {
+            if self.sender.send(event.as_arc()).is_err() {
                 return false;
             }
         }

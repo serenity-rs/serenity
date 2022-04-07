@@ -374,10 +374,7 @@ impl<'de> Deserialize<'de> for Activity {
             .and_then(|v| ActivityType::deserialize(v).ok())
             .unwrap_or(ActivityType::Playing);
 
-        let name = map
-            .remove("name")
-            .and_then(|v| String::deserialize(v).ok())
-            .unwrap_or_else(String::new);
+        let name = map.remove("name").and_then(|v| String::deserialize(v).ok()).unwrap_or_default();
 
         let party = match map.remove("party") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
