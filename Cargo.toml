@@ -108,7 +108,7 @@ version = "0.5"
 version = "1"
 default-features = true
 optional = true
-features = ["fs", "macros", "rt", "sync", "time", "tracing"]
+features = ["fs", "macros", "rt", "sync", "time"]
 
 # Tokio v0.2
 [dependencies.tokio_compat]
@@ -163,6 +163,7 @@ standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 unstable_discord_api = []
 utils = ["base64"]
 voice = ["client", "model"]
+tokio_task_builder = ["tokio/tracing"]
 
 # Backends to pick from:
 # - Rustls Backends
