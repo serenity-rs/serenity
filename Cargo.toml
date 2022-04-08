@@ -108,7 +108,7 @@ version = "0.5"
 version = "1"
 default-features = true
 optional = true
-features = ["fs", "macros", "rt", "sync", "time"]
+features = ["fs", "macros", "rt", "sync", "time", "tracing"]
 
 # Tokio v0.2
 [dependencies.tokio_compat]
