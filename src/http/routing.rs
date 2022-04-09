@@ -505,7 +505,7 @@ impl Route {
         limit: u8,
         after: Option<u64>,
     ) -> String {
-        let mut uri = api!(
+        let mut url = api!(
             "/channels/{}/messages/{}/reactions/{}?limit={}",
             channel_id,
             message_id,
@@ -514,10 +514,10 @@ impl Route {
         );
 
         if let Some(after) = after {
-            let _ = write!(uri, "&after={}", after);
+            let _ = write!(url, "&after={}", after);
         }
 
-        uri
+        url
     }
 
     pub fn channel_messages(channel_id: u64, query: Option<&str>) -> String {

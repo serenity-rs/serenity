@@ -414,7 +414,7 @@ impl Future for ClientBuilder {
             });
 
             self.fut = Some(Box::pin(async move {
-                let url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+                let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 
                 let (shard_manager, shard_manager_worker) = {
                     ShardManager::new(ShardManagerOptions {
@@ -428,7 +428,7 @@ impl Future for ClientBuilder {
                         shard_total: 0,
                         #[cfg(feature = "voice")]
                         voice_manager: &voice_manager,
-                        ws_url: &url,
+                        ws_url: &ws_url,
                         cache_and_http: &cache_and_http,
                         intents,
                     })
@@ -436,7 +436,7 @@ impl Future for ClientBuilder {
                 };
 
                 Ok(Client {
-                    ws_uri: url,
+                    ws_url,
                     data,
                     shard_manager,
                     shard_manager_worker,
@@ -669,14 +669,14 @@ pub struct Client {
     /// connections.
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
-    /// URI that the client's shards will use to connect to the gateway.
+    /// URL that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
     /// for debugging.
     ///
     /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
     /// value available.
-    pub ws_uri: Arc<Mutex<String>>,
+    pub ws_url: Arc<Mutex<String>>,
     /// A container for an optional cache and HTTP client.
     /// It also contains the cache update timeout.
     pub cache_and_http: Arc<CacheAndHttp>,
