@@ -3829,12 +3829,12 @@ impl Http {
     }
 }
 
-#[cfg(not(feature = "native_tls_backend_marker"))]
+#[cfg(not(feature = "native_tls_backend"))]
 fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
     builder.use_rustls_tls()
 }
 
-#[cfg(feature = "native_tls_backend_marker")]
+#[cfg(feature = "native_tls_backend")]
 fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
     builder.use_native_tls()
 }

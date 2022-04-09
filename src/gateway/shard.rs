@@ -23,9 +23,9 @@ use super::{
 use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, close_codes};
 use crate::internal::prelude::*;
-#[cfg(feature = "native_tls_backend_marker")]
+#[cfg(feature = "native_tls_backend")]
 use crate::internal::ws_impl::create_native_tls_client;
-#[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
 use crate::model::{
     event::{Event, GatewayEvent},
@@ -806,14 +806,14 @@ impl Shard {
     }
 }
 
-#[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
     Ok(create_rustls_client(url).await?)
 }
 
-#[cfg(feature = "native_tls_backend_marker")]
+#[cfg(feature = "native_tls_backend")]
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
