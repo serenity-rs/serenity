@@ -74,7 +74,6 @@ pub struct ClientBuilder {
     http: Option<Http>,
     fut: Option<BoxFuture<'static, Result<Client>>>,
     intents: GatewayIntents,
-    application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
     cache_settings: Option<CacheSettings>,
     #[cfg(feature = "framework")]
@@ -93,7 +92,6 @@ impl ClientBuilder {
             http: Some(http),
             fut: None,
             intents: GatewayIntents::non_privileged(),
-            application_id: None,
             #[cfg(feature = "cache")]
             cache_settings: Some(CacheSettings::new()),
             #[cfg(feature = "framework")]
@@ -142,10 +140,8 @@ impl ClientBuilder {
     }
 
     /// Sets the application id.
-    pub fn application_id(mut self, application_id: u64) -> Self {
-        self.application_id = Some(ApplicationId(application_id));
-
-        if let Some(http) = &mut self.http {
+    pub fn application_id(self, application_id: u64) -> Self {
+        if let Some(http) = &self.http {
             http.set_application_id(application_id);
         }
 
@@ -154,7 +150,7 @@ impl ClientBuilder {
 
     /// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
     pub fn get_application_id(&self) -> Option<ApplicationId> {
-        self.application_id
+        self.http.as_ref().and_then(|h| h.application_id().map(ApplicationId))
     }
 
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
