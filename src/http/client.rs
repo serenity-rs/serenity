@@ -32,7 +32,7 @@ use crate::{constants, utils};
 /// A builder for the underlying [`Http`] client that performs requests
 /// to Discord's HTTP API. If you do not need to use a proxy or do not
 /// need to disable the rate limiter, you can use [`Http::new`] or
-/// [`Http::new_with_token`] instead.
+/// [`Http::new_with_application_id`] instead.
 ///
 /// ## Example
 ///
