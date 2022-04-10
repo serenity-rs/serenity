@@ -975,36 +975,6 @@
 <span id="970">970</span>
 <span id="971">971</span>
 <span id="972">972</span>
-<span id="973">973</span>
-<span id="974">974</span>
-<span id="975">975</span>
-<span id="976">976</span>
-<span id="977">977</span>
-<span id="978">978</span>
-<span id="979">979</span>
-<span id="980">980</span>
-<span id="981">981</span>
-<span id="982">982</span>
-<span id="983">983</span>
-<span id="984">984</span>
-<span id="985">985</span>
-<span id="986">986</span>
-<span id="987">987</span>
-<span id="988">988</span>
-<span id="989">989</span>
-<span id="990">990</span>
-<span id="991">991</span>
-<span id="992">992</span>
-<span id="993">993</span>
-<span id="994">994</span>
-<span id="995">995</span>
-<span id="996">996</span>
-<span id="997">997</span>
-<span id="998">998</span>
-<span id="999">999</span>
-<span id="1000">1000</span>
-<span id="1001">1001</span>
-<span id="1002">1002</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1032,8 +1002,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">event_handler</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">boxed::Box</span>,
     <span class="ident">future::Future</span>,
@@ -1085,8 +1053,6 @@
     <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
     <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="ident">cache_settings</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CacheSettings</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
     <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -1105,8 +1071,6 @@
             <span class="ident">fut</span>: <span class="prelude-val">None</span>,
             <span class="ident">intents</span>: <span class="ident">GatewayIntents::non_privileged</span>(),
             <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-            <span class="ident">timeout</span>: <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident">cache_settings</span>: <span class="prelude-val">Some</span>(<span class="ident">CacheSettings::new</span>()),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
@@ -1193,27 +1157,6 @@
         <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">TypeMap::new</span>).<span class="ident">insert</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>);
 
         <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Sets how long - if wanted to begin with - a cache update shall</span>
-    <span class="doccomment">/// be attempted for. After the `timeout` ran out, the update will be</span>
-    <span class="doccomment">/// skipped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, a cache update will never timeout and potentially</span>
-    <span class="doccomment">/// cause a deadlock.</span>
-    <span class="doccomment">/// A timeout however, will invalidate the cache.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_update_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timeout</span>);
-
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the cache update timeout, if already initialized. See [`Self::cache_update_timeout`]</span>
-    <span class="doccomment">/// for more info.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_cache_update_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">timeout</span>
     }
 
     <span class="doccomment">/// Sets the settings of the cache.</span>
@@ -1415,8 +1358,6 @@
             <span class="kw">let</span> <span class="ident">cache_and_http</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">CacheAndHttp</span> {
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
                 <span class="ident">cache</span>: <span class="ident">Arc::new</span>(<span class="ident">Cache::new_with_settings</span>(<span class="self">self</span>.<span class="ident">cache_settings</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>())),
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-                <span class="ident">update_cache_timeout</span>: <span class="self">self</span>.<span class="ident">timeout</span>.<span class="ident">take</span>(),
                 <span class="ident">http</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>),
             });
 
@@ -1685,7 +1626,6 @@
     <span class="doccomment">/// value available.</span>
     <span class="kw">pub</span> <span class="ident">ws_uri</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A container for an optional cache and HTTP client.</span>
-    <span class="doccomment">/// It also contains the cache update timeout.</span>
     <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
 }
 
