@@ -370,11 +370,6 @@ impl Future for ClientBuilder {
             let intents = self.intents;
             let http = Arc::new(self.http.take().unwrap());
 
-            // TODO: It should not be required for all users of serenity to set the application_id or get a panic.
-            if http.application_id == 0 {
-                panic!("Please provide an Application Id in order to use interactions features.");
-            }
-
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();
 

@@ -76,6 +76,8 @@ pub enum Error {
     InvalidScheme,
     /// When using a proxy with an invalid port.
     InvalidPort,
+    /// When an application id was expected but missing.
+    ApplicationIdMissing,
 }
 
 impl Error {
@@ -165,6 +167,7 @@ impl fmt::Display for Error {
             Error::Request(_) => f.write_str("Error while sending HTTP request."),
             Error::InvalidScheme => f.write_str("Invalid Url scheme."),
             Error::InvalidPort => f.write_str("Invalid port."),
+            Error::ApplicationIdMissing => f.write_str("Application id was expected but missing."),
         }
     }
 }
