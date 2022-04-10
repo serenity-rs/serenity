@@ -1,8 +1,7 @@
-use std::str::FromStr;
-
 use crate::cache::Cache;
 use crate::model::channel::Channel;
-use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
+use crate::model::id::GuildId;
+use crate::model::mention::Mention;
 use crate::model::user::User;
 
 /// Struct that allows to alter [`content_safe`]'s behaviour.
@@ -138,25 +137,7 @@ pub fn content_safe(
     options: &ContentSafeOptions,
     users: &[User],
 ) -> String {
-    let mut content = s.as_ref().to_string();
-
-    if options.clean_role {
-        clean_roles(&cache, &mut content);
-    }
-
-    if options.clean_channel {
-        clean_channels(&cache, &mut content);
-    }
-
-    if options.clean_user {
-        clean_users(
-            &cache,
-            &mut content,
-            options.show_discriminator,
-            options.guild_reference,
-            users,
-        );
-    }
+    let mut content = clean_mentions(&cache, s, options, users);
 
     if options.clean_here {
         content = content.replace("@here", "@\u{200B}here");
@@ -169,160 +150,108 @@ pub fn content_safe(
     content
 }
 
-#[inline]
-fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
-    let mut progress = 0;
-
-    while let Some(mut mention_start) = s[progress..].find("<@&") {
-        mention_start += progress;
-
-        if let Some(mut mention_end) = s[mention_start..].find('>') {
-            mention_end += mention_start;
-            mention_start += "<@&".len();
-
-            if let Ok(id) = RoleId::from_str(&s[mention_start..mention_end]) {
-                let to_replace = format!("<@&{}>", &s[mention_start..mention_end]);
-
-                *s = if let Some(role) = id.to_role_cached(&cache) {
-                    s.replace(&to_replace, &format!("@{}", &role.name))
-                } else {
-                    s.replace(&to_replace, "@deleted-role")
-                };
-            } else {
-                let id = &s[mention_start..mention_end].to_string();
-
-                if !id.is_empty() && id.as_bytes().iter().all(u8::is_ascii_digit) {
-                    let to_replace = format!("<@&{}>", id);
-
-                    *s = s.replace(&to_replace, "@deleted-role");
-                } else {
-                    progress = mention_end;
-                }
-            }
-        } else {
-            break;
-        }
-    }
-}
-
-#[inline]
-fn clean_channels(cache: &impl AsRef<Cache>, s: &mut String) {
-    let mut progress = 0;
-
-    while let Some(mut mention_start) = s[progress..].find("<#") {
-        mention_start += progress;
-
-        if let Some(mut mention_end) = s[mention_start..].find('>') {
-            mention_end += mention_start;
-            mention_start += "<#".len();
-
-            if let Ok(id) = ChannelId::from_str(&s[mention_start..mention_end]) {
-                let to_replace = format!("<#{}>", &s[mention_start..mention_end]);
-
-                *s = if let Some(Channel::Guild(channel)) = id.to_channel_cached(&cache) {
-                    let replacement = format!("#{}", &channel.name);
-                    s.replace(&to_replace, &replacement)
-                } else {
-                    s.replace(&to_replace, "#deleted-channel")
-                };
-            } else {
-                let id = &s[mention_start..mention_end].to_string();
-
-                if !id.is_empty() && id.as_bytes().iter().all(u8::is_ascii_digit) {
-                    let to_replace = format!("<#{}>", id);
-
-                    *s = s.replace(&to_replace, "#deleted-channel");
-                } else {
-                    progress = mention_end;
-                }
-            }
-        } else {
-            break;
-        }
-    }
-}
-
-fn format_user(user: &User, show_discriminator: bool) -> String {
-    if show_discriminator {
-        format!("@{}#{:04}", user.name, user.discriminator)
-    } else {
-        format!("@{}", user.name)
-    }
-}
-
-#[inline]
-fn clean_users(
-    cache: &impl AsRef<Cache>,
-    s: &mut String,
-    show_discriminator: bool,
-    guild: Option<GuildId>,
+fn clean_mentions(
+    cache: impl AsRef<Cache>,
+    s: impl AsRef<str>,
+    options: &ContentSafeOptions,
     users: &[User],
-) {
-    let cache = cache.as_ref();
+) -> String {
+    let s = s.as_ref();
+    let mut content = String::with_capacity(s.len());
+    let mut brackets = s.match_indices(|c| c == '<' || c == '>').peekable();
     let mut progress = 0;
+    while let Some((idx1, b1)) = brackets.next() {
+        // Find inner-most pairs of angle brackets
+        if b1 == "<" {
+            if let Some(&(idx2, b2)) = brackets.peek() {
+                if b2 == ">" {
+                    content.push_str(&s[progress..idx1]);
+                    let mention_str = &s[idx1..=idx2];
 
-    while let Some(mut mention_start) = s[progress..].find("<@") {
-        mention_start += progress;
-
-        if let Some(mut mention_end) = s[mention_start..].find('>') {
-            mention_end += mention_start;
-            mention_start += "<@".len();
-
-            let has_exclamation =
-                if s[mention_start..].as_bytes().get(0).map_or(false, |c| *c == b'!') {
-                    mention_start += "!".len();
-
-                    true
-                } else {
-                    false
-                };
-
-            if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
-                let mut replacement = None;
-
-                if let Some(guild_id) = guild {
-                    if let Some(guild) = cache.guild(&guild_id) {
-                        if let Some(member) = guild.members.get(&id) {
-                            replacement = Some(if show_discriminator {
-                                format!("@{}", member.distinct())
+                    // Don't waste time parsing if we're not going to clean the mention anyway
+                    // NOTE: Emoji mentions aren't cleaned.
+                    let mut chars = mention_str.chars();
+                    chars.next();
+                    let should_parse = match chars.next() {
+                        Some('#') => options.clean_channel,
+                        Some('@') => {
+                            if let Some('&') = chars.next() {
+                                options.clean_role
                             } else {
-                                format!("@{}", member.display_name())
-                            });
+                                options.clean_user
+                            }
+                        },
+                        _ => false,
+                    };
+
+                    // I wish let_chains were stabilized :(
+                    let mut cleaned = false;
+                    if should_parse {
+                        // NOTE: numeric strings that are too large to fit into u64 will not parse
+                        // correctly and will be left unchanged.
+                        if let Ok(mention) = mention_str.parse() {
+                            content.push_str(&clean_mention(&cache, mention, options, users));
+                            cleaned = true;
                         }
                     }
-                }
-
-                let replacement = replacement.unwrap_or_else(|| {
-                    cache.user(id).map(|u| format_user(&u, show_discriminator)).unwrap_or_else(
-                        || {
-                            users
-                                .iter()
-                                .find(|u| u.id == id)
-                                .map(|u| format_user(u, show_discriminator))
-                                .unwrap_or_else(|| "@invalid-user".to_string())
-                        },
-                    )
-                });
-
-                let code_start = if has_exclamation { "<@!" } else { "<@" };
-                let to_replace = format!("{}{}>", code_start, &s[mention_start..mention_end]);
-
-                *s = s.replace(&to_replace, &replacement);
-            } else {
-                let id = &s[mention_start..mention_end].to_string();
-
-                if !id.is_empty() && id.as_bytes().iter().all(u8::is_ascii_digit) {
-                    let code_start = if has_exclamation { "<@!" } else { "<@" };
-                    let to_replace = format!("{}{}>", code_start, id);
-
-                    *s = s.replace(&to_replace, "@invalid-user");
-                } else {
-                    progress = mention_end;
+                    if !cleaned {
+                        content.push_str(mention_str);
+                    }
+                    progress = idx2 + 1;
                 }
             }
-        } else {
-            break;
         }
+    }
+    content.push_str(&s[progress..]);
+    content
+}
+
+fn clean_mention(
+    cache: impl AsRef<Cache>,
+    mention: Mention,
+    options: &ContentSafeOptions,
+    users: &[User],
+) -> String {
+    let cache = cache.as_ref();
+    match mention {
+        Mention::Channel(id) => {
+            if let Some(Channel::Guild(channel)) = id.to_channel_cached(&cache) {
+                format!("#{}", channel.name)
+            } else {
+                "#deleted-channel".to_string()
+            }
+        },
+        Mention::Role(id) => id
+            .to_role_cached(&cache)
+            .map_or_else(|| "@deleted-role".to_string(), |role| format!("@{}", role.name)),
+        Mention::User(id) => {
+            if let Some(guild_id) = options.guild_reference {
+                if let Some(guild) = cache.guild(&guild_id) {
+                    if let Some(member) = guild.members.get(&id) {
+                        return if options.show_discriminator {
+                            format!("@{}", member.distinct())
+                        } else {
+                            format!("@{}", member.display_name())
+                        };
+                    }
+                }
+            }
+
+            let get_username = |user: &User| {
+                if options.show_discriminator {
+                    format!("@{}", user.tag())
+                } else {
+                    format!("@{}", user.name)
+                }
+            };
+            cache
+                .user(id)
+                .as_ref()
+                .map(get_username)
+                .or_else(|| users.iter().find(|u| u.id == id).map(get_username))
+                .unwrap_or_else(|| "@invalid-user".to_string())
+        },
+        Mention::Emoji(_, _) => unreachable!(),
     }
 }
 
@@ -335,6 +264,7 @@ mod tests {
     use super::*;
     use crate::model::channel::*;
     use crate::model::guild::*;
+    use crate::model::id::{ChannelId, RoleId, UserId};
     use crate::model::user::User;
     use crate::model::{Permissions, Timestamp};
     use crate::utils::Colour;
@@ -480,7 +410,7 @@ mod tests {
         <@123invalid> <@> <@ ";
 
         let without_user_mentions = "@Crab#0000 @invalid-user @invalid-user @invalid-user \
-        @invalid-user @invalid-user @invalid-user <@!invalid> \
+        <@!123123123123123123123> @invalid-user @invalid-user <@!invalid> \
         <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
         <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
         <@123invalid> <@> <@ ";
@@ -553,10 +483,12 @@ mod tests {
 
         // Role mentions
         let with_role_mentions = "<@&> @deleted-role <@&9829> \
-        <@&333333333333333333> <@&000000000000000000>";
+        <@&333333333333333333> <@&000000000000000000> \
+        <@&111111111111111111111111111111> <@&<@&1234>";
 
         let without_role_mentions = "<@&> @deleted-role @deleted-role \
-        @ferris-club-member @deleted-role";
+        @ferris-club-member @deleted-role \
+        <@&111111111111111111111111111111> <@&@deleted-role";
 
         assert_eq!(without_role_mentions, content_safe(&cache, with_role_mentions, &options, &[]));
 

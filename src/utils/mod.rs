@@ -217,33 +217,6 @@ pub fn parse_channel(mention: impl AsRef<str>) -> Option<u64> {
     }
 }
 
-/// Retrieve the ID number out of a channel, role, or user mention.
-///
-/// If the mention is invalid, [`None`] is returned.
-///
-/// # Examples
-///
-/// ```rust
-/// use serenity::utils::parse_mention;
-///
-/// assert_eq!(parse_mention("<@136510335967297536>"), Some(136510335967297536));
-/// assert_eq!(parse_mention("<@&137235212097683456>"), Some(137235212097683456));
-/// assert_eq!(parse_mention("<#137234234728251392>"), Some(137234234728251392));
-/// ```
-pub fn parse_mention(mention: impl AsRef<str>) -> Option<u64> {
-    let mention = mention.as_ref();
-
-    if mention.starts_with("<@&") {
-        parse_role(mention)
-    } else if mention.starts_with("<@") || mention.starts_with("<@!") {
-        parse_username(mention)
-    } else if mention.starts_with("<#") {
-        parse_channel(mention)
-    } else {
-        None
-    }
-}
-
 /// Retrieves the animated state, name and Id from an emoji mention, in the form of an
 /// [`EmojiIdentifier`].
 ///

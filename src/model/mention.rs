@@ -1,6 +1,12 @@
+#[cfg(all(feature = "model", feature = "utils"))]
+use std::error::Error as StdError;
 use std::fmt;
+#[cfg(all(feature = "model", feature = "utils"))]
+use std::str::FromStr;
 
 use super::prelude::*;
+#[cfg(all(feature = "model", feature = "utils"))]
+use crate::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
@@ -85,8 +91,8 @@ pub trait Mentionable {
 #[derive(Debug, Clone, Copy)]
 pub enum Mention {
     Channel(ChannelId),
-    User(UserId),
     Role(RoleId),
+    User(UserId),
     Emoji(EmojiId, bool),
 }
 
@@ -103,8 +109,8 @@ macro_rules! mention {
 
 mention!(value:
     ChannelId, Mention::Channel(value);
-    UserId, Mention::User(value);
     RoleId, Mention::Role(value);
+    UserId, Mention::User(value);
     EmojiId, Mention::Emoji(value, false);
     (EmojiId, bool), Mention::Emoji(value.0, value.1);
 );
@@ -113,12 +119,49 @@ impl fmt::Display for Mention {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Mention::Channel(id) => f.write_fmt(format_args!("<#{}>", id.0)),
-            Mention::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
             Mention::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
+            Mention::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
             Mention::Emoji(id, animated) => {
                 f.write_fmt(format_args!("<{}:omitted:{}>", if animated { "a" } else { "" }, id.0,))
             },
         }
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+#[derive(Debug)]
+pub enum MentionParseError {
+    InvalidMention,
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl fmt::Display for MentionParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("invalid mention")
+    }
+}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl StdError for MentionParseError {}
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl FromStr for Mention {
+    type Err = MentionParseError;
+
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+        let m = if let Some(id) = utils::parse_channel(s) {
+            ChannelId(id).mention()
+        } else if let Some(id) = utils::parse_role(s) {
+            RoleId(id).mention()
+        } else if let Some(id) = utils::parse_username(s) {
+            UserId(id).mention()
+        } else if let Some(emoji_ident) = utils::parse_emoji(s) {
+            emoji_ident.mention()
+        } else {
+            return Err(MentionParseError::InvalidMention);
+        };
+
+        Ok(m)
     }
 }
 
@@ -156,6 +199,7 @@ mentionable!(value:
     User, value.id;
     Role, value.id;
     Emoji, (value.id, value.animated);
+    EmojiIdentifier, (value.id, value.animated);
 );
 
 #[cfg(feature = "utils")]
