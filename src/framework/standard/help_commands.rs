@@ -79,7 +79,6 @@ use crate::{
     cache::Cache,
     client::Context,
     framework::standard::CommonOptions,
-    http::CacheHttp,
     http::Http,
     model::channel::Message,
     model::id::{ChannelId, UserId},
@@ -188,16 +187,12 @@ pub enum CustomisedHelpData<'a> {
 /// Checks whether a user is member of required roles
 /// and given the required permissions.
 #[cfg(feature = "cache")]
-pub fn has_all_requirements(
-    cache_http: impl CacheHttp + AsRef<Cache>,
-    cmd: &CommandOptions,
-    msg: &Message,
-) -> bool {
-    let cache = cache_http.as_ref();
+pub fn has_all_requirements(cache: impl AsRef<Cache>, cmd: &CommandOptions, msg: &Message) -> bool {
+    let cache = cache.as_ref();
 
     if let Some(guild_id) = msg.guild_id {
         if let Some(member) = cache.member(guild_id, &msg.author.id) {
-            if let Ok(permissions) = member.permissions(&cache_http) {
+            if let Ok(permissions) = member.permissions(&cache) {
                 return if cmd.allowed_roles.is_empty() {
                     permissions.administrator() || has_correct_permissions(&cache, &cmd, msg)
                 } else if let Some(roles) = cache.guild_roles(guild_id) {
@@ -228,7 +223,7 @@ fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
 // Decides how a listed help entry shall be displayed.
 #[cfg(all(feature = "cache", feature = "http"))]
 fn check_common_behaviour(
-    cache_http: impl CacheHttp + AsRef<Cache>,
+    cache: impl AsRef<Cache>,
     msg: &Message,
     options: &impl CommonOptions,
     owners: &HashSet<UserId>,
@@ -252,11 +247,11 @@ fn check_common_behaviour(
         return HelpBehaviour::Nothing;
     }
 
-    if !has_correct_permissions(&cache_http, options, msg) {
+    if !has_correct_permissions(&cache, options, msg) {
         return help_options.lacking_permissions;
     }
 
-    msg.guild_field(&cache_http, |guild| {
+    msg.guild_field(&cache, |guild| {
         if let Some(member) = guild.members.get(&msg.author.id) {
             if !has_correct_roles(options, &guild.roles, member) {
                 return help_options.lacking_role;
