@@ -146,7 +146,7 @@ impl ClientBuilder {
         self.application_id = Some(ApplicationId(application_id));
 
         if let Some(http) = &mut self.http {
-            http.application_id = application_id;
+            http.set_application_id(application_id);
         }
 
         self
