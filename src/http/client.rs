@@ -1,4 +1,6 @@
 #![allow(clippy::missing_errors_doc)]
+
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::{borrow::Cow, fmt, str::FromStr, sync::Arc};
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
@@ -147,10 +149,7 @@ impl HttpBuilder {
     pub fn build(self) -> Http {
         let token = self.token;
 
-        // TODO: It should not be required for all users of serenity to set the application_id or get a panic.
-        let application_id = self
-            .application_id
-            .expect("Expected application Id in order to use interacions features");
+        let application_id = AtomicU64::new(self.application_id.unwrap_or_default());
 
         let client = self.client.unwrap_or_else(|| {
             let builder = configure_client_backend(Client::builder());
@@ -206,7 +205,7 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
-    pub application_id: u64,
+    application_id: AtomicU64,
 }
 
 impl fmt::Debug for Http {
@@ -230,7 +229,7 @@ impl Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: token.to_string(),
-            application_id: 0,
+            application_id: AtomicU64::new(0),
         }
     }
 
@@ -238,9 +237,9 @@ impl Http {
         let builder = configure_client_backend(Client::builder());
         let built = builder.build().expect("Cannot build reqwest::Client");
 
-        let mut data = Self::new(built, "");
+        let data = Self::new(built, "");
 
-        data.application_id = application_id;
+        data.set_application_id(application_id);
 
         data
     }
@@ -260,11 +259,29 @@ impl Http {
     }
 
     pub fn new_with_token_application_id(token: &str, application_id: u64) -> Self {
-        let mut base = Self::new_with_token(token);
+        let base = Self::new_with_token(token);
 
-        base.application_id = application_id;
+        base.set_application_id(application_id);
 
         base
+    }
+
+    pub fn application_id(&self) -> Option<u64> {
+        let application_id = self.application_id.load(Ordering::Relaxed);
+
+        if application_id == 0 {
+            None
+        } else {
+            Some(application_id)
+        }
+    }
+
+    fn try_application_id(&self) -> Result<u64> {
+        self.application_id().ok_or_else(|| HttpError::ApplicationIdMissing.into())
+    }
+
+    pub fn set_application_id(&self, application_id: u64) {
+        self.application_id.store(application_id, Ordering::Relaxed);
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -488,7 +505,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -513,7 +530,7 @@ impl Http {
             }),
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -540,7 +557,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -556,7 +573,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommands {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -573,7 +590,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommands {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -640,7 +657,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -975,7 +992,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -990,7 +1007,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteGlobalApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -1021,7 +1038,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteGuildApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1145,7 +1162,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteOriginalInteractionResponse {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -1366,7 +1383,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1395,7 +1412,7 @@ impl Http {
             }),
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1418,7 +1435,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1443,7 +1460,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGlobalApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -1488,7 +1505,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1514,7 +1531,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandPermission {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1539,7 +1556,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandsPermissions {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -1734,7 +1751,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetOriginalInteractionResponse {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -1756,7 +1773,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -2634,7 +2651,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommands {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -2650,7 +2667,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -2693,7 +2710,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommands {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -2711,7 +2728,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -2729,7 +2746,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommandsPermissions {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -2747,7 +2764,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommandPermissions {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -3856,7 +3873,7 @@ impl Default for Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
-            application_id: 0,
+            application_id: AtomicU64::new(0),
         }
     }
 }
