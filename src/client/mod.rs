@@ -25,8 +25,6 @@ mod error;
 #[cfg(feature = "gateway")]
 mod event_handler;
 
-#[cfg(all(feature = "cache", feature = "gateway"))]
-use std::time::Duration;
 use std::{
     boxed::Box,
     future::Future,
@@ -78,8 +76,6 @@ pub struct ClientBuilder {
     intents: GatewayIntents,
     application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
-    timeout: Option<Duration>,
-    #[cfg(feature = "cache")]
     cache_settings: Option<CacheSettings>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<dyn Framework + Send + Sync + 'static>>,
@@ -98,8 +94,6 @@ impl ClientBuilder {
             fut: None,
             intents: GatewayIntents::non_privileged(),
             application_id: None,
-            #[cfg(feature = "cache")]
-            timeout: None,
             #[cfg(feature = "cache")]
             cache_settings: Some(CacheSettings::new()),
             #[cfg(feature = "framework")]
@@ -186,27 +180,6 @@ impl ClientBuilder {
         self.data.get_or_insert_with(TypeMap::new).insert::<T>(value);
 
         self
-    }
-
-    /// Sets how long - if wanted to begin with - a cache update shall
-    /// be attempted for. After the `timeout` ran out, the update will be
-    /// skipped.
-    ///
-    /// By default, a cache update will never timeout and potentially
-    /// cause a deadlock.
-    /// A timeout however, will invalidate the cache.
-    #[cfg(feature = "cache")]
-    pub fn cache_update_timeout(mut self, timeout: Duration) -> Self {
-        self.timeout = Some(timeout);
-
-        self
-    }
-
-    /// Gets the cache update timeout, if already initialized. See [`Self::cache_update_timeout`]
-    /// for more info.
-    #[cfg(feature = "cache")]
-    pub fn get_cache_update_timeout(&self) -> Option<Duration> {
-        self.timeout
     }
 
     /// Sets the settings of the cache.
@@ -408,8 +381,6 @@ impl Future for ClientBuilder {
             let cache_and_http = Arc::new(CacheAndHttp {
                 #[cfg(feature = "cache")]
                 cache: Arc::new(Cache::new_with_settings(self.cache_settings.take().unwrap())),
-                #[cfg(feature = "cache")]
-                update_cache_timeout: self.timeout.take(),
                 http: Arc::clone(&http),
             });
 
@@ -678,7 +649,6 @@ pub struct Client {
     /// value available.
     pub ws_uri: Arc<Mutex<String>>,
     /// A container for an optional cache and HTTP client.
-    /// It also contains the cache update timeout.
     pub cache_and_http: Arc<CacheAndHttp>,
 }
 

@@ -95,8 +95,6 @@ mod error;
 
 #[cfg(feature = "client")]
 use std::sync::Arc;
-#[cfg(all(feature = "client", feature = "cache"))]
-use std::time::Duration;
 
 #[cfg(all(feature = "client", feature = "cache"))]
 use crate::cache::Cache;
@@ -112,8 +110,6 @@ use crate::http::Http;
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
-    #[cfg(feature = "cache")]
-    pub update_cache_timeout: Option<Duration>,
     pub http: Arc<Http>,
 }
 
