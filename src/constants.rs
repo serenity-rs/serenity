@@ -9,7 +9,7 @@ pub const EMBED_MAX_COUNT: usize = 10;
 /// The maximum number of stickers in a message.
 pub const STICKER_MAX_COUNT: usize = 3;
 
-/// The gateway version used by the library. The gateway URI is retrieved via
+/// The gateway version used by the library. The gateway URL is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 10;
 

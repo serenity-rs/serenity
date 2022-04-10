@@ -10,26 +10,26 @@
 //! > account when generating rate limits since it's the major parameter. The
 //! only current major parameters are `channel_id`, `guild_id` and `webhook_id`.
 //!
-//! This results in the two URIs of `GET /channels/4/messages/7` and
+//! This results in the two URLs of `GET /channels/4/messages/7` and
 //! `GET /channels/5/messages/8` being rate limited _separately_. However, the
-//! two URIs of `GET /channels/10/messages/11` and
+//! two URLs of `GET /channels/10/messages/11` and
 //! `GET /channels/10/messages/12` will count towards the "same ratelimit", as
-//! the major parameter - `10` is equivalent in both URIs' format.
+//! the major parameter - `10` is equivalent in both URLs' format.
 //!
 //! # Examples
 //!
-//! First: taking the first two URIs - `GET /channels/4/messages/7` and
+//! First: taking the first two URLs - `GET /channels/4/messages/7` and
 //! `GET /channels/5/messages/8` - and assuming both buckets have a `limit` of
-//! `10`, requesting the first URI will result in the response containing a
+//! `10`, requesting the first URL will result in the response containing a
 //! `remaining` of `9`. Immediately after - prior to buckets resetting -
-//! performing a request to the _second_ URI will also contain a `remaining` of
+//! performing a request to the _second_ URL will also contain a `remaining` of
 //! `9` in the response, as the major parameter - `channel_id` - is different
 //! in the two requests (`4` and `5`).
 //!
-//! Second: take for example the last two URIs. Assuming the bucket's `limit` is
-//! `10`, requesting the first URI will return a `remaining` of `9` in the
+//! Second: take for example the last two URLs. Assuming the bucket's `limit` is
+//! `10`, requesting the first URL will return a `remaining` of `9` in the
 //! response. Immediately after - prior to buckets resetting - performing a
-//! request to the _second_ URI will return a `remaining` of `8` in the
+//! request to the _second_ URL will return a `remaining` of `8` in the
 //! response, as the major parameter - `channel_id` - is equivalent for the two
 //! requests (`10`).
 //!
