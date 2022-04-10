@@ -105,7 +105,7 @@ impl ChannelCategory {
     /// # async fn run() {
     /// #     use serenity::http::Http;
     /// #     use serenity::model::id::ChannelId;
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// #     let category = ChannelId(1234);
     /// category.edit(&http, |c| c.name("test").bitrate(86400)).await;
     /// # }

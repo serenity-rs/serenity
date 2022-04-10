@@ -587,7 +587,7 @@ impl Http {
     /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #    let http = Http::default();
+    /// #    let http = Http::new("token");
     /// let map = json!({
     ///     "name": "test",
     /// });
@@ -886,7 +886,7 @@ impl Http {
     /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #    let http = Http::default();
+    /// #    let http = Http::new("token");
     /// let channel_id = 81384788765712384;
     /// let map = json!({"name": "test"});
     ///
@@ -1083,7 +1083,7 @@ impl Http {
     /// use serenity::model::id::{ChannelId, MessageId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let channel_id = ChannelId(7);
     /// let message_id = MessageId(8);
     ///
@@ -1233,7 +1233,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// // Due to the `delete_webhook` function requiring you to authenticate, you
     /// // must have set the token first.
-    /// let http = Http::default();
+    /// let http = Http::new("token");
     ///
     /// http.delete_webhook(245037420704169985).await?;
     /// Ok(())
@@ -1263,7 +1263,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
@@ -1902,7 +1902,7 @@ impl Http {
     /// use serenity::json::{json, prelude::*};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 187450744427773963;
     /// let user_id = 150443906511667200;
     /// let value = json!({
@@ -1952,7 +1952,7 @@ impl Http {
     /// use serenity::json::{json, prelude::*};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 187450744427773963;
     /// let value = json!({
     ///     "channel_id": "826929611849334784",
@@ -2004,7 +2004,7 @@ impl Http {
     /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let image = serenity::utils::read_image("./webhook_img.png")?;
     /// let map = json!({
@@ -2047,7 +2047,7 @@ impl Http {
     /// use serenity::json::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"name": "new name"});
@@ -2113,7 +2113,7 @@ impl Http {
     /// use serenity::json::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"content": "test"});
@@ -2491,7 +2491,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let channel_id = 81384788765712384;
     ///
     /// let webhooks = http.get_channel_webhooks(channel_id).await?;
@@ -2991,7 +2991,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 81384788765712384;
     ///
     /// let webhooks = http.get_guild_webhooks(guild_id).await?;
@@ -3024,7 +3024,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::http::GuildPagination;
     /// use serenity::model::id::GuildId;
     ///
@@ -3333,7 +3333,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let webhook = http.get_webhook(id).await?;
     /// #     Ok(())
@@ -3363,7 +3363,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
@@ -3396,7 +3396,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 
     /// let webhook = http.get_webhook_from_url(url).await?;
@@ -3654,7 +3654,7 @@ impl Http {
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// // Initiate typing (assuming http is `Arc<Http>`)
     /// let typing = http.start_typing(7)?;
     ///
@@ -3705,7 +3705,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
     /// #
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// use serenity::{
     ///     http::{
     ///         routing::RouteInfo,
@@ -3756,7 +3756,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::http::{
     ///     request::RequestBuilder,
     ///     routing::RouteInfo,

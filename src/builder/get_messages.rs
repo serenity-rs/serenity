@@ -29,7 +29,7 @@ use crate::model::id::MessageId;
 /// # use serenity::http::Http;
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http = Http::default();
+/// # let http = Http::new("token");
 /// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// // you can then pass it into a function which retrieves messages:

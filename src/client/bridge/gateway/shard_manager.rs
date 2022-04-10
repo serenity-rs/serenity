@@ -65,7 +65,9 @@ use crate::CacheAndHttp;
 /// impl EventHandler for Handler {}
 /// impl RawEventHandler for Handler {}
 ///
-/// # let cache_and_http = Arc::new(CacheAndHttp::default());
+/// # let http = Arc::new(Http::new("token"));
+/// # let cache = Arc::new(Cache::default());
+/// # let cache_and_http = Arc::new(CacheAndHttp { http, cache });
 /// # let http = &cache_and_http.http;
 /// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
