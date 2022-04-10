@@ -1362,7 +1362,7 @@
             });
 
             <span class="self">self</span>.<span class="ident">fut</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">http</span>.<span class="ident">get_gateway</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">url</span>));
+                <span class="kw">let</span> <span class="ident">ws_url</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">http</span>.<span class="ident">get_gateway</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">url</span>));
 
                 <span class="kw">let</span> (<span class="ident">shard_manager</span>, <span class="ident">shard_manager_worker</span>) <span class="op">=</span> {
                     <span class="ident">ShardManager::new</span>(<span class="ident">ShardManagerOptions</span> {
@@ -1376,7 +1376,7 @@
                         <span class="ident">shard_total</span>: <span class="number">0</span>,
                         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
                         <span class="ident">voice_manager</span>: <span class="kw-2">&amp;</span><span class="ident">voice_manager</span>,
-                        <span class="ident">ws_url</span>: <span class="kw-2">&amp;</span><span class="ident">url</span>,
+                        <span class="ident">ws_url</span>: <span class="kw-2">&amp;</span><span class="ident">ws_url</span>,
                         <span class="ident">cache_and_http</span>: <span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>,
                         <span class="ident">intents</span>,
                     })
@@ -1384,7 +1384,7 @@
                 };
 
                 <span class="prelude-val">Ok</span>(<span class="ident">Client</span> {
-                    <span class="ident">ws_uri</span>: <span class="ident">url</span>,
+                    <span class="ident">ws_url</span>,
                     <span class="ident">data</span>,
                     <span class="ident">shard_manager</span>,
                     <span class="ident">shard_manager_worker</span>,
@@ -1617,14 +1617,14 @@
     <span class="doccomment">/// connections.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// URI that the client&#39;s shards will use to connect to the gateway.</span>
+    <span class="doccomment">/// URL that the client&#39;s shards will use to connect to the gateway.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is likely not important for production usage and is, at best, used</span>
     <span class="doccomment">/// for debugging.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is wrapped in an `Arc&lt;Mutex&lt;T&gt;&gt;` so all shards will have an updated</span>
     <span class="doccomment">/// value available.</span>
-    <span class="kw">pub</span> <span class="ident">ws_uri</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A container for an optional cache and HTTP client.</span>
     <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
 }
