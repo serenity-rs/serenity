@@ -65,7 +65,7 @@ async fn main() {
 
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    let http = Http::new_with_token(&token);
+    let http = Http::new(&token);
 
     // We will fetch your bot's owners and id
     let (owners, _bot_id) = match http.get_current_application_info().await {

@@ -171,7 +171,7 @@ impl HttpBuilder {
 fn parse_token(token: impl AsRef<str>) -> String {
     let token = token.as_ref().trim();
 
-    if token.starts_with("Bot ") {
+    if token.starts_with("Bot ") || token.starts_with("Bearer ") {
         token.to_string()
     } else {
         format!("Bot {}", token)
@@ -214,7 +214,10 @@ impl fmt::Debug for Http {
 }
 
 impl Http {
-    pub fn new(client: Client, token: &str) -> Self {
+    pub fn new(token: &str) -> Self {
+        let builder = configure_client_backend(Client::builder());
+
+        let client = builder.build().expect("Cannot build reqwest::Client");
         let client2 = client.clone();
 
         Http {
@@ -222,42 +225,17 @@ impl Http {
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
             ratelimiter_disabled: false,
             proxy: None,
-            token: token.to_string(),
+            token: parse_token(token),
             application_id: AtomicU64::new(0),
         }
     }
 
-    pub fn new_with_application_id(application_id: u64) -> Self {
-        let builder = configure_client_backend(Client::builder());
-        let built = builder.build().expect("Cannot build reqwest::Client");
+    pub fn new_with_application_id(token: &str, application_id: u64) -> Self {
+        let http = Self::new(token);
 
-        let data = Self::new(built, "");
+        http.set_application_id(application_id);
 
-        data.set_application_id(application_id);
-
-        data
-    }
-
-    pub fn new_with_token(token: &str) -> Self {
-        let builder = configure_client_backend(Client::builder());
-        let built = builder.build().expect("Cannot build reqwest::Client");
-
-        let trimmed = token.trim();
-        let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
-            token.to_string()
-        } else {
-            format!("Bot {}", token)
-        };
-
-        Self::new(built, &token)
-    }
-
-    pub fn new_with_token_application_id(token: &str, application_id: u64) -> Self {
-        let base = Self::new_with_token(token);
-
-        base.set_application_id(application_id);
-
-        base
+        http
     }
 
     pub fn application_id(&self) -> Option<u64> {
@@ -3850,21 +3828,5 @@ fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
 impl AsRef<Http> for Http {
     fn as_ref(&self) -> &Http {
         self
-    }
-}
-
-impl Default for Http {
-    fn default() -> Self {
-        let client = Client::builder().build().expect("Cannot build Reqwest::Client.");
-        let client2 = client.clone();
-
-        Self {
-            client,
-            ratelimiter: Ratelimiter::new(client2, ""),
-            ratelimiter_disabled: false,
-            proxy: None,
-            token: "".to_string(),
-            application_id: AtomicU64::new(0),
-        }
     }
 }

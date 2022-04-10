@@ -105,7 +105,6 @@ pub use crate::error::{Error, Result};
 use crate::http::Http;
 
 #[cfg(feature = "client")]
-#[derive(Clone, Default)]
 #[non_exhaustive]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]

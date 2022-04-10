@@ -111,7 +111,7 @@ impl ClientBuilder {
     /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
     pub fn new(token: impl AsRef<str>) -> Self {
-        Self::_new(Http::new_with_token(token.as_ref()))
+        Self::_new(Http::new(token.as_ref()))
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on
@@ -128,7 +128,7 @@ impl ClientBuilder {
     /// Sets a token for the bot. If the token is not prefixed "Bot ",
     /// this method will automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.http = Some(Http::new_with_token(token.as_ref()));
+        self.http = Some(Http::new(token.as_ref()));
 
         self
     }
