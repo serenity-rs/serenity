@@ -1050,13 +1050,12 @@ impl PartialGuild {
             return Ok(Permissions::all());
         }
 
-        let everyone = match self.roles.get(&RoleId(self.id.0)) {
-            Some(everyone) => everyone,
-            None => {
-                error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
+        let everyone = if let Some(everyone) = self.roles.get(&RoleId(self.id.0)) {
+            everyone
+        } else {
+            error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
 
-                return Ok(Permissions::empty());
-            },
+            return Ok(Permissions::empty());
         };
 
         let member = self.member(cache_http, &user_id).await?;

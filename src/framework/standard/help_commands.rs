@@ -358,7 +358,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                                     .await
                             {
                                 similar_commands.push(SuggestedCommandName {
-                                    name: command_name.to_string(),
+                                    name: (*command_name).to_string(),
                                     levenshtein_distance,
                                 });
                             }
@@ -373,7 +373,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                         .sub_commands
                         .iter()
                         .find(|n| n.options.names.contains(&name_str))
-                        .cloned();
+                        .copied();
 
                     // If we found a sub-command, we replace the parent with
                     // it. This allows the help-system to extract information
@@ -431,9 +431,8 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                     .await
                 {
                     return Some(command);
-                } else {
-                    break;
                 }
+                break;
             }
         }
 
@@ -552,7 +551,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                 });
             }
 
-            match nested_group_command_search(
+            if let Ok(found) = nested_group_command_search(
                 ctx,
                 msg,
                 group.options.sub_groups,
@@ -563,8 +562,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
             )
             .await
             {
-                Ok(found) => return Ok(found),
-                Err(()) => (),
+                return Ok(found);
             }
         }
 
@@ -636,14 +634,11 @@ async fn fill_eligible_commands<'a>(
         let options = &command.options;
         let name = &options.names[0];
 
-        match &group_behaviour {
-            HelpBehaviour::Nothing => (),
-            _ => {
-                let name = format_command_name!(&group_behaviour, &name);
-                to_fill.command_names.push(name);
+        if group_behaviour != HelpBehaviour::Nothing {
+            let name = format_command_name!(&group_behaviour, &name);
+            to_fill.command_names.push(name);
 
-                continue;
-            },
+            continue;
         }
 
         let command_behaviour = check_command_behaviour(
@@ -821,7 +816,7 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
                         .options
                         .description
                         .as_ref()
-                        .map(|s| s.to_string())
+                        .map(ToString::to_string)
                         .unwrap_or_default(),
                     groups: vec![single_group],
                 });
@@ -899,13 +894,13 @@ pub async fn create_customised_help_data<'a>(
     }
 
     let strikethrough_command_tip = if msg.is_private() {
-        &help_options.strikethrough_commands_tip_in_dm
+        help_options.strikethrough_commands_tip_in_dm
     } else {
-        &help_options.strikethrough_commands_tip_in_guild
+        help_options.strikethrough_commands_tip_in_guild
     };
 
-    let description = if let Some(ref strikethrough_command_text) = strikethrough_command_tip {
-        format!("{}\n{}", &help_options.individual_command_tip, &strikethrough_command_text)
+    let description = if let Some(strikethrough_command_text) = strikethrough_command_tip {
+        format!("{}\n{}", help_options.individual_command_tip, strikethrough_command_text)
     } else {
         help_options.individual_command_tip.to_string()
     };
@@ -1068,11 +1063,11 @@ async fn send_single_command_embed(
                 embed.title(&command.name);
                 embed.colour(colour);
 
-                if let Some(ref desc) = command.description {
+                if let Some(desc) = command.description {
                     embed.description(desc);
                 }
 
-                if let Some(ref usage) = command.usage {
+                if let Some(usage) = command.usage {
                     let full_usage_text = if let Some(first_prefix) = command.group_prefixes.get(0)
                     {
                         format!("`{} {} {}`", first_prefix, command.name, usage)
@@ -1310,11 +1305,11 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
         );
     }
 
-    if let Some(ref description) = command.description {
+    if let Some(description) = command.description {
         let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
     };
 
-    if let Some(ref usage) = command.usage {
+    if let Some(usage) = command.usage {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
             let _ = writeln!(
                 result,
@@ -1427,7 +1422,7 @@ pub async fn plain(
             ref suggestions,
         } => help_description.replace("{}", &suggestions.join("`, `")),
         CustomisedHelpData::NoCommandFound {
-            ref help_error_message,
+            help_error_message,
         } => help_error_message.to_string(),
         CustomisedHelpData::GroupedCommands {
             ref help_description,

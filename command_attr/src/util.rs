@@ -79,7 +79,7 @@ impl IdentExt2 for Ident {
 }
 
 #[inline]
-pub fn into_stream(e: Error) -> TokenStream {
+pub fn into_stream(e: &Error) -> TokenStream {
     e.to_compile_error().into()
 }
 
@@ -87,7 +87,7 @@ macro_rules! propagate_err {
     ($res:expr) => {{
         match $res {
             Ok(v) => v,
-            Err(e) => return $crate::util::into_stream(e),
+            Err(e) => return $crate::util::into_stream(&e),
         }
     }};
 }
@@ -176,7 +176,7 @@ impl ToTokens for Argument {
 }
 
 #[inline]
-pub fn generate_type_validation(have: Type, expect: Type) -> syn::Stmt {
+pub fn generate_type_validation(have: &Type, expect: &Type) -> syn::Stmt {
     parse_quote! {
         serenity::static_assertions::assert_type_eq_all!(#have, #expect);
     }
@@ -216,7 +216,7 @@ pub fn create_declaration_validations(fun: &mut CommandFun, dec_for: DeclarFor) 
 
     let mut spoof_or_check = |kind: Type, name: &str| {
         match fun.args.get(index) {
-            Some(x) => fun.body.insert(0, generate_type_validation(x.kind.clone(), kind)),
+            Some(x) => fun.body.insert(0, generate_type_validation(&x.kind, &kind)),
             None => fun.args.push(Argument {
                 mutable: None,
                 name: Ident::new(name, Span::call_site()),
@@ -249,8 +249,8 @@ pub fn create_declaration_validations(fun: &mut CommandFun, dec_for: DeclarFor) 
 }
 
 #[inline]
-pub fn create_return_type_validation(r#fn: &mut CommandFun, expect: Type) {
-    let stmt = generate_type_validation(r#fn.ret.clone(), expect);
+pub fn create_return_type_validation(r#fn: &mut CommandFun, expect: &Type) {
+    let stmt = generate_type_validation(&r#fn.ret, expect);
     r#fn.body.insert(0, stmt);
 }
 
@@ -279,14 +279,11 @@ pub fn append_line(desc: &mut AsOption<String>, mut line: String) {
 
     let desc = desc.0.get_or_insert_with(String::default);
 
-    match line.rfind("\\$") {
-        Some(i) => {
-            desc.push_str(line[..i].trim_end());
-            desc.push(' ');
-        },
-        None => {
-            desc.push_str(&line);
-            desc.push('\n');
-        },
+    if let Some(i) = line.rfind("\\$") {
+        desc.push_str(line[..i].trim_end());
+        desc.push(' ');
+    } else {
+        desc.push_str(&line);
+        desc.push('\n');
     }
 }

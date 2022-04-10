@@ -89,7 +89,7 @@ impl PrivateChannel {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item = T>>(
+    pub async fn delete_messages<T, It>(
         &self,
         http: impl AsRef<Http>,
         message_ids: It,

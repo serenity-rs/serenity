@@ -318,10 +318,7 @@ impl Member {
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
     pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        match self
-            .guild_id
-            .edit_member(&http, self.user.id, |member| member.enable_communication())
-            .await
+        match self.guild_id.edit_member(&http, self.user.id, EditMember::enable_communication).await
         {
             Ok(_) => {
                 self.communication_disabled_until = None;

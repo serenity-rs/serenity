@@ -132,7 +132,7 @@ impl<'a> ExecuteWebhook<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1.extend(files.into_iter().map(|f| f.into()));
+        self.1.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -145,7 +145,7 @@ impl<'a> ExecuteWebhook<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1 = files.into_iter().map(|f| f.into()).collect();
+        self.1 = files.into_iter().map(Into::into).collect();
         self
     }
 
@@ -307,6 +307,6 @@ impl<'a> Default for ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::from(false));
 
-        ExecuteWebhook(map, Default::default())
+        ExecuteWebhook(map, Vec::default())
     }
 }

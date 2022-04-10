@@ -542,7 +542,7 @@ impl Configuration {
         It: IntoIterator<Item = T>,
     {
         self.delimiters.clear();
-        self.delimiters.extend(delimiters.into_iter().map(|s| s.into()));
+        self.delimiters.extend(delimiters.into_iter().map(Into::into));
 
         self
     }

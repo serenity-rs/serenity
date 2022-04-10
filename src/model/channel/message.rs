@@ -219,14 +219,13 @@ impl Message {
                 if self.author.id != cache.current_user_id() {
                     if self.is_private() {
                         return Err(Error::Model(ModelError::NotAuthor));
-                    } else {
-                        utils::user_has_perms_cache(
-                            cache,
-                            self.channel_id,
-                            self.guild_id,
-                            Permissions::MANAGE_MESSAGES,
-                        )?;
                     }
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )?;
                 }
             }
         }
@@ -1257,11 +1256,10 @@ impl MessageId {
     /// Returns a link referencing this message. When clicked, users will jump to the message.
     /// The link will be valid for messages in either private channels or guilds.
     pub fn link(&self, channel_id: ChannelId, guild_id: Option<GuildId>) -> String {
-        match guild_id {
-            Some(guild_id) => {
-                format!("https://discord.com/channels/{}/{}/{}", guild_id.0, channel_id.0, self.0)
-            },
-            None => format!("https://discord.com/channels/@me/{}/{}", channel_id.0, self.0),
+        if let Some(guild_id) = guild_id {
+            format!("https://discord.com/channels/{}/{}/{}", guild_id, channel_id, self)
+        } else {
+            format!("https://discord.com/channels/@me/{}/{}", channel_id, self)
         }
     }
 

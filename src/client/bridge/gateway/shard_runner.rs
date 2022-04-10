@@ -387,17 +387,9 @@ impl ShardRunner {
                 },
                 ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate {
                     ..
-                }) => {
-                    // nb: not sent here
-
-                    true
-                },
-                ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated) => {
-                    // nb: not sent here
-
-                    true
-                },
-                ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
+                })
+                | ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated)
+                | ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
                     // nb: not sent here
 
                     true
