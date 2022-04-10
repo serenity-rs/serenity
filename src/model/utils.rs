@@ -78,7 +78,7 @@ pub fn deserialize_options_with_resolved<'de, D: Deserializer<'de>>(
 ) -> StdResult<Vec<ApplicationCommandInteractionDataOption>, D::Error> {
     let mut options = Vec::deserialize(deserializer)?;
 
-    for option in options.iter_mut() {
+    for option in &mut options {
         loop_resolved(option, resolved);
     }
 
@@ -120,7 +120,7 @@ fn try_resolve(
 
             if let Some(user) = resolved.users.get(&UserId(id)) {
                 let user = user.to_owned();
-                let member = resolved.members.get(&UserId(id)).map(|m| m.to_owned());
+                let member = resolved.members.get(&UserId(id)).map(ToOwned::to_owned);
 
                 Some(ApplicationCommandInteractionDataOptionValue::User(user, member))
             } else {
@@ -160,7 +160,7 @@ fn loop_resolved(
         options.resolved = try_resolve(value, options.kind, resolved);
     }
 
-    for option in options.options.iter_mut() {
+    for option in &mut options.options {
         loop_resolved(option, resolved);
     }
 }

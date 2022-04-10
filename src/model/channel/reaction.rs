@@ -221,20 +221,19 @@ impl Reaction {
     /// Returns [`Error::Http`] if the user that made the reaction is unable to be
     /// retrieved from the API.
     pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
-        match self.user_id {
-            Some(id) => id.to_user(cache_http).await,
-            None => {
-                // This can happen if only Http was passed to Message::react, even though
-                // "cache" was enabled.
-                #[cfg(feature = "cache")]
-                {
-                    if let Some(cache) = cache_http.cache() {
-                        return Ok(User::from(&cache.current_user()));
-                    }
+        if let Some(id) = self.user_id {
+            id.to_user(cache_http).await
+        } else {
+            // This can happen if only Http was passed to Message::react, even though
+            // "cache" was enabled.
+            #[cfg(feature = "cache")]
+            {
+                if let Some(cache) = cache_http.cache() {
+                    return Ok(User::from(&cache.current_user()));
                 }
+            }
 
-                Ok(cache_http.http().get_current_user().await?.into())
-            },
+            Ok(cache_http.http().get_current_user().await?.into())
         }
     }
 
@@ -359,7 +358,7 @@ impl<'de> Deserialize<'de> for ReactionType {
                             }
 
                             if let Ok(emoji_id) = map.next_value::<EmojiId>() {
-                                id = Some(emoji_id)
+                                id = Some(emoji_id);
                             }
                         },
                         Field::Name => {
@@ -435,7 +434,7 @@ impl ReactionType {
                 ref name,
                 ..
             } => {
-                format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id)
+                format!("{}:{}", name.as_ref().map_or("", String::as_str), id)
             },
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
@@ -660,7 +659,7 @@ impl fmt::Display for ReactionType {
                 } else {
                     f.write_str("<:")?;
                 }
-                f.write_str(name.as_ref().map_or("", |s| s.as_str()))?;
+                f.write_str(name.as_ref().map_or("", String::as_str))?;
                 f.write_char(':')?;
                 fmt::Display::fmt(&id, f)?;
                 f.write_char('>')

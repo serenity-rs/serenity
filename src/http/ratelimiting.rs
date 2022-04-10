@@ -110,8 +110,8 @@ impl Ratelimiter {
     fn _new(client: Client, token: String) -> Self {
         Self {
             client,
-            global: Default::default(),
-            routes: Default::default(),
+            global: Arc::default(),
+            routes: Arc::default(),
             token,
         }
     }
@@ -204,29 +204,29 @@ impl Ratelimiter {
             // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
             if route == Route::None {
                 return Ok(response);
+            }
+
+            let redo = if response.headers().get("x-ratelimit-global").is_some() {
+                let _ = self.global.lock().await;
+
+                Ok(
+                    if let Some(retry_after) =
+                        parse_header::<f64>(response.headers(), "retry-after")?
+                    {
+                        debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
+                        sleep(Duration::from_secs_f64(retry_after)).await;
+
+                        true
+                    } else {
+                        false
+                    },
+                )
             } else {
-                let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                    let _ = self.global.lock().await;
+                bucket.lock().await.post_hook(&response, &route).await
+            };
 
-                    Ok(
-                        if let Some(retry_after) =
-                            parse_header::<f64>(response.headers(), "retry-after")?
-                        {
-                            debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
-                            sleep(Duration::from_secs_f64(retry_after)).await;
-
-                            true
-                        } else {
-                            false
-                        },
-                    )
-                } else {
-                    bucket.lock().await.post_hook(&response, &route).await
-                };
-
-                if !redo.unwrap_or(true) {
-                    return Ok(response);
-                }
+            if !redo.unwrap_or(true) {
+                return Ok(response);
             }
         }
     }
@@ -261,26 +261,23 @@ impl Ratelimit {
             return;
         }
 
-        let reset = match self.reset {
-            Some(reset) => reset,
-            None => {
-                // We're probably in the past.
-                self.remaining = self.limit;
+        let reset = if let Some(reset) = self.reset {
+            reset
+        } else {
+            // We're probably in the past.
+            self.remaining = self.limit;
 
-                return;
-            },
+            return;
         };
 
-        let delay = match reset.duration_since(SystemTime::now()) {
-            Ok(delay) => delay,
-
+        let delay = if let Ok(delay) = reset.duration_since(SystemTime::now()) {
+            delay
+        } else {
             // if duration is negative (i.e. adequate time has passed since last call to this api)
-            Err(_) => {
-                if self.remaining() != 0 {
-                    self.remaining -= 1;
-                }
-                return;
-            },
+            if self.remaining() != 0 {
+                self.remaining -= 1;
+            }
+            return;
         };
 
         if self.remaining() == 0 {

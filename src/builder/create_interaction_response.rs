@@ -81,7 +81,7 @@ impl<'a> CreateInteractionResponseData<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1.extend(files.into_iter().map(|f| f.into()));
+        self.1.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -93,7 +93,7 @@ impl<'a> CreateInteractionResponseData<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1 = files.into_iter().map(|f| f.into()).collect();
+        self.1 = files.into_iter().map(Into::into).collect();
         self
     }
 
@@ -194,8 +194,7 @@ impl<'a> CreateInteractionResponseData<'a> {
         let flags = self
             .0
             .get("flags")
-            .map(|f| f.as_u64().expect("Interaction response flag was not a number"))
-            .unwrap_or(0);
+            .map_or(0, |f| f.as_u64().expect("Interaction response flag was not a number"));
 
         let flags = if ephemeral {
             flags | InteractionApplicationCommandCallbackDataFlags::EPHEMERAL.bits()

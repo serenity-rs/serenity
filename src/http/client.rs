@@ -1175,7 +1175,7 @@ impl Http {
         user_id: Option<u64>,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        let user = user_id.map(|uid| uid.to_string()).unwrap_or_else(|| "@me".to_string());
+        let user = user_id.map_or_else(|| "@me".to_string(), |uid| uid.to_string());
 
         self.wind(204, Request {
             body: None,
@@ -2275,6 +2275,12 @@ impl Http {
     ///
     /// Does not require authentication.
     pub async fn get_active_maintenances(&self) -> Result<Vec<Maintenance>> {
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            scheduled_maintenances: Vec<Maintenance>,
+        }
+
         let response = self
             .request(Request {
                 body: None,
@@ -2283,12 +2289,6 @@ impl Http {
                 route: RouteInfo::GetActiveMaintenance,
             })
             .await?;
-
-        #[derive(Deserialize)]
-        struct StatusResponse {
-            #[serde(default)]
-            scheduled_maintenances: Vec<Maintenance>,
-        }
 
         let status: StatusResponse = response.json().await?;
         Ok(status.scheduled_maintenances)
@@ -3242,6 +3242,12 @@ impl Http {
     ///
     /// Does not require authentication.
     pub async fn get_unresolved_incidents(&self) -> Result<Vec<Incident>> {
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            incidents: Vec<Incident>,
+        }
+
         let response = self
             .request(Request {
                 body: None,
@@ -3251,12 +3257,6 @@ impl Http {
             })
             .await?;
 
-        #[derive(Deserialize)]
-        struct StatusResponse {
-            #[serde(default)]
-            incidents: Vec<Incident>,
-        }
-
         let status: StatusResponse = response.json().await?;
         Ok(status.incidents)
     }
@@ -3265,6 +3265,12 @@ impl Http {
     ///
     /// Does not require authentication.
     pub async fn get_upcoming_maintenances(&self) -> Result<Vec<Maintenance>> {
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            scheduled_maintenances: Vec<Maintenance>,
+        }
+
         let response = self
             .request(Request {
                 body: None,
@@ -3273,12 +3279,6 @@ impl Http {
                 route: RouteInfo::GetUpcomingMaintenances,
             })
             .await?;
-
-        #[derive(Deserialize)]
-        struct StatusResponse {
-            #[serde(default)]
-            scheduled_maintenances: Vec<Maintenance>,
-        }
 
         let status: StatusResponse = response.json().await?;
         Ok(status.scheduled_maintenances)

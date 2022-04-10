@@ -256,7 +256,7 @@ impl ShardManager {
     /// [`ShardRunner`]: super::ShardRunner
     #[instrument(skip(self))]
     pub async fn shards_instantiated(&self) -> Vec<ShardId> {
-        self.runners.lock().await.keys().cloned().collect()
+        self.runners.lock().await.keys().copied().collect()
     }
 
     /// Attempts to shut down the shard runner by Id.
@@ -272,11 +272,12 @@ impl ShardManager {
     #[instrument(skip(self))]
     #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
+        const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
+
         info!("Shutting down shard {}", shard_id);
 
         let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code));
 
-        const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
         match timeout(TIMEOUT, self.shard_shutdown.next()).await {
             Ok(Some(shutdown_shard_id)) => {
                 if shutdown_shard_id != shard_id {
@@ -288,7 +289,7 @@ impl ShardManager {
             },
             Ok(None) => (),
             Err(why) => {
-                warn!("Failed to cleanly shutdown shard {}, reached timeout: {:?}", shard_id, why,)
+                warn!("Failed to cleanly shutdown shard {}, reached timeout: {:?}", shard_id, why);
             },
         }
 
@@ -310,7 +311,7 @@ impl ShardManager {
                 return;
             }
 
-            runners.keys().cloned().collect::<Vec<_>>()
+            runners.keys().copied().collect::<Vec<_>>()
         };
 
         info!("Shutting down all shards");

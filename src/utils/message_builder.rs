@@ -1047,7 +1047,7 @@ impl<T: ToString> Add<T> for Content {
     type Output = Content;
 
     fn add(mut self, rhs: T) -> Content {
-        self.inner = self.inner + &rhs.to_string();
+        self.inner += &rhs.to_string();
 
         self
     }
@@ -1058,7 +1058,7 @@ impl<T: ToString> Add<T> for ContentModifier {
 
     fn add(self, rhs: T) -> Content {
         let mut nc = self.to_content();
-        nc.inner = nc.inner + &rhs.to_string();
+        nc.inner += &rhs.to_string();
 
         nc
     }

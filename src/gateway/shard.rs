@@ -361,14 +361,13 @@ impl Shard {
                 self.stage = ConnectionStage::Identifying;
 
                 return ShardAction::Identify;
-            } else {
-                warn!(
-                    "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
-                    self.shard_info
-                );
-
-                return ShardAction::Reconnect(self.reconnection_type());
             }
+            warn!(
+                "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
+                self.shard_info
+            );
+
+            return ShardAction::Reconnect(self.reconnection_type());
         }
 
         ShardAction::Heartbeat
@@ -453,8 +452,7 @@ impl Shard {
         }
 
         let resume = num
-            .map(|x| x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some())
-            .unwrap_or(true);
+            .map_or(true, |x| x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some());
 
         Ok(Some(if resume {
             ShardAction::Reconnect(ReconnectType::Resume)
@@ -810,14 +808,14 @@ impl Shard {
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
-    Ok(create_rustls_client(url).await?)
+    create_rustls_client(url).await
 }
 
 #[cfg(feature = "native_tls_backend")]
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
-    Ok(create_native_tls_client(url).await?)
+    create_native_tls_client(url).await
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {

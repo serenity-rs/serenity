@@ -192,13 +192,13 @@ impl CacheUpdate for GuildCreateEvent {
             }
         }
 
-        for pair in guild.channels.clone().into_iter() {
+        for pair in guild.channels.clone() {
             if let Channel::Guild(channel) = pair.1 {
                 cache.channels.insert(pair.0, channel);
             }
         }
 
-        for pair in guild.channels.clone().into_iter() {
+        for pair in guild.channels.clone() {
             if let Channel::Category(category) = pair.1 {
                 cache.categories.insert(pair.0, category);
             }

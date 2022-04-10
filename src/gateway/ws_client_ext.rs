@@ -76,7 +76,7 @@ impl WebSocketGatewayClientExt for WsStream {
             ChunkGuildFilter::Query(query) => payload["d"]["query"] = json!(query),
             ChunkGuildFilter::UserIds(user_ids) => {
                 let ids = user_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
-                payload["d"]["user_ids"] = json!(ids)
+                payload["d"]["user_ids"] = json!(ids);
             },
         };
 
