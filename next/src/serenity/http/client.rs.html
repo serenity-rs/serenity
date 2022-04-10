@@ -7696,12 +7696,12 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend&quot;</span>))]</span>
 <span class="kw">fn</span> <span class="ident">configure_client_backend</span>(<span class="ident">builder</span>: <span class="ident">ClientBuilder</span>) -&gt; <span class="ident">ClientBuilder</span> {
     <span class="ident">builder</span>.<span class="ident">use_rustls_tls</span>()
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">configure_client_backend</span>(<span class="ident">builder</span>: <span class="ident">ClientBuilder</span>) -&gt; <span class="ident">ClientBuilder</span> {
     <span class="ident">builder</span>.<span class="ident">use_native_tls</span>()
 }
