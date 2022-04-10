@@ -194,11 +194,8 @@ rustls_backend = [
     "reqwest/rustls-tls",
     "async-tungstenite/tokio-rustls-webpki-roots",
     "tokio",
-    "rustls_backend_marker",
     "bytes",
 ]
-# Marks that a Rustls backend is active
-rustls_backend_marker = []
 
 # - Native TLS Backends
 native_tls_backend = [
@@ -206,10 +203,7 @@ native_tls_backend = [
     "async-tungstenite/tokio-native-tls",
     "tokio",
     "bytes",
-    "native_tls_backend_marker",
 ]
-# Marks that a Native TLS backend is active
-native_tls_backend_marker = []
 
 [package.metadata.docs.rs]
 all-features = true

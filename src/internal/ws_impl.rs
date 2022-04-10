@@ -1,4 +1,4 @@
-#[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use std::{error::Error as StdError, fmt, io::Error as IoError};
 
 use async_trait::async_trait;
@@ -84,7 +84,7 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
 /// An error that occurred while connecting over rustls
 #[derive(Debug)]
 #[non_exhaustive]
-#[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 pub enum RustlsError {
     /// WebPKI X.509 Certificate Validation Error.
     WebPKI,
@@ -94,14 +94,14 @@ pub enum RustlsError {
     Io(IoError),
 }
 
-#[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 impl From<IoError> for RustlsError {
     fn from(e: IoError) -> Self {
         RustlsError::Io(e)
     }
 }
 
-#[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 impl fmt::Display for RustlsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -114,7 +114,7 @@ impl fmt::Display for RustlsError {
     }
 }
 
-#[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 impl StdError for RustlsError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
@@ -134,7 +134,7 @@ fn websocket_config() -> async_tungstenite::tungstenite::protocol::WebSocketConf
     }
 }
 
-#[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 #[instrument]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) =
@@ -145,7 +145,7 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     Ok(stream)
 }
 
-#[cfg(feature = "native_tls_backend_marker")]
+#[cfg(feature = "native_tls_backend")]
 #[instrument]
 pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
     let (stream, _) =

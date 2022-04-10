@@ -23,8 +23,8 @@ use crate::http::HttpError;
 use crate::internal::prelude::*;
 #[cfg(all(
     feature = "gateway",
-    feature = "rustls_backend_marker",
-    not(feature = "native_tls_backend_marker")
+    feature = "rustls_backend",
+    not(feature = "native_tls_backend")
 ))]
 use crate::internal::ws_impl::RustlsError;
 use crate::model::ModelError;
@@ -111,8 +111,8 @@ pub enum Error {
     /// An error occurring in rustls
     #[cfg(all(
         feature = "gateway",
-        feature = "rustls_backend_marker",
-        not(feature = "native_tls_backend_marker")
+        feature = "rustls_backend",
+        not(feature = "native_tls_backend")
     ))]
     Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
@@ -164,11 +164,7 @@ impl From<ModelError> for Error {
     }
 }
 
-#[cfg(all(
-    feature = "gateway",
-    feature = "rustls_backend_marker",
-    not(feature = "native_tls_backend_marker")
-))]
+#[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
 impl From<RustlsError> for Error {
     fn from(e: RustlsError) -> Error {
         Error::Rustls(e)
@@ -225,7 +221,7 @@ impl fmt::Display for Error {
             Error::Gateway(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "http")]
             Error::Http(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(all(feature = "gateway", not(feature = "native_tls_backend_marker")))]
+            #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
             Error::Rustls(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
@@ -252,8 +248,8 @@ impl StdError for Error {
             Error::Http(inner) => Some(inner),
             #[cfg(all(
                 feature = "gateway",
-                feature = "rustls_backend_marker",
-                not(feature = "native_tls_backend_marker")
+                feature = "rustls_backend",
+                not(feature = "native_tls_backend")
             ))]
             Error::Rustls(inner) => Some(inner),
             #[cfg(feature = "gateway")]
