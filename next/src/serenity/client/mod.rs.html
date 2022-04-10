@@ -970,11 +970,6 @@
 <span id="965">965</span>
 <span id="966">966</span>
 <span id="967">967</span>
-<span id="968">968</span>
-<span id="969">969</span>
-<span id="970">970</span>
-<span id="971">971</span>
-<span id="972">972</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1346,11 +1341,6 @@
             <span class="kw">let</span> <span class="ident">raw_event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">take</span>();
             <span class="kw">let</span> <span class="ident">intents</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intents</span>;
             <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="self">self</span>.<span class="ident">http</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
-
-            <span class="comment">// TODO: It should not be required for all users of serenity to set the application_id or get a panic.</span>
-            <span class="kw">if</span> <span class="ident">http</span>.<span class="ident">application_id</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="macro">panic!</span>(<span class="string">&quot;Please provide an Application Id in order to use interactions features.&quot;</span>);
-            }
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
             <span class="kw">let</span> <span class="ident">voice_manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">take</span>();

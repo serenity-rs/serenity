@@ -218,6 +218,9 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>, <span class="ident">fmt</span>};
 
 <span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">header::InvalidHeaderValue</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>, <span class="ident">Url</span>};
@@ -296,6 +299,8 @@
     <span class="ident">InvalidScheme</span>,
     <span class="doccomment">/// When using a proxy with an invalid port.</span>
     <span class="ident">InvalidPort</span>,
+    <span class="doccomment">/// When an application id was expected but missing.</span>
+    <span class="ident">ApplicationIdMissing</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
@@ -385,6 +390,7 @@
             <span class="ident">Error::Request</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Error while sending HTTP request.&quot;</span>),
             <span class="ident">Error::InvalidScheme</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid Url scheme.&quot;</span>),
             <span class="ident">Error::InvalidPort</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid port.&quot;</span>),
+            <span class="ident">Error::ApplicationIdMissing</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Application id was expected but missing.&quot;</span>),
         }
     }
 }

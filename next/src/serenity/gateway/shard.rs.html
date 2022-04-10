@@ -830,6 +830,20 @@
 <span id="825">825</span>
 <span id="826">826</span>
 <span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync::Arc</span>,
     <span class="ident">time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>},
@@ -854,6 +868,7 @@
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ChunkGuildFilter</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl::create_native_tls_client</span>;
@@ -911,6 +926,7 @@
     <span class="doccomment">/// [`latency`]: fn@Self::latency</span>
     <span class="ident">heartbeat_instants</span>: (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>),
     <span class="ident">heartbeat_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
+    <span class="ident">http</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// This is used by the heartbeater to determine whether the last</span>
     <span class="doccomment">/// heartbeat was sent without an acknowledgement, and whether to reconnect.</span>
     <span class="comment">// This _must_ be set to `true` in `Shard::handle_event`&#39;s</span>
@@ -988,6 +1004,7 @@
             <span class="ident">current_presence</span>,
             <span class="ident">heartbeat_instants</span>,
             <span class="ident">heartbeat_interval</span>,
+            <span class="ident">http</span>: <span class="prelude-val">None</span>,
             <span class="ident">last_heartbeat_acknowledged</span>,
             <span class="ident">seq</span>,
             <span class="ident">stage</span>,
@@ -998,6 +1015,13 @@
             <span class="ident">ws_url</span>,
             <span class="ident">intents</span>,
         })
+    }
+
+    <span class="doccomment">/// Sets the associated [`Http`] client.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will update the client&#39;s application id after the shard receives a READY payload.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_http</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>);
     }
 
     <span class="doccomment">/// Retrieves the current presence of the shard.</span>
@@ -1162,6 +1186,10 @@
 
                 <span class="self">self</span>.<span class="ident">session_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ready</span>.<span class="ident">ready</span>.<span class="ident">session_id</span>.<span class="ident">clone</span>());
                 <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">ConnectionStage::Connected</span>;
+
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">http</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">http</span> {
+                    <span class="ident">http</span>.<span class="ident">set_application_id</span>(<span class="ident">ready</span>.<span class="ident">ready</span>.<span class="ident">application</span>.<span class="ident">id</span>.<span class="number">0</span>);
+                }
             },
             <span class="ident">Event::Resumed</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">info!</span>(<span class="string">&quot;[Shard {:?}] Resumed&quot;</span>, <span class="self">self</span>.<span class="ident">shard_info</span>);

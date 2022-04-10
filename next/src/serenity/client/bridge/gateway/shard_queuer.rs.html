@@ -265,6 +265,8 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
     <span class="ident">sync::Arc</span>,
@@ -445,13 +447,15 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">u64</span>, <span class="ident">shard_total</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">shard_info</span> <span class="op">=</span> [<span class="ident">shard_id</span>, <span class="ident">shard_total</span>];
 
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="ident">Shard::new</span>(
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shard</span> <span class="op">=</span> <span class="ident">Shard::new</span>(
             <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ws_url</span>),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">token</span>,
             <span class="ident">shard_info</span>,
             <span class="self">self</span>.<span class="ident">intents</span>,
         )
         .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="ident">shard</span>.<span class="ident">set_http</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">ShardRunner::new</span>(<span class="ident">ShardRunnerOptions</span> {
             <span class="ident">data</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>),

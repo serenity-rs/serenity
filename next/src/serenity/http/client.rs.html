@@ -3865,7 +3865,26 @@
 <span id="3860">3860</span>
 <span id="3861">3861</span>
 <span id="3862">3862</span>
+<span id="3863">3863</span>
+<span id="3864">3864</span>
+<span id="3865">3865</span>
+<span id="3866">3866</span>
+<span id="3867">3867</span>
+<span id="3868">3868</span>
+<span id="3869">3869</span>
+<span id="3870">3870</span>
+<span id="3871">3871</span>
+<span id="3872">3872</span>
+<span id="3873">3873</span>
+<span id="3874">3874</span>
+<span id="3875">3875</span>
+<span id="3876">3876</span>
+<span id="3877">3877</span>
+<span id="3878">3878</span>
+<span id="3879">3879</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
+
+<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">use</span> <span class="ident">percent_encoding</span>::{<span class="ident">utf8_percent_encode</span>, <span class="ident">NON_ALPHANUMERIC</span>};
@@ -4014,10 +4033,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Http</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>;
 
-        <span class="comment">// TODO: It should not be required for all users of serenity to set the application_id or get a panic.</span>
-        <span class="kw">let</span> <span class="ident">application_id</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">application_id</span>
-            .<span class="ident">expect</span>(<span class="string">&quot;Expected application Id in order to use interacions features&quot;</span>);
+        <span class="kw">let</span> <span class="ident">application_id</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="self">self</span>.<span class="ident">application_id</span>.<span class="ident">unwrap_or_default</span>());
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
@@ -4073,7 +4089,7 @@
     <span class="kw">pub</span> <span class="ident">ratelimiter_disabled</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">proxy</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="ident">u64</span>,
+    <span class="ident">application_id</span>: <span class="ident">AtomicU64</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Http</span> {
@@ -4097,7 +4113,7 @@
             <span class="ident">ratelimiter_disabled</span>: <span class="bool-val">false</span>,
             <span class="ident">proxy</span>: <span class="prelude-val">None</span>,
             <span class="ident">token</span>: <span class="ident">token</span>.<span class="ident">to_string</span>(),
-            <span class="ident">application_id</span>: <span class="number">0</span>,
+            <span class="ident">application_id</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
         }
     }
 
@@ -4105,9 +4121,9 @@
         <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
         <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">built</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">built</span>, <span class="string">&quot;&quot;</span>);
 
-        <span class="ident">data</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="ident">application_id</span>;
+        <span class="ident">data</span>.<span class="ident">set_application_id</span>(<span class="ident">application_id</span>);
 
         <span class="ident">data</span>
     }
@@ -4127,11 +4143,29 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_token_application_id</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_with_token</span>(<span class="ident">token</span>);
+        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_with_token</span>(<span class="ident">token</span>);
 
-        <span class="ident">base</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="ident">application_id</span>;
+        <span class="ident">base</span>.<span class="ident">set_application_id</span>(<span class="ident">application_id</span>);
 
         <span class="ident">base</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">application_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">application_id</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+
+        <span class="kw">if</span> <span class="ident">application_id</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="prelude-val">None</span>
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">application_id</span>)
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">try_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">application_id</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">HttpError::ApplicationIdMissing</span>.<span class="ident">into</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) {
+        <span class="self">self</span>.<span class="ident">application_id</span>.<span class="ident">store</span>(<span class="ident">application_id</span>, <span class="ident">Ordering::Relaxed</span>);
     }
 
     <span class="doccomment">/// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.</span>
@@ -4355,7 +4389,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateFollowupMessage</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
             },
         })
@@ -4380,7 +4414,7 @@
             }),
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateFollowupMessage</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
             },
         })
@@ -4407,7 +4441,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGlobalApplicationCommand</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
             },
         })
         .<span class="kw">await</span>
@@ -4423,7 +4457,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGlobalApplicationCommands</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
             },
         })
         .<span class="kw">await</span>
@@ -4440,7 +4474,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuildApplicationCommands</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
             },
         })
@@ -4507,7 +4541,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::CreateGuildApplicationCommand</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
             },
         })
@@ -4842,7 +4876,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteFollowupMessage</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
                 <span class="ident">message_id</span>,
             },
@@ -4857,7 +4891,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteGlobalApplicationCommand</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">command_id</span>,
             },
         })
@@ -4888,7 +4922,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteGuildApplicationCommand</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
                 <span class="ident">command_id</span>,
             },
@@ -5012,7 +5046,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::DeleteOriginalInteractionResponse</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
             },
         })
@@ -5233,7 +5267,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditFollowupMessage</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
                 <span class="ident">message_id</span>,
             },
@@ -5262,7 +5296,7 @@
             }),
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditFollowupMessage</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
                 <span class="ident">message_id</span>,
             },
@@ -5285,7 +5319,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetFollowupMessage</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
                 <span class="ident">message_id</span>,
             },
@@ -5310,7 +5344,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGlobalApplicationCommand</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">command_id</span>,
             },
         })
@@ -5355,7 +5389,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommand</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
                 <span class="ident">command_id</span>,
             },
@@ -5381,7 +5415,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommandPermission</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
                 <span class="ident">command_id</span>,
             },
@@ -5406,7 +5440,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditGuildApplicationCommandsPermissions</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
             },
         })
@@ -5601,7 +5635,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetOriginalInteractionResponse</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
             },
         })
@@ -5623,7 +5657,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::EditOriginalInteractionResponse</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">interaction_token</span>,
             },
         })
@@ -6501,7 +6535,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGlobalApplicationCommands</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
             },
         })
         .<span class="kw">await</span>
@@ -6517,7 +6551,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGlobalApplicationCommand</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">command_id</span>,
             },
         })
@@ -6560,7 +6594,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildApplicationCommands</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
             },
         })
@@ -6578,7 +6612,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildApplicationCommand</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
                 <span class="ident">command_id</span>,
             },
@@ -6596,7 +6630,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildApplicationCommandsPermissions</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
             },
         })
@@ -6614,7 +6648,7 @@
             <span class="ident">multipart</span>: <span class="prelude-val">None</span>,
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo::GetGuildApplicationCommandPermissions</span> {
-                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">application_id</span>,
+                <span class="ident">application_id</span>: <span class="self">self</span>.<span class="ident">try_application_id</span>()<span class="question-mark">?</span>,
                 <span class="ident">guild_id</span>,
                 <span class="ident">command_id</span>,
             },
@@ -7723,7 +7757,7 @@
             <span class="ident">ratelimiter_disabled</span>: <span class="bool-val">false</span>,
             <span class="ident">proxy</span>: <span class="prelude-val">None</span>,
             <span class="ident">token</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">application_id</span>: <span class="number">0</span>,
+            <span class="ident">application_id</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
         }
     }
 }
