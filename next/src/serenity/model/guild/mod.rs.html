@@ -3134,8 +3134,6 @@
 <span id="3129">3129</span>
 <span id="3130">3130</span>
 <span id="3131">3131</span>
-<span id="3132">3132</span>
-<span id="3133">3133</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -5035,13 +5033,12 @@
             <span class="kw">return</span> <span class="ident">Permissions::all</span>();
         }
 
-        <span class="kw">let</span> <span class="ident">everyone</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)) {
-            <span class="prelude-val">Some</span>(<span class="ident">everyone</span>) =&gt; <span class="ident">everyone</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;@everyone role ({}) missing in &#39;{}&#39;&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">name</span>);
+        <span class="kw">let</span> <span class="ident">everyone</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">everyone</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)) {
+            <span class="ident">everyone</span>
+        } <span class="kw">else</span> {
+            <span class="macro">error!</span>(<span class="string">&quot;@everyone role ({}) missing in &#39;{}&#39;&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">name</span>);
 
-                <span class="kw">return</span> <span class="ident">Permissions::empty</span>();
-            },
+            <span class="kw">return</span> <span class="ident">Permissions::empty</span>();
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="ident">everyone</span>.<span class="ident">permissions</span>;
@@ -5114,12 +5111,11 @@
         }
 
         <span class="comment">// Start by retrieving the @everyone role&#39;s permissions.</span>
-        <span class="kw">let</span> <span class="ident">everyone</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">guild_id</span>.<span class="number">0</span>)) {
-            <span class="prelude-val">Some</span>(<span class="ident">everyone</span>) =&gt; <span class="ident">everyone</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;@everyone role missing in {}&quot;</span>, <span class="ident">guild_id</span>,);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::RoleNotFound</span>));
-            },
+        <span class="kw">let</span> <span class="ident">everyone</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">everyone</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">guild_id</span>.<span class="number">0</span>)) {
+            <span class="ident">everyone</span>
+        } <span class="kw">else</span> {
+            <span class="macro">error!</span>(<span class="string">&quot;@everyone role missing in {}&quot;</span>, <span class="ident">guild_id</span>,);
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::RoleNotFound</span>));
         };
 
         <span class="comment">// Create a base set of permissions, starting with `@everyone`s.</span>

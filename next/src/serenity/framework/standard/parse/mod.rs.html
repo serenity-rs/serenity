@@ -612,13 +612,12 @@
         <span class="kw">return</span> <span class="ident">Permissions::all</span>();
     }
 
-    <span class="kw">let</span> <span class="ident">everyone</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">guild_id</span>.<span class="number">0</span>)) {
-        <span class="prelude-val">Some</span>(<span class="ident">everyone</span>) =&gt; <span class="ident">everyone</span>,
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="macro">tracing::error!</span>(<span class="string">&quot;@everyone role is missing in guild {}&quot;</span>, <span class="ident">guild_id</span>);
+    <span class="kw">let</span> <span class="ident">everyone</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">everyone</span>) <span class="op">=</span> <span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="ident">guild_id</span>.<span class="number">0</span>)) {
+        <span class="ident">everyone</span>
+    } <span class="kw">else</span> {
+        <span class="macro">tracing::error!</span>(<span class="string">&quot;@everyone role is missing in guild {}&quot;</span>, <span class="ident">guild_id</span>);
 
-            <span class="kw">return</span> <span class="ident">Permissions::empty</span>();
-        },
+        <span class="kw">return</span> <span class="ident">Permissions::empty</span>();
     };
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="ident">everyone</span>.<span class="ident">permissions</span>;
@@ -796,7 +795,7 @@
     <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Configuration</span>,
 ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">mention</span>(<span class="ident">stream</span>, <span class="ident">config</span>) {
-        <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>());
+        <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
 
         <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">id</span>));
     }
@@ -808,7 +807,7 @@
     }
 
     <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">with_whitespace</span>.<span class="ident">prefixes</span> {
-        <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>());
+        <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
     }
 
     <span class="ident">prefix</span>
@@ -875,7 +874,7 @@
     <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>,
 ) -&gt; (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">M::Storage</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">by_space</span> {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">stream</span>.<span class="ident">peek_until_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>()));
+        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">stream</span>.<span class="ident">peek_until_char</span>(<span class="ident">char::is_whitespace</span>));
 
         <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>);
 
@@ -920,7 +919,7 @@
             <span class="ident">stream</span>.<span class="ident">increment</span>(<span class="ident">n</span>.<span class="ident">len</span>());
 
             <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">with_whitespace</span>.<span class="ident">commands</span> {
-                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>());
+                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
             }
 
             <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -959,7 +958,7 @@
             <span class="ident">stream</span>.<span class="ident">increment</span>(<span class="ident">n</span>.<span class="ident">len</span>());
 
             <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">with_whitespace</span>.<span class="ident">groups</span> {
-                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>());
+                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
             }
 
             <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -1066,7 +1065,7 @@
             <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">n</span> {
                 <span class="ident">stream</span>.<span class="ident">increment</span>(<span class="ident">n</span>.<span class="ident">len</span>());
 
-                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>());
+                <span class="ident">stream</span>.<span class="ident">take_while_char</span>(<span class="ident">char::is_whitespace</span>);
 
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Invoke::Help</span>(<span class="ident">name</span>));
             }
@@ -1090,6 +1089,7 @@
                     <span class="ident">last</span> <span class="op">=</span> <span class="ident">res</span>;
                 }
             },
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::items_after_statements</span>)]</span>
             <span class="ident">Map::Prefixless</span>(<span class="ident">subgroups</span>, <span class="ident">commands</span>) =&gt; {
                 <span class="ident">is_prefixless</span> <span class="op">=</span> <span class="bool-val">true</span>;
 

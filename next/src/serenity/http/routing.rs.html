@@ -2666,19 +2666,6 @@
 <span id="2661">2661</span>
 <span id="2662">2662</span>
 <span id="2663">2663</span>
-<span id="2664">2664</span>
-<span id="2665">2665</span>
-<span id="2666">2666</span>
-<span id="2667">2667</span>
-<span id="2668">2668</span>
-<span id="2669">2669</span>
-<span id="2670">2670</span>
-<span id="2671">2671</span>
-<span id="2672">2672</span>
-<span id="2673">2673</span>
-<span id="2674">2674</span>
-<span id="2675">2675</span>
-<span id="2676">2676</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
@@ -4595,6 +4582,9 @@
             ),
             <span class="ident">RouteInfo::EditChannel</span> {
                 <span class="ident">channel_id</span>,
+            }
+            <span class="op">|</span> <span class="ident">RouteInfo::EditThread</span> {
+                <span class="ident">channel_id</span>,
             } =&gt; (
                 <span class="ident">LightMethod::Patch</span>,
                 <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
@@ -4768,13 +4758,6 @@
                 <span class="ident">Route::GuildsIdStickersId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_sticker</span>(<span class="ident">guild_id</span>, <span class="ident">sticker_id</span>)),
             ),
-            <span class="ident">RouteInfo::EditThread</span> {
-                <span class="ident">channel_id</span>,
-            } =&gt; (
-                <span class="ident">LightMethod::Patch</span>,
-                <span class="ident">Route::ChannelsId</span>(<span class="ident">channel_id</span>),
-                <span class="ident">Cow::from</span>(<span class="ident">Route::channel</span>(<span class="ident">channel_id</span>)),
-            ),
             <span class="ident">RouteInfo::EditVoiceState</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">user_id</span>,
@@ -4832,9 +4815,6 @@
                 <span class="ident">Route::WebhooksId</span>(<span class="ident">webhook_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::webhook_with_token_optioned</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>)),
             ),
-            <span class="ident">RouteInfo::GetActiveMaintenance</span> =&gt; {
-                (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_maintenances_active</span>()))
-            },
             <span class="ident">RouteInfo::GetAuditLogs</span> {
                 <span class="ident">action_type</span>,
                 <span class="ident">before</span>,
@@ -5226,12 +5206,6 @@
             <span class="ident">RouteInfo::GetStickerPacks</span> =&gt; {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::StickerPacks</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::sticker_packs</span>()))
             },
-            <span class="ident">RouteInfo::GetUnresolvedIncidents</span> =&gt; {
-                (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_incidents_unresolved</span>()))
-            },
-            <span class="ident">RouteInfo::GetUpcomingMaintenances</span> =&gt; {
-                (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_maintenances_upcoming</span>()))
-            },
             <span class="ident">RouteInfo::GetUser</span> {
                 <span class="ident">user_id</span>,
             } =&gt; (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::UsersId</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::user</span>(<span class="ident">user_id</span>))),
@@ -5335,13 +5309,13 @@
                 <span class="ident">Route::GuildsIdIntegrationsId</span>(<span class="ident">guild_id</span>),
                 <span class="ident">Cow::from</span>(<span class="ident">Route::guild_integration_sync</span>(<span class="ident">guild_id</span>, <span class="ident">integration_id</span>)),
             ),
-            <span class="ident">RouteInfo::StatusIncidentsUnresolved</span> =&gt; {
+            <span class="ident">RouteInfo::GetUnresolvedIncidents</span> <span class="op">|</span> <span class="ident">RouteInfo::StatusIncidentsUnresolved</span> =&gt; {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_incidents_unresolved</span>()))
             },
-            <span class="ident">RouteInfo::StatusMaintenancesActive</span> =&gt; {
+            <span class="ident">RouteInfo::GetActiveMaintenance</span> <span class="op">|</span> <span class="ident">RouteInfo::StatusMaintenancesActive</span> =&gt; {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_maintenances_active</span>()))
             },
-            <span class="ident">RouteInfo::StatusMaintenancesUpcoming</span> =&gt; {
+            <span class="ident">RouteInfo::GetUpcomingMaintenances</span> <span class="op">|</span> <span class="ident">RouteInfo::StatusMaintenancesUpcoming</span> =&gt; {
                 (<span class="ident">LightMethod::Get</span>, <span class="ident">Route::None</span>, <span class="ident">Cow::from</span>(<span class="ident">Route::status_maintenances_upcoming</span>()))
             },
             <span class="ident">RouteInfo::UnpinMessage</span> {

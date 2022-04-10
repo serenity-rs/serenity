@@ -147,8 +147,6 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std::fs::File</span>;
@@ -218,11 +216,9 @@
             <span class="ident">AttachmentType::Path</span>(<span class="ident">path</span>) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">path</span>.<span class="ident">file_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">filename</span><span class="op">|</span> <span class="ident">filename</span>.<span class="ident">to_string_lossy</span>().<span class="ident">to_string</span>()))
             },
-            <span class="ident">AttachmentType::Image</span>(<span class="ident">url</span>) =&gt; {
-                <span class="kw">match</span> <span class="ident">url</span>.<span class="ident">path_segments</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">segments</span><span class="op">|</span> <span class="ident">segments</span>.<span class="ident">last</span>()) {
-                    <span class="prelude-val">Some</span>(<span class="ident">filename</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">filename</span>.<span class="ident">to_string</span>())),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>())),
-                }
+            <span class="ident">AttachmentType::Image</span>(<span class="ident">url</span>) =&gt; <span class="kw">match</span> <span class="ident">url</span>.<span class="ident">path_segments</span>().<span class="ident">and_then</span>(<span class="ident">Iterator::last</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">filename</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">filename</span>.<span class="ident">to_string</span>())),
+                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>())),
             },
         }
     }

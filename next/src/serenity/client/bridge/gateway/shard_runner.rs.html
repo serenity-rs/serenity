@@ -703,14 +703,6 @@
 <span id="698">698</span>
 <span id="699">699</span>
 <span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
-<span id="708">708</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>::{
@@ -1100,17 +1092,9 @@
                 },
                 <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShardUpdate</span> {
                     ..
-                }) =&gt; {
-                    <span class="comment">// nb: not sent here</span>
-
-                    <span class="bool-val">true</span>
-                },
-                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>) =&gt; {
-                    <span class="comment">// nb: not sent here</span>
-
-                    <span class="bool-val">true</span>
-                },
-                <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="kw">_</span>)) =&gt; {
+                })
+                <span class="op">|</span> <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownInitiated</span>)
+                <span class="op">|</span> <span class="ident">ShardClientMessage::Manager</span>(<span class="ident">ShardManagerMessage::ShutdownFinished</span>(<span class="kw">_</span>)) =&gt; {
                     <span class="comment">// nb: not sent here</span>
 
                     <span class="bool-val">true</span>

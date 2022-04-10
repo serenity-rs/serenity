@@ -1154,7 +1154,7 @@
         <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
     {
         <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">extend</span>(<span class="ident">delimiters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>()));
+        <span class="self">self</span>.<span class="ident">delimiters</span>.<span class="ident">extend</span>(<span class="ident">delimiters</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
 
         <span class="self">self</span>
     }

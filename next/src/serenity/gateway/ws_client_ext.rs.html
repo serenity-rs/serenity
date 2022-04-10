@@ -255,7 +255,7 @@
             <span class="ident">ChunkGuildFilter::Query</span>(<span class="ident">query</span>) =&gt; <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="ident">query</span>),
             <span class="ident">ChunkGuildFilter::UserIds</span>(<span class="ident">user_ids</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">user_ids</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="number">0</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-                <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;user_ids&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="ident">ids</span>)
+                <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;user_ids&quot;</span>] <span class="op">=</span> <span class="macro">json!</span>(<span class="ident">ids</span>);
             },
         };
 

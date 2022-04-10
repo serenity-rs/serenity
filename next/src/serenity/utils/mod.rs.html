@@ -534,8 +534,6 @@
 <span id="529">529</span>
 <span id="530">530</span>
 <span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
 
@@ -835,15 +833,13 @@
                 <span class="kw">for</span> <span class="ident">y</span> <span class="kw">in</span> <span class="ident">mention</span>[<span class="ident">from</span>..].<span class="ident">chars</span>() {
                     <span class="kw">if</span> <span class="ident">y</span> <span class="op">==</span> <span class="string">&#39;&gt;&#39;</span> {
                         <span class="kw">break</span>;
-                    } <span class="kw">else</span> {
-                        <span class="ident">id</span>.<span class="ident">push</span>(<span class="ident">y</span>);
                     }
+                    <span class="ident">id</span>.<span class="ident">push</span>(<span class="ident">y</span>);
                 }
 
                 <span class="kw">break</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">name</span>.<span class="ident">push</span>(<span class="ident">x</span>);
             }
+            <span class="ident">name</span>.<span class="ident">push</span>(<span class="ident">x</span>);
         }
 
         <span class="kw">match</span> <span class="ident">id</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() {

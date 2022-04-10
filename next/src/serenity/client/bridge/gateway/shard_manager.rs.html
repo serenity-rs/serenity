@@ -368,6 +368,7 @@
 <span id="363">363</span>
 <span id="364">364</span>
 <span id="365">365</span>
+<span id="366">366</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
     <span class="ident">sync::Arc</span>,
@@ -626,7 +627,7 @@
     <span class="doccomment">/// [`ShardRunner`]: super::ShardRunner</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shards_instantiated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ShardId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+        <span class="self">self</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">keys</span>().<span class="ident">copied</span>().<span class="ident">collect</span>()
     }
 
     <span class="doccomment">/// Attempts to shut down the shard runner by Id.</span>
@@ -642,11 +643,12 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::let_underscore_must_use</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">shard_id</span>: <span class="ident">ShardId</span>, <span class="ident">code</span>: <span class="ident">u16</span>) {
+        <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">tokio::time::Duration</span> <span class="op">=</span> <span class="ident">tokio::time::Duration::from_secs</span>(<span class="number">5</span>);
+
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down shard {}&quot;</span>, <span class="ident">shard_id</span>);
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard_queuer</span>.<span class="ident">unbounded_send</span>(<span class="ident">ShardQueuerMessage::ShutdownShard</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>));
 
-        <span class="kw">const</span> <span class="ident">TIMEOUT</span>: <span class="ident">tokio::time::Duration</span> <span class="op">=</span> <span class="ident">tokio::time::Duration::from_secs</span>(<span class="number">5</span>);
         <span class="kw">match</span> <span class="ident">timeout</span>(<span class="ident">TIMEOUT</span>, <span class="self">self</span>.<span class="ident">shard_shutdown</span>.<span class="ident">next</span>()).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">shutdown_shard_id</span>)) =&gt; {
                 <span class="kw">if</span> <span class="ident">shutdown_shard_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">shard_id</span> {
@@ -658,7 +660,7 @@
             },
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; (),
             <span class="prelude-val">Err</span>(<span class="ident">why</span>) =&gt; {
-                <span class="macro">warn!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, <span class="ident">shard_id</span>, <span class="ident">why</span>,)
+                <span class="macro">warn!</span>(<span class="string">&quot;Failed to cleanly shutdown shard {}, reached timeout: {:?}&quot;</span>, <span class="ident">shard_id</span>, <span class="ident">why</span>);
             },
         }
 
@@ -680,7 +682,7 @@
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">runners</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+            <span class="ident">runners</span>.<span class="ident">keys</span>().<span class="ident">copied</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
         };
 
         <span class="macro">info!</span>(<span class="string">&quot;Shutting down all shards&quot;</span>);

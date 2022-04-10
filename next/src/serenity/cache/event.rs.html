@@ -918,13 +918,13 @@
             }
         }
 
-        <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>() {
+        <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">clone</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">pair</span>.<span class="number">1</span> {
                 <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">pair</span>.<span class="number">0</span>, <span class="ident">channel</span>);
             }
         }
 
-        <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>() {
+        <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">clone</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Channel::Category</span>(<span class="ident">category</span>) <span class="op">=</span> <span class="ident">pair</span>.<span class="number">1</span> {
                 <span class="ident">cache</span>.<span class="ident">categories</span>.<span class="ident">insert</span>(<span class="ident">pair</span>.<span class="number">0</span>, <span class="ident">category</span>);
             }

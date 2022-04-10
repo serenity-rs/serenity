@@ -1289,8 +1289,6 @@
 <span id="1284">1284</span>
 <span id="1285">1285</span>
 <span id="1286">1286</span>
-<span id="1287">1287</span>
-<span id="1288">1288</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to Discord channels.</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1512,14 +1510,13 @@
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user_id</span>() {
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_private</span>() {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Model</span>(<span class="ident">ModelError::NotAuthor</span>));
-                    } <span class="kw">else</span> {
-                        <span class="ident">utils::user_has_perms_cache</span>(
-                            <span class="ident">cache</span>,
-                            <span class="self">self</span>.<span class="ident">channel_id</span>,
-                            <span class="self">self</span>.<span class="ident">guild_id</span>,
-                            <span class="ident">Permissions::MANAGE_MESSAGES</span>,
-                        )<span class="question-mark">?</span>;
                     }
+                    <span class="ident">utils::user_has_perms_cache</span>(
+                        <span class="ident">cache</span>,
+                        <span class="self">self</span>.<span class="ident">channel_id</span>,
+                        <span class="self">self</span>.<span class="ident">guild_id</span>,
+                        <span class="ident">Permissions::MANAGE_MESSAGES</span>,
+                    )<span class="question-mark">?</span>;
                 }
             }
         }
@@ -2550,11 +2547,10 @@
     <span class="doccomment">/// Returns a link referencing this message. When clicked, users will jump to the message.</span>
     <span class="doccomment">/// The link will be valid for messages in either private channels or guilds.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">link</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">guild_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/{}/{}/{}&quot;</span>, <span class="ident">guild_id</span>.<span class="number">0</span>, <span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">0</span>)
-            },
-            <span class="prelude-val">None</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/@me/{}/{}&quot;</span>, <span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">0</span>),
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">guild_id</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/{}/{}/{}&quot;</span>, <span class="ident">guild_id</span>, <span class="ident">channel_id</span>, <span class="self">self</span>)
+        } <span class="kw">else</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;https://discord.com/channels/@me/{}/{}&quot;</span>, <span class="ident">channel_id</span>, <span class="self">self</span>)
         }
     }
 
