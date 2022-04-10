@@ -454,6 +454,9 @@ pub struct ApplicationCommandInteractionData {
     /// The converted objects from the given options.
     #[serde(default)]
     pub resolved: ApplicationCommandInteractionDataResolved,
+    /// The Id of the guild the command is registered to.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub guild_id: Option<GuildId>,
     /// The targeted user or message, if the triggered application command type
     /// is [`User`] or [`Message`].
     ///
@@ -526,6 +529,11 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             .and_then(ApplicationCommandType::deserialize)
             .map_err(DeError::custom)?;
 
+        let guild_id = match map.remove("guild_id") {
+            Some(id) => Option::<GuildId>::deserialize(id).map_err(DeError::custom)?,
+            None => None,
+        };
+
         let target_id = match map.remove("target_id") {
             Some(id) => Option::<TargetId>::deserialize(id).map_err(DeError::custom)?,
             None => None,
@@ -537,6 +545,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             kind,
             options,
             resolved,
+            guild_id,
             target_id,
         })
     }
