@@ -1,20 +1,19 @@
 use std::borrow::Cow;
 
-use reqwest::{
-    header::{
-        HeaderMap as Headers,
-        HeaderValue,
-        AUTHORIZATION,
-        CONTENT_LENGTH,
-        CONTENT_TYPE,
-        USER_AGENT,
-    },
-    Url,
+use reqwest::header::{
+    HeaderMap as Headers,
+    HeaderValue,
+    AUTHORIZATION,
+    CONTENT_LENGTH,
+    CONTENT_TYPE,
+    USER_AGENT,
 };
-use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder};
+use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder, Url};
 use tracing::instrument;
 
-use super::{multipart::Multipart, routing::RouteInfo, HttpError};
+use super::multipart::Multipart;
+use super::routing::RouteInfo;
+use super::HttpError;
 use crate::constants;
 use crate::internal::prelude::*;
 

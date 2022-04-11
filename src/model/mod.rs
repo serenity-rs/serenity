@@ -42,7 +42,8 @@ pub mod user;
 pub mod voice;
 pub mod webhook;
 
-use std::{collections::HashMap, result::Result as StdResult};
+use std::collections::HashMap;
+use std::result::Result as StdResult;
 
 use serde::de::Visitor;
 use serde::{Deserialize, Deserializer};

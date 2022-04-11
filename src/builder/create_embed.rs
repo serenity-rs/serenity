@@ -465,10 +465,8 @@ impl CreateEmbedFooter {
 mod test {
     use super::CreateEmbed;
     use crate::json::{self, json, Value};
-    use crate::{
-        model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo},
-        utils::Colour,
-    };
+    use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
+    use crate::utils::Colour;
 
     #[test]
     fn test_from_embed() {

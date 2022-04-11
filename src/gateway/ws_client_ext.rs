@@ -2,8 +2,7 @@ use std::env::consts;
 use std::time::SystemTime;
 
 use async_trait::async_trait;
-use tracing::instrument;
-use tracing::{debug, trace};
+use tracing::{debug, instrument, trace};
 
 use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, OpCode};

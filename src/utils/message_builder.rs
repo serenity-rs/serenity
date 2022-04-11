@@ -1,14 +1,9 @@
-use std::{
-    default::Default,
-    fmt::{self, Write},
-    ops::Add,
-};
+use std::fmt::{self, Write};
+use std::ops::Add;
 
-use crate::model::{
-    guild::Emoji,
-    id::{ChannelId, RoleId, UserId},
-    misc::Mentionable,
-};
+use crate::model::guild::Emoji;
+use crate::model::id::{ChannelId, RoleId, UserId};
+use crate::model::misc::Mentionable;
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
@@ -1236,10 +1231,8 @@ fn normalize(text: &str) -> String {
 
 #[cfg(test)]
 mod test {
-    use super::{
-        ContentModifier::{Bold, Code, Italic, Spoiler},
-        MessageBuilder,
-    };
+    use super::ContentModifier::{Bold, Code, Italic, Spoiler};
+    use super::MessageBuilder;
     use crate::model::prelude::*;
 
     macro_rules! gen {

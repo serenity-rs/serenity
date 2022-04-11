@@ -32,9 +32,10 @@ use crate::cache::Cache;
 use crate::client::Context;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
+use crate::model::channel::Message;
 #[cfg(feature = "cache")]
 use crate::model::guild::Member;
-use crate::model::{channel::Message, permissions::Permissions};
+use crate::model::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
 

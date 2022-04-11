@@ -1,4 +1,5 @@
-use std::{error::Error as StdError, fmt};
+use std::error::Error as StdError;
+use std::fmt;
 
 /// An error returned from the [`Client`].
 ///

@@ -1,11 +1,9 @@
 use std::collections::HashMap;
 
-use crate::{internal::prelude::*, json::from_number};
-use crate::{
-    json::NULL,
-    model::id::{ChannelId, RoleId},
-    model::Timestamp,
-};
+use crate::internal::prelude::*;
+use crate::json::{from_number, NULL};
+use crate::model::id::{ChannelId, RoleId};
+use crate::model::Timestamp;
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].

@@ -2,8 +2,7 @@ use std::collections::HashMap;
 #[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
-use super::CreateAllowedMentions;
-use super::CreateEmbed;
+use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
 use crate::json::{self, from_number, to_value};

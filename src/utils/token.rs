@@ -1,7 +1,6 @@
 //! Utilities to parse and validate Discord tokens.
 
-use std::fmt;
-use std::str;
+use std::{fmt, str};
 
 use crate::model::id::UserId;
 

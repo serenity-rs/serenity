@@ -4,10 +4,8 @@ use futures::future::BoxFuture;
 
 use super::Delimiter;
 use crate::client::Context;
-use crate::model::{
-    channel::Message,
-    id::{ChannelId, GuildId, UserId},
-};
+use crate::model::channel::Message;
+use crate::model::id::{ChannelId, GuildId, UserId};
 
 type DynamicPrefixHook =
     for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;

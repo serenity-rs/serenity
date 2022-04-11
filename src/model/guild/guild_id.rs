@@ -86,8 +86,7 @@ impl GuildId {
     /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
     /// ```rust,no_run
-    /// use serenity::model::id::GuildId;
-    /// use serenity::model::id::UserId;
+    /// use serenity::model::id::{GuildId, UserId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;

@@ -1,4 +1,6 @@
-use serenity::{async_trait, model::prelude::*, prelude::*};
+use serenity::async_trait;
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 
 struct Bot {
     database: sqlx::SqlitePool,

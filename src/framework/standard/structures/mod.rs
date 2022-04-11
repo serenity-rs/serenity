@@ -1,10 +1,14 @@
-use std::{collections::HashSet, error::Error as StdError, fmt};
+use std::collections::HashSet;
+use std::error::Error as StdError;
+use std::fmt;
 
 use futures::future::BoxFuture;
 
 use super::Args;
 use crate::client::Context;
-use crate::model::{channel::Message, id::UserId, permissions::Permissions};
+use crate::model::channel::Message;
+use crate::model::id::UserId;
+use crate::model::permissions::Permissions;
 use crate::utils::Colour;
 
 pub mod buckets;

@@ -14,19 +14,12 @@ use super::Cache;
 /// Creating a custom struct implementation to update the cache with:
 ///
 /// ```rust,ignore
-/// use serenity::{
-///     json::json,    
-///     cache::{Cache, CacheUpdate},
-///     model::{
-///         id::UserId,
-///         user::User,
-///     },
-///     prelude::RwLock,
-/// };
-/// use std::{
-///     collections::hash_map::Entry,
-///     sync::Arc,
-/// };
+/// use std::collections::hash_map::Entry;
+///
+/// use serenity::json::json;
+/// use serenity::cache::{Cache, CacheUpdate};
+/// use serenity::model::id::UserId;
+/// use serenity::model::user::User;
 ///
 /// // For example, an update to the user's record in the database was
 /// // published to a pubsub channel.
