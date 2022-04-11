@@ -1465,10 +1465,6 @@
 <span id="1460">1460</span>
 <span id="1461">1461</span>
 <span id="1462">1462</span>
-<span id="1463">1463</span>
-<span id="1464">1464</span>
-<span id="1465">1465</span>
-<span id="1466">1466</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Example</span>
@@ -1778,7 +1774,6 @@
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Context</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Message</span>,
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">CommandGroup</span>,
-    <span class="ident">found_group_prefix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">bool</span>,
     <span class="ident">commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">InternalCommand</span>],
     <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">String</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
@@ -1873,7 +1868,6 @@
                             <span class="ident">ctx</span>,
                             <span class="ident">msg</span>,
                             <span class="ident">group</span>,
-                            <span class="ident">found_group_prefix</span>,
                             <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">sub_commands</span>,
                             <span class="ident">name</span>,
                             <span class="ident">help_options</span>,
@@ -1944,12 +1938,10 @@
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found_group_prefix</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
             <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="ident">nested_commands_search</span>(
                 <span class="ident">ctx</span>,
                 <span class="ident">msg</span>,
                 <span class="ident">group</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">found_group_prefix</span>,
                 <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span>,
                 <span class="ident">name</span>,
                 <span class="ident">help_options</span>,
