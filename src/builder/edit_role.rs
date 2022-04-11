@@ -35,7 +35,7 @@ use crate::model::Permissions;
 /// # use serenity::{model::id::{ChannelId, GuildId}, http::Http};
 /// # use std::sync::Arc;
 /// #
-/// # let http = Arc::new(Http::default());
+/// # let http = Arc::new(Http::new("token"));
 /// # let (channel_id, guild_id) = (ChannelId(1), GuildId(2));
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound

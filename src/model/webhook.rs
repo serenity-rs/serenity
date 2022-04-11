@@ -136,7 +136,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
@@ -175,7 +175,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
@@ -222,7 +222,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
@@ -263,7 +263,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
@@ -279,7 +279,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// use serenity::model::channel::Embed;
     ///
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";

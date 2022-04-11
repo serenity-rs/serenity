@@ -35,7 +35,7 @@ use crate::model::id::StickerId;
 /// # use serenity::http::Http;
 /// # use std::sync::Arc;
 /// #
-/// # let http = Arc::new(Http::default());
+/// # let http = Arc::new(Http::new("token"));
 ///
 /// let channel_id = ChannelId(7);
 ///

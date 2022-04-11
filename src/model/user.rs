@@ -242,7 +242,7 @@ impl CurrentUser {
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// #     let mut user = CurrentUser::default();
     /// let avatar = serenity::utils::read_image("./avatar.png")?;
     ///
@@ -301,7 +301,7 @@ impl CurrentUser {
     /// #
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// // assuming the user has been bound
     ///
     /// if let Ok(guilds) = user.guilds(&http).await {
@@ -360,7 +360,7 @@ impl CurrentUser {
     /// #
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
@@ -389,7 +389,7 @@ impl CurrentUser {
     /// #
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
@@ -441,7 +441,7 @@ impl CurrentUser {
     /// #
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::model::oauth2::OAuth2Scope;
     /// use serenity::model::Permissions;
     ///

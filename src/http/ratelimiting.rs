@@ -127,7 +127,7 @@ impl Ratelimiter {
     /// # use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let routes = http.ratelimiter.routes();
     /// let reader = routes.read().await;
     ///

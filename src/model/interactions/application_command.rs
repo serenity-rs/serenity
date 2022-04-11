@@ -728,7 +728,7 @@ impl ApplicationCommand {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// use serenity::model::id::ApplicationId;
     /// use serenity::model::interactions::application_command::ApplicationCommand;
     ///
@@ -746,7 +746,7 @@ impl ApplicationCommand {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// use serenity::model::id::ApplicationId;
     /// use serenity::model::interactions::application_command::{
     ///     ApplicationCommand,

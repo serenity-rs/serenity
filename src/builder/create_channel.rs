@@ -100,7 +100,7 @@ impl CreateChannel {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Arc::new(Http::default());
+    /// #     let http = Arc::new(Http::new("token"));
     /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;
