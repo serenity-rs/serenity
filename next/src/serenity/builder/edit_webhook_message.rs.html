@@ -73,6 +73,8 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CreateAllowedMentions</span>;
@@ -128,10 +130,12 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets the components of this message. Requires an application-owned webhook, meaning</span>
-    <span class="doccomment">/// the webhook&#39;s `kind` field is set to [`WebhookType::Application`].</span>
+    <span class="doccomment">/// Creates components for this message. Requires an application-owned webhook, meaning either</span>
+    <span class="doccomment">/// the webhook&#39;s `kind` field is set to [`WebhookType::Application`], or it was created by an</span>
+    <span class="doccomment">/// application (and has kind [`WebhookType::Incoming`]).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`WebhookType::Application`]: crate::model::webhook::WebhookType</span>
+    <span class="doccomment">/// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">components</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateComponents</span>,
