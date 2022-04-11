@@ -3835,44 +3835,6 @@
 <span id="3830">3830</span>
 <span id="3831">3831</span>
 <span id="3832">3832</span>
-<span id="3833">3833</span>
-<span id="3834">3834</span>
-<span id="3835">3835</span>
-<span id="3836">3836</span>
-<span id="3837">3837</span>
-<span id="3838">3838</span>
-<span id="3839">3839</span>
-<span id="3840">3840</span>
-<span id="3841">3841</span>
-<span id="3842">3842</span>
-<span id="3843">3843</span>
-<span id="3844">3844</span>
-<span id="3845">3845</span>
-<span id="3846">3846</span>
-<span id="3847">3847</span>
-<span id="3848">3848</span>
-<span id="3849">3849</span>
-<span id="3850">3850</span>
-<span id="3851">3851</span>
-<span id="3852">3852</span>
-<span id="3853">3853</span>
-<span id="3854">3854</span>
-<span id="3855">3855</span>
-<span id="3856">3856</span>
-<span id="3857">3857</span>
-<span id="3858">3858</span>
-<span id="3859">3859</span>
-<span id="3860">3860</span>
-<span id="3861">3861</span>
-<span id="3862">3862</span>
-<span id="3863">3863</span>
-<span id="3864">3864</span>
-<span id="3865">3865</span>
-<span id="3866">3866</span>
-<span id="3867">3867</span>
-<span id="3868">3868</span>
-<span id="3869">3869</span>
-<span id="3870">3870</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -3907,7 +3869,7 @@
 <span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests</span>
 <span class="doccomment">/// to Discord&#39;s HTTP API. If you do not need to use a proxy or do not</span>
 <span class="doccomment">/// need to disable the rate limiter, you can use [`Http::new`] or</span>
-<span class="doccomment">/// [`Http::new_with_token`] instead.</span>
+<span class="doccomment">/// [`Http::new_with_application_id`] instead.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ## Example</span>
 <span class="doccomment">///</span>
@@ -4046,7 +4008,7 @@
 <span class="kw">fn</span> <span class="ident">parse_token</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">as_ref</span>().<span class="ident">trim</span>();
 
-    <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Bot &quot;</span>) {
+    <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Bot &quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Bearer &quot;</span>) {
         <span class="ident">token</span>.<span class="ident">to_string</span>()
     } <span class="kw">else</span> {
         <span class="macro">format!</span>(<span class="string">&quot;Bot {}&quot;</span>, <span class="ident">token</span>)
@@ -4089,7 +4051,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Http</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
+
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>);
         <span class="kw">let</span> <span class="ident">client2</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
 
         <span class="ident">Http</span> {
@@ -4097,42 +4062,17 @@
             <span class="ident">ratelimiter</span>: <span class="ident">Ratelimiter::new</span>(<span class="ident">client2</span>, <span class="ident">token</span>.<span class="ident">to_string</span>()),
             <span class="ident">ratelimiter_disabled</span>: <span class="bool-val">false</span>,
             <span class="ident">proxy</span>: <span class="prelude-val">None</span>,
-            <span class="ident">token</span>: <span class="ident">token</span>.<span class="ident">to_string</span>(),
+            <span class="ident">token</span>: <span class="ident">parse_token</span>(<span class="ident">token</span>),
             <span class="ident">application_id</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_application_id</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
-        <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_application_id</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">token</span>);
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">built</span>, <span class="string">&quot;&quot;</span>);
+        <span class="ident">http</span>.<span class="ident">set_application_id</span>(<span class="ident">application_id</span>);
 
-        <span class="ident">data</span>.<span class="ident">set_application_id</span>(<span class="ident">application_id</span>);
-
-        <span class="ident">data</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_token</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">configure_client_backend</span>(<span class="ident">Client::builder</span>());
-        <span class="kw">let</span> <span class="ident">built</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>);
-
-        <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">trim</span>();
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">trimmed</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Bot &quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">trimmed</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Bearer &quot;</span>) {
-            <span class="ident">token</span>.<span class="ident">to_string</span>()
-        } <span class="kw">else</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;Bot {}&quot;</span>, <span class="ident">token</span>)
-        };
-
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">built</span>, <span class="kw-2">&amp;</span><span class="ident">token</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_token_application_id</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_with_token</span>(<span class="ident">token</span>);
-
-        <span class="ident">base</span>.<span class="ident">set_application_id</span>(<span class="ident">application_id</span>);
-
-        <span class="ident">base</span>
+        <span class="ident">http</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
@@ -4484,7 +4424,7 @@
     <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #    let http = Http::default();</span>
+    <span class="doccomment">/// #    let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let map = json!({</span>
     <span class="doccomment">///     &quot;name&quot;: &quot;test&quot;,</span>
     <span class="doccomment">/// });</span>
@@ -4783,7 +4723,7 @@
     <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #    let http = Http::default();</span>
+    <span class="doccomment">/// #    let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let channel_id = 81384788765712384;</span>
     <span class="doccomment">/// let map = json!({&quot;name&quot;: &quot;test&quot;});</span>
     <span class="doccomment">///</span>
@@ -4980,7 +4920,7 @@
     <span class="doccomment">/// use serenity::model::id::{ChannelId, MessageId};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let channel_id = ChannelId(7);</span>
     <span class="doccomment">/// let message_id = MessageId(8);</span>
     <span class="doccomment">///</span>
@@ -5130,7 +5070,7 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// // Due to the `delete_webhook` function requiring you to authenticate, you</span>
     <span class="doccomment">/// // must have set the token first.</span>
-    <span class="doccomment">/// let http = Http::default();</span>
+    <span class="doccomment">/// let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// http.delete_webhook(245037420704169985).await?;</span>
     <span class="doccomment">/// Ok(())</span>
@@ -5160,7 +5100,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let id = 245037420704169985;</span>
     <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">///</span>
@@ -5799,7 +5739,7 @@
     <span class="doccomment">/// use serenity::json::{json, prelude::*};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let guild_id = 187450744427773963;</span>
     <span class="doccomment">/// let user_id = 150443906511667200;</span>
     <span class="doccomment">/// let value = json!({</span>
@@ -5849,7 +5789,7 @@
     <span class="doccomment">/// use serenity::json::{json, prelude::*};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let guild_id = 187450744427773963;</span>
     <span class="doccomment">/// let value = json!({</span>
     <span class="doccomment">///     &quot;channel_id&quot;: &quot;826929611849334784&quot;,</span>
@@ -5901,7 +5841,7 @@
     <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let id = 245037420704169985;</span>
     <span class="doccomment">/// let image = serenity::utils::read_image(&quot;./webhook_img.png&quot;)?;</span>
     <span class="doccomment">/// let map = json!({</span>
@@ -5944,7 +5884,7 @@
     <span class="doccomment">/// use serenity::json::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let id = 245037420704169985;</span>
     <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">/// let value = json!({&quot;name&quot;: &quot;new name&quot;});</span>
@@ -6010,7 +5950,7 @@
     <span class="doccomment">/// use serenity::json::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let id = 245037420704169985;</span>
     <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">/// let value = json!({&quot;content&quot;: &quot;test&quot;});</span>
@@ -6388,7 +6328,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let channel_id = 81384788765712384;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let webhooks = http.get_channel_webhooks(channel_id).await?;</span>
@@ -6888,7 +6828,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let guild_id = 81384788765712384;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let webhooks = http.get_guild_webhooks(guild_id).await?;</span>
@@ -6921,7 +6861,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::http::GuildPagination;</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
@@ -7230,7 +7170,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let id = 245037420704169985;</span>
     <span class="doccomment">/// let webhook = http.get_webhook(id).await?;</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -7260,7 +7200,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let id = 245037420704169985;</span>
     <span class="doccomment">/// let token = &quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
     <span class="doccomment">///</span>
@@ -7293,7 +7233,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let url = &quot;https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;;</span>
 
     <span class="doccomment">/// let webhook = http.get_webhook_from_url(url).await?;</span>
@@ -7551,7 +7491,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # fn long_process() {}</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// // Initiate typing (assuming http is `Arc&lt;Http&gt;`)</span>
     <span class="doccomment">/// let typing = http.start_typing(7)?;</span>
     <span class="doccomment">///</span>
@@ -7602,7 +7542,7 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::{</span>
     <span class="doccomment">///     http::{</span>
     <span class="doccomment">///         routing::RouteInfo,</span>
@@ -7653,7 +7593,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::http::{</span>
     <span class="doccomment">///     request::RequestBuilder,</span>
     <span class="doccomment">///     routing::RouteInfo,</span>
@@ -7725,22 +7665,6 @@
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Http</span> {
     <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Http</span> {
         <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Http</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::builder</span>().<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build Reqwest::Client.&quot;</span>);
-        <span class="kw">let</span> <span class="ident">client2</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
-
-        <span class="self">Self</span> {
-            <span class="ident">client</span>,
-            <span class="ident">ratelimiter</span>: <span class="ident">Ratelimiter::new</span>(<span class="ident">client2</span>, <span class="string">&quot;&quot;</span>),
-            <span class="ident">ratelimiter_disabled</span>: <span class="bool-val">false</span>,
-            <span class="ident">proxy</span>: <span class="prelude-val">None</span>,
-            <span class="ident">token</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">application_id</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
-        }
     }
 }
 </code></pre></div>

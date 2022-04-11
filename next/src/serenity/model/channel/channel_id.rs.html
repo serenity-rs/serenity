@@ -1368,7 +1368,7 @@
     <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # let http = serenity::http::Http::default();</span>
+    <span class="doccomment">/// # let http = serenity::http::Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let _successful = ChannelId(7).broadcast_typing(&amp;http).await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -1627,7 +1627,7 @@
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     use serenity::http::Http;</span>
     <span class="doccomment">/// #     use serenity::model::id::ChannelId;</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// #     let channel_id = ChannelId(1234);</span>
     <span class="doccomment">/// channel_id.edit(&amp;http, |c| c.name(&quot;test&quot;).bitrate(64000)).await;</span>
     <span class="doccomment">/// # }</span>
@@ -1827,7 +1827,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let channel_id = ChannelId::default();</span>
-    <span class="doccomment">/// # let ctx = Http::default();</span>
+    <span class="doccomment">/// # let ctx = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::futures::StreamExt;</span>
     <span class="doccomment">/// use serenity::model::channel::MessagesIter;</span>
     <span class="doccomment">///</span>
@@ -1982,7 +1982,7 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let channel_id = ChannelId(7);</span>
@@ -2000,7 +2000,7 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// use serenity::model::id::ChannelId;</span>
     <span class="doccomment">/// use tokio::fs::File;</span>
     <span class="doccomment">///</span>
@@ -2118,7 +2118,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # fn long_process() {}</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// // Initiate typing (assuming http is `Arc&lt;Http&gt;`)</span>
     <span class="doccomment">/// let typing = ChannelId(7).start_typing(&amp;http)?;</span>
     <span class="doccomment">///</span>
@@ -2586,7 +2586,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let channel_id = ChannelId::default();</span>
-    <span class="doccomment">/// # let ctx = Http::default();</span>
+    <span class="doccomment">/// # let ctx = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::futures::StreamExt;</span>
     <span class="doccomment">/// use serenity::model::channel::MessagesIter;</span>
     <span class="doccomment">///</span>

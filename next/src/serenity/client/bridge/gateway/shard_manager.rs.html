@@ -434,7 +434,7 @@
 <span class="doccomment">/// impl EventHandler for Handler {}</span>
 <span class="doccomment">/// impl RawEventHandler for Handler {}</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// # let cache_and_http = Arc::new(CacheAndHttp::default());</span>
+<span class="doccomment">/// # let cache_and_http: Arc&lt;CacheAndHttp&gt; = unimplemented!();</span>
 <span class="doccomment">/// # let http = &amp;cache_and_http.http;</span>
 <span class="doccomment">/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
 <span class="doccomment">/// let data = Arc::new(RwLock::new(TypeMap::new()));</span>

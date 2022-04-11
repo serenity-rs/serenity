@@ -1783,7 +1783,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// # let user = UserId(1);</span>
     <span class="doccomment">/// // assuming a `user` has already been bound</span>
     <span class="doccomment">/// let _ = GuildId(81384788765712384).ban(&amp;http, user, 4).await;</span>
@@ -1917,7 +1917,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>
-    <span class="doccomment">/// # let http = Http::default();</span>
+    <span class="doccomment">/// # let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let _channel =</span>
     <span class="doccomment">///     GuildId(7).create_channel(&amp;http, |c| c.name(&quot;test&quot;).kind(ChannelType::Voice)).await;</span>
     <span class="doccomment">/// # }</span>
@@ -2661,7 +2661,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let guild_id = GuildId::default();</span>
-    <span class="doccomment">/// # let ctx = Http::default();</span>
+    <span class="doccomment">/// # let ctx = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::futures::StreamExt;</span>
     <span class="doccomment">/// use serenity::model::guild::MembersIter;</span>
     <span class="doccomment">///</span>
@@ -3330,7 +3330,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let guild_id = GuildId::default();</span>
-    <span class="doccomment">/// # let ctx = Http::default();</span>
+    <span class="doccomment">/// # let ctx = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::futures::StreamExt;</span>
     <span class="doccomment">/// use serenity::model::guild::MembersIter;</span>
     <span class="doccomment">///</span>

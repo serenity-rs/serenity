@@ -596,7 +596,7 @@
     <span class="doccomment">/// # use serenity::http::Http;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// let routes = http.ratelimiter.routes();</span>
     <span class="doccomment">/// let reader = routes.read().await;</span>
     <span class="doccomment">///</span>

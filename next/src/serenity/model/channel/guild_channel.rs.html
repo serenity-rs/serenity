@@ -1539,7 +1539,7 @@
     <span class="doccomment">/// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// #     let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// #     let cache = Cache::default();</span>
     <span class="doccomment">/// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));</span>
     <span class="doccomment">/// #</span>
@@ -1571,7 +1571,7 @@
     <span class="doccomment">/// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #   let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// #   let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// #   let cache = Cache::default();</span>
     <span class="doccomment">/// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));</span>
     <span class="doccomment">/// #</span>
@@ -1813,7 +1813,7 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// #     let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// #     let cache = Cache::default();</span>
     <span class="doccomment">/// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));</span>
     <span class="doccomment">/// #</span>
@@ -1863,7 +1863,7 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// # use serenity::{cache::Cache, http::Http, model::id::ChannelId};</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// #     let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// #     let cache = Cache::default();</span>
     <span class="doccomment">/// #     let channel_id = ChannelId(0);</span>
     <span class="doccomment">/// #</span>
@@ -2307,7 +2307,7 @@
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # fn long_process() {}</span>
-    <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// # let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// # let cache = Cache::default();</span>
     <span class="doccomment">/// # let channel = cache</span>
     <span class="doccomment">/// #    .guild_channel(ChannelId(7))</span>

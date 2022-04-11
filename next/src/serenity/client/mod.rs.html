@@ -1082,7 +1082,7 @@
     <span class="doccomment">/// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,</span>
     <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">Http::new_with_token</span>(<span class="ident">token</span>.<span class="ident">as_ref</span>()))
+        <span class="ident"><span class="self">Self</span>::_new</span>(<span class="ident">Http::new</span>(<span class="ident">token</span>.<span class="ident">as_ref</span>()))
     }
 
     <span class="doccomment">/// Construct a new builder with a [`Http`] instance to calls methods on</span>
@@ -1099,7 +1099,7 @@
     <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;,</span>
     <span class="doccomment">/// this method will automatically do so.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Http::new_with_token</span>(<span class="ident">token</span>.<span class="ident">as_ref</span>()));
+        <span class="self">self</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Http::new</span>(<span class="ident">token</span>.<span class="ident">as_ref</span>()));
 
         <span class="self">self</span>
     }

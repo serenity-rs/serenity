@@ -953,7 +953,7 @@
     <span class="doccomment">/// # use serenity::model::gateway::GatewayIntents;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// #     let http = Arc::new(Http::new(&quot;token&quot;));</span>
     <span class="doccomment">/// let token = std::env::var(&quot;DISCORD_BOT_TOKEN&quot;)?;</span>
     <span class="doccomment">/// // retrieve the gateway response, which contains the URL to connect to</span>
     <span class="doccomment">/// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>

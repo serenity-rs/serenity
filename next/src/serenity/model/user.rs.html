@@ -1649,7 +1649,7 @@
     <span class="doccomment">/// # use serenity::model::user::CurrentUser;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// #     let mut user = CurrentUser::default();</span>
     <span class="doccomment">/// let avatar = serenity::utils::read_image(&quot;./avatar.png&quot;)?;</span>
     <span class="doccomment">///</span>
@@ -1708,7 +1708,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     let user = CurrentUser::default();</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// // assuming the user has been bound</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Ok(guilds) = user.guilds(&amp;http).await {</span>
@@ -1767,7 +1767,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     let user = CurrentUser::default();</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::model::Permissions;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming the user has been bound</span>
@@ -1796,7 +1796,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     let user = CurrentUser::default();</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::model::Permissions;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // assuming the user has been bound</span>
@@ -1848,7 +1848,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// #     let user = CurrentUser::default();</span>
-    <span class="doccomment">/// #     let http = Http::default();</span>
+    <span class="doccomment">/// #     let http = Http::new(&quot;token&quot;);</span>
     <span class="doccomment">/// use serenity::model::oauth2::OAuth2Scope;</span>
     <span class="doccomment">/// use serenity::model::Permissions;</span>
     <span class="doccomment">///</span>
