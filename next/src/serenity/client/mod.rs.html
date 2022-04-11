@@ -971,10 +971,6 @@
 <span id="966">966</span>
 <span id="967">967</span>
 <span id="968">968</span>
-<span id="969">969</span>
-<span id="970">970</span>
-<span id="971">971</span>
-<span id="972">972</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
 <span class="doccomment">//! the shards&#39; connections are handled directly via the client. In addition,</span>
@@ -1049,7 +1045,6 @@
     <span class="ident">http</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
-    <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="ident">cache_settings</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CacheSettings</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
@@ -1068,7 +1063,6 @@
             <span class="ident">http</span>: <span class="prelude-val">Some</span>(<span class="ident">http</span>),
             <span class="ident">fut</span>: <span class="prelude-val">None</span>,
             <span class="ident">intents</span>: <span class="ident">GatewayIntents::non_privileged</span>(),
-            <span class="ident">application_id</span>: <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident">cache_settings</span>: <span class="prelude-val">Some</span>(<span class="ident">CacheSettings::new</span>()),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
@@ -1117,10 +1111,8 @@
     }
 
     <span class="doccomment">/// Sets the application id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">application_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ApplicationId</span>(<span class="ident">application_id</span>));
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">http</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_id</span>(<span class="self">self</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span> {
             <span class="ident">http</span>.<span class="ident">set_application_id</span>(<span class="ident">application_id</span>);
         }
 
@@ -1129,7 +1121,7 @@
 
     <span class="doccomment">/// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_application_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">application_id</span>
+        <span class="self">self</span>.<span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">application_id</span>().<span class="ident">map</span>(<span class="ident">ApplicationId</span>))
     }
 
     <span class="doccomment">/// Sets the entire [`TypeMap`] that will be available in [`Context`]s.</span>
