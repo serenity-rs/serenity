@@ -163,10 +163,12 @@ impl<'a> ExecuteWebhook<'a> {
         self
     }
 
-    /// Creates components for this message. Requires an application-owned webhook, meaning
-    /// the webhook's `kind` field is set to [`WebhookType::Application`].
+    /// Creates components for this message. Requires an application-owned webhook, meaning either
+    /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
+    /// application (and has kind [`WebhookType::Incoming`]).
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
+    /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
     pub fn components<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
@@ -178,7 +180,10 @@ impl<'a> ExecuteWebhook<'a> {
         self
     }
 
-    /// Sets the components of this message. Requires an application-owned webhook. See [`ExecuteWebhook::components`] for details.
+    /// Sets the components of this message. Requires an application-owned webhook. See
+    /// [`components`] for details.
+    ///
+    /// [`components`]: crate::builder::ExecuteWebhook::components
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
         self.0.insert("components", Value::Array(components.0));
         self
