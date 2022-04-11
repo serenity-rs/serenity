@@ -104,9 +104,11 @@
 <span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">internal::prelude</span>::<span class="kw-2">*</span>, <span class="ident">json::NULL</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::NULL</span>;
 
 <span class="doccomment">/// A builder to edit the current user&#39;s settings, to be used in conjunction</span>
 <span class="doccomment">/// with [`CurrentUser::edit`].</span>

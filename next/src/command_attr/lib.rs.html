@@ -956,27 +956,15 @@
 <span id="951">951</span>
 <span id="952">952</span>
 <span id="953">953</span>
-<span id="954">954</span>
-<span id="955">955</span>
-<span id="956">956</span>
-<span id="957">957</span>
-<span id="958">958</span>
-<span id="959">959</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
 <span class="kw">use</span> <span class="ident">quote::quote</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">parse</span>::{<span class="ident">Error</span>, <span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">parse_macro_input</span>,
-    <span class="ident">parse_quote</span>,
-    <span class="ident">punctuated::Punctuated</span>,
-    <span class="ident">spanned::Spanned</span>,
-    <span class="ident">Ident</span>,
-    <span class="ident">Lit</span>,
-    <span class="ident">Token</span>,
-};
+<span class="kw">use</span> <span class="ident">syn::parse</span>::{<span class="ident">Error</span>, <span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use</span> <span class="ident">syn::punctuated::Punctuated</span>;
+<span class="kw">use</span> <span class="ident">syn::spanned::Spanned</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_macro_input</span>, <span class="ident">parse_quote</span>, <span class="ident">Ident</span>, <span class="ident">Lit</span>, <span class="ident">Token</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">attributes</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">consts</span>;

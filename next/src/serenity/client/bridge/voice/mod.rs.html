@@ -47,20 +47,12 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">futures::channel::mpsc::UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">gateway::InterMessage</span>,
-    <span class="ident">model</span>::{
-        <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
-        <span class="ident">voice::VoiceState</span>,
-    },
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::gateway::InterMessage</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::voice::VoiceState</span>;
 
 <span class="doccomment">/// Interface for any compatible voice plugin.</span>
 <span class="doccomment">///</span>

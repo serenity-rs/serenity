@@ -1404,6 +1404,7 @@
 <span id="1399">1399</span>
 <span id="1400">1400</span>
 <span id="1401">1401</span>
+<span id="1402">1402</span>
 </pre><pre class="rust"><code><span class="doccomment">//! User information-related models.</span>
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -1432,12 +1433,13 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::GuildPagination</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::to_string</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">internal::prelude</span>::<span class="kw-2">*</span>, <span class="ident">model::misc::Mentionable</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::misc::Mentionable</span>;
 
 <span class="doccomment">/// Used with `#[serde(with|deserialize_with|serialize_with)]`</span>
 <span class="doccomment">///</span>

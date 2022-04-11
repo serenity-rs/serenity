@@ -176,19 +176,19 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::Http</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">GuildId</span>, <span class="ident">StickerId</span>, <span class="ident">StickerPackId</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
-    <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">StickerId</span>, <span class="ident">StickerPackId</span>},
-    <span class="ident">user::User</span>,
-    <span class="ident">utils::comma_separated_string</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils::comma_separated_string</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sticker_id</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sticker_item</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sticker_pack</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">sticker_id</span>::<span class="kw-2">*</span>, <span class="ident">sticker_item</span>::<span class="kw-2">*</span>, <span class="ident">sticker_pack</span>::<span class="kw-2">*</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::sticker_id</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::sticker_item</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::sticker_pack</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A sticker sent with a message.</span>
 <span class="doccomment">///</span>

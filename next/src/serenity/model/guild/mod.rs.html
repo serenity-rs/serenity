@@ -3133,7 +3133,6 @@
 <span id="3128">3128</span>
 <span id="3129">3129</span>
 <span id="3130">3130</span>
-<span id="3131">3131</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">audit_log</span>;
@@ -3201,6 +3200,11 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::json</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::utils</span>::{<span class="ident">emojis</span>, <span class="ident">presences</span>, <span class="ident">roles</span>, <span class="ident">stickers</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">builder</span>::{
@@ -3210,12 +3214,6 @@
         <span class="ident">CreateApplicationCommandsPermissions</span>,
     },
     <span class="ident">model::interactions::application_command</span>::{<span class="ident">ApplicationCommand</span>, <span class="ident">ApplicationCommandPermission</span>},
-};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>},
-    <span class="ident">model::prelude</span>::<span class="kw-2">*</span>,
-    <span class="ident">model::utils</span>::{<span class="ident">emojis</span>, <span class="ident">presences</span>, <span class="ident">roles</span>, <span class="ident">stickers</span>},
-    <span class="ident">model::Timestamp</span>,
 };
 
 <span class="doccomment">/// A representation of a banning of a user.</span>

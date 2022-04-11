@@ -110,13 +110,6 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Cache</span>;
 
 <span class="doccomment">/// Trait used for updating the cache with a type.</span>
@@ -133,19 +126,12 @@
 <span class="doccomment">/// Creating a custom struct implementation to update the cache with:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// use serenity::{</span>
-<span class="doccomment">///     json::json,    </span>
-<span class="doccomment">///     cache::{Cache, CacheUpdate},</span>
-<span class="doccomment">///     model::{</span>
-<span class="doccomment">///         id::UserId,</span>
-<span class="doccomment">///         user::User,</span>
-<span class="doccomment">///     },</span>
-<span class="doccomment">///     prelude::RwLock,</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// use std::{</span>
-<span class="doccomment">///     collections::hash_map::Entry,</span>
-<span class="doccomment">///     sync::Arc,</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">/// use std::collections::hash_map::Entry;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// use serenity::json::json;</span>
+<span class="doccomment">/// use serenity::cache::{Cache, CacheUpdate};</span>
+<span class="doccomment">/// use serenity::model::id::UserId;</span>
+<span class="doccomment">/// use serenity::model::user::User;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // For example, an update to the user&#39;s record in the database was</span>
 <span class="doccomment">/// // published to a pubsub channel.</span>

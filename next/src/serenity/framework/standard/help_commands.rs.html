@@ -1464,7 +1464,6 @@
 <span id="1459">1459</span>
 <span id="1460">1460</span>
 <span id="1461">1461</span>
-<span id="1462">1462</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Example</span>
@@ -1528,10 +1527,11 @@
 <span class="kw">use</span> <span class="ident">tracing::warn</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::structures::Command</span> <span class="kw">as</span> <span class="ident">InternalCommand</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">has_correct_permissions</span>,
     <span class="ident">has_correct_roles</span>,
-    <span class="ident">structures::Command</span> <span class="kw">as</span> <span class="ident">InternalCommand</span>,
     <span class="ident">Args</span>,
     <span class="ident">Check</span>,
     <span class="ident">CommandGroup</span>,
@@ -2625,20 +2625,19 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
 <span class="doccomment">/// # use serenity::prelude::*;</span>
-<span class="doccomment">/// use std::{collections::HashSet, hash::BuildHasher};</span>
+<span class="doccomment">/// use std::collections::HashSet;</span>
+<span class="doccomment">/// use std::hash::BuildHasher;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// use serenity::{</span>
-<span class="doccomment">///     framework::standard::{</span>
-<span class="doccomment">///         help_commands::*,</span>
-<span class="doccomment">///         macros::help,</span>
-<span class="doccomment">///         Args,</span>
-<span class="doccomment">///         CommandGroup,</span>
-<span class="doccomment">///         CommandResult,</span>
-<span class="doccomment">///         HelpOptions,</span>
-<span class="doccomment">///         StandardFramework,</span>
-<span class="doccomment">///     },</span>
-<span class="doccomment">///     model::prelude::*,</span>
+<span class="doccomment">/// use serenity::framework::standard::help_commands::*;</span>
+<span class="doccomment">/// use serenity::framework::standard::macros::help;</span>
+<span class="doccomment">/// use serenity::framework::standard::{</span>
+<span class="doccomment">///     Args,</span>
+<span class="doccomment">///     CommandGroup,</span>
+<span class="doccomment">///     CommandResult,</span>
+<span class="doccomment">///     HelpOptions,</span>
+<span class="doccomment">///     StandardFramework,</span>
 <span class="doccomment">/// };</span>
+<span class="doccomment">/// use serenity::model::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[help]</span>
 <span class="doccomment">/// async fn my_help(</span>
@@ -2833,20 +2832,19 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust,no_run</span>
 <span class="doccomment">/// # use serenity::prelude::*;</span>
-<span class="doccomment">/// use std::{collections::HashSet, hash::BuildHasher};</span>
+<span class="doccomment">/// use std::collections::HashSet;</span>
+<span class="doccomment">/// use std::hash::BuildHasher;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// use serenity::{</span>
-<span class="doccomment">///     framework::standard::{</span>
-<span class="doccomment">///         help_commands::*,</span>
-<span class="doccomment">///         macros::help,</span>
-<span class="doccomment">///         Args,</span>
-<span class="doccomment">///         CommandGroup,</span>
-<span class="doccomment">///         CommandResult,</span>
-<span class="doccomment">///         HelpOptions,</span>
-<span class="doccomment">///         StandardFramework,</span>
-<span class="doccomment">///     },</span>
-<span class="doccomment">///     model::prelude::*,</span>
+<span class="doccomment">/// use serenity::framework::standard::help_commands::*;</span>
+<span class="doccomment">/// use serenity::framework::standard::macros::help;</span>
+<span class="doccomment">/// use serenity::framework::standard::{</span>
+<span class="doccomment">///     Args,</span>
+<span class="doccomment">///     CommandGroup,</span>
+<span class="doccomment">///     CommandResult,</span>
+<span class="doccomment">///     HelpOptions,</span>
+<span class="doccomment">///     StandardFramework,</span>
 <span class="doccomment">/// };</span>
+<span class="doccomment">/// use serenity::model::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// #[help]</span>
 <span class="doccomment">/// async fn my_help(</span>

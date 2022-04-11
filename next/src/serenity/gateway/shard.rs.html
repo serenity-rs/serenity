@@ -838,21 +838,11 @@
 <span id="833">833</span>
 <span id="834">834</span>
 <span id="835">835</span>
-<span id="836">836</span>
-<span id="837">837</span>
-<span id="838">838</span>
-<span id="839">839</span>
-<span id="840">840</span>
-<span id="841">841</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>},
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>, <span class="ident">Instant</span>};
 
-<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite</span>::{
-    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>,
-    <span class="ident">protocol::frame::CloseFrame</span>,
-};
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::error::Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>;
+<span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::protocol::frame::CloseFrame</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
@@ -874,12 +864,10 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl::create_native_tls_client</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::ws_impl::create_rustls_client</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
-    <span class="ident">event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>},
-    <span class="ident">gateway</span>::{<span class="ident">Activity</span>, <span class="ident">GatewayIntents</span>},
-    <span class="ident">id::GuildId</span>,
-    <span class="ident">user::OnlineStatus</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">GatewayEvent</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway</span>::{<span class="ident">Activity</span>, <span class="ident">GatewayIntents</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
 <span class="doccomment">/// A Shard is a higher-level handler for a websocket connection to Discord&#39;s</span>
 <span class="doccomment">/// gateway. The shard allows for sending and receiving messages over the</span>

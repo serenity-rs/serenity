@@ -240,19 +240,19 @@
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">GatewayError</span>,
-    <span class="ident">shard::Shard</span>,
-    <span class="ident">ws_client_ext::WebSocketGatewayClientExt</span>,
-};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span> <span class="kw">as</span> <span class="ident">GatewayError</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::shard::Shard</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ws_client_ext::WebSocketGatewayClientExt</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardClientMessage</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::Value</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">gateway::Activity</span>, <span class="ident">user::OnlineStatus</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::Activity</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CurrentPresence</span> <span class="op">=</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="ident">OnlineStatus</span>);
 
-<span class="kw">use</span> <span class="ident">async_tungstenite</span>::{<span class="ident">tokio::ConnectStream</span>, <span class="ident">WebSocketStream</span>};
+<span class="kw">use</span> <span class="ident">async_tungstenite::tokio::ConnectStream</span>;
+<span class="kw">use</span> <span class="ident">async_tungstenite::WebSocketStream</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">WsStream</span> <span class="op">=</span> <span class="ident">WebSocketStream</span><span class="op">&lt;</span><span class="ident">ConnectStream</span><span class="op">&gt;</span>;
 

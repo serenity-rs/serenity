@@ -183,6 +183,7 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
+<span id="181">181</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -196,7 +197,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::AttachmentType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">guild::Role</span>, <span class="ident">Permissions</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Role</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Permissions</span>;
 
 <span class="doccomment">/// A builder to create or edit a [`Role`] for use via a number of model methods.</span>
 <span class="doccomment">///</span>

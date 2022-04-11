@@ -79,14 +79,10 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
-<span class="kw">use</span> <span class="ident">reqwest</span>::{
-    <span class="ident">multipart</span>::{<span class="ident">Form</span>, <span class="ident">Part</span>},
-    <span class="ident">Client</span>,
-};
+<span class="kw">use</span> <span class="ident">reqwest::multipart</span>::{<span class="ident">Form</span>, <span class="ident">Part</span>};
+<span class="kw">use</span> <span class="ident">reqwest::Client</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::AttachmentType</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;

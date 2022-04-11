@@ -304,15 +304,11 @@
 <span id="299">299</span>
 <span id="300">300</span>
 <span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">NULL</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">internal::prelude</span>::<span class="kw-2">*</span>,
-    <span class="ident">json</span>::{<span class="ident">from_number</span>, <span class="ident">NULL</span>},
-};
 
 <span class="doccomment">/// A builder to optionally edit certain fields of a [`Guild`]. This is meant</span>
 <span class="doccomment">/// for usage with [`Guild::edit`].</span>

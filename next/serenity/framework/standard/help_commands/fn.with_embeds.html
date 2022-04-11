@@ -8,20 +8,19 @@
 <h2 id="examples"><a href="#examples">Examples</a></h2>
 <p>Use the command with <a href="../struct.StandardFramework.html#method.help"><code>StandardFramework::help</code></a>:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashSet</span>, <span class="ident">hash::BuildHasher</span>};
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+<span class="kw">use</span> <span class="ident">std::hash::BuildHasher</span>;
 
-<span class="kw">use</span> <span class="ident">serenity</span>::{
-    <span class="ident">framework::standard</span>::{
-        <span class="ident">help_commands</span>::<span class="kw-2">*</span>,
-        <span class="ident">macros::help</span>,
-        <span class="ident">Args</span>,
-        <span class="ident">CommandGroup</span>,
-        <span class="ident">CommandResult</span>,
-        <span class="ident">HelpOptions</span>,
-        <span class="ident">StandardFramework</span>,
-    },
-    <span class="ident">model::prelude</span>::<span class="kw-2">*</span>,
+<span class="kw">use</span> <span class="ident">serenity::framework::standard::help_commands</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">serenity::framework::standard::macros::help</span>;
+<span class="kw">use</span> <span class="ident">serenity::framework::standard</span>::{
+    <span class="ident">Args</span>,
+    <span class="ident">CommandGroup</span>,
+    <span class="ident">CommandResult</span>,
+    <span class="ident">HelpOptions</span>,
+    <span class="ident">StandardFramework</span>,
 };
+<span class="kw">use</span> <span class="ident">serenity::model::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">help</span>]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">my_help</span>(

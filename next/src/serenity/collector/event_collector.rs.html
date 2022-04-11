@@ -422,23 +422,12 @@
 <span id="417">417</span>
 <span id="418">418</span>
 <span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">boxed::Box</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>},
-    <span class="ident">time::Duration</span>,
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
 <span class="kw">use</span> <span class="ident">futures::stream::Stream</span>;
 <span class="kw">use</span> <span class="ident">tokio::sync::mpsc</span>::{
@@ -448,16 +437,11 @@
 };
 <span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Sleep</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client::bridge::gateway::ShardMessenger</span>,
-    <span class="ident">collector</span>::{<span class="ident">CollectorError</span>, <span class="ident">LazyArc</span>},
-    <span class="ident">model</span>::{
-        <span class="ident">event</span>::{<span class="ident">Event</span>, <span class="ident">EventType</span>, <span class="ident">RelatedIdsForEventType</span>},
-        <span class="ident">id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">MessageId</span>, <span class="ident">UserId</span>},
-    },
-    <span class="ident">Error</span>,
-    <span class="prelude-ty">Result</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">CollectorError</span>, <span class="ident">LazyArc</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::event</span>::{<span class="ident">Event</span>, <span class="ident">EventType</span>, <span class="ident">RelatedIdsForEventType</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">MessageId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
 
 <span class="doccomment">/// Filters events on the shard&#39;s end and sends them to the collector.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>

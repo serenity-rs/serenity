@@ -896,6 +896,7 @@
 <span id="891">891</span>
 <span id="892">892</span>
 <span id="893">893</span>
+<span id="894">894</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">check</span>, <span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">hook</span>};
@@ -930,9 +931,10 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Context</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Channel</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Message</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Member</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">channel::Message</span>, <span class="ident">permissions::Permissions</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::permissions::Permissions</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">guild::Role</span>, <span class="ident">id::RoleId</span>};
 

@@ -418,27 +418,15 @@
 <span id="413">413</span>
 <span id="414">414</span>
 <span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">boxed::Box</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>},
-    <span class="ident">time::Duration</span>,
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span> <span class="kw">as</span> <span class="ident">FutContext</span>, <span class="ident">Poll</span>};
+<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
-<span class="kw">use</span> <span class="ident">futures</span>::{
-    <span class="ident">future::BoxFuture</span>,
-    <span class="ident">stream</span>::{<span class="ident">Stream</span>, <span class="ident">StreamExt</span>},
-};
+<span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
+<span class="kw">use</span> <span class="ident">futures::stream</span>::{<span class="ident">Stream</span>, <span class="ident">StreamExt</span>};
 <span class="kw">use</span> <span class="ident">tokio::sync::mpsc</span>::{
     <span class="ident">unbounded_channel</span>,
     <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>,
@@ -446,12 +434,10 @@
 };
 <span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">sleep</span>, <span class="ident">Sleep</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client::bridge::gateway::ShardMessenger</span>,
-    <span class="ident">collector::LazyArc</span>,
-    <span class="ident">model::channel::Reaction</span>,
-    <span class="ident">model::id::UserId</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::bridge::gateway::ShardMessenger</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector::LazyArc</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Reaction</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
 
 <span class="macro">macro_rules!</span> <span class="ident">impl_reaction_collector</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) =&gt; {

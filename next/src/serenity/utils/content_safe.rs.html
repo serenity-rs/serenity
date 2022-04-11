@@ -594,11 +594,13 @@
 <span id="589">589</span>
 <span id="590">590</span>
 <span id="591">591</span>
+<span id="592">592</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Channel</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">channel::Channel</span>, <span class="ident">user::User</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
 
 <span class="doccomment">/// Struct that allows to alter [`content_safe`]&#39;s behaviour.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>

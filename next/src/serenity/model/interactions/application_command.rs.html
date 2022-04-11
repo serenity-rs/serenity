@@ -1138,7 +1138,6 @@
 <span id="1133">1133</span>
 <span id="1134">1134</span>
 <span id="1135">1135</span>
-<span id="1136">1136</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">serde::de::Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
@@ -1870,10 +1869,8 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
-    <span class="doccomment">/// use serenity::model::{</span>
-    <span class="doccomment">///     id::ApplicationId,</span>
-    <span class="doccomment">///     interactions::application_command::ApplicationCommand,</span>
-    <span class="doccomment">/// };</span>
+    <span class="doccomment">/// use serenity::model::id::ApplicationId;</span>
+    <span class="doccomment">/// use serenity::model::interactions::application_command::ApplicationCommand;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let _ = ApplicationCommand::create_global_application_command(&amp;http, |command| {</span>
     <span class="doccomment">///     command.name(&quot;ping&quot;).description(&quot;A simple ping command&quot;)</span>
@@ -1890,9 +1887,10 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() {</span>
     <span class="doccomment">/// # let http = Arc::new(Http::default());</span>
-    <span class="doccomment">/// use serenity::model::{</span>
-    <span class="doccomment">///     id::ApplicationId,</span>
-    <span class="doccomment">///     interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},</span>
+    <span class="doccomment">/// use serenity::model::id::ApplicationId;</span>
+    <span class="doccomment">/// use serenity::model::interactions::application_command::{</span>
+    <span class="doccomment">///     ApplicationCommand,</span>
+    <span class="doccomment">///     ApplicationCommandOptionType,</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let _ = ApplicationCommand::create_global_application_command(&amp;http, |command| {</span>

@@ -84,8 +84,6 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">async_tungstenite::tungstenite::Message</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -96,11 +94,9 @@
     <span class="ident">ModalInteractionFilter</span>,
     <span class="ident">ReactionFilter</span>,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
-    <span class="ident">gateway::Activity</span>,
-    <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
-    <span class="ident">user::OnlineStatus</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::Activity</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::OnlineStatus</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChunkGuildFilter</span> {

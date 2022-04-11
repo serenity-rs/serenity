@@ -1225,10 +1225,6 @@
 <span id="1220">1220</span>
 <span id="1221">1221</span>
 <span id="1222">1222</span>
-<span id="1223">1223</span>
-<span id="1224">1224</span>
-<span id="1225">1225</span>
-<span id="1226">1226</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Using the cache allows to avoid REST API requests via the [`http`] module</span>
@@ -1261,19 +1257,17 @@
 <span class="doccomment">//! [`Shard`]: crate::gateway::Shard</span>
 <span class="doccomment">//! [`http`]: crate::http</span>
 
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">hash_map::RandomState</span>, <span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
+<span class="kw">use</span> <span class="ident">std::collections::hash_map::RandomState</span>;
+<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
 <span class="kw">use</span> <span class="ident">std::hash::BuildHasher</span>;
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
-<span class="kw">use</span> <span class="ident">dashmap</span>::{
-    <span class="ident">iter::Iter</span>,
-    <span class="ident">mapref</span>::{<span class="ident">entry::Entry</span>, <span class="ident">multiple::RefMulti</span>},
-    <span class="ident">DashMap</span>,
-    <span class="ident">DashSet</span>,
-};
+<span class="kw">use</span> <span class="ident">dashmap::iter::Iter</span>;
+<span class="kw">use</span> <span class="ident">dashmap::mapref::entry::Entry</span>;
+<span class="kw">use</span> <span class="ident">dashmap::mapref::multiple::RefMulti</span>;
+<span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;temp_cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">moka::dash::Cache</span> <span class="kw">as</span> <span class="ident">DashCache</span>;
 <span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
@@ -2267,11 +2261,9 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>, <span class="ident">Settings</span>};
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json::from_number</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>, <span class="ident">Settings</span>},
-        <span class="ident">model::prelude</span>::<span class="kw-2">*</span>,
-    };
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_cache_messages</span>() {

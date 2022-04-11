@@ -456,9 +456,17 @@
 <span id="451">451</span>
 <span id="452">452</span>
 <span id="453">453</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">hash::Hash</span>};
 
 <span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeSeq</span>, <span class="ident">Serializer</span>};
 
@@ -488,7 +496,8 @@
     <span class="kw">use</span> <span class="ident">serde::Deserializer</span>;
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SequenceToMapVisitor</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">guild::Emoji</span>, <span class="ident">id::EmojiId</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Emoji</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::EmojiId</span>;
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">deserializer</span>: <span class="ident">D</span>,
@@ -630,7 +639,8 @@
     <span class="kw">use</span> <span class="ident">serde::Deserializer</span>;
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SequenceToMapVisitor</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">gateway::Presence</span>, <span class="ident">id::UserId</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::gateway::Presence</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::UserId</span>;
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">deserializer</span>: <span class="ident">D</span>,
@@ -664,7 +674,8 @@
     <span class="kw">use</span> <span class="ident">serde::Deserializer</span>;
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SequenceToMapVisitor</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">channel::Channel</span>, <span class="ident">id::ChannelId</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Channel</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::ChannelId</span>;
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">deserializer</span>: <span class="ident">D</span>,
@@ -724,7 +735,8 @@
     <span class="kw">use</span> <span class="ident">serde::Deserializer</span>;
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SequenceToMapVisitor</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">id::StickerId</span>, <span class="ident">sticker::Sticker</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::StickerId</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::sticker::Sticker</span>;
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="ident">deserializer</span>: <span class="ident">D</span>,
@@ -756,7 +768,9 @@
 
 <span class="doccomment">/// Used with `#[serde(with = &quot;single_recipient&quot;)]`</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">single_recipient</span> {
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::Error</span>, <span class="ident">ser::SerializeSeq</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+    <span class="kw">use</span> <span class="ident">serde::de::Error</span>;
+    <span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
+    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
 
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
 

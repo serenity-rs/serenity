@@ -1691,7 +1691,6 @@
 <span id="1686">1686</span>
 <span id="1687">1687</span>
 <span id="1688">1688</span>
-<span id="1689">1689</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1780,8 +1779,7 @@
     <span class="doccomment">/// Ban a member and remove all messages they&#39;ve sent in the last 4 days:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::model::id::GuildId;</span>
-    <span class="doccomment">/// use serenity::model::id::UserId;</span>
+    <span class="doccomment">/// use serenity::model::id::{GuildId, UserId};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// # use serenity::http::Http;</span>

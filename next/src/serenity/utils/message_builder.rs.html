@@ -1517,24 +1517,12 @@
 <span id="1512">1512</span>
 <span id="1513">1513</span>
 <span id="1514">1514</span>
-<span id="1515">1515</span>
-<span id="1516">1516</span>
-<span id="1517">1517</span>
-<span id="1518">1518</span>
-<span id="1519">1519</span>
-<span id="1520">1520</span>
-<span id="1521">1521</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">default::Default</span>,
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
-    <span class="ident">ops::Add</span>,
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
+<span class="kw">use</span> <span class="ident">std::ops::Add</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{
-    <span class="ident">guild::Emoji</span>,
-    <span class="ident">id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>},
-    <span class="ident">misc::Mentionable</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild::Emoji</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::misc::Mentionable</span>;
 
 <span class="doccomment">/// The Message Builder is an ergonomic utility to easily build a message,</span>
 <span class="doccomment">/// by adding text and mentioning mentionable structs.</span>
@@ -2762,10 +2750,8 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{
-        <span class="ident">ContentModifier</span>::{<span class="ident">Bold</span>, <span class="ident">Code</span>, <span class="ident">Italic</span>, <span class="ident">Spoiler</span>},
-        <span class="ident">MessageBuilder</span>,
-    };
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ContentModifier</span>::{<span class="ident">Bold</span>, <span class="ident">Code</span>, <span class="ident">Italic</span>, <span class="ident">Spoiler</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::MessageBuilder</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">gen</span> {

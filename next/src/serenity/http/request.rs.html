@@ -173,24 +173,22 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-<span id="171">171</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
-<span class="kw">use</span> <span class="ident">reqwest</span>::{
-    <span class="ident">header</span>::{
-        <span class="ident">HeaderMap</span> <span class="kw">as</span> <span class="ident">Headers</span>,
-        <span class="ident">HeaderValue</span>,
-        <span class="ident">AUTHORIZATION</span>,
-        <span class="ident">CONTENT_LENGTH</span>,
-        <span class="ident">CONTENT_TYPE</span>,
-        <span class="ident">USER_AGENT</span>,
-    },
-    <span class="ident">Url</span>,
+<span class="kw">use</span> <span class="ident">reqwest::header</span>::{
+    <span class="ident">HeaderMap</span> <span class="kw">as</span> <span class="ident">Headers</span>,
+    <span class="ident">HeaderValue</span>,
+    <span class="ident">AUTHORIZATION</span>,
+    <span class="ident">CONTENT_LENGTH</span>,
+    <span class="ident">CONTENT_TYPE</span>,
+    <span class="ident">USER_AGENT</span>,
 };
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">RequestBuilder</span> <span class="kw">as</span> <span class="ident">ReqwestRequestBuilder</span>};
+<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">RequestBuilder</span> <span class="kw">as</span> <span class="ident">ReqwestRequestBuilder</span>, <span class="ident">Url</span>};
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">multipart::Multipart</span>, <span class="ident">routing::RouteInfo</span>, <span class="ident">HttpError</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::multipart::Multipart</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routing::RouteInfo</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::HttpError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 

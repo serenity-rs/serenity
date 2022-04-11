@@ -221,9 +221,13 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>, <span class="ident">fmt</span>};
+<span id="219">219</span>
+<span id="220">220</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">header::InvalidHeaderValue</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>, <span class="ident">Url</span>};
+<span class="kw">use</span> <span class="ident">reqwest::header::InvalidHeaderValue</span>;
+<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>, <span class="ident">Response</span>, <span class="ident">StatusCode</span>, <span class="ident">Url</span>};
 <span class="kw">use</span> <span class="ident">url::ParseError</span> <span class="kw">as</span> <span class="ident">UrlError</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http::utils::deserialize_errors</span>;

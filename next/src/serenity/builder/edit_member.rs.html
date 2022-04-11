@@ -131,16 +131,12 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">internal::prelude</span>::<span class="kw-2">*</span>, <span class="ident">json::from_number</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">json::NULL</span>,
-    <span class="ident">model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>},
-    <span class="ident">model::Timestamp</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">NULL</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::Timestamp</span>;
 
 <span class="doccomment">/// A builder which edits the properties of a [`Member`], to be used in</span>
 <span class="doccomment">/// conjunction with [`Member::edit`].</span>

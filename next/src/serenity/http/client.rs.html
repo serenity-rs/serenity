@@ -3873,43 +3873,28 @@
 <span id="3868">3868</span>
 <span id="3869">3869</span>
 <span id="3870">3870</span>
-<span id="3871">3871</span>
-<span id="3872">3872</span>
-<span id="3873">3873</span>
-<span id="3874">3874</span>
-<span id="3875">3875</span>
-<span id="3876">3876</span>
-<span id="3877">3877</span>
-<span id="3878">3878</span>
-<span id="3879">3879</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
+<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">percent_encoding</span>::{<span class="ident">utf8_percent_encode</span>, <span class="ident">NON_ALPHANUMERIC</span>};
-<span class="kw">use</span> <span class="ident">reqwest</span>::{
-    <span class="ident">header</span>::{<span class="ident">HeaderMap</span> <span class="kw">as</span> <span class="ident">Headers</span>, <span class="ident">HeaderValue</span>, <span class="ident">CONTENT_TYPE</span>},
-    <span class="ident">StatusCode</span>,
-    <span class="ident">Url</span>,
-};
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">ClientBuilder</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ReqwestResponse</span>};
+<span class="kw">use</span> <span class="ident">reqwest::header</span>::{<span class="ident">HeaderMap</span> <span class="kw">as</span> <span class="ident">Headers</span>, <span class="ident">HeaderValue</span>, <span class="ident">CONTENT_TYPE</span>};
+<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">ClientBuilder</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ReqwestResponse</span>, <span class="ident">StatusCode</span>, <span class="ident">Url</span>};
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;simd-json&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">simd_json::ValueAccess</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>};
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">multipart::Multipart</span>,
-    <span class="ident">ratelimiting</span>::{<span class="ident">RatelimitedRequest</span>, <span class="ident">Ratelimiter</span>},
-    <span class="ident">request::Request</span>,
-    <span class="ident">routing::RouteInfo</span>,
-    <span class="ident">typing::Typing</span>,
-    <span class="ident">AttachmentType</span>,
-    <span class="ident">GuildPagination</span>,
-    <span class="ident">HttpError</span>,
-};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::multipart::Multipart</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ratelimiting</span>::{<span class="ident">RatelimitedRequest</span>, <span class="ident">Ratelimiter</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::request::Request</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::routing::RouteInfo</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::typing::Typing</span>;
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AttachmentType</span>, <span class="ident">GuildPagination</span>, <span class="ident">HttpError</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::json</span>::{<span class="ident">from_number</span>, <span class="ident">from_value</span>, <span class="ident">json</span>, <span class="ident">to_value</span>, <span class="ident">to_vec</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::interactions::application_command</span>::{
@@ -3917,7 +3902,7 @@
     <span class="ident">ApplicationCommandPermission</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants</span>, <span class="ident">utils</span>};
 
 <span class="doccomment">/// A builder for the underlying [`Http`] client that performs requests</span>
 <span class="doccomment">/// to Discord&#39;s HTTP API. If you do not need to use a proxy or do not</span>
@@ -4495,8 +4480,8 @@
     <span class="doccomment">/// Create a guild called `&quot;test&quot;` in the [US West region]:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">/// use serenity::http::Http;</span>
+    <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #    let http = Http::default();</span>
@@ -4794,8 +4779,8 @@
     <span class="doccomment">/// Creating a webhook named `test`:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">/// use serenity::http::Http;</span>
+    <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #    let http = Http::default();</span>
@@ -5810,10 +5795,8 @@
     <span class="doccomment">/// Suppress a user</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::{</span>
-    <span class="doccomment">///     http::Http,</span>
-    <span class="doccomment">///     json::{json, prelude::*},</span>
-    <span class="doccomment">/// };</span>
+    <span class="doccomment">/// use serenity::http::Http;</span>
+    <span class="doccomment">/// use serenity::json::{json, prelude::*};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Http::default();</span>
@@ -5862,10 +5845,8 @@
     <span class="doccomment">/// Unsuppress the current bot user</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::{</span>
-    <span class="doccomment">///     http::Http,</span>
-    <span class="doccomment">///     json::{json, prelude::*},</span>
-    <span class="doccomment">/// };</span>
+    <span class="doccomment">/// use serenity::http::Http;</span>
+    <span class="doccomment">/// use serenity::json::{json, prelude::*};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Http::default();</span>
@@ -5916,8 +5897,8 @@
     <span class="doccomment">/// Edit the image of a webhook given its Id and unique token:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">/// use serenity::http::Http;</span>
+    <span class="doccomment">/// use serenity::json::json;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Http::default();</span>
@@ -5959,9 +5940,8 @@
     <span class="doccomment">/// Edit the name of a webhook given its Id and unique token:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::json::prelude::*;</span>
     <span class="doccomment">/// use serenity::http::Http;</span>
-    <span class="doccomment">///</span>
+    <span class="doccomment">/// use serenity::json::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Http::default();</span>
@@ -6026,8 +6006,8 @@
     <span class="doccomment">/// Sending a webhook with message content of `test`:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use serenity::json::prelude::*;</span>
     <span class="doccomment">/// use serenity::http::Http;</span>
+    <span class="doccomment">/// use serenity::json::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Http::default();</span>
@@ -6942,7 +6922,8 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let http = Http::default();</span>
-    <span class="doccomment">/// use serenity::{http::GuildPagination, model::id::GuildId};</span>
+    <span class="doccomment">/// use serenity::http::GuildPagination;</span>
+    <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let guild_id = GuildId(81384788765712384);</span>
     <span class="doccomment">///</span>
@@ -7564,8 +7545,9 @@
     <span class="doccomment">/// ## Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// # use serenity::{http::{Http, Typing}, Result};</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
+    <span class="doccomment">/// # use serenity::http::{Http, Typing};</span>
+    <span class="doccomment">/// # use serenity::Result;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # fn long_process() {}</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;()&gt; {</span>
