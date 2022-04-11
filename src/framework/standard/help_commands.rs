@@ -307,7 +307,6 @@ fn nested_commands_search<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
     group: &'rec CommandGroup,
-    found_group_prefix: &'rec mut bool,
     commands: &'rec [&'static InternalCommand],
     name: &'rec mut String,
     help_options: &'a HelpOptions,
@@ -402,7 +401,6 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                             ctx,
                             msg,
                             group,
-                            found_group_prefix,
                             command.options.sub_commands,
                             name,
                             help_options,
@@ -473,12 +471,10 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                 continue;
             }
 
-            let mut found_group_prefix: bool = false;
             let found = nested_commands_search(
                 ctx,
                 msg,
                 group,
-                &mut found_group_prefix,
                 group.options.commands,
                 name,
                 help_options,
