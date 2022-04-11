@@ -1,7 +1,8 @@
 use std::borrow::Cow;
 use std::error::Error as StdError;
+use std::fmt;
 use std::marker::PhantomData;
-use std::{fmt, str::FromStr};
+use std::str::FromStr;
 
 use uwl::Stream;
 

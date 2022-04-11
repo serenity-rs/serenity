@@ -1,6 +1,8 @@
-use std::{error::Error as StdError, fmt};
+use std::error::Error as StdError;
+use std::fmt;
 
-use reqwest::{header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url};
+use reqwest::header::InvalidHeaderValue;
+use reqwest::{Error as ReqwestError, Response, StatusCode, Url};
 use url::ParseError as UrlError;
 
 use crate::http::utils::deserialize_errors;

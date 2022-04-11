@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
 use crate::cache::Cache;
+use crate::model::channel::Channel;
 use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
-use crate::model::{channel::Channel, user::User};
+use crate::model::user::User;
 
 /// Struct that allows to alter [`content_safe`]'s behaviour.
 #[derive(Clone, Debug)]

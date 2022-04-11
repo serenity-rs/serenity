@@ -1,7 +1,5 @@
-use std::{
-    borrow::Cow,
-    fmt::{Display, Write},
-};
+use std::borrow::Cow;
+use std::fmt::{Display, Write};
 
 use super::LightMethod;
 use crate::constants;

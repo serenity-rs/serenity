@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
-use crate::json::{from_number, json};
-use crate::json::{Value, NULL};
+use crate::json::{from_number, json, Value, NULL};
 use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType, VideoQualityMode};
 use crate::model::id::ChannelId;
 

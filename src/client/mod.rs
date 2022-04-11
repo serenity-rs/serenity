@@ -25,13 +25,10 @@ mod error;
 #[cfg(feature = "gateway")]
 mod event_handler;
 
-use std::{
-    boxed::Box,
-    future::Future,
-    pin::Pin,
-    sync::Arc,
-    task::{Context as FutContext, Poll},
-};
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context as FutContext, Poll};
 
 use futures::future::BoxFuture;
 use tokio::sync::{Mutex, RwLock};
@@ -47,9 +44,10 @@ use self::bridge::gateway::{
 };
 #[cfg(feature = "voice")]
 use self::bridge::voice::VoiceGatewayManager;
+pub use self::context::Context;
+pub use self::error::Error as ClientError;
 #[cfg(feature = "gateway")]
 pub use self::event_handler::{EventHandler, RawEventHandler};
-pub use self::{context::Context, error::Error as ClientError};
 #[cfg(feature = "gateway")]
 use super::gateway::GatewayError;
 #[cfg(feature = "cache")]
@@ -487,10 +485,11 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```rust,ignore
-    /// use serenity::prelude::*;
-    /// use serenity::model::prelude::*;
     /// use std::collections::HashMap;
     /// use std::env;
+    ///
+    /// use serenity::model::prelude::*;
+    /// use serenity::prelude::*;
     ///
     /// struct MessageEventCounter;
     ///
@@ -520,7 +519,13 @@ pub struct Client {
     ///     }
     ///
     ///     #[cfg(feature = "cache")]
-    ///     async fn message_update(&self, ctx: Context, _old: Option<Message>, _new: Option<Message>, _: MessageUpdateEvent) {
+    ///     async fn message_update(
+    ///         &self,
+    ///         ctx: Context,
+    ///         _old: Option<Message>,
+    ///         _new: Option<Message>,
+    ///         _: MessageUpdateEvent,
+    ///     ) {
     ///         reg(ctx, "MessageUpdate").await
     ///     }
     ///

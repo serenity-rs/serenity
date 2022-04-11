@@ -51,7 +51,8 @@ mod shard_queuer;
 mod shard_runner;
 mod shard_runner_message;
 
-use std::{fmt, time::Duration as StdDuration};
+use std::fmt;
+use std::time::Duration as StdDuration;
 
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
 pub use self::shard_manager_monitor::{ShardManagerError, ShardManagerMonitor};

@@ -1,15 +1,17 @@
 //! All the events this library handles.
 
+use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::{collections::HashMap, fmt};
+use std::fmt;
 
 use serde::de::{Error as DeError, IgnoredAny, MapAccess};
 
 use super::prelude::*;
 use super::utils::{emojis, roles, stickers};
+use crate::constants::OpCode;
 use crate::internal::prelude::*;
+use crate::json::prelude::*;
 use crate::model::interactions::Interaction;
-use crate::{constants::OpCode, json::prelude::*};
 
 /// Event data for the channel creation event.
 ///

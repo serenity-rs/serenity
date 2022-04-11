@@ -1,12 +1,9 @@
-use std::{
-    boxed::Box,
-    fmt,
-    future::Future,
-    pin::Pin,
-    sync::Arc,
-    task::{Context as FutContext, Poll},
-    time::Duration,
-};
+use std::fmt;
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context as FutContext, Poll};
+use std::time::Duration;
 
 use futures::stream::Stream;
 use tokio::sync::mpsc::{
@@ -16,16 +13,11 @@ use tokio::sync::mpsc::{
 };
 use tokio::time::{sleep, Sleep};
 
-use crate::{
-    client::bridge::gateway::ShardMessenger,
-    collector::{CollectorError, LazyArc},
-    model::{
-        event::{Event, EventType, RelatedIdsForEventType},
-        id::{ChannelId, GuildId, MessageId, UserId},
-    },
-    Error,
-    Result,
-};
+use crate::client::bridge::gateway::ShardMessenger;
+use crate::collector::{CollectorError, LazyArc};
+use crate::model::event::{Event, EventType, RelatedIdsForEventType};
+use crate::model::id::{ChannelId, GuildId, MessageId, UserId};
+use crate::{Error, Result};
 
 /// Filters events on the shard's end and sends them to the collector.
 #[derive(Clone, Debug)]

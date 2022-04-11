@@ -262,8 +262,8 @@ impl GuildChannel {
     /// #   let cache = Cache::default();
     /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
-    /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
-    /// use serenity::model::{channel::Channel, ModelError, Permissions};
+    /// use serenity::model::channel::{Channel, PermissionOverwrite, PermissionOverwriteType};
+    /// use serenity::model::{ModelError, Permissions};
     ///
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;

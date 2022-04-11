@@ -1,11 +1,10 @@
 use std::env;
 
-use serenity::{
-    async_trait,
-    model::Timestamp,
-    model::{channel::Message, gateway::Ready},
-    prelude::*,
-};
+use serenity::async_trait;
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
+use serenity::model::Timestamp;
+use serenity::prelude::*;
 
 struct Handler;
 

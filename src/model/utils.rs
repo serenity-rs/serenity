@@ -1,6 +1,7 @@
+use std::collections::HashMap;
 use std::fmt;
+use std::hash::Hash;
 use std::marker::PhantomData;
-use std::{collections::HashMap, hash::Hash};
 
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 
@@ -30,7 +31,8 @@ pub mod emojis {
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::{guild::Emoji, id::EmojiId};
+    use crate::model::guild::Emoji;
+    use crate::model::id::EmojiId;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -172,7 +174,8 @@ pub mod presences {
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::{gateway::Presence, id::UserId};
+    use crate::model::gateway::Presence;
+    use crate::model::id::UserId;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -206,7 +209,8 @@ pub mod private_channels {
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::{channel::Channel, id::ChannelId};
+    use crate::model::channel::Channel;
+    use crate::model::id::ChannelId;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -266,7 +270,8 @@ pub mod stickers {
     use serde::Deserializer;
 
     use super::SequenceToMapVisitor;
-    use crate::model::{id::StickerId, sticker::Sticker};
+    use crate::model::id::StickerId;
+    use crate::model::sticker::Sticker;
 
     pub fn deserialize<'de, D: Deserializer<'de>>(
         deserializer: D,
@@ -298,7 +303,9 @@ pub mod comma_separated_string {
 
 /// Used with `#[serde(with = "single_recipient")]`
 pub mod single_recipient {
-    use serde::{de::Error, ser::SerializeSeq, Deserialize, Deserializer, Serializer};
+    use serde::de::Error;
+    use serde::ser::SerializeSeq;
+    use serde::{Deserialize, Deserializer, Serializer};
 
     use crate::model::user::User;
 

@@ -1,5 +1,5 @@
 #[cfg(feature = "model")]
-use std::fmt::Write as FmtWrite;
+use std::fmt::Write as _;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 

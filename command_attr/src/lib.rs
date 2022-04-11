@@ -3,16 +3,10 @@
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
-use syn::{
-    parse::{Error, Parse, ParseStream, Result},
-    parse_macro_input,
-    parse_quote,
-    punctuated::Punctuated,
-    spanned::Spanned,
-    Ident,
-    Lit,
-    Token,
-};
+use syn::parse::{Error, Parse, ParseStream, Result};
+use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
+use syn::{parse_macro_input, parse_quote, Ident, Lit, Token};
 
 pub(crate) mod attributes;
 pub(crate) mod consts;

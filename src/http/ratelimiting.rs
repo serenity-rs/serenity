@@ -39,18 +39,14 @@
 //!
 //! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
-use std::{
-    collections::HashMap,
-    f64,
-    fmt,
-    i64,
-    str::{self, FromStr},
-    sync::Arc,
-    time::SystemTime,
-};
+use std::collections::HashMap;
+use std::fmt;
+use std::str::{self, FromStr};
+use std::sync::Arc;
+use std::time::SystemTime;
 
-use reqwest::{header::HeaderMap, StatusCode};
-use reqwest::{Client, Response};
+use reqwest::header::HeaderMap;
+use reqwest::{Client, Response, StatusCode};
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::{sleep, Duration};
 use tracing::{debug, instrument};
@@ -400,12 +396,14 @@ fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<
 
 #[cfg(test)]
 mod tests {
-    use std::{error::Error as StdError, result::Result as StdResult};
+    use std::error::Error as StdError;
+    use std::result::Result as StdResult;
 
     use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 
     use super::parse_header;
-    use crate::{error::Error, http::HttpError};
+    use crate::error::Error;
+    use crate::http::HttpError;
 
     type Result<T> = StdResult<T, Box<dyn StdError>>;
 

@@ -8,11 +8,9 @@ use crate::collector::{
     ModalInteractionFilter,
     ReactionFilter,
 };
-use crate::model::{
-    gateway::Activity,
-    id::{GuildId, UserId},
-    user::OnlineStatus,
-};
+use crate::model::gateway::Activity;
+use crate::model::id::{GuildId, UserId};
+use crate::model::user::OnlineStatus;
 
 #[derive(Clone, Debug)]
 pub enum ChunkGuildFilter {

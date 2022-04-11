@@ -26,12 +26,13 @@ use crate::collector::{
 use crate::http::GuildPagination;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::json::to_string;
-use crate::{internal::prelude::*, model::misc::Mentionable};
+use crate::model::misc::Mentionable;
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///

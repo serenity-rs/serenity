@@ -1,16 +1,15 @@
 use proc_macro::TokenStream;
-use proc_macro2::Span;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote, ToTokens};
+use syn::parse::{Error, Parse, ParseStream, Result as SynResult};
+use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
+use syn::token::{Comma, Mut};
 use syn::{
     braced,
     bracketed,
     parenthesized,
-    parse::{Error, Parse, ParseStream, Result as SynResult},
     parse_quote,
-    punctuated::Punctuated,
-    spanned::Spanned,
-    token::{Comma, Mut},
     Attribute,
     Ident,
     Lifetime,
