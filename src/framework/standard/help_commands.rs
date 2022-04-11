@@ -61,10 +61,11 @@ use levenshtein::levenshtein;
 use tracing::warn;
 
 #[cfg(all(feature = "cache", feature = "http"))]
+use super::structures::Command as InternalCommand;
+#[cfg(all(feature = "cache", feature = "http"))]
 use super::{
     has_correct_permissions,
     has_correct_roles,
-    structures::Command as InternalCommand,
     Args,
     Check,
     CommandGroup,
@@ -1158,20 +1159,19 @@ async fn send_error_embed(
 ///
 /// ```rust,no_run
 /// # use serenity::prelude::*;
-/// use std::{collections::HashSet, hash::BuildHasher};
+/// use std::collections::HashSet;
+/// use std::hash::BuildHasher;
 ///
-/// use serenity::{
-///     framework::standard::{
-///         help_commands::*,
-///         macros::help,
-///         Args,
-///         CommandGroup,
-///         CommandResult,
-///         HelpOptions,
-///         StandardFramework,
-///     },
-///     model::prelude::*,
+/// use serenity::framework::standard::help_commands::*;
+/// use serenity::framework::standard::macros::help;
+/// use serenity::framework::standard::{
+///     Args,
+///     CommandGroup,
+///     CommandResult,
+///     HelpOptions,
+///     StandardFramework,
 /// };
+/// use serenity::model::prelude::*;
 ///
 /// #[help]
 /// async fn my_help(
@@ -1366,20 +1366,19 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///
 /// ```rust,no_run
 /// # use serenity::prelude::*;
-/// use std::{collections::HashSet, hash::BuildHasher};
+/// use std::collections::HashSet;
+/// use std::hash::BuildHasher;
 ///
-/// use serenity::{
-///     framework::standard::{
-///         help_commands::*,
-///         macros::help,
-///         Args,
-///         CommandGroup,
-///         CommandResult,
-///         HelpOptions,
-///         StandardFramework,
-///     },
-///     model::prelude::*,
+/// use serenity::framework::standard::help_commands::*;
+/// use serenity::framework::standard::macros::help;
+/// use serenity::framework::standard::{
+///     Args,
+///     CommandGroup,
+///     CommandResult,
+///     HelpOptions,
+///     StandardFramework,
 /// };
+/// use serenity::model::prelude::*;
 ///
 /// #[help]
 /// async fn my_help(

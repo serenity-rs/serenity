@@ -1,13 +1,12 @@
 use std::str::FromStr;
 
-use proc_macro2::Span;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens};
+use syn::parse::{Error, Parse, ParseStream, Result};
+use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
 use syn::{
     braced,
-    parse::{Error, Parse, ParseStream, Result},
-    punctuated::Punctuated,
-    spanned::Spanned,
     Attribute,
     Block,
     Expr,

@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
+use crate::internal::prelude::*;
+use crate::json::{from_number, NULL};
 use crate::model::prelude::*;
-use crate::{
-    internal::prelude::*,
-    json::{from_number, NULL},
-};
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Guild::edit`].

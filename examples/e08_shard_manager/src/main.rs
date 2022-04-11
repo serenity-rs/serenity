@@ -22,9 +22,12 @@
 //!
 //! Note that it may take a minute or more for a latency to be recorded or to
 //! update, depending on how often Discord tells the client to send a heartbeat.
-use std::{env, time::Duration};
+use std::env;
+use std::time::Duration;
 
-use serenity::{async_trait, model::gateway::Ready, prelude::*};
+use serenity::async_trait;
+use serenity::model::gateway::Ready;
+use serenity::prelude::*;
 use tokio::time::sleep;
 
 struct Handler;

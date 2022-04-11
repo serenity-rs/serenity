@@ -8,39 +8,33 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-use std::{
-    collections::{HashMap, HashSet},
-    env,
-    fmt::Write,
-    sync::Arc,
-};
+use std::collections::{HashMap, HashSet};
+use std::env;
+use std::fmt::Write;
+use std::sync::Arc;
 
-use serenity::prelude::*;
-use serenity::{
-    async_trait,
-    client::bridge::gateway::{ShardId, ShardManager},
-    framework::standard::{
-        buckets::{LimitedFor, RevertBucket},
-        help_commands,
-        macros::{check, command, group, help, hook},
-        Args,
-        CommandGroup,
-        CommandOptions,
-        CommandResult,
-        DispatchError,
-        HelpOptions,
-        Reason,
-        StandardFramework,
-    },
-    http::Http,
-    model::{
-        channel::{Channel, Message},
-        gateway::{GatewayIntents, Ready},
-        id::UserId,
-        permissions::Permissions,
-    },
-    utils::{content_safe, ContentSafeOptions},
+use serenity::async_trait;
+use serenity::client::bridge::gateway::{ShardId, ShardManager};
+use serenity::framework::standard::buckets::{LimitedFor, RevertBucket};
+use serenity::framework::standard::macros::{check, command, group, help, hook};
+use serenity::framework::standard::{
+    help_commands,
+    Args,
+    CommandGroup,
+    CommandOptions,
+    CommandResult,
+    DispatchError,
+    HelpOptions,
+    Reason,
+    StandardFramework,
 };
+use serenity::http::Http;
+use serenity::model::channel::{Channel, Message};
+use serenity::model::gateway::{GatewayIntents, Ready};
+use serenity::model::id::UserId;
+use serenity::model::permissions::Permissions;
+use serenity::prelude::*;
+use serenity::utils::{content_safe, ContentSafeOptions};
 use tokio::sync::Mutex;
 
 // A container type is created for inserting into the Client's `data`, which
@@ -201,7 +195,8 @@ async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError, _com
 
 // You can construct a hook without the use of a macro, too.
 // This requires some boilerplate though and the following additional import.
-use serenity::{futures::future::BoxFuture, FutureExt};
+use serenity::futures::future::BoxFuture;
+use serenity::FutureExt;
 fn _dispatch_error_no_macro<'fut>(
     ctx: &'fut mut Context,
     msg: &'fut Message,

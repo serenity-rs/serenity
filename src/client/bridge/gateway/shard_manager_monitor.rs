@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
-use futures::{
-    channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},
-    StreamExt,
-};
+use futures::channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use futures::StreamExt;
 use tokio::sync::Mutex;
 use tracing::{debug, instrument, warn};
 

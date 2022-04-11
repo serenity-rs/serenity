@@ -1,9 +1,7 @@
-use std::{
-    error::Error as StdError,
-    fmt::{self, Error as FormatError},
-    io::Error as IoError,
-    num::ParseIntError,
-};
+use std::error::Error as StdError;
+use std::fmt::{self, Error as FormatError};
+use std::io::Error as IoError;
+use std::num::ParseIntError;
 
 #[cfg(feature = "gateway")]
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;

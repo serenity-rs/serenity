@@ -1,12 +1,8 @@
-use std::{
-    sync::Arc,
-    time::{Duration as StdDuration, Instant},
-};
+use std::sync::Arc;
+use std::time::{Duration as StdDuration, Instant};
 
-use async_tungstenite::tungstenite::{
-    error::Error as TungsteniteError,
-    protocol::frame::CloseFrame,
-};
+use async_tungstenite::tungstenite::error::Error as TungsteniteError;
+use async_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tokio::sync::Mutex;
 use tracing::{debug, error, info, instrument, trace, warn};
 use url::Url;
@@ -28,12 +24,10 @@ use crate::internal::prelude::*;
 use crate::internal::ws_impl::create_native_tls_client;
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
-use crate::model::{
-    event::{Event, GatewayEvent},
-    gateway::{Activity, GatewayIntents},
-    id::GuildId,
-    user::OnlineStatus,
-};
+use crate::model::event::{Event, GatewayEvent};
+use crate::model::gateway::{Activity, GatewayIntents};
+use crate::model::id::GuildId;
+use crate::model::user::OnlineStatus;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the

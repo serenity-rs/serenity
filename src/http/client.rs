@@ -1,31 +1,25 @@
 #![allow(clippy::missing_errors_doc)]
 
+use std::borrow::Cow;
+use std::fmt;
+use std::str::FromStr;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::{borrow::Cow, fmt, str::FromStr, sync::Arc};
+use std::sync::Arc;
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-use reqwest::{
-    header::{HeaderMap as Headers, HeaderValue, CONTENT_TYPE},
-    StatusCode,
-    Url,
-};
-use reqwest::{Client, ClientBuilder, Response as ReqwestResponse};
+use reqwest::header::{HeaderMap as Headers, HeaderValue, CONTENT_TYPE};
+use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode, Url};
 use serde::de::DeserializeOwned;
 #[cfg(feature = "simd-json")]
 use simd_json::ValueAccess;
 use tracing::{debug, instrument, trace};
 
-use super::{
-    multipart::Multipart,
-    ratelimiting::{RatelimitedRequest, Ratelimiter},
-    request::Request,
-    routing::RouteInfo,
-    typing::Typing,
-    AttachmentType,
-    GuildPagination,
-    HttpError,
-};
-use crate::constants;
+use super::multipart::Multipart;
+use super::ratelimiting::{RatelimitedRequest, Ratelimiter};
+use super::request::Request;
+use super::routing::RouteInfo;
+use super::typing::Typing;
+use super::{AttachmentType, GuildPagination, HttpError};
 use crate::internal::prelude::*;
 use crate::json::{from_number, from_value, json, to_value, to_vec};
 use crate::model::interactions::application_command::{
@@ -33,7 +27,7 @@ use crate::model::interactions::application_command::{
     ApplicationCommandPermission,
 };
 use crate::model::prelude::*;
-use crate::utils;
+use crate::{constants, utils};
 
 /// A builder for the underlying [`Http`] client that performs requests
 /// to Discord's HTTP API. If you do not need to use a proxy or do not
@@ -611,8 +605,8 @@ impl Http {
     /// Create a guild called `"test"` in the [US West region]:
     ///
     /// ```rust,no_run
-    /// use serenity::json::json;
     /// use serenity::http::Http;
+    /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #    let http = Http::default();
@@ -910,8 +904,8 @@ impl Http {
     /// Creating a webhook named `test`:
     ///
     /// ```rust,no_run
-    /// use serenity::json::json;
     /// use serenity::http::Http;
+    /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #    let http = Http::default();
@@ -1926,10 +1920,8 @@ impl Http {
     /// Suppress a user
     ///
     /// ```rust,no_run
-    /// use serenity::{
-    ///     http::Http,
-    ///     json::{json, prelude::*},
-    /// };
+    /// use serenity::http::Http;
+    /// use serenity::json::{json, prelude::*};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
@@ -1978,10 +1970,8 @@ impl Http {
     /// Unsuppress the current bot user
     ///
     /// ```rust,no_run
-    /// use serenity::{
-    ///     http::Http,
-    ///     json::{json, prelude::*},
-    /// };
+    /// use serenity::http::Http;
+    /// use serenity::json::{json, prelude::*};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
@@ -2032,8 +2022,8 @@ impl Http {
     /// Edit the image of a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
-    /// use serenity::json::json;
     /// use serenity::http::Http;
+    /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
@@ -2075,9 +2065,8 @@ impl Http {
     /// Edit the name of a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
-    /// use serenity::json::prelude::*;
     /// use serenity::http::Http;
-    ///
+    /// use serenity::json::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
@@ -2142,8 +2131,8 @@ impl Http {
     /// Sending a webhook with message content of `test`:
     ///
     /// ```rust,no_run
-    /// use serenity::json::prelude::*;
     /// use serenity::http::Http;
+    /// use serenity::json::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
@@ -3058,7 +3047,8 @@ impl Http {
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Http::default();
-    /// use serenity::{http::GuildPagination, model::id::GuildId};
+    /// use serenity::http::GuildPagination;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
@@ -3680,8 +3670,9 @@ impl Http {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::{Http, Typing}, Result};
     /// # use std::sync::Arc;
+    /// # use serenity::http::{Http, Typing};
+    /// # use serenity::Result;
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {

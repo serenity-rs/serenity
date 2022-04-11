@@ -17,19 +17,21 @@ pub use argument_convert::*;
 pub use content_safe::*;
 use url::Url;
 
+pub use self::colour::{colours, Colour};
+pub use self::custom_message::CustomMessage;
+pub use self::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
 #[doc(inline)]
 pub use self::token::{parse as parse_token, validate as validate_token};
-pub use self::{
-    colour::{colours, Colour},
-    custom_message::CustomMessage,
-    message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder},
-};
 pub type Color = Colour;
 
-use std::{ffi::OsStr, fs::File, io::Read, path::Path};
+use std::ffi::OsStr;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
 
 use crate::internal::prelude::*;
-use crate::model::{id::EmojiId, misc::EmojiIdentifier};
+use crate::model::id::EmojiId;
+use crate::model::misc::EmojiIdentifier;
 
 /// Retrieves the "code" part of an invite out of a URL.
 ///

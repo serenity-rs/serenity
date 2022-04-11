@@ -10,18 +10,23 @@
 //! ```
 mod commands;
 
-use std::{collections::HashSet, env, sync::Arc};
+use std::collections::HashSet;
+use std::env;
+use std::sync::Arc;
 
-use commands::{math::*, meta::*, owner::*};
-use serenity::{
-    async_trait,
-    client::bridge::gateway::ShardManager,
-    framework::{standard::macros::group, StandardFramework},
-    http::Http,
-    model::{event::ResumedEvent, gateway::Ready},
-    prelude::*,
-};
+use serenity::async_trait;
+use serenity::client::bridge::gateway::ShardManager;
+use serenity::framework::standard::macros::group;
+use serenity::framework::StandardFramework;
+use serenity::http::Http;
+use serenity::model::event::ResumedEvent;
+use serenity::model::gateway::Ready;
+use serenity::prelude::*;
 use tracing::{error, info};
+
+use crate::commands::math::*;
+use crate::commands::meta::*;
+use crate::commands::owner::*;
 
 pub struct ShardManagerContainer;
 

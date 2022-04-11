@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use crate::json::from_number;
-use crate::json::json;
-use crate::json::Value;
+use crate::json::{from_number, json, Value};
 use crate::model::prelude::*;
 
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].

@@ -1,7 +1,8 @@
 use std::fmt;
 
 use super::ArgumentConvert;
-use crate::{model::prelude::*, prelude::*};
+use crate::model::prelude::*;
+use crate::prelude::*;
 
 /// Error that can be returned from [`Member::convert`].
 #[non_exhaustive]

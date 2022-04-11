@@ -6,10 +6,8 @@ use std::mem;
 
 #[cfg(feature = "model")]
 use super::channel::Message;
-use super::{
-    id::{ChannelId, GuildId, WebhookId},
-    user::User,
-};
+use super::id::{ChannelId, GuildId, WebhookId};
+use super::user::User;
 #[cfg(feature = "model")]
 use crate::builder::{EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "model")]
