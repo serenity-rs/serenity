@@ -31,7 +31,7 @@ use crate::internal::tokio::spawn_named;
 /// #
 /// # fn long_process() {}
 /// # fn main() -> Result<()> {
-/// # let http = Http::default();
+/// # let http = Http::new("token");
 /// // Initiate typing (assuming `http` is bound)
 /// let typing = Typing::start(Arc::new(http), 7)?;
 ///

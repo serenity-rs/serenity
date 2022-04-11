@@ -32,7 +32,7 @@ use crate::{constants, utils};
 /// A builder for the underlying [`Http`] client that performs requests
 /// to Discord's HTTP API. If you do not need to use a proxy or do not
 /// need to disable the rate limiter, you can use [`Http::new`] or
-/// [`Http::new_with_token`] instead.
+/// [`Http::new_with_application_id`] instead.
 ///
 /// ## Example
 ///
@@ -171,7 +171,7 @@ impl HttpBuilder {
 fn parse_token(token: impl AsRef<str>) -> String {
     let token = token.as_ref().trim();
 
-    if token.starts_with("Bot ") {
+    if token.starts_with("Bot ") || token.starts_with("Bearer ") {
         token.to_string()
     } else {
         format!("Bot {}", token)
@@ -214,7 +214,10 @@ impl fmt::Debug for Http {
 }
 
 impl Http {
-    pub fn new(client: Client, token: &str) -> Self {
+    pub fn new(token: &str) -> Self {
+        let builder = configure_client_backend(Client::builder());
+
+        let client = builder.build().expect("Cannot build reqwest::Client");
         let client2 = client.clone();
 
         Http {
@@ -222,42 +225,17 @@ impl Http {
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
             ratelimiter_disabled: false,
             proxy: None,
-            token: token.to_string(),
+            token: parse_token(token),
             application_id: AtomicU64::new(0),
         }
     }
 
-    pub fn new_with_application_id(application_id: u64) -> Self {
-        let builder = configure_client_backend(Client::builder());
-        let built = builder.build().expect("Cannot build reqwest::Client");
+    pub fn new_with_application_id(token: &str, application_id: u64) -> Self {
+        let http = Self::new(token);
 
-        let data = Self::new(built, "");
+        http.set_application_id(application_id);
 
-        data.set_application_id(application_id);
-
-        data
-    }
-
-    pub fn new_with_token(token: &str) -> Self {
-        let builder = configure_client_backend(Client::builder());
-        let built = builder.build().expect("Cannot build reqwest::Client");
-
-        let trimmed = token.trim();
-        let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
-            token.to_string()
-        } else {
-            format!("Bot {}", token)
-        };
-
-        Self::new(built, &token)
-    }
-
-    pub fn new_with_token_application_id(token: &str, application_id: u64) -> Self {
-        let base = Self::new_with_token(token);
-
-        base.set_application_id(application_id);
-
-        base
+        http
     }
 
     pub fn application_id(&self) -> Option<u64> {
@@ -609,7 +587,7 @@ impl Http {
     /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #    let http = Http::default();
+    /// #    let http = Http::new("token");
     /// let map = json!({
     ///     "name": "test",
     /// });
@@ -908,7 +886,7 @@ impl Http {
     /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #    let http = Http::default();
+    /// #    let http = Http::new("token");
     /// let channel_id = 81384788765712384;
     /// let map = json!({"name": "test"});
     ///
@@ -1105,7 +1083,7 @@ impl Http {
     /// use serenity::model::id::{ChannelId, MessageId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let channel_id = ChannelId(7);
     /// let message_id = MessageId(8);
     ///
@@ -1255,7 +1233,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// // Due to the `delete_webhook` function requiring you to authenticate, you
     /// // must have set the token first.
-    /// let http = Http::default();
+    /// let http = Http::new("token");
     ///
     /// http.delete_webhook(245037420704169985).await?;
     /// Ok(())
@@ -1285,7 +1263,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
@@ -1924,7 +1902,7 @@ impl Http {
     /// use serenity::json::{json, prelude::*};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 187450744427773963;
     /// let user_id = 150443906511667200;
     /// let value = json!({
@@ -1974,7 +1952,7 @@ impl Http {
     /// use serenity::json::{json, prelude::*};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 187450744427773963;
     /// let value = json!({
     ///     "channel_id": "826929611849334784",
@@ -2026,7 +2004,7 @@ impl Http {
     /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let image = serenity::utils::read_image("./webhook_img.png")?;
     /// let map = json!({
@@ -2069,7 +2047,7 @@ impl Http {
     /// use serenity::json::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"name": "new name"});
@@ -2135,7 +2113,7 @@ impl Http {
     /// use serenity::json::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"content": "test"});
@@ -2513,7 +2491,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let channel_id = 81384788765712384;
     ///
     /// let webhooks = http.get_channel_webhooks(channel_id).await?;
@@ -3013,7 +2991,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 81384788765712384;
     ///
     /// let webhooks = http.get_guild_webhooks(guild_id).await?;
@@ -3046,7 +3024,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::http::GuildPagination;
     /// use serenity::model::id::GuildId;
     ///
@@ -3355,7 +3333,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let webhook = http.get_webhook(id).await?;
     /// #     Ok(())
@@ -3385,7 +3363,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
@@ -3418,7 +3396,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 
     /// let webhook = http.get_webhook_from_url(url).await?;
@@ -3676,7 +3654,7 @@ impl Http {
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// // Initiate typing (assuming http is `Arc<Http>`)
     /// let typing = http.start_typing(7)?;
     ///
@@ -3727,7 +3705,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
     /// #
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// use serenity::{
     ///     http::{
     ///         routing::RouteInfo,
@@ -3778,7 +3756,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::http::{
     ///     request::RequestBuilder,
     ///     routing::RouteInfo,
@@ -3850,21 +3828,5 @@ fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
 impl AsRef<Http> for Http {
     fn as_ref(&self) -> &Http {
         self
-    }
-}
-
-impl Default for Http {
-    fn default() -> Self {
-        let client = Client::builder().build().expect("Cannot build Reqwest::Client.");
-        let client2 = client.clone();
-
-        Self {
-            client,
-            ratelimiter: Ratelimiter::new(client2, ""),
-            ratelimiter_disabled: false,
-            proxy: None,
-            token: "".to_string(),
-            application_id: AtomicU64::new(0),
-        }
     }
 }

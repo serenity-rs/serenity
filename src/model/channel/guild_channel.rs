@@ -226,7 +226,7 @@ impl GuildChannel {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use std::sync::Arc;
     /// #
-    /// #     let http = Arc::new(Http::default());
+    /// #     let http = Arc::new(Http::new("token"));
     /// #     let cache = Cache::default();
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
@@ -258,7 +258,7 @@ impl GuildChannel {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use std::sync::Arc;
     /// #
-    /// #   let http = Arc::new(Http::default());
+    /// #   let http = Arc::new(Http::new("token"));
     /// #   let cache = Cache::default();
     /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
@@ -500,7 +500,7 @@ impl GuildChannel {
     /// # use std::sync::Arc;
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// #
-    /// #     let http = Arc::new(Http::default());
+    /// #     let http = Arc::new(Http::new("token"));
     /// #     let cache = Cache::default();
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
@@ -550,7 +550,7 @@ impl GuildChannel {
     /// # use std::sync::Arc;
     /// # use serenity::{cache::Cache, http::Http, model::id::ChannelId};
     /// #
-    /// #     let http = Arc::new(Http::default());
+    /// #     let http = Arc::new(Http::new("token"));
     /// #     let cache = Cache::default();
     /// #     let channel_id = ChannelId(0);
     /// #
@@ -994,7 +994,7 @@ impl GuildChannel {
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// # let cache = Cache::default();
     /// # let channel = cache
     /// #    .guild_channel(ChannelId(7))

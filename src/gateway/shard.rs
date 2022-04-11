@@ -113,7 +113,7 @@ impl Shard {
     /// # use serenity::model::gateway::GatewayIntents;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Arc::new(Http::default());
+    /// #     let http = Arc::new(Http::new("token"));
     /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));

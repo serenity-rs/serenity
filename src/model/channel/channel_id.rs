@@ -56,7 +56,7 @@ impl ChannelId {
     /// use serenity::model::id::ChannelId;
     ///
     /// # async fn run() {
-    /// # let http = serenity::http::Http::default();
+    /// # let http = serenity::http::Http::new("token");
     /// let _successful = ChannelId(7).broadcast_typing(&http).await;
     /// # }
     /// ```
@@ -315,7 +315,7 @@ impl ChannelId {
     /// # async fn run() {
     /// #     use serenity::http::Http;
     /// #     use serenity::model::id::ChannelId;
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// #     let channel_id = ChannelId(1234);
     /// channel_id.edit(&http, |c| c.name("test").bitrate(64000)).await;
     /// # }
@@ -515,7 +515,7 @@ impl ChannelId {
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::default();
-    /// # let ctx = Http::default();
+    /// # let ctx = Http::new("token");
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///
@@ -670,7 +670,7 @@ impl ChannelId {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// use serenity::model::id::ChannelId;
     ///
     /// let channel_id = ChannelId(7);
@@ -688,7 +688,7 @@ impl ChannelId {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// use serenity::model::id::ChannelId;
     /// use tokio::fs::File;
     ///
@@ -806,7 +806,7 @@ impl ChannelId {
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// // Initiate typing (assuming http is `Arc<Http>`)
     /// let typing = ChannelId(7).start_typing(&http)?;
     ///
@@ -1274,7 +1274,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::default();
-    /// # let ctx = Http::default();
+    /// # let ctx = Http::new("token");
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///
