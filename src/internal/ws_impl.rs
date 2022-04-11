@@ -1,6 +1,3 @@
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-use std::{error::Error as StdError, fmt, io::Error as IoError};
-
 use async_trait::async_trait;
 use async_tungstenite::tungstenite::Message;
 use flate2::read::ZlibDecoder;
@@ -81,49 +78,6 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
     })
 }
 
-/// An error that occurred while connecting over rustls
-#[derive(Debug)]
-#[non_exhaustive]
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-pub enum RustlsError {
-    /// WebPKI X.509 Certificate Validation Error.
-    WebPKI,
-    /// An error with the handshake in tungstenite
-    HandshakeError,
-    /// Standard IO error happening while creating the tcp stream
-    Io(IoError),
-}
-
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-impl From<IoError> for RustlsError {
-    fn from(e: IoError) -> Self {
-        RustlsError::Io(e)
-    }
-}
-
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-impl fmt::Display for RustlsError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            RustlsError::WebPKI => f.write_str("Failed to validate X.509 certificate"),
-            RustlsError::HandshakeError => {
-                f.write_str("TLS handshake failed when making the websocket connection")
-            },
-            RustlsError::Io(inner) => fmt::Display::fmt(&inner, f),
-        }
-    }
-}
-
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-impl StdError for RustlsError {
-    fn source(&self) -> Option<&(dyn StdError + 'static)> {
-        match self {
-            RustlsError::Io(inner) => Some(inner),
-            _ => None,
-        }
-    }
-}
-
 #[cfg(any(feature = "rustls_backend", feature = "native_tls_backend"))]
 fn websocket_config() -> async_tungstenite::tungstenite::protocol::WebSocketConfig {
     async_tungstenite::tungstenite::protocol::WebSocketConfig {
@@ -139,8 +93,7 @@ fn websocket_config() -> async_tungstenite::tungstenite::protocol::WebSocketConf
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) =
         async_tungstenite::tokio::connect_async_with_config::<Url>(url, Some(websocket_config()))
-            .await
-            .map_err(|_| RustlsError::HandshakeError)?;
+            .await?;
 
     Ok(stream)
 }
