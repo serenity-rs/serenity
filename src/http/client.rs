@@ -220,12 +220,14 @@ impl Http {
         let client = builder.build().expect("Cannot build reqwest::Client");
         let client2 = client.clone();
 
+        let token = parse_token(token);
+
         Http {
             client,
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
             ratelimiter_disabled: false,
             proxy: None,
-            token: parse_token(token),
+            token,
             application_id: AtomicU64::new(0),
         }
     }
