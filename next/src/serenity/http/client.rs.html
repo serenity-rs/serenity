@@ -3835,6 +3835,8 @@
 <span id="3830">3830</span>
 <span id="3831">3831</span>
 <span id="3832">3832</span>
+<span id="3833">3833</span>
+<span id="3834">3834</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::missing_errors_doc</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -4057,12 +4059,14 @@
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>().<span class="ident">expect</span>(<span class="string">&quot;Cannot build reqwest::Client&quot;</span>);
         <span class="kw">let</span> <span class="ident">client2</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
 
+        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">parse_token</span>(<span class="ident">token</span>);
+
         <span class="ident">Http</span> {
             <span class="ident">client</span>,
             <span class="ident">ratelimiter</span>: <span class="ident">Ratelimiter::new</span>(<span class="ident">client2</span>, <span class="ident">token</span>.<span class="ident">to_string</span>()),
             <span class="ident">ratelimiter_disabled</span>: <span class="bool-val">false</span>,
             <span class="ident">proxy</span>: <span class="prelude-val">None</span>,
-            <span class="ident">token</span>: <span class="ident">parse_token</span>(<span class="ident">token</span>),
+            <span class="ident">token</span>,
             <span class="ident">application_id</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
         }
     }
