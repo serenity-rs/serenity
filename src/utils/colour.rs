@@ -158,6 +158,7 @@ impl Colour {
     /// use serenity::utils::Colour;
     ///
     /// assert_eq!(Colour::new(6573123).b(), 67);
+    /// ```
     pub const fn b(self) -> u8 {
         (self.0 & 255) as u8
     }

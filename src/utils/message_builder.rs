@@ -879,6 +879,7 @@ impl fmt::Display for MessageBuilder {
     ///
     /// ```rust
     /// use serenity::utils::MessageBuilder;
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }
