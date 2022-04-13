@@ -166,7 +166,7 @@ impl GuildChannel {
 
     /// Creates an invite leading to the given channel.
     ///
-    /// **Note**: Requires the [Create Invite] permission.
+    /// **Note**: Requires the [Create Instant Invite] permission.
     ///
     /// # Examples
     ///

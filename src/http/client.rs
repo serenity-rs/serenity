@@ -722,9 +722,9 @@ impl Http {
     ///
     /// All fields are optional.
     ///
-    /// **Note**: Requires the [Create Invite] permission.
+    /// **Note**: Requires the [Create Instant Invite] permission.
     ///
-    /// [Create Invite]: Permissions::CREATE_INSTANT_INVITE
+    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     /// [docs]: https://discord.com/developers/docs/resources/channel#create-channel-invite
     pub async fn create_invite(
         &self,

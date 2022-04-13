@@ -109,11 +109,11 @@ macro_rules! generate_get_permission_names {
 /// - [Attach Files]
 /// - [Change Nickname]
 /// - [Connect]
-/// - [Create Invite]
+/// - [Create Instant Invite]
 /// - [Embed Links]
 /// - [Mention Everyone]
 /// - [Read Message History]
-/// - [Read Messages]
+/// - [View Channel]
 /// - [Send Messages]
 /// - [Send TTS Messages]
 /// - [Speak]
@@ -133,11 +133,11 @@ macro_rules! generate_get_permission_names {
 /// [Attach Files]: Permissions::ATTACH_FILES
 /// [Change Nickname]: Permissions::CHANGE_NICKNAME
 /// [Connect]: Permissions::CONNECT
-/// [Create Invite]: Permissions::CREATE_INSTANT_INVITE
+/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
 /// [Embed Links]: Permissions::EMBED_LINKS
 /// [Mention Everyone]: Permissions::MENTION_EVERYONE
 /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-/// [Read Messages]: Permissions::VIEW_CHANNEL
+/// [View Channel]: Permissions::VIEW_CHANNEL
 /// [Send Messages]: Permissions::SEND_MESSAGES
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Speak]: Permissions::SPEAK
@@ -168,11 +168,11 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
-/// - [Create Invite]
+/// - [Create Instant Invite]
 /// - [Embed Links]
 /// - [Mention Everyone]
 /// - [Read Message History]
-/// - [Read Messages]
+/// - [View Channel]
 /// - [Send Messages]
 /// - [Send TTS Messages]
 /// - [Use External Emojis]
@@ -180,11 +180,11 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// [Add Reactions]: Permissions::ADD_REACTIONS
 /// [Attach Files]: Permissions::ATTACH_FILES
 /// [Change Nickname]: Permissions::CHANGE_NICKNAME
-/// [Create Invite]: Permissions::CREATE_INSTANT_INVITE
+/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
 /// [Embed Links]: Permissions::EMBED_LINKS
 /// [Mention Everyone]: Permissions::MENTION_EVERYONE
 /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-/// [Read Messages]: Permissions::VIEW_CHANNEL
+/// [View Channel]: Permissions::VIEW_CHANNEL
 /// [Send Messages]: Permissions::SEND_MESSAGES
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
