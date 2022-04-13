@@ -34,11 +34,12 @@ use crate::cache::Cache;
 use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
+use crate::json::prelude::*;
+use crate::model::prelude::*;
 use crate::model::utils::is_false;
 use crate::model::Timestamp;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
-use crate::{json::prelude::*, model::prelude::*};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]

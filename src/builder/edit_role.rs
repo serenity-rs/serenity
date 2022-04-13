@@ -11,7 +11,8 @@ use crate::internal::prelude::*;
 use crate::json::from_number;
 #[cfg(feature = "model")]
 use crate::model::channel::AttachmentType;
-use crate::model::{guild::Role, Permissions};
+use crate::model::guild::Role;
+use crate::model::Permissions;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -34,7 +35,7 @@ use crate::model::{guild::Role, Permissions};
 /// # use serenity::{model::id::{ChannelId, GuildId}, http::Http};
 /// # use std::sync::Arc;
 /// #
-/// # let http = Arc::new(Http::default());
+/// # let http = Arc::new(Http::new("token"));
 /// # let (channel_id, guild_id) = (ChannelId(1), GuildId(2));
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound

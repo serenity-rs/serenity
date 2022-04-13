@@ -1,22 +1,14 @@
-use std::{
-    env,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc,
-    },
-    time::Duration,
-};
+use std::env;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+use std::time::Duration;
 
 use chrono::offset::Utc;
-use serenity::{
-    async_trait,
-    model::{
-        channel::Message,
-        gateway::{Activity, Ready},
-        id::{ChannelId, GuildId},
-    },
-    prelude::*,
-};
+use serenity::async_trait;
+use serenity::model::channel::Message;
+use serenity::model::gateway::{Activity, Ready};
+use serenity::model::id::{ChannelId, GuildId};
+use serenity::prelude::*;
 
 struct Handler {
     is_loop_running: AtomicBool,

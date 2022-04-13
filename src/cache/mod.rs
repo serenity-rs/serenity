@@ -30,19 +30,17 @@
 //! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
 
-use std::collections::{hash_map::RandomState, HashMap, VecDeque};
-use std::default::Default;
+use std::collections::hash_map::RandomState;
+use std::collections::{HashMap, VecDeque};
 use std::hash::BuildHasher;
 use std::str::FromStr;
 #[cfg(feature = "temp_cache")]
 use std::time::Duration;
 
-use dashmap::{
-    iter::Iter,
-    mapref::{entry::Entry, multiple::RefMulti},
-    DashMap,
-    DashSet,
-};
+use dashmap::iter::Iter;
+use dashmap::mapref::entry::Entry;
+use dashmap::mapref::multiple::RefMulti;
+use dashmap::{DashMap, DashSet};
 #[cfg(feature = "temp_cache")]
 use moka::dash::Cache as DashCache;
 use parking_lot::RwLock;
@@ -1036,11 +1034,9 @@ impl Default for Cache {
 mod test {
     use std::collections::HashMap;
 
+    use crate::cache::{Cache, CacheUpdate, Settings};
     use crate::json::from_number;
-    use crate::{
-        cache::{Cache, CacheUpdate, Settings},
-        model::prelude::*,
-    };
+    use crate::model::prelude::*;
 
     #[test]
     fn test_cache_messages() {

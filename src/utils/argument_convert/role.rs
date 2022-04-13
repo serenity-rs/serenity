@@ -1,7 +1,8 @@
 use std::fmt;
 
 use super::ArgumentConvert;
-use crate::{model::prelude::*, prelude::*};
+use crate::model::prelude::*;
+use crate::prelude::*;
 
 /// Error that can be returned from [`Role::convert`].
 #[non_exhaustive]
@@ -22,10 +23,10 @@ pub enum RoleParseError {
 impl std::error::Error for RoleParseError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            RoleParseError::NotInGuild => None,
-            RoleParseError::NotInCache => None,
             RoleParseError::Http(e) => Some(e),
-            RoleParseError::NotFoundOrMalformed => None,
+            RoleParseError::NotFoundOrMalformed
+            | RoleParseError::NotInGuild
+            | RoleParseError::NotInCache => None,
         }
     }
 }

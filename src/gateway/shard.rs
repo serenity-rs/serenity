@@ -1,12 +1,8 @@
-use std::{
-    sync::Arc,
-    time::{Duration as StdDuration, Instant},
-};
+use std::sync::Arc;
+use std::time::{Duration as StdDuration, Instant};
 
-use async_tungstenite::tungstenite::{
-    error::Error as TungsteniteError,
-    protocol::frame::CloseFrame,
-};
+use async_tungstenite::tungstenite::error::Error as TungsteniteError;
+use async_tungstenite::tungstenite::protocol::frame::CloseFrame;
 use tokio::sync::Mutex;
 use tracing::{debug, error, info, instrument, trace, warn};
 use url::Url;
@@ -22,17 +18,16 @@ use super::{
 };
 use crate::client::bridge::gateway::ChunkGuildFilter;
 use crate::constants::{self, close_codes};
+use crate::http::Http;
 use crate::internal::prelude::*;
 #[cfg(feature = "native_tls_backend")]
 use crate::internal::ws_impl::create_native_tls_client;
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
-use crate::model::{
-    event::{Event, GatewayEvent},
-    gateway::{Activity, GatewayIntents},
-    id::GuildId,
-    user::OnlineStatus,
-};
+use crate::model::event::{Event, GatewayEvent};
+use crate::model::gateway::{Activity, GatewayIntents};
+use crate::model::id::GuildId;
+use crate::model::user::OnlineStatus;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -79,6 +74,7 @@ pub struct Shard {
     /// [`latency`]: fn@Self::latency
     heartbeat_instants: (Option<Instant>, Option<Instant>),
     heartbeat_interval: Option<u64>,
+    http: Option<Arc<Http>>,
     /// This is used by the heartbeater to determine whether the last
     /// heartbeat was sent without an acknowledgement, and whether to reconnect.
     // This _must_ be set to `true` in `Shard::handle_event`'s
@@ -117,7 +113,7 @@ impl Shard {
     /// # use serenity::model::gateway::GatewayIntents;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Arc::new(Http::default());
+    /// #     let http = Arc::new(Http::new("token"));
     /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));
@@ -156,6 +152,7 @@ impl Shard {
             current_presence,
             heartbeat_instants,
             heartbeat_interval,
+            http: None,
             last_heartbeat_acknowledged,
             seq,
             stage,
@@ -166,6 +163,13 @@ impl Shard {
             ws_url,
             intents,
         })
+    }
+
+    /// Sets the associated [`Http`] client.
+    ///
+    /// This will update the client's application id after the shard receives a READY payload.
+    pub fn set_http(&mut self, http: Arc<Http>) {
+        self.http = Some(http);
     }
 
     /// Retrieves the current presence of the shard.
@@ -330,6 +334,10 @@ impl Shard {
 
                 self.session_id = Some(ready.ready.session_id.clone());
                 self.stage = ConnectionStage::Connected;
+
+                if let Some(ref http) = self.http {
+                    http.set_application_id(ready.ready.application.id.0);
+                }
             },
             Event::Resumed(_) => {
                 info!("[Shard {:?}] Resumed", self.shard_info);
@@ -361,14 +369,13 @@ impl Shard {
                 self.stage = ConnectionStage::Identifying;
 
                 return ShardAction::Identify;
-            } else {
-                warn!(
-                    "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
-                    self.shard_info
-                );
-
-                return ShardAction::Reconnect(self.reconnection_type());
             }
+            warn!(
+                "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
+                self.shard_info
+            );
+
+            return ShardAction::Reconnect(self.reconnection_type());
         }
 
         ShardAction::Heartbeat
@@ -453,8 +460,7 @@ impl Shard {
         }
 
         let resume = num
-            .map(|x| x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some())
-            .unwrap_or(true);
+            .map_or(true, |x| x != close_codes::AUTHENTICATION_FAILED && self.session_id.is_some());
 
         Ok(Some(if resume {
             ShardAction::Reconnect(ReconnectType::Resume)
@@ -810,14 +816,14 @@ impl Shard {
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
-    Ok(create_rustls_client(url).await?)
+    create_rustls_client(url).await
 }
 
 #[cfg(feature = "native_tls_backend")]
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
-    Ok(create_native_tls_client(url).await?)
+    create_native_tls_client(url).await
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {

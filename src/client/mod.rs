@@ -25,15 +25,10 @@ mod error;
 #[cfg(feature = "gateway")]
 mod event_handler;
 
-#[cfg(all(feature = "cache", feature = "gateway"))]
-use std::time::Duration;
-use std::{
-    boxed::Box,
-    future::Future,
-    pin::Pin,
-    sync::Arc,
-    task::{Context as FutContext, Poll},
-};
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context as FutContext, Poll};
 
 use futures::future::BoxFuture;
 use tokio::sync::{Mutex, RwLock};
@@ -49,9 +44,10 @@ use self::bridge::gateway::{
 };
 #[cfg(feature = "voice")]
 use self::bridge::voice::VoiceGatewayManager;
+pub use self::context::Context;
+pub use self::error::Error as ClientError;
 #[cfg(feature = "gateway")]
 pub use self::event_handler::{EventHandler, RawEventHandler};
-pub use self::{context::Context, error::Error as ClientError};
 #[cfg(feature = "gateway")]
 use super::gateway::GatewayError;
 #[cfg(feature = "cache")]
@@ -76,9 +72,6 @@ pub struct ClientBuilder {
     http: Option<Http>,
     fut: Option<BoxFuture<'static, Result<Client>>>,
     intents: GatewayIntents,
-    application_id: Option<ApplicationId>,
-    #[cfg(feature = "cache")]
-    timeout: Option<Duration>,
     #[cfg(feature = "cache")]
     cache_settings: Option<CacheSettings>,
     #[cfg(feature = "framework")]
@@ -97,9 +90,6 @@ impl ClientBuilder {
             http: Some(http),
             fut: None,
             intents: GatewayIntents::non_privileged(),
-            application_id: None,
-            #[cfg(feature = "cache")]
-            timeout: None,
             #[cfg(feature = "cache")]
             cache_settings: Some(CacheSettings::new()),
             #[cfg(feature = "framework")]
@@ -119,7 +109,7 @@ impl ClientBuilder {
     /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
     pub fn new(token: impl AsRef<str>) -> Self {
-        Self::_new(Http::new_with_token(token.as_ref()))
+        Self::_new(Http::new(token.as_ref()))
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on
@@ -136,7 +126,7 @@ impl ClientBuilder {
     /// Sets a token for the bot. If the token is not prefixed "Bot ",
     /// this method will automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        self.http = Some(Http::new_with_token(token.as_ref()));
+        self.http = Some(Http::new(token.as_ref()));
 
         self
     }
@@ -148,11 +138,9 @@ impl ClientBuilder {
     }
 
     /// Sets the application id.
-    pub fn application_id(mut self, application_id: u64) -> Self {
-        self.application_id = Some(ApplicationId(application_id));
-
-        if let Some(http) = &mut self.http {
-            http.application_id = application_id;
+    pub fn application_id(self, application_id: u64) -> Self {
+        if let Some(http) = &self.http {
+            http.set_application_id(application_id);
         }
 
         self
@@ -160,7 +148,7 @@ impl ClientBuilder {
 
     /// Gets the application ID, if already initialized. See [`Self::application_id`] for more info.
     pub fn get_application_id(&self) -> Option<ApplicationId> {
-        self.application_id
+        self.http.as_ref().and_then(|h| h.application_id().map(ApplicationId))
     }
 
     /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
@@ -186,27 +174,6 @@ impl ClientBuilder {
         self.data.get_or_insert_with(TypeMap::new).insert::<T>(value);
 
         self
-    }
-
-    /// Sets how long - if wanted to begin with - a cache update shall
-    /// be attempted for. After the `timeout` ran out, the update will be
-    /// skipped.
-    ///
-    /// By default, a cache update will never timeout and potentially
-    /// cause a deadlock.
-    /// A timeout however, will invalidate the cache.
-    #[cfg(feature = "cache")]
-    pub fn cache_update_timeout(mut self, timeout: Duration) -> Self {
-        self.timeout = Some(timeout);
-
-        self
-    }
-
-    /// Gets the cache update timeout, if already initialized. See [`Self::cache_update_timeout`]
-    /// for more info.
-    #[cfg(feature = "cache")]
-    pub fn get_cache_update_timeout(&self) -> Option<Duration> {
-        self.timeout
     }
 
     /// Sets the settings of the cache.
@@ -397,24 +364,17 @@ impl Future for ClientBuilder {
             let intents = self.intents;
             let http = Arc::new(self.http.take().unwrap());
 
-            // TODO: It should not be required for all users of serenity to set the application_id or get a panic.
-            if http.application_id == 0 {
-                panic!("Please provide an Application Id in order to use interactions features.");
-            }
-
             #[cfg(feature = "voice")]
             let voice_manager = self.voice_manager.take();
 
             let cache_and_http = Arc::new(CacheAndHttp {
                 #[cfg(feature = "cache")]
                 cache: Arc::new(Cache::new_with_settings(self.cache_settings.take().unwrap())),
-                #[cfg(feature = "cache")]
-                update_cache_timeout: self.timeout.take(),
                 http: Arc::clone(&http),
             });
 
             self.fut = Some(Box::pin(async move {
-                let url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+                let ws_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 
                 let (shard_manager, shard_manager_worker) = {
                     ShardManager::new(ShardManagerOptions {
@@ -428,7 +388,7 @@ impl Future for ClientBuilder {
                         shard_total: 0,
                         #[cfg(feature = "voice")]
                         voice_manager: &voice_manager,
-                        ws_url: &url,
+                        ws_url: &ws_url,
                         cache_and_http: &cache_and_http,
                         intents,
                     })
@@ -436,7 +396,7 @@ impl Future for ClientBuilder {
                 };
 
                 Ok(Client {
-                    ws_uri: url,
+                    ws_url,
                     data,
                     shard_manager,
                     shard_manager_worker,
@@ -444,7 +404,7 @@ impl Future for ClientBuilder {
                     voice_manager,
                     cache_and_http,
                 })
-            }))
+            }));
         }
 
         self.fut.as_mut().unwrap().as_mut().poll(ctx)
@@ -521,10 +481,11 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```rust,ignore
-    /// use serenity::prelude::*;
-    /// use serenity::model::prelude::*;
     /// use std::collections::HashMap;
     /// use std::env;
+    ///
+    /// use serenity::model::prelude::*;
+    /// use serenity::prelude::*;
     ///
     /// struct MessageEventCounter;
     ///
@@ -554,7 +515,13 @@ pub struct Client {
     ///     }
     ///
     ///     #[cfg(feature = "cache")]
-    ///     async fn message_update(&self, ctx: Context, _old: Option<Message>, _new: Option<Message>, _: MessageUpdateEvent) {
+    ///     async fn message_update(
+    ///         &self,
+    ///         ctx: Context,
+    ///         _old: Option<Message>,
+    ///         _new: Option<Message>,
+    ///         _: MessageUpdateEvent,
+    ///     ) {
     ///         reg(ctx, "MessageUpdate").await
     ///     }
     ///
@@ -669,16 +636,15 @@ pub struct Client {
     /// connections.
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
-    /// URI that the client's shards will use to connect to the gateway.
+    /// URL that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
     /// for debugging.
     ///
     /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
     /// value available.
-    pub ws_uri: Arc<Mutex<String>>,
+    pub ws_url: Arc<Mutex<String>>,
     /// A container for an optional cache and HTTP client.
-    /// It also contains the cache update timeout.
     pub cache_and_http: Arc<CacheAndHttp>,
 }
 

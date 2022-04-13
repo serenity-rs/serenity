@@ -89,7 +89,7 @@ impl PrivateChannel {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item = T>>(
+    pub async fn delete_messages<T, It>(
         &self,
         http: impl AsRef<Http>,
         message_ids: It,
@@ -348,7 +348,7 @@ impl PrivateChannel {
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// # let cache = Cache::default();
     /// # let channel = cache.private_channel(ChannelId(7))
     /// #    .ok_or(ModelError::ItemMissing)?;

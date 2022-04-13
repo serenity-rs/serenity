@@ -1,14 +1,9 @@
-use std::{
-    default::Default,
-    fmt::{self, Write},
-    ops::Add,
-};
+use std::fmt::{self, Write};
+use std::ops::Add;
 
-use crate::model::{
-    guild::Emoji,
-    id::{ChannelId, RoleId, UserId},
-    misc::Mentionable,
-};
+use crate::model::guild::Emoji;
+use crate::model::id::{ChannelId, RoleId, UserId};
+use crate::model::misc::Mentionable;
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
@@ -1047,7 +1042,7 @@ impl<T: ToString> Add<T> for Content {
     type Output = Content;
 
     fn add(mut self, rhs: T) -> Content {
-        self.inner = self.inner + &rhs.to_string();
+        self.inner += &rhs.to_string();
 
         self
     }
@@ -1058,7 +1053,7 @@ impl<T: ToString> Add<T> for ContentModifier {
 
     fn add(self, rhs: T) -> Content {
         let mut nc = self.to_content();
-        nc.inner = nc.inner + &rhs.to_string();
+        nc.inner += &rhs.to_string();
 
         nc
     }
@@ -1236,10 +1231,8 @@ fn normalize(text: &str) -> String {
 
 #[cfg(test)]
 mod test {
-    use super::{
-        ContentModifier::{Bold, Code, Italic, Spoiler},
-        MessageBuilder,
-    };
+    use super::ContentModifier::{Bold, Code, Italic, Spoiler};
+    use super::MessageBuilder;
     use crate::model::prelude::*;
 
     macro_rules! gen {

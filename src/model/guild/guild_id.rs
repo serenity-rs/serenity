@@ -86,12 +86,11 @@ impl GuildId {
     /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
     /// ```rust,no_run
-    /// use serenity::model::id::GuildId;
-    /// use serenity::model::id::UserId;
+    /// use serenity::model::id::{GuildId, UserId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// # let user = UserId(1);
     /// // assuming a `user` has already been bound
     /// let _ = GuildId(81384788765712384).ban(&http, user, 4).await;
@@ -225,7 +224,7 @@ impl GuildId {
     ///
     /// # async fn run() {
     /// # use serenity::http::Http;
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let _channel =
     ///     GuildId(7).create_channel(&http, |c| c.name("test").kind(ChannelType::Voice)).await;
     /// # }
@@ -969,7 +968,7 @@ impl GuildId {
     /// #
     /// # async fn run() {
     /// # let guild_id = GuildId::default();
-    /// # let ctx = Http::default();
+    /// # let ctx = Http::new("token");
     /// use serenity::futures::StreamExt;
     /// use serenity::model::guild::MembersIter;
     ///
@@ -1638,7 +1637,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
     /// #
     /// # async fn run() {
     /// # let guild_id = GuildId::default();
-    /// # let ctx = Http::default();
+    /// # let ctx = Http::new("token");
     /// use serenity::futures::StreamExt;
     /// use serenity::model::guild::MembersIter;
     ///

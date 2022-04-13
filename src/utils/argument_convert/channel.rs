@@ -1,7 +1,8 @@
 use std::fmt;
 
 use super::ArgumentConvert;
-use crate::{model::prelude::*, prelude::*};
+use crate::model::prelude::*;
+use crate::prelude::*;
 
 /// Error that can be returned from [`Channel::convert`].
 #[non_exhaustive]
@@ -123,8 +124,7 @@ impl std::error::Error for GuildChannelParseError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Http(e) => Some(e),
-            Self::NotFoundOrMalformed => None,
-            Self::NotAGuildChannel => None,
+            Self::NotFoundOrMalformed | Self::NotAGuildChannel => None,
         }
     }
 }
@@ -182,8 +182,7 @@ impl std::error::Error for ChannelCategoryParseError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Http(e) => Some(e),
-            Self::NotFoundOrMalformed => None,
-            Self::NotAChannelCategory => None,
+            Self::NotFoundOrMalformed | Self::NotAChannelCategory => None,
         }
     }
 }

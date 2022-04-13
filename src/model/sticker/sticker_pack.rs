@@ -1,7 +1,5 @@
-use crate::model::{
-    id::{SkuId, StickerId, StickerPackBannerId, StickerPackId},
-    sticker::Sticker,
-};
+use crate::model::id::{SkuId, StickerId, StickerPackBannerId, StickerPackId};
+use crate::model::sticker::Sticker;
 
 /// A sticker sent with a message.
 ///

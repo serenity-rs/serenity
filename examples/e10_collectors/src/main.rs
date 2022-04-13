@@ -1,27 +1,26 @@
 //! This example will showcase the beauty of collectors.
 //! They allow to await messages or reactions from a user in the middle
 //! of a control flow, one being a command.
-use std::{collections::HashSet, env, time::Duration};
+use std::collections::HashSet;
+use std::env;
+use std::time::Duration;
 
-use serenity::{
-    async_trait,
-    collector::{EventCollectorBuilder, MessageCollectorBuilder},
-    framework::standard::{
-        help_commands,
-        macros::{command, group, help},
-        Args,
-        CommandGroup,
-        CommandResult,
-        HelpOptions,
-        StandardFramework,
-    },
-    // Collectors are streams, that means we can use `StreamExt` and
-    // `TryStreamExt`.
-    futures::stream::StreamExt,
-    http::Http,
-    model::prelude::*,
-    prelude::*,
+use serenity::async_trait;
+use serenity::collector::{EventCollectorBuilder, MessageCollectorBuilder};
+use serenity::framework::standard::macros::{command, group, help};
+use serenity::framework::standard::{
+    help_commands,
+    Args,
+    CommandGroup,
+    CommandResult,
+    HelpOptions,
+    StandardFramework,
 };
+// Collectors are streams, that means we can use `StreamExt` and `TryStreamExt`.
+use serenity::futures::stream::StreamExt;
+use serenity::http::Http;
+use serenity::model::prelude::*;
+use serenity::prelude::*;
 
 #[group("collector")]
 #[commands(challenge)]
@@ -54,7 +53,7 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    let http = Http::new_with_token(&token);
+    let http = Http::new(&token);
 
     // We will fetch your bot's id.
     let bot_id = match http.get_current_user().await {

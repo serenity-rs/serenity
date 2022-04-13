@@ -28,7 +28,10 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::json::{from_number, prelude::*};
+use crate::json::prelude::*;
+use crate::json::{from_number, from_value};
+use crate::model::prelude::*;
+use crate::model::utils::{emojis, roles, stickers};
 #[cfg(feature = "model")]
 use crate::{
     builder::{
@@ -38,11 +41,6 @@ use crate::{
         CreateApplicationCommandsPermissions,
     },
     model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
-};
-use crate::{
-    json::from_value,
-    model::prelude::*,
-    model::utils::{emojis, roles, stickers},
 };
 
 /// Partial information about a [`Guild`]. This does not include information
@@ -1050,13 +1048,12 @@ impl PartialGuild {
             return Ok(Permissions::all());
         }
 
-        let everyone = match self.roles.get(&RoleId(self.id.0)) {
-            Some(everyone) => everyone,
-            None => {
-                error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
+        let everyone = if let Some(everyone) = self.roles.get(&RoleId(self.id.0)) {
+            everyone
+        } else {
+            error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
 
-                return Ok(Permissions::empty());
-            },
+            return Ok(Permissions::empty());
         };
 
         let member = self.member(cache_http, &user_id).await?;

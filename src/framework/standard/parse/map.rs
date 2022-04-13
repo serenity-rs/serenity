@@ -38,7 +38,7 @@ impl CommandMap {
                 map.max_length = std::cmp::max(len, map.max_length);
 
                 let name =
-                    if conf.case_insensitive { name.to_lowercase() } else { name.to_string() };
+                    if conf.case_insensitive { name.to_lowercase() } else { (*name).to_string() };
 
                 map.cmds.insert(name, (*cmd, sub_map.clone()));
             }

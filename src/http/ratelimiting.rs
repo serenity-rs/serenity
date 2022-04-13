@@ -10,26 +10,26 @@
 //! > account when generating rate limits since it's the major parameter. The
 //! only current major parameters are `channel_id`, `guild_id` and `webhook_id`.
 //!
-//! This results in the two URIs of `GET /channels/4/messages/7` and
+//! This results in the two URLs of `GET /channels/4/messages/7` and
 //! `GET /channels/5/messages/8` being rate limited _separately_. However, the
-//! two URIs of `GET /channels/10/messages/11` and
+//! two URLs of `GET /channels/10/messages/11` and
 //! `GET /channels/10/messages/12` will count towards the "same ratelimit", as
-//! the major parameter - `10` is equivalent in both URIs' format.
+//! the major parameter - `10` is equivalent in both URLs' format.
 //!
 //! # Examples
 //!
-//! First: taking the first two URIs - `GET /channels/4/messages/7` and
+//! First: taking the first two URLs - `GET /channels/4/messages/7` and
 //! `GET /channels/5/messages/8` - and assuming both buckets have a `limit` of
-//! `10`, requesting the first URI will result in the response containing a
+//! `10`, requesting the first URL will result in the response containing a
 //! `remaining` of `9`. Immediately after - prior to buckets resetting -
-//! performing a request to the _second_ URI will also contain a `remaining` of
+//! performing a request to the _second_ URL will also contain a `remaining` of
 //! `9` in the response, as the major parameter - `channel_id` - is different
 //! in the two requests (`4` and `5`).
 //!
-//! Second: take for example the last two URIs. Assuming the bucket's `limit` is
-//! `10`, requesting the first URI will return a `remaining` of `9` in the
+//! Second: take for example the last two URLs. Assuming the bucket's `limit` is
+//! `10`, requesting the first URL will return a `remaining` of `9` in the
 //! response. Immediately after - prior to buckets resetting - performing a
-//! request to the _second_ URI will return a `remaining` of `8` in the
+//! request to the _second_ URL will return a `remaining` of `8` in the
 //! response, as the major parameter - `channel_id` - is equivalent for the two
 //! requests (`10`).
 //!
@@ -39,18 +39,14 @@
 //!
 //! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
-use std::{
-    collections::HashMap,
-    f64,
-    fmt,
-    i64,
-    str::{self, FromStr},
-    sync::Arc,
-    time::SystemTime,
-};
+use std::collections::HashMap;
+use std::fmt;
+use std::str::{self, FromStr};
+use std::sync::Arc;
+use std::time::SystemTime;
 
-use reqwest::{header::HeaderMap, StatusCode};
-use reqwest::{Client, Response};
+use reqwest::header::HeaderMap;
+use reqwest::{Client, Response, StatusCode};
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::{sleep, Duration};
 use tracing::{debug, instrument};
@@ -110,8 +106,8 @@ impl Ratelimiter {
     fn _new(client: Client, token: String) -> Self {
         Self {
             client,
-            global: Default::default(),
-            routes: Default::default(),
+            global: Arc::default(),
+            routes: Arc::default(),
             token,
         }
     }
@@ -131,7 +127,7 @@ impl Ratelimiter {
     /// # use serenity::http::Http;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let routes = http.ratelimiter.routes();
     /// let reader = routes.read().await;
     ///
@@ -204,29 +200,29 @@ impl Ratelimiter {
             // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
             if route == Route::None {
                 return Ok(response);
+            }
+
+            let redo = if response.headers().get("x-ratelimit-global").is_some() {
+                let _ = self.global.lock().await;
+
+                Ok(
+                    if let Some(retry_after) =
+                        parse_header::<f64>(response.headers(), "retry-after")?
+                    {
+                        debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
+                        sleep(Duration::from_secs_f64(retry_after)).await;
+
+                        true
+                    } else {
+                        false
+                    },
+                )
             } else {
-                let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                    let _ = self.global.lock().await;
+                bucket.lock().await.post_hook(&response, &route).await
+            };
 
-                    Ok(
-                        if let Some(retry_after) =
-                            parse_header::<f64>(response.headers(), "retry-after")?
-                        {
-                            debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
-                            sleep(Duration::from_secs_f64(retry_after)).await;
-
-                            true
-                        } else {
-                            false
-                        },
-                    )
-                } else {
-                    bucket.lock().await.post_hook(&response, &route).await
-                };
-
-                if !redo.unwrap_or(true) {
-                    return Ok(response);
-                }
+            if !redo.unwrap_or(true) {
+                return Ok(response);
             }
         }
     }
@@ -261,26 +257,23 @@ impl Ratelimit {
             return;
         }
 
-        let reset = match self.reset {
-            Some(reset) => reset,
-            None => {
-                // We're probably in the past.
-                self.remaining = self.limit;
+        let reset = if let Some(reset) = self.reset {
+            reset
+        } else {
+            // We're probably in the past.
+            self.remaining = self.limit;
 
-                return;
-            },
+            return;
         };
 
-        let delay = match reset.duration_since(SystemTime::now()) {
-            Ok(delay) => delay,
-
+        let delay = if let Ok(delay) = reset.duration_since(SystemTime::now()) {
+            delay
+        } else {
             // if duration is negative (i.e. adequate time has passed since last call to this api)
-            Err(_) => {
-                if self.remaining() != 0 {
-                    self.remaining -= 1;
-                }
-                return;
-            },
+            if self.remaining() != 0 {
+                self.remaining -= 1;
+            }
+            return;
         };
 
         if self.remaining() == 0 {
@@ -403,12 +396,14 @@ fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<
 
 #[cfg(test)]
 mod tests {
-    use std::{error::Error as StdError, result::Result as StdResult};
+    use std::error::Error as StdError;
+    use std::result::Result as StdResult;
 
     use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 
     use super::parse_header;
-    use crate::{error::Error, http::HttpError};
+    use crate::error::Error;
+    use crate::http::HttpError;
 
     type Result<T> = StdResult<T, Box<dyn StdError>>;
 

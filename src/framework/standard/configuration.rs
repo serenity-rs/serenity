@@ -4,10 +4,8 @@ use futures::future::BoxFuture;
 
 use super::Delimiter;
 use crate::client::Context;
-use crate::model::{
-    channel::Message,
-    id::{ChannelId, GuildId, UserId},
-};
+use crate::model::channel::Message;
+use crate::model::id::{ChannelId, GuildId, UserId};
 
 type DynamicPrefixHook =
     for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
@@ -542,7 +540,7 @@ impl Configuration {
         It: IntoIterator<Item = T>,
     {
         self.delimiters.clear();
-        self.delimiters.extend(delimiters.into_iter().map(|s| s.into()));
+        self.delimiters.extend(delimiters.into_iter().map(Into::into));
 
         self
     }

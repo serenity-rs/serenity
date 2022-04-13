@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
 use crate::cache::Cache;
+use crate::model::channel::Channel;
 use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
-use crate::model::{channel::Channel, user::User};
+use crate::model::user::User;
 
 /// Struct that allows to alter [`content_safe`]'s behaviour.
 #[derive(Clone, Debug)]
@@ -306,7 +307,7 @@ fn clean_users(
                 let code_start = if has_exclamation { "<@!" } else { "<@" };
                 let to_replace = format!("{}{}>", code_start, &s[mention_start..mention_end]);
 
-                *s = s.replace(&to_replace, &replacement)
+                *s = s.replace(&to_replace, &replacement);
             } else {
                 let id = &s[mention_start..mention_end].to_string();
 

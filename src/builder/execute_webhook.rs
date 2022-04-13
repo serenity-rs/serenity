@@ -28,7 +28,7 @@ use crate::model::channel::MessageFlags;
 /// use serenity::utils::Colour;
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// # let http = Http::default();
+/// # let http = Http::new("token");
 /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// let webhook = http.get_webhook_from_url(url).await?;
 ///
@@ -76,7 +76,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
@@ -103,7 +103,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| w.content("foo")).await;
@@ -132,7 +132,7 @@ impl<'a> ExecuteWebhook<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1.extend(files.into_iter().map(|f| f.into()));
+        self.1.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -145,7 +145,7 @@ impl<'a> ExecuteWebhook<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.1 = files.into_iter().map(|f| f.into()).collect();
+        self.1 = files.into_iter().map(Into::into).collect();
         self
     }
 
@@ -163,10 +163,12 @@ impl<'a> ExecuteWebhook<'a> {
         self
     }
 
-    /// Creates components for this message. Requires an application-owned webhook, meaning
-    /// the webhook's `kind` field is set to [`WebhookType::Application`].
+    /// Creates components for this message. Requires an application-owned webhook, meaning either
+    /// the webhook's `kind` field is set to [`WebhookType::Application`], or it was created by an
+    /// application (and has kind [`WebhookType::Incoming`]).
     ///
     /// [`WebhookType::Application`]: crate::model::webhook::WebhookType
+    /// [`WebhookType::Incoming`]: crate::model::webhook::WebhookType
     pub fn components<F>(&mut self, f: F) -> &mut Self
     where
         F: FnOnce(&mut CreateComponents) -> &mut CreateComponents,
@@ -178,7 +180,10 @@ impl<'a> ExecuteWebhook<'a> {
         self
     }
 
-    /// Sets the components of this message. Requires an application-owned webhook. See [`ExecuteWebhook::components`] for details.
+    /// Sets the components of this message. Requires an application-owned webhook. See
+    /// [`components`] for details.
+    ///
+    /// [`components`]: crate::builder::ExecuteWebhook::components
     pub fn set_components(&mut self, components: CreateComponents) -> &mut Self {
         self.0.insert("components", Value::Array(components.0));
         self
@@ -212,7 +217,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| w.content("hello").tts(true)).await;
@@ -238,7 +243,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| w.content("hello").username("hakase")).await;
@@ -265,7 +270,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # use serenity::model::channel::MessageFlags;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook
@@ -307,6 +312,6 @@ impl<'a> Default for ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::from(false));
 
-        ExecuteWebhook(map, Default::default())
+        ExecuteWebhook(map, Vec::default())
     }
 }

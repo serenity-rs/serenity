@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
-use crate::json::{from_number, json};
-use crate::json::{Value, NULL};
+use crate::json::{from_number, json, Value, NULL};
 use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType, VideoQualityMode};
 use crate::model::id::ChannelId;
 
@@ -17,7 +16,7 @@ use crate::model::id::ChannelId;
 /// # use serenity::{http::Http, model::id::ChannelId};
 /// #
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// #     let http = Http::default();
+/// #     let http = Http::new("token");
 /// #     let mut channel = ChannelId(0);
 /// // assuming a channel has already been bound
 /// if let Err(why) = channel.edit(&http, |c| c.name("new name").topic("a test topic")).await {
@@ -161,7 +160,7 @@ impl EditChannel {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Arc::new(Http::default());
+    /// #     let http = Arc::new(Http::new("token"));
     /// #     let mut channel = ChannelId(0);
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;

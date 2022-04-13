@@ -1,29 +1,25 @@
 #![allow(clippy::missing_errors_doc)]
-use std::{borrow::Cow, fmt, str::FromStr, sync::Arc};
+
+use std::borrow::Cow;
+use std::fmt;
+use std::str::FromStr;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::Arc;
 
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-use reqwest::{
-    header::{HeaderMap as Headers, HeaderValue, CONTENT_TYPE},
-    StatusCode,
-    Url,
-};
-use reqwest::{Client, ClientBuilder, Response as ReqwestResponse};
+use reqwest::header::{HeaderMap as Headers, HeaderValue, CONTENT_TYPE};
+use reqwest::{Client, ClientBuilder, Response as ReqwestResponse, StatusCode, Url};
 use serde::de::DeserializeOwned;
 #[cfg(feature = "simd-json")]
 use simd_json::ValueAccess;
 use tracing::{debug, instrument, trace};
 
-use super::{
-    multipart::Multipart,
-    ratelimiting::{RatelimitedRequest, Ratelimiter},
-    request::Request,
-    routing::RouteInfo,
-    typing::Typing,
-    AttachmentType,
-    GuildPagination,
-    HttpError,
-};
-use crate::constants;
+use super::multipart::Multipart;
+use super::ratelimiting::{RatelimitedRequest, Ratelimiter};
+use super::request::Request;
+use super::routing::RouteInfo;
+use super::typing::Typing;
+use super::{AttachmentType, GuildPagination, HttpError};
 use crate::internal::prelude::*;
 use crate::json::{from_number, from_value, json, to_value, to_vec};
 use crate::model::interactions::application_command::{
@@ -31,12 +27,12 @@ use crate::model::interactions::application_command::{
     ApplicationCommandPermission,
 };
 use crate::model::prelude::*;
-use crate::utils;
+use crate::{constants, utils};
 
 /// A builder for the underlying [`Http`] client that performs requests
 /// to Discord's HTTP API. If you do not need to use a proxy or do not
 /// need to disable the rate limiter, you can use [`Http::new`] or
-/// [`Http::new_with_token`] instead.
+/// [`Http::new_with_application_id`] instead.
 ///
 /// ## Example
 ///
@@ -147,10 +143,7 @@ impl HttpBuilder {
     pub fn build(self) -> Http {
         let token = self.token;
 
-        // TODO: It should not be required for all users of serenity to set the application_id or get a panic.
-        let application_id = self
-            .application_id
-            .expect("Expected application Id in order to use interacions features");
+        let application_id = AtomicU64::new(self.application_id.unwrap_or_default());
 
         let client = self.client.unwrap_or_else(|| {
             let builder = configure_client_backend(Client::builder());
@@ -178,7 +171,7 @@ impl HttpBuilder {
 fn parse_token(token: impl AsRef<str>) -> String {
     let token = token.as_ref().trim();
 
-    if token.starts_with("Bot ") {
+    if token.starts_with("Bot ") || token.starts_with("Bearer ") {
         token.to_string()
     } else {
         format!("Bot {}", token)
@@ -206,7 +199,7 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
-    pub application_id: u64,
+    application_id: AtomicU64,
 }
 
 impl fmt::Debug for Http {
@@ -221,50 +214,48 @@ impl fmt::Debug for Http {
 }
 
 impl Http {
-    pub fn new(client: Client, token: &str) -> Self {
+    pub fn new(token: &str) -> Self {
+        let builder = configure_client_backend(Client::builder());
+
+        let client = builder.build().expect("Cannot build reqwest::Client");
         let client2 = client.clone();
+
+        let token = parse_token(token);
 
         Http {
             client,
             ratelimiter: Ratelimiter::new(client2, token.to_string()),
             ratelimiter_disabled: false,
             proxy: None,
-            token: token.to_string(),
-            application_id: 0,
+            token,
+            application_id: AtomicU64::new(0),
         }
     }
 
-    pub fn new_with_application_id(application_id: u64) -> Self {
-        let builder = configure_client_backend(Client::builder());
-        let built = builder.build().expect("Cannot build reqwest::Client");
+    pub fn new_with_application_id(token: &str, application_id: u64) -> Self {
+        let http = Self::new(token);
 
-        let mut data = Self::new(built, "");
+        http.set_application_id(application_id);
 
-        data.application_id = application_id;
-
-        data
+        http
     }
 
-    pub fn new_with_token(token: &str) -> Self {
-        let builder = configure_client_backend(Client::builder());
-        let built = builder.build().expect("Cannot build reqwest::Client");
+    pub fn application_id(&self) -> Option<u64> {
+        let application_id = self.application_id.load(Ordering::Relaxed);
 
-        let trimmed = token.trim();
-        let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
-            token.to_string()
+        if application_id == 0 {
+            None
         } else {
-            format!("Bot {}", token)
-        };
-
-        Self::new(built, &token)
+            Some(application_id)
+        }
     }
 
-    pub fn new_with_token_application_id(token: &str, application_id: u64) -> Self {
-        let mut base = Self::new_with_token(token);
+    fn try_application_id(&self) -> Result<u64> {
+        self.application_id().ok_or_else(|| HttpError::ApplicationIdMissing.into())
+    }
 
-        base.application_id = application_id;
-
-        base
+    pub fn set_application_id(&self, application_id: u64) {
+        self.application_id.store(application_id, Ordering::Relaxed);
     }
 
     /// Adds a [`User`] to a [`Guild`] with a valid OAuth2 access token.
@@ -488,7 +479,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -513,7 +504,7 @@ impl Http {
             }),
             headers: None,
             route: RouteInfo::CreateFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -540,7 +531,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -556,7 +547,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGlobalApplicationCommands {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -573,7 +564,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommands {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -594,11 +585,11 @@ impl Http {
     /// Create a guild called `"test"` in the [US West region]:
     ///
     /// ```rust,no_run
-    /// use serenity::json::json;
     /// use serenity::http::Http;
+    /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #    let http = Http::default();
+    /// #    let http = Http::new("token");
     /// let map = json!({
     ///     "name": "test",
     /// });
@@ -640,7 +631,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::CreateGuildApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -893,11 +884,11 @@ impl Http {
     /// Creating a webhook named `test`:
     ///
     /// ```rust,no_run
-    /// use serenity::json::json;
     /// use serenity::http::Http;
+    /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #    let http = Http::default();
+    /// #    let http = Http::new("token");
     /// let channel_id = 81384788765712384;
     /// let map = json!({"name": "test"});
     ///
@@ -975,7 +966,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -990,7 +981,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteGlobalApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -1021,7 +1012,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteGuildApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1094,7 +1085,7 @@ impl Http {
     /// use serenity::model::id::{ChannelId, MessageId};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let channel_id = ChannelId(7);
     /// let message_id = MessageId(8);
     ///
@@ -1145,7 +1136,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::DeleteOriginalInteractionResponse {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -1175,7 +1166,7 @@ impl Http {
         user_id: Option<u64>,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        let user = user_id.map(|uid| uid.to_string()).unwrap_or_else(|| "@me".to_string());
+        let user = user_id.map_or_else(|| "@me".to_string(), |uid| uid.to_string());
 
         self.wind(204, Request {
             body: None,
@@ -1244,7 +1235,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// // Due to the `delete_webhook` function requiring you to authenticate, you
     /// // must have set the token first.
-    /// let http = Http::default();
+    /// let http = Http::new("token");
     ///
     /// http.delete_webhook(245037420704169985).await?;
     /// Ok(())
@@ -1274,7 +1265,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
@@ -1366,7 +1357,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1395,7 +1386,7 @@ impl Http {
             }),
             headers: None,
             route: RouteInfo::EditFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1418,7 +1409,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetFollowupMessage {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
                 message_id,
             },
@@ -1443,7 +1434,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGlobalApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -1488,7 +1479,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1514,7 +1505,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandPermission {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -1539,7 +1530,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditGuildApplicationCommandsPermissions {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -1734,7 +1725,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetOriginalInteractionResponse {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -1756,7 +1747,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::EditOriginalInteractionResponse {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 interaction_token,
             },
         })
@@ -1909,13 +1900,11 @@ impl Http {
     /// Suppress a user
     ///
     /// ```rust,no_run
-    /// use serenity::{
-    ///     http::Http,
-    ///     json::{json, prelude::*},
-    /// };
+    /// use serenity::http::Http;
+    /// use serenity::json::{json, prelude::*};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 187450744427773963;
     /// let user_id = 150443906511667200;
     /// let value = json!({
@@ -1961,13 +1950,11 @@ impl Http {
     /// Unsuppress the current bot user
     ///
     /// ```rust,no_run
-    /// use serenity::{
-    ///     http::Http,
-    ///     json::{json, prelude::*},
-    /// };
+    /// use serenity::http::Http;
+    /// use serenity::json::{json, prelude::*};
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 187450744427773963;
     /// let value = json!({
     ///     "channel_id": "826929611849334784",
@@ -2015,11 +2002,11 @@ impl Http {
     /// Edit the image of a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
-    /// use serenity::json::json;
     /// use serenity::http::Http;
+    /// use serenity::json::json;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let image = serenity::utils::read_image("./webhook_img.png")?;
     /// let map = json!({
@@ -2058,12 +2045,11 @@ impl Http {
     /// Edit the name of a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
-    /// use serenity::json::prelude::*;
     /// use serenity::http::Http;
-    ///
+    /// use serenity::json::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"name": "new name"});
@@ -2125,11 +2111,11 @@ impl Http {
     /// Sending a webhook with message content of `test`:
     ///
     /// ```rust,no_run
-    /// use serenity::json::prelude::*;
     /// use serenity::http::Http;
+    /// use serenity::json::prelude::*;
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let value = json!({"content": "test"});
@@ -2275,6 +2261,12 @@ impl Http {
     ///
     /// Does not require authentication.
     pub async fn get_active_maintenances(&self) -> Result<Vec<Maintenance>> {
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            scheduled_maintenances: Vec<Maintenance>,
+        }
+
         let response = self
             .request(Request {
                 body: None,
@@ -2283,12 +2275,6 @@ impl Http {
                 route: RouteInfo::GetActiveMaintenance,
             })
             .await?;
-
-        #[derive(Deserialize)]
-        struct StatusResponse {
-            #[serde(default)]
-            scheduled_maintenances: Vec<Maintenance>,
-        }
 
         let status: StatusResponse = response.json().await?;
         Ok(status.scheduled_maintenances)
@@ -2507,7 +2493,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let channel_id = 81384788765712384;
     ///
     /// let webhooks = http.get_channel_webhooks(channel_id).await?;
@@ -2634,7 +2620,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommands {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
             },
         })
         .await
@@ -2650,7 +2636,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGlobalApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 command_id,
             },
         })
@@ -2693,7 +2679,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommands {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -2711,7 +2697,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommand {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -2729,7 +2715,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommandsPermissions {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
             },
         })
@@ -2747,7 +2733,7 @@ impl Http {
             multipart: None,
             headers: None,
             route: RouteInfo::GetGuildApplicationCommandPermissions {
-                application_id: self.application_id,
+                application_id: self.try_application_id()?,
                 guild_id,
                 command_id,
             },
@@ -3007,7 +2993,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let guild_id = 81384788765712384;
     ///
     /// let webhooks = http.get_guild_webhooks(guild_id).await?;
@@ -3040,8 +3026,9 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
-    /// use serenity::{http::GuildPagination, model::id::GuildId};
+    /// #     let http = Http::new("token");
+    /// use serenity::http::GuildPagination;
+    /// use serenity::model::id::GuildId;
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
@@ -3242,6 +3229,12 @@ impl Http {
     ///
     /// Does not require authentication.
     pub async fn get_unresolved_incidents(&self) -> Result<Vec<Incident>> {
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            incidents: Vec<Incident>,
+        }
+
         let response = self
             .request(Request {
                 body: None,
@@ -3251,12 +3244,6 @@ impl Http {
             })
             .await?;
 
-        #[derive(Deserialize)]
-        struct StatusResponse {
-            #[serde(default)]
-            incidents: Vec<Incident>,
-        }
-
         let status: StatusResponse = response.json().await?;
         Ok(status.incidents)
     }
@@ -3265,6 +3252,12 @@ impl Http {
     ///
     /// Does not require authentication.
     pub async fn get_upcoming_maintenances(&self) -> Result<Vec<Maintenance>> {
+        #[derive(Deserialize)]
+        struct StatusResponse {
+            #[serde(default)]
+            scheduled_maintenances: Vec<Maintenance>,
+        }
+
         let response = self
             .request(Request {
                 body: None,
@@ -3273,12 +3266,6 @@ impl Http {
                 route: RouteInfo::GetUpcomingMaintenances,
             })
             .await?;
-
-        #[derive(Deserialize)]
-        struct StatusResponse {
-            #[serde(default)]
-            scheduled_maintenances: Vec<Maintenance>,
-        }
 
         let status: StatusResponse = response.json().await?;
         Ok(status.scheduled_maintenances)
@@ -3348,7 +3335,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let webhook = http.get_webhook(id).await?;
     /// #     Ok(())
@@ -3378,7 +3365,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
@@ -3411,7 +3398,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 
     /// let webhook = http.get_webhook_from_url(url).await?;
@@ -3663,12 +3650,13 @@ impl Http {
     /// ## Examples
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::{Http, Typing}, Result};
     /// # use std::sync::Arc;
+    /// # use serenity::http::{Http, Typing};
+    /// # use serenity::Result;
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// // Initiate typing (assuming http is `Arc<Http>`)
     /// let typing = http.start_typing(7)?;
     ///
@@ -3719,7 +3707,7 @@ impl Http {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::http::Http;
     /// #
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// use serenity::{
     ///     http::{
     ///         routing::RouteInfo,
@@ -3770,7 +3758,7 @@ impl Http {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::http::{
     ///     request::RequestBuilder,
     ///     routing::RouteInfo,
@@ -3842,21 +3830,5 @@ fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
 impl AsRef<Http> for Http {
     fn as_ref(&self) -> &Http {
         self
-    }
-}
-
-impl Default for Http {
-    fn default() -> Self {
-        let client = Client::builder().build().expect("Cannot build Reqwest::Client.");
-        let client2 = client.clone();
-
-        Self {
-            client,
-            ratelimiter: Ratelimiter::new(client2, ""),
-            ratelimiter_disabled: false,
-            proxy: None,
-            token: "".to_string(),
-            application_id: 0,
-        }
     }
 }

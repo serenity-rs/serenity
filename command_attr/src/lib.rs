@@ -3,16 +3,10 @@
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
-use syn::{
-    parse::{Error, Parse, ParseStream, Result},
-    parse_macro_input,
-    parse_quote,
-    punctuated::Punctuated,
-    spanned::Spanned,
-    Ident,
-    Lit,
-    Token,
-};
+use syn::parse::{Error, Parse, ParseStream, Result};
+use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
+use syn::{parse_macro_input, parse_quote, Ident, Lit, Token};
 
 pub(crate) mod attributes;
 pub(crate) mod consts;
@@ -100,10 +94,10 @@ macro_rules! match_options {
 pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut fun = parse_macro_input!(input as CommandFun);
 
-    let _name = if !attr.is_empty() {
-        parse_macro_input!(attr as Lit).to_str()
-    } else {
+    let _name = if attr.is_empty() {
         fun.name.to_string_non_raw()
+    } else {
+        parse_macro_input!(attr as Lit).to_str()
     };
 
     let mut options = Options::new();
@@ -172,7 +166,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Command));
 
     let res = parse_quote!(serenity::framework::standard::CommandResult);
-    create_return_type_validation(&mut fun, res);
+    create_return_type_validation(&mut fun, &res);
 
     let visibility = fun.visibility;
     let name = fun.name.clone();
@@ -279,7 +273,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut fun = parse_macro_input!(input as CommandFun);
 
-    let names = if !attr.is_empty() {
+    let names = if attr.is_empty() {
+        vec!["help".to_string()]
+    } else {
         struct Names(Vec<String>);
 
         impl Parse for Names {
@@ -291,8 +287,6 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         let Names(names) = parse_macro_input!(attr as Names);
 
         names
-    } else {
-        vec!["help".to_string()]
     };
 
     // Revert the change for the names of documentation attributes done when
@@ -457,7 +451,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Help));
 
     let res = parse_quote!(serenity::framework::standard::CommandResult);
-    create_return_type_validation(&mut fun, res);
+    create_return_type_validation(&mut fun, &res);
 
     let options = fun.name.with_suffix(HELP_OPTIONS);
 
@@ -618,10 +612,10 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     let group = parse_macro_input!(input as GroupStruct);
 
-    let name = if !attr.is_empty() {
-        parse_macro_input!(attr as Lit).to_str()
-    } else {
+    let name = if attr.is_empty() {
         group.name.to_string_non_raw()
+    } else {
+        parse_macro_input!(attr as Lit).to_str()
     };
 
     let mut options = GroupOptions::new();
@@ -772,7 +766,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Check));
 
     let res = parse_quote!(std::result::Result<(), serenity::framework::standard::Reason>);
-    create_return_type_validation(&mut fun, res);
+    create_return_type_validation(&mut fun, &res);
 
     let n = fun.name.clone();
     let n2 = name.clone();

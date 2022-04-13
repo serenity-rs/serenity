@@ -1,7 +1,5 @@
-use std::{
-    borrow::Cow,
-    fmt::{Display, Write},
-};
+use std::borrow::Cow;
+use std::fmt::{Display, Write};
 
 use super::LightMethod;
 use crate::constants;
@@ -505,7 +503,7 @@ impl Route {
         limit: u8,
         after: Option<u64>,
     ) -> String {
-        let mut uri = api!(
+        let mut url = api!(
             "/channels/{}/messages/{}/reactions/{}?limit={}",
             channel_id,
             message_id,
@@ -514,10 +512,10 @@ impl Route {
         );
 
         if let Some(after) = after {
-            let _ = write!(uri, "&after={}", after);
+            let _ = write!(url, "&after={}", after);
         }
 
-        uri
+        url
     }
 
     pub fn channel_messages(channel_id: u64, query: Option<&str>) -> String {
@@ -1914,6 +1912,9 @@ impl<'a> RouteInfo<'a> {
             ),
             RouteInfo::EditChannel {
                 channel_id,
+            }
+            | RouteInfo::EditThread {
+                channel_id,
             } => (
                 LightMethod::Patch,
                 Route::ChannelsId(channel_id),
@@ -2087,13 +2088,6 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdStickersId(guild_id),
                 Cow::from(Route::guild_sticker(guild_id, sticker_id)),
             ),
-            RouteInfo::EditThread {
-                channel_id,
-            } => (
-                LightMethod::Patch,
-                Route::ChannelsId(channel_id),
-                Cow::from(Route::channel(channel_id)),
-            ),
             RouteInfo::EditVoiceState {
                 guild_id,
                 user_id,
@@ -2151,9 +2145,6 @@ impl<'a> RouteInfo<'a> {
                 Route::WebhooksId(webhook_id),
                 Cow::from(Route::webhook_with_token_optioned(webhook_id, token, wait)),
             ),
-            RouteInfo::GetActiveMaintenance => {
-                (LightMethod::Get, Route::None, Cow::from(Route::status_maintenances_active()))
-            },
             RouteInfo::GetAuditLogs {
                 action_type,
                 before,
@@ -2545,12 +2536,6 @@ impl<'a> RouteInfo<'a> {
             RouteInfo::GetStickerPacks => {
                 (LightMethod::Get, Route::StickerPacks, Cow::from(Route::sticker_packs()))
             },
-            RouteInfo::GetUnresolvedIncidents => {
-                (LightMethod::Get, Route::None, Cow::from(Route::status_incidents_unresolved()))
-            },
-            RouteInfo::GetUpcomingMaintenances => {
-                (LightMethod::Get, Route::None, Cow::from(Route::status_maintenances_upcoming()))
-            },
             RouteInfo::GetUser {
                 user_id,
             } => (LightMethod::Get, Route::UsersId, Cow::from(Route::user(user_id))),
@@ -2654,13 +2639,13 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdIntegrationsId(guild_id),
                 Cow::from(Route::guild_integration_sync(guild_id, integration_id)),
             ),
-            RouteInfo::StatusIncidentsUnresolved => {
+            RouteInfo::GetUnresolvedIncidents | RouteInfo::StatusIncidentsUnresolved => {
                 (LightMethod::Get, Route::None, Cow::from(Route::status_incidents_unresolved()))
             },
-            RouteInfo::StatusMaintenancesActive => {
+            RouteInfo::GetActiveMaintenance | RouteInfo::StatusMaintenancesActive => {
                 (LightMethod::Get, Route::None, Cow::from(Route::status_maintenances_active()))
             },
-            RouteInfo::StatusMaintenancesUpcoming => {
+            RouteInfo::GetUpcomingMaintenances | RouteInfo::StatusMaintenancesUpcoming => {
                 (LightMethod::Get, Route::None, Cow::from(Route::status_maintenances_upcoming()))
             },
             RouteInfo::UnpinMessage {

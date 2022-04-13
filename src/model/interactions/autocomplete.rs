@@ -13,10 +13,8 @@ use crate::internal::prelude::StdResult;
 use crate::json::{self, json};
 use crate::json::{from_number, JsonMap, Value};
 use crate::model::id::{ApplicationId, ChannelId, GuildId, InteractionId};
-use crate::model::interactions::{
-    application_command::ApplicationCommandInteractionData,
-    InteractionType,
-};
+use crate::model::interactions::application_command::ApplicationCommandInteractionData;
+use crate::model::interactions::InteractionType;
 use crate::model::prelude::User;
 
 /// An interaction received when the user fills in an autocomplete option

@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
+use crate::internal::prelude::*;
+use crate::json::{from_number, NULL};
 use crate::model::prelude::*;
-use crate::{
-    internal::prelude::*,
-    json::{from_number, NULL},
-};
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Guild::edit`].
@@ -56,7 +54,7 @@ impl EditGuild {
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
     /// use serenity::utils;
     ///
@@ -241,7 +239,7 @@ impl EditGuild {
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
     /// use serenity::model::guild::VerificationLevel;
     ///
@@ -275,7 +273,7 @@ impl EditGuild {
     /// # use serenity::{http::Http, model::id::GuildId};
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
     /// use serenity::model::guild::SystemChannelFlags;
     ///

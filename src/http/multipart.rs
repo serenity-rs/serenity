@@ -1,9 +1,7 @@
 use std::borrow::Cow;
 
-use reqwest::{
-    multipart::{Form, Part},
-    Client,
-};
+use reqwest::multipart::{Form, Part};
+use reqwest::Client;
 
 use super::AttachmentType;
 use crate::internal::prelude::*;

@@ -65,6 +65,11 @@ use crate::constants::LARGE_THRESHOLD;
 use crate::http::{CacheHttp, Http};
 #[cfg(all(feature = "http", feature = "model"))]
 use crate::json::json;
+use crate::json::prelude::*;
+use crate::json::{from_number, from_value};
+use crate::model::prelude::*;
+use crate::model::utils::{emojis, presences, roles, stickers};
+use crate::model::Timestamp;
 #[cfg(feature = "model")]
 use crate::{
     builder::{
@@ -74,12 +79,6 @@ use crate::{
         CreateApplicationCommandsPermissions,
     },
     model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
-};
-use crate::{
-    json::{from_number, from_value, prelude::*},
-    model::prelude::*,
-    model::utils::{emojis, presences, roles, stickers},
-    model::Timestamp,
 };
 
 /// A representation of a banning of a user.
@@ -1897,13 +1896,12 @@ impl Guild {
             return Permissions::all();
         }
 
-        let everyone = match self.roles.get(&RoleId(self.id.0)) {
-            Some(everyone) => everyone,
-            None => {
-                error!("@everyone role ({}) missing in '{}'", self.id, self.name);
+        let everyone = if let Some(everyone) = self.roles.get(&RoleId(self.id.0)) {
+            everyone
+        } else {
+            error!("@everyone role ({}) missing in '{}'", self.id, self.name);
 
-                return Permissions::empty();
-            },
+            return Permissions::empty();
         };
 
         let mut permissions = everyone.permissions;
@@ -1976,12 +1974,11 @@ impl Guild {
         }
 
         // Start by retrieving the @everyone role's permissions.
-        let everyone = match roles.get(&RoleId(guild_id.0)) {
-            Some(everyone) => everyone,
-            None => {
-                error!("@everyone role missing in {}", guild_id,);
-                return Err(Error::Model(ModelError::RoleNotFound));
-            },
+        let everyone = if let Some(everyone) = roles.get(&RoleId(guild_id.0)) {
+            everyone
+        } else {
+            error!("@everyone role missing in {}", guild_id,);
+            return Err(Error::Model(ModelError::RoleNotFound));
         };
 
         // Create a base set of permissions, starting with `@everyone`s.

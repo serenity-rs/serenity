@@ -4,8 +4,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "simd-json")]
 use simd_json::Mutable;
 
-use crate::json::json;
-use crate::json::Value;
+use crate::json::{json, Value};
 use crate::model::id::{RoleId, UserId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
