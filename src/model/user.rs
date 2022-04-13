@@ -464,6 +464,7 @@ impl CurrentUser {
     /// );
     /// # }
     /// ```
+    ///
     /// # Errors
     ///
     /// Returns an

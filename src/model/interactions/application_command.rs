@@ -297,8 +297,6 @@ impl ApplicationCommandInteraction {
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
     ///
-    /// # Errors
-    ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
