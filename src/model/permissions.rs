@@ -133,11 +133,11 @@ macro_rules! generate_get_permission_names {
 /// [Attach Files]: Permissions::ATTACH_FILES
 /// [Change Nickname]: Permissions::CHANGE_NICKNAME
 /// [Connect]: Permissions::CONNECT
-/// [Create Invite]: Permissions::CREATE_INVITE
+/// [Create Invite]: Permissions::CREATE_INSTANT_INVITE
 /// [Embed Links]: Permissions::EMBED_LINKS
 /// [Mention Everyone]: Permissions::MENTION_EVERYONE
 /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-/// [Read Messages]: Permissions::READ_MESSAGES
+/// [Read Messages]: Permissions::VIEW_CHANNEL
 /// [Send Messages]: Permissions::SEND_MESSAGES
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Speak]: Permissions::SPEAK
@@ -148,11 +148,11 @@ pub const PRESET_GENERAL: Permissions = Permissions {
         | Permissions::ATTACH_FILES.bits
         | Permissions::CHANGE_NICKNAME.bits
         | Permissions::CONNECT.bits
-        | Permissions::CREATE_INVITE.bits
+        | Permissions::CREATE_INSTANT_INVITE.bits
         | Permissions::EMBED_LINKS.bits
         | Permissions::MENTION_EVERYONE.bits
         | Permissions::READ_MESSAGE_HISTORY.bits
-        | Permissions::READ_MESSAGES.bits
+        | Permissions::VIEW_CHANNEL.bits
         | Permissions::SEND_MESSAGES.bits
         | Permissions::SEND_TTS_MESSAGES.bits
         | Permissions::SPEAK.bits
@@ -180,11 +180,11 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// [Add Reactions]: Permissions::ADD_REACTIONS
 /// [Attach Files]: Permissions::ATTACH_FILES
 /// [Change Nickname]: Permissions::CHANGE_NICKNAME
-/// [Create Invite]: Permissions::CREATE_INVITE
+/// [Create Invite]: Permissions::CREATE_INSTANT_INVITE
 /// [Embed Links]: Permissions::EMBED_LINKS
 /// [Mention Everyone]: Permissions::MENTION_EVERYONE
 /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-/// [Read Messages]: Permissions::READ_MESSAGES
+/// [Read Messages]: Permissions::VIEW_CHANNEL
 /// [Send Messages]: Permissions::SEND_MESSAGES
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS

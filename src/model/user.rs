@@ -394,7 +394,7 @@ impl CurrentUser {
     ///
     /// // assuming the user has been bound
     /// let permissions =
-    ///     Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
+    ///     Permissions::VIEW_CHANNEL | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
     /// let url = match user.invite_url(&http, permissions).await {
     ///     Ok(v) => v,
     ///     Err(why) => {

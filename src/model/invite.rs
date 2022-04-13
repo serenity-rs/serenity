@@ -77,7 +77,7 @@ impl Invite {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [Create Invite]: Permissions::CREATE_INVITE
+    /// [Create Invite]: Permissions::CREATE_INSTANT_INVITE
     /// [permission]: super::permissions
     #[inline]
     pub async fn create<F>(
@@ -97,7 +97,7 @@ impl Invite {
                     cache,
                     channel_id,
                     None,
-                    Permissions::CREATE_INVITE,
+                    Permissions::CREATE_INSTANT_INVITE,
                 )?;
             }
         }

@@ -80,7 +80,7 @@ impl ChannelId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Create Invite]: Permissions::CREATE_INVITE
+    /// [Create Invite]: Permissions::CREATE_INSTANT_INVITE
     pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
     where
         F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
