@@ -456,6 +456,7 @@
 <span id="451">451</span>
 <span id="452">452</span>
 <span id="453">453</span>
+<span id="454">454</span>
 </pre><pre class="rust"><code><span class="comment">// Disable this lint to avoid it wanting to change `0xABCDEF` to `0xAB_CDEF`.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::unreadable_literal</span>)]</span>
 
@@ -616,6 +617,7 @@
     <span class="doccomment">/// use serenity::utils::Colour;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(Colour::new(6573123).b(), 67);</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">b</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">255</span>) <span class="kw">as</span> <span class="ident">u8</span>
     }

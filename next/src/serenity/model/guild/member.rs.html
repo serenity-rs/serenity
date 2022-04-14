@@ -1208,7 +1208,7 @@
     <span class="doccomment">/// ```rust,ignore</span>
     <span class="doccomment">/// // assuming there&#39;s a `member` variable gotten from anything.</span>
     <span class="doccomment">/// println!(&quot;The permission bits for the member are: {}&quot;,</span>
-    <span class="doccomment">/// member.permissions().expect(&quot;permissions&quot;).bits);</span>
+    <span class="doccomment">/// member.permissions(&amp;cache).expect(&quot;permissions&quot;).bits());</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>

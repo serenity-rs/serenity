@@ -1497,26 +1497,6 @@
 <span id="1492">1492</span>
 <span id="1493">1493</span>
 <span id="1494">1494</span>
-<span id="1495">1495</span>
-<span id="1496">1496</span>
-<span id="1497">1497</span>
-<span id="1498">1498</span>
-<span id="1499">1499</span>
-<span id="1500">1500</span>
-<span id="1501">1501</span>
-<span id="1502">1502</span>
-<span id="1503">1503</span>
-<span id="1504">1504</span>
-<span id="1505">1505</span>
-<span id="1506">1506</span>
-<span id="1507">1507</span>
-<span id="1508">1508</span>
-<span id="1509">1509</span>
-<span id="1510">1510</span>
-<span id="1511">1511</span>
-<span id="1512">1512</span>
-<span id="1513">1513</span>
-<span id="1514">1514</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std::ops::Add</span>;
 
@@ -2398,6 +2378,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
     <span class="doccomment">/// use serenity::utils::MessageBuilder;</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
     }
@@ -2414,19 +2395,13 @@
 <span class="doccomment">/// Make a named link to Rust&#39;s GitHub organization:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// #[cfg(feature = &quot;utils&quot;)]</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};</span>
+<span class="doccomment">/// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     let msg = MessageBuilder::new()</span>
-<span class="doccomment">///         .push_named_link(&quot;Rust&#39;s GitHub&quot;, &quot;https://github.com/rust-lang&quot;)</span>
-<span class="doccomment">///         .build();</span>
+<span class="doccomment">/// let msg = MessageBuilder::new()</span>
+<span class="doccomment">///     .push_named_link(&quot;Rust&#39;s GitHub&quot;, &quot;https://github.com/rust-lang&quot;)</span>
+<span class="doccomment">///     .build();</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///     assert_eq!(msg, &quot;[Rust&#39;s GitHub](https://github.com/rust-lang)&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[cfg(not(feature = &quot;utils&quot;))]</span>
-<span class="doccomment">/// {}</span>
+<span class="doccomment">/// assert_eq!(msg, &quot;[Rust&#39;s GitHub](https://github.com/rust-lang)&quot;);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">EmbedMessageBuilding</span> {
     <span class="doccomment">/// Pushes a named link to a message, intended for use in embeds.</span>
@@ -2436,20 +2411,14 @@
     <span class="doccomment">/// Make a simple link to Rust&#39;s homepage for use in an embed:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// #[cfg(feature = &quot;utils&quot;)]</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};</span>
+    <span class="doccomment">/// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     let mut msg = MessageBuilder::new();</span>
-    <span class="doccomment">///     msg.push(&quot;Rust&#39;s website: &quot;);</span>
-    <span class="doccomment">///     msg.push_named_link(&quot;Homepage&quot;, &quot;https://rust-lang.org&quot;);</span>
-    <span class="doccomment">///     let content = msg.build();</span>
+    <span class="doccomment">/// let mut msg = MessageBuilder::new();</span>
+    <span class="doccomment">/// msg.push(&quot;Rust&#39;s website: &quot;);</span>
+    <span class="doccomment">/// msg.push_named_link(&quot;Homepage&quot;, &quot;https://rust-lang.org&quot;);</span>
+    <span class="doccomment">/// let content = msg.build();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     assert_eq!(content, &quot;Rust&#39;s website: [Homepage](https://rust-lang.org)&quot;);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[cfg(not(feature = &quot;utils&quot;))]</span>
-    <span class="doccomment">/// {}</span>
+    <span class="doccomment">/// assert_eq!(content, &quot;Rust&#39;s website: [Homepage](https://rust-lang.org)&quot;);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">push_named_link</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Content</span><span class="op">&gt;</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Content</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>;
 
@@ -2461,23 +2430,14 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// #[cfg(feature = &quot;utils&quot;)]</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};</span>
+    <span class="doccomment">/// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     let mut msg = MessageBuilder::new();</span>
-    <span class="doccomment">///     msg.push(&quot;A weird website name: &quot;);</span>
-    <span class="doccomment">///     msg.push_named_link_safe(&quot;Try to ] break links (](&quot;, &quot;https://rust-lang.org&quot;);</span>
-    <span class="doccomment">///     let content = msg.build();</span>
+    <span class="doccomment">/// let mut msg = MessageBuilder::new();</span>
+    <span class="doccomment">/// msg.push(&quot;A weird website name: &quot;);</span>
+    <span class="doccomment">/// msg.push_named_link_safe(&quot;Try to ] break links (](&quot;, &quot;https://rust-lang.org&quot;);</span>
+    <span class="doccomment">/// let content = msg.build();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///     assert_eq!(</span>
-    <span class="doccomment">///         content,</span>
-    <span class="doccomment">///         &quot;A weird website name: [Try to   break links ( (](https://rust-lang.org)&quot;</span>
-    <span class="doccomment">///     );</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[cfg(not(feature = &quot;utils&quot;))]</span>
-    <span class="doccomment">/// {}</span>
+    <span class="doccomment">/// assert_eq!(content, &quot;A weird website name: [Try to   break links ( (](https://rust-lang.org)&quot;);</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">push_named_link_safe</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,

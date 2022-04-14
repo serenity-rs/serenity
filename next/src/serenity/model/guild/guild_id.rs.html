@@ -2565,11 +2565,11 @@
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">kick_member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="kw">await</span>
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// In addition to the reasons [`Self::kick`] may return an error,</span>
     <span class="doccomment">/// may also return an error if the reason is too long.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">kick_with_reason</span>(
         <span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
