@@ -510,14 +510,14 @@
     <span class="doccomment">/// See the documentation for the [`CreateInvite`] builder for information</span>
     <span class="doccomment">/// on how to use this and the default values that it provides.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the [Create Invite] permission.</span>
+    <span class="doccomment">/// Requires the [Create Instant Invite] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have the required [permission].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Create Invite]: Permissions::CREATE_INVITE</span>
+    <span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE</span>
     <span class="doccomment">/// [permission]: super::permissions</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -537,7 +537,7 @@
                     <span class="ident">cache</span>,
                     <span class="ident">channel_id</span>,
                     <span class="prelude-val">None</span>,
-                    <span class="ident">Permissions::CREATE_INVITE</span>,
+                    <span class="ident">Permissions::CREATE_INSTANT_INVITE</span>,
                 )<span class="question-mark">?</span>;
             }
         }

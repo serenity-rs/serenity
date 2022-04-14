@@ -1386,13 +1386,13 @@
 
     <span class="doccomment">/// Creates an invite leading to the given channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Create Invite] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Create Instant Invite] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Errors</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`Error::Http`] if the current user lacks permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Create Invite]: Permissions::CREATE_INVITE</span>
+    <span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_invite</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">CreateInvite</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CreateInvite</span>,

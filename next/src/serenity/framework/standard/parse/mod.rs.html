@@ -679,7 +679,7 @@
     }
 
     <span class="kw">if</span> <span class="ident">channel_id</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">guild_id</span>.<span class="number">0</span> {
-        <span class="ident">permissions</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Permissions::READ_MESSAGES</span>;
+        <span class="ident">permissions</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Permissions::VIEW_CHANNEL</span>;
     }
 
     <span class="comment">// No SEND_MESSAGES =&gt; no message-sending-related actions</span>
@@ -692,9 +692,9 @@
             <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>);
     }
 
-    <span class="comment">// If the permission does not have the `READ_MESSAGES` permission, then</span>
+    <span class="comment">// If the permission does not have the `VIEW_CHANNEL` permission, then</span>
     <span class="comment">// throw out actionable permissions.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">Permissions::READ_MESSAGES</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">Permissions::VIEW_CHANNEL</span>) {
         <span class="ident">permissions</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">Permissions::KICK_MEMBERS</span>
             <span class="op">|</span> <span class="ident">Permissions::BAN_MEMBERS</span>
             <span class="op">|</span> <span class="ident">Permissions::ADMINISTRATOR</span>

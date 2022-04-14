@@ -1479,7 +1479,7 @@
 
     <span class="doccomment">/// Creates an invite leading to the given channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Requires the [Create Invite] permission.</span>
+    <span class="doccomment">/// **Note**: Requires the [Create Instant Invite] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1496,7 +1496,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Otherwise returns [`Error::Http`] if the current user lacks permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INVITE</span>
+    <span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_invite</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span>
@@ -1510,7 +1510,7 @@
                     <span class="ident">cache</span>,
                     <span class="self">self</span>.<span class="ident">id</span>,
                     <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">guild_id</span>),
-                    <span class="ident">Permissions::CREATE_INVITE</span>,
+                    <span class="ident">Permissions::CREATE_INSTANT_INVITE</span>,
                 )<span class="question-mark">?</span>;
             }
         }
@@ -2398,7 +2398,7 @@
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
                         <span class="kw">if</span> <span class="self">self</span>
                             .<span class="ident">permissions_for_user</span>(<span class="ident">cache</span>, <span class="ident">e</span>.<span class="number">0</span>)
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">contains</span>(<span class="ident">Permissions::READ_MESSAGES</span>))
+                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">contains</span>(<span class="ident">Permissions::VIEW_CHANNEL</span>))
                             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
                         {
                             <span class="prelude-val">Some</span>(<span class="ident">e</span>.<span class="number">1</span>.<span class="ident">clone</span>())

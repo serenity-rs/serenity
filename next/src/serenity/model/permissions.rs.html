@@ -737,6 +737,69 @@
 <span id="732">732</span>
 <span id="733">733</span>
 <span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A set of permissions for a role or user. These can be assigned directly</span>
 <span class="doccomment">//! to a role or as a channel&#39;s permission overrides.</span>
 <span class="doccomment">//!</span>
@@ -848,11 +911,11 @@
 <span class="doccomment">/// - [Attach Files]</span>
 <span class="doccomment">/// - [Change Nickname]</span>
 <span class="doccomment">/// - [Connect]</span>
-<span class="doccomment">/// - [Create Invite]</span>
+<span class="doccomment">/// - [Create Instant Invite]</span>
 <span class="doccomment">/// - [Embed Links]</span>
 <span class="doccomment">/// - [Mention Everyone]</span>
 <span class="doccomment">/// - [Read Message History]</span>
-<span class="doccomment">/// - [Read Messages]</span>
+<span class="doccomment">/// - [View Channel]</span>
 <span class="doccomment">/// - [Send Messages]</span>
 <span class="doccomment">/// - [Send TTS Messages]</span>
 <span class="doccomment">/// - [Speak]</span>
@@ -872,11 +935,11 @@
 <span class="doccomment">/// [Attach Files]: Permissions::ATTACH_FILES</span>
 <span class="doccomment">/// [Change Nickname]: Permissions::CHANGE_NICKNAME</span>
 <span class="doccomment">/// [Connect]: Permissions::CONNECT</span>
-<span class="doccomment">/// [Create Invite]: Permissions::CREATE_INVITE</span>
+<span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE</span>
 <span class="doccomment">/// [Embed Links]: Permissions::EMBED_LINKS</span>
 <span class="doccomment">/// [Mention Everyone]: Permissions::MENTION_EVERYONE</span>
 <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
-<span class="doccomment">/// [Read Messages]: Permissions::READ_MESSAGES</span>
+<span class="doccomment">/// [View Channel]: Permissions::VIEW_CHANNEL</span>
 <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
 <span class="doccomment">/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES</span>
 <span class="doccomment">/// [Speak]: Permissions::SPEAK</span>
@@ -887,11 +950,11 @@
         <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::CHANGE_NICKNAME</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::CONNECT</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::CREATE_INVITE</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::CREATE_INSTANT_INVITE</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::EMBED_LINKS</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::MENTION_EVERYONE</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGE_HISTORY</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::VIEW_CHANNEL</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::SEND_MESSAGES</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::SEND_TTS_MESSAGES</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::SPEAK</span>.<span class="ident">bits</span>
@@ -907,11 +970,11 @@
 <span class="doccomment">/// - [Add Reactions]</span>
 <span class="doccomment">/// - [Attach Files]</span>
 <span class="doccomment">/// - [Change Nickname]</span>
-<span class="doccomment">/// - [Create Invite]</span>
+<span class="doccomment">/// - [Create Instant Invite]</span>
 <span class="doccomment">/// - [Embed Links]</span>
 <span class="doccomment">/// - [Mention Everyone]</span>
 <span class="doccomment">/// - [Read Message History]</span>
-<span class="doccomment">/// - [Read Messages]</span>
+<span class="doccomment">/// - [View Channel]</span>
 <span class="doccomment">/// - [Send Messages]</span>
 <span class="doccomment">/// - [Send TTS Messages]</span>
 <span class="doccomment">/// - [Use External Emojis]</span>
@@ -919,11 +982,11 @@
 <span class="doccomment">/// [Add Reactions]: Permissions::ADD_REACTIONS</span>
 <span class="doccomment">/// [Attach Files]: Permissions::ATTACH_FILES</span>
 <span class="doccomment">/// [Change Nickname]: Permissions::CHANGE_NICKNAME</span>
-<span class="doccomment">/// [Create Invite]: Permissions::CREATE_INVITE</span>
+<span class="doccomment">/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE</span>
 <span class="doccomment">/// [Embed Links]: Permissions::EMBED_LINKS</span>
 <span class="doccomment">/// [Mention Everyone]: Permissions::MENTION_EVERYONE</span>
 <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
-<span class="doccomment">/// [Read Messages]: Permissions::READ_MESSAGES</span>
+<span class="doccomment">/// [View Channel]: Permissions::VIEW_CHANNEL</span>
 <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
 <span class="doccomment">/// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES</span>
 <span class="doccomment">/// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS</span>
@@ -931,11 +994,11 @@
     <span class="ident">bits</span>: <span class="ident">Permissions::ADD_REACTIONS</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::CHANGE_NICKNAME</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::CREATE_INVITE</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::CREATE_INSTANT_INVITE</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::EMBED_LINKS</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::MENTION_EVERYONE</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGE_HISTORY</span>.<span class="ident">bits</span>
-        <span class="op">|</span> <span class="ident">Permissions::READ_MESSAGES</span>.<span class="ident">bits</span>
+        <span class="op">|</span> <span class="ident">Permissions::VIEW_CHANNEL</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::SEND_MESSAGES</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::SEND_TTS_MESSAGES</span>.<span class="ident">bits</span>
         <span class="op">|</span> <span class="ident">Permissions::USE_EXTERNAL_EMOJIS</span>.<span class="ident">bits</span>,
@@ -972,7 +1035,7 @@
         <span class="doccomment">/// Allows for the creation of [`RichInvite`]s.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`RichInvite`]: super::invite::RichInvite</span>
-        <span class="kw">const</span> <span class="ident">CREATE_INVITE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
+        <span class="kw">const</span> <span class="ident">CREATE_INSTANT_INVITE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
         <span class="doccomment">/// Allows for the kicking of guild [member]s.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [member]: super::guild::Member</span>
@@ -1005,11 +1068,11 @@
         <span class="kw">const</span> <span class="ident">VIEW_AUDIT_LOG</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
         <span class="doccomment">/// Allows the use of priority speaking in voice channels.</span>
         <span class="kw">const</span> <span class="ident">PRIORITY_SPEAKER</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
-        <span class="comment">// Allows the user to go live</span>
+        <span class="comment">// Allows the user to go live.</span>
         <span class="kw">const</span> <span class="ident">STREAM</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
-        <span class="doccomment">/// Allows reading messages in a guild channel. If a user does not have</span>
-        <span class="doccomment">/// this permission, then they will not be able to see the channel.</span>
-        <span class="kw">const</span> <span class="ident">READ_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
+        <span class="doccomment">/// Allows guild members to view a channel, which includes reading</span>
+        <span class="doccomment">/// messages in text channels and joining voice channels.</span>
+        <span class="kw">const</span> <span class="ident">VIEW_CHANNEL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
         <span class="doccomment">/// Allows sending messages in a guild channel.</span>
         <span class="kw">const</span> <span class="ident">SEND_MESSAGES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
         <span class="doccomment">/// Allows the sending of text-to-speech messages in a channel.</span>
@@ -1085,7 +1148,7 @@
         <span class="doccomment">/// Allows for sending messages in threads</span>
         <span class="kw">const</span> <span class="ident">SEND_MESSAGES_IN_THREADS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">38</span>;
         <span class="doccomment">/// Allows for launching activities in a voice channel</span>
-        <span class="kw">const</span> <span class="ident">START_EMBEDDED_ACTIVITIES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">39</span>;
+        <span class="kw">const</span> <span class="ident">USE_EMBEDDED_ACTIVITIES</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">39</span>;
         <span class="doccomment">/// Allows for timing out users to prevent them from sending or reacting to messages in</span>
         <span class="doccomment">/// chat and threads, and from speaking in voice and stage channels.</span>
         <span class="kw">const</span> <span class="ident">MODERATE_MEMBERS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">40</span>;
@@ -1100,7 +1163,9 @@
     <span class="ident">ban_members</span>: <span class="string">&quot;Ban Members&quot;</span>,
     <span class="ident">change_nickname</span>: <span class="string">&quot;Change Nickname&quot;</span>,
     <span class="ident">connect</span>: <span class="string">&quot;Connect&quot;</span>,
-    <span class="ident">create_invite</span>: <span class="string">&quot;Create Invite&quot;</span>,
+    <span class="ident">create_instant_invite</span>: <span class="string">&quot;Create Instant Invite&quot;</span>,
+    <span class="ident">create_private_threads</span>: <span class="string">&quot;Create Private Threads&quot;</span>,
+    <span class="ident">create_public_threads</span>: <span class="string">&quot;Create Public Threads&quot;</span>,
     <span class="ident">deafen_members</span>: <span class="string">&quot;Deafen Members&quot;</span>,
     <span class="ident">embed_links</span>: <span class="string">&quot;Embed Links&quot;</span>,
     <span class="ident">external_emojis</span>: <span class="string">&quot;Use External Emojis&quot;</span>,
@@ -1111,23 +1176,28 @@
     <span class="ident">manage_messages</span>: <span class="string">&quot;Manage Messages&quot;</span>,
     <span class="ident">manage_nicknames</span>: <span class="string">&quot;Manage Nicknames&quot;</span>,
     <span class="ident">manage_roles</span>: <span class="string">&quot;Manage Roles&quot;</span>,
+    <span class="ident">manage_threads</span>: <span class="string">&quot;Manage Threads&quot;</span>,
     <span class="ident">manage_webhooks</span>: <span class="string">&quot;Manage Webhooks&quot;</span>,
     <span class="ident">mention_everyone</span>: <span class="string">&quot;Mention Everyone&quot;</span>,
+    <span class="ident">moderate_members</span>: <span class="string">&quot;Moderate Members&quot;</span>,
     <span class="ident">move_members</span>: <span class="string">&quot;Move Members&quot;</span>,
     <span class="ident">mute_members</span>: <span class="string">&quot;Mute Members&quot;</span>,
     <span class="ident">priority_speaker</span>: <span class="string">&quot;Priority Speaker&quot;</span>,
     <span class="ident">read_message_history</span>: <span class="string">&quot;Read Message History&quot;</span>,
     <span class="ident">request_to_speak</span>: <span class="string">&quot;Request To Speak&quot;</span>,
-    <span class="ident">read_messages</span>: <span class="string">&quot;Read Messages&quot;</span>,
     <span class="ident">send_messages</span>: <span class="string">&quot;Send Messages&quot;</span>,
+    <span class="ident">send_messages_in_threads</span>: <span class="string">&quot;Send Messages in Threads&quot;</span>,
     <span class="ident">send_tts_messages</span>: <span class="string">&quot;Send TTS Messages&quot;</span>,
     <span class="ident">speak</span>: <span class="string">&quot;Speak&quot;</span>,
     <span class="ident">stream</span>: <span class="string">&quot;Stream&quot;</span>,
+    <span class="ident">use_embedded_activities</span>: <span class="string">&quot;Use Embedded Activities&quot;</span>,
     <span class="ident">use_external_emojis</span>: <span class="string">&quot;Use External Emojis&quot;</span>,
     <span class="ident">use_external_stickers</span>: <span class="string">&quot;Use External Stickers&quot;</span>,
     <span class="ident">use_slash_commands</span>: <span class="string">&quot;Use Slash Commands&quot;</span>,
     <span class="ident">use_vad</span>: <span class="string">&quot;Use Voice Activity&quot;</span>,
-    <span class="ident">view_audit_log</span>: <span class="string">&quot;View Audit Log&quot;</span>
+    <span class="ident">view_audit_log</span>: <span class="string">&quot;View Audit Log&quot;</span>,
+    <span class="ident">view_channel</span>: <span class="string">&quot;View Channel&quot;</span>,
+    <span class="ident">view_guild_insights</span>: <span class="string">&quot;View Guild Insights&quot;</span>
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1188,6 +1258,22 @@
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::VIEW_AUDIT_LOG</span>)
     }
 
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [View Channel] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [View Channel]: Self::VIEW_CHANNEL</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">view_channel</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::VIEW_CHANNEL</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [View Guild Insights] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">view_guild_insights</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::VIEW_GUILD_INSIGHTS</span>)
+    }
+
     <span class="doccomment">/// Shorthand for checking that the set of permission contains the</span>
     <span class="doccomment">/// [Priority Speaker] permission.</span>
     <span class="doccomment">///</span>
@@ -1205,11 +1291,27 @@
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Create Invite] permission.</span>
+    <span class="doccomment">/// [Create Instant Invite] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Create Invite]: Self::CREATE_INVITE</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_invite</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CREATE_INVITE</span>)
+    <span class="doccomment">/// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_instant_invite</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CREATE_INSTANT_INVITE</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Create Private Threads] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_private_threads</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CREATE_PRIVATE_THREADS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Create Public Threads] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_public_threads</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::CREATE_PUBLIC_THREADS</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
@@ -1293,6 +1395,14 @@
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Manage Threads] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Manage Threads]: Self::MANAGE_THREADS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">manage_threads</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MANAGE_THREADS</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
     <span class="doccomment">/// [Manage Webhooks] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Webhooks]: Self::MANAGE_WEBHOOKS</span>
@@ -1306,6 +1416,14 @@
     <span class="doccomment">/// [Mention Everyone]: Self::MENTION_EVERYONE</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mention_everyone</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MENTION_EVERYONE</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Moderate Members] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Moderate Members]: Self::MODERATE_MEMBERS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">moderate_members</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::MODERATE_MEMBERS</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
@@ -1333,19 +1451,19 @@
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
-    <span class="doccomment">/// [Read Messages] permission.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Read Messages]: Self::READ_MESSAGES</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::READ_MESSAGES</span>)
-    }
-
-    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
     <span class="doccomment">/// [Send Messages] permission.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Send Messages]: Self::SEND_MESSAGES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SEND_MESSAGES</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Send Messages in Threads] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_messages_in_threads</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::SEND_MESSAGES_IN_THREADS</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
@@ -1370,6 +1488,14 @@
     <span class="doccomment">/// [Request To Speak]: Self::REQUEST_TO_SPEAK</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request_to_speak</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::REQUEST_TO_SPEAK</span>)
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>
+    <span class="doccomment">/// [Use Embedded Activities] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_embedded_activities</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident"><span class="self">Self</span>::USE_EMBEDDED_ACTIVITIES</span>)
     }
 
     <span class="doccomment">/// Shorthand for checking that the set of permissions contains the</span>

@@ -31,7 +31,7 @@ and cannot do.</p>
 
 <span class="comment">// Assuming a guild has already been bound.</span>
 <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">PermissionOverwrite</span> {
-    <span class="ident">allow</span>: <span class="ident">Permissions::READ_MESSAGES</span>,
+    <span class="ident">allow</span>: <span class="ident">Permissions::VIEW_CHANNEL</span>,
     <span class="ident">deny</span>: <span class="ident">Permissions::SEND_TTS_MESSAGES</span>,
     <span class="ident">kind</span>: <span class="ident">PermissionOverwriteType::Member</span>(<span class="ident">UserId</span>(<span class="number">1234</span>)),
 }];

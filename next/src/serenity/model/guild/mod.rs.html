@@ -3421,7 +3421,7 @@
         <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">uid</span>)<span class="question-mark">?</span>;
         <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">values</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">channel</span> {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">read_messages</span>() {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">view_channel</span>() {
                     <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>);
                 }
             }
@@ -3440,7 +3440,7 @@
         <span class="kw">for</span> <span class="ident">channel</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">channels</span>.<span class="ident">values</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Channel::Guild</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">channel</span> {
                 <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">values</span>() {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">read_messages</span>() {
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">view_channel</span>() {
                         <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">channel</span>);
                     }
                 }
@@ -5172,7 +5172,7 @@
 
         <span class="comment">// The default channel is always readable.</span>
         <span class="kw">if</span> <span class="ident">channel</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">guild_id</span>.<span class="number">0</span> {
-            <span class="ident">permissions</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Permissions::READ_MESSAGES</span>;
+            <span class="ident">permissions</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Permissions::VIEW_CHANNEL</span>;
         }
 
         <span class="ident"><span class="self">Self</span>::remove_unusable_permissions</span>(<span class="kw-2">&amp;mut</span> <span class="ident">permissions</span>);
@@ -5268,9 +5268,9 @@
                 <span class="op">|</span> <span class="ident">Permissions::ATTACH_FILES</span>);
         }
 
-        <span class="comment">// If the permission does not have the `READ_MESSAGES` permission, then</span>
+        <span class="comment">// If the permission does not have the `VIEW_CHANNEL` permission, then</span>
         <span class="comment">// throw out actionable permissions.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">Permissions::READ_MESSAGES</span>) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">Permissions::VIEW_CHANNEL</span>) {
             <span class="kw-2">*</span><span class="ident">permissions</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">Permissions::KICK_MEMBERS</span>
                 <span class="op">|</span> <span class="ident">Permissions::BAN_MEMBERS</span>
                 <span class="op">|</span> <span class="ident">Permissions::ADMINISTRATOR</span>
