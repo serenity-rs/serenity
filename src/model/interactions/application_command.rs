@@ -15,7 +15,7 @@ use crate::builder::{
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::internal::prelude::{JsonMap, StdResult, Value};
-use crate::model::channel::{ChannelType, PartialChannel};
+use crate::model::channel::{Attachment, ChannelType, PartialChannel};
 use crate::model::guild::{Member, PartialMember, Role};
 use crate::model::id::{
     ApplicationId,
@@ -570,6 +570,8 @@ pub struct ApplicationCommandInteractionDataResolved {
     pub channels: HashMap<ChannelId, PartialChannel>,
     /// The resolved messages.
     pub messages: HashMap<MessageId, Message>,
+    /// The resolved partial attachments
+    pub attachments: HashMap<AttachmentId, Attachment>,
 }
 
 impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
@@ -621,12 +623,22 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionDataResolved {
             false => HashMap::new(),
         };
 
+        let attachments = match map.contains_key("attachments") {
+            true => map
+                .remove("attachments")
+                .ok_or_else(|| DeError::custom("expected attachments"))
+                .and_then(deserialize_attachments_map)
+                .map_err(DeError::custom)?,
+            false => HashMap::new()
+        };
+
         Ok(Self {
             users,
             members,
             roles,
             channels,
             messages,
+            attachments,
         })
     }
 }
@@ -725,6 +737,7 @@ pub enum ApplicationCommandInteractionDataOptionValue {
     Channel(PartialChannel),
     Role(Role),
     Number(f64),
+    Attachment(Attachment),
 }
 
 fn default_permission_value() -> bool {
@@ -1147,6 +1160,7 @@ pub enum ApplicationCommandOptionType {
     Role = 8,
     Mentionable = 9,
     Number = 10,
+    Attachment = 11,
     Unknown = !0,
 }
 
@@ -1160,7 +1174,8 @@ enum_number!(ApplicationCommandOptionType {
     Channel,
     Role,
     Mentionable,
-    Number
+    Number,
+    Attachment,
 });
 
 /// The type of an [`ApplicationCommandPermissionData`].
