@@ -570,7 +570,7 @@ pub struct ApplicationCommandInteractionDataResolved {
     pub channels: HashMap<ChannelId, PartialChannel>,
     /// The resolved messages.
     pub messages: HashMap<MessageId, Message>,
-    /// The resolved partial attachments
+    /// The resolved attachments
     pub attachments: HashMap<AttachmentId, Attachment>,
 }
 
