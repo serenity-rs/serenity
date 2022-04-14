@@ -82,8 +82,6 @@ impl ModalSubmitInteraction {
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
     ///
-    /// # Errors
-    ///
     /// [`Error::Model`]: crate::error::Error::Model
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json

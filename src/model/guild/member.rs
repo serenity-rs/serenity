@@ -488,7 +488,7 @@ impl Member {
     /// ```rust,ignore
     /// // assuming there's a `member` variable gotten from anything.
     /// println!("The permission bits for the member are: {}",
-    /// member.permissions().expect("permissions").bits);
+    /// member.permissions(&cache).expect("permissions").bits());
     /// ```
     ///
     /// # Errors

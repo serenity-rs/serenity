@@ -1486,11 +1486,11 @@ impl Guild {
         self.id.kick(&http, user_id).await
     }
 
-    #[inline]
     /// # Errors
     ///
     /// In addition to the reasons [`Self::kick`] may return an error,
     /// may also return an error if the reason is too long.
+    #[inline]
     pub async fn kick_with_reason(
         &self,
         http: impl AsRef<Http>,

@@ -126,6 +126,7 @@ impl Shard {
     /// ```
     ///
     /// # Errors
+    ///
     /// On Error, will return either [`Error::Gateway`], [`Error::Tungstenite`]
     /// or a Rustls/native TLS error.
     ///

@@ -879,6 +879,7 @@ impl fmt::Display for MessageBuilder {
     ///
     /// ```rust
     /// use serenity::utils::MessageBuilder;
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }
@@ -895,19 +896,13 @@ impl fmt::Display for MessageBuilder {
 /// Make a named link to Rust's GitHub organization:
 ///
 /// ```rust
-/// #[cfg(feature = "utils")]
-/// {
-///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+/// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
 ///
-///     let msg = MessageBuilder::new()
-///         .push_named_link("Rust's GitHub", "https://github.com/rust-lang")
-///         .build();
+/// let msg = MessageBuilder::new()
+///     .push_named_link("Rust's GitHub", "https://github.com/rust-lang")
+///     .build();
 ///
-///     assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
-/// }
-///
-/// #[cfg(not(feature = "utils"))]
-/// {}
+/// assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
 /// ```
 pub trait EmbedMessageBuilding {
     /// Pushes a named link to a message, intended for use in embeds.
@@ -917,20 +912,14 @@ pub trait EmbedMessageBuilding {
     /// Make a simple link to Rust's homepage for use in an embed:
     ///
     /// ```rust
-    /// #[cfg(feature = "utils")]
-    /// {
-    ///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+    /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    ///     let mut msg = MessageBuilder::new();
-    ///     msg.push("Rust's website: ");
-    ///     msg.push_named_link("Homepage", "https://rust-lang.org");
-    ///     let content = msg.build();
+    /// let mut msg = MessageBuilder::new();
+    /// msg.push("Rust's website: ");
+    /// msg.push_named_link("Homepage", "https://rust-lang.org");
+    /// let content = msg.build();
     ///
-    ///     assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
-    /// }
-    ///
-    /// #[cfg(not(feature = "utils"))]
-    /// {}
+    /// assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
     /// ```
     fn push_named_link(&mut self, name: impl Into<Content>, url: impl Into<Content>) -> &mut Self;
 
@@ -942,23 +931,14 @@ pub trait EmbedMessageBuilding {
     /// # Examples
     ///
     /// ```rust
-    /// #[cfg(feature = "utils")]
-    /// {
-    ///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+    /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    ///     let mut msg = MessageBuilder::new();
-    ///     msg.push("A weird website name: ");
-    ///     msg.push_named_link_safe("Try to ] break links (](", "https://rust-lang.org");
-    ///     let content = msg.build();
+    /// let mut msg = MessageBuilder::new();
+    /// msg.push("A weird website name: ");
+    /// msg.push_named_link_safe("Try to ] break links (](", "https://rust-lang.org");
+    /// let content = msg.build();
     ///
-    ///     assert_eq!(
-    ///         content,
-    ///         "A weird website name: [Try to   break links ( (](https://rust-lang.org)"
-    ///     );
-    /// }
-    ///
-    /// #[cfg(not(feature = "utils"))]
-    /// {}
+    /// assert_eq!(content, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
     /// ```
     fn push_named_link_safe(
         &mut self,
