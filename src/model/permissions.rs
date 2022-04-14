@@ -109,11 +109,11 @@ macro_rules! generate_get_permission_names {
 /// - [Attach Files]
 /// - [Change Nickname]
 /// - [Connect]
-/// - [Create Invite]
+/// - [Create Instant Invite]
 /// - [Embed Links]
 /// - [Mention Everyone]
 /// - [Read Message History]
-/// - [Read Messages]
+/// - [View Channel]
 /// - [Send Messages]
 /// - [Send TTS Messages]
 /// - [Speak]
@@ -133,11 +133,11 @@ macro_rules! generate_get_permission_names {
 /// [Attach Files]: Permissions::ATTACH_FILES
 /// [Change Nickname]: Permissions::CHANGE_NICKNAME
 /// [Connect]: Permissions::CONNECT
-/// [Create Invite]: Permissions::CREATE_INVITE
+/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
 /// [Embed Links]: Permissions::EMBED_LINKS
 /// [Mention Everyone]: Permissions::MENTION_EVERYONE
 /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-/// [Read Messages]: Permissions::READ_MESSAGES
+/// [View Channel]: Permissions::VIEW_CHANNEL
 /// [Send Messages]: Permissions::SEND_MESSAGES
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Speak]: Permissions::SPEAK
@@ -148,11 +148,11 @@ pub const PRESET_GENERAL: Permissions = Permissions {
         | Permissions::ATTACH_FILES.bits
         | Permissions::CHANGE_NICKNAME.bits
         | Permissions::CONNECT.bits
-        | Permissions::CREATE_INVITE.bits
+        | Permissions::CREATE_INSTANT_INVITE.bits
         | Permissions::EMBED_LINKS.bits
         | Permissions::MENTION_EVERYONE.bits
         | Permissions::READ_MESSAGE_HISTORY.bits
-        | Permissions::READ_MESSAGES.bits
+        | Permissions::VIEW_CHANNEL.bits
         | Permissions::SEND_MESSAGES.bits
         | Permissions::SEND_TTS_MESSAGES.bits
         | Permissions::SPEAK.bits
@@ -168,11 +168,11 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// - [Add Reactions]
 /// - [Attach Files]
 /// - [Change Nickname]
-/// - [Create Invite]
+/// - [Create Instant Invite]
 /// - [Embed Links]
 /// - [Mention Everyone]
 /// - [Read Message History]
-/// - [Read Messages]
+/// - [View Channel]
 /// - [Send Messages]
 /// - [Send TTS Messages]
 /// - [Use External Emojis]
@@ -180,11 +180,11 @@ pub const PRESET_GENERAL: Permissions = Permissions {
 /// [Add Reactions]: Permissions::ADD_REACTIONS
 /// [Attach Files]: Permissions::ATTACH_FILES
 /// [Change Nickname]: Permissions::CHANGE_NICKNAME
-/// [Create Invite]: Permissions::CREATE_INVITE
+/// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
 /// [Embed Links]: Permissions::EMBED_LINKS
 /// [Mention Everyone]: Permissions::MENTION_EVERYONE
 /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-/// [Read Messages]: Permissions::READ_MESSAGES
+/// [View Channel]: Permissions::VIEW_CHANNEL
 /// [Send Messages]: Permissions::SEND_MESSAGES
 /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
 /// [Use External Emojis]: Permissions::USE_EXTERNAL_EMOJIS
@@ -192,11 +192,11 @@ pub const PRESET_TEXT: Permissions = Permissions {
     bits: Permissions::ADD_REACTIONS.bits
         | Permissions::ATTACH_FILES.bits
         | Permissions::CHANGE_NICKNAME.bits
-        | Permissions::CREATE_INVITE.bits
+        | Permissions::CREATE_INSTANT_INVITE.bits
         | Permissions::EMBED_LINKS.bits
         | Permissions::MENTION_EVERYONE.bits
         | Permissions::READ_MESSAGE_HISTORY.bits
-        | Permissions::READ_MESSAGES.bits
+        | Permissions::VIEW_CHANNEL.bits
         | Permissions::SEND_MESSAGES.bits
         | Permissions::SEND_TTS_MESSAGES.bits
         | Permissions::USE_EXTERNAL_EMOJIS.bits,
@@ -233,7 +233,7 @@ bitflags::bitflags! {
         /// Allows for the creation of [`RichInvite`]s.
         ///
         /// [`RichInvite`]: super::invite::RichInvite
-        const CREATE_INVITE = 1 << 0;
+        const CREATE_INSTANT_INVITE = 1 << 0;
         /// Allows for the kicking of guild [member]s.
         ///
         /// [member]: super::guild::Member
@@ -266,11 +266,11 @@ bitflags::bitflags! {
         const VIEW_AUDIT_LOG = 1 << 7;
         /// Allows the use of priority speaking in voice channels.
         const PRIORITY_SPEAKER = 1 << 8;
-        // Allows the user to go live
+        // Allows the user to go live.
         const STREAM = 1 << 9;
-        /// Allows reading messages in a guild channel. If a user does not have
-        /// this permission, then they will not be able to see the channel.
-        const READ_MESSAGES = 1 << 10;
+        /// Allows guild members to view a channel, which includes reading
+        /// messages in text channels and joining voice channels.
+        const VIEW_CHANNEL = 1 << 10;
         /// Allows sending messages in a guild channel.
         const SEND_MESSAGES = 1 << 11;
         /// Allows the sending of text-to-speech messages in a channel.
@@ -346,7 +346,7 @@ bitflags::bitflags! {
         /// Allows for sending messages in threads
         const SEND_MESSAGES_IN_THREADS = 1 << 38;
         /// Allows for launching activities in a voice channel
-        const START_EMBEDDED_ACTIVITIES = 1 << 39;
+        const USE_EMBEDDED_ACTIVITIES = 1 << 39;
         /// Allows for timing out users to prevent them from sending or reacting to messages in
         /// chat and threads, and from speaking in voice and stage channels.
         const MODERATE_MEMBERS = 1 << 40;
@@ -361,7 +361,9 @@ generate_get_permission_names! {
     ban_members: "Ban Members",
     change_nickname: "Change Nickname",
     connect: "Connect",
-    create_invite: "Create Invite",
+    create_instant_invite: "Create Instant Invite",
+    create_private_threads: "Create Private Threads",
+    create_public_threads: "Create Public Threads",
     deafen_members: "Deafen Members",
     embed_links: "Embed Links",
     external_emojis: "Use External Emojis",
@@ -372,23 +374,28 @@ generate_get_permission_names! {
     manage_messages: "Manage Messages",
     manage_nicknames: "Manage Nicknames",
     manage_roles: "Manage Roles",
+    manage_threads: "Manage Threads",
     manage_webhooks: "Manage Webhooks",
     mention_everyone: "Mention Everyone",
+    moderate_members: "Moderate Members",
     move_members: "Move Members",
     mute_members: "Mute Members",
     priority_speaker: "Priority Speaker",
     read_message_history: "Read Message History",
     request_to_speak: "Request To Speak",
-    read_messages: "Read Messages",
     send_messages: "Send Messages",
+    send_messages_in_threads: "Send Messages in Threads",
     send_tts_messages: "Send TTS Messages",
     speak: "Speak",
     stream: "Stream",
+    use_embedded_activities: "Use Embedded Activities",
     use_external_emojis: "Use External Emojis",
     use_external_stickers: "Use External Stickers",
     use_slash_commands: "Use Slash Commands",
     use_vad: "Use Voice Activity",
-    view_audit_log: "View Audit Log"
+    view_audit_log: "View Audit Log",
+    view_channel: "View Channel",
+    view_guild_insights: "View Guild Insights"
 }
 
 #[cfg(feature = "model")]
@@ -449,6 +456,22 @@ impl Permissions {
         self.contains(Self::VIEW_AUDIT_LOG)
     }
 
+    /// Shorthand for checking that the set of permissions contains the
+    /// [View Channel] permission.
+    ///
+    /// [View Channel]: Self::VIEW_CHANNEL
+    pub fn view_channel(self) -> bool {
+        self.contains(Self::VIEW_CHANNEL)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [View Guild Insights] permission.
+    ///
+    /// [View Guild Insights]: Self::VIEW_GUILD_INSIGHTS
+    pub fn view_guild_insights(self) -> bool {
+        self.contains(Self::VIEW_GUILD_INSIGHTS)
+    }
+
     /// Shorthand for checking that the set of permission contains the
     /// [Priority Speaker] permission.
     ///
@@ -466,11 +489,27 @@ impl Permissions {
     }
 
     /// Shorthand for checking that the set of permissions contains the
-    /// [Create Invite] permission.
+    /// [Create Instant Invite] permission.
     ///
-    /// [Create Invite]: Self::CREATE_INVITE
-    pub fn create_invite(self) -> bool {
-        self.contains(Self::CREATE_INVITE)
+    /// [Create Instant Invite]: Self::CREATE_INSTANT_INVITE
+    pub fn create_instant_invite(self) -> bool {
+        self.contains(Self::CREATE_INSTANT_INVITE)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Create Private Threads] permission.
+    ///
+    /// [Create Private Threads]: Self::CREATE_PRIVATE_THREADS
+    pub fn create_private_threads(self) -> bool {
+        self.contains(Self::CREATE_PRIVATE_THREADS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Create Public Threads] permission.
+    ///
+    /// [Create Public Threads]: Self::CREATE_PUBLIC_THREADS
+    pub fn create_public_threads(self) -> bool {
+        self.contains(Self::CREATE_PUBLIC_THREADS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
@@ -554,6 +593,14 @@ impl Permissions {
     }
 
     /// Shorthand for checking that the set of permissions contains the
+    /// [Manage Threads] permission.
+    ///
+    /// [Manage Threads]: Self::MANAGE_THREADS
+    pub fn manage_threads(self) -> bool {
+        self.contains(Self::MANAGE_THREADS)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
     /// [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
@@ -567,6 +614,14 @@ impl Permissions {
     /// [Mention Everyone]: Self::MENTION_EVERYONE
     pub fn mention_everyone(self) -> bool {
         self.contains(Self::MENTION_EVERYONE)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Moderate Members] permission.
+    ///
+    /// [Moderate Members]: Self::MODERATE_MEMBERS
+    pub fn moderate_members(self) -> bool {
+        self.contains(Self::MODERATE_MEMBERS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
@@ -594,19 +649,19 @@ impl Permissions {
     }
 
     /// Shorthand for checking that the set of permissions contains the
-    /// [Read Messages] permission.
-    ///
-    /// [Read Messages]: Self::READ_MESSAGES
-    pub fn read_messages(self) -> bool {
-        self.contains(Self::READ_MESSAGES)
-    }
-
-    /// Shorthand for checking that the set of permissions contains the
     /// [Send Messages] permission.
     ///
     /// [Send Messages]: Self::SEND_MESSAGES
     pub fn send_messages(self) -> bool {
         self.contains(Self::SEND_MESSAGES)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Send Messages in Threads] permission.
+    ///
+    /// [Send Messages in Threads]: Self::SEND_MESSAGES_IN_THREADS
+    pub fn send_messages_in_threads(self) -> bool {
+        self.contains(Self::SEND_MESSAGES_IN_THREADS)
     }
 
     /// Shorthand for checking that the set of permissions contains the
@@ -631,6 +686,14 @@ impl Permissions {
     /// [Request To Speak]: Self::REQUEST_TO_SPEAK
     pub fn request_to_speak(self) -> bool {
         self.contains(Self::REQUEST_TO_SPEAK)
+    }
+
+    /// Shorthand for checking that the set of permissions contains the
+    /// [Use Embedded Activities] permission.
+    ///
+    /// [Use Embedded Activities]: Self::USE_EMBEDDED_ACTIVITIES
+    pub fn use_embedded_activities(self) -> bool {
+        self.contains(Self::USE_EMBEDDED_ACTIVITIES)
     }
 
     /// Shorthand for checking that the set of permissions contains the

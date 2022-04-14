@@ -286,7 +286,7 @@ impl Guild {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
-                if self.user_permissions_in(channel, member).ok()?.read_messages() {
+                if self.user_permissions_in(channel, member).ok()?.view_channel() {
                     return Some(channel);
                 }
             }
@@ -305,7 +305,7 @@ impl Guild {
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
                 for member in self.members.values() {
-                    if self.user_permissions_in(channel, member).ok()?.read_messages() {
+                    if self.user_permissions_in(channel, member).ok()?.view_channel() {
                         return Some(channel);
                     }
                 }
@@ -2037,7 +2037,7 @@ impl Guild {
 
         // The default channel is always readable.
         if channel.id.0 == guild_id.0 {
-            permissions |= Permissions::READ_MESSAGES;
+            permissions |= Permissions::VIEW_CHANNEL;
         }
 
         Self::remove_unusable_permissions(&mut permissions);
@@ -2133,9 +2133,9 @@ impl Guild {
                 | Permissions::ATTACH_FILES);
         }
 
-        // If the permission does not have the `READ_MESSAGES` permission, then
+        // If the permission does not have the `VIEW_CHANNEL` permission, then
         // throw out actionable permissions.
-        if !permissions.contains(Permissions::READ_MESSAGES) {
+        if !permissions.contains(Permissions::VIEW_CHANNEL) {
             *permissions &= !(Permissions::KICK_MEMBERS
                 | Permissions::BAN_MEMBERS
                 | Permissions::ADMINISTRATOR

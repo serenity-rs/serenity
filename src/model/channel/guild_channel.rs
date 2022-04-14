@@ -166,7 +166,7 @@ impl GuildChannel {
 
     /// Creates an invite leading to the given channel.
     ///
-    /// **Note**: Requires the [Create Invite] permission.
+    /// **Note**: Requires the [Create Instant Invite] permission.
     ///
     /// # Examples
     ///
@@ -183,7 +183,7 @@ impl GuildChannel {
     ///
     /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Create Instant Invite]: Permissions::CREATE_INVITE
+    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[inline]
     #[cfg(feature = "utils")]
     pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
@@ -197,7 +197,7 @@ impl GuildChannel {
                     cache,
                     self.id,
                     Some(self.guild_id),
-                    Permissions::CREATE_INVITE,
+                    Permissions::CREATE_INSTANT_INVITE,
                 )?;
             }
         }
@@ -1085,7 +1085,7 @@ impl GuildChannel {
                     .filter_map(|e| async move {
                         if self
                             .permissions_for_user(cache, e.0)
-                            .map(|p| p.contains(Permissions::READ_MESSAGES))
+                            .map(|p| p.contains(Permissions::VIEW_CHANNEL))
                             .unwrap_or(false)
                         {
                             Some(e.1.clone())
