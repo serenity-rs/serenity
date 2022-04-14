@@ -1,7 +1,6 @@
 use std::error::Error as StdError;
 use std::fmt::{self, Error as FormatError};
 use std::io::Error as IoError;
-use std::num::ParseIntError;
 
 #[cfg(feature = "gateway")]
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;
@@ -49,13 +48,10 @@ pub enum Error {
     #[cfg(feature = "simd-json")]
     /// An error from the `simd_json` crate.
     SimdJson(simd_json::Error),
-
     /// An error from the [`model`] module.
     ///
     /// [`model`]: crate::model
     Model(ModelError),
-    /// An error occurred while parsing an integer.
-    Num(ParseIntError),
     /// Input exceeded a limit.
     /// Providing the input and the limit that's not supposed to be exceeded.
     ///
@@ -137,12 +133,6 @@ impl From<JsonError> for Error {
     }
 }
 
-impl From<ParseIntError> for Error {
-    fn from(e: ParseIntError) -> Error {
-        Error::Num(e)
-    }
-}
-
 impl From<ModelError> for Error {
     fn from(e: ModelError) -> Error {
         Error::Model(e)
@@ -187,7 +177,6 @@ impl fmt::Display for Error {
             Error::Io(inner) => fmt::Display::fmt(&inner, f),
             Error::Json(inner) => fmt::Display::fmt(&inner, f),
             Error::Model(inner) => fmt::Display::fmt(&inner, f),
-            Error::Num(inner) => fmt::Display::fmt(&inner, f),
             Error::Url(msg) => f.write_str(msg),
             #[cfg(feature = "simd-json")]
             Error::SimdJson(inner) => fmt::Display::fmt(&inner, f),
@@ -213,7 +202,6 @@ impl StdError for Error {
             Error::Io(inner) => Some(inner),
             Error::Json(inner) => Some(inner),
             Error::Model(inner) => Some(inner),
-            Error::Num(inner) => Some(inner),
             #[cfg(feature = "client")]
             Error::Client(inner) => Some(inner),
             #[cfg(feature = "collector")]
