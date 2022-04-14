@@ -104,7 +104,7 @@ fn permissions_in(
     }
 
     if channel_id.0 == guild_id.0 {
-        permissions |= Permissions::READ_MESSAGES;
+        permissions |= Permissions::VIEW_CHANNEL;
     }
 
     // No SEND_MESSAGES => no message-sending-related actions
@@ -117,9 +117,9 @@ fn permissions_in(
             | Permissions::ATTACH_FILES);
     }
 
-    // If the permission does not have the `READ_MESSAGES` permission, then
+    // If the permission does not have the `VIEW_CHANNEL` permission, then
     // throw out actionable permissions.
-    if !permissions.contains(Permissions::READ_MESSAGES) {
+    if !permissions.contains(Permissions::VIEW_CHANNEL) {
         permissions &= !(Permissions::KICK_MEMBERS
             | Permissions::BAN_MEMBERS
             | Permissions::ADMINISTRATOR
