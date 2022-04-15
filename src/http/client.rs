@@ -3457,7 +3457,7 @@ impl Http {
     /// This method only works for user tokens with the
     /// [`Connections`] OAuth2 scope.
     ///
-    /// [`Connections`]: crate::model::oauth2::OAuth2Scope::Connections
+    /// [`Connections`]: crate::model::application::oauth::Scope::Connections
     pub async fn get_user_connections(&self) -> Result<Vec<Connection>> {
         self.fire(Request {
             body: None,

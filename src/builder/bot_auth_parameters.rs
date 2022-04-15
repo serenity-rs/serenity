@@ -4,13 +4,14 @@ use url::Url;
 use crate::http::client::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
+use crate::model::application::oauth::Scope;
 use crate::model::prelude::*;
 
 /// A builder for constructing an invite link with custom OAuth2 scopes.
 #[derive(Debug, Clone, Default)]
 pub struct CreateBotAuthParameters {
     client_id: ApplicationId,
-    scopes: Vec<OAuth2Scope>,
+    scopes: Vec<Scope>,
     permissions: Permissions,
     guild_id: GuildId,
     disable_guild_select: bool,
@@ -77,8 +78,8 @@ impl CreateBotAuthParameters {
     ///
     /// **Note**: This needs to include the [`Bot`] scope.
     ///
-    /// [`Bot`]: OAuth2Scope::Bot
-    pub fn scopes(&mut self, scopes: &[OAuth2Scope]) -> &mut Self {
+    /// [`Bot`]: Scope::Bot
+    pub fn scopes(&mut self, scopes: &[Scope]) -> &mut Self {
         self.scopes = scopes.to_vec();
         self
     }

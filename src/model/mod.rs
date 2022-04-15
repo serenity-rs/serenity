@@ -34,7 +34,6 @@ pub mod interactions;
 pub mod invite;
 pub mod mention;
 pub mod misc;
-pub mod oauth2;
 pub mod permissions;
 pub mod prelude;
 pub mod sticker;
@@ -42,6 +41,12 @@ pub mod timestamp;
 pub mod user;
 pub mod voice;
 pub mod webhook;
+
+#[deprecated(note = "use `model::application::oauth`")]
+pub mod oauth2 {
+    #[deprecated(note = "use `model::application::oauth::Scope`")]
+    pub type OAuth2Scope = super::application::oauth::Scope;
+}
 
 use std::collections::HashMap;
 use std::result::Result as StdResult;

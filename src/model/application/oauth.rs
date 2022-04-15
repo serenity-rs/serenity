@@ -3,7 +3,7 @@ use std::fmt;
 /// The available OAuth2 Scopes.
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum OAuth2Scope {
+pub enum Scope {
     /// For oauth2 bots, this puts the bot in the user's selected guild by default.
     Bot,
     /// Allows your app to use Slash Commands in a guild.
@@ -52,7 +52,7 @@ pub enum OAuth2Scope {
     RelactionshipsRead,
 }
 
-impl fmt::Display for OAuth2Scope {
+impl fmt::Display for Scope {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let val = match self {
             Self::Bot => "bot",

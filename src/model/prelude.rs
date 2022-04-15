@@ -22,6 +22,7 @@ pub use super::interactions::*;
 pub use super::invite::*;
 pub use super::mention::*;
 pub use super::misc::*;
+#[allow(deprecated)]
 pub use super::oauth2::*;
 pub use super::permissions::*;
 pub use super::sticker::*;

@@ -30,6 +30,8 @@ use crate::json;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::json::to_string;
+#[cfg(feature = "model")]
+use crate::model::application::oauth::Scope;
 use crate::model::mention::Mentionable;
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
@@ -427,7 +429,7 @@ impl CurrentUser {
         http: impl AsRef<Http>,
         permissions: Permissions,
     ) -> Result<String> {
-        self.invite_url_with_oauth2_scopes(http, permissions, &[OAuth2Scope::Bot]).await
+        self.invite_url_with_oauth2_scopes(http, permissions, &[Scope::Bot]).await
     }
 
     /// Generate an invite url, but with custom scopes.
@@ -443,10 +445,10 @@ impl CurrentUser {
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
     /// #     let http = Http::new("token");
-    /// use serenity::model::oauth2::OAuth2Scope;
+    /// use serenity::model::application::oauth::Scope;
     /// use serenity::model::Permissions;
     ///
-    /// let scopes = vec![OAuth2Scope::Bot, OAuth2Scope::ApplicationsCommands];
+    /// let scopes = vec![Scope::Bot, Scope::ApplicationsCommands];
     ///
     /// // assuming the user has been bound
     /// let url = match user.invite_url_with_oauth2_scopes(&http, Permissions::empty(), &scopes).await {
@@ -479,7 +481,7 @@ impl CurrentUser {
         &self,
         http: impl AsRef<Http>,
         permissions: Permissions,
-        scopes: &[OAuth2Scope],
+        scopes: &[Scope],
     ) -> Result<String> {
         let mut builder = CreateBotAuthParameters::default();
 
