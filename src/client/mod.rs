@@ -73,7 +73,7 @@ pub struct ClientBuilder {
     data: Option<TypeMap>,
     http: Http,
     fut: Option<BoxFuture<'static, Result<Client>>>,
-    intents: Option<GatewayIntents>,
+    intents: GatewayIntents,
     application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
@@ -90,12 +90,12 @@ pub struct ClientBuilder {
 
 #[cfg(feature = "gateway")]
 impl ClientBuilder {
-    fn _new(http: Http) -> Self {
+    fn _new(http: Http, intents: GatewayIntents) -> Self {
         Self {
             data: Some(TypeMap::new()),
             http,
             fut: None,
-            intents: None,
+            intents,
             application_id: None,
             #[cfg(feature = "cache")]
             timeout: None,
@@ -117,8 +117,8 @@ impl ClientBuilder {
     /// If you have enabled the `framework`-feature (on by default), you must specify
     /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
-    pub fn new(token: impl AsRef<str>) -> Self {
-        Self::_new(Http::new_with_token(token.as_ref()))
+    pub fn new(token: impl AsRef<str>, intents: GatewayIntents) -> Self {
+        Self::_new(Http::new_with_token(token.as_ref()), intents)
     }
 
     /// Construct a new builder with a [`Http`] instance to calls methods on
@@ -128,8 +128,8 @@ impl ClientBuilder {
     /// If you have enabled the `framework`-feature (on by default), you must specify
     /// a framework via the [`Self::framework`] or [`Self::framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
-    pub fn new_with_http(http: Http) -> Self {
-        Self::_new(http)
+    pub fn new_with_http(http: Http, intents: GatewayIntents) -> Self {
+        Self::_new(http, intents)
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ",
@@ -329,13 +329,13 @@ impl ClientBuilder {
     /// [Privileged intents]: https://discord.com/developers/docs/topics/gateway#privileged-intents
     /// [the bot must be verified]: https://support.discord.com/hc/en-us/articles/360040720412-Bot-Verification-and-Data-Whitelisting
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
-        self.intents = Some(intents);
+        self.intents = intents;
 
         self
     }
 
     /// Gets the intents. See [`Self::intents`] for more info.
-    pub fn get_intents(&self) -> Option<GatewayIntents> {
+    pub fn get_intents(&self) -> GatewayIntents {
         self.intents
     }
 
@@ -391,10 +391,7 @@ impl Future for ClientBuilder {
                 If you don't want to use the command framework, disable default features and specify all features you want to use.");
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
-            let intents = self.intents.expect(
-                "No gateway intents were provided. \
-                Please set gateway intents using `.intents()` on `ClientBuilder`",
-            );
+            let intents = self.intents;
             let http = Arc::new(std::mem::take(&mut self.http));
 
             // TODO: It should not be required for all users of serenity to set the application_id or get a panic.
@@ -683,8 +680,8 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn builder(token: impl AsRef<str>) -> ClientBuilder {
-        ClientBuilder::new(token)
+    pub fn builder(token: impl AsRef<str>, intents: GatewayIntents) -> ClientBuilder {
+        ClientBuilder::new(token, intents)
     }
 
     /// Establish the connection and start listening for events.

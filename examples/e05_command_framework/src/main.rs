@@ -305,16 +305,16 @@ async fn main() {
         .group(&MATH_GROUP)
         .group(&OWNER_GROUP);
 
-    let mut client = Client::builder(&token)
+    // For this example to run properly, the "Presence Intent" and "Server Members Intent"
+    // options need to be enabled.
+    // These are needed so the `required_permissions` macro works on the commands that need to
+    // use it.
+    // You will need to enable these 2 options on the bot application, and possibly wait up to 5
+    // minutes.
+    let intents = GatewayIntents::all();
+    let mut client = Client::builder(&token, intents)
         .event_handler(Handler)
         .framework(framework)
-        // For this example to run properly, the "Presence Intent" and "Server Members Intent"
-        // options need to be enabled.
-        // These are needed so the `required_permissions` macro works on the commands that need to
-        // use it.
-        // You will need to enable these 2 options on the bot application, and possibly wait up to 5
-        // minutes.
-        .intents(GatewayIntents::all())
         .type_map_insert::<CommandCounter>(HashMap::default())
         .await
         .expect("Err creating client");

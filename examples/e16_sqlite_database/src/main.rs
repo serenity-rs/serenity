@@ -81,14 +81,10 @@ async fn main() {
         database,
     };
 
-    let mut client = Client::builder(&token)
-        .event_handler(bot)
-        .intents(
-            GatewayIntents::GUILD_MESSAGES
-                | GatewayIntents::DIRECT_MESSAGES
-                | GatewayIntents::MESSAGE_CONTENT,
-        )
-        .await
-        .expect("Err creating client");
+    let intents = GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::DIRECT_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
+    let mut client =
+        Client::builder(&token, intents).event_handler(bot).await.expect("Err creating client");
     client.start().await.unwrap();
 }
