@@ -4,13 +4,14 @@ use std::time::Duration;
 use std::{env, fmt};
 
 use dotenv::dotenv;
+use serenity::async_trait;
 use serenity::builder::{CreateActionRow, CreateButton, CreateSelectMenu, CreateSelectMenuOption};
 use serenity::client::{Context, EventHandler};
 use serenity::futures::StreamExt;
 use serenity::model::channel::Message;
 use serenity::model::interactions::message_component::ButtonStyle;
 use serenity::model::interactions::InteractionResponseType;
-use serenity::{async_trait, Client};
+use serenity::prelude::*;
 
 #[derive(Debug)]
 enum Animal {
