@@ -52,19 +52,19 @@ mod ws_client_ext;
 
 use std::fmt;
 
-pub use self::{
-    error::Error as GatewayError,
-    shard::Shard,
-    ws_client_ext::WebSocketGatewayClientExt,
-};
+pub use self::error::Error as GatewayError;
+pub use self::shard::Shard;
+pub use self::ws_client_ext::WebSocketGatewayClientExt;
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
 use crate::json::Value;
-use crate::model::{gateway::Activity, user::OnlineStatus};
+use crate::model::gateway::Activity;
+use crate::model::user::OnlineStatus;
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 
-use async_tungstenite::{tokio::ConnectStream, WebSocketStream};
+use async_tungstenite::tokio::ConnectStream;
+use async_tungstenite::WebSocketStream;
 
 pub type WsStream = WebSocketStream<ConnectStream>;
 

@@ -1,10 +1,9 @@
-use std::{borrow::Cow, sync::Arc};
+use std::borrow::Cow;
+use std::sync::Arc;
 
-use async_tungstenite::tungstenite::{
-    self,
-    error::Error as TungsteniteError,
-    protocol::frame::CloseFrame,
-};
+use async_tungstenite::tungstenite::error::Error as TungsteniteError;
+use async_tungstenite::tungstenite::protocol::frame::CloseFrame;
+use async_tungstenite::tungstenite::{self};
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::{SinkExt, StreamExt};
 use serde::Deserialize;
@@ -387,17 +386,9 @@ impl ShardRunner {
                 },
                 ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate {
                     ..
-                }) => {
-                    // nb: not sent here
-
-                    true
-                },
-                ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated) => {
-                    // nb: not sent here
-
-                    true
-                },
-                ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
+                })
+                | ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated)
+                | ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
                     // nb: not sent here
 
                     true

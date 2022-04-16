@@ -1,14 +1,9 @@
-use std::{
-    default::Default,
-    fmt::{self, Write},
-    ops::Add,
-};
+use std::fmt::{self, Write};
+use std::ops::Add;
 
-use crate::model::{
-    guild::Emoji,
-    id::{ChannelId, RoleId, UserId},
-    misc::Mentionable,
-};
+use crate::model::guild::Emoji;
+use crate::model::id::{ChannelId, RoleId, UserId};
+use crate::model::misc::Mentionable;
 
 /// The Message Builder is an ergonomic utility to easily build a message,
 /// by adding text and mentioning mentionable structs.
@@ -21,19 +16,9 @@ use crate::model::{
 /// value:
 ///
 /// ```rust,no_run
-/// # use serde_json::{json, from_value};
 /// # use serenity::model::prelude::*;
 /// #
-/// # async fn run() {
-/// # let user = UserId(1);
-/// # let emoji = from_value::<Emoji>(json!({
-/// #     "animated": false,
-/// #     "id": EmojiId(2),
-/// #     "name": "test",
-/// #     "managed": false,
-/// #     "require_colons": true,
-/// #     "roles": Vec::<Role>::new(),
-/// # })).unwrap();
+/// # fn run(user: UserId, emoji: Emoji) {
 /// #
 /// use serenity::utils::MessageBuilder;
 ///
@@ -150,28 +135,19 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # use serenity::model::guild::Role;
-    /// #
-    /// # {
-    /// #
     /// # use serde_json::{json, from_value};
     /// # use serenity::model::guild::Emoji;
     /// # use serenity::model::id::EmojiId;
     /// # use serenity::utils::MessageBuilder;
     ///
     /// # let emoji = from_value::<Emoji>(json!({
-    /// #     "animated": false,
     /// #     "id": EmojiId(302516740095606785),
-    /// #     "managed": true,
-    /// #     "name": "smugAnimeFace".to_string(),
-    /// #     "require_colons": true,
-    /// #     "roles": Vec::<Role>::new(),
+    /// #     "name": "smugAnimeFace",
     /// # })).unwrap();
     ///
     /// let message = MessageBuilder::new().push("foo ").emoji(&emoji).push(".").build();
     ///
     /// assert_eq!(message, "foo <:smugAnimeFace:302516740095606785>.");
-    /// # }
     /// ```
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
@@ -903,6 +879,7 @@ impl fmt::Display for MessageBuilder {
     ///
     /// ```rust
     /// use serenity::utils::MessageBuilder;
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.0, f)
     }
@@ -919,19 +896,13 @@ impl fmt::Display for MessageBuilder {
 /// Make a named link to Rust's GitHub organization:
 ///
 /// ```rust
-/// #[cfg(feature = "utils")]
-/// {
-///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+/// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
 ///
-///     let msg = MessageBuilder::new()
-///         .push_named_link("Rust's GitHub", "https://github.com/rust-lang")
-///         .build();
+/// let msg = MessageBuilder::new()
+///     .push_named_link("Rust's GitHub", "https://github.com/rust-lang")
+///     .build();
 ///
-///     assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
-/// }
-///
-/// #[cfg(not(feature = "utils"))]
-/// {}
+/// assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
 /// ```
 pub trait EmbedMessageBuilding {
     /// Pushes a named link to a message, intended for use in embeds.
@@ -941,20 +912,14 @@ pub trait EmbedMessageBuilding {
     /// Make a simple link to Rust's homepage for use in an embed:
     ///
     /// ```rust
-    /// #[cfg(feature = "utils")]
-    /// {
-    ///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+    /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    ///     let mut msg = MessageBuilder::new();
-    ///     msg.push("Rust's website: ");
-    ///     msg.push_named_link("Homepage", "https://rust-lang.org");
-    ///     let content = msg.build();
+    /// let mut msg = MessageBuilder::new();
+    /// msg.push("Rust's website: ");
+    /// msg.push_named_link("Homepage", "https://rust-lang.org");
+    /// let content = msg.build();
     ///
-    ///     assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
-    /// }
-    ///
-    /// #[cfg(not(feature = "utils"))]
-    /// {}
+    /// assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
     /// ```
     fn push_named_link(&mut self, name: impl Into<Content>, url: impl Into<Content>) -> &mut Self;
 
@@ -966,23 +931,14 @@ pub trait EmbedMessageBuilding {
     /// # Examples
     ///
     /// ```rust
-    /// #[cfg(feature = "utils")]
-    /// {
-    ///     use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+    /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
-    ///     let mut msg = MessageBuilder::new();
-    ///     msg.push("A weird website name: ");
-    ///     msg.push_named_link_safe("Try to ] break links (](", "https://rust-lang.org");
-    ///     let content = msg.build();
+    /// let mut msg = MessageBuilder::new();
+    /// msg.push("A weird website name: ");
+    /// msg.push_named_link_safe("Try to ] break links (](", "https://rust-lang.org");
+    /// let content = msg.build();
     ///
-    ///     assert_eq!(
-    ///         content,
-    ///         "A weird website name: [Try to   break links ( (](https://rust-lang.org)"
-    ///     );
-    /// }
-    ///
-    /// #[cfg(not(feature = "utils"))]
-    /// {}
+    /// assert_eq!(content, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
     /// ```
     fn push_named_link_safe(
         &mut self,
@@ -1066,7 +1022,7 @@ impl<T: ToString> Add<T> for Content {
     type Output = Content;
 
     fn add(mut self, rhs: T) -> Content {
-        self.inner = self.inner + &rhs.to_string();
+        self.inner += &rhs.to_string();
 
         self
     }
@@ -1077,7 +1033,7 @@ impl<T: ToString> Add<T> for ContentModifier {
 
     fn add(self, rhs: T) -> Content {
         let mut nc = self.to_content();
-        nc.inner = nc.inner + &rhs.to_string();
+        nc.inner += &rhs.to_string();
 
         nc
     }
@@ -1255,10 +1211,8 @@ fn normalize(text: &str) -> String {
 
 #[cfg(test)]
 mod test {
-    use super::{
-        ContentModifier::{Bold, Code, Italic, Spoiler},
-        MessageBuilder,
-    };
+    use super::ContentModifier::{Bold, Code, Italic, Spoiler};
+    use super::MessageBuilder;
     use crate::model::prelude::*;
 
     macro_rules! gen {

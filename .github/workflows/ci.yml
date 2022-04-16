@@ -21,6 +21,7 @@ jobs:
           # see: jobs.nightly
           # - nightly
           - Windows
+          - native-tls
           - no default features
           - no cache
           - no gateway
@@ -33,6 +34,8 @@ jobs:
             toolchain: beta
           - name: Windows
             os: windows-latest
+          - name: native-tls
+            features: default_native_tls
           - name: no default features
             features: " "
           - name: no cache
@@ -43,6 +46,8 @@ jobs:
             features: model http rustls_backend
           - name: time
             features: time
+          - name: chrono
+            features: chrono
           - name: unstable Discord API features
             features: default unstable_discord_api
             dont-test: true

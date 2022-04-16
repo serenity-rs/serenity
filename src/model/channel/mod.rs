@@ -11,6 +11,8 @@ mod partial_channel;
 mod private_channel;
 mod reaction;
 
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use std::error::Error as StdError;
 use std::fmt;
 
 use serde::de::{Error as DeError, Unexpected};
@@ -32,23 +34,23 @@ use crate::cache::Cache;
 use crate::cache::FromStrAndCache;
 #[cfg(feature = "model")]
 use crate::http::CacheHttp;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::model::misc::ChannelParseError;
+use crate::json::prelude::*;
+use crate::model::prelude::*;
 use crate::model::utils::is_false;
 use crate::model::Timestamp;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
-use crate::{json::prelude::*, model::prelude::*};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Channel {
-    /// A [text], [voice], or [stage] channel within a [`Guild`].
+    /// A [text], [voice], [stage] or [directory] channel within a [`Guild`].
     ///
     /// [text]: ChannelType::Text
     /// [voice]: ChannelType::Voice
     /// [stage]: ChannelType::Stage
+    /// [directory]: ChannelType::Directory
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
@@ -69,14 +71,8 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.guild() {
     ///     Some(guild_channel) => {
@@ -106,14 +102,8 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.private() {
     ///     Some(private) => {
@@ -143,14 +133,8 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #   let cache = Cache::default();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// # use serenity::model::channel::Channel;
+    /// # fn run(channel: Channel) {
     /// #
     /// match channel.category() {
     ///     Some(category) => {
@@ -160,7 +144,6 @@ impl Channel {
     ///         println!("It's not a category!");
     ///     },
     /// }
-    /// #
     /// # }
     /// ```
     pub fn category(self) -> Option<ChannelCategory> {
@@ -250,7 +233,7 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 | 5 | 6 | 10 | 11 | 12 | 13 | 15 => from_value::<GuildChannel>(Value::from(v))
+            0 | 2 | 5 | 10 | 11 | 12 | 13 | 14 | 15 => from_value::<GuildChannel>(Value::from(v))
                 .map(Channel::Guild)
                 .map_err(DeError::custom),
             1 => from_value::<PrivateChannel>(Value::from(v))
@@ -319,6 +302,10 @@ pub enum ChannelType {
     PrivateThread = 12,
     /// An indicator that the channel is a stage [`GuildChannel`].
     Stage = 13,
+    /// An indicator that the channel is a directory [`GuildChannel`] in a [hub].
+    ///
+    /// [hub]: https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ
+    Directory = 14,
     /// An indicator that the channel is a forum [`GuildChannel`].
     #[cfg(feature = "unstable_discord_api")]
     Forum = 15,
@@ -336,6 +323,7 @@ enum_number!(ChannelType {
     PublicThread,
     PrivateThread,
     Stage,
+    Directory,
     #[cfg(feature = "unstable_discord_api")]
     Forum,
 });
@@ -353,6 +341,7 @@ impl ChannelType {
             ChannelType::PublicThread => "public_thread",
             ChannelType::PrivateThread => "private_thread",
             ChannelType::Stage => "stage",
+            ChannelType::Directory => "directory",
             #[cfg(feature = "unstable_discord_api")]
             ChannelType::Forum => "forum",
             ChannelType::Unknown => "unknown",
@@ -582,6 +571,26 @@ mod test {
         }
     }
 }
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+#[derive(Debug)]
+pub enum ChannelParseError {
+    NotPresentInCache,
+    InvalidChannel,
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl fmt::Display for ChannelParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ChannelParseError::NotPresentInCache => f.write_str("not present in cache"),
+            ChannelParseError::InvalidChannel => f.write_str("invalid channel"),
+        }
+    }
+}
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+impl StdError for ChannelParseError {}
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 impl FromStrAndCache for Channel {

@@ -67,11 +67,9 @@ impl<'a> AttachmentType<'a> {
             AttachmentType::Path(path) => {
                 Ok(path.file_name().map(|filename| filename.to_string_lossy().to_string()))
             },
-            AttachmentType::Image(url) => {
-                match url.path_segments().and_then(|segments| segments.last()) {
-                    Some(filename) => Ok(Some(filename.to_string())),
-                    None => Err(Error::Url(url.to_string())),
-                }
+            AttachmentType::Image(url) => match url.path_segments().and_then(Iterator::last) {
+                Some(filename) => Ok(Some(filename.to_string())),
+                None => Err(Error::Url(url.to_string())),
             },
         }
     }

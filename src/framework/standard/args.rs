@@ -1,7 +1,8 @@
 use std::borrow::Cow;
 use std::error::Error as StdError;
+use std::fmt;
 use std::marker::PhantomData;
-use std::{fmt, str::FromStr};
+use std::str::FromStr;
 
 use uwl::Stream;
 
@@ -349,7 +350,7 @@ impl Args {
                 Delimiter::Single(c) => message.contains(*c),
                 Delimiter::Multiple(s) => message.contains(s),
             })
-            .map(|delim| delim.to_str())
+            .map(Delimiter::to_str)
             .collect::<Vec<_>>();
 
         let args = if delims.is_empty() && !message.is_empty() {
@@ -779,12 +780,11 @@ impl Args {
         let before = self.offset;
         self.restore();
 
-        let pos = match self.iter::<T>().quoted().position(|res| res.is_ok()) {
-            Some(p) => p,
-            None => {
-                self.offset = before;
-                return Err(Error::Eos);
-            },
+        let pos = if let Some(p) = self.iter::<T>().quoted().position(|res| res.is_ok()) {
+            p
+        } else {
+            self.offset = before;
+            return Err(Error::Eos);
         };
 
         self.offset = pos;
@@ -827,12 +827,11 @@ impl Args {
         let before = self.offset;
         self.restore();
 
-        let pos = match self.iter::<T>().quoted().position(|res| res.is_ok()) {
-            Some(p) => p,
-            None => {
-                self.offset = before;
-                return Err(Error::Eos);
-            },
+        let pos = if let Some(p) = self.iter::<T>().quoted().position(|res| res.is_ok()) {
+            p
+        } else {
+            self.offset = before;
+            return Err(Error::Eos);
         };
 
         self.offset = pos;

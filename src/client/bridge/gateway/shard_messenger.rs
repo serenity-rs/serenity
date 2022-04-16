@@ -248,6 +248,7 @@ impl ShardMessenger {
     }
 
     /// Sends a message to the shard.
+    ///
     /// # Errors
     ///
     /// Returns a [`TrySendError`] if the shard's receiver was closed.

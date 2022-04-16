@@ -61,10 +61,11 @@ use levenshtein::levenshtein;
 use tracing::warn;
 
 #[cfg(all(feature = "cache", feature = "http"))]
+use super::structures::Command as InternalCommand;
+#[cfg(all(feature = "cache", feature = "http"))]
 use super::{
     has_correct_permissions,
     has_correct_roles,
-    structures::Command as InternalCommand,
     Args,
     Check,
     CommandGroup,
@@ -79,7 +80,6 @@ use crate::{
     cache::Cache,
     client::Context,
     framework::standard::CommonOptions,
-    http::CacheHttp,
     http::Http,
     model::channel::Message,
     model::id::{ChannelId, UserId},
@@ -188,16 +188,12 @@ pub enum CustomisedHelpData<'a> {
 /// Checks whether a user is member of required roles
 /// and given the required permissions.
 #[cfg(feature = "cache")]
-pub fn has_all_requirements(
-    cache_http: impl CacheHttp + AsRef<Cache>,
-    cmd: &CommandOptions,
-    msg: &Message,
-) -> bool {
-    let cache = cache_http.as_ref();
+pub fn has_all_requirements(cache: impl AsRef<Cache>, cmd: &CommandOptions, msg: &Message) -> bool {
+    let cache = cache.as_ref();
 
     if let Some(guild_id) = msg.guild_id {
         if let Some(member) = cache.member(guild_id, &msg.author.id) {
-            if let Ok(permissions) = member.permissions(&cache_http) {
+            if let Ok(permissions) = member.permissions(&cache) {
                 return if cmd.allowed_roles.is_empty() {
                     permissions.administrator() || has_correct_permissions(&cache, &cmd, msg)
                 } else if let Some(roles) = cache.guild_roles(guild_id) {
@@ -228,7 +224,7 @@ fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
 // Decides how a listed help entry shall be displayed.
 #[cfg(all(feature = "cache", feature = "http"))]
 fn check_common_behaviour(
-    cache_http: impl CacheHttp + AsRef<Cache>,
+    cache: impl AsRef<Cache>,
     msg: &Message,
     options: &impl CommonOptions,
     owners: &HashSet<UserId>,
@@ -252,11 +248,11 @@ fn check_common_behaviour(
         return HelpBehaviour::Nothing;
     }
 
-    if !has_correct_permissions(&cache_http, options, msg) {
+    if !has_correct_permissions(&cache, options, msg) {
         return help_options.lacking_permissions;
     }
 
-    msg.guild_field(&cache_http, |guild| {
+    msg.guild_field(&cache, |guild| {
         if let Some(member) = guild.members.get(&msg.author.id) {
             if !has_correct_roles(options, &guild.roles, member) {
                 return help_options.lacking_role;
@@ -307,7 +303,6 @@ fn nested_commands_search<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
     group: &'rec CommandGroup,
-    found_group_prefix: &'rec mut bool,
     commands: &'rec [&'static InternalCommand],
     name: &'rec mut String,
     help_options: &'a HelpOptions,
@@ -358,7 +353,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                                     .await
                             {
                                 similar_commands.push(SuggestedCommandName {
-                                    name: command_name.to_string(),
+                                    name: (*command_name).to_string(),
                                     levenshtein_distance,
                                 });
                             }
@@ -373,7 +368,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                         .sub_commands
                         .iter()
                         .find(|n| n.options.names.contains(&name_str))
-                        .cloned();
+                        .copied();
 
                     // If we found a sub-command, we replace the parent with
                     // it. This allows the help-system to extract information
@@ -402,7 +397,6 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                             ctx,
                             msg,
                             group,
-                            found_group_prefix,
                             command.options.sub_commands,
                             name,
                             help_options,
@@ -431,9 +425,8 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                     .await
                 {
                     return Some(command);
-                } else {
-                    break;
                 }
+                break;
             }
         }
 
@@ -474,12 +467,10 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                 continue;
             }
 
-            let mut found_group_prefix: bool = false;
             let found = nested_commands_search(
                 ctx,
                 msg,
                 group,
-                &mut found_group_prefix,
                 group.options.commands,
                 name,
                 help_options,
@@ -552,7 +543,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                 });
             }
 
-            match nested_group_command_search(
+            if let Ok(found) = nested_group_command_search(
                 ctx,
                 msg,
                 group.options.sub_groups,
@@ -563,8 +554,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
             )
             .await
             {
-                Ok(found) => return Ok(found),
-                Err(()) => (),
+                return Ok(found);
             }
         }
 
@@ -636,14 +626,11 @@ async fn fill_eligible_commands<'a>(
         let options = &command.options;
         let name = &options.names[0];
 
-        match &group_behaviour {
-            HelpBehaviour::Nothing => (),
-            _ => {
-                let name = format_command_name!(&group_behaviour, &name);
-                to_fill.command_names.push(name);
+        if group_behaviour != HelpBehaviour::Nothing {
+            let name = format_command_name!(&group_behaviour, &name);
+            to_fill.command_names.push(name);
 
-                continue;
-            },
+            continue;
         }
 
         let command_behaviour = check_command_behaviour(
@@ -821,7 +808,7 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
                         .options
                         .description
                         .as_ref()
-                        .map(|s| s.to_string())
+                        .map(ToString::to_string)
                         .unwrap_or_default(),
                     groups: vec![single_group],
                 });
@@ -899,13 +886,13 @@ pub async fn create_customised_help_data<'a>(
     }
 
     let strikethrough_command_tip = if msg.is_private() {
-        &help_options.strikethrough_commands_tip_in_dm
+        help_options.strikethrough_commands_tip_in_dm
     } else {
-        &help_options.strikethrough_commands_tip_in_guild
+        help_options.strikethrough_commands_tip_in_guild
     };
 
-    let description = if let Some(ref strikethrough_command_text) = strikethrough_command_tip {
-        format!("{}\n{}", &help_options.individual_command_tip, &strikethrough_command_text)
+    let description = if let Some(strikethrough_command_text) = strikethrough_command_tip {
+        format!("{}\n{}", help_options.individual_command_tip, strikethrough_command_text)
     } else {
         help_options.individual_command_tip.to_string()
     };
@@ -1068,11 +1055,11 @@ async fn send_single_command_embed(
                 embed.title(&command.name);
                 embed.colour(colour);
 
-                if let Some(ref desc) = command.description {
+                if let Some(desc) = command.description {
                     embed.description(desc);
                 }
 
-                if let Some(ref usage) = command.usage {
+                if let Some(usage) = command.usage {
                     let full_usage_text = if let Some(first_prefix) = command.group_prefixes.get(0)
                     {
                         format!("`{} {} {}`", first_prefix, command.name, usage)
@@ -1167,20 +1154,19 @@ async fn send_error_embed(
 ///
 /// ```rust,no_run
 /// # use serenity::prelude::*;
-/// use std::{collections::HashSet, hash::BuildHasher};
+/// use std::collections::HashSet;
+/// use std::hash::BuildHasher;
 ///
-/// use serenity::{
-///     framework::standard::{
-///         help_commands::*,
-///         macros::help,
-///         Args,
-///         CommandGroup,
-///         CommandResult,
-///         HelpOptions,
-///         StandardFramework,
-///     },
-///     model::prelude::*,
+/// use serenity::framework::standard::help_commands::*;
+/// use serenity::framework::standard::macros::help;
+/// use serenity::framework::standard::{
+///     Args,
+///     CommandGroup,
+///     CommandResult,
+///     HelpOptions,
+///     StandardFramework,
 /// };
+/// use serenity::model::prelude::*;
 ///
 /// #[help]
 /// async fn my_help(
@@ -1310,11 +1296,11 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
         );
     }
 
-    if let Some(ref description) = command.description {
+    if let Some(description) = command.description {
         let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
     };
 
-    if let Some(ref usage) = command.usage {
+    if let Some(usage) = command.usage {
         if let Some(first_prefix) = command.group_prefixes.get(0) {
             let _ = writeln!(
                 result,
@@ -1375,20 +1361,19 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///
 /// ```rust,no_run
 /// # use serenity::prelude::*;
-/// use std::{collections::HashSet, hash::BuildHasher};
+/// use std::collections::HashSet;
+/// use std::hash::BuildHasher;
 ///
-/// use serenity::{
-///     framework::standard::{
-///         help_commands::*,
-///         macros::help,
-///         Args,
-///         CommandGroup,
-///         CommandResult,
-///         HelpOptions,
-///         StandardFramework,
-///     },
-///     model::prelude::*,
+/// use serenity::framework::standard::help_commands::*;
+/// use serenity::framework::standard::macros::help;
+/// use serenity::framework::standard::{
+///     Args,
+///     CommandGroup,
+///     CommandResult,
+///     HelpOptions,
+///     StandardFramework,
 /// };
+/// use serenity::model::prelude::*;
 ///
 /// #[help]
 /// async fn my_help(
@@ -1427,7 +1412,7 @@ pub async fn plain(
             ref suggestions,
         } => help_description.replace("{}", &suggestions.join("`, `")),
         CustomisedHelpData::NoCommandFound {
-            ref help_error_message,
+            help_error_message,
         } => help_error_message.to_string(),
         CustomisedHelpData::GroupedCommands {
             ref help_description,

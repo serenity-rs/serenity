@@ -4,19 +4,19 @@ use crate::builder::EditSticker;
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+use crate::model::id::{GuildId, StickerId, StickerPackId};
 #[cfg(feature = "model")]
 use crate::model::prelude::*;
-use crate::model::{
-    id::{GuildId, StickerId, StickerPackId},
-    user::User,
-    utils::comma_separated_string,
-};
+use crate::model::user::User;
+use crate::model::utils::comma_separated_string;
 
 pub mod sticker_id;
 pub mod sticker_item;
 pub mod sticker_pack;
 
-pub use self::{sticker_id::*, sticker_item::*, sticker_pack::*};
+pub use self::sticker_id::*;
+pub use self::sticker_item::*;
+pub use self::sticker_pack::*;
 
 /// A sticker sent with a message.
 ///

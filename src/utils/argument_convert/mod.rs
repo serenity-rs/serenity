@@ -115,24 +115,3 @@ pub fn parse_message_url(s: &str) -> Option<(GuildId, ChannelId, MessageId)> {
     let message_id = MessageId(parts.next()?.parse().ok()?);
     Some((guild_id, channel_id, message_id))
 }
-
-/// Retrieves the username and discriminator out of a user tag (`name#discrim`).
-///
-/// If the user tag is invalid, None is returned.
-///
-/// # Examples
-/// ```rust
-/// use serenity::utils::parse_user_tag;
-///
-/// assert_eq!(parse_user_tag("kangalioo#9108"), Some(("kangalioo", 9108)));
-/// assert_eq!(parse_user_tag("kangalioo#10108"), None);
-/// ```
-pub fn parse_user_tag(s: &str) -> Option<(&str, u16)> {
-    let pound_sign = s.find('#')?;
-    let name = &s[..pound_sign];
-    let discrim = s[(pound_sign + 1)..].parse::<u16>().ok()?;
-    if discrim > 9999 {
-        return None;
-    }
-    Some((name, discrim))
-}

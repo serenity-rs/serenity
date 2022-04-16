@@ -6,10 +6,8 @@ use std::mem;
 
 #[cfg(feature = "model")]
 use super::channel::Message;
-use super::{
-    id::{ChannelId, GuildId, WebhookId},
-    user::User,
-};
+use super::id::{ChannelId, GuildId, WebhookId};
+use super::user::User;
 #[cfg(feature = "model")]
 use crate::builder::{EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "model")]
@@ -138,7 +136,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
@@ -177,7 +175,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
@@ -224,7 +222,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
@@ -265,7 +263,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let mut webhook = http.get_webhook_from_url(url).await?;
     ///
@@ -281,7 +279,7 @@ impl Webhook {
     /// # use serenity::http::Http;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Http::default();
+    /// # let http = Http::new("token");
     /// use serenity::model::channel::Embed;
     ///
     /// let url = "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
@@ -331,12 +329,12 @@ impl Webhook {
 
         let map = json::hashmap_to_json_map(execute_webhook.0);
 
-        if !execute_webhook.1.is_empty() {
+        if execute_webhook.1.is_empty() {
+            http.as_ref().execute_webhook(self.id.0, token, wait, &map).await
+        } else {
             http.as_ref()
                 .execute_webhook_with_files(self.id.0, token, wait, execute_webhook.1.clone(), &map)
                 .await
-        } else {
-            http.as_ref().execute_webhook(self.id.0, token, wait, &map).await
         }
     }
 

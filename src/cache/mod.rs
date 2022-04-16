@@ -30,18 +30,18 @@
 //! [`Shard`]: crate::gateway::Shard
 //! [`http`]: crate::http
 
-use std::collections::{hash_map::RandomState, HashMap, VecDeque};
-use std::default::Default;
+use std::collections::hash_map::RandomState;
+use std::collections::{HashMap, VecDeque};
 use std::hash::BuildHasher;
 use std::str::FromStr;
+#[cfg(feature = "temp_cache")]
 use std::time::Duration;
 
-use dashmap::{
-    iter::Iter,
-    mapref::{entry::Entry, multiple::RefMulti},
-    DashMap,
-    DashSet,
-};
+use dashmap::iter::Iter;
+use dashmap::mapref::entry::Entry;
+use dashmap::mapref::multiple::RefMulti;
+use dashmap::{DashMap, DashSet};
+#[cfg(feature = "temp_cache")]
 use moka::dash::Cache as DashCache;
 use parking_lot::RwLock;
 use tracing::instrument;
@@ -136,6 +136,7 @@ pub struct Cache {
     /// Cache of channels that have been fetched via to_channel.
     ///
     /// Each value has a maximum TTL of 1 hour.
+    #[cfg(feature = "temp_cache")]
     pub(crate) temp_channels: DashCache<ChannelId, GuildChannel>,
     /// A map of channel categories.
     pub(crate) categories: DashMap<ChannelId, ChannelCategory>,
@@ -191,6 +192,7 @@ pub struct Cache {
     /// Cache of users who have been fetched from `to_user`.
     ///
     /// Each value has a max TTL of 1 hour.
+    #[cfg(feature = "temp_cache")]
     pub(crate) temp_users: DashCache<UserId, User>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
@@ -297,15 +299,11 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
-    /// # fn run() {
     /// # let cache = Cache::default();
     /// let amount = cache.private_channels().len();
     ///
     /// println!("There are {} private channels", amount);
-    /// # }
     /// ```
     pub fn private_channels(&self) -> DashMap<ChannelId, PrivateChannel> {
         self.private_channels.clone()
@@ -362,8 +360,13 @@ impl Cache {
         if let Some(channel) = self.channels.get(&id) {
             let channel = channel.clone();
             return Some(Channel::Guild(channel));
-        } else if let Some(channel) = self.temp_channels.get(&id) {
-            return Some(Channel::Guild(channel));
+        }
+
+        #[cfg(feature = "temp_cache")]
+        {
+            if let Some(channel) = self.temp_channels.get(&id) {
+                return Some(Channel::Guild(channel));
+            }
         }
 
         if let Some(private_channel) = self.private_channels.get(&id) {
@@ -407,17 +410,12 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache = Cache::default();
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(guild) = cache.guild(7) {
     ///     println!("Guild name: {}", guild.name);
     /// }
-    /// #   Ok(())
-    /// # }
     /// ```
     #[inline]
     pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Guild> {
@@ -573,13 +571,9 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
     /// # use serenity::http::Http;
-    /// # use serenity::model::id::{ChannelId, MessageId};
-    /// # use std::sync::Arc;
+    /// # use serenity::model::channel::Message;
     /// #
-    /// # async fn run() {
-    /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
-    /// # let message = ChannelId(0).message(&http, MessageId(1)).await.unwrap();
-    /// # let cache = Cache::default();
+    /// # async fn run(http: Http, cache: Cache, message: Message) {
     /// #
     /// let member = {
     ///     let channel = match cache.guild_channel(message.channel_id) {
@@ -753,21 +747,14 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use serenity::http::Http;
-    /// # use serenity::model::id::{ChannelId, MessageId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::model::channel::Message;
     /// #
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
-    /// # let message = ChannelId(0).message(&http, MessageId(1)).await?;
-    /// # let cache = Cache::default();
+    /// # fn run(cache: Cache, message: Message) {
     /// #
     /// match cache.message(message.channel_id, message.id) {
     ///     Some(m) => assert_eq!(message.content, m.content),
     ///     None => println!("No message found in cache."),
     /// };
-    /// #     Ok(())
     /// # }
     /// ```
     ///
@@ -800,18 +787,13 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #   let cache = Cache::default();
+    /// # let cache = Cache::default();
     /// // assuming the cache has been unlocked
     ///
     /// if let Some(channel) = cache.private_channel(7) {
     ///     println!("The recipient is {}", channel.recipient);
     /// }
-    /// #     Ok(())
-    /// # }
     /// ```
     #[inline]
     pub fn private_channel(&self, channel_id: impl Into<ChannelId>) -> Option<PrivateChannel> {
@@ -836,17 +818,12 @@ impl Cache {
     ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
-    /// # fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache = Cache::default();
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(role) = cache.role(7, 77) {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// }
-    /// #     Ok(())
-    /// # }
     /// ```
     #[inline]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
@@ -912,12 +889,18 @@ impl Cache {
         self._user(user_id.into())
     }
 
+    #[cfg(feature = "temp_cache")]
     fn _user(&self, user_id: UserId) -> Option<User> {
         if let Some(user) = self.users.get(&user_id) {
             Some(user.clone())
         } else {
             self.temp_users.get(&user_id)
         }
+    }
+
+    #[cfg(not(feature = "temp_cache"))]
+    fn _user(&self, user_id: UserId) -> Option<User> {
+        self.users.get(&user_id).map(|u| u.clone())
     }
 
     /// Clones all users and returns them.
@@ -1028,6 +1011,7 @@ impl Default for Cache {
     fn default() -> Cache {
         Cache {
             channels: DashMap::default(),
+            #[cfg(feature = "temp_cache")]
             temp_channels: DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
             categories: DashMap::default(),
             guilds: DashMap::default(),
@@ -1039,6 +1023,7 @@ impl Default for Cache {
             unavailable_guilds: DashSet::default(),
             user: RwLock::new(CurrentUser::default()),
             users: DashMap::default(),
+            #[cfg(feature = "temp_cache")]
             temp_users: DashCache::builder().time_to_live(Duration::from_secs(60 * 60)).build(),
             message_queue: DashMap::default(),
         }
@@ -1049,11 +1034,9 @@ impl Default for Cache {
 mod test {
     use std::collections::HashMap;
 
+    use crate::cache::{Cache, CacheUpdate, Settings};
     use crate::json::from_number;
-    use crate::{
-        cache::{Cache, CacheUpdate, Settings},
-        model::prelude::*,
-    };
+    use crate::model::prelude::*;
 
     #[test]
     fn test_cache_messages() {

@@ -1,17 +1,12 @@
-use std::{
-    boxed::Box,
-    fmt,
-    future::Future,
-    pin::Pin,
-    sync::Arc,
-    task::{Context as FutContext, Poll},
-    time::Duration,
-};
+use std::fmt;
+use std::future::Future;
+use std::pin::Pin;
+use std::sync::Arc;
+use std::task::{Context as FutContext, Poll};
+use std::time::Duration;
 
-use futures::{
-    future::BoxFuture,
-    stream::{Stream, StreamExt},
-};
+use futures::future::BoxFuture;
+use futures::stream::{Stream, StreamExt};
 use tokio::sync::mpsc::{
     unbounded_channel,
     UnboundedReceiver as Receiver,

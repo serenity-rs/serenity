@@ -231,7 +231,7 @@ impl Member {
 
         for channel in guild.channels.values() {
             if let Channel::Guild(channel) = channel {
-                if guild.user_permissions_in(channel, member).ok()?.read_messages() {
+                if guild.user_permissions_in(channel, member).ok()?.view_channel() {
                     return Some(channel.clone());
                 }
             }
@@ -318,10 +318,7 @@ impl Member {
     /// [Moderate Members]: Permissions::MODERATE_MEMBERS
     #[doc(alias = "timeout")]
     pub async fn enable_communication(&mut self, http: impl AsRef<Http>) -> Result<()> {
-        match self
-            .guild_id
-            .edit_member(&http, self.user.id, |member| member.enable_communication())
-            .await
+        match self.guild_id.edit_member(&http, self.user.id, EditMember::enable_communication).await
         {
             Ok(_) => {
                 self.communication_disabled_until = None;
@@ -491,7 +488,7 @@ impl Member {
     /// ```rust,ignore
     /// // assuming there's a `member` variable gotten from anything.
     /// println!("The permission bits for the member are: {}",
-    /// member.permissions().expect("permissions").bits);
+    /// member.permissions(&cache).expect("permissions").bits());
     /// ```
     ///
     /// # Errors
@@ -502,8 +499,8 @@ impl Member {
     /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not
     /// found.
     #[cfg(feature = "cache")]
-    pub fn permissions(&self, cache_http: impl CacheHttp + AsRef<Cache>) -> Result<Permissions> {
-        let perms_opt = cache_http
+    pub fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
+        let perms_opt = cache
             .as_ref()
             .guild_field(self.guild_id, |guild| guild._member_permission_from_member(self));
 

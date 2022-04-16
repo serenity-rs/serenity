@@ -1,7 +1,7 @@
 //! A set of utilities to help with common use cases that are not required to
 //! fully use the library.
 
-#[cfg(all(feature = "client", feature = "cache"))]
+#[cfg(feature = "client")]
 mod argument_convert;
 mod colour;
 #[cfg(feature = "cache")]
@@ -11,25 +11,27 @@ mod message_builder;
 
 pub mod token;
 
-#[cfg(all(feature = "client", feature = "cache"))]
+#[cfg(feature = "client")]
 pub use argument_convert::*;
 #[cfg(feature = "cache")]
 pub use content_safe::*;
 use url::Url;
 
+pub use self::colour::{colours, Colour};
+pub use self::custom_message::CustomMessage;
+pub use self::message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder};
 #[doc(inline)]
 pub use self::token::{parse as parse_token, validate as validate_token};
-pub use self::{
-    colour::{colours, Colour},
-    custom_message::CustomMessage,
-    message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder},
-};
 pub type Color = Colour;
 
-use std::{ffi::OsStr, fs::File, io::Read, path::Path};
+use std::ffi::OsStr;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
 
 use crate::internal::prelude::*;
-use crate::model::{id::EmojiId, misc::EmojiIdentifier};
+use crate::model::id::EmojiId;
+use crate::model::misc::EmojiIdentifier;
 
 /// Retrieves the "code" part of an invite out of a URL.
 ///
@@ -69,6 +71,27 @@ pub fn parse_invite(code: &str) -> &str {
     } else {
         code
     }
+}
+
+/// Retrieves the username and discriminator out of a user tag (`name#discrim`).
+///
+/// If the user tag is invalid, None is returned.
+///
+/// # Examples
+/// ```rust
+/// use serenity::utils::parse_user_tag;
+///
+/// assert_eq!(parse_user_tag("kangalioo#9108"), Some(("kangalioo", 9108)));
+/// assert_eq!(parse_user_tag("kangalioo#10108"), None);
+/// ```
+pub fn parse_user_tag(s: &str) -> Option<(&str, u16)> {
+    let pound_sign = s.find('#')?;
+    let name = &s[..pound_sign];
+    let discrim = s[(pound_sign + 1)..].parse::<u16>().ok()?;
+    if discrim > 9999 {
+        return None;
+    }
+    Some((name, discrim))
 }
 
 /// Retrieves an Id from a user mention.
@@ -276,15 +299,13 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
                 for y in mention[from..].chars() {
                     if y == '>' {
                         break;
-                    } else {
-                        id.push(y);
                     }
+                    id.push(y);
                 }
 
                 break;
-            } else {
-                name.push(x);
             }
+            name.push(x);
         }
 
         match id.parse::<u64>() {

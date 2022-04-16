@@ -2,8 +2,7 @@ use std::collections::HashMap;
 #[cfg(not(feature = "model"))]
 use std::marker::PhantomData;
 
-use super::CreateAllowedMentions;
-use super::CreateEmbed;
+use super::{CreateAllowedMentions, CreateEmbed};
 use crate::builder::CreateComponents;
 use crate::internal::prelude::*;
 use crate::json::{self, from_number, to_value};
@@ -36,7 +35,7 @@ use crate::model::id::StickerId;
 /// # use serenity::http::Http;
 /// # use std::sync::Arc;
 /// #
-/// # let http = Arc::new(Http::default());
+/// # let http = Arc::new(Http::new("token"));
 ///
 /// let channel_id = ChannelId(7);
 ///
@@ -186,7 +185,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.2.extend(files.into_iter().map(|f| f.into()));
+        self.2.extend(files.into_iter().map(Into::into));
         self
     }
 
@@ -199,7 +198,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         files: It,
     ) -> &mut Self {
-        self.2 = files.into_iter().map(|f| f.into()).collect();
+        self.2 = files.into_iter().map(Into::into).collect();
         self
     }
 
@@ -283,7 +282,7 @@ impl<'a> CreateMessage<'a> {
         &mut self,
         sticker_ids: It,
     ) -> &mut Self {
-        for sticker_id in sticker_ids.into_iter() {
+        for sticker_id in sticker_ids {
             self.add_sticker_id(sticker_id);
         }
 
@@ -315,6 +314,6 @@ impl<'a> Default for CreateMessage<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::from(false));
 
-        CreateMessage(map, None, Default::default())
+        CreateMessage(map, None, Vec::default())
     }
 }

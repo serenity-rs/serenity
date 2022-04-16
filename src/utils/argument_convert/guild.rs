@@ -1,7 +1,11 @@
+// From HTTP you can only get PartialGuild; for Guild you need gateway and cache
+#![cfg(feature = "cache")]
+
 use std::fmt;
 
 use super::ArgumentConvert;
-use crate::{model::prelude::*, prelude::*};
+use crate::model::prelude::*;
+use crate::prelude::*;
 
 /// Error that can be returned from [`Guild::convert`].
 #[non_exhaustive]
@@ -25,7 +29,6 @@ impl fmt::Display for GuildParseError {
 /// Look up a Guild, either by ID or by a string case-insensitively.
 ///
 /// Requires the cache feature to be enabled.
-#[cfg(feature = "cache")]
 #[async_trait::async_trait]
 impl ArgumentConvert for Guild {
     type Err = GuildParseError;

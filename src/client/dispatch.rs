@@ -2,20 +2,17 @@
 use std::fmt;
 use std::sync::Arc;
 
-use futures::{
-    channel::mpsc::UnboundedSender as Sender,
-    future::{BoxFuture, FutureExt},
-};
+use futures::channel::mpsc::UnboundedSender as Sender;
+use futures::future::{BoxFuture, FutureExt};
 use tokio::sync::RwLock;
 use tracing::instrument;
 use typemap_rev::TypeMap;
 
-use super::Context;
 #[cfg(feature = "gateway")]
-use super::{
-    bridge::gateway::event::ClientEvent,
-    event_handler::{EventHandler, RawEventHandler},
-};
+use super::bridge::gateway::event::ClientEvent;
+#[cfg(feature = "gateway")]
+use super::event_handler::{EventHandler, RawEventHandler};
+use super::Context;
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "framework")]
@@ -23,13 +20,11 @@ use crate::framework::Framework;
 use crate::gateway::InterMessage;
 use crate::http::Http;
 use crate::internal::tokio::spawn_named;
+use crate::model::channel::{Channel, Message};
+use crate::model::event::Event;
+use crate::model::guild::Member;
 #[cfg(feature = "cache")]
 use crate::model::id::GuildId;
-use crate::model::{
-    channel::{Channel, Message},
-    event::Event,
-    guild::Member,
-};
 use crate::CacheAndHttp;
 
 #[inline]
@@ -308,7 +303,7 @@ pub(crate) fn dispatch<'rec>(
                     },
                     other => {
                         handle_event(other, data, handler, runner_tx, shard_id, cache_and_http)
-                            .await
+                            .await;
                     },
                 }
             },

@@ -1,4 +1,5 @@
-use std::{error::Error as StdError, fmt};
+use std::error::Error as StdError;
+use std::fmt;
 
 /// An error that occurred while working with a collector.
 #[derive(Clone, Debug)]

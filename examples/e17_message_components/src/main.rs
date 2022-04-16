@@ -1,18 +1,16 @@
-use std::{env, error::Error as StdError, fmt, str::FromStr, time::Duration};
+use std::error::Error as StdError;
+use std::str::FromStr;
+use std::time::Duration;
+use std::{env, fmt};
 
 use dotenv::dotenv;
-use serenity::{
-    async_trait,
-    builder::{CreateActionRow, CreateButton, CreateSelectMenu, CreateSelectMenuOption},
-    client::{Context, EventHandler},
-    futures::StreamExt,
-    model::{
-        channel::Message,
-        gateway::GatewayIntents,
-        interactions::{message_component::ButtonStyle, InteractionResponseType},
-    },
-    Client,
-};
+use serenity::builder::{CreateActionRow, CreateButton, CreateSelectMenu, CreateSelectMenuOption};
+use serenity::client::{Context, EventHandler};
+use serenity::futures::StreamExt;
+use serenity::model::channel::Message;
+use serenity::model::interactions::message_component::ButtonStyle;
+use serenity::model::interactions::InteractionResponseType;
+use serenity::{async_trait, Client};
 
 #[derive(Debug)]
 enum Animal {

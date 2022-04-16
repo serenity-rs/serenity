@@ -1,22 +1,15 @@
 use std::env;
 
-use serenity::{
-    async_trait,
-    model::{
-        gateway::{GatewayIntents, Ready},
-        id::GuildId,
-        interactions::{
-            application_command::{
-                ApplicationCommand,
-                ApplicationCommandInteractionDataOptionValue,
-                ApplicationCommandOptionType,
-            },
-            Interaction,
-            InteractionResponseType,
-        },
-    },
-    prelude::*,
+use serenity::async_trait;
+use serenity::model::gateway::Ready;
+use serenity::model::id::GuildId;
+use serenity::model::interactions::application_command::{
+    ApplicationCommand,
+    ApplicationCommandInteractionDataOptionValue,
+    ApplicationCommandOptionType,
 };
+use serenity::model::interactions::{Interaction, InteractionResponseType};
+use serenity::prelude::*;
 
 struct Handler;
 

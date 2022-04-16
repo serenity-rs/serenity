@@ -14,25 +14,17 @@ extern crate tracing;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
-use std::sync::{atomic::*, Arc};
+use std::sync::atomic::*;
+use std::sync::Arc;
 use std::time::Instant;
 
-use rillrate::prime::{
-    table::{Col, Row},
-    *,
-};
+use rillrate::prime::table::{Col, Row};
+use rillrate::prime::*;
 use serenity::async_trait;
-use serenity::client::{
-    bridge::gateway::{ShardId, ShardManager},
-    Client,
-    Context,
-    EventHandler,
-};
-use serenity::framework::standard::{
-    macros::{command, group, hook},
-    CommandResult,
-    StandardFramework,
-};
+use serenity::client::bridge::gateway::{ShardId, ShardManager};
+use serenity::client::{Client, Context, EventHandler};
+use serenity::framework::standard::macros::{command, group, hook};
+use serenity::framework::standard::{CommandResult, StandardFramework};
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 use tokio::sync::Mutex;

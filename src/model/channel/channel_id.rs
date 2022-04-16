@@ -1,5 +1,5 @@
 #[cfg(feature = "model")]
-use std::fmt::Write as FmtWrite;
+use std::fmt::Write as _;
 #[cfg(feature = "model")]
 use std::sync::Arc;
 
@@ -56,7 +56,7 @@ impl ChannelId {
     /// use serenity::model::id::ChannelId;
     ///
     /// # async fn run() {
-    /// # let http = serenity::http::Http::default();
+    /// # let http = serenity::http::Http::new("token");
     /// let _successful = ChannelId(7).broadcast_typing(&http).await;
     /// # }
     /// ```
@@ -74,13 +74,13 @@ impl ChannelId {
 
     /// Creates an invite leading to the given channel.
     ///
-    /// **Note**: Requires the [Create Invite] permission.
+    /// **Note**: Requires the [Create Instant Invite] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
-    /// [Create Invite]: Permissions::CREATE_INVITE
+    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
     where
         F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
@@ -315,7 +315,7 @@ impl ChannelId {
     /// # async fn run() {
     /// #     use serenity::http::Http;
     /// #     use serenity::model::id::ChannelId;
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// #     let channel_id = ChannelId(1234);
     /// channel_id.edit(&http, |c| c.name("test").bitrate(64000)).await;
     /// # }
@@ -392,8 +392,10 @@ impl ChannelId {
     /// First attempts to find a [`Channel`] by its Id in the cache,
     /// upon failure requests it via the REST API.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
-    /// owning the required permissions the HTTP-request will be issued.
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon owning the
+    /// required permissions the HTTP-request will be issued. Additionally, you might want to
+    /// enable the `temp_cache` feature to cache channel data retrieved by this function for a
+    /// short duration.
     #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
@@ -407,7 +409,8 @@ impl ChannelId {
         }
 
         let channel = cache_http.http().get_channel(self.0).await?;
-        #[cfg(feature = "cache")]
+
+        #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
                 if let Channel::Guild(guild_channel) = &channel {
@@ -415,6 +418,7 @@ impl ChannelId {
                 }
             }
         }
+
         Ok(channel)
     }
 
@@ -511,7 +515,7 @@ impl ChannelId {
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::default();
-    /// # let ctx = Http::default();
+    /// # let ctx = Http::new("token");
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///
@@ -666,7 +670,7 @@ impl ChannelId {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// use serenity::model::id::ChannelId;
     ///
     /// let channel_id = ChannelId(7);
@@ -684,7 +688,7 @@ impl ChannelId {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// use serenity::model::id::ChannelId;
     /// use tokio::fs::File;
     ///
@@ -802,7 +806,7 @@ impl ChannelId {
     /// #
     /// # fn long_process() {}
     /// # fn main() -> Result<()> {
-    /// # let http = Arc::new(Http::default());
+    /// # let http = Arc::new(Http::new("token"));
     /// // Initiate typing (assuming http is `Arc<Http>`)
     /// let typing = ChannelId(7).start_typing(&http)?;
     ///
@@ -1270,7 +1274,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// #
     /// # async fn run() {
     /// # let channel_id = ChannelId::default();
-    /// # let ctx = Http::default();
+    /// # let ctx = Http::new("token");
     /// use serenity::futures::StreamExt;
     /// use serenity::model::channel::MessagesIter;
     ///

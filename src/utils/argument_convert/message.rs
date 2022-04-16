@@ -1,7 +1,8 @@
 use std::fmt;
 
 use super::ArgumentConvert;
-use crate::{model::prelude::*, prelude::*};
+use crate::model::prelude::*;
+use crate::prelude::*;
 
 /// Error that can be returned from [`Message::convert`].
 #[non_exhaustive]
@@ -18,9 +19,8 @@ pub enum MessageParseError {
 impl std::error::Error for MessageParseError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Self::Malformed => None,
             Self::Http(e) => Some(e),
-            Self::HttpNotAvailable => None,
+            Self::HttpNotAvailable | Self::Malformed => None,
         }
     }
 }

@@ -26,12 +26,13 @@ use crate::collector::{
 use crate::http::GuildPagination;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::json;
 #[cfg(feature = "model")]
 use crate::json::json;
 use crate::json::to_string;
-use crate::{internal::prelude::*, model::misc::Mentionable};
+use crate::model::misc::Mentionable;
 
 /// Used with `#[serde(with|deserialize_with|serialize_with)]`
 ///
@@ -67,6 +68,7 @@ pub(crate) mod discriminator {
         deserializer.deserialize_any(DiscriminatorVisitor)
     }
 
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S: Serializer>(value: &u16, serializer: S) -> Result<S::Ok, S::Error> {
         serializer.collect_str(&format_args!("{:04}", value))
     }
@@ -126,6 +128,7 @@ pub(crate) mod discriminator {
             deserializer.deserialize_option(OptionalDiscriminatorVisitor)
         }
 
+        #[allow(clippy::trivially_copy_pass_by_ref)]
         pub fn serialize<S: Serializer>(
             value: &Option<u16>,
             serializer: S,
@@ -198,10 +201,8 @@ impl CurrentUser {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
-    /// # async fn run() {
+    /// # fn run() {
     /// # use serenity::cache::Cache;
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
     /// #
     /// # let cache = Cache::default();
     /// // assuming the cache has been unlocked
@@ -241,7 +242,7 @@ impl CurrentUser {
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// #     let mut user = CurrentUser::default();
     /// let avatar = serenity::utils::read_image("./avatar.png")?;
     ///
@@ -300,7 +301,7 @@ impl CurrentUser {
     /// #
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// // assuming the user has been bound
     ///
     /// if let Ok(guilds) = user.guilds(&http).await {
@@ -359,7 +360,7 @@ impl CurrentUser {
     /// #
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
@@ -388,12 +389,12 @@ impl CurrentUser {
     /// #
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::model::Permissions;
     ///
     /// // assuming the user has been bound
     /// let permissions =
-    ///     Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
+    ///     Permissions::VIEW_CHANNEL | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
     /// let url = match user.invite_url(&http, permissions).await {
     ///     Ok(v) => v,
     ///     Err(why) => {
@@ -440,7 +441,7 @@ impl CurrentUser {
     /// #
     /// # async fn run() {
     /// #     let user = CurrentUser::default();
-    /// #     let http = Http::default();
+    /// #     let http = Http::new("token");
     /// use serenity::model::oauth2::OAuth2Scope;
     /// use serenity::model::Permissions;
     ///
@@ -463,6 +464,7 @@ impl CurrentUser {
     /// );
     /// # }
     /// ```
+    ///
     /// # Errors
     ///
     /// Returns an
@@ -1134,8 +1136,10 @@ impl UserId {
     /// First attempts to find a [`User`] by its Id in the cache,
     /// upon failure requests it via the REST API.
     ///
-    /// **Note**: If the cache is not enabled,
-    /// REST API will be used only.
+    /// **Note**: If the cache is not enabled, REST API will be used only.
+    ///
+    /// **Note**: If the cache is enabled, you might want to enable the `temp_cache` feature to
+    /// cache user data retrieved by this function for a short duration.
     ///
     /// # Errors
     ///
@@ -1159,12 +1163,14 @@ impl UserId {
         }
 
         let user = cache_http.http().get_user(self.0).await?;
-        #[cfg(feature = "cache")]
+
+        #[cfg(all(feature = "cache", feature = "temp_cache"))]
         {
             if let Some(cache) = cache_http.cache() {
                 cache.temp_users.insert(user.id, user.clone());
             }
         }
+
         Ok(user)
     }
 }

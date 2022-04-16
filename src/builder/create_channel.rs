@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use crate::json::from_number;
-use crate::json::json;
-use crate::json::Value;
+use crate::json::{from_number, json, Value};
 use crate::model::prelude::*;
 
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].
@@ -102,7 +100,7 @@ impl CreateChannel {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// #     let http = Arc::new(Http::default());
+    /// #     let http = Arc::new(Http::new("token"));
     /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;
@@ -110,7 +108,7 @@ impl CreateChannel {
     ///
     /// // Assuming a guild has already been bound.
     /// let permissions = vec![PermissionOverwrite {
-    ///     allow: Permissions::READ_MESSAGES,
+    ///     allow: Permissions::VIEW_CHANNEL,
     ///     deny: Permissions::SEND_TTS_MESSAGES,
     ///     kind: PermissionOverwriteType::Member(UserId(1234)),
     /// }];

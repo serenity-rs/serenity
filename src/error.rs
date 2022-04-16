@@ -1,9 +1,6 @@
-use std::{
-    error::Error as StdError,
-    fmt::{self, Error as FormatError},
-    io::Error as IoError,
-    num::ParseIntError,
-};
+use std::error::Error as StdError;
+use std::fmt::{self, Error as FormatError};
+use std::io::Error as IoError;
 
 #[cfg(feature = "gateway")]
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;
@@ -21,12 +18,6 @@ use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
 use crate::internal::prelude::*;
-#[cfg(all(
-    feature = "gateway",
-    feature = "rustls_backend_marker",
-    not(feature = "native_tls_backend_marker")
-))]
-use crate::internal::ws_impl::RustlsError;
 use crate::model::ModelError;
 
 /// The common result type between most library functions.
@@ -57,13 +48,10 @@ pub enum Error {
     #[cfg(feature = "simd-json")]
     /// An error from the `simd_json` crate.
     SimdJson(simd_json::Error),
-
     /// An error from the [`model`] module.
     ///
     /// [`model`]: crate::model
     Model(ModelError),
-    /// An error occurred while parsing an integer.
-    Num(ParseIntError),
     /// Input exceeded a limit.
     /// Providing the input and the limit that's not supposed to be exceeded.
     ///
@@ -108,13 +96,6 @@ pub enum Error {
     /// [`http`]: crate::http
     #[cfg(feature = "http")]
     Http(Box<HttpError>),
-    /// An error occurring in rustls
-    #[cfg(all(
-        feature = "gateway",
-        feature = "rustls_backend_marker",
-        not(feature = "native_tls_backend_marker")
-    ))]
-    Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
     Tungstenite(TungsteniteError),
@@ -152,26 +133,9 @@ impl From<JsonError> for Error {
     }
 }
 
-impl From<ParseIntError> for Error {
-    fn from(e: ParseIntError) -> Error {
-        Error::Num(e)
-    }
-}
-
 impl From<ModelError> for Error {
     fn from(e: ModelError) -> Error {
         Error::Model(e)
-    }
-}
-
-#[cfg(all(
-    feature = "gateway",
-    feature = "rustls_backend_marker",
-    not(feature = "native_tls_backend_marker")
-))]
-impl From<RustlsError> for Error {
-    fn from(e: RustlsError) -> Error {
-        Error::Rustls(e)
     }
 }
 
@@ -213,7 +177,6 @@ impl fmt::Display for Error {
             Error::Io(inner) => fmt::Display::fmt(&inner, f),
             Error::Json(inner) => fmt::Display::fmt(&inner, f),
             Error::Model(inner) => fmt::Display::fmt(&inner, f),
-            Error::Num(inner) => fmt::Display::fmt(&inner, f),
             Error::Url(msg) => f.write_str(msg),
             #[cfg(feature = "simd-json")]
             Error::SimdJson(inner) => fmt::Display::fmt(&inner, f),
@@ -225,8 +188,6 @@ impl fmt::Display for Error {
             Error::Gateway(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "http")]
             Error::Http(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(all(feature = "gateway", not(feature = "native_tls_backend_marker")))]
-            Error::Rustls(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
         }
@@ -241,7 +202,6 @@ impl StdError for Error {
             Error::Io(inner) => Some(inner),
             Error::Json(inner) => Some(inner),
             Error::Model(inner) => Some(inner),
-            Error::Num(inner) => Some(inner),
             #[cfg(feature = "client")]
             Error::Client(inner) => Some(inner),
             #[cfg(feature = "collector")]
@@ -250,12 +210,6 @@ impl StdError for Error {
             Error::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
             Error::Http(inner) => Some(inner),
-            #[cfg(all(
-                feature = "gateway",
-                feature = "rustls_backend_marker",
-                not(feature = "native_tls_backend_marker")
-            ))]
-            Error::Rustls(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => Some(inner),
             _ => None,

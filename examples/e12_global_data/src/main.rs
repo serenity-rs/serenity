@@ -1,29 +1,17 @@
 //! In this example, you will be shown various ways of sharing data between events and commands.
 //! And how to use locks correctly to avoid deadlocking the bot.
 
-use std::{
-    collections::HashMap,
-    env,
-    sync::{
-        atomic::{AtomicUsize, Ordering},
-        Arc,
-    },
-};
+use std::collections::HashMap;
+use std::env;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::Arc;
 
-use serenity::{
-    async_trait,
-    framework::standard::{
-        macros::{command, group, hook},
-        Args,
-        CommandResult,
-        StandardFramework,
-    },
-    model::{
-        channel::Message,
-        gateway::{GatewayIntents, Ready},
-    },
-    prelude::*,
-};
+use serenity::async_trait;
+use serenity::framework::standard::macros::{command, group, hook};
+use serenity::framework::standard::{Args, CommandResult, StandardFramework};
+use serenity::model::channel::Message;
+use serenity::model::gateway::Ready;
+use serenity::prelude::*;
 use tokio::sync::RwLock;
 
 // A container type is created for inserting into the Client's `data`, which

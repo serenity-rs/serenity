@@ -32,9 +32,10 @@ use crate::cache::Cache;
 use crate::client::Context;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
+use crate::model::channel::Message;
 #[cfg(feature = "cache")]
 use crate::model::guild::Member;
-use crate::model::{channel::Message, permissions::Permissions};
+use crate::model::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
 
@@ -391,7 +392,7 @@ impl StandardFramework {
     /// it's not intended to be chained as the other commands are.
     pub fn group_remove(&mut self, group: &'static CommandGroup) {
         // Iterates through the vector and if a given group _doesn't_ match, we retain it
-        self.groups.retain(|&(g, _)| g != group)
+        self.groups.retain(|&(g, _)| g != group);
     }
 
     /// Specify the function that's called in case a command wasn't executed for one reason or
@@ -611,7 +612,7 @@ impl Framework for StandardFramework {
 
         let mut stream = Stream::new(&msg.content);
 
-        stream.take_while_char(|c| c.is_whitespace());
+        stream.take_while_char(char::is_whitespace);
 
         let prefix = parse::prefix(&ctx, &msg, &mut stream, &self.config).await;
 
@@ -716,7 +717,7 @@ impl Framework for StandardFramework {
                                 v.push(Delimiter::Single(delim.chars().next().unwrap()));
                             } else {
                                 // This too.
-                                v.push(Delimiter::Multiple(delim.to_string()));
+                                v.push(Delimiter::Multiple((*delim).to_string()));
                             }
                         }
 
@@ -887,7 +888,7 @@ pub(crate) fn has_correct_roles(
         options
             .allowed_roles()
             .iter()
-            .flat_map(|r| roles.values().find(|role| *r == role.name))
+            .filter_map(|r| roles.values().find(|role| *r == role.name))
             .any(|g| member.roles.contains(&g.id))
     }
 }

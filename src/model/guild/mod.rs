@@ -65,6 +65,11 @@ use crate::constants::LARGE_THRESHOLD;
 use crate::http::{CacheHttp, Http};
 #[cfg(all(feature = "http", feature = "model"))]
 use crate::json::json;
+use crate::json::prelude::*;
+use crate::json::{from_number, from_value};
+use crate::model::prelude::*;
+use crate::model::utils::{emojis, presences, roles, stickers};
+use crate::model::Timestamp;
 #[cfg(feature = "model")]
 use crate::{
     builder::{
@@ -74,12 +79,6 @@ use crate::{
         CreateApplicationCommandsPermissions,
     },
     model::interactions::application_command::{ApplicationCommand, ApplicationCommandPermission},
-};
-use crate::{
-    json::{from_number, from_value, prelude::*},
-    model::prelude::*,
-    model::utils::{emojis, presences, roles, stickers},
-    model::Timestamp,
 };
 
 /// A representation of a banning of a user.
@@ -287,7 +286,7 @@ impl Guild {
         let member = self.members.get(&uid)?;
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
-                if self.user_permissions_in(channel, member).ok()?.read_messages() {
+                if self.user_permissions_in(channel, member).ok()?.view_channel() {
                     return Some(channel);
                 }
             }
@@ -306,7 +305,7 @@ impl Guild {
         for channel in self.channels.values() {
             if let Channel::Guild(channel) = channel {
                 for member in self.members.values() {
-                    if self.user_permissions_in(channel, member).ok()?.read_messages() {
+                    if self.user_permissions_in(channel, member).ok()?.view_channel() {
                         return Some(channel);
                     }
                 }
@@ -1487,11 +1486,11 @@ impl Guild {
         self.id.kick(&http, user_id).await
     }
 
-    #[inline]
     /// # Errors
     ///
     /// In addition to the reasons [`Self::kick`] may return an error,
     /// may also return an error if the reason is too long.
+    #[inline]
     pub async fn kick_with_reason(
         &self,
         http: impl AsRef<Http>,
@@ -1591,28 +1590,15 @@ impl Guild {
     /// search all members in the guild via the Http API, use
     /// [`Self::search_members`].
     pub fn member_named(&self, name: &str) -> Option<&Member> {
-        let (name, discrim) = if let Some(pos) = name.rfind('#') {
-            let split = name.split_at(pos + 1);
-
-            let split2 = (split.0.get(0..split.0.len() - 1).unwrap_or(""), split.1);
-
-            match split2.1.parse::<u16>() {
-                Ok(discrim_int) => (split2.0, Some(discrim_int)),
-                Err(_) => (name, None),
-            }
-        } else {
-            (name, None)
+        let (username, discrim) = match crate::utils::parse_user_tag(name) {
+            Some((username, discrim)) => (username, Some(discrim)),
+            None => (name, None),
         };
 
         for member in self.members.values() {
-            let name_matches = member.user.name == name;
-
-            let discrim_matches = match discrim {
-                Some(discrim) => member.user.discriminator == discrim,
-                None => true,
-            };
-
-            if name_matches && discrim_matches {
+            if member.user.name == username
+                && discrim.map_or(true, |d| member.user.discriminator == d)
+            {
                 return Some(member);
             }
         }
@@ -1910,13 +1896,12 @@ impl Guild {
             return Permissions::all();
         }
 
-        let everyone = match self.roles.get(&RoleId(self.id.0)) {
-            Some(everyone) => everyone,
-            None => {
-                error!("@everyone role ({}) missing in '{}'", self.id, self.name);
+        let everyone = if let Some(everyone) = self.roles.get(&RoleId(self.id.0)) {
+            everyone
+        } else {
+            error!("@everyone role ({}) missing in '{}'", self.id, self.name);
 
-                return Permissions::empty();
-            },
+            return Permissions::empty();
         };
 
         let mut permissions = everyone.permissions;
@@ -1989,12 +1974,11 @@ impl Guild {
         }
 
         // Start by retrieving the @everyone role's permissions.
-        let everyone = match roles.get(&RoleId(guild_id.0)) {
-            Some(everyone) => everyone,
-            None => {
-                error!("@everyone role missing in {}", guild_id,);
-                return Err(Error::Model(ModelError::RoleNotFound));
-            },
+        let everyone = if let Some(everyone) = roles.get(&RoleId(guild_id.0)) {
+            everyone
+        } else {
+            error!("@everyone role missing in {}", guild_id,);
+            return Err(Error::Model(ModelError::RoleNotFound));
         };
 
         // Create a base set of permissions, starting with `@everyone`s.
@@ -2053,7 +2037,7 @@ impl Guild {
 
         // The default channel is always readable.
         if channel.id.0 == guild_id.0 {
-            permissions |= Permissions::READ_MESSAGES;
+            permissions |= Permissions::VIEW_CHANNEL;
         }
 
         Self::remove_unusable_permissions(&mut permissions);
@@ -2149,9 +2133,9 @@ impl Guild {
                 | Permissions::ATTACH_FILES);
         }
 
-        // If the permission does not have the `READ_MESSAGES` permission, then
+        // If the permission does not have the `VIEW_CHANNEL` permission, then
         // throw out actionable permissions.
-        if !permissions.contains(Permissions::READ_MESSAGES) {
+        if !permissions.contains(Permissions::VIEW_CHANNEL) {
             *permissions &= !(Permissions::KICK_MEMBERS
                 | Permissions::BAN_MEMBERS
                 | Permissions::ADMINISTRATOR

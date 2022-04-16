@@ -70,14 +70,14 @@ impl Invite {
     /// See the documentation for the [`CreateInvite`] builder for information
     /// on how to use this and the default values that it provides.
     ///
-    /// Requires the [Create Invite] permission.
+    /// Requires the [Create Instant Invite] permission.
     ///
     /// # Errors
     ///
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
-    /// [Create Invite]: Permissions::CREATE_INVITE
+    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     /// [permission]: super::permissions
     #[inline]
     pub async fn create<F>(
@@ -97,7 +97,7 @@ impl Invite {
                     cache,
                     channel_id,
                     None,
-                    Permissions::CREATE_INVITE,
+                    Permissions::CREATE_INSTANT_INVITE,
                 )?;
             }
         }

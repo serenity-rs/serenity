@@ -297,8 +297,6 @@ impl ApplicationCommandInteraction {
     /// or an [`Error::Json`] if there is an error in deserializing the
     /// API response.
     ///
-    /// # Errors
-    ///
     /// [`Error::Http`]: crate::error::Error::Http
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn defer(&self, http: impl AsRef<Http>) -> Result<()> {
@@ -454,6 +452,9 @@ pub struct ApplicationCommandInteractionData {
     /// The converted objects from the given options.
     #[serde(default)]
     pub resolved: ApplicationCommandInteractionDataResolved,
+    /// The Id of the guild the command is registered to.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub guild_id: Option<GuildId>,
     /// The targeted user or message, if the triggered application command type
     /// is [`User`] or [`Message`].
     ///
@@ -477,13 +478,13 @@ impl ApplicationCommandInteractionData {
                 let user = self.resolved.users.get(&user_id).cloned()?;
                 let member = self.resolved.members.get(&user_id).cloned();
 
-                Some(ResolvedTarget::User(user, member))
+                Some(ResolvedTarget::User(user, member.map(Box::new)))
             },
             (ApplicationCommandType::Message, Some(id)) => {
                 let message_id = id.to_message_id();
                 let message = self.resolved.messages.get(&message_id).cloned()?;
 
-                Some(ResolvedTarget::Message(message))
+                Some(ResolvedTarget::Message(Box::new(message)))
             },
             _ => None,
         }
@@ -526,15 +527,14 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             .and_then(ApplicationCommandType::deserialize)
             .map_err(DeError::custom)?;
 
-        let target_id = if kind != ApplicationCommandType::ChatInput {
-            Some(
-                map.remove("target_id")
-                    .ok_or_else(|| DeError::custom("expected resolved"))
-                    .and_then(TargetId::deserialize)
-                    .map_err(DeError::custom)?,
-            )
-        } else {
-            None
+        let guild_id = match map.remove("guild_id") {
+            Some(id) => Option::<GuildId>::deserialize(id).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        let target_id = match map.remove("target_id") {
+            Some(id) => Option::<TargetId>::deserialize(id).map_err(DeError::custom)?,
+            None => None,
         };
 
         Ok(Self {
@@ -543,6 +543,7 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
             kind,
             options,
             resolved,
+            guild_id,
             target_id,
         })
     }
@@ -553,8 +554,8 @@ impl<'de> Deserialize<'de> for ApplicationCommandInteractionData {
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ResolvedTarget {
-    User(User, Option<PartialMember>),
-    Message(Message),
+    User(User, Option<Box<PartialMember>>),
+    Message(Box<Message>),
 }
 
 /// The resolved data of a command data interaction payload.
@@ -725,11 +726,9 @@ impl ApplicationCommand {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let http = Arc::new(Http::default());
-    /// use serenity::model::{
-    ///     id::ApplicationId,
-    ///     interactions::application_command::ApplicationCommand,
-    /// };
+    /// # let http = Arc::new(Http::new("token"));
+    /// use serenity::model::id::ApplicationId;
+    /// use serenity::model::interactions::application_command::ApplicationCommand;
     ///
     /// let _ = ApplicationCommand::create_global_application_command(&http, |command| {
     ///     command.name("ping").description("A simple ping command")
@@ -745,10 +744,11 @@ impl ApplicationCommand {
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let http = Arc::new(Http::default());
-    /// use serenity::model::{
-    ///     id::ApplicationId,
-    ///     interactions::application_command::{ApplicationCommand, ApplicationCommandOptionType},
+    /// # let http = Arc::new(Http::new("token"));
+    /// use serenity::model::id::ApplicationId;
+    /// use serenity::model::interactions::application_command::{
+    ///     ApplicationCommand,
+    ///     ApplicationCommandOptionType,
     /// };
     ///
     /// let _ = ApplicationCommand::create_global_application_command(&http, |command| {

@@ -9,7 +9,7 @@ pub struct PartialChannel {
     /// The channel Id.
     pub id: ChannelId,
     /// The channel name.
-    pub name: String,
+    pub name: Option<String>,
     /// The channel type.
     #[serde(rename = "type")]
     pub kind: ChannelType,

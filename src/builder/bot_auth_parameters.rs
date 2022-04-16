@@ -29,7 +29,7 @@ impl CreateBotAuthParameters {
         if !self.scopes.is_empty() {
             valid_data.push((
                 "scope",
-                self.scopes.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(" "),
+                self.scopes.iter().map(ToString::to_string).collect::<Vec<_>>().join(" "),
             ));
         }
 

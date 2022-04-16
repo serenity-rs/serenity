@@ -1,6 +1,7 @@
 //! Error enum definition wrapping potential model implementation errors.
 
-use std::{error::Error as StdError, fmt};
+use std::error::Error as StdError;
+use std::fmt;
 
 use super::Permissions;
 

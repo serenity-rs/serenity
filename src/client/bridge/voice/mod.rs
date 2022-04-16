@@ -1,13 +1,9 @@
 use async_trait::async_trait;
 use futures::channel::mpsc::UnboundedSender as Sender;
 
-use crate::{
-    gateway::InterMessage,
-    model::{
-        id::{GuildId, UserId},
-        voice::VoiceState,
-    },
-};
+use crate::gateway::InterMessage;
+use crate::model::id::{GuildId, UserId};
+use crate::model::voice::VoiceState;
 
 /// Interface for any compatible voice plugin.
 ///

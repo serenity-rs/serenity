@@ -1,13 +1,9 @@
 use std::env;
 
-use serenity::{
-    async_trait,
-    model::{
-        channel::Message,
-        gateway::{GatewayIntents, Presence, Ready},
-    },
-    prelude::*,
-};
+use serenity::async_trait;
+use serenity::model::channel::Message;
+use serenity::model::gateway::{GatewayIntents, Presence, Ready};
+use serenity::prelude::*;
 
 struct Handler;
 
