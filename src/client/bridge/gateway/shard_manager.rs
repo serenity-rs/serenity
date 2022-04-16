@@ -221,7 +221,7 @@ impl ShardManager {
     /// use std::env;
     ///
     /// use serenity::client::bridge::gateway::ShardId;
-    /// use serenity::client::{Client, EventHandler};
+    /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
@@ -229,7 +229,8 @@ impl ShardManager {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::builder(&token, Default::default()).event_handler(Handler).await?;
+    /// let mut client =
+    ///     Client::builder(&token, GatewayIntents::default()).event_handler(Handler).await?;
     ///
     /// // restart shard ID 7
     /// client.shard_manager.lock().await.restart(ShardId(7)).await;

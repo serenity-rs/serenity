@@ -32,10 +32,10 @@
 //! ping and about command:
 //!
 //! ```rust,no_run
-//! use serenity::client::{Client, Context, EventHandler};
 //! use serenity::framework::standard::macros::{command, group};
 //! use serenity::framework::standard::{CommandResult, StandardFramework};
 //! use serenity::model::channel::Message;
+//! use serenity::prelude::*;
 //!
 //! #[command]
 //! async fn about(ctx: &Context, msg: &Message) -> CommandResult {
@@ -70,7 +70,7 @@
 //!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
 //!     .group(&GENERAL_GROUP);
 //!
-//! let mut client = Client::builder(&token, Default::default())
+//! let mut client = Client::builder(&token, GatewayIntents::default())
 //!     .event_handler(Handler)
 //!     .framework(framework)
 //!     .await?;

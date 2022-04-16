@@ -76,7 +76,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// Responding to mentions and setting a command prefix of `"~"`:
 ///
 /// ```rust,no_run
-/// # use serenity::prelude::EventHandler;
+/// # use serenity::prelude::*;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {}
@@ -90,7 +90,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// let framework =
 ///     StandardFramework::new().configure(|c| c.on_mention(Some(UserId(5))).prefix("~"));
 ///
-/// let mut client = Client::builder(&token, Default::default())
+/// let mut client = Client::builder(&token, GatewayIntents::default())
 ///     .event_handler(Handler)
 ///     .framework(framework)
 ///     .await?;
