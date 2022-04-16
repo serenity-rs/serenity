@@ -42,7 +42,7 @@ A basic ping-pong bot looks like:
 use std::env;
 
 use serenity::async_trait;
-use serenity::client::{Client, Context, EventHandler};
+use serenity::prelude::*;
 use serenity::model::channel::Message;
 use serenity::framework::standard::macros::{command, group};
 use serenity::framework::standard::{StandardFramework, CommandResult};

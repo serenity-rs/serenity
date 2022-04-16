@@ -30,4 +30,4 @@ pub use crate::gateway::GatewayError;
 pub use crate::http::HttpError;
 pub use crate::model::misc::Mentionable;
 #[cfg(feature = "model")]
-pub use crate::model::ModelError;
+pub use crate::model::{gateway::GatewayIntents, ModelError};
