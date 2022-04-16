@@ -70,7 +70,10 @@
 //!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
 //!     .group(&GENERAL_GROUP);
 //!
-//! let mut client = Client::builder(&token).event_handler(Handler).framework(framework).await?;
+//! let mut client = Client::builder(&token, Default::default())
+//!     .event_handler(Handler)
+//!     .framework(framework)
+//!     .await?;
 //! #     Ok(())
 //! # }
 //! ```
