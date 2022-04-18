@@ -527,79 +527,10 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-<span id="531">531</span>
-<span id="532">532</span>
-<span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
-<span id="567">567</span>
-<span id="568">568</span>
-<span id="569">569</span>
-<span id="570">570</span>
-<span id="571">571</span>
-<span id="572">572</span>
-<span id="573">573</span>
-<span id="574">574</span>
-<span id="575">575</span>
-<span id="576">576</span>
-<span id="577">577</span>
-<span id="578">578</span>
-<span id="579">579</span>
-<span id="580">580</span>
-<span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cache::Cache</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel::Channel</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id::GuildId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::mention::Mention</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
 
 <span class="doccomment">/// Struct that allows to alter [`content_safe`]&#39;s behaviour.</span>
@@ -735,25 +666,7 @@
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ContentSafeOptions</span>,
     <span class="ident">users</span>: <span class="kw-2">&amp;</span>[<span class="ident">User</span>],
 ) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>().<span class="ident">to_string</span>();
-
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_role</span> {
-        <span class="ident">clean_roles</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;mut</span> <span class="ident">content</span>);
-    }
-
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_channel</span> {
-        <span class="ident">clean_channels</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="kw-2">&amp;mut</span> <span class="ident">content</span>);
-    }
-
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_user</span> {
-        <span class="ident">clean_users</span>(
-            <span class="kw-2">&amp;</span><span class="ident">cache</span>,
-            <span class="kw-2">&amp;mut</span> <span class="ident">content</span>,
-            <span class="ident">options</span>.<span class="ident">show_discriminator</span>,
-            <span class="ident">options</span>.<span class="ident">guild_reference</span>,
-            <span class="ident">users</span>,
-        );
-    }
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">clean_mentions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">s</span>, <span class="ident">options</span>, <span class="ident">users</span>);
 
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">clean_here</span> {
         <span class="ident">content</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">replace</span>(<span class="string">&quot;@here&quot;</span>, <span class="string">&quot;@\u{200B}here&quot;</span>);
@@ -766,160 +679,108 @@
     <span class="ident">content</span>
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">clean_roles</span>(<span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">progress</span> <span class="op">=</span> <span class="number">0</span>;
-
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">mention_start</span>) <span class="op">=</span> <span class="ident">s</span>[<span class="ident">progress</span>..].<span class="ident">find</span>(<span class="string">&quot;&lt;@&amp;&quot;</span>) {
-        <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="ident">progress</span>;
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">mention_end</span>) <span class="op">=</span> <span class="ident">s</span>[<span class="ident">mention_start</span>..].<span class="ident">find</span>(<span class="string">&#39;&gt;&#39;</span>) {
-            <span class="ident">mention_end</span> <span class="op">+</span><span class="op">=</span> <span class="ident">mention_start</span>;
-            <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;&lt;@&amp;&quot;</span>.<span class="ident">len</span>();
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">RoleId::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]) {
-                <span class="kw">let</span> <span class="ident">to_replace</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;&lt;@&amp;{}&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]);
-
-                <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
-                    <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">role</span>.<span class="ident">name</span>))
-                } <span class="kw">else</span> {
-                    <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="string">&quot;@deleted-role&quot;</span>)
-                };
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>].<span class="ident">to_string</span>();
-
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">id</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">id</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">all</span>(<span class="ident">u8::is_ascii_digit</span>) {
-                    <span class="kw">let</span> <span class="ident">to_replace</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;&lt;@&amp;{}&gt;&quot;</span>, <span class="ident">id</span>);
-
-                    <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="string">&quot;@deleted-role&quot;</span>);
-                } <span class="kw">else</span> {
-                    <span class="ident">progress</span> <span class="op">=</span> <span class="ident">mention_end</span>;
-                }
-            }
-        } <span class="kw">else</span> {
-            <span class="kw">break</span>;
-        }
-    }
-}
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">clean_channels</span>(<span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">progress</span> <span class="op">=</span> <span class="number">0</span>;
-
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">mention_start</span>) <span class="op">=</span> <span class="ident">s</span>[<span class="ident">progress</span>..].<span class="ident">find</span>(<span class="string">&quot;&lt;#&quot;</span>) {
-        <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="ident">progress</span>;
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">mention_end</span>) <span class="op">=</span> <span class="ident">s</span>[<span class="ident">mention_start</span>..].<span class="ident">find</span>(<span class="string">&#39;&gt;&#39;</span>) {
-            <span class="ident">mention_end</span> <span class="op">+</span><span class="op">=</span> <span class="ident">mention_start</span>;
-            <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;&lt;#&quot;</span>.<span class="ident">len</span>();
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">ChannelId::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]) {
-                <span class="kw">let</span> <span class="ident">to_replace</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;&lt;#{}&gt;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]);
-
-                <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_channel_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
-                    <span class="kw">let</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;#{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">name</span>);
-                    <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="kw-2">&amp;</span><span class="ident">replacement</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="string">&quot;#deleted-channel&quot;</span>)
-                };
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>].<span class="ident">to_string</span>();
-
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">id</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">id</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">all</span>(<span class="ident">u8::is_ascii_digit</span>) {
-                    <span class="kw">let</span> <span class="ident">to_replace</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;&lt;#{}&gt;&quot;</span>, <span class="ident">id</span>);
-
-                    <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="string">&quot;#deleted-channel&quot;</span>);
-                } <span class="kw">else</span> {
-                    <span class="ident">progress</span> <span class="op">=</span> <span class="ident">mention_end</span>;
-                }
-            }
-        } <span class="kw">else</span> {
-            <span class="kw">break</span>;
-        }
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">format_user</span>(<span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>, <span class="ident">show_discriminator</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">if</span> <span class="ident">show_discriminator</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;@{}#{:04}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>, <span class="ident">user</span>.<span class="ident">discriminator</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>)
-    }
-}
-
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">clean_users</span>(
-    <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
-    <span class="ident">s</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
-    <span class="ident">show_discriminator</span>: <span class="ident">bool</span>,
-    <span class="ident">guild</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+<span class="kw">fn</span> <span class="ident">clean_mentions</span>(
+    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
+    <span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ContentSafeOptions</span>,
     <span class="ident">users</span>: <span class="kw-2">&amp;</span>[<span class="ident">User</span>],
-) {
-    <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>();
+) -&gt; <span class="ident">String</span> {
+    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">s</span>.<span class="ident">len</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">brackets</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">match_indices</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&lt;&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;&gt;&#39;</span>).<span class="ident">peekable</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">progress</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">idx1</span>, <span class="ident">b1</span>)) <span class="op">=</span> <span class="ident">brackets</span>.<span class="ident">next</span>() {
+        <span class="comment">// Find inner-most pairs of angle brackets</span>
+        <span class="kw">if</span> <span class="ident">b1</span> <span class="op">==</span> <span class="string">&quot;&lt;&quot;</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">idx2</span>, <span class="ident">b2</span>)) <span class="op">=</span> <span class="ident">brackets</span>.<span class="ident">peek</span>() {
+                <span class="kw">if</span> <span class="ident">b2</span> <span class="op">==</span> <span class="string">&quot;&gt;&quot;</span> {
+                    <span class="ident">content</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">progress</span>..<span class="ident">idx1</span>]);
+                    <span class="kw">let</span> <span class="ident">mention_str</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">idx1</span>..<span class="op">=</span><span class="ident">idx2</span>];
 
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">mention_start</span>) <span class="op">=</span> <span class="ident">s</span>[<span class="ident">progress</span>..].<span class="ident">find</span>(<span class="string">&quot;&lt;@&quot;</span>) {
-        <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="ident">progress</span>;
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">mention_end</span>) <span class="op">=</span> <span class="ident">s</span>[<span class="ident">mention_start</span>..].<span class="ident">find</span>(<span class="string">&#39;&gt;&#39;</span>) {
-            <span class="ident">mention_end</span> <span class="op">+</span><span class="op">=</span> <span class="ident">mention_start</span>;
-            <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;&lt;@&quot;</span>.<span class="ident">len</span>();
-
-            <span class="kw">let</span> <span class="ident">has_exclamation</span> <span class="op">=</span>
-                <span class="kw">if</span> <span class="ident">s</span>[<span class="ident">mention_start</span>..].<span class="ident">as_bytes</span>().<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">==</span> <span class="string">b&#39;!&#39;</span>) {
-                    <span class="ident">mention_start</span> <span class="op">+</span><span class="op">=</span> <span class="string">&quot;!&quot;</span>.<span class="ident">len</span>();
-
-                    <span class="bool-val">true</span>
-                } <span class="kw">else</span> {
-                    <span class="bool-val">false</span>
-                };
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">UserId::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]) {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">guild</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
-                            <span class="ident">replacement</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="ident">show_discriminator</span> {
-                                <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">member</span>.<span class="ident">distinct</span>())
+                    <span class="comment">// Don&#39;t waste time parsing if we&#39;re not going to clean the mention anyway</span>
+                    <span class="comment">// NOTE: Emoji mentions aren&#39;t cleaned.</span>
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">mention_str</span>.<span class="ident">chars</span>();
+                    <span class="ident">chars</span>.<span class="ident">next</span>();
+                    <span class="kw">let</span> <span class="ident">should_parse</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
+                        <span class="prelude-val">Some</span>(<span class="string">&#39;#&#39;</span>) =&gt; <span class="ident">options</span>.<span class="ident">clean_channel</span>,
+                        <span class="prelude-val">Some</span>(<span class="string">&#39;@&#39;</span>) =&gt; {
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="string">&#39;&amp;&#39;</span>) <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
+                                <span class="ident">options</span>.<span class="ident">clean_role</span>
                             } <span class="kw">else</span> {
-                                <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">member</span>.<span class="ident">display_name</span>())
-                            });
+                                <span class="ident">options</span>.<span class="ident">clean_user</span>
+                            }
+                        },
+                        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+                    };
+
+                    <span class="comment">// I wish let_chains were stabilized :(</span>
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cleaned</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    <span class="kw">if</span> <span class="ident">should_parse</span> {
+                        <span class="comment">// NOTE: numeric strings that are too large to fit into u64 will not parse</span>
+                        <span class="comment">// correctly and will be left unchanged.</span>
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">mention</span>) <span class="op">=</span> <span class="ident">mention_str</span>.<span class="ident">parse</span>() {
+                            <span class="ident">content</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">clean_mention</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">mention</span>, <span class="ident">options</span>, <span class="ident">users</span>));
+                            <span class="ident">cleaned</span> <span class="op">=</span> <span class="bool-val">true</span>;
                         }
                     }
-                }
-
-                <span class="kw">let</span> <span class="ident">replacement</span> <span class="op">=</span> <span class="ident">replacement</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">cache</span>.<span class="ident">user</span>(<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">format_user</span>(<span class="kw-2">&amp;</span><span class="ident">u</span>, <span class="ident">show_discriminator</span>)).<span class="ident">unwrap_or_else</span>(
-                        <span class="op">|</span><span class="op">|</span> {
-                            <span class="ident">users</span>
-                                .<span class="ident">iter</span>()
-                                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">id</span>)
-                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">format_user</span>(<span class="ident">u</span>, <span class="ident">show_discriminator</span>))
-                                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;@invalid-user&quot;</span>.<span class="ident">to_string</span>())
-                        },
-                    )
-                });
-
-                <span class="kw">let</span> <span class="ident">code_start</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_exclamation</span> { <span class="string">&quot;&lt;@!&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&lt;@&quot;</span> };
-                <span class="kw">let</span> <span class="ident">to_replace</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&gt;&quot;</span>, <span class="ident">code_start</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>]);
-
-                <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="kw-2">&amp;</span><span class="ident">replacement</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">mention_start</span>..<span class="ident">mention_end</span>].<span class="ident">to_string</span>();
-
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">id</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">id</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">all</span>(<span class="ident">u8::is_ascii_digit</span>) {
-                    <span class="kw">let</span> <span class="ident">code_start</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_exclamation</span> { <span class="string">&quot;&lt;@!&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&lt;@&quot;</span> };
-                    <span class="kw">let</span> <span class="ident">to_replace</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&gt;&quot;</span>, <span class="ident">code_start</span>, <span class="ident">id</span>);
-
-                    <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">to_replace</span>, <span class="string">&quot;@invalid-user&quot;</span>);
-                } <span class="kw">else</span> {
-                    <span class="ident">progress</span> <span class="op">=</span> <span class="ident">mention_end</span>;
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">cleaned</span> {
+                        <span class="ident">content</span>.<span class="ident">push_str</span>(<span class="ident">mention_str</span>);
+                    }
+                    <span class="ident">progress</span> <span class="op">=</span> <span class="ident">idx2</span> <span class="op">+</span> <span class="number">1</span>;
                 }
             }
-        } <span class="kw">else</span> {
-            <span class="kw">break</span>;
         }
+    }
+    <span class="ident">content</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">progress</span>..]);
+    <span class="ident">content</span>
+}
+
+<span class="kw">fn</span> <span class="ident">clean_mention</span>(
+    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
+    <span class="ident">mention</span>: <span class="ident">Mention</span>,
+    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">ContentSafeOptions</span>,
+    <span class="ident">users</span>: <span class="kw-2">&amp;</span>[<span class="ident">User</span>],
+) -&gt; <span class="ident">String</span> {
+    <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>();
+    <span class="kw">match</span> <span class="ident">mention</span> {
+        <span class="ident">Mention::Channel</span>(<span class="ident">id</span>) =&gt; {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Channel::Guild</span>(<span class="ident">channel</span>)) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">to_channel_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>) {
+                <span class="macro">format!</span>(<span class="string">&quot;#{}&quot;</span>, <span class="ident">channel</span>.<span class="ident">name</span>)
+            } <span class="kw">else</span> {
+                <span class="string">&quot;#deleted-channel&quot;</span>.<span class="ident">to_string</span>()
+            }
+        },
+        <span class="ident">Mention::Role</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span>
+            .<span class="ident">to_role_cached</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>)
+            .<span class="ident">map_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;@deleted-role&quot;</span>.<span class="ident">to_string</span>(), <span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">role</span>.<span class="ident">name</span>)),
+        <span class="ident">Mention::User</span>(<span class="ident">id</span>) =&gt; {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">guild_reference</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
+                        <span class="kw">return</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">show_discriminator</span> {
+                            <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">member</span>.<span class="ident">distinct</span>())
+                        } <span class="kw">else</span> {
+                            <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">member</span>.<span class="ident">display_name</span>())
+                        };
+                    }
+                }
+            }
+
+            <span class="kw">let</span> <span class="ident">get_username</span> <span class="op">=</span> <span class="op">|</span><span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span><span class="op">|</span> {
+                <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">show_discriminator</span> {
+                    <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">user</span>.<span class="ident">tag</span>())
+                } <span class="kw">else</span> {
+                    <span class="macro">format!</span>(<span class="string">&quot;@{}&quot;</span>, <span class="ident">user</span>.<span class="ident">name</span>)
+                }
+            };
+            <span class="ident">cache</span>
+                .<span class="ident">user</span>(<span class="ident">id</span>)
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">map</span>(<span class="ident">get_username</span>)
+                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">users</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">id</span>).<span class="ident">map</span>(<span class="ident">get_username</span>))
+                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;@invalid-user&quot;</span>.<span class="ident">to_string</span>())
+        },
+        <span class="ident">Mention::Emoji</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
@@ -932,6 +793,7 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::channel</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::guild</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>, <span class="ident">UserId</span>};
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model::user::User</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model</span>::{<span class="ident">Permissions</span>, <span class="ident">Timestamp</span>};
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::Colour</span>;
@@ -1077,7 +939,7 @@
         &lt;@123invalid&gt; &lt;@&gt; &lt;@ &quot;</span>;
 
         <span class="kw">let</span> <span class="ident">without_user_mentions</span> <span class="op">=</span> <span class="string">&quot;@Crab#0000 @invalid-user @invalid-user @invalid-user \
-        @invalid-user @invalid-user @invalid-user &lt;@!invalid&gt; \
+        &lt;@!123123123123123123123&gt; @invalid-user @invalid-user &lt;@!invalid&gt; \
         &lt;@invalid&gt; &lt;@日本語 한국어$§)[/__#\\(/&amp;2032$§#&gt; \
         &lt;@!i)/==(&lt;&lt;&gt;z/9080)&gt; &lt;@!1231invalid&gt; &lt;@invalid123&gt; \
         &lt;@123invalid&gt; &lt;@&gt; &lt;@ &quot;</span>;
@@ -1150,10 +1012,12 @@
 
         <span class="comment">// Role mentions</span>
         <span class="kw">let</span> <span class="ident">with_role_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;@&amp;&gt; @deleted-role &lt;@&amp;9829&gt; \
-        &lt;@&amp;333333333333333333&gt; &lt;@&amp;000000000000000000&gt;&quot;</span>;
+        &lt;@&amp;333333333333333333&gt; &lt;@&amp;000000000000000000&gt; \
+        &lt;@&amp;111111111111111111111111111111&gt; &lt;@&amp;&lt;@&amp;1234&gt;&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">without_role_mentions</span> <span class="op">=</span> <span class="string">&quot;&lt;@&amp;&gt; @deleted-role @deleted-role \
-        @ferris-club-member @deleted-role&quot;</span>;
+        @ferris-club-member @deleted-role \
+        &lt;@&amp;111111111111111111111111111111&gt; &lt;@&amp;@deleted-role&quot;</span>;
 
         <span class="macro">assert_eq!</span>(<span class="ident">without_role_mentions</span>, <span class="ident">content_safe</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">with_role_mentions</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="kw-2">&amp;</span>[]));
 
